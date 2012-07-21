@@ -176,13 +176,6 @@ int libewf_header_values_convert_utf8_header_string_to_header(
      int codepage,
      libcerror_error_t **error );
 
-int libewf_header_values_convert_utf8_header_string_to_header2(
-     const uint8_t *header_string,
-     size_t header_string_size,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error );
-
 int libewf_header_values_generate_utf8_header_string(
      libfvalue_table_t *header_values,
      uint8_t header_string_type,
@@ -239,8 +232,9 @@ int libewf_header_values_generate_header_encase4(
      int codepage,
      libcerror_error_t **error );
 
-int libewf_header_values_generate_header_linen5(
+int libewf_header_values_generate_header_linen(
      libfvalue_table_t *header_values,
+     uint8_t format,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
@@ -248,33 +242,9 @@ int libewf_header_values_generate_header_linen5(
      int codepage,
      libcerror_error_t **error );
 
-int libewf_header_values_generate_header_linen6(
+int libewf_header_values_generate_header2(
      libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header,
-     size_t *header_size,
-     int codepage,
-     libcerror_error_t **error );
-
-int libewf_header_values_generate_header2_encase4(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error );
-
-int libewf_header_values_generate_header2_encase5(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error );
-
-int libewf_header_values_generate_header2_encase6(
-     libfvalue_table_t *header_values,
+     uint8_t format,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header2,
@@ -320,14 +290,6 @@ int libewf_header_values_generate_header_ewfx(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libcerror_error_t **error );
-
-int libewf_header_values_generate_header2_ewfx(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

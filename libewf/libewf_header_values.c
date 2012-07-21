@@ -2637,124 +2637,6 @@ on_error:
 	return( -1 );
 }
 
-/* Converts an UTF-8 encoded header string into a header2
- * Sets the header and header size
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_convert_utf8_header_string_to_header2(
-     const uint8_t *header_string,
-     size_t header_string_size,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_header_values_convert_utf8_header_string_to_header2";
-
-	if( header_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header string.",
-		 function );
-
-		return( -1 );
-	}
-	if( header2 == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header2.",
-		 function );
-
-		return( -1 );
-	}
-	if( *header2 != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: header2 already created.",
-		 function );
-
-		return( -1 );
-	}
-	if( header2_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header2 size.",
-		 function );
-
-		return( -1 );
-	}
-	if( libuna_utf16_stream_size_from_utf8(
-	     header_string,
-	     header_string_size,
-	     header2_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine header2 size.",
-		 function );
-
-		goto on_error;
-	}
-	*header2 = (uint8_t *) memory_allocate(
-	                        sizeof( uint8_t ) * *header2_size );
-
-	if( *header2 == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create header2.",
-		 function );
-
-		goto on_error;
-	}
-	if( libuna_utf16_stream_copy_from_utf8(
-	     *header2,
-	     *header2_size,
-	     LIBUNA_ENDIAN_LITTLE,
-	     header_string,
-	     header_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set header2.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( *header2 != NULL )
-	{
-		memory_free(
-		 header2 );
-
-		*header2 = NULL;
-	}
-	*header2_size = 0;
-
-	return( -1 );
-}
-
 /* Generate an UTF-8 encoded header string
  * Sets header string and header string size
  * Returns 1 if successful or -1 on error
@@ -2777,11 +2659,13 @@ int libewf_header_values_generate_utf8_header_string(
 	libfvalue_value_t *compression_level_header_value        = NULL;
 	libfvalue_value_t *device_label_header_value             = NULL;
 	libfvalue_value_t *description_header_value              = NULL;
-	libfvalue_value_t *examiner_name_header_value            = NULL;
 	libfvalue_value_t *evidence_number_header_value          = NULL;
+	libfvalue_value_t *examiner_name_header_value            = NULL;
+	libfvalue_value_t *extents_header_value                  = NULL;
 	libfvalue_value_t *model_header_value                    = NULL;
 	libfvalue_value_t *notes_header_value                    = NULL;
 	libfvalue_value_t *password_header_value                 = NULL;
+	libfvalue_value_t *process_identifier_header_value       = NULL;
 	libfvalue_value_t *serial_number_header_value            = NULL;
 	libfvalue_value_t *system_date_header_value              = NULL;
 	libfvalue_value_t *unknown_dc_header_value               = NULL;
@@ -2801,12 +2685,14 @@ int libewf_header_values_generate_utf8_header_string(
 	size_t device_label_string_length                        = 0;
 	size_t evidence_number_string_length                     = 0;
 	size_t examiner_name_string_length                       = 0;
+	size_t extents_string_length                             = 0;
 	size_t generated_acquiry_date_size                       = 0;
 	size_t generated_system_date_size                        = 0;
 	size_t header_string_index                               = 0;
 	size_t model_string_length                               = 0;
 	size_t notes_string_length                               = 0;
 	size_t password_string_length                            = 0;
+	size_t process_identifier_string_length                  = 0;
 	size_t srce_section_string_length                        = 0;
 	size_t sub_section_string_length                         = 0;
 	size_t serial_number_string_length                       = 0;
@@ -2885,9 +2771,9 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: header string already created.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: header string already set.",
 		 function );
 
 		return( -1 );
@@ -3161,11 +3047,26 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
-/* TODO pid
 	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
 	{
+		if( libfvalue_table_get_value_by_identifier(
+		     header_values,
+		     (uint8_t *) "process_identifier",
+		     19,
+		     &process_identifier_header_value,
+		     0,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: process_identifier.",
+			 function );
+
+			goto on_error;
+		}
 	}
-*/
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
@@ -3188,11 +3089,26 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
-/* TODO ext
 	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
 	{
+		if( libfvalue_table_get_value_by_identifier(
+		     header_values,
+		     (uint8_t *) "extents",
+		     8,
+		     &extents_header_value,
+		     0,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve header value: extents.",
+			 function );
+
+			goto on_error;
+		}
 	}
-*/
 	/* Determine the header string size
 	 */
 	*header_string_size = 0;
@@ -3775,6 +3691,32 @@ int libewf_header_values_generate_utf8_header_string(
 				*header_string_size += device_label_string_length;
 			}
 		}
+		if( process_identifier_header_value != NULL )
+		{
+			result = libfvalue_value_get_utf8_string_size(
+				  process_identifier_header_value,
+				  0,
+				  &process_identifier_string_length,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve string size of header value: process_identifier",
+				 function );
+
+				goto on_error;
+			}
+			if( process_identifier_string_length > 0 )
+			{
+				process_identifier_string_length -= 1;
+
+				*header_string_size += process_identifier_string_length;
+			}
+		}
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
@@ -3804,6 +3746,35 @@ int libewf_header_values_generate_utf8_header_string(
 				unknown_dc_string_length -= 1;
 
 				*header_string_size += unknown_dc_string_length;
+			}
+		}
+	}
+	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	{
+		if( extents_header_value != NULL )
+		{
+			result = libfvalue_value_get_utf8_string_size(
+				  extents_header_value,
+				  0,
+				  &extents_string_length,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve string size of header value: extents",
+				 function );
+
+				goto on_error;
+			}
+			if( extents_string_length > 0 )
+			{
+				extents_string_length -= 1;
+
+				*header_string_size += extents_string_length;
 			}
 		}
 	}
@@ -4503,16 +4474,15 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 		header_string_index += compression_level_string_length;
 	}
-/* TODO pid
 	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
-		if( ( unknown_dc_header_value != NULL )
-		 && ( unknown_dc_string_length > 0 ) )
+		if( ( process_identifier_header_value != NULL )
+		 && ( process_identifier_string_length > 0 ) )
 		{
 			result = libfvalue_value_copy_to_utf8_string(
-				  unknown_dc_header_value,
+				  process_identifier_header_value,
 				  0,
 				  &( ( *header_string )[ header_string_index ] ),
 			          *header_string_size - header_string_index,
@@ -4524,15 +4494,14 @@ int libewf_header_values_generate_utf8_header_string(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy string of header value: unknown_dc.",
+				 "%s: unable to copy string of header value: process_identifier.",
 				 function );
 
 				goto on_error;
 			}
-			header_string_index += unknown_dc_string_length;
+			header_string_index += process_identifier_string_length;
 		}
 	}
-*/
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
@@ -4563,16 +4532,15 @@ int libewf_header_values_generate_utf8_header_string(
 			header_string_index += unknown_dc_string_length;
 		}
 	}
-/* TODO ext
 	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
 	{
 		( *header_string )[ header_string_index++ ] = (uint8_t) '\t';
 
-		if( ( unknown_dc_header_value != NULL )
-		 && ( unknown_dc_string_length > 0 ) )
+		if( ( extents_header_value != NULL )
+		 && ( extents_string_length > 0 ) )
 		{
 			result = libfvalue_value_copy_to_utf8_string(
-				  unknown_dc_header_value,
+				  extents_header_value,
 				  0,
 				  &( ( *header_string )[ header_string_index ] ),
 			          *header_string_size - header_string_index,
@@ -4584,15 +4552,14 @@ int libewf_header_values_generate_utf8_header_string(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy string of header value: unknown_dc.",
+				 "%s: unable to copy string of header value: extents.",
 				 function );
 
 				goto on_error;
 			}
-			header_string_index += unknown_dc_string_length;
+			header_string_index += extents_string_length;
 		}
 	}
-*/
 	( *header_string )[ header_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
@@ -5014,12 +4981,13 @@ on_error:
 	return( -1 );
 }
 
-/* Generate a linen5 header
+/* Generate a linen header
  * Sets header and header length
  * Returns 1 if successful or -1 on error
  */
-int libewf_header_values_generate_header_linen5(
+int libewf_header_values_generate_header_linen(
      libfvalue_table_t *header_values,
+     uint8_t format,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
@@ -5027,13 +4995,38 @@ int libewf_header_values_generate_header_linen5(
      int codepage,
      libcerror_error_t **error )
 {
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header_linen5";
-	size_t header_string_size = 0;
+	uint8_t *header_string     = NULL;
+	static char *function      = "libewf_header_values_generate_header_linen";
+	size_t header_string_size  = 0;
+	uint8_t header_string_type = 0;
 
+	switch( format )
+	{
+		case LIBEWF_FORMAT_LINEN5:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_7;
+			break;
+
+		case LIBEWF_FORMAT_LINEN6:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_6;
+			break;
+
+		case LIBEWF_FORMAT_LINEN7:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_8;
+			break;
+
+		default:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported format.",
+			 function );
+
+			break;
+	}
 	if( libewf_header_values_generate_utf8_header_string(
 	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_7,
+	     header_string_type,
 	     (uint8_t *) "\n",
 	     1,
 	     timestamp,
@@ -5082,93 +5075,89 @@ on_error:
 	return( -1 );
 }
 
-/* Generate a linen6 header
- * Sets header and header length
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_header_linen6(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header,
-     size_t *header_size,
-     int codepage,
-     libcerror_error_t **error )
-{
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header_linen6";
-	size_t header_string_size = 0;
-
-	if( libewf_header_values_generate_utf8_header_string(
-	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_6,
-	     (uint8_t *) "\n",
-	     1,
-	     timestamp,
-	     compression_level,
-	     &header_string,
-	     &header_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_values_convert_utf8_header_string_to_header(
-	     header_string,
-	     header_string_size,
-	     header,
-	     header_size,
-	     codepage,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 header_string );
-
-	return( 1 );
-
-on_error:
-	if( header_string != NULL )
-	{
-		memory_free(
-		 header_string );
-	}
-	return( -1 );
-}
-
-/* Generate an EnCase4 header2
+/* Generate a header2
  * Sets header2 and header2 size
  * Returns 1 if successful or -1 on error
  */
-int libewf_header_values_generate_header2_encase4(
+int libewf_header_values_generate_header2(
      libfvalue_table_t *header_values,
+     uint8_t format,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header2,
      size_t *header2_size,
      libcerror_error_t **error )
 {
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header2_encase4";
-	size_t header_string_size = 0;
+	uint8_t *header_string     = NULL;
+	static char *function      = "libewf_header_values_generate_header2";
+	size_t header_string_size  = 0;
+	uint8_t header_string_type = 0;
 
+	if( header2 == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header2.",
+		 function );
+
+		return( -1 );
+	}
+	if( *header2 != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: header2 already created.",
+		 function );
+
+		return( -1 );
+	}
+	if( header2_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header2 size.",
+		 function );
+
+		return( -1 );
+	}
+	switch( format )
+	{
+		case LIBEWF_FORMAT_ENCASE4:
+		case LIBEWF_FORMAT_EWFX:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_4;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE5:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_5;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE6:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_6;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE7:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_8;
+			break;
+
+		default:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported format.",
+			 function );
+
+			break;
+	}
 	if( libewf_header_values_generate_utf8_header_string(
 	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_4,
+	     header_string_type,
 	     (uint8_t *) "\n",
 	     1,
 	     timestamp,
@@ -5186,18 +5175,48 @@ int libewf_header_values_generate_header2_encase4(
 
 		goto on_error;
 	}
-	if( libewf_header_values_convert_utf8_header_string_to_header2(
+	if( libuna_utf16_stream_size_from_utf8(
 	     header_string,
 	     header_string_size,
-	     header2,
 	     header2_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine header2 size.",
+		 function );
+
+		goto on_error;
+	}
+	*header2 = (uint8_t *) memory_allocate(
+	                        sizeof( uint8_t ) * *header2_size );
+
+	if( *header2 == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header2.",
+		 function );
+
+		goto on_error;
+	}
+	if( libuna_utf16_stream_copy_from_utf8(
+	     *header2,
+	     *header2_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     header_string,
+	     header_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set header2.",
 		 function );
 
 		goto on_error;
@@ -5213,138 +5232,15 @@ on_error:
 		memory_free(
 		 header_string );
 	}
-	return( -1 );
-}
-
-/* Generate an EnCase5 header2
- * Sets header2 and header2 size
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_header2_encase5(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error )
-{
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header2_encase5";
-	size_t header_string_size = 0;
-
-	if( libewf_header_values_generate_utf8_header_string(
-	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_5,
-	     (uint8_t *) "\n",
-	     1,
-	     timestamp,
-	     compression_level,
-	     &header_string,
-	     &header_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_values_convert_utf8_header_string_to_header2(
-	     header_string,
-	     header_string_size,
-	     header2,
-	     header2_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header2.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 header_string );
-
-	return( 1 );
-
-on_error:
-	if( header_string != NULL )
+	if( *header2 != NULL )
 	{
 		memory_free(
-		 header_string );
+		 header2 );
+
+		*header2 = NULL;
 	}
-	return( -1 );
-}
+	*header2_size = 0;
 
-/* Generate an EnCase6 header2
- * Sets header2 and header2 size
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_header2_encase6(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error )
-{
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header2_encase6";
-	size_t header_string_size = 0;
-
-	if( libewf_header_values_generate_utf8_header_string(
-	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_6,
-	     (uint8_t *) "\n",
-	     1,
-	     timestamp,
-	     compression_level,
-	     &header_string,
-	     &header_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_values_convert_utf8_header_string_to_header2(
-	     header_string,
-	     header_string_size,
-	     header2,
-	     header2_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header2.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 header_string );
-
-	return( 1 );
-
-on_error:
-	if( header_string != NULL )
-	{
-		memory_free(
-		 header_string );
-	}
 	return( -1 );
 }
 
@@ -6940,72 +6836,6 @@ int libewf_header_values_generate_header_ewfx(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 header_string );
-
-	return( 1 );
-
-on_error:
-	if( header_string != NULL )
-	{
-		memory_free(
-		 header_string );
-	}
-	return( -1 );
-}
-
-/* Generate an EWFX header2
- * Sets header2 and the header2 size
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_generate_header2_ewfx(
-     libfvalue_table_t *header_values,
-     time_t timestamp,
-     int8_t compression_level,
-     uint8_t **header2,
-     size_t *header2_size,
-     libcerror_error_t **error )
-{
-	uint8_t *header_string    = NULL;
-	static char *function     = "libewf_header_values_generate_header2_ewfx";
-	size_t header_string_size = 0;
-
-	if( libewf_header_values_generate_utf8_header_string(
-	     header_values,
-	     LIBEWF_HEADER_STRING_TYPE_4,
-	     (uint8_t *) "\n",
-	     1,
-	     timestamp,
-	     compression_level,
-	     &header_string,
-	     &header_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_values_convert_utf8_header_string_to_header2(
-	     header_string,
-	     header_string_size,
-	     header2,
-	     header2_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header2.",
 		 function );
 
 		goto on_error;

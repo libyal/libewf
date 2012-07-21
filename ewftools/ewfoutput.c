@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -30,8 +31,6 @@
 #if defined( HAVE_STRING_H ) || defined( WINAPI )
 #include <string.h>
 #endif
-
-#include <libewf/features.h>
 
 #if defined( HAVE_LOCAL_LIBBFIO )
 #include <libbfio_definitions.h>

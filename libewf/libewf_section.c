@@ -683,12 +683,62 @@ ssize_t libewf_section_descriptor_read(
 	}
 	if( format_version == 1 )
 	{
+		if( ( section->end_offset < file_offset )
+		 || ( section->end_offset > (off64_t) INT64_MAX ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section next offset value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( section->size != 0 )
+		 && ( ( section->size < (size64_t) sizeof( ewf_section_descriptor_v1_t ) )
+		  ||  ( section->size > (size64_t) INT64_MAX ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		section->start_offset = file_offset;
-		section->data_size    = section->size - sizeof( ewf_section_descriptor_v1_t );
+
+		/* Some versions of EWF1 do not set the section size
+		 * The next and done section, which point back to themselves, are not corrected
+		 */
+		if( ( section->size == 0 )
+		 && ( section->end_offset != section->start_offset ) )
+		{
+			section->size = section->end_offset - section->start_offset;
+		}
+		if( section->size != 0 )
+		{
+			section->data_size = section->size - sizeof( ewf_section_descriptor_v1_t );
+		}
 	}
 	else if( format_version == 2 )
 	{
-/* TODO check sanity of start offset and data size, padding size */
+		if( ( section->start_offset < 0 )
+		 || ( ( section->start_offset != 0 )
+		  &&  ( section->start_offset < (off64_t) sizeof( ewf_file_header_v2_t ) ) )
+		 || ( section->start_offset >= file_offset ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section previous offset value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		if( section->start_offset == 0 )
 		{
 			section->start_offset = sizeof( ewf_file_header_v2_t );
@@ -699,30 +749,29 @@ ssize_t libewf_section_descriptor_read(
 		}
 		section->end_offset = file_offset + sizeof( ewf_section_descriptor_v2_t );
 		section->size       = (size64_t) ( section->end_offset - section->start_offset );
-	}
-	if( ( section->size != 0 )
-	 && ( ( section->size < (size64_t) section_descriptor_data_size )
-	  ||  ( section->size > (size64_t) INT64_MAX ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds.",
-		 function );
 
-		return( -1 );
-	}
-	if( ( section->end_offset < file_offset )
-	 || ( section->end_offset > (off64_t) INT64_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section next offset value out of bounds.",
-		 function );
+		if( section->data_size > section->size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section data size value out of bounds.",
+			 function );
 
+			return( -1 );
+		}
+		if( section->padding_size > section->data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid section padding size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( format_version == 1 )
 	{
@@ -2461,8 +2510,10 @@ ssize_t libewf_section_data_write(
 
 		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 		{
 			byte_stream_copy_from_uint32_little_endian(
@@ -6804,15 +6855,27 @@ ssize_t libewf_section_table_header_read(
 			 "%s: table contains no entries.\n",
 			 function );
 		}
-		else if( ( ( format != LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES ) )
-		      || ( ( format == LIBEWF_FORMAT_ENCASE6 )
-		       &&  ( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 ) ) )
+/* TODO what about linen7 */
+		else if( ( format == LIBEWF_FORMAT_ENCASE6 )
+		      || ( format == LIBEWF_FORMAT_ENCASE7 ) )
 		{
-			libcnotify_printf(
-			 "%s: number of entries: %" PRIu32 " exceeds maximum.\n",
-			 function,
-			 number_of_entries );
+			if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 )
+			{
+				libcnotify_printf(
+				 "%s: number of entries: %" PRIu32 " exceeds maximum.\n",
+				 function,
+				 number_of_entries );
+			}
+		}
+		else
+		{
+			if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES )
+			{
+				libcnotify_printf(
+				 "%s: number of entries: %" PRIu32 " exceeds maximum.\n",
+				 function,
+				 number_of_entries );
+			}
 		}
 	}
 #endif
@@ -7705,8 +7768,10 @@ ssize_t libewf_section_volume_e01_write(
 
 	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
 	 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 	 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 )
 	 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 	{
 		volume->compression_level = (uint8_t) io_handle->compression_level;

@@ -1,4 +1,4 @@
-.Dd July 5, 2012
+.Dd July 21, 2012
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -80,7 +80,7 @@ the examiner name (default is examiner_name)
 .It Fl E Ar evidence_number
 the evidence number (default is evidence_number)
 .It Fl f Ar format
-the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6, ewfx.
+the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), encase7, linen5, linen6, linen7, ewfx.
 .It Fl g Ar number_of_sectors
 the number of sectors to be used as error granularity
 .It Fl h
@@ -108,7 +108,7 @@ resume acquiry at a safe point
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 and encase7 format and 1.9 GiB for other formats)
 .It Fl t Ar target
 the target file (without extension) to write to (default is image)
 .It Fl T Ar toc_file
@@ -134,7 +134,7 @@ should mimic EnCase it will zero all of sectors specified as error granularity.
 .Pp
 Empty block compression detects blocks of sectors with entirely the same byte data and compresses them using the default compression level.
 .Pp
-The encase6 format allows for segment files greater than 2 GiB (2147483648 bytes).
+The encase6 and encase7 format allows for segment files greater than 2 GiB (2147483648 bytes).
 .Sh ENVIRONMENT
 None
 .Sh FILES
@@ -150,7 +150,7 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20110801
+ewfacquire 20120721
 
 Device information:
 Bus type:
@@ -173,7 +173,7 @@ Notes: Just a floppy in my system
 Media type (fixed, removable, optical, memory) [fixed]: removable
 Media characteristics (logical, physical) [logical]:
 Use compression (none, empty-block, fast, best) [none]:
-Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase6]:
+Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase6]: encase5
 Start to acquire at offset (0 <= value <= 1474560) [0]:
 The number of bytes to acquire (0 <= value <= 1474560) [1474560]:
 Evidence segment file size in bytes (1.0 MiB <= value <= 1.9 GiB) [1.4 GiB]:
@@ -193,7 +193,7 @@ Notes:					Just a floppy in my system
 Media type:				removable
 Is physical:				no
 Compression used:			none
-EWF file format:			Encase 5
+EWF file format:			Encase 5 (.E01)
 Acquiry start offset:			0
 Number of bytes to acquire:		1.4 MiB (1474560 bytes)
 Evidence segment file size:		1.4 GiB (1572864000 bytes)

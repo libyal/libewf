@@ -2437,7 +2437,10 @@ int imaging_handle_prompt_for_maximum_segment_size(
 
 		return( -1 );
 	}
-	if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+/* TODO what about linen 7 */
+	if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE7 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_ENCASE7 ) )
 	{
 		maximum_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
        	}
@@ -3309,15 +3312,30 @@ int imaging_handle_set_maximum_segment_size(
 	}
         else if( result != 0 )
 	{
-		if( ( imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-		 || ( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-		 &&  ( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-		 || ( ( imaging_handle->ewf_format != LIBEWF_FORMAT_ENCASE6 )
-		 &&  ( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+		if( imaging_handle->maximum_segment_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+		{
+			result = 0;
+		}
+/* TODO what about linen 7 */
+		else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE7 )
+		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_ENCASE7 ) )
+		{
+			if( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT )
+			{
+				result = 0;
+			}
+		}
+		else
+		{
+			if( imaging_handle->maximum_segment_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT )
+			{
+				result = 0;
+			}
+		}
+		if( result == 0 )
 		{
 			imaging_handle->maximum_segment_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-			result = 0;
 		}
 	}
 	return( result );
@@ -4395,6 +4413,9 @@ int imaging_handle_set_output_values(
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
 	if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE7 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN7 )
+	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_ENCASE7 )
 	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 	{
 		guid_type = GUID_TYPE_RANDOM;
@@ -5428,77 +5449,97 @@ int imaging_handle_print_parameters(
 	 imaging_handle->notify_stream,
 	 "EWF file format:\t\t\t" );
 
-	if( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
+	switch( imaging_handle->ewf_format )
 	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "original EWF" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_SMART )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "SMART" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_FTK )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "FTK Imager" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE1 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 1" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE2 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 2" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE3 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 3" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE4 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 4" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 5" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "EnCase 6" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN5 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "linen 5" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_LINEN6 )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "linen 6" );
-	}
-	else if( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "extended EWF (ewfx)" );
+		case LIBEWF_FORMAT_EWF:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "original EWF (.e01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE1:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 1 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE2:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 2 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE3:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 3 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE4:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 4 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE5:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 5 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE6:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 6 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_ENCASE7:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 7 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_SMART:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "SMART (.s01)" );
+			break;
+
+		case LIBEWF_FORMAT_FTK:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "FTK Imager (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_LINEN5:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "linen 5 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_LINEN6:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "linen 6 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_LINEN7:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "linen 7 (.E01)" );
+			break;
+
+		case LIBEWF_FORMAT_V2_ENCASE7:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "EnCase 7 (.Ex01)" );
+			break;
+
+		case LIBEWF_FORMAT_EWFX:
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "extended EWF (ewfx) (.e01)" );
+			break;
 	}
 	fprintf(
 	 imaging_handle->notify_stream,

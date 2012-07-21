@@ -1,8 +1,5 @@
 TODO
-* update codegear files
-  - see build machine
-  - fix executables
-  - fix static build
+* work on deduplication support
 
 * internally mark Ex01 and Lx01 format and have ewfinfo print a string
   representation
@@ -384,6 +381,10 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+
+20120721
+* code clean up
+* fix in spec file
 
 20120719
 * worked on codegear files

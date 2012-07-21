@@ -113,6 +113,7 @@ int libewf_write_io_handle_initialize(
 
 		goto on_error;
 	}
+	( *write_io_handle )->section_descriptor_size     = sizeof( ewf_section_descriptor_v1_t );
 	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_TABLE_ENTRIES;
@@ -412,6 +413,14 @@ int libewf_write_io_handle_initialize_values(
 	{
 		segment_table->maximum_segment_size = write_io_handle->maximum_segment_file_size;
 	}
+	if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
+	{
+		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v1_t );
+	}
 	/* If no input write size was provided check if EWF file format allows for streaming
 	 */
 	if( media_values->media_size == 0 )
@@ -428,6 +437,7 @@ int libewf_write_io_handle_initialize_values(
 		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
 		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE6 )
 		 && ( io_handle->format != LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+		 && ( io_handle->format != LIBEWF_FORMAT_V2_ENCASE7 )
 		 && ( io_handle->format != LIBEWF_FORMAT_FTK_IMAGER )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
@@ -435,7 +445,7 @@ int libewf_write_io_handle_initialize_values(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: EWF file format does not allow for streaming write.",
+			 "%s: format does not allow for streaming write.",
 			 function );
 
 			goto on_error;
@@ -462,14 +472,17 @@ int libewf_write_io_handle_initialize_values(
 	}
 	if( media_values->media_size > LIBEWF_2_TIB )
 	{
+/* TODO what about linen 7 */
 		if( ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE7 )
+		 && ( io_handle->format != LIBEWF_FORMAT_V2_ENCASE7 )
 		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: EWF file format does not allow for a media size greater than 2 TiB.",
+			 "%s: format does not allow for a media size greater than 2 TiB.",
 			 function );
 
 			goto on_error;
@@ -482,7 +495,9 @@ int libewf_write_io_handle_initialize_values(
 	else
 	{
 		io_handle->force_compression = 0;
-
+	}
+	if( io_handle->force_compression == 0 )
+	{
 		if( write_io_handle->compressed_zero_byte_empty_block == NULL )
 		{
 			zero_byte_empty_block = (uint8_t *) memory_allocate(
@@ -1346,7 +1361,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
-		/* Leave space for the chunk section starts
+		/* Leave space for the chunk section descriptors
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
 		                                    * sizeof( ewf_section_descriptor_v1_t );
@@ -1358,7 +1373,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
-		/* Leave space for the chunk section starts and the offset table checksum
+		/* Leave space for the chunk section descriptors and the offset table checksum
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
 		                                    * ( sizeof( ewf_section_descriptor_v1_t ) + 4 );
@@ -1368,9 +1383,9 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		calculated_chunks_per_segment_file -= maximum_chunks_per_segment_file
 		                                    * sizeof( ewf_table_entry_v1_t );
 	}
-	else
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 	{
-		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
+		/* Leave space for the chunk, table and table2 section descriptors and the table and table2 offset table checksums
 		 */
 		calculated_chunks_per_segment_file -= required_chunk_sections
 		                                    * ( ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * 4 ) );
@@ -1379,6 +1394,10 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 		 */
 		calculated_chunks_per_segment_file -= 2 * maximum_chunks_per_segment_file
 		                                    * sizeof( ewf_table_entry_v1_t );
+	}
+	else
+	{
+/* TODO EWF2 */
 	}
 	/* Calculate the number of chunks within this segment file
 	 */
@@ -1799,6 +1818,7 @@ int libewf_write_io_handle_create_segment_file(
      uint8_t segment_file_type,
      uint32_t segment_number,
      uint32_t maximum_number_of_segments,
+     const uint8_t *set_identifier,
      libewf_segment_file_t **segment_file,
      int *segment_files_list_index,
      int *file_io_pool_entry,
@@ -2032,6 +2052,23 @@ int libewf_write_io_handle_create_segment_file(
 	( *segment_file )->segment_number = segment_number;
 	( *segment_file )->flags         |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 
+	if( io_handle->major_version == 2 )
+	{
+		if( memory_copy(
+		     ( *segment_file )->set_identifier,
+		     set_identifier,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy set identifier.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	if( libmfdata_file_list_append_file(
 	     segment_files_list,
 	     segment_files_list_index,
@@ -2381,6 +2418,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		     io_handle->segment_file_type,
 		     (uint32_t) ( segment_files_list_index + 1 ),
 		     write_io_handle->maximum_number_of_segments,
+		     media_values->set_identifier,
 		     &segment_file,
 		     &segment_files_list_index,
 		     &file_io_pool_entry,
@@ -2399,7 +2437,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		/* Reserve space for the done or next section
 		 */
 		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
-		                                             - sizeof( ewf_section_descriptor_v1_t );
+		                                             - write_io_handle->section_descriptor_size;
 
 		/* Write the start of the segment file
 		 * like the file header, the header, volume and/or data section, etc.
@@ -2529,21 +2567,25 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		if( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		{
-			/* Leave space for the chunk section start
+			/* Leave space for the chunk section descriptor
 			 */
 			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t );
 		}
 		else if( io_handle->format == LIBEWF_FORMAT_ENCASE1 )
 		{
-			/* Leave space for the chunk section start and the offset table checksum
+			/* Leave space for the chunk section descriptor and the offset table checksum
 			 */
 			write_io_handle->remaining_segment_file_size -= sizeof( ewf_section_descriptor_v1_t ) + 4;
 		}
-		else
+		else if( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 		{
-			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table checksums
+			/* Leave space for the chunk, table and table2 section descriptors and the table and table2 offset table checksums
 			 */
 			write_io_handle->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_descriptor_v1_t ) ) + ( 2 * 4 );
+		}
+		else
+		{
+/* TODO EWF2 */
 		}
 		if( libbfio_pool_get_offset(
 		     file_io_pool,
@@ -2662,7 +2704,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 			return( -1 );
 		}
-		/* Write the section start of the chunks section
+		/* Write the section descriptor of the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_section_start(
 		               segment_file,
@@ -2683,7 +2725,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write chunks section start.",
+			 "%s: unable to write chunks section descriptor.",
 			 function );
 
 			return( -1 );
@@ -3344,6 +3386,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			     LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA,
 			     (uint32_t) ( segment_files_list_index + 1 ),
 			     write_io_handle->maximum_number_of_segments,
+			     media_values->set_identifier,
 			     &segment_file,
 			     &segment_files_list_index,
 			     &file_io_pool_entry,

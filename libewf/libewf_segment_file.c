@@ -656,6 +656,20 @@ ssize_t libewf_segment_file_write_file_header(
 
 		return( -1 );
 	}
+	if( memory_set(
+	     &( file_header_data[ 8 ] ),
+	     0,
+	     24 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file header data.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file->major_version == 1 )
 	{
 		( (ewf_file_header_v1_t *) file_header_data )->fields_start = 1;
@@ -663,16 +677,30 @@ ssize_t libewf_segment_file_write_file_header(
 		byte_stream_copy_from_uint16_little_endian(
 		 ( (ewf_file_header_v1_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
-
-		( (ewf_file_header_v1_t *) file_header_data )->fields_end[ 0 ] = 0;
-		( (ewf_file_header_v1_t *) file_header_data )->fields_end[ 1 ] = 0;
 	}
 	else if( segment_file->major_version == 2 )
 	{
-/* TODO add EWF2 support */
+		( (ewf_file_header_v2_t *) file_header_data )->major_version = segment_file->major_version;
+		( (ewf_file_header_v2_t *) file_header_data )->minor_version = segment_file->minor_version;
+
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
+
+		if( memory_copy(
+		     ( (ewf_file_header_v2_t *) file_header_data )->set_identifier,
+		     segment_file->set_identifier,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy set identifier.",
+			 function );
+
+			return( -1 );
+		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1476,10 +1504,10 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 	return( 1 );
 }
 
-/* Write the headers to file
+/* Writes the header sections to file
  * Returns the number of bytes written or -1 on error
  */
-ssize_t libewf_segment_file_write_headers(
+ssize_t libewf_segment_file_write_header_sections(
          libewf_segment_file_t *segment_file,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -1490,7 +1518,7 @@ ssize_t libewf_segment_file_write_headers(
 {
 	libewf_header_sections_t *header_sections = NULL;
 	libewf_section_t *section                 = NULL;
-	static char *function                     = "libewf_segment_file_write_headers";
+	static char *function                     = "libewf_segment_file_write_header_sections";
 	ssize_t write_count                       = 0;
 	ssize_t total_write_count                 = 0;
 
@@ -1619,9 +1647,10 @@ ssize_t libewf_segment_file_write_headers(
 	}
 	else if( ( io_handle->format == LIBEWF_FORMAT_ENCASE2 )
 	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
+	      || ( io_handle->format == LIBEWF_FORMAT_FTK_IMAGER )
 	      || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 	      || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
-	      || ( io_handle->format == LIBEWF_FORMAT_FTK_IMAGER ) )
+	      || ( io_handle->format == LIBEWF_FORMAT_LINEN7 ) )
 	{
 		/* The header should be written twice
 		 * the default compression is used
@@ -1732,7 +1761,8 @@ ssize_t libewf_segment_file_write_headers(
 	}
 	else if( ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
 	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
-	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 ) )
+	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 ) )
 	{
 		if( ( header_sections->header2 == NULL )
 		 && ( header_sections->header2_size == 0 ) )
@@ -2309,7 +2339,7 @@ ssize_t libewf_segment_file_write_start(
 	{
 		if( segment_file->segment_number == 1 )
 		{
-			write_count = libewf_segment_file_write_headers(
+			write_count = libewf_segment_file_write_header_sections(
 				       segment_file,
 				       io_handle,
 				       file_io_pool,
@@ -2426,6 +2456,9 @@ ssize_t libewf_segment_file_write_start(
 		}
 		section = NULL;
 	}
+	else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	{
+	}
 	return( total_write_count );
 
 on_error:
@@ -2541,7 +2574,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		/* Write table section start
+		/* Write table section descriptor
 		 */
 		write_count = libewf_section_table_write(
 		               section,
@@ -2670,7 +2703,10 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 		return( -1 );
 	}
-	if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+/* TODO what about linen 7 */
+	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
+	 || ( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 ) )
 	{
 		if( chunks_section_size >= (size64_t) INT64_MAX )
 		{
@@ -2710,7 +2746,8 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 
 		return( -1 );
 	}
-	if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 ) )
 	{
 		base_offset = chunks_section_offset;
 	}
@@ -2784,7 +2821,7 @@ ssize_t libewf_segment_file_write_chunks_section_correction(
 			 chunks_section_size );
 		}
 #endif
-		/* Rewrite table section start
+		/* Rewrite table section descriptor
 		 */
 		write_count = libewf_section_table_write(
 		               section,
@@ -3697,8 +3734,11 @@ ssize_t libewf_segment_file_write_close(
 		 */
 		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 )
+		 || ( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 		{
 			if( libewf_sector_list_get_number_of_elements(
@@ -3771,14 +3811,17 @@ ssize_t libewf_segment_file_write_close(
 				section = NULL;
 			}
 		}
-		/* Write the error2 section if required
+		/* Write the error section if required
 		 */
 		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
 		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 )
+		 || ( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
 		 || ( io_handle->format == LIBEWF_FORMAT_EWFX ) )
 		{
 			if( libewf_sector_list_get_number_of_elements(
@@ -3851,7 +3894,9 @@ ssize_t libewf_segment_file_write_close(
 			}
 		}
 		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )
+		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 ) )
 		{
 			/* Write the digest section if required
 			 */

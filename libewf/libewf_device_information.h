@@ -33,7 +33,14 @@
 extern "C" {
 #endif
 
-int libewf_device_information_parse_string(
+int libewf_device_information_generate_utf8_string(
+     uint8_t **device_information_string,
+     size_t *device_information_string_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error );
+
+int libewf_device_information_parse_utf8_string(
      const uint8_t *device_information_string,
      size_t device_information_string_size,
      libewf_media_values_t *media_values,

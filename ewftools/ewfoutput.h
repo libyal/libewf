@@ -23,6 +23,7 @@
 #define _EWFOUTPUT_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
 
 #include "ewftools_libcstring.h"

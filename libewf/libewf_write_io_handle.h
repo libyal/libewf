@@ -49,6 +49,10 @@ typedef struct libewf_write_io_handle libewf_write_io_handle_t;
 
 struct libewf_write_io_handle
 {
+	/* The size of a section descriptor
+	 */
+	size_t section_descriptor_size;
+
 	/* A cached version of the data section
 	 */
 	ewf_data_t *data_section;
@@ -230,6 +234,7 @@ int libewf_write_io_handle_create_segment_file(
      uint8_t segment_file_type,
      uint32_t segment_number,
      uint32_t maximum_number_of_segments,
+     const uint8_t *set_identifier,
      libewf_segment_file_t **segment_file,
      int *segment_files_list_index,
      int *file_io_pool_entry,

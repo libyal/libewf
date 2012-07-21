@@ -170,7 +170,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
          libmfdata_list_t *chunk_table_list,
          libcerror_error_t **error );
 
-ssize_t libewf_segment_file_write_headers(
+ssize_t libewf_segment_file_write_header_sections(
          libewf_segment_file_t *segment_file,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,

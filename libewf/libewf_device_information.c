@@ -32,10 +32,612 @@
 #include "libewf_libuna.h"
 #include "libewf_media_values.h"
 
+/* Generate an UTF-8 encoded device information string
+ * Sets device information string and device information string size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_device_information_generate_utf8_string(
+     uint8_t **device_information_string,
+     size_t *device_information_string_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *device_label_header_value       = NULL;
+	libfvalue_value_t *model_header_value              = NULL;
+	libfvalue_value_t *process_identifier_header_value = NULL;
+	libfvalue_value_t *serial_number_header_value      = NULL;
+	const char *newline_string                         = "\n";
+	static char *function                              = "libewf_device_information_generate_utf8_string";
+	size_t device_information_string_index             = 0;
+	size_t device_label_string_length                  = 0;
+	size_t model_string_length                         = 0;
+	size_t newline_string_length                       = 1;
+	size_t process_identifier_string_length            = 0;
+	size_t serial_number_string_length                 = 0;
+	int number_of_characters                           = 0;
+	int number_of_tabs                                 = 0;
+	int result                                         = 0;
+
+	if( device_information_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information string.",
+		 function );
+
+		return( -1 );
+	}
+	if( *device_information_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: device information string already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_information_string_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "serial_number",
+	     14,
+	     &serial_number_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: serial_number.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "model",
+	     6,
+	     &model_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: model.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "device_label",
+	     13,
+	     &device_label_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: device_label.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "process_identifier",
+	     19,
+	     &process_identifier_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: process_identifier.",
+		 function );
+
+		goto on_error;
+	}
+	/* Determine the device information string size
+	 */
+	*device_information_string_size = 0;
+
+	/* Reserve space for:
+	 * 1 <newline>
+	 * main <newline>
+	 */
+	*device_information_string_size += 5 + ( 2 * newline_string_length );
+
+	/* Reserve space for:
+	 * sn <tab> md <tab> lb <tab> ts <tab> hs <tab> dc <tab> dt <tab> pid <tab> rs <tab> ls <tab> bp <tab> ph <newline>
+	 */
+	number_of_characters = 25;
+	number_of_tabs       = 11;
+
+	*device_information_string_size += number_of_characters + number_of_tabs + newline_string_length;
+
+	if( serial_number_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  serial_number_header_value,
+			  0,
+			  &serial_number_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: serial_number",
+			 function );
+
+			goto on_error;
+		}
+		if( serial_number_string_length > 0 )
+		{
+			serial_number_string_length -= 1;
+
+			*device_information_string_size += serial_number_string_length;
+		}
+	}
+	if( model_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  model_header_value,
+			  0,
+			  &model_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: model",
+			 function );
+
+			goto on_error;
+		}
+		if( model_string_length > 0 )
+		{
+			model_string_length -= 1;
+
+			*device_information_string_size += model_string_length;
+		}
+	}
+	if( device_label_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  device_label_header_value,
+			  0,
+			  &device_label_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: device_label",
+			 function );
+
+			goto on_error;
+		}
+		if( device_label_string_length > 0 )
+		{
+			device_label_string_length -= 1;
+
+			*device_information_string_size += device_label_string_length;
+		}
+	}
+/* TODO: number of sectors, ts */
+/* TODO: hs, dc */
+
+/* TODO: media type, dt */
+	if( process_identifier_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  process_identifier_header_value,
+			  0,
+			  &process_identifier_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: process_identifier",
+			 function );
+
+			goto on_error;
+		}
+		if( process_identifier_string_length > 0 )
+		{
+			process_identifier_string_length -= 1;
+
+			*device_information_string_size += process_identifier_string_length;
+		}
+	}
+/* TODO: rs, ls */
+/* TODO: bytes per sector, bp */
+/* TODO: is physical, ph */
+
+	/* Reserve space for the tabs and 2 newlines
+	 */
+	*device_information_string_size += number_of_tabs + ( 2 * newline_string_length );
+
+	/* Reserve space for the end-of-string character
+	 */
+	*device_information_string_size += 1;
+
+	/* Determine the device information string
+	 */
+	*device_information_string = (uint8_t *) memory_allocate(
+	                                          sizeof( uint8_t ) * *device_information_string_size );
+
+	if( *device_information_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create device information string.",
+		 function );
+
+		goto on_error;
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '1';
+
+	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'm';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'a';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'i';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'n';
+
+	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'n';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'm';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'l';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'b';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 't';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'h';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'c';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 't';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'i';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'r';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'l';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'b';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'h';
+
+	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+	}
+	if( ( serial_number_header_value != NULL )
+	 && ( serial_number_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string(
+			  serial_number_header_value,
+			  0,
+			  &( ( *device_information_string )[ device_information_string_index ] ),
+			  *device_information_string_size - device_information_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string of header value: serial_number.",
+			 function );
+
+			goto on_error;
+		}
+		device_information_string_index += serial_number_string_length;
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+
+	if( ( model_header_value != NULL )
+	 && ( model_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string(
+			  model_header_value,
+			  0,
+			  &( ( *device_information_string )[ device_information_string_index ] ),
+			  *device_information_string_size - device_information_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string of header value: model.",
+			 function );
+
+			goto on_error;
+		}
+		device_information_string_index += model_string_length;
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+
+	if( ( device_label_header_value != NULL )
+	 && ( device_label_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string(
+			  device_label_header_value,
+			  0,
+			  &( ( *device_information_string )[ device_information_string_index ] ),
+			  *device_information_string_size - device_information_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string of header value: device_label.",
+			 function );
+
+			goto on_error;
+		}
+		device_information_string_index += device_label_string_length;
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: number of sectors, ts */
+/* TODO: hs, dc */
+
+	if( ( process_identifier_header_value != NULL )
+	 && ( process_identifier_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string(
+			  process_identifier_header_value,
+			  0,
+			  &( ( *device_information_string )[ device_information_string_index ] ),
+			  *device_information_string_size - device_information_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy string of header value: process_identifier.",
+			 function );
+
+			goto on_error;
+		}
+		device_information_string_index += process_identifier_string_length;
+	}
+	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: media type, dt */
+/* TODO: rs, ls */
+/* TODO: bytes per sector, bp */
+/* TODO: is physical, ph */
+
+	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+	}
+	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+	}
+	( *device_information_string )[ device_information_string_index++ ] = 0;
+
+	return( 1 );
+}
+
+/* Generate device information
+ * Sets device_information and device_information_size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_device_information_generate(
+     uint8_t **device_information,
+     size_t *device_information_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error )
+{
+	uint8_t *device_information_string    = NULL;
+	static char *function                 = "libewf_device_information_generate";
+	size_t device_information_string_size = 0;
+
+	if( device_information == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information.",
+		 function );
+
+		return( -1 );
+	}
+	if( *device_information != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: device information already created.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_information_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_device_information_generate_utf8_string(
+	     &device_information_string,
+	     &device_information_string_type,
+	     media_values,
+	     header_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create device information string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libuna_utf16_stream_size_from_utf8(
+	     device_information_string,
+	     device_information_string_size,
+	     device_information_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine device information size.",
+		 function );
+
+		goto on_error;
+	}
+	*device_information = (uint8_t *) memory_allocate(
+	                                   sizeof( uint8_t ) * *device_information_size );
+
+	if( *device_information == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create device information.",
+		 function );
+
+		goto on_error;
+	}
+	if( libuna_utf16_stream_copy_from_utf8(
+	     *device_information,
+	     *device_information_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     device_information_string,
+	     device_information_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set device information.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 device_information_string );
+
+	return( 1 );
+
+on_error:
+	if( device_information_string != NULL )
+	{
+		memory_free(
+		 device_information_string );
+	}
+	if( *device_information != NULL )
+	{
+		memory_free(
+		 device_information );
+
+		*device_information = NULL;
+	}
+	*device_information_size = 0;
+
+	return( -1 );
+}
+
 /* Parses an UTF-8 encoded device information string
  * Returns 1 if successful or -1 on error
  */
-int libewf_device_information_parse_string(
+int libewf_device_information_parse_utf8_string(
      const uint8_t *device_information_string,
      size_t device_information_string_size,
      libewf_media_values_t *media_values,
@@ -50,7 +652,7 @@ int libewf_device_information_parse_string(
 	uint8_t *line_string                  = NULL;
 	uint8_t *type_string                  = NULL;
 	uint8_t *value_string                 = NULL;
-	static char *function                 = "libewf_device_information_parse_string";
+	static char *function                 = "libewf_device_information_parse_utf8_string";
 	size_t identifier_size                = 0;
 	size_t line_string_size               = 0;
 	size_t type_string_size               = 0;
@@ -747,7 +1349,7 @@ int libewf_device_information_parse(
      libcerror_error_t **error )
 {
 	uint8_t *device_information_string    = NULL;
-	static char *function        = "libewf_device_information_parse";
+	static char *function                 = "libewf_device_information_parse";
 	size_t device_information_string_size = 0;
 
 	if( device_information == NULL )
@@ -778,7 +1380,7 @@ int libewf_device_information_parse(
 		goto on_error;
 	}
 	device_information_string = (uint8_t *) memory_allocate(
-	                                        sizeof( uint8_t ) * device_information_string_size );
+	                                         sizeof( uint8_t ) * device_information_string_size );
 
 	if( device_information_string == NULL )
 	{
@@ -817,7 +1419,7 @@ int libewf_device_information_parse(
 		 device_information_string );
 	}
 #endif
-	if( libewf_device_information_parse_string(
+	if( libewf_device_information_parse_utf8_string(
 	     device_information_string,
 	     device_information_string_size,
 	     media_values,
@@ -828,7 +1430,7 @@ int libewf_device_information_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse device information string.",
+		 "%s: unable to parse device information UTF-8 string.",
 		 function );
 
 		goto on_error;

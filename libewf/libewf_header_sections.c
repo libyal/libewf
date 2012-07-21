@@ -449,7 +449,10 @@ int libewf_header_sections_create(
 			goto on_error;
 		}
 	}
-	else if( format == LIBEWF_FORMAT_ENCASE4 )
+	else if( ( format == LIBEWF_FORMAT_ENCASE4 )
+	      || ( format == LIBEWF_FORMAT_ENCASE5 )
+	      || ( format == LIBEWF_FORMAT_ENCASE6 )
+	      || ( format == LIBEWF_FORMAT_ENCASE7 ) )
 	{
 		if( libewf_header_values_generate_header_encase4(
 		     header_values,
@@ -469,8 +472,9 @@ int libewf_header_sections_create(
 
 			goto on_error;
 		}
-		if( libewf_header_values_generate_header2_encase4(
+		if( libewf_header_values_generate_header2(
 		     header_values,
+		     format,
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header2 ),
@@ -487,107 +491,13 @@ int libewf_header_sections_create(
 			goto on_error;
 		}
 	}
-	else if( format == LIBEWF_FORMAT_ENCASE5 )
+	else if( ( format == LIBEWF_FORMAT_LINEN5 )
+	      || ( format == LIBEWF_FORMAT_LINEN6 )
+	      || ( format == LIBEWF_FORMAT_LINEN7 ) )
 	{
-		if( libewf_header_values_generate_header_encase4(
+		if( libewf_header_values_generate_header_linen(
 		     header_values,
-		     timestamp,
-		     compression_level,
-		     &( header_sections->header ),
-		     &( header_sections->header_size ),
-		     header_codepage,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_header_values_generate_header2_encase5(
-		     header_values,
-		     timestamp,
-		     compression_level,
-		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 sections.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else if( format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		if( libewf_header_values_generate_header_encase4(
-		     header_values,
-		     timestamp,
-		     compression_level,
-		     &( header_sections->header ),
-		     &( header_sections->header_size ),
-		     header_codepage,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_header_values_generate_header2_encase6(
-		     header_values,
-		     timestamp,
-		     compression_level,
-		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 sections.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else if( format == LIBEWF_FORMAT_LINEN5 )
-	{
-		if( libewf_header_values_generate_header_linen5(
-		     header_values,
-		     timestamp,
-		     compression_level,
-		     &( header_sections->header ),
-		     &( header_sections->header_size ),
-		     header_codepage,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	else if( format == LIBEWF_FORMAT_LINEN6 )
-	{
-		if( libewf_header_values_generate_header_linen6(
-		     header_values,
+		     format,
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header ),
@@ -625,8 +535,9 @@ int libewf_header_sections_create(
 
 			goto on_error;
 		}
-		if( libewf_header_values_generate_header2_ewfx(
+		if( libewf_header_values_generate_header2(
 		     header_values,
+		     format,
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header2 ),

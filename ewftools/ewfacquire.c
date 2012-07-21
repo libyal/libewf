@@ -139,7 +139,7 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart,\n"
 	                 "\t        ftk, encase2, encase3, encase4, encase5, encase6 (default),\n"
-	                 "\t        linen5, linen6, ewfx\n" );
+	                 "\t        encase7, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
@@ -161,8 +161,8 @@ void ewfacquire_usage_fprint(
 	if( result == 1 )
 	{
 		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
-		                 "\t        (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for encase6 format\n"
-		                 "\t        and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n",
+		                 "\t        (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for encase6\n"
+		                 "\t        and encase7 format and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -171,8 +171,8 @@ void ewfacquire_usage_fprint(
 	else
 	{
 		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIu32 ")\n"
-		                 "\t        (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
-		                 "\t        and %" PRIu32 " for other formats)\n",
+		                 "\t        (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6\n"
+		                 "\t        and encase7 format and %" PRIu32 " for other formats)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
