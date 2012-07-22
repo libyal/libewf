@@ -126,7 +126,7 @@ fi
 
 for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk ewfx;
+	for FORMAT in encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk ewfx;
 	do
 		for SEGMENT_SIZE in 650MB 1MiB;
 		do

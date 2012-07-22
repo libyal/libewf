@@ -2083,7 +2083,7 @@ int export_handle_prompt_for_output_format(
 	size_t fixed_string_variable_length                  = 0;
 	int result                                           = 0;
 
-	libcstring_system_character_t *format_types[ 14 ] = \
+	libcstring_system_character_t *format_types[ 16 ] = \
 	{ _LIBCSTRING_SYSTEM_STRING( "raw" ),
 	  _LIBCSTRING_SYSTEM_STRING( "files" ),
 	  _LIBCSTRING_SYSTEM_STRING( "ewf" ),
@@ -2095,8 +2095,10 @@ int export_handle_prompt_for_output_format(
 	  _LIBCSTRING_SYSTEM_STRING( "encase4" ),
 	  _LIBCSTRING_SYSTEM_STRING( "encase5" ),
 	  _LIBCSTRING_SYSTEM_STRING( "encase6" ),
+	  _LIBCSTRING_SYSTEM_STRING( "encase7" ),
 	  _LIBCSTRING_SYSTEM_STRING( "linen5" ),
 	  _LIBCSTRING_SYSTEM_STRING( "linen6" ),
+	  _LIBCSTRING_SYSTEM_STRING( "linen7" ),
 	  _LIBCSTRING_SYSTEM_STRING( "ewfx" ) };
 
 	if( export_handle == NULL )
@@ -2116,7 +2118,7 @@ int export_handle_prompt_for_output_format(
 	          EXPORT_HANDLE_INPUT_BUFFER_SIZE,
 	          request_string,
 	          format_types,
-	          14,
+	          16,
 	          0,
 	          &fixed_string_variable,
 	          error );

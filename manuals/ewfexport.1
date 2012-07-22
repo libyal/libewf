@@ -1,4 +1,4 @@
-.Dd July 5, 2012
+.Dd July 22, 2012
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -52,7 +52,7 @@ the compression level, options: none (default), empty-block, fast, best (not use
 .It Fl d Ar digest_type
 calculate additional digest (hash) types besides md5, options: sha1 (not used for raw and files formats)
 .It Fl f Ar format
-the output format to write to, options: raw (default), files (restricted to logical volume files), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
+the output format to write to, options: raw (default), files (restricted to logical volume files), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, linen5, linen6, linen7, ewfx.
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
@@ -64,7 +64,7 @@ the process buffer size (default is the chunk size)
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for raw and encase6 format and 1.9 GiB for other formats) (not used for files format)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for raw, encase6 and encase7 format and 1.9 GiB for other formats) (not used for files format)
 .It Fl t Ar target
 the target file to export to, use \- for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
@@ -85,10 +85,10 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20110801
+ewfexport 20120722
 
 Information for export required, please provide the necessary input
-Export to format (raw, files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
+Export to format (raw, files, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, linen5, linen6, linen7, ewfx) [raw]:
 Target path and filename without extension or \- for stdout: floppy
 Evidence segment file size in bytes (1.0 MiB <= value <= 7.9 EiB) [1.4 GiB]:
 Start export at offset (0 <= value <= 1474560) [0]:

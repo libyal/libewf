@@ -156,7 +156,7 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
+	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
 		if ! test_export_ewf "${FORMAT}" "${FILENAME}";
 		then
@@ -167,7 +167,7 @@ done
 
 for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
 do
-	for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
+	for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
 		if ! test_export_unattended "${FORMAT}" "${FILENAME}";
 		then

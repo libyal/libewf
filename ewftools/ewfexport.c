@@ -124,7 +124,7 @@ void usage_fprint(
 	fprintf( stream, "\t-f:        specify the output format to write to, options:\n"
 	                 "\t           raw (default), files (restricted to logical volume files), ewf,\n"
 	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
-	                 "\t           linen5, linen6, ewfx\n" );
+	                 "\t           encase7, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
@@ -137,8 +137,8 @@ void usage_fprint(
 	if( result == 1 )
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
-		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw and encase6\n"
-		                 "\t           and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
+		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw, encase6\n"
+		                 "\t           and encase7 format and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
 		                 "\t           (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
@@ -148,8 +148,8 @@ void usage_fprint(
 	else
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIu32 ")\n"
-		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for raw and encase6 format\n"
-		                 "\t           and %" PRIu32 " for other formats)\n"
+		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for raw, encase6 and\n"
+		                 "\t           enccase7 format and %" PRIu32 " for other formats)\n"
 		                 "\t           (not used for files format)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,

@@ -5575,6 +5575,7 @@ ssize_t libewf_handle_read_buffer(
 		total_read_count += (ssize_t) read_size;
 		chunk_index      += 1;
 		chunk_offset     += internal_handle->media_values->chunk_size;
+		chunk_data        = NULL;
 		chunk_data_offset = 0;
 
 		internal_handle->io_handle->current_offset += (off64_t) read_size;
@@ -6695,7 +6696,8 @@ ssize_t libewf_handle_write_buffer(
 			buffer_size   -= write_size;
 
 			chunk_data_size = chunk_data->data_size;
-			pack_flags      = internal_handle->io_handle->pack_flags;
+			pack_flags      = internal_handle->io_handle->pack_flags
+			                & ~( LIBEWF_PACK_FLAG_FORCE_COMPRESSION );
 
 			if( libewf_chunk_data_pack(
 			     chunk_data,

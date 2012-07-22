@@ -182,7 +182,7 @@ fi
 
 for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
+	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
 		for SEGMENT_SIZE in 650MB 1MiB;
 		do
@@ -263,7 +263,7 @@ done
 
 for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 linen5 linen6 ftk smart ewfx;
+	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
 		if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" none 650MB 64;
 		then

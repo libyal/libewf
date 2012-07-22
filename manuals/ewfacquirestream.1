@@ -1,4 +1,4 @@
-.Dd July 5, 2012
+.Dd July 22, 2012
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -67,7 +67,7 @@ the examiner name (default is examiner_name)
 .It Fl E Ar evidence_number
 the evidence number (default is evidence_number)
 .It Fl f Ar format
-the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5, encase6 (default), linen5, linen6, ewfx.
+the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5, encase6 (default), encase7, linen5, linen6, linen7, ewfx.
 .Nm libewf
 does not support streamed writes for other EWF formats.
 .It Fl h
@@ -91,7 +91,7 @@ quiet shows minimal status information
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 and encase7 format and 1.9 GiB for other formats)
 .It Fl t Ar target
 the target file (without extension) to write to (default is image)
 .It Fl v

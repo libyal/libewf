@@ -387,20 +387,20 @@ int libewf_chunk_table_read_chunk(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: chunk: %d file IO pool entry\t\t: %d\n",
+		 "%s: chunk: % 8d file IO pool entry\t: %d\n",
 		 function,
 		 element_index,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: %d offset\t\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk: % 8d offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 element_index,
 		 element_data_offset,
 		 element_data_offset );
 
 		libcnotify_printf(
-		 "%s: chunk: %d size\t\t\t\t: %" PRIu64 "\n",
+		 "%s: chunk: % 8d size\t\t\t: %" PRIu64 "\n",
 		 function,
 		 element_index,
 		 element_data_size );
@@ -413,13 +413,13 @@ int libewf_chunk_table_read_chunk(
 			 chunk_checksum );
 		}
 		libcnotify_printf(
-		 "%s: chunk: %d checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: chunk: % 8d checksum\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 element_index,
 		 chunk_checksum );
 
 		libcnotify_printf(
-		 "%s: chunk: %d flags:\n",
+		 "%s: chunk: % 8d flags:\n",
 		 function,
 		 element_index );
 
@@ -2531,7 +2531,7 @@ int libewf_chunk_table_generate_table_entries_data(
 
 		return( -1 );
 	}
-	if( table_entries_data_size != ( number_of_entries * table_entry_data_size ) )
+	if( ( number_of_entries * table_entry_data_size ) > table_entries_data_size )
 	{
 		libcerror_error_set(
 		 error,

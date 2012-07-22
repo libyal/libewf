@@ -1,4 +1,6 @@
 TODO
+* fix issues regarding failing tests
+
 * refactor write compressed string
   - to support caching of compressed strings, e.g. case data, device info
 

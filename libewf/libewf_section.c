@@ -6766,6 +6766,7 @@ ssize_t libewf_section_table_write(
 	size_t table_entry_data_size        = 0;
 	size_t table_header_data_size       = 0;
 	size_t table_footer_data_size       = 0;
+	size_t used_table_entries_data_size = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
@@ -6852,7 +6853,9 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	if( table_entries_data_size != ( number_of_entries * table_entry_data_size ) )
+	used_table_entries_data_size = number_of_entries * table_entry_data_size;
+
+	if( used_table_entries_data_size > table_entries_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -6864,7 +6867,7 @@ ssize_t libewf_section_table_write(
 		return( -1 );
 	}
 	section_data_size = table_header_data_size
-	                  + table_entries_data_size
+	                  + used_table_entries_data_size
 	                  + chunks_data_size;
 
 	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
@@ -7004,7 +7007,7 @@ ssize_t libewf_section_table_write(
 		 function );
 		libcnotify_print_data(
 		 table_entries_data,
-		 table_entries_data_size,
+		 used_table_entries_data_size,
 		 0 );
 	}
 #endif
@@ -7012,10 +7015,10 @@ ssize_t libewf_section_table_write(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               table_entries_data,
-	               table_entries_data_size,
+	               used_table_entries_data_size,
 	               error );
 
-	if( write_count != (ssize_t) table_entries_data_size )
+	if( write_count != (ssize_t) used_table_entries_data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -7032,7 +7035,7 @@ ssize_t libewf_section_table_write(
 	{
 		calculated_checksum = ewf_checksum_calculate(
 		                       table_entries_data,
-		                       table_entries_data_size,
+		                       used_table_entries_data_size,
 		                       1 );
 
 		if( memory_set(
@@ -8890,20 +8893,20 @@ ssize_t libewf_section_delta_chunk_write(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu32 " file IO pool entry\t\t: %d\n",
+		 "%s: chunk: % 8" PRIu32 " file IO pool entry\t: %d\n",
 		 function,
 		 chunk_index - 1,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu32 " offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk: % 8" PRIu32 " offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 chunk_index - 1,
 		 section_offset + total_write_count,
 		 section_offset + total_write_count );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu32 " size\t\t\t\t: %" PRIzd "\n",
+		 "%s: chunk: % 8" PRIu32 " size\t\t\t: %" PRIzd "\n",
 		 function,
 		 chunk_index - 1,
 		 chunk_size );
@@ -8916,13 +8919,13 @@ ssize_t libewf_section_delta_chunk_write(
 			 chunk_checksum );
 		}
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu32 " checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: chunk: % 8" PRIu32 " checksum\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 chunk_index - 1,
 		 chunk_checksum );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu32 " flags:\n",
+		 "%s: chunk: % 8" PRIu32 " flags:\n",
 		 function,
 		 chunk_index - 1 );
 		libcnotify_printf(
