@@ -32,12 +32,1285 @@
 #include "libewf_libuna.h"
 #include "libewf_media_values.h"
 
+/* Generate an UTF-8 encoded case data string
+ * Sets utf8_string and utf8_string_size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_case_data_generate_utf8_string(
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *acquiry_date_header_value             = NULL;
+	libfvalue_value_t *acquiry_operating_system_header_value = NULL;
+	libfvalue_value_t *acquiry_software_version_header_value = NULL;
+	libfvalue_value_t *case_number_header_value              = NULL;
+	libfvalue_value_t *description_header_value              = NULL;
+	libfvalue_value_t *evidence_number_header_value          = NULL;
+	libfvalue_value_t *examiner_name_header_value            = NULL;
+	libfvalue_value_t *notes_header_value                    = NULL;
+	libfvalue_value_t *system_date_header_value              = NULL;
+	uint8_t *generated_acquiry_date                          = NULL;
+	uint8_t *generated_system_date                           = NULL;
+	const char *newline_string                               = "\n";
+	static char *function                                    = "libewf_case_data_generate_utf8_string";
+	size_t acquiry_date_string_length                        = 0;
+	size_t acquiry_operating_system_string_length            = 0;
+	size_t acquiry_software_version_string_length            = 0;
+	size_t case_number_string_length                         = 0;
+	size_t description_string_length                         = 0;
+	size_t error_granularity_string_length                   = 0;
+	size_t evidence_number_string_length                     = 0;
+	size_t examiner_name_string_length                       = 0;
+	size_t generated_acquiry_date_size                       = 0;
+	size_t generated_system_date_size                        = 0;
+	size_t newline_string_length                             = 1;
+	size_t notes_string_length                               = 0;
+	size_t number_of_chunks_string_length                    = 0;
+	size_t sectors_per_chunk_string_length                   = 0;
+	size_t system_date_string_length                         = 0;
+	size_t utf8_string_index                                 = 0;
+	int number_of_characters                                 = 0;
+	int number_of_tabs                                       = 0;
+	int result                                               = 0;
+
+	if( utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( *utf8_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: UTF-8 string already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "description",
+	     12,
+	     &description_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: description.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "case_number",
+	     12,
+	     &case_number_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: case_number.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "evidence_number",
+	     16,
+	     &evidence_number_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: evidence_number.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "examiner_name",
+	     14,
+	     &examiner_name_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: examiner_name.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "notes",
+	     6,
+	     &notes_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: notes.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "acquiry_software_version",
+	     25,
+	     &acquiry_software_version_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: acquiry_software_version.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "acquiry_operating_system",
+	     25,
+	     &acquiry_operating_system_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: acquiry_operating_system.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "acquiry_date",
+	     13,
+	     &acquiry_date_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: acquiry_date.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "system_date",
+	     12,
+	     &system_date_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: system_date.",
+		 function );
+
+		goto on_error;
+	}
+	/* Determine the string size
+	 * Reserve space for:
+	 * 1 <newline>
+	 * main <newline>
+	 */
+	*utf8_string_size = 5 + ( 2 * newline_string_length );
+
+	/* Reserve space for:
+	 * nm <tab> cn <tab> en <tab> ex <tab> nt <tab> av <tab> os <tab> tt <tab> at <tab> tb <tab> cp <tab> sb <tab> gr <tab> wb <newline>
+	 */
+	number_of_characters = 28;
+	number_of_tabs       = 13;
+
+	*utf8_string_size += number_of_characters + number_of_tabs + newline_string_length;
+
+	if( description_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          description_header_value,
+		          0,
+		          &description_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: description.",
+			 function );
+
+			goto on_error;
+		}
+		if( description_string_length > 0 )
+		{
+			description_string_length -= 1;
+
+			*utf8_string_size += description_string_length;
+		}
+	}
+	if( case_number_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          case_number_header_value,
+		          0,
+		          &case_number_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: case_number.",
+			 function );
+
+			goto on_error;
+		}
+		if( case_number_string_length > 0 )
+		{
+			case_number_string_length -= 1;
+
+			*utf8_string_size += case_number_string_length;
+		}
+	}
+	if( evidence_number_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          evidence_number_header_value,
+		          0,
+		          &evidence_number_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: evidence_number.",
+			 function );
+
+			goto on_error;
+		}
+		if( evidence_number_string_length > 0 )
+		{
+			evidence_number_string_length -= 1;
+
+			*utf8_string_size += evidence_number_string_length;
+		}
+	}
+	if( examiner_name_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          examiner_name_header_value,
+		          0,
+		          &examiner_name_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: examiner_name.",
+			 function );
+
+			goto on_error;
+		}
+		if( examiner_name_string_length > 0 )
+		{
+			examiner_name_string_length -= 1;
+
+			*utf8_string_size += examiner_name_string_length;
+		}
+	}
+	if( notes_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          notes_header_value,
+		          0,
+		          &notes_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: notes.",
+			 function );
+
+			goto on_error;
+		}
+		if( notes_string_length > 0 )
+		{
+			notes_string_length -= 1;
+
+			*utf8_string_size += notes_string_length;
+		}
+	}
+	if( acquiry_software_version_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  acquiry_software_version_header_value,
+			  0,
+			  &acquiry_software_version_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: acquiry_software_version.",
+			 function );
+
+			goto on_error;
+		}
+		if( acquiry_software_version_string_length > 0 )
+		{
+			acquiry_software_version_string_length -= 1;
+
+			*utf8_string_size += acquiry_software_version_string_length;
+		}
+	}
+	if( acquiry_operating_system_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+			  acquiry_operating_system_header_value,
+			  0,
+			  &acquiry_operating_system_string_length,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: acquiry_operating_system.",
+			 function );
+
+			goto on_error;
+		}
+		if( acquiry_operating_system_string_length > 0 )
+		{
+			acquiry_operating_system_string_length -= 1;
+
+			*utf8_string_size += acquiry_operating_system_string_length;
+		}
+	}
+	if( acquiry_date_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          acquiry_date_header_value,
+		          0,
+		          &acquiry_date_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: acquiry_date.",
+			 function );
+
+			goto on_error;
+		}
+		if( acquiry_date_string_length > 0 )
+		{
+			acquiry_date_string_length -= 1;
+		}
+	}
+	if( ( acquiry_date_header_value == NULL )
+	 || ( acquiry_date_string_length == 0 ) )
+	{
+		result = libewf_generate_date_header2_value(
+			  timestamp,
+			  &generated_acquiry_date,
+			  &generated_acquiry_date_size,
+			  error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to generate acquiry date header value.",
+			 function );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		else
+		{
+			/* Make sure to determine the actual length of the date time values string
+			 */
+			acquiry_date_string_length = libcstring_narrow_string_length(
+			                              (char *) generated_acquiry_date );
+		}
+	}
+	*utf8_string_size += acquiry_date_string_length;
+
+	if( system_date_header_value != NULL )
+	{
+		result = libfvalue_value_get_utf8_string_size(
+		          system_date_header_value,
+		          0,
+		          &system_date_string_length,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string size of header value: system_date.",
+			 function );
+
+			goto on_error;
+		}
+		if( system_date_string_length > 0 )
+		{
+			system_date_string_length -= 1;
+		}
+	}
+	if( ( system_date_header_value == NULL )
+	 || ( system_date_string_length == 0 ) )
+	{
+		result = libewf_generate_date_header2_value(
+			  timestamp,
+			  &generated_system_date,
+			  &generated_system_date_size,
+			  error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to generate system date header value.",
+			 function );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		else
+		{
+			/* Make sure to determine the actual length of the date time values string
+			 */
+			 system_date_string_length = libcstring_narrow_string_length(
+			                              (char *) generated_system_date );
+		}
+	}
+	*utf8_string_size += system_date_string_length;
+
+	if( libfvalue_string_size_from_integer(
+	     &number_of_chunks_string_length,
+	     media_values->number_of_chunks,
+	     64,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string size of number of chunks.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_chunks_string_length > 0 )
+	{
+		number_of_chunks_string_length -= 1;
+
+		*utf8_string_size += number_of_chunks_string_length;
+	}
+/* TODO: cp */
+
+	if( libfvalue_string_size_from_integer(
+	     &sectors_per_chunk_string_length,
+	     media_values->sectors_per_chunk,
+	     32,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string size of sectors per chunk.",
+		 function );
+
+		goto on_error;
+	}
+	if( sectors_per_chunk_string_length > 0 )
+	{
+		sectors_per_chunk_string_length -= 1;
+
+		*utf8_string_size += sectors_per_chunk_string_length;
+	}
+	if( libfvalue_string_size_from_integer(
+	     &error_granularity_string_length,
+	     media_values->error_granularity,
+	     32,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string size of error granularity.",
+		 function );
+
+		goto on_error;
+	}
+	if( error_granularity_string_length > 0 )
+	{
+		error_granularity_string_length -= 1;
+
+		*utf8_string_size += error_granularity_string_length;
+	}
+/* TODO: wb */
+
+	/* Reserve space for the tabs and 2 newlines
+	 */
+	*utf8_string_size += number_of_tabs + ( 2 * newline_string_length );
+
+	/* Reserve space for the end-of-string character
+	 */
+	*utf8_string_size += 1;
+
+	/* Determine the string
+	 */
+	*utf8_string = (uint8_t *) memory_allocate(
+	                            sizeof( uint8_t ) * *utf8_string_size );
+
+	if( *utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create UTF-8 string.",
+		 function );
+
+		goto on_error;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '1';
+
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'a';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'i';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'e';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'e';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'x';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'a';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'v';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'o';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'a';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'g';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'r';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'w';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
+
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	if( ( description_header_value != NULL )
+	 && ( description_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+			  description_header_value,
+			  0,
+			  *utf8_string,
+			  *utf8_string_size,
+			  &utf8_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: description to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( case_number_header_value != NULL )
+	 && ( case_number_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          case_number_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: case_number to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( evidence_number_header_value != NULL )
+	 && ( evidence_number_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          evidence_number_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: evidence_number to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( examiner_name_header_value != NULL )
+	 && ( examiner_name_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          examiner_name_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: examiner_name to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( notes_header_value != NULL )
+	 && ( notes_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          notes_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: notes to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( acquiry_software_version_header_value != NULL )
+	 && ( acquiry_software_version_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+			  acquiry_software_version_header_value,
+			  0,
+			  *utf8_string,
+			  *utf8_string_size,
+			  &utf8_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: acquiry_software_version to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( acquiry_operating_system_header_value != NULL )
+	 && ( acquiry_operating_system_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+			  acquiry_operating_system_header_value,
+			  0,
+			  *utf8_string,
+			  *utf8_string_size,
+			  &utf8_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: acquiry_operating_system to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( generated_acquiry_date == NULL )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          acquiry_date_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: acquiry_date to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	else
+	{
+		if( libcstring_narrow_string_copy(
+		     (char *) &( ( *utf8_string )[ utf8_string_index ] ),
+		     (char *) generated_acquiry_date,
+		     acquiry_date_string_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy acquiry date string.",
+			 function );
+
+			goto on_error;
+		}
+		if( generated_acquiry_date != NULL )
+		{
+			memory_free(
+			 generated_acquiry_date );
+
+			generated_acquiry_date = NULL;
+		}
+		utf8_string_index += acquiry_date_string_length;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( generated_system_date == NULL )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+		          system_date_header_value,
+		          0,
+			  *utf8_string,
+		          *utf8_string_size,
+		          &utf8_string_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: system_date to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	else
+	{
+		if( libcstring_narrow_string_copy(
+		     (char *) &( ( *utf8_string )[ utf8_string_index ] ),
+		     (char *) generated_system_date,
+		     system_date_string_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy system date string.",
+			 function );
+
+			goto on_error;
+		}
+		if( generated_system_date != NULL )
+		{
+			memory_free(
+			 generated_system_date );
+
+			generated_system_date = NULL;
+		}
+		utf8_string_index += system_date_string_length;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( number_of_chunks_string_length > 0 )
+	{
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
+		     *utf8_string,
+		     *utf8_string_size,
+		     &utf8_string_index,
+		     media_values->number_of_chunks,
+		     64,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy number of chunks to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: cp */
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( sectors_per_chunk_string_length > 0 )
+	{
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
+		     *utf8_string,
+		     *utf8_string_size,
+		     &utf8_string_index,
+		     media_values->sectors_per_chunk,
+		     32,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy sectors per chunk to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( error_granularity_string_length > 0 )
+	{
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
+		     *utf8_string,
+		     *utf8_string_size,
+		     &utf8_string_index,
+		     media_values->error_granularity,
+		     32,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy error granularity to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+/* TODO: wb */
+
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	( *utf8_string )[ utf8_string_index++ ] = 0;
+
+	return( 1 );
+
+on_error:
+	if( generated_acquiry_date != NULL )
+	{
+		memory_free(
+		 generated_acquiry_date );
+	}
+	if( generated_system_date != NULL )
+	{
+		memory_free(
+		 generated_system_date );
+	}
+	if( *utf8_string != NULL )
+	{
+		memory_free(
+		 *utf8_string );
+
+		*utf8_string = NULL;
+	}
+	*utf8_string_size = 0;
+
+	return( -1 );
+}
+
+/* Generate case data
+ * Sets case_data and case_data_size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_case_data_generate(
+     uint8_t **case_data,
+     size_t *case_data_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
+     libcerror_error_t **error )
+{
+	uint8_t *utf8_string    = NULL;
+	static char *function                 = "libewf_case_data_generate";
+	size_t utf8_string_size = 0;
+
+	if( case_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data.",
+		 function );
+
+		return( -1 );
+	}
+	if( *case_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: case data already created.",
+		 function );
+
+		return( -1 );
+	}
+	if( case_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_case_data_generate_utf8_string(
+	     &utf8_string,
+	     &utf8_string_size,
+	     media_values,
+	     header_values,
+	     timestamp,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create UTF-8 case data string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"%s: case data string:\n%s",
+		 function,
+		 utf8_string );
+	}
+#endif
+	if( libuna_utf16_stream_size_from_utf8(
+	     utf8_string,
+	     utf8_string_size,
+	     case_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine case data size.",
+		 function );
+
+		goto on_error;
+	}
+	*case_data = (uint8_t *) memory_allocate(
+	                                   sizeof( uint8_t ) * *case_data_size );
+
+	if( *case_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create case data.",
+		 function );
+
+		goto on_error;
+	}
+	if( libuna_utf16_stream_copy_from_utf8(
+	     *case_data,
+	     *case_data_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     utf8_string,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBCERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set case data.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 utf8_string );
+
+	return( 1 );
+
+on_error:
+	if( utf8_string != NULL )
+	{
+		memory_free(
+		 utf8_string );
+	}
+	if( *case_data != NULL )
+	{
+		memory_free(
+		 case_data );
+
+		*case_data = NULL;
+	}
+	*case_data_size = 0;
+
+	return( -1 );
+}
+
 /* Parses an UTF-8 encoded case data string
  * Returns 1 if successful or -1 on error
  */
 int libewf_case_data_parse_string(
-     const uint8_t *case_data_string,
-     size_t case_data_string_size,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
@@ -63,20 +1336,20 @@ int libewf_case_data_parse_string(
 	int number_of_values                  = 0;
 	int value_index                       = 0;
 
-	if( case_data_string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid case data string.",
+		 "%s: invalid UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
 	if( libfvalue_utf8_string_split(
-	     case_data_string,
-	     case_data_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     (uint8_t) '\n',
 	     &lines,
 	     error ) != 1 )
@@ -85,7 +1358,7 @@ int libewf_case_data_parse_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split case data string into lines.",
+		 "%s: unable to split UTF-8 string into lines.",
 		 function );
 
 		goto on_error;
@@ -837,9 +2110,9 @@ int libewf_case_data_parse(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	uint8_t *case_data_string    = NULL;
+	uint8_t *utf8_string    = NULL;
 	static char *function        = "libewf_case_data_parse";
-	size_t case_data_string_size = 0;
+	size_t utf8_string_size = 0;
 
 	if( case_data == NULL )
 	{
@@ -856,35 +2129,35 @@ int libewf_case_data_parse(
 	     case_data,
 	     case_data_size,
 	     0,
-	     &case_data_string_size,
+	     &utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine case data string size.",
+		 "%s: unable to determine UTF-8 string size.",
 		 function );
 
 		goto on_error;
 	}
-	case_data_string = (uint8_t *) memory_allocate(
-	                                sizeof( uint8_t ) * case_data_string_size );
+	utf8_string = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( case_data_string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create case data string.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	if( libuna_utf8_string_copy_from_utf16_stream(
-	     case_data_string,
-	     case_data_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     case_data,
 	     case_data_size,
 	     0,
@@ -894,7 +2167,7 @@ int libewf_case_data_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to set case data string.",
+		 "%s: unable to copy case data to UTF-8 string.",
 		 function );
 
 		goto on_error;
@@ -905,12 +2178,12 @@ int libewf_case_data_parse(
 		libcnotify_printf(
 	 	"%s: case data string:\n%s",
 		 function,
-		 case_data_string );
+		 utf8_string );
 	}
 #endif
 	if( libewf_case_data_parse_string(
-	     case_data_string,
-	     case_data_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     media_values,
 	     header_values,
 	     error ) != 1 )
@@ -919,21 +2192,21 @@ int libewf_case_data_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse case data string.",
+		 "%s: unable to parse UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	memory_free(
-	 case_data_string );
+	 utf8_string );
 
 	return( 1 );
 
 on_error:
-	if( case_data_string != NULL )
+	if( utf8_string != NULL )
 	{
 		memory_free(
-		 case_data_string );
+		 utf8_string );
 	}
 	return( -1 );
 }

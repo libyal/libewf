@@ -55,6 +55,9 @@
 #include "ewf_volume.h"
 #include "ewfx_delta_chunk.h"
 
+static uint8_t libewf_section_alignement_padding[ 16 ] = \
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
 /* Tests if a buffer entirely consists of zero values
  * Returns 1 if zero, 0 if not, or -1 on error
  */
@@ -913,6 +916,7 @@ ssize_t libewf_section_descriptor_write(
 	uint8_t section_descriptor_data[ 76 ];
 
 	static char *function               = "libewf_section_descriptor_write";
+	off64_t previous_offset             = 0;
 	size_t section_descriptor_data_size = 0;
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
@@ -990,6 +994,14 @@ ssize_t libewf_section_descriptor_write(
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
 		 section->type );
+
+		if( section->start_offset > (off64_t) sizeof( ewf_section_descriptor_v2_t ) )
+		{
+			previous_offset = section->start_offset - sizeof( ewf_section_descriptor_v2_t );
+		}
+		byte_stream_copy_from_uint64_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
+		 previous_offset );
 
 /* TODO set data flags
 		byte_stream_copy_from_uint32_little_endian(
@@ -1086,9 +1098,9 @@ ssize_t libewf_section_descriptor_write(
 			 0 );
 
 			libcnotify_printf(
-			 "%s: previous offset\t\t\t\t: 0x%08" PRIx64 "\n",
+			 "%s: previous offset\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section->start_offset );
+			 previous_offset );
 
 			libcnotify_printf(
 			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
@@ -1096,7 +1108,7 @@ ssize_t libewf_section_descriptor_write(
 			 section->data_size );
 
 			libcnotify_printf(
-			 "%s: section descriptor size\t\t\t: %" PRIzd "\n",
+			 "%s: section descriptor size\t\t: %" PRIzd "\n",
 			 function,
 			 section_descriptor_data_size );
 
@@ -1412,7 +1424,7 @@ ssize_t libewf_section_last_write(
 	               section,
 	               file_io_pool,
 	               file_io_pool_entry,
-	               1,
+	               format_version,
 	               error );
 
 	if( write_count != (ssize_t) section_descriptor_data_size )
@@ -1651,7 +1663,9 @@ ssize_t libewf_section_write_compressed_string(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         uint8_t *type_string,
+         uint8_t format_version,
+         uint32_t type,
+         const uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
          uint8_t *uncompressed_string,
@@ -1659,13 +1673,16 @@ ssize_t libewf_section_write_compressed_string(
          int8_t compression_level,
          libcerror_error_t **error )
 {
-	uint8_t *compressed_string    = NULL;
-	static char *function         = "libewf_section_write_compressed_string";
-	void *reallocation            = NULL;
-	size_t compressed_string_size = 0;
-	ssize_t total_write_count     = 0;
-	ssize_t write_count           = 0;
-	int result                    = 0;
+	uint8_t *compressed_string          = NULL;
+	static char *function               = "libewf_section_write_compressed_string";
+	void *reallocation                  = NULL;
+	size64_t section_data_size          = 0;
+	size_t alignment_padding_size       = 0;
+	size_t compressed_string_size       = 0;
+	size_t section_descriptor_data_size = 0;
+	ssize_t total_write_count           = 0;
+	ssize_t write_count                 = 0;
+	int result                          = 0;
 
 	if( section == NULL )
 	{
@@ -1678,13 +1695,21 @@ ssize_t libewf_section_write_compressed_string(
 
 		return( -1 );
 	}
-	if( type_string == NULL )
+	if( format_version == 1 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid type string.",
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
 		 function );
 
 		return( -1 );
@@ -1700,6 +1725,18 @@ ssize_t libewf_section_write_compressed_string(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: uncompressed string:\n",
+		 function );
+		libcnotify_print_data(
+		 uncompressed_string,
+		 uncompressed_string_size,
+		 0 );
+	}
+#endif
 	compressed_string_size = uncompressed_string_size;
 
 	compressed_string = (uint8_t *) memory_allocate(
@@ -1766,16 +1803,27 @@ ssize_t libewf_section_write_compressed_string(
 
 		goto on_error;
 	}
-/* TODO add support for EWF2 */
+	section_data_size = compressed_string_size;
+
+	if( format_version == 2 )
+	{
+		alignment_padding_size = compressed_string_size % 16;
+
+		if( alignment_padding_size != 0 )
+		{
+			alignment_padding_size = 16 - alignment_padding_size;
+			section_data_size     += alignment_padding_size;
+		}
+	}
 	if( libewf_section_set_values(
 	     section,
-	     0,
+	     type,
 	     type_string,
 	     type_string_length,
 	     section_offset,
-	     sizeof( ewf_section_descriptor_v1_t ) + compressed_string_size,
-	     compressed_string_size,
-	     0,
+	     section_descriptor_data_size + section_data_size,
+	     section_data_size,
+	     (uint32_t) alignment_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1787,27 +1835,40 @@ ssize_t libewf_section_write_compressed_string(
 
 		goto on_error;
 	}
-	write_count = libewf_section_descriptor_write(
-	               section,
-	               file_io_pool,
-	               file_io_pool_entry,
-	               1,
-	               error );
-
-	if( write_count != (ssize_t) sizeof( ewf_section_descriptor_v1_t ) )
+	if( format_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write %s section descriptor.",
-		 function,
-		 (char *) type_string );
+		write_count = libewf_section_descriptor_write(
+			       section,
+			       file_io_pool,
+			       file_io_pool_entry,
+			       format_version,
+			       error );
 
-		goto on_error;
+		if( write_count != (ssize_t) section_descriptor_data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write section descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		total_write_count += write_count;
 	}
-	total_write_count += write_count;
-
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: compressed string:\n",
+		 function );
+		libcnotify_print_data(
+		 compressed_string,
+		 compressed_string_size,
+		 0 );
+	}
+#endif
 	write_count = libbfio_pool_write_buffer(
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -1831,6 +1892,52 @@ ssize_t libewf_section_write_compressed_string(
 	memory_free(
 	 compressed_string );
 
+	compressed_string = NULL;
+
+	if( format_version == 2 )
+	{
+		if( alignment_padding_size > 0 )
+		{
+			write_count = libbfio_pool_write_buffer(
+				       file_io_pool,
+				       file_io_pool_entry,
+				       libewf_section_alignement_padding,
+				       alignment_padding_size,
+				       error );
+
+			if( write_count != (ssize_t) alignment_padding_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write alignment padding.",
+				 function );
+
+				goto on_error;
+			}
+			total_write_count += write_count;
+		}
+		write_count = libewf_section_descriptor_write(
+			       section,
+			       file_io_pool,
+			       file_io_pool_entry,
+			       format_version,
+			       error );
+
+		if( write_count != (ssize_t) section_descriptor_data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write section descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		total_write_count += write_count;
+	}
 	return( total_write_count );
 
 on_error:
@@ -4503,181 +4610,6 @@ ssize_t libewf_section_sha1_hash_read(
 	return( read_count );
 }
 
-/* Reads a header section
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libewf_section_header_read(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_header_sections_t *header_sections,
-         libcerror_error_t **error )
-{
-	uint8_t *header       = NULL;
-	static char *function = "libewf_section_header_read";
-	ssize_t read_count    = 0;
-	size_t header_size    = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_section_compressed_string_read(
-	              section,
-	              file_io_pool,
-	              file_io_pool_entry,
-	              &header,
-	              &header_size,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read header.",
-		 function );
-
-		goto on_error;
-	}
-	if( header == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing header.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libewf_debug_byte_stream_print(
-		     "Header",
-		     header,
-		     header_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header.",
-			 function );
-
-			goto on_error;
-		}
-	}
-#endif
-	if( header_sections->header == NULL )
-	{
-		header_sections->header      = header;
-		header_sections->header_size = header_size;
-	}
-	else
-	{
-		memory_free(
-		 header );
-	}
-	header_sections->number_of_header_sections += 1;
-
-	return( read_count );
-
-on_error:
-	if( header != NULL )
-	{
-		memory_free(
-		 header );
-	}
-	return( -1 );
-}
-
-/* Writes a header section
- * Returns the number of bytes written or -1 on error
- */
-ssize_t libewf_section_header_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_header_sections_t *header_sections,
-         int8_t compression_level,
-         libcerror_error_t **error )
-{
-	static char *function = "libewf_section_header_write";
-	ssize_t write_count   = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libewf_debug_byte_stream_print(
-		     "Header",
-		     header_sections->header,
-		     header_sections->header_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header.",
-			 function );
-
-			return( -1 );
-		}
-	}
-#endif
-	/* Do not include the end of string character in the compressed data
-	 */
-	write_count = libewf_section_write_compressed_string(
-	               section,
-	               file_io_pool,
-	               file_io_pool_entry,
-	               (uint8_t *) "header",
-	               6,
-	               section_offset,
-	               header_sections->header,
-	               header_sections->header_size - 1,
-	               compression_level,
-	               error );
-
-	if( write_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
-		 function );
-
-		return( -1 );
-	}
-	header_sections->number_of_header_sections += 1;
-
-	return( write_count );
-}
-
 /* Reads a header2 section
  * Returns the number of bytes read or -1 on error
  */
@@ -4775,82 +4707,6 @@ on_error:
 		 header2 );
 	}
 	return( -1 );
-}
-
-/* Writes a header2 section
- * Returns the number of bytes written or -1 on error
- */
-ssize_t libewf_section_header2_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_header_sections_t *header_sections,
-         int8_t compression_level,
-         libcerror_error_t **error )
-{
-	static char *function = "libewf_section_header2_write";
-	ssize_t write_count   = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libewf_debug_utf16_stream_print(
-		     "Header2",
-		     header_sections->header2,
-		     header_sections->header2_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header2.",
-			 function );
-
-			return( -1 );
-		}
-	}
-#endif
-	/* Do not include the end of string character in the compressed data
-	 */
-	write_count = libewf_section_write_compressed_string(
-	               section,
-	               file_io_pool,
-	               file_io_pool_entry,
-	               (uint8_t *) "header2",
-	               7,
-	               section_offset,
-	               header_sections->header2,
-	               header_sections->header2_size - 2,
-	               compression_level,
-	               error );
-
-	if( write_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
-		 function );
-
-		return( -1 );
-	}
-	header_sections->number_of_header_sections += 1;
-
-	return( write_count );
 }
 
 /* Reads a ltree section
@@ -6895,6 +6751,7 @@ ssize_t libewf_section_table_write(
          off64_t section_offset,
          off64_t base_offset,
          const uint8_t *table_entries_data,
+         size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
          uint8_t segment_file_type,
@@ -6907,7 +6764,6 @@ ssize_t libewf_section_table_write(
 	size64_t section_data_size          = 0;
 	size_t section_descriptor_data_size = 0;
 	size_t table_entry_data_size        = 0;
-	size_t table_entries_data_size      = 0;
 	size_t table_header_data_size       = 0;
 	size_t table_footer_data_size       = 0;
 	ssize_t total_write_count           = 0;
@@ -6985,8 +6841,28 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	table_entries_data_size = number_of_entries * table_entry_data_size;
+	if( table_entries_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid table entries data size value exceeds maximum.",
+		 function );
 
+		return( -1 );
+	}
+	if( table_entries_data_size != ( number_of_entries * table_entry_data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid table entries data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	section_data_size = table_header_data_size
 	                  + table_entries_data_size
 	                  + chunks_data_size;
@@ -8473,6 +8349,8 @@ ssize_t libewf_section_xhash_write(
 	               section,
 	               file_io_pool,
 	               file_io_pool_entry,
+	               1,
+	               0,
 	               (uint8_t *) "xhash",
 	               5,
 	               section_offset,
@@ -8592,82 +8470,6 @@ on_error:
 		 xheader );
 	}
 	return( -1 );
-}
-
-/* Writes a xheader section
- * Returns the number of bytes written or -1 on error
- */
-ssize_t libewf_section_xheader_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_header_sections_t *header_sections,
-         int8_t compression_level,
-         libcerror_error_t **error )
-{
-	static char *function = "libewf_section_xheader_write";
-	ssize_t write_count   = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libewf_debug_utf8_stream_print(
-		     "XHeader",
-		     header_sections->xheader,
-		     header_sections->xheader_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print xheader.",
-			 function );
-
-			return( -1 );
-		}
-	}
-#endif
-	/* Do not include the end of string character in the compressed data
-	 */
-	write_count = libewf_section_write_compressed_string(
-	               section,
-	               file_io_pool,
-	               file_io_pool_entry,
-	               (uint8_t *) "xheader",
-	               7,
-	               section_offset,
-	               header_sections->xheader,
-	               header_sections->xheader_size - 1,
-	               compression_level,
-	               error );
-
-	if( write_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
-		 function );
-
-		return( -1 );
-	}
-	header_sections->number_of_header_sections += 1;
-
-	return( write_count );
 }
 
 /* Reads a delta chunk section

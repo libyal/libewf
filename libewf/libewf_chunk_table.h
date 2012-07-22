@@ -142,12 +142,14 @@ int libewf_chunk_table_correct_v1(
      uint8_t tainted,
      libcerror_error_t **error );
 
-int libewf_chunk_table_fill_offsets(
+int libewf_chunk_table_generate_table_entries_data(
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
+     uint8_t format_version,
+     uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint32_t number_of_entries,
      off64_t base_offset,
-     ewf_table_entry_v1_t *table_offsets,
-     uint32_t number_of_offsets,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

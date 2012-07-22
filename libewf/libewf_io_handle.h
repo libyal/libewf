@@ -71,10 +71,9 @@ struct libewf_io_handle
 	 */
 	uint8_t compression_flags;
 
-	/* Value to indicate compression is forced
-	 * Used by EWF-S01
+	/* Flags used for chunk packing
 	 */
-	uint8_t force_compression;
+	uint8_t pack_flags;
 
 	/* Value to indicate the data and some metadata is encrypted
 	 */

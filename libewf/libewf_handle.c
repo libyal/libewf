@@ -28,6 +28,7 @@
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
+#include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
 #include "libewf_empty_block.h"
@@ -3372,12 +3373,58 @@ int libewf_handle_open_read_section_data(
 				  (void *) "header",
 				  6 ) == 0 )
 			{
-				read_count = libewf_section_header_read(
+				read_count = libewf_section_compressed_string_read(
 					      section,
 					      file_io_pool,
 					      file_io_pool_entry,
-					      header_sections,
+					      &file_object_string,
+					      &file_object_string_size,
 					      error );
+
+				if( read_count == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read header file object string.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( libewf_debug_byte_stream_print(
+					     "Header",
+					     file_object_string,
+					     file_object_string_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+						 "%s: unable to print header.",
+						 function );
+
+						goto on_error;
+					}
+				}
+#endif
+				if( header_sections->header == NULL )
+				{
+					header_sections->header      = file_object_string;
+					header_sections->header_size = file_object_string_size;
+				}
+				else
+				{
+					memory_free(
+					 file_object_string );
+				}
+				file_object_string = NULL;
+
+				header_sections->number_of_header_sections += 1;
 
 				known_section = 1;
 /* TODO change */
@@ -6647,16 +6694,8 @@ ssize_t libewf_handle_write_buffer(
 			buffer_offset += write_size;
 			buffer_size   -= write_size;
 
-/* TODO add EWF2 support ? Pass pack flags form IO handle */
-			if( internal_handle->io_handle->major_version == 1 )
-			{
-				pack_flags = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
-			}
-			else
-			{
-				pack_flags = 0;
-			}
 			chunk_data_size = chunk_data->data_size;
+			pack_flags      = internal_handle->io_handle->pack_flags;
 
 			if( libewf_chunk_data_pack(
 			     chunk_data,
@@ -6826,14 +6865,8 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( write_chunk != 0 )
 			{
-/* TODO add EWF2 support ? Pass pack flags form IO handle */
-				pack_flags = internal_handle->io_handle->force_compression;
-
-				if( internal_handle->io_handle->major_version == 1 )
-				{
-					pack_flags |= LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
-				}
 				chunk_data_size = internal_handle->chunk_data->data_size;
+				pack_flags      = internal_handle->io_handle->pack_flags;
 
 				if( libewf_chunk_data_pack(
 				     internal_handle->chunk_data,
@@ -7112,14 +7145,8 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-/* TODO add EWF2 support ? Pass pack flags form IO handle */
-		pack_flags = internal_handle->io_handle->force_compression;
-
-		if( internal_handle->io_handle->major_version == 1 )
-		{
-			pack_flags |= LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
-		}
 		chunk_data_size = internal_handle->chunk_data->data_size;
+		pack_flags      = internal_handle->io_handle->pack_flags;
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
@@ -7241,7 +7268,7 @@ ssize_t libewf_handle_write_finalize(
 		{
 			return( write_finalize_count );
 		}
-		/* Create the headers if required
+		/* Create the segment file if required
 		 */
 		if( libewf_write_io_handle_create_segment_file(
 		     internal_handle->io_handle,
@@ -7389,21 +7416,22 @@ ssize_t libewf_handle_write_finalize(
 		 */
 		if( internal_handle->write_io_handle->chunks_section_offset != 0 )
 		{
-			/* Correct the offset, size in the chunks section
-			 */
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: correcting chunks section.\n",
+				 "%s: closing chunks section.\n",
 				 function );
 			}
 #endif
 			if( internal_handle->write_io_handle->number_of_table_entries < internal_handle->write_io_handle->number_of_chunks_written_to_section )
 			{
+				internal_handle->write_io_handle->table_entries_data_size = internal_handle->write_io_handle->number_of_chunks_written_to_section
+				                                                          * internal_handle->write_io_handle->table_entry_size;
+
 				reallocation = memory_reallocate(
 				                internal_handle->write_io_handle->table_entries_data,
-				                sizeof( ewf_table_entry_v1_t ) * internal_handle->write_io_handle->number_of_chunks_written_to_section );
+				                internal_handle->write_io_handle->table_entries_data_size );
 
 				if( reallocation == NULL )
 				{
@@ -7416,10 +7444,10 @@ ssize_t libewf_handle_write_finalize(
 
 					return( -1 );
 				}
-				internal_handle->write_io_handle->table_entries_data      = (ewf_table_entry_v1_t *) reallocation;
+				internal_handle->write_io_handle->table_entries_data      = (uint8_t *) reallocation;
 				internal_handle->write_io_handle->number_of_table_entries = internal_handle->write_io_handle->number_of_chunks_written_to_section;
 			}
-			write_count = libewf_segment_file_write_chunks_section_correction(
+			write_count = libewf_segment_file_write_chunks_section_final(
 				       segment_file,
 				       internal_handle->io_handle,
 				       internal_handle->file_io_pool,
@@ -7427,6 +7455,7 @@ ssize_t libewf_handle_write_finalize(
 				       segment_file_offset,
 				       internal_handle->chunk_table_list,
 			               internal_handle->write_io_handle->table_entries_data,
+			               internal_handle->write_io_handle->table_entries_data_size,
 			               internal_handle->write_io_handle->number_of_table_entries,
 				       internal_handle->write_io_handle->chunks_section_offset,
 				       (size64_t) internal_handle->write_io_handle->chunks_section_write_count,

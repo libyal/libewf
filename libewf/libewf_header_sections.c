@@ -341,16 +341,16 @@ on_error:
 /* Create the header sections from the header values
  * Returns 1 on success or -1 on error
  */
-int libewf_header_sections_create(
+int libewf_header_sections_generate(
      libewf_header_sections_t *header_sections,
      libfvalue_table_t *header_values,
+     time_t timestamp,
      int8_t compression_level,
      uint8_t format,
      int header_codepage,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_header_sections_create";
-	time_t timestamp      = time( NULL );
+	static char *function = "libewf_header_sections_generate";
 
 	if( header_sections == NULL )
 	{

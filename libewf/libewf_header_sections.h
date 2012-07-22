@@ -79,9 +79,10 @@ int libewf_header_sections_clone(
      libewf_header_sections_t *source_header_sections,
      libcerror_error_t **error );
 
-int libewf_header_sections_create(
+int libewf_header_sections_generate(
      libewf_header_sections_t *header_sections,
      libfvalue_table_t *header_values,
+     time_t timestamp,
      int8_t compression_level,
      uint8_t format,
      int header_codepage,

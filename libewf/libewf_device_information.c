@@ -33,12 +33,12 @@
 #include "libewf_media_values.h"
 
 /* Generate an UTF-8 encoded device information string
- * Sets device information string and device information string size
+ * Sets utf8_string and utf8_string_size
  * Returns 1 if successful or -1 on error
  */
 int libewf_device_information_generate_utf8_string(
-     uint8_t **device_information_string,
-     size_t *device_information_string_size,
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
@@ -49,45 +49,58 @@ int libewf_device_information_generate_utf8_string(
 	libfvalue_value_t *serial_number_header_value      = NULL;
 	const char *newline_string                         = "\n";
 	static char *function                              = "libewf_device_information_generate_utf8_string";
-	size_t device_information_string_index             = 0;
+	size_t bytes_per_sector_string_length              = 0;
 	size_t device_label_string_length                  = 0;
 	size_t model_string_length                         = 0;
 	size_t newline_string_length                       = 1;
+	size_t number_of_sectors_string_length             = 0;
 	size_t process_identifier_string_length            = 0;
 	size_t serial_number_string_length                 = 0;
+	size_t utf8_string_index                           = 0;
 	int number_of_characters                           = 0;
 	int number_of_tabs                                 = 0;
 	int result                                         = 0;
 
-	if( device_information_string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid device information string.",
+		 "%s: invalid UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	if( *device_information_string != NULL )
+	if( *utf8_string != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: device information string already set.",
+		 "%s: UTF-8 string already set.",
 		 function );
 
 		return( -1 );
 	}
-	if( device_information_string_size == NULL )
+	if( utf8_string_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid device information string size.",
+		 "%s: invalid UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -160,15 +173,12 @@ int libewf_device_information_generate_utf8_string(
 
 		goto on_error;
 	}
-	/* Determine the device information string size
-	 */
-	*device_information_string_size = 0;
-
-	/* Reserve space for:
+	/* Determine the string size
+	 * Reserve space for:
 	 * 1 <newline>
 	 * main <newline>
 	 */
-	*device_information_string_size += 5 + ( 2 * newline_string_length );
+	*utf8_string_size = 5 + ( 2 * newline_string_length );
 
 	/* Reserve space for:
 	 * sn <tab> md <tab> lb <tab> ts <tab> hs <tab> dc <tab> dt <tab> pid <tab> rs <tab> ls <tab> bp <tab> ph <newline>
@@ -176,7 +186,7 @@ int libewf_device_information_generate_utf8_string(
 	number_of_characters = 25;
 	number_of_tabs       = 11;
 
-	*device_information_string_size += number_of_characters + number_of_tabs + newline_string_length;
+	*utf8_string_size += number_of_characters + number_of_tabs + newline_string_length;
 
 	if( serial_number_header_value != NULL )
 	{
@@ -192,7 +202,7 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: serial_number",
+			 "%s: unable to retrieve string size of header value: serial_number.",
 			 function );
 
 			goto on_error;
@@ -201,7 +211,7 @@ int libewf_device_information_generate_utf8_string(
 		{
 			serial_number_string_length -= 1;
 
-			*device_information_string_size += serial_number_string_length;
+			*utf8_string_size += serial_number_string_length;
 		}
 	}
 	if( model_header_value != NULL )
@@ -218,7 +228,7 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: model",
+			 "%s: unable to retrieve string size of header value: model.",
 			 function );
 
 			goto on_error;
@@ -227,7 +237,7 @@ int libewf_device_information_generate_utf8_string(
 		{
 			model_string_length -= 1;
 
-			*device_information_string_size += model_string_length;
+			*utf8_string_size += model_string_length;
 		}
 	}
 	if( device_label_header_value != NULL )
@@ -244,7 +254,7 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: device_label",
+			 "%s: unable to retrieve string size of header value: device_label.",
 			 function );
 
 			goto on_error;
@@ -253,13 +263,36 @@ int libewf_device_information_generate_utf8_string(
 		{
 			device_label_string_length -= 1;
 
-			*device_information_string_size += device_label_string_length;
+			*utf8_string_size += device_label_string_length;
 		}
 	}
-/* TODO: number of sectors, ts */
+	if( libfvalue_string_size_from_integer(
+	     &number_of_sectors_string_length,
+	     media_values->number_of_sectors,
+	     64,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string size of number of sectors.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_sectors_string_length > 0 )
+	{
+		number_of_sectors_string_length -= 1;
+
+		*utf8_string_size += number_of_sectors_string_length;
+	}
 /* TODO: hs, dc */
 
-/* TODO: media type, dt */
+	/* Reserve space for the media (or drive) type */
+	*utf8_string_size += 1;
+
 	if( process_identifier_header_value != NULL )
 	{
 		result = libfvalue_value_get_utf8_string_size(
@@ -274,7 +307,7 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: process_identifier",
+			 "%s: unable to retrieve string size of header value: process_identifier.",
 			 function );
 
 			goto on_error;
@@ -283,107 +316,132 @@ int libewf_device_information_generate_utf8_string(
 		{
 			process_identifier_string_length -= 1;
 
-			*device_information_string_size += process_identifier_string_length;
+			*utf8_string_size += process_identifier_string_length;
 		}
 	}
 /* TODO: rs, ls */
-/* TODO: bytes per sector, bp */
-/* TODO: is physical, ph */
 
+	if( libfvalue_string_size_from_integer(
+	     &bytes_per_sector_string_length,
+	     media_values->bytes_per_sector,
+	     32,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string size of bytes per sector.",
+		 function );
+
+		goto on_error;
+	}
+	if( bytes_per_sector_string_length > 0 )
+	{
+		bytes_per_sector_string_length -= 1;
+
+		*utf8_string_size += bytes_per_sector_string_length;
+	}
+	if( ( media_values->media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
+	{
+		*utf8_string_size += 1;
+	}
 	/* Reserve space for the tabs and 2 newlines
 	 */
-	*device_information_string_size += number_of_tabs + ( 2 * newline_string_length );
+	*utf8_string_size += number_of_tabs + ( 2 * newline_string_length );
 
 	/* Reserve space for the end-of-string character
 	 */
-	*device_information_string_size += 1;
+	*utf8_string_size += 1;
 
-	/* Determine the device information string
+	/* Determine the string
 	 */
-	*device_information_string = (uint8_t *) memory_allocate(
-	                                          sizeof( uint8_t ) * *device_information_string_size );
+	*utf8_string = (uint8_t *) memory_allocate(
+	                                          sizeof( uint8_t ) * *utf8_string_size );
 
-	if( *device_information_string == NULL )
+	if( *utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create device information string.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '1';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '1';
 
-	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'm';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'a';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'i';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'a';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'i';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
 
-	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'n';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'm';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'l';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'b';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 't';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'h';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'c';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 't';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'i';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'd';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'r';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'l';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 's';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'b';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'p';
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) 'h';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'h';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'i';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'r';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'h';
 
-	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
 	if( ( serial_number_header_value != NULL )
 	 && ( serial_number_string_length > 0 ) )
 	{
-		result = libfvalue_value_copy_to_utf8_string(
+		result = libfvalue_value_copy_to_utf8_string_with_index(
 			  serial_number_header_value,
 			  0,
-			  &( ( *device_information_string )[ device_information_string_index ] ),
-			  *device_information_string_size - device_information_string_index,
+			  *utf8_string,
+			  *utf8_string_size,
+		          &utf8_string_index,
 			  error );
 
 		if( result == -1 )
@@ -392,23 +450,24 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy string of header value: serial_number.",
+			 "%s: unable to copy header value: serial_number to string.",
 			 function );
 
 			goto on_error;
 		}
-		device_information_string_index += serial_number_string_length;
+		utf8_string_index--;
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( ( model_header_value != NULL )
 	 && ( model_string_length > 0 ) )
 	{
-		result = libfvalue_value_copy_to_utf8_string(
+		result = libfvalue_value_copy_to_utf8_string_with_index(
 			  model_header_value,
 			  0,
-			  &( ( *device_information_string )[ device_information_string_index ] ),
-			  *device_information_string_size - device_information_string_index,
+			  *utf8_string,
+			  *utf8_string_size,
+		          &utf8_string_index,
 			  error );
 
 		if( result == -1 )
@@ -417,23 +476,24 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy string of header value: model.",
+			 "%s: unable to copy header value: model to string.",
 			 function );
 
 			goto on_error;
 		}
-		device_information_string_index += model_string_length;
+		utf8_string_index--;
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( ( device_label_header_value != NULL )
 	 && ( device_label_string_length > 0 ) )
 	{
-		result = libfvalue_value_copy_to_utf8_string(
+		result = libfvalue_value_copy_to_utf8_string_with_index(
 			  device_label_header_value,
 			  0,
-			  &( ( *device_information_string )[ device_information_string_index ] ),
-			  *device_information_string_size - device_information_string_index,
+			  *utf8_string,
+			  *utf8_string_size,
+		          &utf8_string_index,
 			  error );
 
 		if( result == -1 )
@@ -442,26 +502,54 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy string of header value: device_label.",
+			 "%s: unable to copy header value: device_label to string.",
 			 function );
 
 			goto on_error;
 		}
-		device_information_string_index += device_label_string_length;
+		utf8_string_index--;
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
-/* TODO: number of sectors, ts */
-/* TODO: hs, dc */
+	if( number_of_sectors_string_length > 0 )
+	{
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
+		     *utf8_string,
+		     *utf8_string_size,
+		     &utf8_string_index,
+		     media_values->number_of_sectors,
+		     64,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy number of sectors to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: set hs */
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: set dc */
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( ( process_identifier_header_value != NULL )
 	 && ( process_identifier_string_length > 0 ) )
 	{
-		result = libfvalue_value_copy_to_utf8_string(
+		result = libfvalue_value_copy_to_utf8_string_with_index(
 			  process_identifier_header_value,
 			  0,
-			  &( ( *device_information_string )[ device_information_string_index ] ),
-			  *device_information_string_size - device_information_string_index,
+			  *utf8_string,
+			  *utf8_string_size,
+		          &utf8_string_index,
 			  error );
 
 		if( result == -1 )
@@ -470,35 +558,111 @@ int libewf_device_information_generate_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy string of header value: process_identifier.",
+			 "%s: unable to copy header value: process_identifier to string.",
 			 function );
 
 			goto on_error;
 		}
-		device_information_string_index += process_identifier_string_length;
+		utf8_string_index--;
 	}
-	( *device_information_string )[ device_information_string_index++ ] = (uint8_t) '\t';
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
-/* TODO: media type, dt */
-/* TODO: rs, ls */
-/* TODO: bytes per sector, bp */
-/* TODO: is physical, ph */
+/* TODO add support for media types: RAM disk, PALM */
+	switch( media_values->media_type )
+	{
+		case LIBEWF_MEDIA_TYPE_REMOVABLE:
+			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'r';
+			break;
 
-	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+		case LIBEWF_MEDIA_TYPE_FIXED:
+			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'f';
+			break;
+
+		case LIBEWF_MEDIA_TYPE_OPTICAL:
+			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
+			break;
+
+		case LIBEWF_MEDIA_TYPE_SINGLE_FILES:
+			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
+			break;
+
+		case LIBEWF_MEDIA_TYPE_MEMORY:
+			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+			break;
+
+		default:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported media type.",
+			 function );
+
+			goto on_error;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: rs */
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+/* TODO: ls */
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( bytes_per_sector_string_length > 0 )
+	{
+		if( libfvalue_utf8_string_with_index_copy_from_integer(
+		     *utf8_string,
+		     *utf8_string_size,
+		     &utf8_string_index,
+		     media_values->bytes_per_sector,
+		     32,
+		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy bytes per sector to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( media_values->media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
+	{
+		( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '1';
+	}
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *device_information_string )[ device_information_string_index++ ] = newline_string[ 0 ];
+	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *device_information_string )[ device_information_string_index++ ] = newline_string[ 1 ];
+		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *device_information_string )[ device_information_string_index++ ] = 0;
+	( *utf8_string )[ utf8_string_index++ ] = 0;
 
 	return( 1 );
+
+on_error:
+	if( *utf8_string != NULL )
+	{
+		memory_free(
+		 *utf8_string );
+
+		*utf8_string = NULL;
+	}
+	*utf8_string_size = 0;
+
+	return( -1 );
 }
 
 /* Generate device information
@@ -512,9 +676,9 @@ int libewf_device_information_generate(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	uint8_t *device_information_string    = NULL;
+	uint8_t *utf8_string    = NULL;
 	static char *function                 = "libewf_device_information_generate";
-	size_t device_information_string_size = 0;
+	size_t utf8_string_size = 0;
 
 	if( device_information == NULL )
 	{
@@ -550,8 +714,8 @@ int libewf_device_information_generate(
 		return( -1 );
 	}
 	if( libewf_device_information_generate_utf8_string(
-	     &device_information_string,
-	     &device_information_string_type,
+	     &utf8_string,
+	     &utf8_string_size,
 	     media_values,
 	     header_values,
 	     error ) != 1 )
@@ -560,14 +724,23 @@ int libewf_device_information_generate(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create device information string.",
+		 "%s: unable to create UTF-8 device information string.",
 		 function );
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	"%s: device information string:\n%s",
+		 function,
+		 utf8_string );
+	}
+#endif
 	if( libuna_utf16_stream_size_from_utf8(
-	     device_information_string,
-	     device_information_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     device_information_size,
 	     error ) != 1 )
 	{
@@ -598,8 +771,8 @@ int libewf_device_information_generate(
 	     *device_information,
 	     *device_information_size,
 	     LIBUNA_ENDIAN_LITTLE,
-	     device_information_string,
-	     device_information_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -612,15 +785,15 @@ int libewf_device_information_generate(
 		goto on_error;
 	}
 	memory_free(
-	 device_information_string );
+	 utf8_string );
 
 	return( 1 );
 
 on_error:
-	if( device_information_string != NULL )
+	if( utf8_string != NULL )
 	{
 		memory_free(
-		 device_information_string );
+		 utf8_string );
 	}
 	if( *device_information != NULL )
 	{
@@ -638,8 +811,8 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_device_information_parse_utf8_string(
-     const uint8_t *device_information_string,
-     size_t device_information_string_size,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
@@ -663,20 +836,20 @@ int libewf_device_information_parse_utf8_string(
 	int number_of_values                  = 0;
 	int value_index                       = 0;
 
-	if( device_information_string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid device information string.",
+		 "%s: invalid UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
 	if( libfvalue_utf8_string_split(
-	     device_information_string,
-	     device_information_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     (uint8_t) '\n',
 	     &lines,
 	     error ) != 1 )
@@ -685,7 +858,7 @@ int libewf_device_information_parse_utf8_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split device information string into lines.",
+		 "%s: unable to split UTF-8 string into lines.",
 		 function );
 
 		goto on_error;
@@ -699,7 +872,7 @@ int libewf_device_information_parse_utf8_string(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of lines",
+		 "%s: unable to retrieve number of lines.",
 		 function );
 
 		goto on_error;
@@ -819,7 +992,7 @@ int libewf_device_information_parse_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of types",
+			 "%s: unable to retrieve number of types.",
 			 function );
 
 			goto on_error;
@@ -865,7 +1038,7 @@ int libewf_device_information_parse_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of values",
+			 "%s: unable to retrieve number of values.",
 			 function );
 
 			goto on_error;
@@ -1348,9 +1521,9 @@ int libewf_device_information_parse(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	uint8_t *device_information_string    = NULL;
-	static char *function                 = "libewf_device_information_parse";
-	size_t device_information_string_size = 0;
+	uint8_t *utf8_string    = NULL;
+	static char *function   = "libewf_device_information_parse";
+	size_t utf8_string_size = 0;
 
 	if( device_information == NULL )
 	{
@@ -1367,35 +1540,35 @@ int libewf_device_information_parse(
 	     device_information,
 	     device_information_size,
 	     0,
-	     &device_information_string_size,
+	     &utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine device information string size.",
+		 "%s: unable to determine UTF-8 string size.",
 		 function );
 
 		goto on_error;
 	}
-	device_information_string = (uint8_t *) memory_allocate(
-	                                         sizeof( uint8_t ) * device_information_string_size );
+	utf8_string = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( device_information_string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create device information string.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	if( libuna_utf8_string_copy_from_utf16_stream(
-	     device_information_string,
-	     device_information_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     device_information,
 	     device_information_size,
 	     0,
@@ -1405,7 +1578,7 @@ int libewf_device_information_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to set device information string.",
+		 "%s: unable to copy device information to UTF-8 string.",
 		 function );
 
 		goto on_error;
@@ -1416,12 +1589,12 @@ int libewf_device_information_parse(
 		libcnotify_printf(
 	 	"%s: device information string:\n%s",
 		 function,
-		 device_information_string );
+		 utf8_string );
 	}
 #endif
 	if( libewf_device_information_parse_utf8_string(
-	     device_information_string,
-	     device_information_string_size,
+	     utf8_string,
+	     utf8_string_size,
 	     media_values,
 	     header_values,
 	     error ) != 1 )
@@ -1430,21 +1603,21 @@ int libewf_device_information_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse device information UTF-8 string.",
+		 "%s: unable to parse UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	memory_free(
-	 device_information_string );
+	 utf8_string );
 
 	return( 1 );
 
 on_error:
-	if( device_information_string != NULL )
+	if( utf8_string != NULL )
 	{
 		memory_free(
-		 device_information_string );
+		 utf8_string );
 	}
 	return( -1 );
 }

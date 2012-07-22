@@ -33,9 +33,25 @@
 extern "C" {
 #endif
 
+int libewf_case_data_generate_utf8_string(
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
+     libcerror_error_t **error );
+
+int libewf_case_data_generate(
+     uint8_t **case_data,
+     size_t *case_data_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
+     libcerror_error_t **error );
+
 int libewf_case_data_parse_string(
-     const uint8_t *case_data_string,
-     size_t case_data_string_size,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error );

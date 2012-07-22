@@ -53,13 +53,25 @@ struct libewf_write_io_handle
 	 */
 	size_t section_descriptor_size;
 
+	/* The size of a (sector) table entry
+	 */
+	size_t table_entry_size;
+
+	/* The size to reserve for (the end of) an chunks section
+	 */
+	size_t chunks_section_reserved_size;
+
+	/* The size to reserve for the table entries of a chunk
+	 */
+	size_t chunk_table_entries_reserved_size;
+
 	/* A cached version of the data section
 	 */
 	ewf_data_t *data_section;
 
 	/* Cached version of the table entries
 	 */
-	ewf_table_entry_v1_t *table_entries_data;
+	uint8_t *table_entries_data;
 
 	/* The size of the cached version of the table entries
 	 */

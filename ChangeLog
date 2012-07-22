@@ -1,5 +1,12 @@
 TODO
+* refactor write compressed string
+  - to support caching of compressed strings, e.g. case data, device info
+
+* make chunks_per_segment_file 64-bit
+* replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
 * work on deduplication support
+
+* remove libewf_device_information conversion to UTF8
 
 * internally mark Ex01 and Lx01 format and have ewfinfo print a string
   representation
@@ -381,10 +388,19 @@ Closed:
   - does not really matter still need to do conversion to runtime UTF-16
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
+* EWF2 can handle more then UINT16_MAX segment files - add support for this?
+  - having more than 60000 segment files is a bit overkill,
+    also the naming schema does not support this without creating odd names
+    for now not adding support for this, unless there is a good reason to do so
+
+20120722
+* code clean up
+* worked on writing Ex01 files
 
 20120721
 * code clean up
 * fix in spec file
+* worked on writing Ex01 files
 
 20120719
 * worked on codegear files

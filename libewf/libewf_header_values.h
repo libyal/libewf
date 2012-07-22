@@ -183,8 +183,8 @@ int libewf_header_values_generate_utf8_header_string(
      size_t newline_string_length,
      time_t timestamp,
      int8_t compression_level,
-     uint8_t **header_string,
-     size_t *header_string_size,
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 int libewf_header_values_generate_header_ewf(

@@ -34,15 +34,22 @@ extern "C" {
 #endif
 
 int libewf_device_information_generate_utf8_string(
-     uint8_t **device_information_string,
-     size_t *device_information_string_size,
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error );
+
+int libewf_device_information_generate(
+     uint8_t **device_information,
+     size_t *device_information_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error );
 
 int libewf_device_information_parse_utf8_string(
-     const uint8_t *device_information_string,
-     size_t device_information_string_size,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      libcerror_error_t **error );
