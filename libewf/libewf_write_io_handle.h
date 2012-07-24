@@ -49,6 +49,10 @@ typedef struct libewf_write_io_handle libewf_write_io_handle_t;
 
 struct libewf_write_io_handle
 {
+	/* Flags used for chunk packing
+	 */
+	uint8_t pack_flags;
+
 	/* The size of a section descriptor
 	 */
 	size_t section_descriptor_size;

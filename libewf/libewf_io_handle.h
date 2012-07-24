@@ -71,10 +71,6 @@ struct libewf_io_handle
 	 */
 	uint8_t compression_flags;
 
-	/* Flags used for chunk packing
-	 */
-	uint8_t pack_flags;
-
 	/* Value to indicate the data and some metadata is encrypted
 	 */
 	uint8_t is_encrypted;

@@ -1184,8 +1184,6 @@ int libewf_handle_set_format(
 		internal_handle->io_handle->major_version = 1;
 		internal_handle->io_handle->minor_version = 0;
 	}
-	internal_handle->io_handle->pack_flags = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
-
 	if( ( format == LIBEWF_FORMAT_EWF )
 	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
@@ -1194,7 +1192,6 @@ int libewf_handle_set_format(
 		 */
 		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 4831;
 		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-		internal_handle->io_handle->pack_flags                      |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
 	}
 	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{

@@ -395,6 +395,10 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20120724
+* fixed issue regarding pack flags not being set on initialization
+* moved pack flags to write IO handle
+
 20120722
 * code clean up
 * worked on writing Ex01 files

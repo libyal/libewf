@@ -113,6 +113,7 @@ int libewf_write_io_handle_initialize(
 
 		goto on_error;
 	}
+	( *write_io_handle )->pack_flags                  = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
 	( *write_io_handle )->section_descriptor_size     = sizeof( ewf_section_descriptor_v1_t );
 	( *write_io_handle )->table_entry_size            = sizeof( ewf_table_entry_v1_t );
 	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
@@ -414,6 +415,13 @@ int libewf_write_io_handle_initialize_values(
 	{
 		segment_table->maximum_segment_size = write_io_handle->maximum_segment_file_size;
 	}
+	write_io_handle->pack_flags = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
+
+	if( ( io_handle->format == LIBEWF_FORMAT_EWF )
+	 || ( io_handle->format == LIBEWF_FORMAT_SMART ) )
+	{
+		write_io_handle->pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+	}
 	if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
 		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v2_t );
@@ -533,7 +541,7 @@ int libewf_write_io_handle_initialize_values(
 			goto on_error;
 		}
 	}
-	if( ( io_handle->pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
+	if( ( write_io_handle->pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
 	{
 		if( write_io_handle->compressed_zero_byte_empty_block == NULL )
 		{
