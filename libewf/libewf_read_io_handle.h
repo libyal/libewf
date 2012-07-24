@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
+#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libmfcache.h"
@@ -65,6 +66,7 @@ int libewf_read_io_handle_clone(
 
 int libewf_read_io_handle_read_chunk_data(
      libewf_read_io_handle_t *read_io_handle,
+     libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_list_t *chunk_table_list,

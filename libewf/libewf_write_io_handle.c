@@ -422,6 +422,10 @@ int libewf_write_io_handle_initialize_values(
 	{
 		write_io_handle->pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
 	}
+	else if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		write_io_handle->pack_flags |= LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING;
+	}
 	if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
 		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v2_t );
@@ -589,12 +593,13 @@ int libewf_write_io_handle_initialize_values(
 
 				goto on_error;
 			}
-			result = libewf_compress(
+			result = libewf_compress_data(
 				  compressed_zero_byte_empty_block,
 				  &( write_io_handle->compressed_zero_byte_empty_block_size ),
+				  io_handle->compression_method,
+				  io_handle->compression_level,
 				  zero_byte_empty_block,
 				  (size_t) media_values->chunk_size,
-				  io_handle->compression_level,
 				  error );
 
 			/* Check if the compressed buffer was too small
@@ -631,12 +636,13 @@ int libewf_write_io_handle_initialize_values(
 				}
 				compressed_zero_byte_empty_block = (uint8_t *) reallocation;
 
-				result = libewf_compress(
+				result = libewf_compress_data(
 					  compressed_zero_byte_empty_block,
 					  &( write_io_handle->compressed_zero_byte_empty_block_size ),
+					  io_handle->compression_method,
+					  io_handle->compression_level,
 					  zero_byte_empty_block,
 					  (size_t) media_values->chunk_size,
-					  io_handle->compression_level,
 					  error );
 			}
 			if( result != 1 )

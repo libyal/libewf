@@ -24,6 +24,7 @@
 
 #include "libewf_chunk_data.h"
 #include "libewf_definitions.h"
+#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
@@ -265,6 +266,7 @@ on_error:
  */
 int libewf_read_io_handle_read_chunk_data(
      libewf_read_io_handle_t *read_io_handle,
+     libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_list_t *chunk_table_list,
@@ -287,6 +289,17 @@ int libewf_read_io_handle_read_chunk_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -380,8 +393,8 @@ int libewf_read_io_handle_read_chunk_data(
 
 			return( -1 );
 		}
-		( *chunk_data )->data_size  = chunk_size;
-		( *chunk_data )->is_corrupt = 1;
+		( *chunk_data )->data_size    = chunk_size;
+		( *chunk_data )->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 
 		if( memory_set(
 		     ( *chunk_data )->data,
@@ -465,6 +478,7 @@ int libewf_read_io_handle_read_chunk_data(
 		if( libewf_chunk_data_unpack(
 		     *chunk_data,
 		     media_values->chunk_size,
+		     io_handle->compression_method,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -477,7 +491,7 @@ int libewf_read_io_handle_read_chunk_data(
 
 			return( -1 );
 		}
-		if( ( *chunk_data )->is_corrupt != 0 )
+		if( ( ( *chunk_data )->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 		{
 			if( read_io_handle->zero_on_error != 0 )
 			{
@@ -498,7 +512,7 @@ int libewf_read_io_handle_read_chunk_data(
 			}
 		}
 	}
-	if( ( *chunk_data )->is_corrupt != 0 )
+	if( ( ( *chunk_data )->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 	{
 		/* Add checksum error
 		 */

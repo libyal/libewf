@@ -285,7 +285,7 @@ int libewf_chunk_table_read_chunk(
 
 		return( -1 );
 	}
-	if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	if( ( element_data_flags & LIBEWF_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -357,17 +357,9 @@ int libewf_chunk_table_read_chunk(
 
 		goto on_error;
 	}
-	chunk_data->data_size = (size_t) read_count;
-
-	if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-	{
-		chunk_data->is_compressed = 1;
-	}
-	if( ( element_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
-	{
-		chunk_data->has_checksum = 1;
-	}
-	chunk_data->is_packed = 1;
+	chunk_data->data_size   = (size_t) read_count;
+	chunk_data->range_flags = ( element_data_flags | LIBEWF_RANGE_FLAG_IS_PACKED )
+	                        & ~( LIBEWF_RANGE_FLAG_IS_TAINTED | LIBEWF_RANGE_FLAG_IS_CORRUPTED );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -423,7 +415,7 @@ int libewf_chunk_table_read_chunk(
 		 function,
 		 element_index );
 
-		if( ( element_data_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		if( ( element_data_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
 			libcnotify_printf(
 			 "Is compressed\n" );
@@ -1211,15 +1203,15 @@ int libewf_chunk_table_fill_v1(
 
 		if( is_compressed != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( corrupted != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 		}
 		if( tainted != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( is_compressed == 0 )
@@ -1432,15 +1424,15 @@ int libewf_chunk_table_fill_v1(
 
 	if( is_compressed != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 	}
 	if( corrupted != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 	}
 	if( tainted != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( is_compressed == 0 )
@@ -1674,7 +1666,7 @@ int libewf_chunk_table_fill_v2(
 
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
 		{
@@ -1686,7 +1678,7 @@ int libewf_chunk_table_fill_v2(
 		}
 		if( tainted != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
 		result = libmfdata_list_is_group(
 		          chunk_table_list,
@@ -1957,15 +1949,15 @@ int libewf_chunk_table_correct_v1(
 
 		if( is_compressed != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 		}
 		if( corrupted != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 		}
 		if( tainted != 0 )
 		{
-			range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( is_compressed == 0 )
@@ -2089,8 +2081,8 @@ int libewf_chunk_table_correct_v1(
 #endif
 					mismatch = 1;
 				}
-				else if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
-				      != ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
+				else if( ( range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED )
+				      != ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) )
 				{
 #if defined( HAVE_DEBUG_OUTPUT )
 					if( libcnotify_verbose != 0 )
@@ -2116,13 +2108,13 @@ int libewf_chunk_table_correct_v1(
 					{
 						update_data_range = 1;
 					}
-					else if( ( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+					else if( ( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 					      && ( corrupted == 0 ) )
 					{
 						update_data_range = 1;
 					}
 				}
-				else if( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
+				else if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_TAINTED ) != 0 )
 				{
 					update_data_range = 1;
 				}
@@ -2253,15 +2245,15 @@ int libewf_chunk_table_correct_v1(
 
 	if( is_compressed != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 	}
 	if( corrupted != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_CORRUPTED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 	}
 	if( tainted != 0 )
 	{
-		range_flags |= LIBMFDATA_RANGE_FLAG_IS_TAINTED;
+		range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( is_compressed == 0 )
@@ -2385,8 +2377,8 @@ int libewf_chunk_table_correct_v1(
 #endif
 				mismatch = 1;
 			}
-			else if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED )
-			      != ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) )
+			else if( ( range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED )
+			      != ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -2412,13 +2404,13 @@ int libewf_chunk_table_correct_v1(
 				{
 					update_data_range = 1;
 				}
-				else if( ( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+				else if( ( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 				      && ( corrupted == 0 ) )
 				{
 					update_data_range = 1;
 				}
 			}
-			else if( ( previous_range_flags & LIBMFDATA_RANGE_FLAG_IS_TAINTED ) != 0 )
+			else if( ( previous_range_flags & LIBEWF_RANGE_FLAG_IS_TAINTED ) != 0 )
 			{
 				update_data_range = 1;
 			}
@@ -2595,7 +2587,7 @@ int libewf_chunk_table_generate_table_entries_data(
 			}
 			table_offset = (uint32_t) chunk_offset;
 
-			if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+			if( ( range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 			{
 				table_offset |= 0x80000000UL;
 			}
@@ -2619,7 +2611,7 @@ int libewf_chunk_table_generate_table_entries_data(
 			}
 			chunk_data_flags = 0;
 
-			if( ( range_flags & LIBMFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+			if( ( range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 			{
 				chunk_data_flags |= LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
 			}

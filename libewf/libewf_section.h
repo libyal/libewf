@@ -130,14 +130,6 @@ ssize_t libewf_section_descriptor_write(
          uint8_t format_version,
          libcerror_error_t **error );
 
-#if defined( HAVE_DEBUG_OUTPUT )
-ssize_t libewf_section_debug_read(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libcerror_error_t **error );
-#endif
-
 ssize_t libewf_section_last_write(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
@@ -152,6 +144,7 @@ ssize_t libewf_section_compressed_string_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint16_t compression_method,
          uint8_t **uncompressed_string,
          size_t *uncompressed_string_size,
          libcerror_error_t **error );
@@ -165,9 +158,10 @@ ssize_t libewf_section_write_compressed_string(
          const uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
+         uint16_t compression_method,
+         int8_t compression_level,
          uint8_t *uncompressed_string,
          size_t uncompressed_string_size,
-         int8_t compression_level,
          libcerror_error_t **error );
 
 ssize_t libewf_section_data_read(
@@ -250,6 +244,7 @@ ssize_t libewf_section_header2_read(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint16_t compression_method,
          libewf_header_sections_t *header_sections,
          libcerror_error_t **error );
 
@@ -349,29 +344,6 @@ ssize_t libewf_section_volume_s01_write(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_media_values_t *media_values,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_xhash_read(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_xhash_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_hash_sections_t *hash_sections,
-         int8_t compression_level,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_xheader_read(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_header_sections_t *header_sections,
          libcerror_error_t **error );
 
 ssize_t libewf_section_delta_chunk_read(

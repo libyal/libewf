@@ -55,21 +55,9 @@ struct libewf_chunk_data
 	 */
 	size_t compressed_data_size;
 
-	/* Value to indicate the chunk has a checksum
+	/* The chunk data range flags
 	 */
-	uint8_t has_checksum;
-
-	/* Value to indicate the chunk is compressed
-	 */
-	uint8_t is_compressed;
-
-	/* Value to indicate the chunk is packed
-	 */
-	uint8_t is_packed;
-
-	/* Value to indicate the chunk is corrupt
-	 */
-	uint8_t is_corrupt;
+	uint32_t range_flags;
 };
 
 int libewf_chunk_data_initialize(
@@ -83,9 +71,10 @@ int libewf_chunk_data_free(
 
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
+     size32_t chunk_size,
+     uint16_t compression_method,
      int8_t compression_level,
      uint8_t compression_flags,
-     size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
      uint8_t pack_flags,
@@ -94,6 +83,7 @@ int libewf_chunk_data_pack(
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
      size_t chunk_size,
+     uint16_t compression_method,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

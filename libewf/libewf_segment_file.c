@@ -509,9 +509,13 @@ ssize_t libewf_segment_file_read_file_header(
 			 segment_file->minor_version );
 
 			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 "\n",
+		 	 "%s: compression method\t\t: %" PRIu16 "",
 			 function,
 			 segment_file->compression_method );
+			libewf_debug_print_compression_method(
+			 segment_file->compression_method );
+			libcnotify_printf(
+			 "\n" );
 		}
 		libcnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
@@ -746,6 +750,15 @@ ssize_t libewf_segment_file_write_file_header(
 		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
 			 function,
 			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
+
+			libcnotify_printf(
+		 	 "%s: compression method\t\t: %" PRIu16 "",
+			 function,
+			 segment_file->compression_method );
+			libewf_debug_print_compression_method(
+			 segment_file->compression_method );
+			libcnotify_printf(
+			 "\n" );
 		}
 		libcnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
@@ -1578,9 +1591,10 @@ ssize_t libewf_segment_file_write_device_information_section(
 	               NULL,
 	               0,
 	               section_offset,
+	               io_handle->compression_method,
+	               LIBEWF_COMPRESSION_DEFAULT,
 	               device_information,
 	               device_information_size - 2,
-	               EWF_COMPRESSION_DEFAULT,
 	               error );
 
 	if( write_count == -1 )
@@ -1589,7 +1603,7 @@ ssize_t libewf_segment_file_write_device_information_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
+		 "%s: unable to write device information section.",
 		 function );
 
 		goto on_error;
@@ -1698,9 +1712,10 @@ ssize_t libewf_segment_file_write_case_data_section(
 	               NULL,
 	               0,
 	               section_offset,
+	               io_handle->compression_method,
+	               LIBEWF_COMPRESSION_DEFAULT,
 	               case_data,
 	               case_data_size - 2,
-	               EWF_COMPRESSION_DEFAULT,
 	               error );
 
 	if( write_count == -1 )
@@ -1709,7 +1724,7 @@ ssize_t libewf_segment_file_write_case_data_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
+		 "%s: unable to write case data section.",
 		 function );
 
 		goto on_error;
@@ -1820,9 +1835,10 @@ ssize_t libewf_segment_file_write_header_section(
 	               (uint8_t *) "header",
 	               6,
 	               section_offset,
+	               io_handle->compression_method,
+	               compression_level,
 	               header_sections->header,
 	               header_sections->header_size - 1,
-	               compression_level,
 	               error );
 
 	if( write_count == -1 )
@@ -1831,7 +1847,7 @@ ssize_t libewf_segment_file_write_header_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
+		 "%s: unable to write header section.",
 		 function );
 
 		goto on_error;
@@ -1894,7 +1910,6 @@ ssize_t libewf_segment_file_write_header2_section(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
          libcerror_error_t **error )
 {
 	libewf_section_t *section = NULL;
@@ -1959,9 +1974,10 @@ ssize_t libewf_segment_file_write_header2_section(
 	               (uint8_t *) "header2",
 	               7,
 	               section_offset,
+	               io_handle->compression_method,
+	               LIBEWF_COMPRESSION_DEFAULT,
 	               header_sections->header2,
 	               header_sections->header2_size - 2,
-	               compression_level,
 	               error );
 
 	if( write_count == -1 )
@@ -1970,7 +1986,7 @@ ssize_t libewf_segment_file_write_header2_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
+		 "%s: unable to write header2 section.",
 		 function );
 
 		goto on_error;
@@ -2033,7 +2049,6 @@ ssize_t libewf_segment_file_write_xheader_section(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
          libcerror_error_t **error )
 {
 	libewf_section_t *section = NULL;
@@ -2098,9 +2113,10 @@ ssize_t libewf_segment_file_write_xheader_section(
 	               (uint8_t *) "xheader",
 	               7,
 	               section_offset,
+	               io_handle->compression_method,
+	               LIBEWF_COMPRESSION_DEFAULT,
 	               header_sections->xheader,
 	               header_sections->xheader_size - 1,
-	               compression_level,
 	               error );
 
 	if( write_count == -1 )
@@ -2109,7 +2125,7 @@ ssize_t libewf_segment_file_write_xheader_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write compressed string.",
+		 "%s: unable to write xheader section.",
 		 function );
 
 		goto on_error;
@@ -2281,7 +2297,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2305,7 +2321,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2337,7 +2353,6 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2361,7 +2376,6 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2388,7 +2402,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2419,7 +2433,6 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2446,7 +2459,6 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2473,7 +2485,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool_entry,
 		               section_offset,
 		               header_sections,
-		               EWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -4517,6 +4529,26 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( libewf_debug_utf8_stream_print(
+				     "XHash",
+				     hash_sections->xhash,
+				     hash_sections->xhash_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print xhash.",
+					 function );
+
+					return( -1 );
+				}
+			}
+#endif
 			if( libewf_section_initialize(
 			     &section,
 			     error ) != 1 )
@@ -4530,14 +4562,22 @@ ssize_t libewf_segment_file_write_close(
 
 				goto on_error;
 			}
-			write_count = libewf_section_xhash_write(
-			               section,
-			               file_io_pool,
-			               file_io_pool_entry,
-			               section_offset,
-			               hash_sections,
-			               EWF_COMPRESSION_DEFAULT,
-			               error );
+			/* Do not include the end of string character in the compressed data
+			 */
+			write_count = libewf_section_write_compressed_string(
+				       section,
+				       file_io_pool,
+				       file_io_pool_entry,
+				       1,
+				       0,
+				       (uint8_t *) "xhash",
+				       5,
+				       section_offset,
+				       io_handle->compression_method,
+			               LIBEWF_COMPRESSION_DEFAULT,
+				       hash_sections->xhash,
+				       hash_sections->xhash_size - 1,
+				       error );
 
 			if( write_count == -1 )
 			{
@@ -4548,7 +4588,7 @@ ssize_t libewf_segment_file_write_close(
 				 "%s: unable to write xhash section.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 			section_offset    += write_count;
 			total_write_count += write_count;

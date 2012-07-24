@@ -1,5 +1,5 @@
 TODO
-* fix issues regarding failing tests
+* libewf_write_io_handle_write_new_chunk pass chunk data flags ?
 
 * refactor write compressed string
   - to support caching of compressed strings, e.g. case data, device info
@@ -398,6 +398,9 @@ Closed:
 20120724
 * fixed issue regarding pack flags not being set on initialization
 * moved pack flags to write IO handle
+* added compression method debug description
+* moved chunk data options into flags
+* worked on compression method support
 
 20120722
 * code clean up

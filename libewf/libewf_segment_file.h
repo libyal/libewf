@@ -208,7 +208,6 @@ ssize_t libewf_segment_file_write_header2_section(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_xheader_section(
@@ -218,7 +217,6 @@ ssize_t libewf_segment_file_write_xheader_section(
          int file_io_pool_entry,
          off64_t section_offset,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_header_sections(

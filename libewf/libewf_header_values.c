@@ -43,8 +43,6 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
-#include "ewf_definitions.h"
-
 /* Initializes the header values
  * Returns 1 if successful or -1 on error
  */
@@ -2743,9 +2741,9 @@ int libewf_header_values_generate_utf8_header_string(
 
 		return( -1 );
 	}
-	if( ( compression_level != EWF_COMPRESSION_NONE )
-	 && ( compression_level != EWF_COMPRESSION_FAST )
-	 && ( compression_level != EWF_COMPRESSION_BEST ) )
+	if( ( compression_level != LIBEWF_COMPRESSION_NONE )
+	 && ( compression_level != LIBEWF_COMPRESSION_FAST )
+	 && ( compression_level != LIBEWF_COMPRESSION_BEST ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3587,15 +3585,15 @@ int libewf_header_values_generate_utf8_header_string(
 		if( ( compression_level_header_value == NULL )
 		 || ( compression_level_string_length == 0 ) )
 		{
-			if( compression_level == EWF_COMPRESSION_NONE )
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_NONE;
 			}
-			else if( compression_level == EWF_COMPRESSION_FAST )
+			else if( compression_level == LIBEWF_COMPRESSION_FAST )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST;
 			}
-			else if( compression_level == EWF_COMPRESSION_BEST )
+			else if( compression_level == LIBEWF_COMPRESSION_BEST )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST;
 			}

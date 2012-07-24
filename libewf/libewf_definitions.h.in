@@ -116,6 +116,7 @@ enum LIBEWF_COMPRESSION_METHODS
 enum LIBEWF_COMPRESSION_LEVELS
 {
 /* TODO rename to compression level */
+	LIBEWF_COMPRESSION_DEFAULT                              = -1,
 	LIBEWF_COMPRESSION_NONE					= 0,
 	LIBEWF_COMPRESSION_FAST					= 1,
 	LIBEWF_COMPRESSION_BEST					= 2,
@@ -292,16 +293,54 @@ enum LIBEWF_CHUNK_DATA_FLAGS
 #define LIBEWF_ITEM_FLAGS_DEFAULT				LIBEWF_ITEM_FLAG_NON_MANAGED_FILE_ENTRY_TREE_NODE
 #endif
 
+/* The chunk data range is sparse
+ */
+#define LIBEWF_RANGE_FLAG_IS_SPARSE				LIBMFDATA_RANGE_FLAG_IS_SPARSE
+
+/* The chunk data range is compressed
+ */
+#define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBMFDATA_RANGE_FLAG_IS_COMPRESSED
+
+/* The chunk data range included the checksum 
+ */
 #define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBMFDATA_RANGE_FLAG_USER_DEFINED_1
+
+/* The chunk data range uses a pattern fill
+ */
 #define LIBEWF_RANGE_FLAG_USES_PATTERN_FILL			LIBMFDATA_RANGE_FLAG_USER_DEFINED_2
-#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBMFDATA_RANGE_FLAG_USER_DEFINED_3
+
+/* The chunk data range refers to a packed (unprocessed) chunk
+ */
+#define LIBEWF_RANGE_FLAG_IS_PACKED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_3
+
+/* The chunk data range refers to a delta chunk
+ */
+#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBMFDATA_RANGE_FLAG_USER_DEFINED_4
+
+/* The chunk data range is tainted (possibly corrupted)
+ */
+#define LIBEWF_RANGE_FLAG_IS_TAINTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_5
+
+/* The chunk data range is corrupted
+ */
+#define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_6
 
 /* Chunk data pack flag definitions
  */
 enum LIBEWF_PACK_FLAGS
 {
+	/* Force compression when packing (processing) the chunk data
+	 * used for EWF-S01
+	 */
 	LIBEWF_PACK_FLAG_FORCE_COMPRESSION			= 0x01,
-	LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM			= 0x02
+
+	/* Calculate and add a checksum when packing (processing) the chunk data
+	 */
+	LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM			= 0x02,
+
+	/* Adds 16-byte alignment padding when packing (processing) the chunk data
+	 */
+	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x04
 };
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )

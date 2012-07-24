@@ -33,6 +33,34 @@
 
 #include "ewf_checksum.h"
 
+/* Prints the compression method
+ */
+void libewf_debug_print_compression_method(
+      uint16_t compression_method )
+{
+	switch( compression_method )
+	{
+		case LIBEWF_COMPRESSION_METHOD_NONE:
+			libcnotify_printf(
+			 "none" );
+			break;
+
+		case LIBEWF_COMPRESSION_METHOD_DEFLATE:
+			libcnotify_printf(
+			 "deflate" );
+			break;
+
+		case LIBEWF_COMPRESSION_METHOD_BZIP2:
+			libcnotify_printf(
+			 "bzip2" );
+			break;
+
+		default:
+			libcnotify_printf(
+			 "UNKNOWN" );
+	}
+}
+
 /* Prints the section type
  */
 void libewf_debug_print_section_type(

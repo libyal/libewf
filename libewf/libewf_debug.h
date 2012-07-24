@@ -33,6 +33,9 @@
 extern "C" {
 #endif
 
+void libewf_debug_print_compression_method(
+      uint16_t compression_method );
+
 void libewf_debug_print_section_type(
       uint32_t section_type );
 

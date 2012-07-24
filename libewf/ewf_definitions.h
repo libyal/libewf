@@ -29,14 +29,6 @@
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
-/* The EWF compression levels
- */
-#define EWF_COMPRESSION_UNKNOWN 		-2
-#define EWF_COMPRESSION_DEFAULT			-1
-#define EWF_COMPRESSION_NONE			 0
-#define EWF_COMPRESSION_FAST			 1
-#define EWF_COMPRESSION_BEST			 2
-
 /* The maximum number of table entries for EWF
  */
 #define EWF_MAXIMUM_TABLE_ENTRIES		16375

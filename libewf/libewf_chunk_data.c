@@ -66,13 +66,14 @@ int libewf_chunk_data_initialize(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
+	if( ( data_size == 0 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -105,6 +106,14 @@ int libewf_chunk_data_initialize(
 
 		goto on_error;
 	}
+	/* The allocated data size should be rounded to the next 16-byte increment
+	 */
+	if( ( data_size % 16 ) != 0 )
+	{
+		data_size += 16;
+	}
+	data_size = ( data_size / 16 ) * 16;
+
 	( *chunk_data )->data = (uint8_t *) memory_allocate(
 	                                     sizeof( uint8_t ) * data_size );
 
@@ -180,9 +189,10 @@ int libewf_chunk_data_free(
  */
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
+     size32_t chunk_size,
+     uint16_t compression_method,
      int8_t compression_level,
      uint8_t compression_flags,
-     size32_t chunk_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
      uint8_t pack_flags,
@@ -216,11 +226,11 @@ int libewf_chunk_data_pack(
 
 		return( -1 );
 	}
-	if( chunk_data->is_packed != 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
 	{
 		return( 1 );
 	}
-	chunk_data->is_compressed = 0;
+	chunk_data->range_flags = 0;
 
 	if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
 	 && ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
@@ -243,9 +253,9 @@ int libewf_chunk_data_pack(
 		}
 		else if( result == 1 )
 		{
-			if( compression_level == EWF_COMPRESSION_NONE )
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
-				compression_level = EWF_COMPRESSION_DEFAULT;
+				compression_level = LIBEWF_COMPRESSION_DEFAULT;
 			}
 			if( ( chunk_data->data )[ 0 ] == 0 )
 			{
@@ -254,11 +264,11 @@ int libewf_chunk_data_pack(
 		}
 		else
 		{
-			compression_level = EWF_COMPRESSION_NONE;
+			compression_level = LIBEWF_COMPRESSION_NONE;
 		}
 	}
 	if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
-	 || ( compression_level != EWF_COMPRESSION_NONE ) )
+	 || ( compression_level != LIBEWF_COMPRESSION_NONE ) )
 	{
 		chunk_data->compressed_data_size = 2 * chunk_data->data_size;
 
@@ -298,12 +308,13 @@ int libewf_chunk_data_pack(
 		}
 		else
 		{
-			result = libewf_compress(
+			result = libewf_compress_data(
 				  chunk_data->compressed_data,
 				  &( chunk_data->compressed_data_size ),
+				  compression_method,
+				  compression_level,
 				  chunk_data->data,
 				  chunk_data->data_size,
-				  compression_level,
 				  error );
 
 			/* Check if the compressed buffer was too small
@@ -332,12 +343,13 @@ int libewf_chunk_data_pack(
 				}
 				chunk_data->compressed_data = (uint8_t *) reallocation;
 
-				result = libewf_compress(
+				result = libewf_compress_data(
 					  chunk_data->compressed_data,
 					  &( chunk_data->compressed_data_size ),
+					  compression_method,
+					  compression_level,
 					  chunk_data->data,
 					  chunk_data->data_size,
-					  compression_level,
 					  error );
 			}
 			if( result != 1 )
@@ -364,10 +376,10 @@ int libewf_chunk_data_pack(
 			chunk_data->compressed_data      = NULL;
 			chunk_data->compressed_data_size = 0;
 
-			chunk_data->is_compressed = 1;
+			chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 		}
 	}
-	if( ( chunk_data->is_compressed == 0 )
+	if( ( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
 	 && ( ( pack_flags & LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM ) != 0 ) )
 	{
 		if( ( chunk_data->data_size + 4 ) > chunk_data->allocated_data_size )
@@ -393,9 +405,9 @@ int libewf_chunk_data_pack(
 
 		chunk_data->data_size += 4;
 
-		chunk_data->has_checksum = 1;
+		chunk_data->range_flags |= LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 	}
-	chunk_data->is_packed = 1;
+	chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_PACKED;
 
 	return( 1 );
 }
@@ -407,6 +419,7 @@ int libewf_chunk_data_pack(
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
      size_t chunk_size,
+     uint16_t compression_method,
      libcerror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_unpack";
@@ -448,11 +461,11 @@ int libewf_chunk_data_unpack(
 
 		return( -1 );
 	}
-	if( chunk_data->is_packed == 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) == 0 )
 	{
 		return( 1 );
 	}
-	if( chunk_data->is_compressed == 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
 	{
 		if( ( chunk_data->data_size < 4 )
 		 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
@@ -466,7 +479,7 @@ int libewf_chunk_data_unpack(
 
 			return( -1 );
 		}
-		if( chunk_data->has_checksum != 0 )
+		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
 		{
 			chunk_data->data_size -= 4;
 
@@ -491,7 +504,7 @@ int libewf_chunk_data_unpack(
 					 calculated_checksum );
 				}
 #endif
-				chunk_data->is_corrupt = 1;
+				chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 			}
 		}
 	}
@@ -531,11 +544,12 @@ int libewf_chunk_data_unpack(
 		}
 		chunk_data->data_size = chunk_size;
 
-		result = libewf_decompress(
-			  chunk_data->data,
-			  &( chunk_data->data_size ),
+		result = libewf_decompress_data(
 			  chunk_data->compressed_data,
 			  chunk_data->compressed_data_size,
+		          compression_method,
+			  chunk_data->data,
+			  &( chunk_data->data_size ),
 			  error );
 
 		if( result == -1 )
@@ -559,10 +573,10 @@ int libewf_chunk_data_unpack(
 				 function );
 			}
 #endif
-			chunk_data->is_corrupt = 1;
+			chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 		}
 	}
-	chunk_data->is_packed = 0;
+	chunk_data->range_flags &= ~( LIBEWF_RANGE_FLAG_IS_PACKED );
 
 	return( 1 );
 }

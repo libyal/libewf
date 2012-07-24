@@ -31,26 +31,26 @@
 #endif
 
 #include "libewf_compression.h"
+#include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 
-#include "ewf_definitions.h"
-
-/* Compresses data, wraps zlib uncompress function
+/* Compresses data using the compression method
  * Returns 1 on success or -1 on error
  */
-int libewf_compress(
+int libewf_compress_data(
      uint8_t *compressed_data,
-     size_t *compressed_size,
-     uint8_t *uncompressed_data,
-     size_t uncompressed_size,
+     size_t *compressed_data_size,
+     uint16_t compression_method,
      int8_t compression_level,
+     const uint8_t *uncompressed_data,
+     size_t uncompressed_data_size,
      libcerror_error_t **error )
 {
-	static char *function       = "libewf_compress";
-	uLongf safe_compressed_size = 0;
-	int zlib_compression_level  = 0;
-	int result                  = 0;
+	static char *function            = "libewf_compress_data";
+	uLongf zlib_compressed_data_size = 0;
+	int zlib_compression_level       = 0;
+	int result                       = 0;
 
 	if( compressed_data == NULL )
 	{
@@ -85,30 +85,30 @@ int libewf_compress(
 
 		return( -1 );
 	}
-	if( compressed_size == NULL )
+	if( compressed_data_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed size.",
+		 "%s: invalid compressed data size.",
 		 function );
 
 		return( -1 );
 	}
-	if( compression_level == EWF_COMPRESSION_DEFAULT )
+	if( compression_level == LIBEWF_COMPRESSION_DEFAULT )
 	{
 		zlib_compression_level = Z_BEST_SPEED;
 	}
-	else if( compression_level == EWF_COMPRESSION_FAST )
+	else if( compression_level == LIBEWF_COMPRESSION_FAST )
 	{
 		zlib_compression_level = Z_BEST_SPEED;
 	}
-	else if( compression_level == EWF_COMPRESSION_BEST )
+	else if( compression_level == LIBEWF_COMPRESSION_BEST )
 	{
 		zlib_compression_level = Z_BEST_COMPRESSION;
 	}
-	else if( compression_level == EWF_COMPRESSION_NONE )
+	else if( compression_level == LIBEWF_COMPRESSION_NONE )
 	{
 		zlib_compression_level = Z_NO_COMPRESSION;
 	}
@@ -123,18 +123,18 @@ int libewf_compress(
 
 		return( -1 );
 	}
-	safe_compressed_size = (uLongf) *compressed_size;
+	zlib_compressed_data_size = (uLongf) *compressed_data_size;
 
 	result = compress2(
 	          (Bytef *) compressed_data,
-	          &safe_compressed_size,
+	          &zlib_compressed_data_size,
 	          (Bytef *) uncompressed_data,
-	          (uLong) uncompressed_size,
+	          (uLong) uncompressed_data_size,
 	          zlib_compression_level );
 
 	if( result == Z_OK )
 	{
-		*compressed_size = (size_t) safe_compressed_size;
+		*compressed_data_size = (size_t) zlib_compressed_data_size;
 
 		return( 1 );
 	}
@@ -151,12 +151,12 @@ int libewf_compress(
 #if defined( HAVE_COMPRESS_BOUND ) || defined( WINAPI )
 		/* Use compressBound to determine the size of the uncompressed buffer
 		 */
-		safe_compressed_size = compressBound( (uLong) uncompressed_size );
-		*compressed_size     = (size_t) safe_compressed_size;
+		zlib_compressed_data_size = compressBound( (uLong) uncompressed_data_size );
+		*compressed_data_size     = (size_t) zlib_compressed_data_size;
 #else
 		/* Estimate that a factor 2 enlargement should suffice
 		 */
-		*compressed_size *= 2;
+		*compressed_data_size *= 2;
 #endif
 	}
 	else if( result == Z_MEM_ERROR )
@@ -168,7 +168,7 @@ int libewf_compress(
 		 "%s: unable to write compressed data: insufficient memory.",
 		 function );
 
-		*compressed_size = 0;
+		*compressed_data_size = 0;
 	}
 	else
 	{
@@ -180,36 +180,26 @@ int libewf_compress(
 		 function,
 		 result );
 
-		*compressed_size = 0;
+		*compressed_data_size = 0;
 	}
 	return( -1 );
 }
 
-/* Decompresses data, wraps zlib uncompress function
+/* Decompresses data using the compression method
  * Returns 1 on success, 0 on failure or -1 on error
  */
-int libewf_decompress(
+int libewf_decompress_data(
+     const uint8_t *compressed_data,
+     size_t compressed_data_size,
+     uint16_t compression_method,
      uint8_t *uncompressed_data,
-     size_t *uncompressed_size,
-     uint8_t *compressed_data,
-     size_t compressed_size,
+     size_t *uncompressed_data_size,
      libcerror_error_t **error )
 {
-	static char *function         = "libewf_decompress";
-	uLongf safe_uncompressed_size = 0;
-	int result                    = 0;
+	static char *function              = "libewf_decompress_data";
+	uLongf zlib_uncompressed_data_size = 0;
+	int result                         = 0;
 
-	if( uncompressed_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid uncompressed data buffer.",
-		 function );
-
-		return( -1 );
-	}
 	if( compressed_data == NULL )
 	{
 		libcerror_error_set(
@@ -217,6 +207,17 @@ int libewf_decompress(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed data buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( uncompressed_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid uncompressed data buffer.",
 		 function );
 
 		return( -1 );
@@ -232,28 +233,28 @@ int libewf_decompress(
 
 		return( -1 );
 	}
-	if( uncompressed_size == NULL )
+	if( uncompressed_data_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid uncompressed size.",
+		 "%s: invalid uncompressed data size.",
 		 function );
 
 		return( -1 );
 	}
-	safe_uncompressed_size = (uLongf) *uncompressed_size;
+	zlib_uncompressed_data_size = (uLongf) *uncompressed_data_size;
 
 	result = uncompress(
 	          (Bytef *) uncompressed_data,
-	          &safe_uncompressed_size,
+	          &zlib_uncompressed_data_size,
 	          (Bytef *) compressed_data,
-	          (uLong) compressed_size );
+	          (uLong) compressed_data_size );
 
 	if( result == Z_OK )
 	{
-		*uncompressed_size = (size_t) safe_uncompressed_size;
+		*uncompressed_data_size = (size_t) zlib_uncompressed_data_size;
 
 		return( 1 );
 	}
@@ -267,7 +268,7 @@ int libewf_decompress(
 			 function );
 		}
 #endif
-		*uncompressed_size = 0;
+		*uncompressed_data_size = 0;
 
 		return( 0 );
 	}
@@ -283,7 +284,7 @@ int libewf_decompress(
 #endif
 		/* Estimate that a factor 2 enlargement should suffice
 		 */
-		*uncompressed_size *= 2;
+		*uncompressed_data_size *= 2;
 	}
 	else if( result == Z_MEM_ERROR )
 	{
@@ -294,7 +295,7 @@ int libewf_decompress(
 		 "%s: unable to read compressed data: insufficient memory.",
 		 function );
 
-		*uncompressed_size = 0;
+		*uncompressed_data_size = 0;
 	}
 	else
 	{
@@ -306,7 +307,7 @@ int libewf_decompress(
 		 function,
 		 result );
 
-		*uncompressed_size = 0;
+		*uncompressed_data_size = 0;
 	}
 	return( -1 );
 }

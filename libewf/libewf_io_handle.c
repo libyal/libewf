@@ -28,8 +28,6 @@
 #include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
 
-#include "ewf_definitions.h"
-
 /* Initialize the IO handle
  * Returns 1 if successful or -1 on error
  */
@@ -93,7 +91,7 @@ int libewf_io_handle_initialize(
 	( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
 	( *io_handle )->major_version     = 1;
 	( *io_handle )->minor_version     = 0;
-	( *io_handle )->compression_level = EWF_COMPRESSION_NONE;
+	( *io_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
 	( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
 
 	return( 1 );
