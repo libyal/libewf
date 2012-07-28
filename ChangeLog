@@ -1,17 +1,13 @@
 TODO
-* implement alder32 algo
-* new chunk functions where chunk is an object
+* write check why "Process identifier:	f" gets set in EWF2
+
+* implement local alder32
+* implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
-
-* libewf_segment_file_write_chunk pass flag to indicate the buffer contains
-  the checksum and/or the padding
-  - make sure to differentiate clearly between unpacked chunk data size
-    and packed chunk data size
-
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 
-* refactor write compressed string
-  - to support caching of compressed strings, e.g. case data, device info
+* refactor read/write compressed string
+  - to do: libewf_section_header2_read
 
 * make chunks_per_segment_file 64-bit
 * replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
@@ -19,8 +15,7 @@ TODO
 
 * remove libewf_device_information conversion to UTF8
 
-* internally mark Ex01 and Lx01 format and have ewfinfo print a string
-  representation
+* internally mark Ex01 and Lx01 format and have ewfinfo print a string representation
 
 * write debug output
   - make sure header string is printed after section descriptor
@@ -83,7 +78,6 @@ TODO
   - change api to deal with compression method stored in the segment files ?
 
 * Ex01/Lx01 format feature support
-  - pattern fill chunk support
   - bzip2 compression support
   - encryption support
   - section integrity MD5 hash support
@@ -96,9 +90,7 @@ TODO
 * open single files ?
 
 * Ex01/Lx01 write support
-  - rename libewf_segment_file_write_chunks_section_start ?
-  - move type string generation into the section functions and pass the section type ?
-  - enable tests in test_read_write.sh
+  - pattern fill chunk support
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount

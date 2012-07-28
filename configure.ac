@@ -100,7 +100,7 @@ dnl Check for zlib compression support
 AX_ZLIB_CHECK_ENABLE
 
 dnl Check for bz2lib compression support
-ac_cv_bz2lib=no
+AX_BZIP2_CHECK_ENABLE
 
 dnl Check for library function support
 AX_LIBEWF_CHECK_LOCAL
@@ -191,6 +191,17 @@ AM_CONDITIONAL(
  [HAVE_MEMWATCH],
  [test "x$ac_cv_enable_memwatch" != xno])
 
+dnl Check if requires and build requires should be set in spec file
+AS_IF(
+ [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes  || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno],
+ [AC_SUBST(
+  [libewf_spec_requires],
+  [Requires:])
+ AC_SUBST(
+  [libewf_spec_build_requires],
+  [BuildRequires:])
+ ])
+
 dnl Set the date for dpkg files
 AC_SUBST(
  [DATE],
@@ -266,7 +277,7 @@ Building:
    libmfcache support:                              $ac_cv_libmfcache
    libmfdata support:                               $ac_cv_libmfdata
    DEFLATE compression support:                     $ac_cv_zlib
-   BZIP2 compression support:                       $ac_cv_bz2lib
+   BZIP2 compression support:                       $ac_cv_bzip2
    libhmac support:                                 $ac_cv_libhmac
    MD5 support:                                     $ac_cv_libhmac_md5
    SHA1 support:                                    $ac_cv_libhmac_sha1

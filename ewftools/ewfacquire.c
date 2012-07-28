@@ -139,7 +139,7 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
 	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart,\n"
 	                 "\t        ftk, encase2, encase3, encase4, encase5, encase6 (default),\n"
-	                 "\t        encase7, linen5, linen6, linen7, ewfx\n" );
+	                 "\t        encase7, encase7-v2, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );

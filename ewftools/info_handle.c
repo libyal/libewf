@@ -2103,12 +2103,14 @@ int info_handle_media_information_fprint(
 {
         libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ GUID_SIZE ];
+	char segment_file_version[ 4 ] = { '0', '.', '0', 0 };
 
 	const libcstring_system_character_t *value_string = NULL;
 	static char *function                             = "info_handle_media_information_fprint";
 	size64_t media_size                               = 0;
 	uint64_t value_64bit                              = 0;
 	uint32_t value_32bit                              = 0;
+	uint16_t compression_method                       = 0;
 	uint8_t compression_flags                         = 0;
 	uint8_t format                                    = 0;
 	uint8_t major_version                             = 0;
@@ -2272,6 +2274,57 @@ int info_handle_media_information_fprint(
 
 		result = -1;
 	}
+	if( ( format == LIBEWF_FORMAT_V2_ENCASE7 )
+	 || ( format == LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 ) )
+	{
+		if( libewf_handle_get_segment_file_version(
+		     info_handle->input_handle,
+		     &major_version,
+		     &minor_version,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file version.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+/* TODO improve this */
+			if( ( major_version >= 0 )
+			 && ( major_version <= 9 ) )
+			{
+				segment_file_version[ 0 ] += major_version;
+			}
+			if( ( minor_version >= 0 )
+			 && ( minor_version <= 9 ) )
+			{
+				segment_file_version[ 2 ] += minor_version;
+			}
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "segment_file_version",
+			     20,
+			     "Segment file version",
+			     20,
+			     segment_file_version,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: segment_file_version.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( format == LIBEWF_FORMAT_ENCASE7 )
@@ -2348,6 +2401,49 @@ int info_handle_media_information_fprint(
 				result = -1;
 			}
 		}
+		if( libewf_handle_get_compression_method(
+		     info_handle->input_handle,
+		     &compression_method,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve compression method.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "deflate" );
+			}
+			else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "bzip2" );
+			}
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "compression_method",
+			     18,
+			     "Compression method",
+			     18,
+			     value_string,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: compression_method.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libewf_handle_get_compression_values(
 		     info_handle->input_handle,
 		     &compression_level,
@@ -2399,25 +2495,6 @@ int info_handle_media_information_fprint(
 
 				result = -1;
 			}
-		}
-		if( libewf_handle_get_segment_file_version(
-		     info_handle->input_handle,
-		     &major_version,
-		     &minor_version,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file version.",
-			 function );
-
-			result = -1;
-		}
-		else
-		{
-/* TODO print segment file format version */
 		}
 		if( libewf_handle_get_segment_file_set_identifier(
 		     info_handle->input_handle,

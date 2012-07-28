@@ -927,6 +927,24 @@ int libewf_handle_set_error_granularity(
      uint32_t error_granularity,
      libewf_error_t **error );
 
+/* Retrieves the compression method
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_compression_method(
+     libewf_handle_t *handle,
+     uint16_t *compression_method,
+     libewf_error_t **error );
+
+/* Sets the compression method
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_set_compression_method(
+     libewf_handle_t *handle,
+     uint16_t compression_method,
+     libewf_error_t **error );
+
 /* Retrieves the compression values
  * Returns 1 if successful or -1 on error
  */

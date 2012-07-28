@@ -2611,8 +2611,8 @@ ssize_t libewf_handle_open_read_segment_file(
 
 				return( -1 );
 			}
-			if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_NONE )
-			 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE ) )
+			if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
+			 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
 			{
 				libcerror_error_set(
 				 error,

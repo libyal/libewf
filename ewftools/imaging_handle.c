@@ -174,6 +174,7 @@ int imaging_handle_initialize(
 		}
 	}
 	( *imaging_handle )->calculate_md5            = calculate_md5;
+	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
 	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 	( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
@@ -1941,6 +1942,73 @@ on_error:
 	return( -1 );
 }
 
+/* Prompts the user for the compression method
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int imaging_handle_prompt_for_compression_method(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *request_string,
+     libcerror_error_t **error )
+{
+	libcstring_system_character_t *fixed_string_variable = NULL;
+	static char *function                                = "imaging_handle_prompt_for_compression_method";
+	int result                                           = 0;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_get_fixed_string_variable(
+	          imaging_handle->notify_stream,
+	          imaging_handle->input_buffer,
+	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
+	          request_string,
+	          ewfinput_compression_methods,
+	          EWFINPUT_COMPRESSION_METHODS_AMOUNT,
+	          EWFINPUT_COMPRESSION_METHODS_DEFAULT,
+	          &fixed_string_variable,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fixed string variable.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		result = ewfinput_determine_compression_method(
+			  fixed_string_variable,
+			  &( imaging_handle->compression_method ),
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine compression method.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( result );
+}
+
 /* Prompts the user for the compression level
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
@@ -2943,6 +3011,47 @@ on_error:
 	*internal_string_size = 0;
 
 	return( -1 );
+}
+
+/* Sets the compression method
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int imaging_handle_set_compression_method(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error )
+{
+	static char *function = "imaging_handle_set_compression_method";
+	int result            = 0;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = ewfinput_determine_compression_method(
+	          string,
+	          &( imaging_handle->compression_method ),
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine compression method.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Sets the compression values

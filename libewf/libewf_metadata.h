@@ -82,6 +82,18 @@ int libewf_handle_set_error_granularity(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_get_compression_method(
+     libewf_handle_t *handle,
+     uint16_t *compression_method,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_set_compression_method(
+     libewf_handle_t *handle,
+     uint16_t compression_method,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_compression_values(
      libewf_handle_t *handle,
      int8_t *compression_level,

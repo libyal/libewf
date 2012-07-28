@@ -536,6 +536,122 @@ int libewf_handle_set_error_granularity(
 	return( 1 );
 }
 
+/* Retrieves the compression method
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_compression_method(
+     libewf_handle_t *handle,
+     uint16_t *compression_method,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_compression_method";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( compression_method == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression method.",
+		 function );
+
+		return( -1 );
+	}
+	*compression_method = internal_handle->io_handle->compression_method;
+
+	return( 1 );
+}
+
+/* Sets the compression method
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_compression_method(
+     libewf_handle_t *handle,
+     uint16_t compression_method,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_set_compression_method";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->write_io_handle == NULL )
+	 || ( internal_handle->write_io_handle->values_initialized != 0 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: compression values cannot be changed.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO make sure to validate if format allows for compression method */
+	if( ( compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
+	 && ( compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported compression method.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->io_handle->compression_method = compression_method;
+
+	return( 1 );
+}
+
 /* Retrieves the compression values
  * Returns 1 if successful or -1 on error
  */
@@ -606,7 +722,7 @@ int libewf_handle_get_compression_values(
 int libewf_handle_set_compression_values(
      libewf_handle_t *handle,
      int8_t compression_level,
-     uint8_t compression_flags ,
+     uint8_t compression_flags,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;

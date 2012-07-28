@@ -39,11 +39,15 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
     [test "x$ac_cv_header_zlib_h" = xno],
     [ac_cv_zlib=no],
     [dnl Check for the individual functions
-    ac_cv_zlib=yes
+    ac_cv_zlib=zlib
     AC_CHECK_LIB(
      z,
      adler32,
      [],
+     [ac_cv_zlib=no])
+
+    AS_IF(
+     [test "x$ac_cv_lib_z_adler32" = xyes],
      [AC_MSG_FAILURE(
       [Missing function: adler32 in library: zlib.],
       [1])
@@ -53,6 +57,10 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
      z,
      compress2,
      [ac_zlib_dummy=yes],
+     [ac_cv_zlib=no])
+
+    AS_IF(
+     [test "x$ac_cv_lib_z_compress2" = xyes],
      [AC_MSG_FAILURE(
       [Missing function: compress2 in library: zlib.],
       [1])
@@ -62,13 +70,17 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
      z,
      uncompress,
      [ac_zlib_dummy=yes],
+     [ac_cv_zlib=no])
+
+    AS_IF(
+     [test "x$ac_cv_lib_z_uncompress" = xyes],
      [AC_MSG_FAILURE(
       [Missing function: uncompress in library: zlib.],
       [1])
      ])
-    ])
 
-   ac_cv_zlib_LIBADD="-lz";
+    ac_cv_zlib_LIBADD="-lz";
+    ])
    ])
   ])
 
@@ -76,7 +88,10 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
   [test "x$ac_cv_zlib" = xzlib],
   [AC_CHECK_LIB(
    z,
-   compressBound,
+   compressBound)
+
+  AS_IF(
+   [test "x$ac_cv_lib_z_compressBound" = xyes],
    [AC_DEFINE(
     [HAVE_COMPRESS_BOUND],
     [1],
@@ -129,17 +144,20 @@ AC_DEFUN([AX_ZLIB_CHECK_ENABLE],
   ])
 
  AS_IF(
-  [test "x$ac_cv_zlib" = zlib],
+  [test "x$ac_cv_zlib" = xzlib],
   [AC_SUBST(
    [ax_zlib_pc_libs_private],
    [-lz])
   ])
 
  AS_IF(
-  [test "x$ac_cv_zlib" = zlib],
+  [test "x$ac_cv_zlib" = xzlib],
   [AC_SUBST(
    [ax_zlib_spec_requires],
    [zlib])
+  AC_SUBST(
+   [ax_zlib_static_spec_requires],
+   [zlib-static])
   AC_SUBST(
    [ax_zlib_spec_build_requires],
    [zlib-devel])
