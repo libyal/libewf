@@ -214,10 +214,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_empty_block.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_error.c"
 				>
 			</File>
@@ -429,10 +425,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_device_information.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_empty_block.h"
 				>
 			</File>
 			<File

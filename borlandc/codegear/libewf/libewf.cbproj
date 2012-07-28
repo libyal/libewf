@@ -52,9 +52,6 @@
 			<None Include="..\..\..\libewf\libewf_file_entry.h">
 				<BuildOrder>77</BuildOrder>
 			</None>
-			<None Include="..\..\..\libewf\libewf_empty_block.h">
-				<BuildOrder>74</BuildOrder>
-			</None>
 			<None Include="..\..\..\libewf\libewf_debug.h">
 				<BuildOrder>71</BuildOrder>
 			</None>
@@ -246,9 +243,6 @@
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_filename.c">
 				<BuildOrder>24</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_empty_block.c">
-				<BuildOrder>21</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_error.c">
 				<BuildOrder>22</BuildOrder>

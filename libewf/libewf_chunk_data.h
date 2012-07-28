@@ -118,6 +118,17 @@ int libewf_chunk_data_unpack_buffer(
      int8_t chunk_io_flags,
      libcerror_error_t **error );
 
+int libewf_chunk_data_check_for_empty_block(
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_check_for_64_bit_pattern_fill(
+     const uint8_t *data,
+     size_t data_size,
+     uint64_t *pattern,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

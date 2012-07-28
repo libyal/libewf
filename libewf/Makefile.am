@@ -45,7 +45,6 @@ libewf_la_SOURCES = \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
 	libewf_device_information.c libewf_device_information.h \
-	libewf_empty_block.c libewf_empty_block.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \

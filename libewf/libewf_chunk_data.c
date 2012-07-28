@@ -27,7 +27,6 @@
 #include "libewf_chunk_data.h"
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
-#include "libewf_empty_block.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 
@@ -200,6 +199,7 @@ int libewf_chunk_data_pack(
      libcerror_error_t **error )
 {
 	static char *function      = "libewf_chunk_data_pack";
+	uint64_t fill_pattern      = 0;
 	uint32_t chunk_checksum    = 0;
 	int8_t chunk_io_flags      = 0;
 	int8_t is_empty_zero_block = 0;
@@ -256,39 +256,72 @@ int libewf_chunk_data_pack(
 	}
 	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) == 0 )
 	{
-		if( ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
-		 && ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 ) )
+		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 		{
-			result = libewf_empty_block_test(
-				  chunk_data->data,
-				  chunk_data->data_size,
-				  error );
-
-			if( result == -1 )
+/* TODO mark pattern fill */
+			if( ( chunk_data->data_size % 8 ) == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if chunk data is an empty block.",
-				 function );
+				result = libewf_chunk_data_check_for_64_bit_pattern_fill(
+					  chunk_data->data,
+					  chunk_data->data_size,
+					  &fill_pattern,
+					  error );
 
-				return( -1 );
-			}
-			else if( result == 0 )
-			{
-				compression_level = LIBEWF_COMPRESSION_NONE;
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine if chunk data contains a fill pattern.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result != 0 )
+				{
+					if( fill_pattern == 0 )
+					{
+						is_empty_zero_block = 1;
+					}
+				}
 			}
 			else
+			{
+				result = libewf_chunk_data_check_for_empty_block(
+					  chunk_data->data,
+					  chunk_data->data_size,
+					  error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine if chunk data is an empty block.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result != 0 )
+				{
+					if( chunk_data->data[ 0 ] == 0 )
+					{
+						is_empty_zero_block = 1;
+					}
+				}
+			}
+			if( result != 0 )
 			{
 				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{
 					compression_level = LIBEWF_COMPRESSION_DEFAULT;
 				}
-				if( chunk_data->data[ 0 ] == 0 )
-				{
-					is_empty_zero_block = 1;
-				}
+			}
+			else
+			{
+				compression_level = LIBEWF_COMPRESSION_NONE;
 			}
 		}
 		if( ( compression_level != LIBEWF_COMPRESSION_NONE )
@@ -1019,6 +1052,220 @@ int libewf_chunk_data_unpack_buffer(
 			return( -1 );
 		}
 	}
+	return( 1 );
+}
+
+/* The largest primary (or scalar) available
+ * supported by a single load and store instruction
+ */
+typedef unsigned long int libewf_aligned_t;
+
+/* Checks if a buffer containing the chunk data is filled with same value bytes (empty-block)
+ * Returns 1 if a pattern was found, 0 if not or -1 on error
+ */
+int libewf_chunk_data_check_for_empty_block(
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libewf_aligned_t *aligned_data_index = NULL;
+	libewf_aligned_t *aligned_data_start = NULL;
+	uint8_t *data_index                  = NULL;
+	uint8_t *data_start                  = NULL;
+	static char *function                = "libewf_chunk_data_check_for_empty_block";
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	data_start = (uint8_t *) data;
+	data_index = (uint8_t *) data + 1;
+	data_size -= 1;
+
+	/* Only optimize for data larger than the alignment
+	 */
+	if( data_size > ( 2 * sizeof( libewf_aligned_t ) ) )
+	{
+		/* Align the data start
+		 */
+		while( ( (intptr_t) data_start % sizeof( libewf_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_start += 1;
+			data_index += 1;
+			data_size  -= 1;
+		}
+		/* Align the data index
+		 */
+		while( ( (intptr_t) data_index % sizeof( libewf_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_index += 1;
+			data_size  -= 1;
+		}
+		aligned_data_start = (libewf_aligned_t *) data_start;
+		aligned_data_index = (libewf_aligned_t *) data_index;
+
+		while( data_size > sizeof( libewf_aligned_t ) )
+		{
+			if( *aligned_data_start != *aligned_data_index )
+			{
+				return( 0 );
+			}
+			aligned_data_index += 1;
+			data_size          -= sizeof( libewf_aligned_t );
+		}
+		data_index = (uint8_t *) aligned_data_index;
+	}
+	while( data_size != 0 )
+	{
+		if( *data_start != *data_index )
+		{
+			return( 0 );
+		}
+		data_index += 1;
+		data_size  -= 1;
+	}
+	return( 1 );
+}
+
+/* Checks if a buffer containing the chunk data is filled with a 64-bit pattern
+ * Returns 1 if a pattern was found, 0 if not or -1 on error
+ */
+int libewf_chunk_data_check_for_64_bit_pattern_fill(
+     const uint8_t *data,
+     size_t data_size,
+     uint64_t *pattern,
+     libcerror_error_t **error )
+{
+	libewf_aligned_t *aligned_data_index = NULL;
+	libewf_aligned_t *aligned_data_start = NULL;
+	uint8_t *data_index                  = NULL;
+	uint8_t *data_start                  = NULL;
+	static char *function                = "libewf_chunk_data_check_for_64_bit_pattern_fill";
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( pattern == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid pattern.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( data_size % 8 ) != 0 )
+	{
+		return( 0 );
+	}
+	data_start = (uint8_t *) data;
+	data_index = (uint8_t *) data + 8;
+	data_size -= 8;
+
+	/* Only optimize for data larger than the alignment
+	 */
+	if( data_size > ( 2 * sizeof( libewf_aligned_t ) ) )
+	{
+		/* Align the data start
+		 */
+		while( ( (intptr_t) data_start % sizeof( libewf_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_start += 1;
+			data_index += 1;
+			data_size  -= 1;
+		}
+		/* Align the data index
+		 */
+		while( ( (intptr_t) data_index % sizeof( libewf_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_index += 1;
+			data_size  -= 1;
+		}
+		aligned_data_start = (libewf_aligned_t *) data_start;
+		aligned_data_index = (libewf_aligned_t *) data_index;
+
+		while( data_size > sizeof( libewf_aligned_t ) )
+		{
+			if( *aligned_data_start != *aligned_data_index )
+			{
+				return( 0 );
+			}
+			aligned_data_start += 1;
+			aligned_data_index += 1;
+			data_size          -= sizeof( libewf_aligned_t );
+		}
+		data_start = (uint8_t *) aligned_data_start;
+		data_index = (uint8_t *) aligned_data_index;
+	}
+	while( data_size != 0 )
+	{
+		if( *data_start != *data_index )
+		{
+			return( 0 );
+		}
+		data_start += 1;
+		data_index += 1;
+		data_size  -= 1;
+	}
+	byte_stream_copy_to_uint64_little_endian(
+	 data,
+	 *pattern );
+
 	return( 1 );
 }
 

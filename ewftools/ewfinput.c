@@ -46,7 +46,6 @@ libcstring_system_character_t *ewfinput_compression_levels[ 4 ] = \
    _LIBCSTRING_SYSTEM_STRING( "fast" ),
    _LIBCSTRING_SYSTEM_STRING( "best" ) };
 
-/* TODO encase7x is a test for now */
 libcstring_system_character_t *ewfinput_format_types[ 15 ] = \
 {  _LIBCSTRING_SYSTEM_STRING( "ewf" ),
    _LIBCSTRING_SYSTEM_STRING( "smart" ),
@@ -58,7 +57,7 @@ libcstring_system_character_t *ewfinput_format_types[ 15 ] = \
    _LIBCSTRING_SYSTEM_STRING( "encase5" ),
    _LIBCSTRING_SYSTEM_STRING( "encase6" ),
    _LIBCSTRING_SYSTEM_STRING( "encase7" ),
-   _LIBCSTRING_SYSTEM_STRING( "encase7x" ),
+   _LIBCSTRING_SYSTEM_STRING( "encase7-v2" ),
    _LIBCSTRING_SYSTEM_STRING( "linen5" ),
    _LIBCSTRING_SYSTEM_STRING( "linen6" ),
    _LIBCSTRING_SYSTEM_STRING( "linen7" ),
@@ -239,18 +238,25 @@ int ewfinput_determine_ewf_format(
 		}
 	}
 /* TODO this is a test for now */
-	else if( string_length == 8 )
+	else if( string_length == 10 )
 	{
 		if( libcstring_system_string_compare(
 		     string,
 		     _LIBCSTRING_SYSTEM_STRING( "encase" ),
 		     6 ) == 0 )
 		{
-			if( ( string[ 6 ] == (libcstring_system_character_t) '7' )
-			 && ( string[ 7 ] == (libcstring_system_character_t) 'x' ) )
+			if( ( string[ 8 ] == (libcstring_system_character_t) 'v' )
+			 && ( string[ 9 ] == (libcstring_system_character_t) '2' ) )
 			{
-				*ewf_format = LIBEWF_FORMAT_V2_ENCASE7;
-				result      = 1;
+				if( ( string[ 7 ] == (libcstring_system_character_t) '-' )
+				 || ( string[ 7 ] == (libcstring_system_character_t) '_' ) )
+				{
+					if( string[ 6 ] == (libcstring_system_character_t) '7' )
+					{
+						*ewf_format = LIBEWF_FORMAT_V2_ENCASE7;
+						result      = 1;
+					}
+				}
 			}
 		}
 	}

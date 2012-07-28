@@ -28,7 +28,6 @@
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
-#include "libewf_empty_block.h"
 #include "libewf_filename.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
@@ -1927,18 +1926,6 @@ int libewf_write_io_handle_create_segment_file(
 
 		return( -1 );
 	}
-	if( ( io_handle->major_version != 1 )
-	 && ( io_handle->major_version != 2 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid IO handle - unsupported major version.",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		libcerror_error_set(
@@ -2122,13 +2109,23 @@ int libewf_write_io_handle_create_segment_file(
 		goto on_error;
 	}
 	( *segment_file )->type           = segment_file_type;
-	( *segment_file )->major_version  = io_handle->major_version;
-	( *segment_file )->minor_version  = io_handle->minor_version;
 	( *segment_file )->segment_number = segment_number;
 	( *segment_file )->flags         |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 
-	if( io_handle->major_version == 2 )
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
+	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART ) )
 	{
+		( *segment_file )->major_version = 1;
+		( *segment_file )->minor_version = 0;
+	}
+	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	{
+		( *segment_file )->major_version = 2;
+		( *segment_file )->minor_version = 1;
+
 		if( memory_copy(
 		     ( *segment_file )->set_identifier,
 		     set_identifier,

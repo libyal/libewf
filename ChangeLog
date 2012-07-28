@@ -410,6 +410,8 @@ Closed:
 20120728
 * code clean up
 * fixes for recent changes
+* worked on Ex01 write support
+* added pattern test fill functions and refactored empty block test
 
 20120727
 * code clean up

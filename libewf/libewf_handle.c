@@ -31,7 +31,6 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
-#include "libewf_empty_block.h"
 #include "libewf_file_entry.h"
 #include "libewf_hash_sections.h"
 #include "libewf_handle.h"
@@ -5755,6 +5754,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	static char *function                     = "libewf_handle_prepare_write_chunk";
 	size_t chunk_padding_size                 = 0;
 	uint64_t chunk_index                      = 0;
+	uint64_t fill_pattern                     = 0;
 	uint32_t chunk_range_flags                = 0;
 	uint8_t compression_flags                 = 0;
 	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
@@ -5935,39 +5935,72 @@ ssize_t libewf_handle_prepare_write_chunk(
 		compression_level = internal_handle->io_handle->compression_level;
 		compression_flags = internal_handle->io_handle->compression_flags;
 
-		if( ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
-		 && ( ( internal_handle->write_io_handle->pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 ) )
+		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
 		{
-			result = libewf_empty_block_test(
-			          chunk_buffer,
-			          chunk_buffer_size,
-				  error );
-
-			if( result == -1 )
+/* TODO mark pattern fill */
+			if( ( chunk_buffer_size % 8 ) == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if chunk data is an empty block.",
-				 function );
+				result = libewf_chunk_data_check_for_64_bit_pattern_fill(
+				          chunk_buffer,
+				          chunk_buffer_size,
+					  &fill_pattern,
+					  error );
 
-				return( -1 );
-			}
-			else if( result == 0 )
-			{
-				compression_level = LIBEWF_COMPRESSION_NONE;
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine if chunk data contains a fill pattern.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result != 0 )
+				{
+					if( fill_pattern == 0 )
+					{
+						is_empty_zero_block = 1;
+					}
+				}
 			}
 			else
+			{
+				result = libewf_chunk_data_check_for_empty_block(
+				          chunk_buffer,
+				          chunk_buffer_size,
+					  error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine if chunk data is an empty block.",
+					 function );
+
+					return( -1 );
+				}
+				else if( result != 0 )
+				{
+					if( *( (uint8_t *) chunk_buffer ) == 0 )
+					{
+						is_empty_zero_block = 1;
+					}
+				}
+			}
+			if( result != 0 )
 			{
 				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{
 					compression_level = LIBEWF_COMPRESSION_DEFAULT;
 				}
-				if( ( (uint8_t *) chunk_buffer )[ 0 ] == 0 )
-				{
-					is_empty_zero_block = 1;
-				}
+			}
+			else
+			{
+				compression_level = LIBEWF_COMPRESSION_NONE;
 			}
 		}
 	}

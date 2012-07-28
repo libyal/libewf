@@ -97,17 +97,17 @@ do
 done
 
 # Run tests for: Ex01
-# BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-#
-# for BASENAME in ${BASENAMES};
-# do
-# 	FILENAMES=`${LS} ${BASENAME}.???? | ${TR} '\n' ' '`;
-#
-# 	if ! test_read_write ${FILENAMES};
-# 	then
-# 		exit ${EXIT_FAILURE};
-# 	fi
-# done
+BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+
+for BASENAME in ${BASENAMES};
+do
+	FILENAMES=`${LS} ${BASENAME}.???? | ${TR} '\n' ' '`;
+
+	if ! test_read_write ${FILENAMES};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+done
 
 exit ${EXIT_SUCCESS};
 

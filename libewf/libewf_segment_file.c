@@ -694,6 +694,10 @@ ssize_t libewf_segment_file_write_file_header(
 		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
 
+		byte_stream_copy_from_uint16_little_endian(
+		 ( (ewf_file_header_v2_t *) file_header_data )->compression_method,
+		 segment_file->compression_method );
+
 		if( memory_copy(
 		     ( (ewf_file_header_v2_t *) file_header_data )->set_identifier,
 		     segment_file->set_identifier,

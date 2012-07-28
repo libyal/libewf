@@ -75,9 +75,6 @@
 			<CppCompile Include="..\..\..\libewf\libewf_device_information.c">
 				<BuildOrder>11</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_empty_block.c">
-				<BuildOrder>12</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_error.c">
 				<BuildOrder>13</BuildOrder>
 			</CppCompile>
@@ -233,9 +230,6 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_device_information.h">
 				<BuildOrder>64</BuildOrder>
-			</None>
-			<None Include="..\..\..\libewf\libewf_empty_block.h">
-				<BuildOrder>65</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_error.h">
 				<BuildOrder>66</BuildOrder>
