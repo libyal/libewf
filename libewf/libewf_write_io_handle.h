@@ -272,13 +272,15 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
          int chunk_index,
+         size_t input_data_size,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
          size_t chunk_data_size,
-         int8_t is_compressed,
+         size_t chunk_padding_size,
+         uint32_t chunk_data_flags,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 ssize_t libewf_write_io_handle_write_existing_chunk(
@@ -294,10 +296,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
          size_t chunk_data_size,
-         int8_t is_compressed,
+         uint32_t chunk_data_flags,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 int libewf_write_io_handle_finalize_write_sections_corrections(

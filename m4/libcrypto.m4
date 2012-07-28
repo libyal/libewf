@@ -1,6 +1,6 @@
 dnl Functions for libcrypto
 dnl
-dnl Version: 20111009
+dnl Version: 20120725
  
 dnl Function to detect whether openssl/evp.h can be used in combination with zlib.h
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
@@ -24,13 +24,16 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP],
  
  AS_IF(
   [test "x$ac_cv_header_openssl_evp_h" = xno],
-  [ac_cv_libcrypto=no],
+  [ac_cv_libcrypto=no
+  ac_cv_libcrypto_evp=no],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
  
   AS_IF(
    [test "x$ac_cv_openssl_evp_zlib_compatible" = xyes],
-   [ac_cv_libcrypto=evp],
-   [ac_cv_libcrypto=no])
+   [ac_cv_libcrypto=yes
+   ac_cv_libcrypto_evp=yes],
+   [ac_cv_libcrypto=no
+   ac_cv_libcrypto_evp=no])
   ])
  ])
 
@@ -123,7 +126,9 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_MD5],
  AS_IF(
   [test "x$ac_cv_header_openssl_md5_h" = xno],
   [ac_cv_libcrypto_md5=no],
-  [AC_CHECK_LIB(
+  [ac_cv_libcrypto_md5=libcrypto
+
+  AC_CHECK_LIB(
    crypto,
    MD5_Init,
    [ac_cv_libcrypto_dummy=yes],
@@ -152,7 +157,9 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA1],
  AS_IF(
   [test "x$ac_cv_header_openssl_sha_h" = xno],
   [ac_cv_libcrypto_sha1=no],
-  [AC_CHECK_LIB(
+  [ac_cv_libcrypto_sha1=libcrypto
+
+  AC_CHECK_LIB(
    crypto,
    SHA1_Init,
    [ac_cv_libcrypto_dummy=yes],
@@ -181,7 +188,9 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA256],
  AS_IF(
   [test "x$ac_cv_header_openssl_sha_h" = xno],
   [ac_cv_libcrypto_sha256=no],
-  [AC_CHECK_LIB(
+  [ac_cv_libcrypto_sha256=libcrypto
+
+  AC_CHECK_LIB(
    crypto,
    SHA256_Init,
    [ac_cv_libcrypto_dummy=yes],
@@ -293,8 +302,10 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
    [PKG_CHECK_MODULES(
     [openssl],
     [openssl >= 1.0],
-    [ac_cv_libcrypto=yes],
-    [ac_cv_libcrypto=no])
+    [ac_cv_libcrypto=yes
+    ac_cv_libcrypto_evp=yes],
+    [ac_cv_libcrypto=no
+    ac_cv_libcrypto_evp=no])
    ])
 
   AS_IF(
@@ -307,13 +318,13 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
    AX_LIBCRYPTO_CHECK_OPENSSL_EVP
 
    AS_IF(
-    [test "x$ac_cv_libcrypto" != xevp && test "$ac_cv_header_openssl_opensslv" = xyes],
+    [test "x$ac_cv_libcrypto_evp" != xyes && test "$ac_cv_header_openssl_opensslv" = xyes],
     [ac_cv_libcrypto=yes])
    ])
 
   dnl Setup libcrypto (openssl) parameters
   AS_IF(
-   [test "x$ac_cv_libcrypto" = xevp],
+   [test "x$ac_cv_libcrypto" = xyes && test "x$ac_cv_libcrypto_evp" = xyes],
    [AC_DEFINE(
     [HAVE_OPENSSL_EVP_H],
     [1],
@@ -353,7 +364,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_MD5],
 
  dnl Check for libcrypto (openssl) EVP MD support
  AS_IF(
-  [test "x$ac_cv_libcrypto" = xevp && test "x$ac_cv_libcrypto_evp_md" != xyes],
+  [test "x$ac_cv_libcrypto_evp" = xyes && test "x$ac_cv_libcrypto_evp_md" != xyes],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD])
 
  dnl Check for libcrypto (openssl) EVP MD5 support
@@ -373,7 +384,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_SHA1],
 
  dnl Check for libcrypto (openssl) EVP MD support
  AS_IF(
-  [test "x$ac_cv_libcrypto" = xevp && test "x$ac_cv_libcrypto_evp_md" != xyes],
+  [test "x$ac_cv_libcrypto_evp" = xyes && test "x$ac_cv_libcrypto_evp_md" != xyes],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD])
 
  dnl Check for libcrypto (openssl) EVP SHA1 support
@@ -393,7 +404,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_SHA256],
 
  dnl Check for libcrypto (openssl) EVP MD support
  AS_IF(
-  [test "x$ac_cv_libcrypto" = xevp && test "x$ac_cv_libcrypto_evp_md" != xyes],
+  [test "x$ac_cv_libcrypto_evp" = xyes && test "x$ac_cv_libcrypto_evp_md" != xyes],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD])
 
  dnl Check for libcrypto (openssl) EVP SHA256 support
@@ -413,7 +424,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_AES],
 
  dnl Check for libcrypto (openssl) EVP MD support
  AS_IF(
-  [test "x$ac_cv_libcrypto" = xevp && test "x$ac_cv_libcrypto_evp_cipher" != xyes],
+  [test "x$ac_cv_libcrypto_evp" = xyes && test "x$ac_cv_libcrypto_evp_cipher" != xyes],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_CIPHER
 
   AS_IF(

@@ -3424,9 +3424,8 @@ int libewf_handle_open_read_section_data(
 				{
 					memory_free(
 					 string_data );
-
-					string_data = NULL;
 				}
+				string_data = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
 				known_section = 1;
 #endif
@@ -3641,9 +3640,9 @@ int libewf_handle_open_read_section_data(
 				{
 					memory_free(
 					 string_data );
-
-					string_data = NULL;
 				}
+				string_data = NULL;
+
 				header_sections->number_of_header_sections += 1;
 
 				header_section_found = 1;
@@ -5026,13 +5025,12 @@ ssize_t libewf_handle_prepare_read_chunk(
          size_t *uncompressed_chunk_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t read_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	uint8_t *checksum_buffer                  = NULL;
 	static char *function                     = "libewf_handle_prepare_read_chunk";
-	uint32_t calculated_checksum              = 0;
+	uint32_t chunk_range_flags                = 0;
 
 	if( handle == NULL )
 	{
@@ -5058,6 +5056,17 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 		return( -1 );
 	}
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
 	if( chunk_buffer == NULL )
 	{
 		libcerror_error_set(
@@ -5065,18 +5074,6 @@ ssize_t libewf_handle_prepare_read_chunk(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( chunk_buffer_size == 0 )
-	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid chunk buffer size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -5092,110 +5089,55 @@ ssize_t libewf_handle_prepare_read_chunk(
 
 		return( -1 );
 	}
-	if( is_compressed == 0 )
+	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_IS_PACKED ) != 0 )
 	{
-		if( chunk_buffer_size < 4 )
+		if( is_compressed != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid chunk buffer size value out of bounds.",
-			 function );
-
-			return( -1 );
+			chunk_range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 		}
-		chunk_buffer_size -= 4;
-
-		if( read_checksum == 0 )
+		else
 		{
-			checksum_buffer = &( ( (uint8_t *) chunk_buffer )[ chunk_buffer_size ] );
+			chunk_range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
-			byte_stream_copy_to_uint32_little_endian(
-			 checksum_buffer,
-			 chunk_checksum );
+			uncompressed_chunk_buffer       = chunk_buffer;
+			*uncompressed_chunk_buffer_size = chunk_buffer_size;
 		}
-		calculated_checksum = ewf_checksum_calculate(
-		                       chunk_buffer,
-		                       chunk_buffer_size,
-		                       1 );
-
-		if( chunk_checksum != calculated_checksum )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_INPUT,
-			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-			 "%s: chunk data checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
-			 function,
-			 chunk_checksum,
-			 calculated_checksum );
-
-			return( -1 );
-		}
-		*uncompressed_chunk_buffer_size = chunk_buffer_size;
-	}
-	else
-	{
-		if( uncompressed_chunk_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid uncompressed chunk buffer.",
-			 function );
-
-			return( -1 );
-		}
-		if( uncompressed_chunk_buffer == chunk_buffer )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid uncompressed chunk buffer is the same as chunk buffer.",
-			 function );
-
-			return( -1 );
-		}
-		if( *uncompressed_chunk_buffer_size > (size_t) SSIZE_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid uncompressed chunk buffer size value exceeds maximum.",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_decompress_data(
-		     chunk_buffer,
-		     chunk_buffer_size,
-		     internal_handle->io_handle->compression_method,
+		if( libewf_chunk_data_unpack_buffer(
 		     uncompressed_chunk_buffer,
 		     uncompressed_chunk_buffer_size,
+		     chunk_buffer,
+		     chunk_buffer_size,
+		     internal_handle->media_values->chunk_size,
+		     internal_handle->io_handle->compression_method,
+		     chunk_range_flags,
+		     chunk_checksum,
+		     chunk_io_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
-			 "%s: unable to decompress chunk buffer.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to unpack chunk buffer.",
 			 function );
 
 			return( -1 );
 		}
+		chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_IS_PACKED );
+	}
+	else
+	{
+		*uncompressed_chunk_buffer_size = chunk_buffer_size;
 	}
 	return( (ssize_t) *uncompressed_chunk_buffer_size );
 }
 
 /* Reads a chunk of (media) data from the current offset into a buffer
  * Will read until the requested size is filled or the entire chunk is read
- * The values read_checksum and chunk_checksum are used for uncompressed chunks only
  * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
- * The value read_checksum is set if the checksum has been read into checksum_buffer
+ * and is used for uncompressed chunks only
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
+ * otherwise the checksum is considered part of the data in the chunk buffer
  * The value chunk_buffer_size contains the size of the chunk buffer
  * Returns the number of bytes read or -1 on error
  */
@@ -5206,7 +5148,7 @@ ssize_t libewf_handle_read_chunk(
          int8_t *is_compressed,
          void *checksum_buffer,
          uint32_t *chunk_checksum,
-         int8_t *read_checksum,
+         int8_t *chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
@@ -5341,13 +5283,13 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-	if( read_checksum == NULL )
+	if( chunk_io_flags == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read checksum.",
+		 "%s: invalid chunk IO flags.",
 		 function );
 
 		return( -1 );
@@ -5356,7 +5298,8 @@ ssize_t libewf_handle_read_chunk(
 	{
 		return( 0 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->io_handle->current_offset
+	            / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
@@ -5402,17 +5345,25 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-	chunk_data_buffer = chunk_data->data;
-	read_size         = chunk_data->data_size;
-	*is_compressed    = chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED;
-	*read_checksum    = 0;
+	*is_compressed = 0;
 
-	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
 	{
-		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
+		chunk_data_buffer = chunk_data->data;
+		read_size         = chunk_data->data_size;
+		*chunk_io_flags   = LIBEWF_CHUNK_IO_FLAG_IS_PACKED;
+
+		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			if( ( chunk_data->data_size < 4 )
-			 || ( chunk_data->data_size > (size_t) SSIZE_MAX ) )
+			*is_compressed = 1;
+		}
+		/* If the chunk data has a checksum and if the checksum buffer is not aligned
+		 * with the chunk buffer the chunk and checksum are stored separately
+		 * otherwise the checksum will be read at the same time as the chunk buffer
+		 */
+		else if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			if( read_size < 4 )
 			{
 				libcerror_error_set(
 				 error,
@@ -5423,43 +5374,46 @@ ssize_t libewf_handle_read_chunk(
 
 				return( -1 );
 			}
-			if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+			if( &( ( (uint8_t *) chunk_buffer )[ read_size - 4 ] ) != checksum_buffer )
 			{
-				read_size -= 4;
-			}
-		}
-		if( chunk_buffer_size < read_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: invalid chunk buffer size value too small.",
-			 function );
+				if( memory_copy(
+				     checksum_buffer,
+				     &( chunk_data_buffer[ read_size - 4 ] ),
+				     4 ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+					 "%s: unable to copy chunk checksum data in chunk buffer.",
+					 function );
 
-			return( -1 );
-		}
-		/* If the chunk data has a checksum
-		 * read the chunk and checksum separately if the checksum buffer is not aligned
-		 * with the chunk buffer otherwise the checksum will be read at the same time
-		 * as the chunk buffer
-		 */
-		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
-		{
-		 	if( &( ( (uint8_t *) chunk_buffer )[ read_size ] ) != checksum_buffer )
-			{
-				*read_checksum = 1;
-			}
-			else
-			{
-				read_size += 4;
+					return( -1 );
+				}
+				byte_stream_copy_to_uint32_little_endian(
+				 (uint8_t *) checksum_buffer,
+				 *chunk_checksum );
+
+				*chunk_io_flags |= LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET;
 			}
 		}
 	}
-	else if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) == 0 )
+	else
 	{
-		chunk_data_buffer = chunk_data->compressed_data;
-		read_size         = chunk_data->compressed_data_size;
+		chunk_data_buffer = chunk_data->data;
+		read_size         = chunk_data->data_size;
+		*chunk_io_flags   = 0;
+	}
+	if( read_size >= chunk_buffer_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: invalid chunk buffer size value too small.",
+		 function );
+
+		return( -1 );
 	}
 	if( memory_copy(
 	     chunk_buffer,
@@ -5475,40 +5429,17 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-	if( *read_checksum != 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
 	{
-		if( memory_copy(
-		     checksum_buffer,
-		     &( chunk_data_buffer[ read_size ] ),
-		     4 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy chunk checksum data in chunk buffer.",
-			 function );
-
-			return( -1 );
-		}
-		read_size += 4;
-
-		byte_stream_copy_to_uint32_little_endian(
-		 (uint8_t *) checksum_buffer,
-		 *chunk_checksum );
-	}
-	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) == 0 )
-	{
-		data_size = chunk_data->data_size;
+		data_size = (size_t) internal_handle->media_values->chunk_size;
 	}
 	else
 	{
-		data_size = (size_t) internal_handle->media_values->chunk_size;
-
-		if( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size )
-		{
-			data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
-		}
+		data_size = chunk_data->data_size;
+	}
+	if( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size )
+	{
+		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
 	}
 	internal_handle->io_handle->current_offset += (off64_t) data_size;
 
@@ -5804,7 +5735,9 @@ ssize_t libewf_handle_read_random(
 /* Prepares a chunk of (media) data before writing according to the handle settings
  * This function should be used before libewf_handle_write_chunk
  * The chunk_buffer_size should contain the actual chunk size
- * The function sets the chunk checksum, is compressed and write checksum values
+ * The function sets the is_compressed, chunk_checksum and chunk_io_flags values
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
+ * and needs to be written separately from the chunk data, in case of an uncompressed chunk
  * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_handle_prepare_write_chunk(
@@ -5815,16 +5748,18 @@ ssize_t libewf_handle_prepare_write_chunk(
          size_t *compressed_chunk_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *write_checksum,
+         int8_t *chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_prepare_write_chunk";
-	size_t chunk_write_size                   = 0;
+	size_t chunk_padding_size                 = 0;
 	uint64_t chunk_index                      = 0;
-	int8_t compression_level                  = 0;
+	uint32_t chunk_range_flags                = 0;
+	uint8_t compression_flags                 = 0;
+	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
+	int8_t is_empty_zero_block                = 0;
 	int chunk_exists                          = 0;
-	int is_empty_zero_block                   = 0;
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -5919,13 +5854,13 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		return( -1 );
 	}
-	if( chunk_checksum == NULL )
+	if( compressed_chunk_buffer_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk checksum.",
+		 "%s: invalid compressed chunk buffer size.",
 		 function );
 
 		return( -1 );
@@ -5941,24 +5876,14 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		return( -1 );
 	}
-	if( write_checksum == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write checksum.",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk_buffer_size == 0 )
 	{
 		return( 0 );
 	}
 	if( internal_handle->read_io_handle != NULL )
 	{
-		chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+		chunk_index = internal_handle->io_handle->current_offset
+		            / internal_handle->media_values->chunk_size;
 
 		if( chunk_index >= (uint64_t) INT_MAX )
 		{
@@ -6005,17 +5930,17 @@ ssize_t libewf_handle_prepare_write_chunk(
 			}
 		}
 	}
-	*is_compressed = 0;
-
 	if( chunk_exists == 0 )
 	{
 		compression_level = internal_handle->io_handle->compression_level;
+		compression_flags = internal_handle->io_handle->compression_flags;
 
-		if( ( internal_handle->io_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+		if( ( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+		 && ( ( internal_handle->write_io_handle->pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 ) )
 		{
 			result = libewf_empty_block_test(
-				  chunk_buffer,
-				  chunk_buffer_size,
+			          chunk_buffer,
+			          chunk_buffer_size,
 				  error );
 
 			if( result == -1 )
@@ -6024,12 +5949,16 @@ ssize_t libewf_handle_prepare_write_chunk(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if chunk buffer is empty.",
+				 "%s: unable to determine if chunk data is an empty block.",
 				 function );
 
 				return( -1 );
 			}
-			else if( result == 1 )
+			else if( result == 0 )
+			{
+				compression_level = LIBEWF_COMPRESSION_NONE;
+			}
+			else
 			{
 				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{
@@ -6040,146 +5969,45 @@ ssize_t libewf_handle_prepare_write_chunk(
 					is_empty_zero_block = 1;
 				}
 			}
-			else
-			{
-				compression_level = LIBEWF_COMPRESSION_NONE;
-			}
-		}
-		if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-		 || ( compression_level != LIBEWF_COMPRESSION_NONE ) )
-		{
-			if( compressed_chunk_buffer == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid compressed chunk buffer.",
-				 function );
-
-				return( -1 );
-			}
-			if( compressed_chunk_buffer == chunk_buffer )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid compressed chunk buffer is the same as chunk buffer.",
-				 function );
-
-				return( -1 );
-			}
-			if( compressed_chunk_buffer_size == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: invalid compressed chunk buffer size.",
-				 function );
-
-				return( -1 );
-			}
-			/* The compressed data size contains the maximum allowed buffer size on entry
-			 */
-			if( *compressed_chunk_buffer_size > (size_t) SSIZE_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid compressed chunk buffer size value exceeds maximum.",
-				 function );
-
-				return( -1 );
-			}
-			/* Use the cached version of the zero byte empty block data if available
-			 */
-			if( ( is_empty_zero_block != 0 )
-			 && ( (size_t) internal_handle->media_values->chunk_size == chunk_buffer_size )
-			 && ( internal_handle->write_io_handle->compressed_zero_byte_empty_block != NULL ) )
-			{
-				if( memory_copy(
-				     compressed_chunk_buffer,
-				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
-				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-					 "%s: unable to copy compressed zero byte empty block to compressed chunk buffer.",
-					 function );
-
-					return( -1 );
-				}
-				*compressed_chunk_buffer_size = internal_handle->write_io_handle->compressed_zero_byte_empty_block_size;
-			}
-			else
-			{
-				result = libewf_compress_data(
-					  (uint8_t *) compressed_chunk_buffer,
-					  compressed_chunk_buffer_size,
-					  internal_handle->io_handle->compression_method,
-					  compression_level,
-					  (uint8_t *) chunk_buffer,
-					  chunk_buffer_size,
-					  error );
-
-				if( result != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
-					 LIBCERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
-					 "%s: unable to compress chunk.",
-					 function );
-
-					return( -1 );
-				}
-			}
-			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-			 || ( *compressed_chunk_buffer_size < chunk_buffer_size ) )
-			{
-				*is_compressed = 1;
-			}
 		}
 	}
-	if( *is_compressed == 0 )
+	if( libewf_chunk_data_pack_buffer(
+	     chunk_buffer,
+	     chunk_buffer_size,
+	     compressed_chunk_buffer,
+	     compressed_chunk_buffer_size,
+	     internal_handle->media_values->chunk_size,
+	     chunk_buffer_size,
+	     &chunk_padding_size,
+	     internal_handle->io_handle->compression_method,
+	     compression_level,
+	     &chunk_range_flags,
+	     chunk_checksum,
+	     chunk_io_flags,
+	     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
+	     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
+             is_empty_zero_block,
+	     internal_handle->write_io_handle->pack_flags,
+	     error ) != 1 )
 	{
-		*chunk_checksum = ewf_checksum_calculate(
-		                   chunk_buffer,
-		                   chunk_buffer_size,
-		                   1 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to pack chunk buffer.",
+		 function );
 
-		chunk_write_size = chunk_buffer_size;
-
-		*write_checksum = 1;
+		return( -1 );
+	}
+	if( ( chunk_range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+	{
+		*is_compressed = 1;
 	}
 	else
 	{
-		/* Zlib creates its own checksum
-		 */
-		if( memory_copy(
-		     chunk_checksum,
-		     &( ( (uint8_t *) compressed_chunk_buffer )[ *compressed_chunk_buffer_size - 4 ] ),
-		     4 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set checksum.",
-			 function );
-
-			return( -1 );
-		}
-		chunk_write_size = *compressed_chunk_buffer_size;
-
-		*write_checksum = 0;
+		*is_compressed = 0;
 	}
-	return( (ssize_t) chunk_write_size );
+	return( (ssize_t) *compressed_chunk_buffer_size );
 }
 
 /* Writes a chunk of (media) data in EWF format at the current offset
@@ -6197,13 +6025,14 @@ ssize_t libewf_handle_write_chunk(
          int8_t is_compressed,
          void *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_chunk";
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
+	uint32_t chunk_data_flags                 = 0;
 	int chunk_exists                          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -6319,6 +6148,19 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
+#if SIZE_OF_SIZE_T > 4
+	if( chunk_buffer_size > (size_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( data_size > internal_handle->media_values->chunk_size )
 	{
 		libcerror_error_set(
@@ -6339,7 +6181,8 @@ ssize_t libewf_handle_write_chunk(
 	{
 		return( 0 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->io_handle->current_offset
+	            / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
@@ -6387,6 +6230,14 @@ ssize_t libewf_handle_write_chunk(
 		 data_size );
 	}
 #endif
+	if( is_compressed != 0 )
+	{
+		chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
+	}
+	else
+	{
+		chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
+	}
 	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
@@ -6432,14 +6283,19 @@ ssize_t libewf_handle_write_chunk(
 		               (uint8_t *) chunk_buffer,
 		               chunk_buffer_size,
 		               data_size,
-		               is_compressed,
+		               chunk_data_flags,
 		               (uint8_t *) checksum_buffer,
 		               chunk_checksum,
-		               write_checksum,
+		               chunk_io_flags,
 		               error );
 	}
 	else
 	{
+/* TODO
+ * set chunk padding size
+ */
+		uint32_t chunk_padding_size = 0;
+
 		write_count = libewf_write_io_handle_write_new_chunk(
 		               internal_handle->write_io_handle,
 		               internal_handle->io_handle,
@@ -6456,13 +6312,15 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->tracks,
 		               internal_handle->acquiry_errors,
 		               (int) chunk_index,
+		               data_size,
 		               (uint8_t *) chunk_buffer,
 		               chunk_buffer_size,
-		               data_size,
-		               is_compressed,
+		               (uint32_t) chunk_buffer_size,
+		               chunk_padding_size,
+		               chunk_data_flags,
 		               (uint8_t *) checksum_buffer,
 		               chunk_checksum,
-		               write_checksum,
+		               chunk_io_flags,
 		               error );
 	}
 	if( write_count < 0 )
@@ -6497,11 +6355,13 @@ ssize_t libewf_handle_write_buffer(
 	static char *function                     = "libewf_handle_write_buffer";
 	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
-	size_t chunk_data_size                    = 0;
+	size_t chunk_padding_size                 = 0;
+	size_t input_data_size                    = 0;
 	size_t write_size                         = 0;
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
 	uint64_t chunk_data_offset                = 0;
+	uint32_t chunk_data_flags                 = 0;
 	int chunk_exists                          = 0;
 	int write_chunk                           = 0;
 
@@ -6857,7 +6717,7 @@ ssize_t libewf_handle_write_buffer(
 			buffer_offset += write_size;
 			buffer_size   -= write_size;
 
-			chunk_data_size = chunk_data->data_size;
+			input_data_size = chunk_data->data_size;
 
 			/* For now ignore the default pack flags when creating a delta chunk
 			 */
@@ -6867,6 +6727,7 @@ ssize_t libewf_handle_write_buffer(
 			     LIBEWF_COMPRESSION_METHOD_NONE,
 			     LIBEWF_COMPRESSION_NONE,
 			     0,
+			     &chunk_padding_size,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 			     LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM,
@@ -6893,9 +6754,9 @@ ssize_t libewf_handle_write_buffer(
 				       internal_handle->chunk_table_list,
 				       (int) chunk_index,
 				       chunk_data->data,
+				       chunk_data->allocated_data_size,
 				       chunk_data->data_size,
-				       chunk_data_size,
-				       0,
+				       LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM,
 				       NULL,
 				       0,
 				       0,
@@ -7030,7 +6891,7 @@ ssize_t libewf_handle_write_buffer(
 			}
 			if( write_chunk != 0 )
 			{
-				chunk_data_size = internal_handle->chunk_data->data_size;
+				input_data_size = internal_handle->chunk_data->data_size;
 
 				if( libewf_chunk_data_pack(
 				     internal_handle->chunk_data,
@@ -7038,6 +6899,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->io_handle->compression_method,
 				     internal_handle->io_handle->compression_level,
 				     internal_handle->io_handle->compression_flags,
+				     &chunk_padding_size,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 				     internal_handle->write_io_handle->pack_flags,
@@ -7052,6 +6914,14 @@ ssize_t libewf_handle_write_buffer(
 					 chunk_index );
 
 					return( -1 );
+				}
+				if( ( internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+				{
+					chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
+				}
+				else
+				{
+					chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
 				}
 				write_count = libewf_write_io_handle_write_new_chunk(
 					       internal_handle->write_io_handle,
@@ -7069,10 +6939,12 @@ ssize_t libewf_handle_write_buffer(
 					       internal_handle->tracks,
 					       internal_handle->acquiry_errors,
 					       (int) chunk_index,
+					       input_data_size,
 					       internal_handle->chunk_data->data,
+					       internal_handle->chunk_data->allocated_data_size,
 					       internal_handle->chunk_data->data_size,
-					       chunk_data_size,
-					       internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED,
+					       chunk_padding_size,
+					       chunk_data_flags,
 					       NULL,
 					       0,
 					       0,
@@ -7193,10 +7065,12 @@ ssize_t libewf_handle_write_finalize(
 	static char *function                     = "libewf_handle_write_finalize";
 	void *reallocation                        = NULL;
 	off64_t segment_file_offset               = 0;
-	size_t chunk_data_size                    = 0;
+	size_t chunk_padding_size                 = 0;
+	size_t input_data_size                    = 0;
 	ssize_t write_count                       = 0;
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
+	uint32_t chunk_data_flags                 = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
 	int segment_files_list_index              = 0;
@@ -7309,7 +7183,7 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		chunk_data_size = internal_handle->chunk_data->data_size;
+		input_data_size = internal_handle->chunk_data->data_size;
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
@@ -7317,6 +7191,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->io_handle->compression_method,
 		     internal_handle->io_handle->compression_level,
 		     internal_handle->io_handle->compression_flags,
+		     &chunk_padding_size,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 		     internal_handle->write_io_handle->pack_flags,
@@ -7331,6 +7206,14 @@ ssize_t libewf_handle_write_finalize(
 			 chunk_index );
 
 			return( -1 );
+		}
+		if( ( internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
+		}
+		else
+		{
+			chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
 		}
 		write_count = libewf_write_io_handle_write_new_chunk(
 			       internal_handle->write_io_handle,
@@ -7348,10 +7231,12 @@ ssize_t libewf_handle_write_finalize(
 			       internal_handle->tracks,
 			       internal_handle->acquiry_errors,
 			       (int) chunk_index,
+			       input_data_size,
 			       internal_handle->chunk_data->data,
+			       internal_handle->chunk_data->allocated_data_size,
 			       internal_handle->chunk_data->data_size,
-			       chunk_data_size,
-			       internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED,
+			       chunk_padding_size,
+			       chunk_data_flags,
 			       NULL,
 			       0,
 			       0,

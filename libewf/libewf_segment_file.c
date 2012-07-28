@@ -509,13 +509,13 @@ ssize_t libewf_segment_file_read_file_header(
 			 segment_file->minor_version );
 
 			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 "",
+		 	 "%s: compression method\t\t: %" PRIu16 " (",
 			 function,
 			 segment_file->compression_method );
 			libewf_debug_print_compression_method(
 			 segment_file->compression_method );
 			libcnotify_printf(
-			 "\n" );
+			 ")\n" );
 		}
 		libcnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
@@ -752,13 +752,13 @@ ssize_t libewf_segment_file_write_file_header(
 			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
 
 			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 "",
+		 	 "%s: compression method\t\t: %" PRIu16 " (",
 			 function,
 			 segment_file->compression_method );
 			libewf_debug_print_compression_method(
 			 segment_file->compression_method );
 			libcnotify_printf(
-			 "\n" );
+			 ")\n" );
 		}
 		libcnotify_printf(
 	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
@@ -1579,7 +1579,6 @@ ssize_t libewf_segment_file_write_device_information_section(
 
 		goto on_error;
 	}
-/* TODO pass compression method and level */
 	/* Do not include the end of string character in the compressed data
 	 */
 	write_count = libewf_section_write_compressed_string(
@@ -1700,7 +1699,6 @@ ssize_t libewf_segment_file_write_case_data_section(
 
 		goto on_error;
 	}
-/* TODO pass compression method and level */
 	/* Do not include the end of string character in the compressed data
 	 */
 	write_count = libewf_section_write_compressed_string(
@@ -3593,7 +3591,7 @@ on_error:
 }
 
 /* Write a chunk of data to a segment file and update the chunk table
- * Set write_checksum to a non 0 value if the checksum is not provided within the chunk data
+ * Set LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags if the checksum is not provided within the chunk data
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_chunk(
@@ -3605,11 +3603,12 @@ ssize_t libewf_segment_file_write_chunk(
          int chunk_index,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
-         size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
-         int8_t is_compressed,
+         size_t chunk_data_size,
+         size_t chunk_padding_size,
+         uint32_t chunk_data_flags,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	static char *function       = "libewf_segment_file_write_chunk";
@@ -3619,8 +3618,6 @@ ssize_t libewf_segment_file_write_chunk(
 	ssize_t write_count         = 0;
 	uint32_t range_flags        = 0;
 	int number_of_chunks        = 0;
-
-	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
 	if( segment_file == NULL )
 	{
@@ -3654,6 +3651,42 @@ ssize_t libewf_segment_file_write_chunk(
 		 function );
 
 		return( -1 );
+	}
+	if( chunk_data_size > (size_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_padding_size > (size_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk padding size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->format != LIBEWF_FORMAT_SMART )
+	{
+		if( chunk_data_size > chunk_buffer_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid chunk data size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( libmfdata_list_get_number_of_elements(
 	     chunk_table_list,
@@ -3703,37 +3736,47 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
-	write_size = chunk_buffer_size;
+	write_size = chunk_data_size;
 
 	/* Write the checksum if necessary
 	 */
-	if( ( is_compressed == 0 )
-	 && ( write_checksum != 0 ) )
+	if( ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) == 0 )
+	 && ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 ) )
 	{
-		/* Check if the chunk and checksum buffers are aligned
-		 * if so write the chunk and checksum at the same time
+		if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
+		{
+			/* Check if the chunk and checksum buffers are aligned
+			 * if so write the chunk and checksum at the same time
+			 */
+			if( checksum_buffer == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid checksum buffer.",
+				 function );
+
+				return( -1 );
+			}
+			byte_stream_copy_from_uint32_little_endian(
+			 checksum_buffer,
+			 chunk_checksum );
+
+			if( checksum_buffer == &( chunk_buffer[ chunk_data_size ] ) )
+			{
+				write_size += 4;
+
+				chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET );
+			}
+		}
+	}
+/* TODO */
+	if( chunk_padding_size > 0 )
+	{
+		/* Check if there is room in chunk buffer to write
+		 * the padding and the rest of the chunk data at the same time
 		 */
-		if( checksum_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid checksum buffer.",
-			 function );
-
-			return( -1 );
-		}
-		byte_stream_copy_from_uint32_little_endian(
-		 checksum_buffer,
-		 chunk_checksum );
-
-		if( checksum_buffer == &( chunk_buffer[ chunk_buffer_size ] ) )
-		{
-			write_size += 4;
-
-			write_checksum = 0;
-		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -3752,19 +3795,63 @@ ssize_t libewf_segment_file_write_chunk(
 		 segment_file_offset );
 
 		libcnotify_printf(
-		 "%s: chunk: %d size\t\t\t\t: %" PRIzd "\n",
+		 "%s: chunk: %d write size\t\t\t: %" PRIzd "\n",
 		 function,
 		 chunk_index,
 		 write_size );
 
-/* TODO what if checksum is not set */
-		if( ( is_compressed != 0 )
-		 && ( write_checksum == 0 ) )
+		libcnotify_printf(
+		 "%s: chunk: %d chunk IO flags\t\t: 0x%02" PRIx8 "\n",
+		 function,
+		 chunk_index,
+		 chunk_io_flags );
+
+		libcnotify_printf(
+		 "%s: chunk: %d data size\t\t\t: %" PRIzd "\n",
+		 function,
+		 chunk_index,
+		 chunk_data_size );
+
+		libcnotify_printf(
+		 "%s: chunk: %d padding size\t\t\t: %" PRIzd "\n",
+		 function,
+		 chunk_index,
+		 chunk_padding_size );
+
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			if( chunk_buffer_size >= 4 )
+			if( chunk_data_size < 4 )
 			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid chunk data size value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			byte_stream_copy_to_uint32_little_endian(
+			 &( chunk_buffer[ chunk_data_size - 4 ] ),
+			 chunk_checksum );
+		}
+		else if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) == 0 )
+			{
+				if( ( chunk_data_size + 4 ) > chunk_buffer_size )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid chunk data size value out of bounds.",
+					 function );
+
+					return( -1 );
+				}
 				byte_stream_copy_to_uint32_little_endian(
-				 &( chunk_buffer[ chunk_buffer_size - 4 ] ),
+				 &( chunk_buffer[ chunk_data_size ] ),
 				 chunk_checksum );
 			}
 		}
@@ -3779,14 +3866,21 @@ ssize_t libewf_segment_file_write_chunk(
 		 function,
 		 chunk_index );
 
-		if( is_compressed != 0 )
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 		{
 			libcnotify_printf(
 			 "Is compressed\n" );
 		}
-/* TODO what if checksum is not set */
-		libcnotify_printf(
-		 "Has checksum\n" );
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			libcnotify_printf(
+			 "Has checksum\n" );
+		}
+		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 )
+		{
+			libcnotify_printf(
+			 "Uses pattern fill\n" );
+		}
 		libcnotify_printf(
 		 "\n" );
 	}
@@ -3817,8 +3911,8 @@ ssize_t libewf_segment_file_write_chunk(
 	/* Check if the chunk and checksum buffers are aligned
 	 * if not the chunk and checksum need to be written separately
 	 */
-	if( ( is_compressed == 0 )
-	 && ( write_checksum != 0 ) )
+	if( ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) == 0 )
+	 && ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 ) )
 	{
 		write_count = libbfio_pool_write_buffer(
 			       file_io_pool,
@@ -3841,11 +3935,17 @@ ssize_t libewf_segment_file_write_chunk(
 		}
 		total_write_count += write_count;
 	}
-	range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
-
-	if( is_compressed != 0 )
+	if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		range_flags |= LIBMFDATA_RANGE_FLAG_IS_COMPRESSED;
+	}
+	if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
+	{
+		range_flags |= LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
+	}
+	if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 )
+	{
+		range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
 	}
 	if( libmfdata_list_set_element_by_index(
 	     chunk_table_list,
@@ -3883,7 +3983,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          size_t chunk_size,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         uint8_t write_checksum,
+         int8_t chunk_io_flags,
 	 uint8_t no_section_append,
          libcerror_error_t **error )
 {
@@ -3973,7 +4073,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               (uint32_t) chunk_size,
 	               checksum_buffer,
 	               chunk_checksum,
-	               write_checksum,
+	               chunk_io_flags,
 	               error );
 
 	if( write_count == -1 )
@@ -4023,7 +4123,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 			goto on_error;
 		}
 	}
-	if( write_checksum != 0 )
+	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
 	{
 		chunk_size += 4;
 	}

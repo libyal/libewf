@@ -812,7 +812,7 @@ ssize_t libewf_raw_read_prepare_buffer(
          size_t *uncompressed_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t read_checksum )
+         int8_t chunk_io_flags )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_prepare_buffer";
@@ -826,7 +826,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	                   uncompressed_buffer_size,
 	                   is_compressed,
 	                   chunk_checksum,
-	                   read_checksum,
+	                   chunk_io_flags,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -859,7 +859,7 @@ ssize_t libewf_raw_read_buffer(
          size_t buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *read_checksum )
+         int8_t *chunk_io_flags )
 {
 	uint8_t checksum_buffer[ 4 ];
 
@@ -874,7 +874,7 @@ ssize_t libewf_raw_read_buffer(
 	              is_compressed,
 	              checksum_buffer,
 	              chunk_checksum,
-	              read_checksum,
+	              chunk_io_flags,
 	              &error );
 
 	if( read_count == -1 )
@@ -986,7 +986,7 @@ ssize_t libewf_raw_write_prepare_buffer(
          size_t *compressed_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *write_checksum )
+         int8_t *chunk_io_flags )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_prepare_buffer";
@@ -1000,7 +1000,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 	                   compressed_buffer_size,
 	                   is_compressed,
 	                   chunk_checksum,
-	                   write_checksum,
+	                   chunk_io_flags,
 	                   &error );
 
 	if( chunk_data_size == -1 )
@@ -1036,7 +1036,7 @@ ssize_t libewf_raw_write_buffer(
          size_t data_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t write_checksum )
+         int8_t chunk_io_flags )
 {
 	uint8_t checksum_buffer[ 4 ];
 
@@ -1052,7 +1052,7 @@ ssize_t libewf_raw_write_buffer(
 	               is_compressed,
 	               checksum_buffer,
 	               chunk_checksum,
-	               write_checksum,
+	               chunk_io_flags,
 	               &error );
 
 	if( write_count == -1 )

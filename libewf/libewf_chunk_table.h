@@ -124,6 +124,8 @@ int libewf_chunk_table_fill_v2(
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
+     libewf_section_t *table_section,
+     uint32_t number_of_offsets,
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
      uint8_t tainted,

@@ -5924,7 +5924,7 @@ int libewf_generate_date_xheader_value(
 
 		goto on_error;
 	}
-	( *date_time_values_string )[ date_time_values_string_index ] = (uint8_t) ' ';
+	( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
 
 	if( libewf_utf8_string_month_copy_from_time_elements(
 	     *date_time_values_string,
@@ -5942,11 +5942,11 @@ int libewf_generate_date_xheader_value(
 
 		goto on_error;
 	}
-	( *date_time_values_string )[ date_time_values_string_index ] = (uint8_t) ' ';
+	( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
 
 	if( time_elements.tm_mday < 10 )
 	{
-		( *date_time_values_string )[ date_time_values_string_index ] = (uint8_t) ' ';
+		( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
 	}
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     *date_time_values_string,
@@ -5984,7 +5984,7 @@ int libewf_generate_date_xheader_value(
 
 		goto on_error;
 	}
-	( *date_time_values_string )[ date_time_values_string_index ] = (uint8_t) ' ';
+	( *date_time_values_string )[ date_time_values_string_index++ ] = (uint8_t) ' ';
 
 	if( libfvalue_utf8_string_with_index_copy_from_integer(
 	     *date_time_values_string,

@@ -39,7 +39,7 @@
 #include <libfvalue_value.h>
 #include <libfvalue_value_type.h>
 
-#elif defined( HAVE_LIBFVALUE_H )
+#else
 
 /* If libtool DLL support is enabled set LIBFVALUE_DLL_IMPORT
  * before including libfvalue.h
@@ -50,8 +50,6 @@
 
 #include <libfvalue.h>
 
-#else
-#error Missing libfvalue.h
 #endif
 
 #endif

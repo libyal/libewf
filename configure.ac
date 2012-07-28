@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120724],
+ [20120728],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -97,61 +97,10 @@ dnl Check for enabling libmfdata for multi-file data types support
 AX_LIBMFDATA_CHECK_ENABLE
 
 dnl Check for zlib compression support
-dnl ac_zlib_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
-AX_COMMON_ARG_WITH(
- [zlib],
- [zlib],
- [search for zlib in includedir and libdir or in the specified DIR],
- [auto-detect],
- [DIR])
+AX_ZLIB_CHECK_ENABLE
 
-AS_IF(
- [test "x$ac_cv_with_zlib" != x && test "x$ac_cv_with_zlib" != xauto-detect],
- [AS_IF(
-  [test -d "$ac_cv_with_zlib"],
-  [CFLAGS="$CFLAGS -I${ac_cv_with_zlib}/include"
-  LDFLAGS="$LDFLAGS -L${ac_cv_with_zlib}/lib"],
-  [AC_MSG_WARN([no such directory: $ac_cv_with_zlib])
-  ])
- ])
-
-AC_CHECK_HEADERS([zlib.h])
-
-AC_CHECK_LIB(
- z,
- adler32,
- [],
- [AC_MSG_FAILURE(
-  [Missing function: adler32 in library: zlib.],
-  [1])
- ])
-
-AC_CHECK_LIB(
- z,
- compress2,
- [ac_zlib_dummy=yes],
- [AC_MSG_FAILURE(
-  [Missing function: compress2 in library: zlib.],
-  [1])
- ])
-
-AC_CHECK_LIB(
- z,
- compressBound,
- [AC_DEFINE(
-  [HAVE_COMPRESS_BOUND],
-  [1],
-  [Define to 1 if compressBound funtion is available in zlib.])
- ])
-
-AC_CHECK_LIB(
- z,
- uncompress,
- [ac_zlib_dummy=yes],
- [AC_MSG_FAILURE(
-  [Missing function: uncompress in library: zlib.],
-  [1])
- ])
+dnl Check for bz2lib compression support
+ac_cv_bz2lib=no
 
 dnl Check for library function support
 AX_LIBEWF_CHECK_LOCAL
@@ -316,6 +265,8 @@ Building:
    libfvalue support:                               $ac_cv_libfvalue
    libmfcache support:                              $ac_cv_libmfcache
    libmfdata support:                               $ac_cv_libmfdata
+   DEFLATE compression support:                     $ac_cv_zlib
+   BZIP2 compression support:                       $ac_cv_bz2lib
    libhmac support:                                 $ac_cv_libhmac
    MD5 support:                                     $ac_cv_libhmac_md5
    SHA1 support:                                    $ac_cv_libhmac_sha1

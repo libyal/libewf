@@ -1240,7 +1240,7 @@ int libewf_utf8_string_month_copy_to_time_elements(
 		return( -1 );
 	}
 	if( ( utf8_string[ 0 ] >= (uint8_t) '0' )
-	 || ( utf8_string[ 0 ] <= (uint8_t) '9' ) )
+	 && ( utf8_string[ 0 ] <= (uint8_t) '9' ) )
 	{
 		if( libfvalue_utf8_string_copy_to_integer(
 		     utf8_string,

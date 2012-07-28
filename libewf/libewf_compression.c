@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_ZLIB_H ) || defined( ZLIB_DLL )
+#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
 #include <zlib.h>
 #endif
 
@@ -36,7 +36,7 @@
 #include "libewf_libcnotify.h"
 
 /* Compresses data using the compression method
- * Returns 1 on success or -1 on error
+ * Returns 1 on success, 0 if buffer is too small or -1 on error
  */
 int libewf_compress_data(
      uint8_t *compressed_data,
@@ -136,7 +136,7 @@ int libewf_compress_data(
 	{
 		*compressed_data_size = (size_t) zlib_compressed_data_size;
 
-		return( 1 );
+		result = 1;
 	}
 	else if( result == Z_BUF_ERROR )
 	{
@@ -158,6 +158,7 @@ int libewf_compress_data(
 		 */
 		*compressed_data_size *= 2;
 #endif
+		result = 0;
 	}
 	else if( result == Z_MEM_ERROR )
 	{
@@ -169,6 +170,8 @@ int libewf_compress_data(
 		 function );
 
 		*compressed_data_size = 0;
+
+		result = -1;
 	}
 	else
 	{
@@ -181,8 +184,10 @@ int libewf_compress_data(
 		 result );
 
 		*compressed_data_size = 0;
+
+		result = -1;
 	}
-	return( -1 );
+	return( result );
 }
 
 /* Decompresses data using the compression method

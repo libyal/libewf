@@ -186,6 +186,23 @@ enum LIBEWF_SEGMENT_FILE_TYPES
 	LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL			= 6
 };
 
+/* The chunk IO (read/write) flags
+ */
+enum LIBEWF_CHUNK_IO_FLAGS
+{
+	/* Indicates the checksum should be read or written
+	 */
+	LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET			= 0x01,
+
+	/* Indicates the padding should be read or written
+	 */
+	LIBEWF_CHUNK_IO_FLAG_PADDING_SET			= 0x02,
+
+	/* Indicates the chunk is packed
+	 */
+	LIBEWF_CHUNK_IO_FLAG_IS_PACKED				= 0x04,
+};
+
 /* The (single) file entry types
  */
 enum LIBEWF_FILE_ENTRY_TYPES

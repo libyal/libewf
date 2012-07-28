@@ -34,6 +34,10 @@
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
+/* Define to make ewf_test_write generate verbose output
+#define EWF_TEST_WRITE_VERBOSE
+ */
+
 /* Tests writing data of media size to EWF file(s) with a maximum segment size
  * Return 1 if successful, 0 if not or -1 on error
  */
@@ -386,15 +390,13 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-/*
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_WRITE_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
 #endif
-*/
 	if( option_chunk_size != NULL )
 	{
 		string_length = libcstring_system_string_length(

@@ -274,13 +274,14 @@ int libewf_chunk_table_read_chunk(
 
 		return( -1 );
 	}
-	if( element_data_size > (size64_t) SSIZE_MAX )
+	if( ( element_data_size == (size64_t) 0 )
+	 || ( element_data_size > (size64_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid element data size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid element data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -295,24 +296,6 @@ int libewf_chunk_table_read_chunk(
 		 function );
 
 		return( -1 );
-	}
-	if( libbfio_pool_seek_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     element_data_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek chunk offset: %" PRIi64 " in file IO pool entry: %d.",
-		 function,
-		 element_data_offset,
-		 file_io_pool_entry );
-
-		goto on_error;
 	}
 	if( libewf_chunk_data_initialize(
 	     &chunk_data,
@@ -339,6 +322,24 @@ int libewf_chunk_table_read_chunk(
 
 		goto on_error;
 	}
+	if( libbfio_pool_seek_offset(
+	     file_io_pool,
+	     file_io_pool_entry,
+	     element_data_offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek chunk offset: %" PRIi64 " in file IO pool entry: %d.",
+		 function,
+		 element_data_offset,
+		 file_io_pool_entry );
+
+		goto on_error;
+	}
 	read_count = libbfio_pool_read_buffer(
 		      file_io_pool,
 		      file_io_pool_entry,
@@ -357,7 +358,8 @@ int libewf_chunk_table_read_chunk(
 
 		goto on_error;
 	}
-	chunk_data->data_size   = (size_t) read_count;
+	chunk_data->data_size = (size_t) read_count;
+
 	chunk_data->range_flags = ( element_data_flags | LIBEWF_RANGE_FLAG_IS_PACKED )
 	                        & ~( LIBEWF_RANGE_FLAG_IS_TAINTED | LIBEWF_RANGE_FLAG_IS_CORRUPTED );
 
@@ -852,6 +854,8 @@ int libewf_chunk_table_read_offsets(
 			          chunk_table_list,
 			          element_index,
 			          file_io_pool_entry,
+			          section,
+			          number_of_entries,
 			          table_entries_data,
 			          table_entries_data_size,
 			          table_entries_corrupted,
@@ -1056,11 +1060,6 @@ int libewf_chunk_table_fill_v1(
 	int previous_file_io_pool_entry = 0;
 	int result                      = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	char *chunk_type                = NULL;
-	char *remarks                   = NULL;
-#endif
-
 	if( chunk_table == NULL )
 	{
 		libcerror_error_set(
@@ -1199,11 +1198,13 @@ int libewf_chunk_table_fill_v1(
 			}
 			corrupted = 1;
 		}
-		range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
-
 		if( is_compressed != 0 )
 		{
-			range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+			range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+		}
+		else
+		{
+			range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 		}
 		if( corrupted != 0 )
 		{
@@ -1214,37 +1215,59 @@ int libewf_chunk_table_fill_v1(
 			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( is_compressed == 0 )
-		{
-			chunk_type = "uncompressed";
-		}
-		else
-		{
-			chunk_type = "compressed";
-		}
-		if( corrupted != 0 )
-		{
-			remarks = " corrupted";
-		}
-		else if( tainted != 0 )
-		{
-			remarks = " tainted";
-		}
-		else
-		{
-			remarks = "";
-		}
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: %s chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 "%s: table entry: % 8" PRIzd " chunk index\t\t: %d\n",
 			 function,
-			 chunk_type,
-			 chunk_index,
-			 base_offset,
-			 current_offset,
-			 chunk_size,
-			 remarks );
+			 table_entry_index,
+			 chunk_index );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " base offset\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 table_entry_index,
+			 base_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 function,
+			 table_entry_index,
+			 current_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data size\t: %" PRIu32 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_size );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data flags:\n",
+			 function,
+			 table_entry_index );
+
+			if( is_compressed != 0 )
+			{
+				libcnotify_printf(
+				 "Is compressed\n" );
+			}
+			else
+			{
+				libcnotify_printf(
+				 "Has checksum\n" );
+			}
+			if( corrupted != 0 )
+			{
+				libcnotify_printf(
+				 "Is corrupted\n" );
+			}
+			else if( tainted != 0 )
+			{
+				libcnotify_printf(
+				 "Is tainted\n" );
+			}
+			libcnotify_printf(
+			 "\n" );
 		}
 #endif
 		result = libmfdata_list_is_group(
@@ -1418,13 +1441,13 @@ int libewf_chunk_table_fill_v1(
 #endif
 		corrupted = 1;
 	}
-	/* Used to indicate the chunk has a checksum
-	 */
-	range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
-
 	if( is_compressed != 0 )
 	{
-		range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+		range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+	}
+	else
+	{
+		range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 	}
 	if( corrupted != 0 )
 	{
@@ -1435,37 +1458,59 @@ int libewf_chunk_table_fill_v1(
 		range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( is_compressed == 0 )
-	{
-		chunk_type = "uncompressed";
-	}
-	else
-	{
-		chunk_type = "compressed";
-	}
-	if( corrupted != 0 )
-	{
-		remarks = " corrupted";
-	}
-	else if( tainted != 0 )
-	{
-		remarks = " tainted";
-	}
-	else
-	{
-		remarks = "";
-	}
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: %s last chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and calculated size %" PRIi64 "%s.\n",
+		 "%s: table entry: % 8" PRIzd " chunk index\t\t: %d\n",
 		 function,
-		 chunk_type,
-		 chunk_index,
-		 base_offset,
-		 current_offset,
-		 last_chunk_size,
-		 remarks );
+		 table_entry_index,
+		 chunk_index );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " base offset\t\t: 0x%08" PRIx64 "\n",
+		 function,
+		 table_entry_index,
+		 base_offset );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data offset\t: 0x%08" PRIx32 "\n",
+		 function,
+		 table_entry_index,
+		 current_offset );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data size\t: %" PRIu32 " (calculated)\n",
+		 function,
+		 table_entry_index,
+		 last_chunk_size );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data flags:\n",
+		 function,
+		 table_entry_index );
+
+		if( is_compressed != 0 )
+		{
+			libcnotify_printf(
+			 "Is compressed\n" );
+		}
+		else
+		{
+			libcnotify_printf(
+			 "Has checksum\n" );
+		}
+		if( corrupted != 0 )
+		{
+			libcnotify_printf(
+			 "Is corrupted\n" );
+		}
+		else if( tainted != 0 )
+		{
+			libcnotify_printf(
+			 "Is tainted\n" );
+		}
+		libcnotify_printf(
+		 "\n" );
 	}
 #endif
 	result = libmfdata_list_is_group(
@@ -1560,6 +1605,8 @@ int libewf_chunk_table_fill_v2(
      libmfdata_list_t *chunk_table_list,
      int chunk_index,
      int file_io_pool_entry,
+     libewf_section_t *table_section,
+     uint32_t number_of_offsets,
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
      uint8_t tainted,
@@ -1567,6 +1614,7 @@ int libewf_chunk_table_fill_v2(
 {
 	static char *function           = "libewf_chunk_table_fill_v2";
 	off64_t previous_chunk_offset   = 0;
+	off64_t table_entry_offset      = 0;
 	size64_t previous_chunk_size    = 0;
 	size_t table_entry_index        = 0;
 	uint64_t chunk_offset           = 0;
@@ -1584,6 +1632,17 @@ int libewf_chunk_table_fill_v2(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk table.",
+		 function );
+
+		return( -1 );
+	}
+	if( table_section == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid table section.",
 		 function );
 
 		return( -1 );
@@ -1610,6 +1669,8 @@ int libewf_chunk_table_fill_v2(
 
 		return( -1 );
 	}
+	table_entry_offset = table_section->start_offset + sizeof( ewf_table_header_v2_t );
+
 	while( table_entries_data_size >= sizeof( ewf_table_entry_v2_t ) )
 	{
 		byte_stream_copy_to_uint64_little_endian(
@@ -1628,19 +1689,36 @@ int libewf_chunk_table_fill_v2(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data offset:\t\t0x%08" PRIx64 "\n",
+			 "%s: table entry: % 8" PRIzd " chunk index\t\t: %d\n",
 			 function,
 			 table_entry_index,
-			 chunk_offset );
+			 chunk_index );
 
+			if( ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
+			 && ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 ) )
+			{
+				libcnotify_printf(
+				 "%s: table entry: % 8" PRIzd " chunk pattern fill\t: 0x%08" PRIx64 "\n",
+				 function,
+				 table_entry_index,
+				 chunk_offset );
+			}
+			else
+			{
+				libcnotify_printf(
+				 "%s: table entry: % 8" PRIzd " chunk data offset\t: 0x%08" PRIx64 "\n",
+				 function,
+				 table_entry_index,
+				 chunk_offset );
+			}
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data size:\t\t%" PRIu32 "\n",
+			 "%s: table entry: % 8" PRIzd " chunk data size\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_size );
 
 			libcnotify_printf(
-			 "%s: table entry: %03" PRIzd " chunk data flags:\t\t0x%08" PRIx32 "\n",
+			 "%s: table entry: % 8" PRIzd " chunk data flags\t: 0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_flags );
@@ -1651,35 +1729,52 @@ int libewf_chunk_table_fill_v2(
 
 		table_entry_index++;
 
-		if( ( chunk_data_flags & ~( 0x00000007UL ) ) != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported chunk data flags.",
-			 function );
-
-			return( -1 );
-		}
 		range_flags = 0;
 
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 		{
 			range_flags |= LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+
+			if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 )
+			{
+				range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
+			}
 		}
 		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM ) != 0 )
 		{
 			range_flags |= LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 		}
-		if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 )
+/* TODO handle corruption e.g. check for zero data
+		if( ( ( chunk_data_flags & 0x00000007UL ) != 1 )
+		 || ( ( chunk_data_flags & 0x00000007UL ) != 2 )
+		 || ( ( chunk_data_flags & 0x00000007UL ) != 5 ) )
 		{
-			range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
 		}
+*/
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( ( chunk_data_flags & ~( 0x00000007UL ) ) != 0 )
+			{
+				libcnotify_printf(
+				 "%s: unsupported chunk data flags: 0x%08" PRIx32 " in table entry: %" PRIzd "\n",
+				 function,
+				 chunk_data_flags,
+				 table_entry_index );
+			}
+		}
+#endif
 		if( tainted != 0 )
 		{
 			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
+		if( ( range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
+		{
+			chunk_offset = table_entry_offset;
+			chunk_size   = 8;
+		}
+		table_entry_offset += sizeof( ewf_table_entry_v2_t );
+
 		result = libmfdata_list_is_group(
 		          chunk_table_list,
 		          chunk_index,
@@ -1755,14 +1850,15 @@ int libewf_chunk_table_fill_v2(
 			/* No need to overwrite the data range of a delta chunk */
 		}
 		chunk_index++;
-	}
+
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "\n" );
-	}
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
 #endif
+	}
 	return( 1 );
 }
 
@@ -1801,11 +1897,6 @@ int libewf_chunk_table_correct_v1(
 	uint8_t update_data_range       = 0;
 	int previous_file_io_pool_entry = 0;
 	int result                      = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	char *chunk_type                = NULL;
-	char *remarks                   = NULL;
-#endif
 
 	if( chunk_table == NULL )
 	{
@@ -1960,37 +2051,59 @@ int libewf_chunk_table_correct_v1(
 			range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( is_compressed == 0 )
-		{
-			chunk_type = "uncompressed";
-		}
-		else
-		{
-			chunk_type = "compressed";
-		}
-		if( corrupted != 0 )
-		{
-			remarks = " corrupted";
-		}
-		else if( tainted != 0 )
-		{
-			remarks = " tainted";
-		}
-		else
-		{
-			remarks = "";
-		}
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: %s chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+			 "%s: table entry: % 8" PRIzd " chunk index\t\t: %d\n",
 			 function,
-			 chunk_type,
-			 chunk_index,
-			 base_offset,
-			 current_offset,
-			 chunk_size,
-			 remarks );
+			 table_entry_index,
+			 chunk_index );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " base offset\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 table_entry_index,
+			 base_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 function,
+			 table_entry_index,
+			 current_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data size\t: %" PRIu32 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_size );
+
+			libcnotify_printf(
+			 "%s: table entry: % 8" PRIzd " chunk data flags:\n",
+			 function,
+			 table_entry_index );
+
+			if( is_compressed != 0 )
+			{
+				libcnotify_printf(
+				 "Is compressed\n" );
+			}
+			else
+			{
+				libcnotify_printf(
+				 "Has checksum\n" );
+			}
+			if( corrupted != 0 )
+			{
+				libcnotify_printf(
+				 "Is corrupted\n" );
+			}
+			else if( tainted != 0 )
+			{
+				libcnotify_printf(
+				 "Is tainted\n" );
+			}
+			libcnotify_printf(
+			 "\n" );
 		}
 #endif
 		result = libmfdata_list_is_group(
@@ -2256,37 +2369,59 @@ int libewf_chunk_table_correct_v1(
 		range_flags |= LIBEWF_RANGE_FLAG_IS_TAINTED;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	if( is_compressed == 0 )
-	{
-		chunk_type = "uncompressed";
-	}
-	else
-	{
-		chunk_type = "compressed";
-	}
-	if( corrupted != 0 )
-	{
-		remarks = " corrupted";
-	}
-	else if( tainted != 0 )
-	{
-		remarks = " tainted";
-	}
-	else
-	{
-		remarks = "";
-	}
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: %s last chunk %d read with: base %" PRIi64 ", offset %" PRIu32 " and calculated size %" PRIi64 "%s.\n",
+		 "%s: table entry: % 8" PRIzd " chunk index\t\t: %d\n",
 		 function,
-		 chunk_type,
-		 chunk_index,
-		 base_offset,
-		 current_offset,
-		 last_chunk_size,
-		 remarks );
+		 table_entry_index,
+		 chunk_index );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " base offset\t\t: 0x%08" PRIx64 "\n",
+		 function,
+		 table_entry_index,
+		 base_offset );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data offset\t: 0x%08" PRIx32 "\n",
+		 function,
+		 table_entry_index,
+		 current_offset );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data size\t: %" PRIu32 " (calculated)\n",
+		 function,
+		 table_entry_index,
+		 last_chunk_size );
+
+		libcnotify_printf(
+		 "%s: table entry: % 8" PRIzd " chunk data flags:\n",
+		 function,
+		 table_entry_index );
+
+		if( is_compressed != 0 )
+		{
+			libcnotify_printf(
+			 "Is compressed\n" );
+		}
+		else
+		{
+			libcnotify_printf(
+			 "Has checksum\n" );
+		}
+		if( corrupted != 0 )
+		{
+			libcnotify_printf(
+			 "Is corrupted\n" );
+		}
+		else if( tainted != 0 )
+		{
+			libcnotify_printf(
+			 "Is tainted\n" );
+		}
+		libcnotify_printf(
+		 "\n" );
 	}
 #endif
 	result = libmfdata_list_is_group(

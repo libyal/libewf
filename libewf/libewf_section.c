@@ -1610,12 +1610,19 @@ ssize_t libewf_section_write_compressed_string(
 	          uncompressed_string_size,
 	          error );
 
-	if( ( result == -1 )
-	 && ( compressed_string_size > 0 ) )
+	if( result == 0 )
 	{
-		libcerror_error_free(
-		 error );
+		if( compressed_string_size <= uncompressed_string_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid compressed string size value out of bounds.",
+			 function );
 
+			goto on_error;
+		}
 		reallocation = memory_reallocate(
 		                compressed_string,
 		                sizeof( uint8_t ) * compressed_string_size );
@@ -1642,7 +1649,7 @@ ssize_t libewf_section_write_compressed_string(
 		          uncompressed_string_size,
 		          error );
 	}
-	if( result == -1 )
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -8063,7 +8070,7 @@ ssize_t libewf_section_delta_chunk_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint32_t *chunk_index,
-         uint32_t *chunk_size,
+         uint32_t *chunk_data_size,
          libcerror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
@@ -8096,13 +8103,13 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	if( chunk_size == NULL )
+	if( chunk_data_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk size.",
+		 "%s: invalid chunk data size.",
 		 function );
 
 		return( -1 );
@@ -8166,8 +8173,8 @@ ssize_t libewf_section_delta_chunk_read(
 	 *chunk_index );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 delta_chunk_header.chunk_size,
-	 *chunk_size );
+	 delta_chunk_header.chunk_data_size,
+	 *chunk_data_size );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 delta_chunk_header.checksum,
@@ -8182,9 +8189,9 @@ ssize_t libewf_section_delta_chunk_read(
 		 *chunk_index );
 
 		libcnotify_printf(
-	 	 "%s: chunk size\t\t\t\t: %" PRIu32 "\n",
+	 	 "%s: chunk data size\t\t\t: %" PRIu32 "\n",
 		 function,
-		 *chunk_size );
+		 *chunk_data_size );
 
 		libcnotify_printf(
 	 	 "%s: padding:\n",
@@ -8236,19 +8243,19 @@ ssize_t libewf_section_delta_chunk_read(
 	 */
 	*chunk_index -= 1;
 
-	if( (size64_t) *chunk_size != section_data_size )
+	if( (size64_t) *chunk_data_size != section_data_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: chunk size: %" PRIu32 " does not match size of data in section correcting in: %" PRIu64 ".\n",
+			 "%s: chunk data size: %" PRIu32 " does not match size of data in section correcting in: %" PRIu64 ".\n",
 			 function,
-			 *chunk_size,
+			 *chunk_data_size,
 			 section_data_size );
 		}
 #endif
-		*chunk_size = (uint32_t) section_data_size;
+		*chunk_data_size = (uint32_t) section_data_size;
 	}
 	return( read_count );
 }
@@ -8263,10 +8270,10 @@ ssize_t libewf_section_delta_chunk_write(
          off64_t section_offset,
          uint32_t chunk_index,
          uint8_t *chunk_buffer,
-         uint32_t chunk_size,
+         uint32_t chunk_data_size,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         uint8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
@@ -8311,7 +8318,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	if( chunk_size > (uint32_t) INT32_MAX )
+	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -8322,11 +8329,32 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	write_size = chunk_size;
+	write_size = chunk_data_size;
 
-	if( write_checksum != 0 )
+	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
 	{
-		write_size += 4;
+		if( checksum_buffer == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid checksum buffer.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_from_uint32_little_endian(
+		 checksum_buffer,
+		 chunk_checksum );
+
+		if( checksum_buffer == &( chunk_buffer[ chunk_data_size ] ) )
+		{
+			write_size += 4;
+
+			chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET );
+		}
+		chunk_data_size += 4;
 	}
 	if( write_size > (uint32_t) INT32_MAX )
 	{
@@ -8398,15 +8426,13 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	/* The chunk number is stored as + 1 in the file
 	 */
-	chunk_index += 1;
-
 	byte_stream_copy_from_uint32_little_endian(
 	 delta_chunk_header.chunk,
-	 chunk_index );
+	 chunk_index + 1 );
 
 	byte_stream_copy_from_uint32_little_endian(
-	 delta_chunk_header.chunk_size,
-	 write_size );
+	 delta_chunk_header.chunk_data_size,
+	 chunk_data_size );
 
 	delta_chunk_header.padding[ 0 ] = (uint8_t) 'D';
 	delta_chunk_header.padding[ 1 ] = (uint8_t) 'E';
@@ -8443,71 +8469,45 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	total_write_count += write_count;
 
-	write_size = chunk_size;
-
-	if( write_checksum != 0 )
-	{
-		if( checksum_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid checksum buffer.",
-			 function );
-
-			return( -1 );
-		}
-		byte_stream_copy_from_uint32_little_endian(
-		 checksum_buffer,
-		 chunk_checksum );
-
-		if( checksum_buffer == &( chunk_buffer[ chunk_size ] ) )
-		{
-			write_size += 4;
-
-			write_checksum = 0;
-		}
-	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
 		 "%s: chunk: % 8" PRIu32 " file IO pool entry\t: %d\n",
 		 function,
-		 chunk_index - 1,
+		 chunk_index,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk: % 8" PRIu32 " data offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
-		 chunk_index - 1,
+		 chunk_index,
 		 section_offset + total_write_count,
 		 section_offset + total_write_count );
 
 		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " size\t\t\t: %" PRIzd "\n",
+		 "%s: chunk: % 8" PRIu32 " data size\t\t: %" PRIzd "\n",
 		 function,
-		 chunk_index - 1,
-		 chunk_size );
+		 chunk_index,
+		 chunk_data_size );
 
-		if( ( write_checksum == 0 )
-		 && ( chunk_size >= 4 ) )
+		if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) == 0 )
+		 && ( chunk_data_size >= 4 ) )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 &( chunk_buffer[ chunk_size - 4 ] ),
+			 &( chunk_buffer[ chunk_data_size - 4 ] ),
 			 chunk_checksum );
 		}
 		libcnotify_printf(
 		 "%s: chunk: % 8" PRIu32 " checksum\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 chunk_index - 1,
+		 chunk_index,
 		 chunk_checksum );
 
 		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " flags:\n",
+		 "%s: chunk: % 8" PRIu32 " data flags:\n",
 		 function,
-		 chunk_index - 1 );
+		 chunk_index );
 		libcnotify_printf(
 		 "Has checksum\n" );
 		libcnotify_printf(
@@ -8537,7 +8537,7 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	total_write_count += write_count;
 
-	if( write_checksum != 0 )
+	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
 	{
 		write_count = libbfio_pool_write_buffer(
 		               file_io_pool,

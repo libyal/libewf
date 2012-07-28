@@ -34,6 +34,10 @@
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
+/* Define to make ewf_test_read_write generate verbose output
+#define EWF_TEST_READ_WRITE_VERBOSE
+ */
+
 /* Tests libewf_handle_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -664,15 +668,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-/*
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
 #endif
-*/
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(

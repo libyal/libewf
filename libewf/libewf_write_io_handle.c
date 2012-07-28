@@ -352,6 +352,7 @@ int libewf_write_io_handle_initialize_values(
 	static char *function                     = "libewf_write_io_handle_initialize_values";
 	void *reallocation                        = NULL;
 	int64_t required_number_of_segments       = 0;
+	int8_t compression_level                  = 0;
 	int result                                = 0;
 
 	if( write_io_handle == NULL )
@@ -577,7 +578,7 @@ int libewf_write_io_handle_initialize_values(
 
 				goto on_error;
 			}
-			write_io_handle->compressed_zero_byte_empty_block_size = 512;
+			write_io_handle->compressed_zero_byte_empty_block_size = 1024;
 
 			compressed_zero_byte_empty_block = (uint8_t *) memory_allocate(
 			                                                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );
@@ -593,11 +594,19 @@ int libewf_write_io_handle_initialize_values(
 
 				goto on_error;
 			}
+			if( io_handle->compression_level == LIBEWF_COMPRESSION_NONE )
+			{
+				compression_level = LIBEWF_COMPRESSION_DEFAULT;
+			}
+			else
+			{
+				compression_level = io_handle->compression_level;
+			}
 			result = libewf_compress_data(
 				  compressed_zero_byte_empty_block,
 				  &( write_io_handle->compressed_zero_byte_empty_block_size ),
 				  io_handle->compression_method,
-				  io_handle->compression_level,
+				  compression_level,
 				  zero_byte_empty_block,
 				  (size_t) media_values->chunk_size,
 				  error );
@@ -605,19 +614,25 @@ int libewf_write_io_handle_initialize_values(
 			/* Check if the compressed buffer was too small
 			 * and a new compressed data size buffer was passed back
 			 */
-			if( ( result == -1 )
-			 && ( write_io_handle->compressed_zero_byte_empty_block_size > 0 ) )
+			if( result == 0 )
 			{
+				if( write_io_handle->compressed_zero_byte_empty_block_size <= 1024 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid compressed string size value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
 #if !defined( HAVE_COMPRESS_BOUND ) && !defined( WINAPI )
 				/* The some version of zlib require a fairly large buffer
-				 * if compressBound() was not used but 2 x 512 then assume
-				 * the chunk size + 16 is sufficient
+				 * if compressBound() was not used but the factor 2 use the chunk size instead
 				 */
-				write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size + 16;
+				write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size;
 #endif
-
-				libcerror_error_free(
-				 error );
 
 				reallocation = memory_reallocate(
 				                compressed_zero_byte_empty_block,
@@ -640,7 +655,7 @@ int libewf_write_io_handle_initialize_values(
 					  compressed_zero_byte_empty_block,
 					  &( write_io_handle->compressed_zero_byte_empty_block_size ),
 					  io_handle->compression_method,
-					  io_handle->compression_level,
+					  compression_level,
 					  zero_byte_empty_block,
 					  (size_t) media_values->chunk_size,
 					  error );
@@ -2210,13 +2225,15 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
          int chunk_index,
+         size_t input_data_size,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
          size_t chunk_data_size,
-         int8_t is_compressed,
+         size_t chunk_padding_size,
+         uint32_t chunk_data_flags,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
@@ -2272,6 +2289,17 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( input_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid input data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -2381,9 +2409,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		libcnotify_printf(
 	 	"%s: writing chunk: %d with size: %" PRIzd " (data size: %" PRIzd ").\n",
 		 function,
-		 chunk_index,
+		 chunk_index + 1,
 		 chunk_buffer_size,
-		 chunk_data_size );
+		 input_data_size );
 	}
 #endif
 	if( libmfdata_file_list_get_number_of_files(
@@ -2820,10 +2848,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		       chunk_buffer,
 		       chunk_buffer_size,
 		       chunk_data_size,
-		       is_compressed,
+		       chunk_padding_size,
+		       chunk_data_flags,
 		       checksum_buffer,
 		       chunk_checksum,
-		       write_checksum,
+		       chunk_io_flags,
 	               error );
 
 	if( write_count <= -1 )
@@ -2841,7 +2870,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 /* TODO version 2 chunk padding keep track of padding size */
 
-	write_io_handle->input_write_count                   += chunk_data_size;
+	write_io_handle->input_write_count                   += input_data_size;
 	write_io_handle->chunks_section_write_count          += write_count;
 	write_io_handle->remaining_segment_file_size         -= write_count;
 	write_io_handle->number_of_chunks_written_to_segment += 1;
@@ -3056,11 +3085,11 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          int chunk_index,
          uint8_t *chunk_buffer,
          size_t chunk_buffer_size,
-         size_t chunk_data_size LIBEWF_ATTRIBUTE_UNUSED,
-         int8_t is_compressed,
+         size_t chunk_data_size,
+         uint32_t chunk_data_flags,
          uint8_t *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	libewf_list_element_t *last_list_element = NULL;
@@ -3078,8 +3107,6 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	int file_io_pool_entry                   = -1;
 	int number_of_segment_files              = 0;
 	int segment_files_list_index             = 0;
-
-	LIBEWF_UNREFERENCED_PARAMETER( chunk_data_size )
 
 	if( write_io_handle == NULL )
 	{
@@ -3148,7 +3175,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
-	if( is_compressed != 0 )
+	if( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3545,10 +3572,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		       chunk_table_list,
 		       chunk_index,
 		       chunk_buffer,
-		       chunk_buffer_size,
+		       chunk_data_size,
 		       checksum_buffer,
 	               chunk_checksum,
-	               write_checksum,
+	               chunk_io_flags,
 	               no_section_append,
 	               error );
 

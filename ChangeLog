@@ -1,5 +1,14 @@
 TODO
-* libewf_write_io_handle_write_new_chunk pass chunk data flags ?
+* implement alder32 algo
+* new chunk functions where chunk is an object
+* add strict chunk data flag handling
+
+* libewf_segment_file_write_chunk pass flag to indicate the buffer contains
+  the checksum and/or the padding
+  - make sure to differentiate clearly between unpacked chunk data size
+    and packed chunk data size
+
+* add light-weight function to determine byte frequency ? to check if compression is viable ?
 
 * refactor write compressed string
   - to support caching of compressed strings, e.g. case data, device info
@@ -33,6 +42,9 @@ TODO
 * ewfinfo
   - print segment file version
   - print compression method
+
+* Document how libewf deals with corruption scenarios
+* Add 2 TiB image size test
 
 * Ex01/Lx01
   - make sure to correctly deal with aligment padding
@@ -391,9 +403,23 @@ Closed:
 * write resume, allow resume from volume/disk section
   - why bother no media data has been written anyway
 * EWF2 can handle more then UINT16_MAX segment files - add support for this?
-  - having more than 60000 segment files is a bit overkill,
+  - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120728
+* code clean up
+* fixes for recent changes
+
+20120727
+* code clean up
+
+20120725
+* code clean up
+* added zlib.m4
+* update libuuid.m4
+* worked on Ex01 write support
+* worked on Ex01 pattern fill read support
 
 20120724
 * fixed issue regarding pack flags not being set on initialization

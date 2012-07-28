@@ -231,7 +231,7 @@ ssize_t libewf_handle_prepare_read_chunk(
          size_t *uncompressed_chunk_buffer_size,
          int8_t is_compressed,
          uint32_t chunk_checksum,
-         int8_t read_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -242,7 +242,7 @@ ssize_t libewf_handle_read_chunk(
          int8_t *is_compressed,
          void *checksum_buffer,
          uint32_t *chunk_checksum,
-         int8_t *read_checksum,
+         int8_t *chunk_io_flags,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -269,7 +269,7 @@ ssize_t libewf_handle_prepare_write_chunk(
          size_t *compressed_chunk_buffer_size,
          int8_t *is_compressed,
          uint32_t *chunk_checksum,
-         int8_t *write_checksum,
+         int8_t *chunk_io_flags,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -281,7 +281,7 @@ ssize_t libewf_handle_write_chunk(
          int8_t is_compressed,
          void *checksum_buffer,
          uint32_t chunk_checksum,
-         int8_t write_checksum,
+         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
