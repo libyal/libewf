@@ -2243,11 +2243,11 @@ int info_handle_media_information_fprint(
 			break;
 
 		case LIBEWF_FORMAT_V2_ENCASE7:
-			value_string = _LIBCSTRING_SYSTEM_STRING( "version 2 EnCase 7" );
+			value_string = _LIBCSTRING_SYSTEM_STRING( "EnCase 7 (version 2)" );
 			break;
 
-		case LIBEWF_FORMAT_LOGICAL_V2_ENCASE7:
-			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) version 2 EnCase 7" );
+		case LIBEWF_FORMAT_V2_LOGICAL_ENCASE7:
+			value_string = _LIBCSTRING_SYSTEM_STRING( "Logical Evidence File (LEF) EnCase 7 (version 2)" );
 			break;
 
 		case LIBEWF_FORMAT_UNKNOWN:
@@ -2275,7 +2275,7 @@ int info_handle_media_information_fprint(
 		result = -1;
 	}
 	if( ( format == LIBEWF_FORMAT_V2_ENCASE7 )
-	 || ( format == LIBEWF_FORMAT_LOGICAL_V2_ENCASE7 ) )
+	 || ( format == LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 ) )
 	{
 		if( libewf_handle_get_segment_file_version(
 		     info_handle->input_handle,

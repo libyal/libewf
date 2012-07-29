@@ -447,8 +447,9 @@ ssize_t libewf_segment_file_read_file_header(
 		 ( (ewf_file_header_v1_t *) file_header_data )->segment_number,
 		 segment_file->segment_number );
 
-		segment_file->major_version = 1;
-		segment_file->minor_version = 0;
+		segment_file->major_version      = 1;
+		segment_file->minor_version      = 0;
+		segment_file->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	}
 	else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
 	{
@@ -1673,12 +1674,24 @@ ssize_t libewf_segment_file_write_case_data_section(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_case_data_generate(
 	     &case_data,
 	     &case_data_size,
 	     media_values,
 	     header_values,
 	     timestamp,
+	     io_handle->format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2953,7 +2966,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: table offsets too small.",
+		 "%s: table entries too small.",
 		 function );
 
 		return( -1 );

@@ -704,7 +704,7 @@ int libewf_chunk_table_read_offsets(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table offsets data.",
+		 "%s: unable to read table entries data.",
 		 function );
 
 		goto on_error;
@@ -824,7 +824,7 @@ int libewf_chunk_table_read_offsets(
 				 calculated_checksum );
 			}
 #endif
-			/* The table offsets cannot be fully trusted therefore mark them as corrupted
+			/* The table entries cannot be fully trusted therefore mark them as corrupted
 			 */
 			table_entries_corrupted = 1;
 		}

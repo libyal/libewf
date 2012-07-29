@@ -39,6 +39,7 @@ int libewf_case_data_generate_utf8_string(
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      time_t timestamp,
+     uint8_t format,
      libcerror_error_t **error );
 
 int libewf_case_data_generate(
@@ -47,6 +48,7 @@ int libewf_case_data_generate(
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      time_t timestamp,
+     uint8_t format,
      libcerror_error_t **error );
 
 int libewf_case_data_parse_string(
@@ -54,6 +56,7 @@ int libewf_case_data_parse_string(
      size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_case_data_parse(
@@ -61,6 +64,7 @@ int libewf_case_data_parse(
      size_t case_data_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

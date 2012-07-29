@@ -1,19 +1,17 @@
 TODO
-* write check why "Process identifier:	f" gets set in EWF2
-
-* implement local alder32
+* throttle number of open files in tools
+* implement local alder32, remove dependency on zlib to allow for different
+  deflate back-ends
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 
 * refactor read/write compressed string
-  - to do: libewf_section_header2_read
+  - change libewf_section_ltree_read to only read header ?
 
 * make chunks_per_segment_file 64-bit
 * replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
 * work on deduplication support
-
-* remove libewf_device_information conversion to UTF8
 
 * internally mark Ex01 and Lx01 format and have ewfinfo print a string representation
 
@@ -31,66 +29,44 @@ TODO
 * change chunk data indication values to flags
 * libewf_filename_create split off wide variant ?
 
+Tests
+  - validate SMART forced compression of uncompressed chunks
+  - test with memwatch
+
 * API
   - get/set compression method
-
-* ewfinfo
-  - print segment file version
-  - print compression method
 
 * Document how libewf deals with corruption scenarios
 * Add 2 TiB image size test
 
 * Ex01/Lx01
   - make sure to correctly deal with aligment padding
-  - libewf_chunk_table_read_chunk: add support for patten fill
   - complete: libewf_chunk_table_fill_v2
   - add support for section MD5 hashes
   - add generic way to parse file object data
-  - rename table offsets to table entries
   - rename table to sector table ?
-  - add SHA1 hash support in
-    - libewf_handle_set_sha1_hash set functions
-    - libewf_handle_set_utf8_hash_value
-    - libewf_handle_set_utf16_hash_value
-  - check alignment of debug output in section descriptor read for non EWF2 file
-  - validate SMART forced compression of uncompressed chunks
-  - refactor: libewf_header_sections_determine_format
-  - parse drive information for header values as well
+
+Optimization:
+  - libewf_device_info_parse do this directly from the UTF16 stream ?
   - libewf_case_data_parse do this directly from the UTF16 stream ?
-  - rename libewf_section_compressed_string_read to libewf_section_compressed_file_object_string_read
-  - remove header value sections, just parse them while reading ? like case data
-    or parse them after reading all sections ?
-  - remove on demand libewf_handle_parse_header_values
-  - fix issue with libfvalue_utf8_string_with_index_copy_from_integer calling from libewf_convert_date_header2_value
-  - move header sections to write IO handle
-  - move libewf_header_sections_determine_format into libewf_header_sections_parse ?
-  - test with memwatch
-  - update msvscpp and borlandc files
-    - add case data files
-    - add device info files
-    - change ewf_error2.h to ewf_error.h
-    - add analytical data files
-    - add restart data files
-    - remove ewf_volume_smart.h
-  - add support for no-compression and bzip2 compression
-  - make sure the encryption keys are read first
-  - change api to deal with compression method stored in the segment files ?
 
 * Ex01/Lx01 format feature support
-  - bzip2 compression support
-  - encryption support
+  - bzip2 compression support (+/-)
+  - encryption support; make sure the encryption keys are read first
   - section integrity MD5 hash support
   - file naming schema, what's after Ex99 ?
 
 * Ex01/Lx01 test images
-* memory image -> winen and encase ?
-* resumed ?
-* encrypted
-* open single files ?
+  - memory image -> winen and encase ?
+  - resumed ?
+  - encrypted
+  - open single files ?
 
 * Ex01/Lx01 write support
   - pattern fill chunk support
+
+* Ex01/Lx01 extensions
+  - implement SHA256 hash section
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
@@ -398,6 +374,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120729
+* code clean up
 
 20120728
 * code clean up

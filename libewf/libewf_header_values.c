@@ -1668,6 +1668,7 @@ int libewf_header_values_parse_utf8_header_string(
 				*format = LIBEWF_FORMAT_ENCASE1;
 			}
 		}
+/* TODO validate line 1 => "main" */
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     lines,
 		     2,

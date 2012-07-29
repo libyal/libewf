@@ -541,32 +541,6 @@ int libewf_device_information_generate_utf8_string(
 /* TODO: set dc */
 	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
-	if( ( process_identifier_header_value != NULL )
-	 && ( process_identifier_string_length > 0 ) )
-	{
-		result = libfvalue_value_copy_to_utf8_string_with_index(
-			  process_identifier_header_value,
-			  0,
-			  *utf8_string,
-			  *utf8_string_size,
-		          &utf8_string_index,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy header value: process_identifier to string.",
-			 function );
-
-			goto on_error;
-		}
-		utf8_string_index--;
-	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-
 /* TODO add support for media types: RAM disk, PALM */
 	switch( media_values->media_type )
 	{
@@ -599,6 +573,32 @@ int libewf_device_information_generate_utf8_string(
 			 function );
 
 			goto on_error;
+	}
+	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+
+	if( ( process_identifier_header_value != NULL )
+	 && ( process_identifier_string_length > 0 ) )
+	{
+		result = libfvalue_value_copy_to_utf8_string_with_index(
+			  process_identifier_header_value,
+			  0,
+			  *utf8_string,
+			  *utf8_string_size,
+		          &utf8_string_index,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy header value: process_identifier to string.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_string_index--;
 	}
 	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -938,8 +938,7 @@ int libewf_device_information_parse_utf8_string(
 
 			goto on_error;
 		}
-		if( ( line_string[ 0 ] < (uint8_t) '0' )
-		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
+		if( line_string[ 0 ] < (uint8_t) '1' )
 		{
 			libcerror_error_set(
 			 error,

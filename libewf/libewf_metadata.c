@@ -1668,14 +1668,14 @@ int libewf_handle_get_md5_hash(
 
 		return( -1 );
 	}
-	if( internal_handle->hash_sections->md5_hash_set == 0 )
+	if( internal_handle->hash_sections->md5_digest_set != 0 )
 	{
 		result = memory_copy(
 		          md5_hash,
 		          internal_handle->hash_sections->md5_digest,
 		          16 );
 	}
-	else
+	else if( internal_handle->hash_sections->md5_hash_set != 0 )
 	{
 		result = memory_copy(
 		          md5_hash,
@@ -1733,14 +1733,14 @@ int libewf_handle_set_md5_hash(
 		return( -1 );
 	}
 	if( ( internal_handle->read_io_handle != NULL )
-	 || ( internal_handle->hash_sections->md5_hash_set )
-	 || ( internal_handle->hash_sections->md5_digest_set ) )
+	 || ( internal_handle->hash_sections->md5_hash_set != 0 )
+	 || ( internal_handle->hash_sections->md5_digest_set != 0 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: md5 hash cannot be changed.",
+		 "%s: MD5 hash cannot be changed.",
 		 function );
 
 		return( -1 );
@@ -1917,14 +1917,14 @@ int libewf_handle_get_sha1_hash(
 
 		return( -1 );
 	}
-	if( internal_handle->hash_sections->sha1_hash_set == 0 )
+	if( internal_handle->hash_sections->sha1_digest_set != 0 )
 	{
 		result = memory_copy(
 		          sha1_hash,
 		          internal_handle->hash_sections->sha1_digest,
 		          20 );
 	}
-	else
+	else if( internal_handle->hash_sections->sha1_hash_set != 0 )
 	{
 		result = memory_copy(
 		          sha1_hash,
@@ -1982,13 +1982,14 @@ int libewf_handle_set_sha1_hash(
 		return( -1 );
 	}
 	if( ( internal_handle->read_io_handle != NULL )
-	 || ( internal_handle->hash_sections->sha1_digest_set ) )
+	 || ( internal_handle->hash_sections->sha1_hash_set != 0 )
+	 || ( internal_handle->hash_sections->sha1_digest_set != 0 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: sha1 hash cannot be changed.",
+		 "%s: SHA1 hash cannot be changed.",
 		 function );
 
 		return( -1 );
@@ -2011,6 +2012,20 @@ int libewf_handle_set_sha1_hash(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: SHA1 hash too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     internal_handle->hash_sections->sha1_hash,
+	     sha1_hash,
+	     20 ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set SHA1 hash.",
 		 function );
 
 		return( -1 );
@@ -2061,6 +2076,7 @@ int libewf_handle_set_sha1_hash(
 
 		return( -1 );
 	}
+	internal_handle->hash_sections->sha1_hash_set   = 1;
 	internal_handle->hash_sections->sha1_digest_set = 1;
 
 	return( 1 );
@@ -5202,6 +5218,22 @@ int libewf_handle_set_utf8_hash_value(
 		{
 			if( libewf_hash_values_generate_sha1_hash(
 			     internal_handle->hash_values,
+			     internal_handle->hash_sections->sha1_hash,
+			     20,
+			     &( internal_handle->hash_sections->sha1_hash_set ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to parse SHA1 hash value for its value.",
+				 function );
+
+				return( -1 );
+			}
+			if( libewf_hash_values_generate_sha1_hash(
+			     internal_handle->hash_values,
 			     internal_handle->hash_sections->sha1_digest,
 			     20,
 			     &( internal_handle->hash_sections->sha1_digest_set ),
@@ -5687,6 +5719,22 @@ int libewf_handle_set_utf16_hash_value(
 		            "SHA1",
 		            identifier_length ) == 0 ) )
 		{
+			if( libewf_hash_values_generate_sha1_hash(
+			     internal_handle->hash_values,
+			     internal_handle->hash_sections->sha1_hash,
+			     20,
+			     &( internal_handle->hash_sections->sha1_hash_set ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to parse SHA1 hash value for its value.",
+				 function );
+
+				return( -1 );
+			}
 			if( libewf_hash_values_generate_sha1_hash(
 			     internal_handle->hash_values,
 			     internal_handle->hash_sections->sha1_digest,

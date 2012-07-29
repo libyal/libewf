@@ -78,7 +78,7 @@ enum LIBEWF_FORMAT
 
 	LIBEWF_FORMAT_V2_ENCASE7				= 0x37,
 
-	LIBEWF_FORMAT_LOGICAL_V2_ENCASE7			= 0x47,
+	LIBEWF_FORMAT_V2_LOGICAL_ENCASE7			= 0x47,
 
 	/* The format as specified by Andrew Rosen
 	 */

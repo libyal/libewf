@@ -42,6 +42,7 @@ int libewf_case_data_generate_utf8_string(
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      time_t timestamp,
+     uint8_t format,
      libcerror_error_t **error )
 {
 	libfvalue_value_t *acquiry_date_header_value             = NULL;
@@ -1171,10 +1172,11 @@ int libewf_case_data_generate(
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
      time_t timestamp,
+     uint8_t format,
      libcerror_error_t **error )
 {
 	uint8_t *utf8_string    = NULL;
-	static char *function                 = "libewf_case_data_generate";
+	static char *function   = "libewf_case_data_generate";
 	size_t utf8_string_size = 0;
 
 	if( case_data == NULL )
@@ -1216,6 +1218,7 @@ int libewf_case_data_generate(
 	     media_values,
 	     header_values,
 	     timestamp,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1313,6 +1316,7 @@ int libewf_case_data_parse_string(
      size_t utf8_string_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *lines  = NULL;
@@ -1343,6 +1347,17 @@ int libewf_case_data_parse_string(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( format == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid format.",
 		 function );
 
 		return( -1 );
@@ -1438,8 +1453,7 @@ int libewf_case_data_parse_string(
 
 			goto on_error;
 		}
-		if( ( line_string[ 0 ] < (uint8_t) '0' )
-		 || ( line_string[ 0 ] > (uint8_t) '9' ) )
+		if( line_string[ 0 ] != (uint8_t) '1' )
 		{
 			libcerror_error_set(
 			 error,
@@ -1451,6 +1465,8 @@ int libewf_case_data_parse_string(
 			goto on_error;
 		}
 /* TODO validate line 1 => "main" */
+		*format = LIBEWF_FORMAT_V2_ENCASE7;
+
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     lines,
 		     2,
@@ -2108,10 +2124,11 @@ int libewf_case_data_parse(
      size_t case_data_size,
      libewf_media_values_t *media_values,
      libfvalue_table_t *header_values,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	uint8_t *utf8_string    = NULL;
-	static char *function        = "libewf_case_data_parse";
+	static char *function   = "libewf_case_data_parse";
 	size_t utf8_string_size = 0;
 
 	if( case_data == NULL )
@@ -2186,6 +2203,7 @@ int libewf_case_data_parse(
 	     utf8_string_size,
 	     media_values,
 	     header_values,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

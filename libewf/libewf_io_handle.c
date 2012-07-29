@@ -87,12 +87,13 @@ int libewf_io_handle_initialize(
 
 		goto on_error;
 	}
-	( *io_handle )->segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-	( *io_handle )->format            = LIBEWF_FORMAT_ENCASE5;
-	( *io_handle )->major_version     = 1;
-	( *io_handle )->minor_version     = 0;
-	( *io_handle )->compression_level = LIBEWF_COMPRESSION_NONE;
-	( *io_handle )->header_codepage   = LIBEWF_CODEPAGE_ASCII;
+	( *io_handle )->segment_file_type  = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+	( *io_handle )->format             = LIBEWF_FORMAT_ENCASE5;
+	( *io_handle )->major_version      = 1;
+	( *io_handle )->minor_version      = 0;
+	( *io_handle )->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	( *io_handle )->compression_level  = LIBEWF_COMPRESSION_NONE;
+	( *io_handle )->header_codepage    = LIBEWF_CODEPAGE_ASCII;
 
 	return( 1 );
 

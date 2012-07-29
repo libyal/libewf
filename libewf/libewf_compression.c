@@ -234,7 +234,7 @@ int libewf_compress_data(
 		return( -1 );
 #endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
 	}
-	else if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+	else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 	{
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
 		if( ( compression_level == LIBEWF_COMPRESSION_DEFAULT )
@@ -318,7 +318,7 @@ int libewf_compress_data(
 #endif
 			result = 0;
 		}
-		else if( result == BZ_OUTBUFF_FULL )
+		else if( result == BZ_MEM_ERROR )
 		{
 			libcerror_error_set(
 			 error,
@@ -486,7 +486,7 @@ int libewf_decompress_data(
 #endif
 			*uncompressed_data_size = 0;
 
-			result = 0;
+			result = -1;
 		}
 		else if( result == Z_BUF_ERROR )
 		{
@@ -502,7 +502,7 @@ int libewf_decompress_data(
 			 */
 			*uncompressed_data_size *= 2;
 
-			result = -1;
+			result = 0;
 		}
 		else if( result == Z_MEM_ERROR )
 		{
@@ -542,7 +542,7 @@ int libewf_decompress_data(
 		return( -1 );
 #endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
 	}
-	else if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+	else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 	{
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
 		if( compressed_data_size > (size_t) UINT_MAX )
@@ -596,7 +596,7 @@ int libewf_decompress_data(
 #endif
 			*uncompressed_data_size = 0;
 
-			result = 0;
+			result = -1;
 		}
 		else if( result == BZ_OUTBUFF_FULL )
 		{
@@ -612,7 +612,7 @@ int libewf_decompress_data(
 			 */
 			*uncompressed_data_size *= 2;
 
-			result = -1;
+			result = 0;
 		}
 		else if( result == BZ_MEM_ERROR )
 		{

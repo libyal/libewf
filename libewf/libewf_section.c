@@ -1428,7 +1428,7 @@ ssize_t libewf_section_compressed_string_read(
 	          uncompressed_string_size,
 	          error );
 
-	while( ( result == -1 )
+	while( ( result == 0 )
 	    && ( *uncompressed_string_size > 0 ) )
 	{
 		libcerror_error_free(
@@ -1459,7 +1459,7 @@ ssize_t libewf_section_compressed_string_read(
 		          uncompressed_string_size,
 		          error );
 	}
-	if( result == -1 )
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -4465,107 +4465,6 @@ ssize_t libewf_section_sha1_hash_read(
 		hash_sections->sha1_hash_set = 0;
 	}
 	return( read_count );
-}
-
-/* Reads a header2 section
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libewf_section_header2_read(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint16_t compression_method,
-         libewf_header_sections_t *header_sections,
-         libcerror_error_t **error )
-{
-	uint8_t *header2      = NULL;
-	static char *function = "libewf_section_header2_read";
-	ssize_t read_count    = 0;
-	size_t header2_size   = 0;
-
-	if( header_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_section_compressed_string_read(
-	              section,
-	              file_io_pool,
-	              file_io_pool_entry,
-	              compression_method,
-	              &header2,
-	              &header2_size,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read header2.",
-		 function );
-
-		goto on_error;
-	}
-	if( header2 == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing header2.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libewf_debug_utf16_stream_print(
-		     "Header2",
-		     header2,
-		     header2_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print header2.",
-			 function );
-
-			goto on_error;
-		}
-	}
-#endif
-	if( header_sections->header2 == NULL )
-	{
-		header_sections->header2      = header2;
-		header_sections->header2_size = header2_size;
-	}
-	else
-	{
-		memory_free(
-		 header2 );
-	}
-	header_sections->number_of_header_sections += 1;
-
-	return( read_count );
-
-on_error:
-	if( header2 != NULL )
-	{
-		memory_free(
-		 header2 );
-	}
-	return( -1 );
 }
 
 /* Reads a ltree section

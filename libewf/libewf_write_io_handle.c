@@ -2117,14 +2117,16 @@ int libewf_write_io_handle_create_segment_file(
 	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
 	 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART ) )
 	{
-		( *segment_file )->major_version = 1;
-		( *segment_file )->minor_version = 0;
+		( *segment_file )->major_version      = 1;
+		( *segment_file )->minor_version      = 0;
+		( *segment_file )->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	}
 	else if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
 	      || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
-		( *segment_file )->major_version = 2;
-		( *segment_file )->minor_version = 1;
+		( *segment_file )->major_version      = io_handle->major_version;
+		( *segment_file )->minor_version      = io_handle->minor_version;
+		( *segment_file )->compression_method = io_handle->compression_method;
 
 		if( memory_copy(
 		     ( *segment_file )->set_identifier,

@@ -2974,6 +2974,7 @@ int libewf_handle_open_read_section_data(
 						     string_data_size,
 						     internal_handle->media_values,
 						     internal_handle->header_values,
+						     &( internal_handle->io_handle->format ),
 						     error ) != 1 )
 						{
 							libcerror_error_set(
@@ -3571,13 +3572,59 @@ int libewf_handle_open_read_section_data(
 			     (void *) "header2",
 			     7 ) == 0 )
 			{
-				read_count = libewf_section_header2_read(
+				read_count = libewf_section_compressed_string_read(
 					      section,
 					      file_io_pool,
 					      file_io_pool_entry,
 				              internal_handle->io_handle->compression_method,
-					      header_sections,
+					      &string_data,
+					      &string_data_size,
 					      error );
+
+				if( read_count == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read header2 file object string.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( libewf_debug_utf16_stream_print(
+					     "Header2",
+					     string_data,
+					     string_data_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+						 "%s: unable to print header2.",
+						 function );
+
+						goto on_error;
+					}
+				}
+#endif
+				if( header_sections->header2 == NULL )
+				{
+					header_sections->header2      = string_data;
+					header_sections->header2_size = string_data_size;
+				}
+				else
+				{
+					memory_free(
+					 string_data );
+				}
+				string_data = NULL;
+
+				header_sections->number_of_header_sections += 1;
 
 				header_section_found = 1;
 
@@ -3717,16 +3764,6 @@ int libewf_handle_open_read_section_data(
 					goto on_error;
 				}
 			}
-/* TODO check if this can be moved */
-			/* Check if the EWF file format is that of EnCase1
-			 * this allows the table read function to reduce verbose
-			 * output of additional data in table section
-			 */
-			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
-			 && ( header_sections->number_of_header_sections == 1 ) )
-			{
-				internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
-			}
 			initialize_chunk_table = 0;
 		}
 		section_list_element = section_list_element->next_element;
@@ -3766,6 +3803,13 @@ int libewf_handle_open_read_section_data(
 			 function );
 
 			goto on_error;
+		}
+		if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
+		{
+			if( internal_handle->io_handle->format == LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+			{
+				internal_handle->io_handle->format = LIBEWF_FORMAT_V2_LOGICAL_ENCASE7;
+			}
 		}
 	}
 	if( libewf_header_sections_free(
