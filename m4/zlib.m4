@@ -1,6 +1,6 @@
 dnl Functions for zlib
 dnl
-dnl Version: 20120728
+dnl Version: 20120729
 
 dnl Function to detect if zlib is available
 AC_DEFUN([AX_ZLIB_CHECK_LIB],
@@ -47,7 +47,7 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
      [ac_cv_zlib=no])
 
     AS_IF(
-     [test "x$ac_cv_lib_z_adler32" = xyes],
+     [test "x$ac_cv_lib_z_adler32" = xno],
      [AC_MSG_FAILURE(
       [Missing function: adler32 in library: zlib.],
       [1])
@@ -60,7 +60,7 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
      [ac_cv_zlib=no])
 
     AS_IF(
-     [test "x$ac_cv_lib_z_compress2" = xyes],
+     [test "x$ac_cv_lib_z_compress2" = xno],
      [AC_MSG_FAILURE(
       [Missing function: compress2 in library: zlib.],
       [1])
@@ -73,7 +73,7 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
      [ac_cv_zlib=no])
 
     AS_IF(
-     [test "x$ac_cv_lib_z_uncompress" = xyes],
+     [test "x$ac_cv_lib_z_uncompress" = xno],
      [AC_MSG_FAILURE(
       [Missing function: uncompress in library: zlib.],
       [1])

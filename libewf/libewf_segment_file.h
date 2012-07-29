@@ -39,7 +39,6 @@
 #include "libewf_sector_list.h"
 #include "libewf_single_files.h"
 
-#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_table.h"
 
@@ -308,6 +307,16 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint32_t chunk_checksum,
          int8_t chunk_io_flags,
 	 uint8_t no_section_append,
+         libcerror_error_t **error );
+
+ssize_t libewf_segment_file_write_hash_sections(
+         libewf_segment_file_t *segment_file,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         off64_t section_offset,
+         libewf_hash_sections_t *hash_sections,
+         libfvalue_table_t *hash_values,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_close(

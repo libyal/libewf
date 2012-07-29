@@ -24,13 +24,13 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_checksum.h"
 #include "libewf_chunk_data.h"
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 
-#include "ewf_checksum.h"
 #include "ewf_definitions.h"
 
 /* Initialize the chunk data
@@ -680,11 +680,22 @@ int libewf_chunk_data_pack_buffer(
 	if( ( ( *range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
 	 && ( ( pack_flags & LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM ) != 0 ) )
 	{
-		*chunk_checksum = ewf_checksum_calculate(
-				   data,
-				   chunk_data_size,
-				   1 );
+		if( libewf_checksum_calculate_adler32(
+		     chunk_checksum,
+		     data,
+		     chunk_data_size,
+		     1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to calculate checksum.",
+			 function );
 
+			return( -1 );
+		}
 		*compressed_data_size = chunk_data_size;
 
 		if( ( chunk_data_size + 4 ) <= data_size )
@@ -1033,11 +1044,22 @@ int libewf_chunk_data_unpack_buffer(
 			 &( data[ *data_size ] ),
 			 chunk_checksum );
 		}
-		calculated_checksum = ewf_checksum_calculate(
-				       data,
-				       *data_size,
-				       1 );
+		if( libewf_checksum_calculate_adler32(
+		     &calculated_checksum,
+		     data,
+		     *data_size,
+		     1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to calculate checksum.",
+			 function );
 
+			return( -1 );
+		}
 		if( chunk_checksum != calculated_checksum )
 		{
 			libcerror_error_set(

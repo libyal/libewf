@@ -1,10 +1,11 @@
 TODO
 * throttle number of open files in tools
-* implement local alder32, remove dependency on zlib to allow for different
-  deflate back-ends
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
+
+* allow zlib to be replaced by alternative back-end
+  - implemented optimized alder32 function (test)
 
 * refactor read/write compressed string
   - change libewf_section_ltree_read to only read header ?
@@ -32,9 +33,6 @@ TODO
 Tests
   - validate SMART forced compression of uncompressed chunks
   - test with memwatch
-
-* API
-  - get/set compression method
 
 * Document how libewf deals with corruption scenarios
 * Add 2 TiB image size test
@@ -377,6 +375,9 @@ Closed:
 
 20120729
 * code clean up
+* fixes for recent changes
+* preparations for replacing Adler32 calculation
+* worked on Ex01 write support
 
 20120728
 * code clean up

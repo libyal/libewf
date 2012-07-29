@@ -35,7 +35,6 @@
 #include "libewf_sector_list.h"
 #include "libewf_single_files.h"
 
-#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
@@ -238,7 +237,14 @@ ssize_t libewf_section_sha1_hash_read(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error );
 
-/* TODO add write */
+ssize_t libewf_section_sha1_hash_write(
+         libewf_section_t *section,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         uint8_t format_version,
+         off64_t section_offset,
+         libewf_hash_sections_t *hash_sections,
+         libcerror_error_t **error );
 
 ssize_t libewf_section_ltree_read(
          libewf_section_t *section,

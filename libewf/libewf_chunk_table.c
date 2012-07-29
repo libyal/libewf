@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_checksum.h"
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_definitions.h"
@@ -37,7 +38,6 @@
 #include "libewf_section.h"
 #include "libewf_unused.h"
 
-#include "ewf_checksum.h"
 #include "ewf_definitions.h"
 #include "ewf_table.h"
 
@@ -807,11 +807,22 @@ int libewf_chunk_table_read_offsets(
 			}
 		}
 #endif
-		calculated_checksum = ewf_checksum_calculate(
-				       table_entries_data,
-				       table_entries_data_size,
-				       1 );
+		if( libewf_checksum_calculate_adler32(
+		     &calculated_checksum,
+		     table_entries_data,
+		     table_entries_data_size,
+		     1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to calculate checksum.",
+			 function );
 
+			goto on_error;
+		}
 		if( stored_checksum != calculated_checksum )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )

@@ -27,8 +27,6 @@
 
 #include "libewf_libcerror.h"
 
-#include "ewf_section.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -38,12 +36,6 @@ void libewf_debug_print_compression_method(
 
 void libewf_debug_print_section_type(
       uint32_t section_type );
-
-int libewf_debug_dump_data(
-     const char *header_string,
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error );
 
 int libewf_debug_byte_stream_print(
      const char *header_string,

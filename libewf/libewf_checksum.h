@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-int libewf_checksum_calculate_little_endian_adler32(
+int libewf_checksum_calculate_adler32(
      uint32_t *checksum_value,
      const uint8_t *buffer,
      size_t size,

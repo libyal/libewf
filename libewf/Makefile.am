@@ -20,7 +20,6 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
-	ewf_checksum.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest.h \
@@ -37,6 +36,7 @@ libewf_la_SOURCES = \
 	libewf_analytical_data.c libewf_analytical_data.h \
 	libewf_array_type.c libewf_array_type.h \
 	libewf_case_data.c libewf_case_data.h \
+	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \

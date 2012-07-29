@@ -4178,6 +4178,359 @@ on_error:
 	return( -1 );
 }
 
+/* Writes the hash sections to file
+ * Returns the number of bytes written or -1 on error
+ */
+ssize_t libewf_segment_file_write_hash_sections(
+         libewf_segment_file_t *segment_file,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         off64_t section_offset,
+         libewf_hash_sections_t *hash_sections,
+         libfvalue_table_t *hash_values,
+         libcerror_error_t **error )
+{
+	libewf_section_t *section = NULL;
+	static char *function     = "libewf_segment_file_write_hash_sections";
+	ssize_t total_write_count = 0;
+	ssize_t write_count       = 0;
+
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
+	 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 ) )
+	{
+		/* Write the digest section if required
+		 */
+		if( hash_sections->sha1_digest_set != 0 )
+		{
+			if( libewf_section_initialize(
+			     &section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create section.",
+				 function );
+
+				goto on_error;
+			}
+			write_count = libewf_section_digest_write(
+				       section,
+				       file_io_pool,
+				       file_io_pool_entry,
+				       section_offset,
+				       hash_sections,
+				       error );
+
+			if( write_count == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write digest section.",
+				 function );
+
+				goto on_error;
+			}
+			section_offset    += write_count;
+			total_write_count += write_count;
+
+			if( libewf_list_append_value(
+			     segment_file->section_list,
+			     (intptr_t *) section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append section to list.",
+				 function );
+
+				goto on_error;
+			}
+			section = NULL;
+		}
+	}
+	/* Write the MD5 hash section if required
+	 */
+	if( hash_sections->md5_hash_set != 0 )
+	{
+		if( libewf_section_initialize(
+		     &section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create section.",
+			 function );
+
+			goto on_error;
+		}
+		write_count = libewf_section_md5_hash_write(
+			       section,
+			       file_io_pool,
+			       file_io_pool_entry,
+			       segment_file->major_version,
+			       section_offset,
+			       hash_sections,
+			       error );
+
+		if( write_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write MD5 hash section.",
+			 function );
+
+			goto on_error;
+		}
+		section_offset    += write_count;
+		total_write_count += write_count;
+
+		if( libewf_list_append_value(
+		     segment_file->section_list,
+		     (intptr_t *) section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append section to list.",
+			 function );
+
+			goto on_error;
+		}
+		section = NULL;
+	}
+	if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		/* Write the SHA1 hash section if required
+		 */
+		if( hash_sections->sha1_hash_set != 0 )
+		{
+			if( libewf_section_initialize(
+			     &section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create section.",
+				 function );
+
+				goto on_error;
+			}
+			write_count = libewf_section_sha1_hash_write(
+				       section,
+				       file_io_pool,
+				       file_io_pool_entry,
+				       segment_file->major_version,
+				       section_offset,
+				       hash_sections,
+				       error );
+
+			if( write_count == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write SHA1 hash section.",
+				 function );
+
+				goto on_error;
+			}
+			section_offset    += write_count;
+			total_write_count += write_count;
+
+			if( libewf_list_append_value(
+			     segment_file->section_list,
+			     (intptr_t *) section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append section to list.",
+				 function );
+
+				goto on_error;
+			}
+			section = NULL;
+		}
+	}
+	if( io_handle->format == LIBEWF_FORMAT_EWFX )
+	{
+		/* Write the xhash section
+		 */
+		if( hash_sections->xhash != NULL )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				"%s: xhash already set - removing previous version.\n",
+				 function );
+			}
+#endif
+			memory_free(
+			 hash_sections->xhash );
+
+			hash_sections->xhash = NULL;
+		}
+		if( libewf_hash_values_generate_xhash(
+		     hash_values,
+		     &( hash_sections->xhash ),
+		     &( hash_sections->xhash_size ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to generate xhash.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( libewf_debug_utf8_stream_print(
+			     "XHash",
+			     hash_sections->xhash,
+			     hash_sections->xhash_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print xhash.",
+				 function );
+
+				goto on_error;
+			}
+		}
+#endif
+		if( libewf_section_initialize(
+		     &section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create section.",
+			 function );
+
+			goto on_error;
+		}
+		/* Do not include the end of string character in the compressed data
+		 */
+		write_count = libewf_section_write_compressed_string(
+			       section,
+			       file_io_pool,
+			       file_io_pool_entry,
+			       1,
+			       0,
+			       (uint8_t *) "xhash",
+			       5,
+			       section_offset,
+			       io_handle->compression_method,
+			       LIBEWF_COMPRESSION_DEFAULT,
+			       hash_sections->xhash,
+			       hash_sections->xhash_size - 1,
+			       error );
+
+		if( write_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write xhash section.",
+			 function );
+
+			goto on_error;
+		}
+		section_offset    += write_count;
+		total_write_count += write_count;
+
+		if( libewf_list_append_value(
+		     segment_file->section_list,
+		     (intptr_t *) section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append section to list.",
+			 function );
+
+			goto on_error;
+		}
+		section = NULL;
+	}
+	return( total_write_count );
+
+on_error:
+	if( section != NULL )
+	{
+		libewf_section_free(
+		 &section,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Closes the segment file, necessary sections at the end of the segment file will be written
  * Returns the number of bytes written or -1 on error
  */
@@ -4222,17 +4575,6 @@ ssize_t libewf_segment_file_write_close(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_sections == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash sections.",
 		 function );
 
 		return( -1 );
@@ -4495,237 +4837,31 @@ ssize_t libewf_segment_file_write_close(
 				section = NULL;
 			}
 		}
-		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 )
-		 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
-		 || ( io_handle->format == LIBEWF_FORMAT_LINEN7 ) )
-		{
-			/* Write the digest section if required
-			 */
-			if( hash_sections->sha1_digest_set != 0 )
-			{
-				if( libewf_section_initialize(
-				     &section,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create section.",
-					 function );
-
-					goto on_error;
-				}
-				write_count = libewf_section_digest_write(
-					       section,
-					       file_io_pool,
-					       file_io_pool_entry,
-					       section_offset,
-					       hash_sections,
-					       error );
-
-				if( write_count == -1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write digest section.",
-					 function );
-
-					goto on_error;
-				}
-				section_offset    += write_count;
-				total_write_count += write_count;
-
-				if( libewf_list_append_value(
-				     segment_file->section_list,
-				     (intptr_t *) section,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append section to list.",
-					 function );
-
-					goto on_error;
-				}
-				section = NULL;
-			}
-		}
-		/* Write the hash section if required
+		/* Write the hash sections
 		 */
-		if( hash_sections->md5_hash_set != 0 )
+		write_count = libewf_segment_file_write_hash_sections(
+			       segment_file,
+			       io_handle,
+			       file_io_pool,
+			       file_io_pool_entry,
+			       section_offset,
+			       hash_sections,
+			       hash_values,
+			       error );
+
+		if( write_count == -1 )
 		{
-			if( libewf_section_initialize(
-			     &section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create section.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write hash sections.",
+			 function );
 
-				goto on_error;
-			}
-			write_count = libewf_section_md5_hash_write(
-			               section,
-			               file_io_pool,
-			               file_io_pool_entry,
-			               segment_file->major_version,
-			               section_offset,
-			               hash_sections,
-			               error );
-
-			if( write_count == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write MD5 hash section.",
-				 function );
-
-				goto on_error;
-			}
-			section_offset    += write_count;
-			total_write_count += write_count;
-
-			if( libewf_list_append_value(
-			     segment_file->section_list,
-			     (intptr_t *) section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append section to list.",
-				 function );
-
-				goto on_error;
-			}
-			section = NULL;
+			goto on_error;
 		}
-		/* Write the xhash section
-		 */
-		if( io_handle->format == LIBEWF_FORMAT_EWFX )
-		{
-			if( hash_sections->xhash != NULL )
-			{
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-				 	"%s: xhash already set - cleaning previous defintion.\n",
-					 function );
-				}
-#endif
-				memory_free(
-				 hash_sections->xhash );
-
-				hash_sections->xhash = NULL;
-			}
-			if( libewf_hash_values_generate_xhash(
-			     hash_values,
-			     &( hash_sections->xhash ),
-			     &( hash_sections->xhash_size ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to generate xhash.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( libewf_debug_utf8_stream_print(
-				     "XHash",
-				     hash_sections->xhash,
-				     hash_sections->xhash_size,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-					 "%s: unable to print xhash.",
-					 function );
-
-					return( -1 );
-				}
-			}
-#endif
-			if( libewf_section_initialize(
-			     &section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create section.",
-				 function );
-
-				goto on_error;
-			}
-			/* Do not include the end of string character in the compressed data
-			 */
-			write_count = libewf_section_write_compressed_string(
-				       section,
-				       file_io_pool,
-				       file_io_pool_entry,
-				       1,
-				       0,
-				       (uint8_t *) "xhash",
-				       5,
-				       section_offset,
-				       io_handle->compression_method,
-			               LIBEWF_COMPRESSION_DEFAULT,
-				       hash_sections->xhash,
-				       hash_sections->xhash_size - 1,
-				       error );
-
-			if( write_count == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write xhash section.",
-				 function );
-
-				return( -1 );
-			}
-			section_offset    += write_count;
-			total_write_count += write_count;
-
-			if( libewf_list_append_value(
-			     segment_file->section_list,
-			     (intptr_t *) section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append section to list.",
-				 function );
-
-				goto on_error;
-			}
-			section = NULL;
-		}
+		total_write_count += write_count;
+		section_offset    += write_count;
 	}
 	/* Write the done or next section
 	 * The segment file offset is updated by the function
@@ -4755,8 +4891,7 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file->number_of_chunks = number_of_chunks_written_to_segment;
 
-	/* Make sure the next time the file is opened
-	 * it is not truncated
+	/* Make sure the next time the file is opened it is not truncated
 	 */
 	if( libbfio_pool_reopen(
 	     file_io_pool,

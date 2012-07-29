@@ -23,8 +23,70 @@
 #include <byte_stream.h>
 #include <types.h>
 
+#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#include <zlib.h>
+#endif
+
 #include "libewf_checksum.h"
 #include "libewf_libcerror.h"
+
+#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+
+/* Calculates the little-endian Adler-32 of a buffer
+ * It uses the initial value to calculate a new Adler-32
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_checksum_calculate_adler32(
+     uint32_t *checksum_value,
+     const uint8_t *buffer,
+     size_t size,
+     uint32_t initial_value,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_checksum_calculate_adler32";
+
+	if( checksum_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid checksum value.",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) UINT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	*checksum_value = adler32(
+	                   (uLong) initial_value,
+	                   (const Bytef *) buffer,
+	                   (uInt) size );
+
+	return( 1 );
+}
+
+#else
 
 /* The largest primary (or scalar) available
  * supported by a single load and store instruction
@@ -35,23 +97,19 @@ typedef unsigned long int libewf_aligned_t;
  * It uses the initial value to calculate a new Adler-32
  * Returns 1 if successful or -1 on error
  */
-int libewf_checksum_calculate_little_endian_adler32(
+int libewf_checksum_calculate_adler32(
      uint32_t *checksum_value,
      const uint8_t *buffer,
      size_t size,
      uint32_t initial_value,
      libcerror_error_t **error )
 {
-	libewf_aligned_t *aligned_buffer_iterator = NULL;
-	uint8_t *buffer_iterator                    = NULL;
-	static char *function                       = "libewf_checksum_calculate_little_endian_adler32";
-	libewf_aligned_t value_aligned            = 0;
-	uint32_t value_32bit                        = 0;
-	uint8_t alignment_count                     = 0;
-	uint8_t alignment_size                      = 0;
-	uint8_t byte_count                          = 0;
-	uint8_t byte_order                          = 0;
-	uint8_t byte_size                           = 0;
+	static char *function = "libewf_checksum_calculate_adler32";
+	size_t buffer_offset  = 0;
+	uint32_t lower_word   = 0;
+	uint32_t upper_word   = 0;
+	uint32_t value_32bit  = 0;
+	int block_index       = 0;
 
 	if( checksum_value == NULL )
 	{
@@ -86,197 +144,178 @@ int libewf_checksum_calculate_little_endian_adler32(
 
 		return( -1 );
 	}
-	*checksum_value = initial_value;
+	lower_word = initial_value & 0xffff;
+	upper_word = ( initial_value >> 16 ) & 0xffff;
 
-	buffer_iterator = (uint8_t *) buffer;
-
-	/* Only optimize when there is the alignment is a multitude of 32-bit
-	 * and for buffers larger than the alignment
-	 */
-	if( ( ( sizeof( libewf_aligned_t ) % 4 ) == 0 )
-	 && ( size > ( 2 * sizeof( libewf_aligned_t ) ) ) )
+	while( size >= 0x15b0 )
 	{
-		/* Align the buffer iterator
+		/* The modulo calculation is needed per 5552 (0x15b0) bytes
+		 * 5552 / 16 = 347
 		 */
-		alignment_size = (uint8_t) ( (intptr_t) buffer_iterator % sizeof( libewf_aligned_t ) );
-
-		byte_size = alignment_size;
-
-		while( byte_size != 0 )
+		for( block_index = 0;
+		     block_index < 347;
+		     block_index++ )
 		{
-			value_32bit = 0;
-			byte_count  = 1;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			if( byte_size >= 4 )
-			{
-				value_32bit |= buffer_iterator[ 3 ];
-				value_32bit <<= 8;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				byte_count++;
-			}
-			if( byte_size >= 3 )
-			{
-				value_32bit |= buffer_iterator[ 2 ];
-				value_32bit <<= 8;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				byte_count++;
-			}
-			if( byte_size >= 2 )
-			{
-				value_32bit |= buffer_iterator[ 1 ];
-				value_32bit <<= 8;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				byte_count++;
-			}
-			value_32bit |= buffer_iterator[ 0 ];
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			buffer_iterator += byte_count;
-			byte_size       -= byte_count;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			*checksum_value ^= value_32bit;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 		}
-		aligned_buffer_iterator = (libewf_aligned_t *) buffer_iterator;
-
-		size -= alignment_size;
-
-		if( *buffer_iterator != (uint8_t) ( *aligned_buffer_iterator & 0xff ) )
-		{
-			byte_order = _BYTE_STREAM_ENDIAN_BIG;
-		}
-		else
-		{
-			byte_order = _BYTE_STREAM_ENDIAN_LITTLE;
-		}
-		/* Determine the aligned XOR value
+		/* Optimized equivalent of:
+		 * lower_word %= 0xfff1
 		 */
-		while( size > sizeof( libewf_aligned_t ) )
+		value_32bit = lower_word >> 16;
+		lower_word &= 0x0000ffffUL;
+		lower_word += ( value_32bit << 4 ) - value_32bit;
+
+		if( lower_word >= 65521 )
 		{
-			value_aligned ^= *aligned_buffer_iterator;
-
-			aligned_buffer_iterator++;
-
-			size -= sizeof( libewf_aligned_t );
+			lower_word -= 65521;
 		}
-		/* Align the aligned XOR value with the 32-bit XOR value
+		/* Optimized equivalent of:
+		 * upper_word %= 0xfff1
 		 */
-		if( alignment_size > 0 )
+		value_32bit = upper_word >> 16;
+		upper_word &= 0x0000ffffUL;
+		upper_word += ( value_32bit << 4 ) - value_32bit;
+
+		if( upper_word >= 65521 )
 		{
-			byte_count     = ( alignment_size % 4 ) * 8;
-			alignment_count = ( sizeof( libewf_aligned_t ) - alignment_size ) * 8;
-
-			if( byte_order == _BYTE_STREAM_ENDIAN_BIG )
-			{
-				/* Shift twice to set unused bytes to 0
-				 */
-				value_32bit = (uint32_t) ( ( value_aligned >> alignment_count ) << byte_count );
-
-				/* Strip-off the used part of the aligned value
-				 */
-				value_aligned <<= byte_count;
-			}
-			else if( byte_order == _BYTE_STREAM_ENDIAN_LITTLE )
-			{
-				value_32bit = (uint32_t) ( value_aligned << byte_count );
-
-				/* Strip-off the used part of the aligned value
-				 */
-				value_aligned >>= alignment_count;
-			}
-			*checksum_value ^= value_32bit;
+			upper_word -= 65521;
 		}
-		/* Update the 32-bit XOR value with the aligned XOR value
-		 */
-		byte_size = (uint8_t) sizeof( libewf_aligned_t );
-
-		while( byte_size != 0 )
+		size -= 0x15b0;
+	}
+	if( size > 0 )
+	{
+		while( size > 16 )
 		{
-			byte_count = ( ( byte_size / 4 ) - 1 ) * 32;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			if( byte_order == _BYTE_STREAM_ENDIAN_BIG )
-			{
-				value_32bit = (uint32_t) ( value_aligned >> byte_count );
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				/* Change big-endian into little-endian
-				 */
-				value_32bit = ( ( value_32bit & 0x00ff ) << 24 )
-				            | ( ( value_32bit & 0xff00 ) << 8 )
-				            | ( ( value_32bit >> 8 ) & 0xff00 )
-				            | ( ( value_32bit >> 24 ) & 0x00ff );
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				value_aligned <<= byte_count;
-			}
-			else if( byte_order == _BYTE_STREAM_ENDIAN_LITTLE )
-			{
-				value_32bit = (uint32_t) value_aligned;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-				value_aligned >>= byte_count;
-			}
-			byte_size -= 4;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			*checksum_value ^= value_32bit;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
+
+			size -= 16;
 		}
-		/* Re-align the buffer iterator
-		 */
-		buffer_iterator = (uint8_t *) aligned_buffer_iterator;
-
-		byte_size = 4 - ( alignment_size % 4 );
-
-		if( byte_size != 4 )
+		while( size > 0 )
 		{
-			value_32bit   = buffer_iterator[ 0 ];
-			value_32bit <<= 8;
+			lower_word += buffer[ buffer_offset++ ];
+			upper_word += lower_word;
 
-			if( byte_size >= 2 )
-			{
-				value_32bit |= buffer_iterator[ 1 ];
-			}
-			value_32bit <<= 8;
+			size--;
+		}
+		/* Optimized equivalent of:
+		 * lower_word %= 0xfff1
+		 */
+		value_32bit = lower_word >> 16;
+		lower_word &= 0x0000ffffUL;
+		lower_word += ( value_32bit << 4 ) - value_32bit;
 
-			if( byte_size >= 3 )
-			{
-				value_32bit |= buffer_iterator[ 2 ];
-			}
-			value_32bit <<= 8;
+		if( lower_word >= 65521 )
+		{
+			lower_word -= 65521;
+		}
+		/* Optimized equivalent of:
+		 * upper_word %= 0xfff1
+		 */
+		value_32bit = upper_word >> 16;
+		upper_word &= 0x0000ffffUL;
+		upper_word += ( value_32bit << 4 ) - value_32bit;
 
-			buffer_iterator += byte_size;
-			size            -= byte_size;
-
-			*checksum_value ^= value_32bit;
+		if( upper_word >= 65521 )
+		{
+			upper_word -= 65521;
 		}
 	}
-	while( size > 0 )
-	{
-		value_32bit = 0;
-		byte_count  = 1;
+	*checksum_value = ( upper_word << 16 ) | lower_word;
 
-		if( size >= 4 )
-		{
-			value_32bit |= buffer_iterator[ 3 ];
-			value_32bit <<= 8;
-
-			byte_count++;
-		}
-		if( size >= 3 )
-		{
-			value_32bit |= buffer_iterator[ 2 ];
-			value_32bit <<= 8;
-
-			byte_count++;
-		}
-		if( size >= 2 )
-		{
-			value_32bit |= buffer_iterator[ 1 ];
-			value_32bit <<= 8;
-
-			byte_count++;
-		}
-		value_32bit |= buffer_iterator[ 0 ];
-
-		buffer_iterator += byte_count;
-		size            -= byte_count;
-
-		*checksum_value ^= value_32bit;
-	}
 	return( 1 );
 }
+
+#endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
 

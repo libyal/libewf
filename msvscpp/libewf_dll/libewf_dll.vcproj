@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_checksum.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_chunk_data.c"
 				>
 			</File>
@@ -328,10 +332,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libewf\ewf_checksum.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\ewf_data.h"
 				>
 			</File>
@@ -389,6 +389,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_case_data.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_checksum.h"
 				>
 			</File>
 			<File

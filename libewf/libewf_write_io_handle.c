@@ -46,7 +46,6 @@
 #include "libewf_unused.h"
 #include "libewf_write_io_handle.h"
 
-#include "ewf_checksum.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_section.h"
