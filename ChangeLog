@@ -1,4 +1,6 @@
 TODO
+* fix verification_handle_verify_input: unexpected end of data on pattern fill
+
 * throttle number of open files in tools
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
@@ -372,6 +374,10 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120730
+* fixes for mingw build
+* fixes for codegear build
 
 20120729
 * code clean up

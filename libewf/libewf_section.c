@@ -1323,6 +1323,7 @@ ssize_t libewf_section_compressed_string_read(
 	static char *function      = "libewf_section_compressed_string_read";
 	void *reallocation         = NULL;
 	ssize_t read_count         = 0;
+	uint8_t number_of_attempts = 0;
 	int result                 = 0;
 
 	if( section == NULL )
@@ -1424,9 +1425,9 @@ ssize_t libewf_section_compressed_string_read(
 		 0 );
 	}
 #endif
-	/* On average the uncompressed string will be twice as large as the compressed string
+	/* On average the uncompressed string will be more than twice as large as the compressed string
 	 */
-	*uncompressed_string_size = 2 * (size_t) section->data_size;
+	*uncompressed_string_size = 4 * (size_t) section->data_size;
 
 	*uncompressed_string = (uint8_t *) memory_allocate(
 	                                    sizeof( uint8_t ) * *uncompressed_string_size );
@@ -1453,8 +1454,7 @@ ssize_t libewf_section_compressed_string_read(
 	while( ( result == 0 )
 	    && ( *uncompressed_string_size > 0 ) )
 	{
-		libcerror_error_free(
-		 error );
+		number_of_attempts++;
 
 		reallocation = memory_reallocate(
 		                *uncompressed_string,
@@ -1480,6 +1480,11 @@ ssize_t libewf_section_compressed_string_read(
 		          *uncompressed_string,
 		          uncompressed_string_size,
 		          error );
+
+		if( number_of_attempts >= 3 )
+		{
+			break;
+		}
 	}
 	if( result != 1 )
 	{

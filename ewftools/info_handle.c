@@ -2295,13 +2295,11 @@ int info_handle_media_information_fprint(
 		else
 		{
 /* TODO improve this */
-			if( ( major_version >= 0 )
-			 && ( major_version <= 9 ) )
+			if( major_version <= 9 )
 			{
 				segment_file_version[ 0 ] += major_version;
 			}
-			if( ( minor_version >= 0 )
-			 && ( minor_version <= 9 ) )
+			if( minor_version <= 9 )
 			{
 				segment_file_version[ 2 ] += minor_version;
 			}

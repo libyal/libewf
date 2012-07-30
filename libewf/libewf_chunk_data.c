@@ -30,6 +30,7 @@
 #include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
+#include "libewf_types.h"
 
 #include "ewf_definitions.h"
 
@@ -970,6 +971,8 @@ int libewf_chunk_data_unpack_buffer(
 
 				return( -1 );
 			}
+			*data_size = (size_t) chunk_size;
+
 			switch( chunk_size % 8 )
 			{
 				case 7:
@@ -999,8 +1002,6 @@ int libewf_chunk_data_unpack_buffer(
 				data[ --chunk_size ] = compressed_data[ 1 ];
 				data[ --chunk_size ] = compressed_data[ 0 ];
 			}
-			*data_size = (size_t) chunk_size;
-
 		}
 		else
 		{
@@ -1076,11 +1077,6 @@ int libewf_chunk_data_unpack_buffer(
 	}
 	return( 1 );
 }
-
-/* The largest primary (or scalar) available
- * supported by a single load and store instruction
- */
-typedef unsigned long int libewf_aligned_t;
 
 /* Checks if a buffer containing the chunk data is filled with same value bytes (empty-block)
  * Returns 1 if a pattern was found, 0 if not or -1 on error

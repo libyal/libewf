@@ -1,6 +1,6 @@
 dnl Functions for libuuid
 dnl
-dnl Version: 20120725
+dnl Version: 20120730
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],
@@ -20,7 +20,8 @@ AC_DEFUN([AX_LIBUUID_CHECK_LIB],
   [ac_cv_libuuid=no],
   [AS_IF(
    [test "x$ac_cv_enable_winapi" = xyes],
-   [ac_cv_libuuid=librpcrt4],
+   [ac_cv_libuuid=librpcrt4
+   ac_cv_libuuid_LIBADD=-lrpcrt4],
    [ac_cv_libuuid=no])
  
   AS_IF(

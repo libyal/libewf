@@ -29,6 +29,7 @@
 
 #include "libewf_checksum.h"
 #include "libewf_libcerror.h"
+#include "libewf_types.h"
 
 #if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
 
@@ -87,11 +88,6 @@ int libewf_checksum_calculate_adler32(
 }
 
 #else
-
-/* The largest primary (or scalar) available
- * supported by a single load and store instruction
- */
-typedef unsigned long int libewf_aligned_t;
 
 /* Calculates the little-endian Adler-32 of a buffer
  * It uses the initial value to calculate a new Adler-32
