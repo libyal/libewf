@@ -7,7 +7,6 @@ TODO
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 
 * allow zlib to be replaced by alternative back-end
-  - implemented optimized alder32 function (test)
 
 * refactor read/write compressed string
   - change libewf_section_ltree_read to only read header ?
@@ -378,6 +377,7 @@ Closed:
 20120730
 * fixes for mingw build
 * fixes for codegear build
+* replaced Adler32
 
 20120729
 * code clean up

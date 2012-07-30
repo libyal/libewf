@@ -31,7 +31,8 @@
 #include "libewf_libcerror.h"
 #include "libewf_types.h"
 
-#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+//#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#ifdef IGNORE
 
 /* Calculates the little-endian Adler-32 of a buffer
  * It uses the initial value to calculate a new Adler-32
@@ -200,6 +201,10 @@ int libewf_checksum_calculate_adler32(
 			lower_word += buffer[ buffer_offset++ ];
 			upper_word += lower_word;
 		}
+uint32_t test = 0;
+
+test = lower_word;
+
 		/* Optimized equivalent of:
 		 * lower_word %= 0xfff1
 		 */
@@ -207,6 +212,12 @@ int libewf_checksum_calculate_adler32(
 		lower_word &= 0x0000ffffUL;
 		lower_word += ( value_32bit << 4 ) - value_32bit;
 
+		if( lower_word > 65521 )
+		{
+			value_32bit = lower_word >> 16;
+			lower_word &= 0x0000ffffUL;
+			lower_word += ( value_32bit << 4 ) - value_32bit;
+		}
 		if( lower_word >= 65521 )
 		{
 			lower_word -= 65521;
@@ -218,6 +229,12 @@ int libewf_checksum_calculate_adler32(
 		upper_word &= 0x0000ffffUL;
 		upper_word += ( value_32bit << 4 ) - value_32bit;
 
+		if( upper_word > 65521 )
+		{
+			value_32bit = upper_word >> 16;
+			upper_word &= 0x0000ffffUL;
+			upper_word += ( value_32bit << 4 ) - value_32bit;
+		}
 		if( upper_word >= 65521 )
 		{
 			upper_word -= 65521;
@@ -292,6 +309,12 @@ int libewf_checksum_calculate_adler32(
 		lower_word &= 0x0000ffffUL;
 		lower_word += ( value_32bit << 4 ) - value_32bit;
 
+		if( lower_word > 65521 )
+		{
+			value_32bit = lower_word >> 16;
+			lower_word &= 0x0000ffffUL;
+			lower_word += ( value_32bit << 4 ) - value_32bit;
+		}
 		if( lower_word >= 65521 )
 		{
 			lower_word -= 65521;
@@ -303,6 +326,12 @@ int libewf_checksum_calculate_adler32(
 		upper_word &= 0x0000ffffUL;
 		upper_word += ( value_32bit << 4 ) - value_32bit;
 
+		if( upper_word > 65521 )
+		{
+			value_32bit = upper_word >> 16;
+			upper_word &= 0x0000ffffUL;
+			upper_word += ( value_32bit << 4 ) - value_32bit;
+		}
 		if( upper_word >= 65521 )
 		{
 			upper_word -= 65521;
