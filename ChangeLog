@@ -374,6 +374,9 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20120731
+* added configure option to disable adler32 in zlib
+
 20120730
 * fixes for mingw build
 * fixes for codegear build

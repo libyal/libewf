@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120730],
+ [20120731],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -276,6 +276,7 @@ Building:
    libfvalue support:                               $ac_cv_libfvalue
    libmfcache support:                              $ac_cv_libmfcache
    libmfdata support:                               $ac_cv_libmfdata
+   ADLER32 checksum support:                        $ac_cv_with_adler32
    DEFLATE compression support:                     $ac_cv_zlib
    BZIP2 compression support:                       $ac_cv_bzip2
    libhmac support:                                 $ac_cv_libhmac

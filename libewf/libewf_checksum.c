@@ -31,8 +31,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_types.h"
 
-//#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
-#ifdef IGNORE
+#if defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
 
 /* Calculates the little-endian Adler-32 of a buffer
  * It uses the initial value to calculate a new Adler-32
@@ -201,10 +200,6 @@ int libewf_checksum_calculate_adler32(
 			lower_word += buffer[ buffer_offset++ ];
 			upper_word += lower_word;
 		}
-uint32_t test = 0;
-
-test = lower_word;
-
 		/* Optimized equivalent of:
 		 * lower_word %= 0xfff1
 		 */
@@ -342,5 +337,5 @@ test = lower_word;
 	return( 1 );
 }
 
-#endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
+#endif /* defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
 

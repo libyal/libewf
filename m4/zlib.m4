@@ -1,6 +1,6 @@
 dnl Functions for zlib
 dnl
-dnl Version: 20120729
+dnl Version: 20120731
 
 dnl Function to detect if zlib is available
 AC_DEFUN([AX_ZLIB_CHECK_LIB],
@@ -40,23 +40,11 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
     [ac_cv_zlib=no],
     [dnl Check for the individual functions
     ac_cv_zlib=zlib
-    AC_CHECK_LIB(
-     z,
-     adler32,
-     [],
-     [ac_cv_zlib=no])
-
-    AS_IF(
-     [test "x$ac_cv_lib_z_adler32" = xno],
-     [AC_MSG_FAILURE(
-      [Missing function: adler32 in library: zlib.],
-      [1])
-     ])
 
     AC_CHECK_LIB(
      z,
      compress2,
-     [ac_zlib_dummy=yes],
+     [],
      [ac_cv_zlib=no])
 
     AS_IF(
@@ -97,6 +85,31 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
     [1],
     [Define to 1 if compressBound funtion is available in zlib.])
    ])
+
+  AC_CHECK_LIB(
+   z,
+   adler32,
+   [ac_zlib_dummy=yes],
+   [ac_cv_zlib=no])
+
+  AS_IF(
+   [test "x$ac_cv_lib_z_adler32" = xno],
+   [AS_IF(
+    [test "x$ac_cv_with_adler32" = xzlib],
+    [AC_MSG_FAILURE(
+     [Missing function: adler32 in library: zlib.],
+     [1])
+    ])
+   ac_cv_with_adler32=local],
+   [AS_IF(
+    [test "x$ac_cv_with_adler32" != xzlib && test "x$ac_cv_with_adler32" != x && test "x$ac_cv_with_adler32" != xauto-detect],
+    [ac_cv_with_adler32=local],
+    [AC_DEFINE(
+     [HAVE_ADLER32],
+     [1],
+     [Define to 1 if adler32 funtion is available in zlib.])
+    ac_cv_with_adler32=zlib])
+   ])
   ])
   
  AS_IF(
@@ -126,6 +139,12 @@ AC_DEFUN([AX_ZLIB_CHECK_ENABLE],
   [search for zlib in includedir and libdir or in the specified DIR, or no if not to use zlib],
   [auto-detect],
   [DIR])
+ AX_COMMON_ARG_WITH(
+  [adler32],
+  [adler32],
+  [specify which alder32 implementation to use, options: 'auto-detect', 'zlib' or 'local'],
+  [auto-detect],
+  [auto-detect])
 
  dnl Check for a shared library version
  AX_ZLIB_CHECK_LIB
