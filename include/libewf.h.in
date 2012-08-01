@@ -708,6 +708,14 @@ int libewf_handle_segment_files_corrupted(
      libewf_handle_t *handle,
      libewf_error_t **error );
 
+/* Determine if the segment files are encrypted
+ * Returns 1 if encrypted, 0 if not or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_segment_files_encrypted(
+     libewf_handle_t *handle,
+     libewf_error_t **error );
+
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
  * Returns 1 if successful, 0 if no such filename or -1 on error

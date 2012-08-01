@@ -329,6 +329,11 @@ int libewf_handle_segment_files_corrupted(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_segment_files_encrypted(
+     libewf_handle_t *handle,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_segment_filename_size(
      libewf_handle_t *handle,
      size_t *filename_size,

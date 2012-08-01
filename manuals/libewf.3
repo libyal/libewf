@@ -1,4 +1,4 @@
-.Dd July 28, 2012
+.Dd August 1, 2012
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -124,6 +124,8 @@ File/Handle functions
 .Fn libewf_handle_set_maximum_delta_segment_size "libewf_handle_t *handle, size64_t maximum_delta_segment_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_segment_files_corrupted "libewf_handle_t *handle, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_segment_files_encrypted "libewf_handle_t *handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int

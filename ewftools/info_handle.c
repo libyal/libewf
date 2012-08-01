@@ -2119,6 +2119,7 @@ int info_handle_media_information_fprint(
 	uint8_t minor_version                             = 0;
 	int8_t compression_level                          = 0;
 	int is_corrupted                                  = 0;
+	int is_encrypted                                  = 0;
 	int result                                        = 1;
 
 	if( info_handle == NULL )
@@ -2581,6 +2582,41 @@ int info_handle_media_information_fprint(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
 			 "%s: unable to print section boolean value: is_corrupted.",
+			 function );
+
+			result = -1;
+		}
+	}
+	is_encrypted = libewf_handle_segment_files_encrypted(
+	                info_handle->input_handle,
+	                error );
+
+	if( is_encrypted == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if segment files are encrypted.",
+		 function );
+
+		result = -1;
+	}
+	else if( is_encrypted != 0 )
+	{
+		if( info_handle_section_value_boolean_fprint(
+		     info_handle,
+		     "is_encrypted",
+		     "Is encrypted",
+		     12,
+		     is_encrypted,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print section boolean value: is_encrypted.",
 			 function );
 
 			result = -1;

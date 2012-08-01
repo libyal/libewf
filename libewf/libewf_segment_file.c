@@ -1138,12 +1138,12 @@ ssize_t libewf_segment_file_read_table_section(
 	}
 	chunk_table->previous_last_chunk_filled = chunk_table->last_chunk_filled;
 
-	read_count = libewf_section_table_header_read(
+	read_count = libewf_section_table_read(
 		      section,
+		      io_handle,
 		      file_io_pool,
 		      file_io_pool_entry,
 		      io_handle->major_version,
-		      io_handle->format,
 		      &number_of_entries,
 		      &base_offset,
 		      error );
@@ -1154,7 +1154,7 @@ ssize_t libewf_segment_file_read_table_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table section header.",
+		 "%s: unable to read table section.",
 		 function );
 
 		return( -1 );
@@ -1299,12 +1299,12 @@ ssize_t libewf_segment_file_read_table2_section(
 
 		return( -1 );
 	}
-	read_count = libewf_section_table_header_read(
+	read_count = libewf_section_table_read(
 	              section,
+	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
 	              io_handle->major_version,
-	              io_handle->format,
 	              &number_of_entries,
 	              &base_offset,
 	              error );
@@ -1315,7 +1315,7 @@ ssize_t libewf_segment_file_read_table2_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table2 section header.",
+		 "%s: unable to read table2 section.",
 		 function );
 
 		return( -1 );

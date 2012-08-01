@@ -152,6 +152,23 @@ void libewf_debug_print_section_type(
 	}
 }
 
+/* Prints the section data flags
+ */
+void libewf_debug_print_section_data_flags(
+      uint32_t section_data_flags )
+{
+	if( ( section_data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
+	{
+		libcnotify_printf(
+		 "Has integrity hash (MD5HASHED)\n" );
+	}
+	if( ( section_data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
+	{
+		libcnotify_printf(
+		 "Is encrypted (ENCRYPTED)\n" );
+	}
+}
+
 /* Prints the byte stream data to the notify stream
  * Returns 1 if successful or -1 on error
  */

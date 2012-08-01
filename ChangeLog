@@ -56,8 +56,16 @@ Optimization:
   - encrypted
   - open single files ?
 
+* Ex01/Lx01 read support
+  - verify device info and case data in multi segment files
+  - read section data at once for encryption
+    refactor section function not to use libbfio_pool_read_buffer() but libewf_section_read_data()
+    refactor libewf_section_table_read to read entire table
+
 * Ex01/Lx01 write support
   - pattern fill chunk support
+  - write section data at once for encryption
+    refactor to use libewf_section_write_data()
 
 * Ex01/Lx01 extensions
   - implement SHA256 hash section
@@ -369,6 +377,7 @@ Closed:
 * worked on TODOs
 * worked on pattern fill write support
 * fixes for recent changes
+* worked on encryption support
 
 20120731
 * added configure option to disable adler32 in zlib

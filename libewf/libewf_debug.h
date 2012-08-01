@@ -37,6 +37,9 @@ void libewf_debug_print_compression_method(
 void libewf_debug_print_section_type(
       uint32_t section_type );
 
+void libewf_debug_print_section_data_flags(
+      uint32_t data_flags );
+
 int libewf_debug_byte_stream_print(
      const char *header_string,
      const uint8_t *byte_stream,

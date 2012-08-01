@@ -260,6 +260,14 @@ enum LIBEWF_SECTION_TYPES
 	LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA			= 0x00000020UL
 };
 
+/* The section data flags definitions
+ */
+enum LIBEWF_SECTION_DATA_FLAGS
+{
+	LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH		= 0x00000001UL,
+	LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED			= 0x00000002UL,
+};
+
 /* The item flags definitions
  */
 enum LIBEWF_ITEM_FLAGS
@@ -279,7 +287,7 @@ enum LIBEWF_SEGMENT_TABLE_FLAGS
 {
 	/* The segment table is corrupted
 	 */
-	LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED			= 0x01
+	LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED			= 0x01,
 };
 
 /* The segment file flags definitions
@@ -349,6 +357,10 @@ enum LIBEWF_CHUNK_DATA_FLAGS
 /* The chunk data range is corrupted
  */
 #define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_6
+
+/* The chunk data range is encrypted
+ */
+#define LIBEWF_RANGE_FLAG_IS_ENCRYPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_7
 
 /* Chunk data pack flag definitions
  */

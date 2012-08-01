@@ -2878,16 +2878,11 @@ int libewf_handle_open_read_section_data(
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					if( read_device_information == 0 )
 					{
 						read_count = libewf_section_compressed_string_read(
 							      section,
+							      internal_handle->io_handle,
 							      file_io_pool,
 							      file_io_pool_entry,
 							      internal_handle->io_handle->compression_method,
@@ -2906,32 +2901,35 @@ int libewf_handle_open_read_section_data(
 
 							goto on_error;
 						}
-						if( libewf_device_information_parse(
-						     string_data,
-						     string_data_size,
-						     internal_handle->media_values,
-						     internal_handle->header_values,
-						     error ) != 1 )
+						else if( read_count != 0 )
 						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-							 "%s: unable to parse device information.",
-							 function );
+							if( libewf_device_information_parse(
+							     string_data,
+							     string_data_size,
+							     internal_handle->media_values,
+							     internal_handle->header_values,
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+								 "%s: unable to parse device information.",
+								 function );
 
-							goto on_error;
-						}
-						memory_free(
-						 string_data );
+								goto on_error;
+							}
+							memory_free(
+							 string_data );
 
-						string_data = NULL;
+							string_data = NULL;
 
-						read_device_information = 1;
+							read_device_information = 1;
 
-						if( read_case_data != 0 )
-						{
-							initialize_chunk_table = 1;
+							if( read_case_data != 0 )
+							{
+								initialize_chunk_table = 1;
+							}
 						}
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2940,16 +2938,11 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_CASE_DATA:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					if( read_case_data == 0 )
 					{
 						read_count = libewf_section_compressed_string_read(
 							      section,
+							      internal_handle->io_handle,
 							      file_io_pool,
 							      file_io_pool_entry,
 							      internal_handle->io_handle->compression_method,
@@ -2968,33 +2961,36 @@ int libewf_handle_open_read_section_data(
 
 							goto on_error;
 						}
-						if( libewf_case_data_parse(
-						     string_data,
-						     string_data_size,
-						     internal_handle->media_values,
-						     internal_handle->header_values,
-						     &( internal_handle->io_handle->format ),
-						     error ) != 1 )
+						else if( read_count != 0 )
 						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-							 "%s: unable to parse case data.",
-							 function );
+							if( libewf_case_data_parse(
+							     string_data,
+							     string_data_size,
+							     internal_handle->media_values,
+							     internal_handle->header_values,
+							     &( internal_handle->io_handle->format ),
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+								 "%s: unable to parse case data.",
+								 function );
 
-							goto on_error;
-						}
-						memory_free(
-						 string_data );
+								goto on_error;
+							}
+							memory_free(
+							 string_data );
 
-						string_data = NULL;
+							string_data = NULL;
 
-						read_case_data = 1;
+							read_case_data = 1;
 
-						if( read_device_information != 0 )
-						{
-							initialize_chunk_table = 1;
+							if( read_device_information != 0 )
+							{
+								initialize_chunk_table = 1;
+							}
 						}
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -3022,12 +3018,6 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					read_count = libewf_segment_file_read_table_section(
 						      segment_file,
 						      section,
@@ -3058,6 +3048,7 @@ int libewf_handle_open_read_section_data(
 #endif
 					read_count = libewf_section_error_read(
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
@@ -3083,6 +3074,7 @@ int libewf_handle_open_read_section_data(
 #endif
 					read_count = libewf_section_session_read(
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
@@ -3104,14 +3096,9 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_MD5_HASH:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					read_count = libewf_section_md5_hash_read(
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
@@ -3124,14 +3111,9 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SHA1_HASH:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					read_count = libewf_section_sha1_hash_read(
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      internal_handle->hash_sections,
@@ -3145,6 +3127,7 @@ int libewf_handle_open_read_section_data(
 				case LIBEWF_SECTION_TYPE_RESTART_DATA:
 					read_count = libewf_section_compressed_string_read(
 						      section,
+					              internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 					              internal_handle->io_handle->compression_method,
@@ -3225,14 +3208,9 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
-					if( internal_handle->io_handle->is_encrypted != 0 )
-					{
-/* TODO: read, decrypt, decompress
- */
-						break;
-					}
 					read_count = libewf_section_compressed_string_read(
 						      section,
+					              internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 					              internal_handle->io_handle->compression_method,
@@ -3251,25 +3229,27 @@ int libewf_handle_open_read_section_data(
 
 						goto on_error;
 					}
-					if( libewf_analytical_data_parse(
-					     string_data,
-					     string_data_size,
-					     error ) != 1 )
+					else if( read_count != 0 )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to parse analytical data.",
-						 function );
+						if( libewf_analytical_data_parse(
+						     string_data,
+						     string_data_size,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+							 "%s: unable to parse analytical data.",
+							 function );
 
-						goto on_error;
+							goto on_error;
+						}
+						memory_free(
+						 string_data );
+
+						string_data = NULL;
 					}
-					memory_free(
-					 string_data );
-
-					string_data = NULL;
-
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -3376,6 +3356,7 @@ int libewf_handle_open_read_section_data(
 #endif
 				read_count = libewf_section_compressed_string_read(
 					      section,
+				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->io_handle->compression_method,
@@ -3466,6 +3447,7 @@ int libewf_handle_open_read_section_data(
 			{
 				read_count = libewf_section_compressed_string_read(
 					      section,
+				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 				              internal_handle->io_handle->compression_method,
@@ -3573,6 +3555,7 @@ int libewf_handle_open_read_section_data(
 			{
 				read_count = libewf_section_compressed_string_read(
 					      section,
+				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 				              internal_handle->io_handle->compression_method,
@@ -3638,6 +3621,7 @@ int libewf_handle_open_read_section_data(
 			{
 				read_count = libewf_section_compressed_string_read(
 					      section,
+				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 				              internal_handle->io_handle->compression_method,
@@ -4162,7 +4146,8 @@ int libewf_handle_open_read_segment_files(
 			{
 				if( section->type == LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS )
 				{
-/* TODO */
+/* TODO get key info */
+					internal_handle->io_handle->format       = LIBEWF_FORMAT_V2_ENCASE7;
 					internal_handle->io_handle->is_encrypted = 1;
 				}
 				if( segment_file->last_section_offset == 0 )
@@ -7945,6 +7930,43 @@ int libewf_handle_segment_files_corrupted(
 		return( 1 );
 	}
 	return( 0 );
+}
+
+/* Determine if the segment files are encrypted
+ * Returns 1 if encrypted, 0 if not or -1 on error
+ */
+int libewf_handle_segment_files_encrypted(
+     libewf_handle_t *handle,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_segment_files_encrypted";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	return( (int) internal_handle->io_handle->is_encrypted );
 }
 
 /* Retrieves the segment filename size

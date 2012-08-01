@@ -611,12 +611,12 @@ int libewf_chunk_table_read_offsets(
 		section->start_offset = element_group_offset;
 		section->data_size    = (uint32_t) element_group_size;
 	}
-	read_count = libewf_section_table_header_read(
+	read_count = libewf_section_table_read(
 		      section,
+		      chunk_table->io_handle,
 		      file_io_pool,
 		      file_io_pool_entry,
 		      chunk_table->io_handle->major_version,
-		      chunk_table->io_handle->format,
 		      &number_of_entries,
 		      &base_offset,
 		      error );
@@ -627,7 +627,7 @@ int libewf_chunk_table_read_offsets(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table section header.",
+		 "%s: unable to read table section.",
 		 function );
 
 		goto on_error;
