@@ -1935,7 +1935,7 @@ int libewf_get_compression_values(
 
 		return( -1 );
 	}
-	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
+	if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 	{
 		*compress_empty_block = 1;
 	}
@@ -1960,7 +1960,7 @@ int libewf_set_compression_values(
 
 	if( compress_empty_block != 0 )
 	{
-		compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+		compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 	}
 	if( libewf_handle_set_compression_values(
 	     handle,

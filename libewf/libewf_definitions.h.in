@@ -124,9 +124,17 @@ enum LIBEWF_COMPRESSION_LEVELS
 
 /* The compression flags
  * bit 1	set to 1 for emtpy block compression
- * bit 2-8	not used
+ *              detects empty blocks and stored them compressed, the compression
+ *              is only done once
+ * bit 2	set to 1 for pattern fill compression
+ *              this implies empty block compression using the pattern fill method
+ * bit 3-8	not used
  */
-#define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK			(uint8_t) 0x01
+enum LIBEWF_COMPRESSION_FLAGS
+{
+	LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION	= (uint8_t) 0x01,
+	LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION	= (uint8_t) 0x02,
+};
 
 /* The media type definitions
  */
@@ -347,17 +355,26 @@ enum LIBEWF_CHUNK_DATA_FLAGS
 enum LIBEWF_PACK_FLAGS
 {
 	/* Force compression when packing (processing) the chunk data
-	 * used for EWF-S01
+	 * used for EWF-S01, empty-block and pattern fill compression
 	 */
 	LIBEWF_PACK_FLAG_FORCE_COMPRESSION			= 0x01,
 
+	/* Use the empty-block compression
+	 * For EWF2, if set, the fill pattern compression is preferred over the empty-block compression
+	 */
+	LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION		= 0x02,
+
+	/* Use the pattern fill compression
+	 */
+	LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION		= 0x04,
+
 	/* Calculate and add a checksum when packing (processing) the chunk data
 	 */
-	LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM			= 0x02,
+	LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM			= 0x08,
 
 	/* Adds 16-byte alignment padding when packing (processing) the chunk data
 	 */
-	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x04
+	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x10
 };
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )

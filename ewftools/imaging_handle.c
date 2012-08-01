@@ -5537,7 +5537,7 @@ int imaging_handle_print_parameters(
 	}
 	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_NONE )
 	{
-		if( ( imaging_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+		if( ( imaging_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 		{
 			fprintf(
 			 imaging_handle->notify_stream,

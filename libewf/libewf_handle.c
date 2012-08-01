@@ -5800,8 +5800,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 	uint64_t fill_pattern                     = 0;
 	uint32_t chunk_range_flags                = 0;
 	uint8_t compression_flags                 = 0;
+	uint8_t pack_flags                        = 0;
 	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
-	int8_t is_empty_zero_block                = 0;
 	int chunk_exists                          = 0;
 	int result                                = 0;
 
@@ -5973,14 +5973,16 @@ ssize_t libewf_handle_prepare_write_chunk(
 			}
 		}
 	}
+	pack_flags = internal_handle->write_io_handle->pack_flags;
+
 	if( chunk_exists == 0 )
 	{
 		compression_level = internal_handle->io_handle->compression_level;
 		compression_flags = internal_handle->io_handle->compression_flags;
 
-		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+		if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		 || ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 ) )
 		{
-/* TODO mark pattern fill */
 			if( ( chunk_buffer_size % 8 ) == 0 )
 			{
 				result = libewf_chunk_data_check_for_64_bit_pattern_fill(
@@ -6002,13 +6004,21 @@ ssize_t libewf_handle_prepare_write_chunk(
 				}
 				else if( result != 0 )
 				{
-					if( fill_pattern == 0 )
+					if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
 					{
-						is_empty_zero_block = 1;
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
+					}
+					else if( fill_pattern == 0 )
+					{
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 					}
 				}
 			}
-			else
+			else if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 			{
 				result = libewf_chunk_data_check_for_empty_block(
 				          chunk_buffer,
@@ -6030,20 +6040,11 @@ ssize_t libewf_handle_prepare_write_chunk(
 				{
 					if( *( (uint8_t *) chunk_buffer ) == 0 )
 					{
-						is_empty_zero_block = 1;
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 					}
 				}
-			}
-			if( result != 0 )
-			{
-				if( compression_level == LIBEWF_COMPRESSION_NONE )
-				{
-					compression_level = LIBEWF_COMPRESSION_DEFAULT;
-				}
-			}
-			else
-			{
-				compression_level = LIBEWF_COMPRESSION_NONE;
 			}
 		}
 	}
@@ -6062,8 +6063,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	     chunk_io_flags,
 	     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 	     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
-             is_empty_zero_block,
-	     internal_handle->write_io_handle->pack_flags,
+	     pack_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -7654,11 +7654,13 @@ ssize_t libewf_handle_write_finalize(
 
 		/* Flush the data section write cache
 		 */
-		memory_free(
-		 internal_handle->write_io_handle->data_section );
+		if( internal_handle->write_io_handle->data_section != NULL )
+		{
+			memory_free(
+			 internal_handle->write_io_handle->data_section );
 
-		internal_handle->write_io_handle->data_section = NULL;
-
+			internal_handle->write_io_handle->data_section = NULL;
+		}
 		/* Correct the sections in the segment files
 		 */
 		if( libewf_write_io_handle_finalize_write_sections_corrections(

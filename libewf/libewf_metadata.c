@@ -634,7 +634,6 @@ int libewf_handle_set_compression_method(
 
 		return( -1 );
 	}
-/* TODO make sure to validate if format allows for compression method */
 	if( ( compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
 	 && ( compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
 	{
@@ -643,6 +642,19 @@ int libewf_handle_set_compression_method(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported compression method.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: compression method not supported by format.",
 		 function );
 
 		return( -1 );
@@ -773,6 +785,19 @@ int libewf_handle_set_compression_values(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported compression level.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: compression flags not supported by format.",
 		 function );
 
 		return( -1 );
@@ -1256,12 +1281,6 @@ int libewf_handle_set_format(
 
 		return( -1 );
 	}
-/* TODO add support for:
- * L01, Lx01:
- * LIBEWF_FORMAT_LOGICAL_ENCASE5
- * LIBEWF_FORMAT_LOGICAL_ENCASE6
- * LIBEWF_FORMAT_LOGICAL_ENCASE7
- */
 	if( ( format != LIBEWF_FORMAT_ENCASE1 )
 	 && ( format != LIBEWF_FORMAT_ENCASE2 )
 	 && ( format != LIBEWF_FORMAT_ENCASE3 )
@@ -1275,6 +1294,12 @@ int libewf_handle_set_format(
 	 && ( format != LIBEWF_FORMAT_LINEN6 )
 	 && ( format != LIBEWF_FORMAT_LINEN7 )
 	 && ( format != LIBEWF_FORMAT_V2_ENCASE7 )
+/* TODO add support for: L01, Lx01:
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LOGICAL_ENCASE7 )
+	 && ( format != LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 )
+*/
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{

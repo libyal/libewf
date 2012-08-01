@@ -438,7 +438,7 @@ int main( int argc, char * const argv[] )
 		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'e' )
 		{
 			compression_level = LIBEWF_COMPRESSION_NONE;
-			compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+			compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 		}
 		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'f' )
 		{

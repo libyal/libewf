@@ -37,7 +37,7 @@ int libewf_analytical_data_parse(
      libcerror_error_t **error )
 {
 	uint8_t *analytical_data_string    = NULL;
-	static char *function           = "libewf_analytical_data_parse";
+	static char *function              = "libewf_analytical_data_parse";
 	size_t analytical_data_string_size = 0;
 
 	if( analytical_data == NULL )
@@ -107,7 +107,7 @@ int libewf_analytical_data_parse(
 		 analytical_data_string );
 	}
 #endif
-/* TODO
+/* TODO add support for analytical data
 	if( libewf_analytical_data_parse_string(
 	     analytical_data_string,
 	     analytical_data_string_size,

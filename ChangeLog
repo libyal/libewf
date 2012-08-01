@@ -1,6 +1,4 @@
 TODO
-* fix verification_handle_verify_input: unexpected end of data on pattern fill
-
 * throttle number of open files in tools
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
@@ -20,15 +18,6 @@ TODO
 * write debug output
   - make sure header string is printed after section descriptor
 
-* delta chunk already sets checksum, is that behavior necessary?
-  or can it be moved to pack?
-  - no checksum is necessary
-  - checksum needs to be calculated
-  - checksum is already set in data
-* pack flags add pattern fill ?
-* check .so library version
-
-* change chunk data indication values to flags
 * libewf_filename_create split off wide variant ?
 
 Tests
@@ -41,7 +30,6 @@ Tests
 * Ex01/Lx01
   - make sure to correctly deal with aligment padding
   - complete: libewf_chunk_table_fill_v2
-  - add support for section MD5 hashes
   - add generic way to parse file object data
   - rename table to sector table ?
 
@@ -49,11 +37,18 @@ Optimization:
   - libewf_device_info_parse do this directly from the UTF16 stream ?
   - libewf_case_data_parse do this directly from the UTF16 stream ?
 
-* Ex01/Lx01 format feature support
+* Ex01/Lx01 format
   - bzip2 compression support (+/-)
   - encryption support; make sure the encryption keys are read first
   - section integrity MD5 hash support
   - file naming schema, what's after Ex99 ?
+  - analytical data
+    - parse (read)
+  - case data (write)
+    - compression method support
+    - write blocker type support
+  - device information
+    - check TODO (read/write)
 
 * Ex01/Lx01 test images
   - memory image -> winen and encase ?
@@ -243,16 +238,7 @@ Possible performance improvements:
   do not copy data to compressed chunk cache
 * do not write section start on data update
   - performance improvement is insignificant
-* read section data on demain
-  - store location of hash section and read on-demand
-  - store location of ltree section and read on-demand
-  - store location of xhash section and read on-demand
-  - store location of digest section and read on-demand
-  - store location of error2 section and read on-demand
-  - store location of header section and read on-demand
-  - store location of header2 section and read on-demand
-  - store location of session section and read on-demand
-  - store location of xheader section and read on-demand
+* read certain section data on demand ?
 
 Python bindings (pyewf)
 * add WINAPI wide character support for open() and glob()
@@ -353,6 +339,8 @@ Deployment:
   - figure out a way to warn about the compiler used
   - add VC_EXTRALEAN to msvscpp config
 * integrating libewf.rc into mingw dll ?
+* macosx PackageMaker files
+  - add pyewf
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -373,6 +361,14 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120801
+* code clean up
+* removed --enable-guid replaced by --with-libuuid=no
+* updated package maker files
+* worked on TODOs
+* worked on pattern fill write support
+* fixes for recent changes
 
 20120731
 * added configure option to disable adler32 in zlib

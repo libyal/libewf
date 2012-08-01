@@ -118,9 +118,20 @@ enum LIBEWF_COMPRESSION_LEVELS
 
 /* The compression flags
  * bit 1	set to 1 for emtpy block compression
+ *              detects empty blocks and stored them compressed, the compression
+ *              is only done once
+ * bit 2	set to 1 for pattern fill compression
+ *              this implies empty block compression using the pattern fill method
  * bit 2-8	not used
  */
-#define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK			(uint8_t) 0x01
+enum LIBEWF_COMPRESSION_FLAGS
+{
+	LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION	= (uint8_t) 0x01,
+	LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION	= (uint8_t) 0x02,
+};
+
+/* TODO deprecated remove after a while */
+#define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK			LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION
 
 /* The media type definitions
  */

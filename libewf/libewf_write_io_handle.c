@@ -592,13 +592,11 @@ int libewf_write_io_handle_initialize_values(
 
 				goto on_error;
 			}
-			if( io_handle->compression_level == LIBEWF_COMPRESSION_NONE )
+			compression_level = io_handle->compression_level;
+
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
 				compression_level = LIBEWF_COMPRESSION_DEFAULT;
-			}
-			else
-			{
-				compression_level = io_handle->compression_level;
 			}
 			result = libewf_compress_data(
 				  compressed_zero_byte_empty_block,
@@ -630,8 +628,14 @@ int libewf_write_io_handle_initialize_values(
 				 * if compressBound() was not used but the factor 2 use the chunk size instead
 				 */
 				write_io_handle->compressed_zero_byte_empty_block_size = media_values->chunk_size;
-#endif
 
+				/* For EWF-S01 in a worst case scenario the resulting chunk data is + 16 larger than the chunk size
+				 */
+				if( io_handle->format == LIBEWF_FORMAT_SMART )
+				{
+					write_io_handle->compressed_zero_byte_empty_block_size += 16;
+				}
+#endif
 				reallocation = memory_reallocate(
 				                compressed_zero_byte_empty_block,
 				                sizeof( uint8_t ) * write_io_handle->compressed_zero_byte_empty_block_size );

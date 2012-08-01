@@ -96,7 +96,6 @@ int libewf_chunk_data_pack_buffer(
      int8_t *chunk_io_flags,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
-     int8_t is_empty_zero_block,
      uint8_t pack_flags,
      libcerror_error_t **error );
 

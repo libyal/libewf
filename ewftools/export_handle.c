@@ -3559,7 +3559,7 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 		if( ( export_handle->compression_level != LIBEWF_COMPRESSION_NONE )
-		 || ( ( export_handle->compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 ) )
+		 || ( ( export_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 ) )
 		{
 			export_handle->write_compressed = 1;
 		}

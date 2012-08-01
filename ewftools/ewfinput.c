@@ -564,7 +564,7 @@ int ewfinput_determine_compression_values(
 		     11 ) == 0 )
 		{
 			*compression_level = LIBEWF_COMPRESSION_NONE;
-			*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+			*compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 			result             = 1;
 		}
 		else if( libcstring_system_string_compare(
@@ -573,7 +573,7 @@ int ewfinput_determine_compression_values(
 			  11 ) == 0 )
 		{
 			*compression_level = LIBEWF_COMPRESSION_NONE;
-			*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+			*compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 			result             = 1;
 		}
 	}

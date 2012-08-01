@@ -199,12 +199,11 @@ int libewf_chunk_data_pack(
      uint8_t pack_flags,
      libcerror_error_t **error )
 {
-	static char *function      = "libewf_chunk_data_pack";
-	uint64_t fill_pattern      = 0;
-	uint32_t chunk_checksum    = 0;
-	int8_t chunk_io_flags      = 0;
-	int8_t is_empty_zero_block = 0;
-	int result                 = 0;
+	static char *function   = "libewf_chunk_data_pack";
+	uint64_t fill_pattern   = 0;
+	uint32_t chunk_checksum = 0;
+	int8_t chunk_io_flags   = 0;
+	int result              = 0;
 
 	if( chunk_data == NULL )
 	{
@@ -257,9 +256,9 @@ int libewf_chunk_data_pack(
 	}
 	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) == 0 )
 	{
-		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) != 0 )
+		if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		 || ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 ) )
 		{
-/* TODO mark pattern fill */
 			if( ( chunk_data->data_size % 8 ) == 0 )
 			{
 				result = libewf_chunk_data_check_for_64_bit_pattern_fill(
@@ -281,13 +280,21 @@ int libewf_chunk_data_pack(
 				}
 				else if( result != 0 )
 				{
-					if( fill_pattern == 0 )
+					if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
 					{
-						is_empty_zero_block = 1;
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
+					}
+					else if( fill_pattern == 0 )
+					{
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 					}
 				}
 			}
-			else
+			else if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 			{
 				result = libewf_chunk_data_check_for_empty_block(
 					  chunk_data->data,
@@ -309,34 +316,35 @@ int libewf_chunk_data_pack(
 				{
 					if( chunk_data->data[ 0 ] == 0 )
 					{
-						is_empty_zero_block = 1;
+						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
+						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
+						pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 					}
 				}
-			}
-			if( result != 0 )
-			{
-				if( compression_level == LIBEWF_COMPRESSION_NONE )
-				{
-					compression_level = LIBEWF_COMPRESSION_DEFAULT;
-				}
-			}
-			else
-			{
-				compression_level = LIBEWF_COMPRESSION_NONE;
 			}
 		}
 		if( ( compression_level != LIBEWF_COMPRESSION_NONE )
 		 || ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 ) )
 		{
-			chunk_data->compressed_data_size = chunk_size;
-
-			/* If the compression is forced we're dealing with EWF-S01
-			 * allow it to have compressed chunks larger than the chunk size
+			if( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
+			{
+				chunk_data->compressed_data_size = chunk_size;
+			}
+			else if( ( pack_flags & LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
+			{
+				chunk_data->compressed_data_size = 8;
+			}
+			else if( ( pack_flags & LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+			{
+				chunk_data->compressed_data_size = compressed_zero_byte_empty_block_size;
+			}
+			/* If the compression is forced and none of the other compression pack flags are set
+			 * we are dealing with EWF-S01 allow it to have compressed chunks larger than the chunk size
 			 * A factor 2 should suffice
 			 */
-			if( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
+			else
 			{
-				chunk_data->compressed_data_size *= 2;
+				chunk_data->compressed_data_size = 2 * chunk_size;
 			}
 			chunk_data->compressed_data = (uint8_t *) memory_allocate(
 			                                           sizeof( uint8_t ) * chunk_data->compressed_data_size );
@@ -368,7 +376,6 @@ int libewf_chunk_data_pack(
 		     &chunk_io_flags,
 		     compressed_zero_byte_empty_block,
 		     compressed_zero_byte_empty_block_size,
-		     is_empty_zero_block,
 		     pack_flags,
 		     error ) != 1 )
 		{
@@ -429,7 +436,6 @@ int libewf_chunk_data_pack_buffer(
      int8_t *chunk_io_flags,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
-     int8_t is_empty_zero_block,
      uint8_t pack_flags,
      libcerror_error_t **error )
 {
@@ -577,9 +583,39 @@ int libewf_chunk_data_pack_buffer(
 
 			return( -1 );
 		}
-		if( ( is_empty_zero_block != 0 )
-		 && ( chunk_data_size == (size_t) chunk_size )
-		 && ( compressed_zero_byte_empty_block != NULL ) )
+		if( ( ( pack_flags & LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
+		 && ( chunk_data_size == (size_t) chunk_size ) )
+		{
+			if( *compressed_data_size < 8 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: compressed data size value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			if( memory_copy(
+			     compressed_data,
+			     data,
+			     8 ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy fill pattern to compressed chunk buffer.",
+				 function );
+
+				return( -1 );
+			}
+			*compressed_data_size = compressed_zero_byte_empty_block_size;
+		}
+		else if( ( ( pack_flags & LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		      && ( chunk_data_size == (size_t) chunk_size )
+		      && ( compressed_zero_byte_empty_block != NULL ) )
 		{
 			if( *compressed_data_size < compressed_zero_byte_empty_block_size )
 			{
@@ -610,6 +646,12 @@ int libewf_chunk_data_pack_buffer(
 		}
 		else
 		{
+			/* If compression was forced but no compression level provided use the default
+			 */
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			{
+				compression_level = LIBEWF_COMPRESSION_DEFAULT;
+			}
 /* TODO add a light weight entropy test */
 			result = libewf_compress_data(
 			          compressed_data,
@@ -669,13 +711,21 @@ int libewf_chunk_data_pack_buffer(
 
 				return( -1 );
 			}
-			/* Zlib creates its own checksum
-			 */
-			byte_stream_copy_to_uint32_little_endian(
-			 &( compressed_data[ *compressed_data_size - 4 ] ),
-			 *chunk_checksum );
-
 			*range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+
+			if( ( pack_flags & LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
+			{
+				*range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
+			}
+			else if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+			{
+				/* Deflate has its own checksum
+				 */
+				byte_stream_copy_to_uint32_little_endian(
+				 &( compressed_data[ *compressed_data_size - 4 ] ),
+				 *chunk_checksum );
+/* TODO what about bzip2 */
+			}
 		}
 	}
 	if( ( ( *range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )

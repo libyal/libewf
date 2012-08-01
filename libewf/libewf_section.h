@@ -83,6 +83,10 @@ struct libewf_section
 	/* The padding size
 	 */
 	uint32_t padding_size;
+
+	/* The data integrity hash
+	 */
+	uint8_t data_integrity_hash[ 16 ];
 };
 
 int libewf_section_test_zero(

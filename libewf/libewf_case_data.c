@@ -626,7 +626,7 @@ int libewf_case_data_generate_utf8_string(
 
 		*utf8_string_size += number_of_chunks_string_length;
 	}
-/* TODO: cp */
+/* TODO: add support for the compression method: cp */
 
 	if( libfvalue_string_size_from_integer(
 	     &sectors_per_chunk_string_length,
@@ -672,7 +672,7 @@ int libewf_case_data_generate_utf8_string(
 
 		*utf8_string_size += error_granularity_string_length;
 	}
-/* TODO: wb */
+/* TODO: add support for the write blocker type: wb */
 
 	/* Reserve space for the tabs and 2 newlines
 	 */
@@ -1071,7 +1071,8 @@ int libewf_case_data_generate_utf8_string(
 	}
 	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
-/* TODO: cp */
+/* TODO: add support for the compression method: cp */
+
 	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( sectors_per_chunk_string_length > 0 )
@@ -1121,7 +1122,8 @@ int libewf_case_data_generate_utf8_string(
 		utf8_string_index--;
 	}
 	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-/* TODO: wb */
+
+/* TODO: add support for the write blocker type: wb */
 
 	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
 
@@ -1448,7 +1450,7 @@ int libewf_case_data_parse_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported header values string.",
+			 "%s: unsupported line string: 0.",
 			 function );
 
 			goto on_error;
@@ -1459,12 +1461,84 @@ int libewf_case_data_parse_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported header values string.",
+			 "%s: unsupported line string: 0.",
 			 function );
 
 			goto on_error;
 		}
-/* TODO validate line 1 => "main" */
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     lines,
+		     1,
+		     &line_string,
+		     &line_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve line string: 1.",
+			 function );
+
+			goto on_error;
+		}
+		if( line_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing line string: 1.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( line_string == NULL )
+		 || ( line_string_size < 5 )
+		 || ( line_string[ 0 ] == 0 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing line string: 1.",
+			 function );
+
+			goto on_error;
+		}
+		/* Remove trailing carriage return
+		 */
+		else if( line_string[ line_string_size - 2 ] == (uint8_t) '\r' )
+		{
+			line_string[ line_string_size - 2 ] = 0;
+
+			line_string_size -= 1;
+		}
+		if( line_string_size != 5 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported line string: 1.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( line_string[ 0 ] != (uint8_t) 'm' )
+		 || ( line_string[ 1 ] != (uint8_t) 'a' )
+		 || ( line_string[ 2 ] != (uint8_t) 'i' )
+		 || ( line_string[ 3 ] != (uint8_t) 'n' ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported line string: 1.",
+			 function );
+
+			goto on_error;
+		}
 		*format = LIBEWF_FORMAT_V2_ENCASE7;
 
 		if( libfvalue_split_utf8_string_get_segment_by_index(
@@ -1494,7 +1568,7 @@ int libewf_case_data_parse_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to split header values string into types.",
+			 "%s: unable to split case data string into types.",
 			 function );
 
 			goto on_error;
@@ -1540,7 +1614,7 @@ int libewf_case_data_parse_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to split header values string into values.",
+			 "%s: unable to split case data string into values.",
 			 function );
 
 			goto on_error;
@@ -1814,7 +1888,6 @@ int libewf_case_data_parse_string(
 				else if( ( type_string[ 0 ] == (uint8_t) 'n' )
 				      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
 				{
-/* TODO is this the same header value? */
 					identifier      = (uint8_t *) "description";
 					identifier_size = 12;
 				}

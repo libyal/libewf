@@ -31,6 +31,10 @@
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libewf.h"
 
+/* Define to make ewf_test_seek generate verbose output
+#define EWF_TEST_SEEK_VERBOSE
+ */
+
 /* Tests seeking an offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -40,7 +44,7 @@ int ewf_test_seek_offset(
      int input_whence,
      off64_t expected_offset )
 {
-	libcerror_error_t *error   = NULL;
+	libcerror_error_t *error  = NULL;
 	const char *whence_string = NULL;
 	static char *function     = "ewf_test_seek_offset";
 	off64_t result_offset     = 0;
@@ -143,8 +147,8 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcerror_error_t *error = NULL;
-	libewf_handle_t *handle = NULL;
-	size64_t media_size     = 0;
+	libewf_handle_t *handle  = NULL;
+	size64_t media_size      = 0;
 
 	if( argc < 2 )
 	{
@@ -154,6 +158,13 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_SEEK_VERBOSE )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
 	/* Initialization
 	 */
 	if( libewf_handle_initialize(

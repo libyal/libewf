@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120731],
+ [20120801],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -17,13 +17,6 @@ AC_CANONICAL_HOST
 
 dnl Check for large file support
 AC_SYS_LARGEFILE
-
-dnl Check for configure arguments
-AX_COMMON_ARG_ENABLE(
- [guid],
- [guid],
- [enable GUID/UUID support in the ewftools],
- [yes])
 
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
@@ -112,10 +105,7 @@ dnl Check for enabling libhmac for message digest hash function support
 AX_LIBHMAC_CHECK_ENABLE
 
 dnl Check for enabling GUID/UUID support
-AS_IF(
- [test "x$ac_cv_enable_guid" = xno],
- [ac_cv_libuuid=no],
- [AX_LIBUUID_CHECK_ENABLE])
+AX_LIBUUID_CHECK_ENABLE
 
 dnl Check for enabling libodraw for optical disc (split) RAW support
 AX_LIBODRAW_CHECK_ENABLE
@@ -207,6 +197,11 @@ AC_SUBST(
  [DATE],
  [`date -R 2> /dev/null`])
 
+dnl Set the current working directory for PackageMaker files
+AC_SUBST(
+ [PWD],
+ [`pwd`])
+
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([include/Makefile])
@@ -253,6 +248,11 @@ AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([libewf/libewf.rc])
 AC_CONFIG_FILES([ewf.net/ewf.net.rc])
+AC_CONFIG_FILES([macosx/libewf.pmdoc/01bin.xml])
+AC_CONFIG_FILES([macosx/libewf.pmdoc/02include.xml])
+AC_CONFIG_FILES([macosx/libewf.pmdoc/03lib.xml])
+AC_CONFIG_FILES([macosx/libewf.pmdoc/04share.xml])
+AC_CONFIG_FILES([macosx/libewf.pmdoc/index.xml])
 AC_CONFIG_FILES([macosx/Introduction.rtf])
 AC_CONFIG_FILES([libewf.pc])
 AC_CONFIG_FILES([libewf.spec])

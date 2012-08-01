@@ -2847,7 +2847,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to read input.\n" );
+		 "Unable to acquire input.\n" );
 
 		libcnotify_print_error_backtrace(
 		 error );

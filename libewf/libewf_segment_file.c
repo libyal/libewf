@@ -297,8 +297,7 @@ ssize_t libewf_segment_file_read_file_header(
          int file_io_pool_entry,
          libcerror_error_t **error )
 {
-	uint8_t file_header_data[ 32 ];
-
+	uint8_t *file_header_data    = NULL;
 	static char *function        = "libewf_segment_file_read_file_header";
 	size_t file_header_data_size = 0;
 	ssize_t read_count           = 0;
@@ -317,6 +316,20 @@ ssize_t libewf_segment_file_read_file_header(
 		 function );
 
 		return( -1 );
+	}
+	file_header_data = (uint8_t *) memory_allocate(
+	                                sizeof( ewf_file_header_v2_t ) );
+
+	if( file_header_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create file header data.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -340,7 +353,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to seek file header offset: 0.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
@@ -358,7 +371,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to read file header signature.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_compare(
 	     ewf1_evf_file_signature,
@@ -409,7 +422,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unsupported file header signature.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
@@ -427,7 +440,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to read file header data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -476,7 +489,7 @@ ssize_t libewf_segment_file_read_file_header(
 			 "%s: unable to copy set identifier.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -548,7 +561,18 @@ ssize_t libewf_segment_file_read_file_header(
 	 	 "\n" );
 	}
 #endif
+	memory_free(
+	 file_header_data );
+
 	return( (ssize_t) file_header_data_size );
+
+on_error:
+	if( file_header_data != NULL )
+	{
+		memory_free(
+		 file_header_data );
+	}
+	return( -1 );
 }
 
 /* Writes the segment file header
@@ -560,8 +584,7 @@ ssize_t libewf_segment_file_write_file_header(
          int file_io_pool_entry,
          libcerror_error_t **error )
 {
-	uint8_t file_header_data[ 32 ];
-
+	uint8_t *file_header_data     = NULL;
 	static char *function         = "libewf_segment_file_write_file_header";
 	const uint8_t *file_signature = NULL;
 	size_t file_header_data_size  = 0;
@@ -648,7 +671,49 @@ ssize_t libewf_segment_file_write_file_header(
 		 "%s: unsupported segment file type.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	file_header_data = (uint8_t *) memory_allocate(
+	                                file_header_data_size );
+
+	if( file_header_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create file header data.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     file_header_data,
+	     0,
+	     file_header_data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file header data.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     file_header_data,
+	     0,
+	     file_header_data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear file header data.",
+		 function );
+
+		goto on_error;
 	}
 	if( memory_copy(
 	     file_header_data,
@@ -662,21 +727,7 @@ ssize_t libewf_segment_file_write_file_header(
 		 "%s: unable to copy file signature.",
 		 function );
 
-		return( -1 );
-	}
-	if( memory_set(
-	     &( file_header_data[ 8 ] ),
-	     0,
-	     24 ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear file header data.",
-		 function );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( segment_file->major_version == 1 )
 	{
@@ -711,7 +762,7 @@ ssize_t libewf_segment_file_write_file_header(
 			 "%s: unable to copy set identifier.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -749,12 +800,12 @@ ssize_t libewf_segment_file_write_file_header(
 			libcnotify_printf(
 		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
 			 function,
-			 ( (ewf_file_header_v2_t *) file_header_data )->major_version );
+			 segment_file->major_version );
 
 			libcnotify_printf(
 		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
 			 function,
-			 ( (ewf_file_header_v2_t *) file_header_data )->minor_version );
+			 segment_file->minor_version );
 
 			libcnotify_printf(
 		 	 "%s: compression method\t\t: %" PRIu16 " (",
@@ -811,9 +862,20 @@ ssize_t libewf_segment_file_write_file_header(
 		 "%s: unable to write file header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
+	memory_free(
+	 file_header_data );
+
 	return( write_count );
+
+on_error:
+	if( file_header_data != NULL )
+	{
+		memory_free(
+		 file_header_data );
+	}
+	return( -1 );
 }
 
 /* Reads a segment file
@@ -1612,6 +1674,11 @@ ssize_t libewf_segment_file_write_device_information_section(
 
 		goto on_error;
 	}
+	memory_free(
+	 device_information );
+
+	device_information = NULL;
+
 	if( libewf_list_append_value(
 	     segment_file->section_list,
 	     (intptr_t *) section,
@@ -1744,6 +1811,11 @@ ssize_t libewf_segment_file_write_case_data_section(
 
 		goto on_error;
 	}
+	memory_free(
+	 case_data );
+
+	case_data = NULL;
+
 	if( libewf_list_append_value(
 	     segment_file->section_list,
 	     (intptr_t *) section,
