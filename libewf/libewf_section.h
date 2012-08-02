@@ -199,6 +199,7 @@ ssize_t libewf_section_data_write(
 
 ssize_t libewf_section_digest_read(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_hash_sections_t *hash_sections,
@@ -312,8 +313,13 @@ ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         uint32_t *number_of_entries,
+         uint8_t **section_data,
+         size_t *section_data_size,
          uint64_t *base_offset,
+         uint8_t **table_entries_data,
+         size_t *table_entries_data_size,
+         uint32_t *number_of_entries,
+         uint8_t *entries_corrupted,
          libcerror_error_t **error );
 
 ssize_t libewf_section_table_write(
@@ -366,7 +372,7 @@ ssize_t libewf_section_volume_s01_write(
          libewf_media_values_t *media_values,
          libcerror_error_t **error );
 
-ssize_t libewf_section_delta_chunk_read(
+ssize_t libewf_section_delta_chunk_read_header(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,

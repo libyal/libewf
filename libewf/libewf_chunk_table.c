@@ -482,25 +482,18 @@ int libewf_chunk_table_read_offsets(
      uint8_t read_flags,
      libcerror_error_t **error )
 {
-	uint8_t table_footer_data[ 16 ];
-
 	libewf_chunk_table_t *chunk_table = NULL;
 	libewf_section_t *section         = NULL;
+	uint8_t *section_data             = NULL;
 	uint8_t *table_entries_data       = NULL;
 	static char *function             = "libewf_chunk_table_read_offsets";
+	size_t section_data_size          = 0;
 	size_t table_entries_data_size    = 0;
-	size_t table_footer_data_size     = 0;
 	ssize_t read_count                = 0;
 	uint64_t base_offset              = 0;
-	uint32_t calculated_checksum      = 0;
 	uint32_t number_of_entries        = 0;
-	uint32_t stored_checksum          = 0;
-	uint8_t table_entries_corrupted   = 0;
+	uint8_t entries_corrupted         = 0;
 	int result                        = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint8_t *trailing_data            = NULL;
-#endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( number_of_elements )
 	LIBEWF_UNREFERENCED_PARAMETER( cache )
@@ -617,8 +610,13 @@ int libewf_chunk_table_read_offsets(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      chunk_table->io_handle->major_version,
-		      &number_of_entries,
+		      &section_data,
+		      &section_data_size,
 		      &base_offset,
+		      &table_entries_data,
+		      &table_entries_data_size,
+		      &number_of_entries,
+		      &entries_corrupted,
 		      error );
 	
 	if( read_count < 0 )
@@ -645,201 +643,6 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-	table_entries_data_size = number_of_entries;
-
-	if( chunk_table->io_handle->major_version == 1 )
-	{
-		table_entries_data_size *= sizeof( ewf_table_entry_v1_t );
-	}
-	else if( chunk_table->io_handle->major_version == 2 )
-	{
-		table_entries_data_size *= sizeof( ewf_table_entry_v2_t );
-	}
-	if( table_entries_data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid table entries data size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	table_entries_data = (uint8_t *) memory_allocate(
-	                                  sizeof( uint8_t ) * table_entries_data_size );
-
-	if( table_entries_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create table entries data.",
-		 function );
-
-		goto on_error;
-	}
-	if( element_group_size < (size64_t) table_entries_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid element group size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libbfio_pool_read_buffer(
-		      file_io_pool,
-		      file_io_pool_entry,
-		      table_entries_data,
-		      table_entries_data_size,
-		      error );
-
-	if( read_count != (ssize_t) table_entries_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table entries data.",
-		 function );
-
-		goto on_error;
-	}
-	element_group_size -= read_count;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-	 	 "%s: table entries data:\n",
-		 function );
-		libcnotify_print_data(
-		 table_entries_data,
-		 table_entries_data_size,
-		 0 );
-	}
-#endif
-	/* The original EWF and SMART (EWF-S01) formats do not contain a table footer
-	 */
-	if( chunk_table->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-	{
-		if( chunk_table->io_handle->major_version == 1 )
-		{
-			table_footer_data_size = 4;
-		}
-		else if( chunk_table->io_handle->major_version == 2 )
-		{
-			table_footer_data_size = 16;
-		}
-		if( element_group_size < (size64_t) table_footer_data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: invalid element group size value too small.",
-			 function );
-
-			return( -1 );
-		}
-		read_count = libbfio_pool_read_buffer(
-			      file_io_pool,
-			      file_io_pool_entry,
-			      table_footer_data,
-			      table_footer_data_size,
-			      error );
-
-		if( read_count != (ssize_t) table_footer_data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read table footer.",
-			 function );
-
-			goto on_error;
-		}
-		element_group_size -= read_count;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: table footer data:\n",
-			 function );
-			libcnotify_print_data(
-			 table_footer_data,
-			 table_footer_data_size,
-			 0 );
-		}
-#endif
-		byte_stream_copy_to_uint32_little_endian(
-		 table_footer_data,
-		 stored_checksum );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-	 		 "%s: table entries checksum\t\t\t: 0x%" PRIx32 "\n",
-			 function,
-			 stored_checksum );
-
-			if( chunk_table->io_handle->major_version == 1 )
-			{
-				libcnotify_printf(
-				 "\n" );
-			}
-			else if( chunk_table->io_handle->major_version == 2 )
-			{
-				libcnotify_printf(
-				 "%s: padding:\n",
-				 function );
-				libcnotify_print_data(
-				 &( table_footer_data[ 4 ] ),
-				 12,
-				 0 );
-			}
-		}
-#endif
-		if( libewf_checksum_calculate_adler32(
-		     &calculated_checksum,
-		     table_entries_data,
-		     table_entries_data_size,
-		     1,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to calculate checksum.",
-			 function );
-
-			goto on_error;
-		}
-		if( stored_checksum != calculated_checksum )
-		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").\n",
-				 function,
-				 stored_checksum,
-				 calculated_checksum );
-			}
-#endif
-			/* The table entries cannot be fully trusted therefore mark them as corrupted
-			 */
-			table_entries_corrupted = 1;
-		}
-	}
 	if( ( read_flags & LIBMFDATA_READ_FLAG_IS_BACKUP_RANGE ) == 0 )
 	{
 		if( chunk_table->io_handle->major_version == 1 )
@@ -854,12 +657,11 @@ int libewf_chunk_table_read_offsets(
 			          number_of_entries,
 			          table_entries_data,
 			          table_entries_data_size,
-			          table_entries_corrupted,
+			          entries_corrupted,
 			          error );
 		}
 		else if( chunk_table->io_handle->major_version == 2 )
 		{
-/* TODO pass table_entries_corrupted */
 			result = libewf_chunk_table_fill_v2(
 			          chunk_table,
 			          chunk_table_list,
@@ -869,7 +671,7 @@ int libewf_chunk_table_read_offsets(
 			          number_of_entries,
 			          table_entries_data,
 			          table_entries_data_size,
-			          table_entries_corrupted,
+			          entries_corrupted,
 			          error );
 		}
 		if( result != 1 )
@@ -898,7 +700,7 @@ int libewf_chunk_table_read_offsets(
 				  number_of_entries,
 				  table_entries_data,
 				  table_entries_data_size,
-				  table_entries_corrupted,
+				  entries_corrupted,
 				  error );
 		}
 		if( result != 1 )
@@ -914,9 +716,9 @@ int libewf_chunk_table_read_offsets(
 		}
 	}
 	memory_free(
-	 table_entries_data );
+	 section_data );
 
-	table_entries_data = NULL;
+	section_data = NULL;
 
 	if( libewf_section_free(
 	     &section,
@@ -933,100 +735,17 @@ int libewf_chunk_table_read_offsets(
 
 		goto on_error;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( ( element_group_size > (size64_t) 0 )
-		 && ( chunk_table->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-		 && ( chunk_table->io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( element_group_size > (size64_t) SSIZE_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid element group size value exceeds maximum.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-		 	 "%s: trailing data:\n",
-			 function );
-
-			trailing_data = (uint8_t *) memory_allocate(
-			                             sizeof( uint8_t ) * (size_t) element_group_size );
-
-			if( trailing_data == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create trailing data.",
-				 function );
-
-				goto on_error;
-			}
-			read_count = libbfio_pool_read_buffer(
-				      file_io_pool,
-				      file_io_pool_entry,
-				      trailing_data,
-				      (size_t) element_group_size,
-				      error );
-
-			if( read_count != (ssize_t) element_group_size )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read trailing data.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-		 	 "%s: trailing data:\n",
-			 function );
-			libcnotify_print_data(
-			 trailing_data,
-			 (size_t) element_group_size,
-			 0 );
-
-			memory_free(
-			 trailing_data );
-
-			trailing_data = NULL;
-
-#elif defined( HAVE_VERBOSE_OUTPUT )
-			libcnotify_printf(
-		 	 "%s: trailing data after table section offsets.\n",
-			 function );
-#endif
-		}
-	}
-#endif
-	if( table_entries_corrupted != 0 )
+	if( entries_corrupted != 0 )
 	{
 		return( 0 );
 	}
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( trailing_data != NULL )
+	if( section_data != NULL )
 	{
 		memory_free(
-		 trailing_data );
-	}
-#endif
-	if( table_entries_data != NULL )
-	{
-		memory_free(
-		 table_entries_data );
+		 section_data );
 	}
 	if( section != NULL )
 	{

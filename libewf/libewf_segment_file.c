@@ -1085,12 +1085,17 @@ ssize_t libewf_segment_file_read_table_section(
          libmfdata_list_t *chunk_table_list,
          libcerror_error_t **error )
 {
-	static char *function        = "libewf_segment_file_read_table_section";
-	off64_t element_group_offset = 0;
-	size64_t element_group_size  = 0;
-	ssize_t read_count           = 0;
-	uint64_t base_offset         = 0;
-	uint32_t number_of_entries   = 0;
+	uint8_t *section_data          = NULL;
+	uint8_t *table_entries_data    = NULL;
+	static char *function          = "libewf_segment_file_read_table_section";
+	off64_t element_group_offset   = 0;
+	size64_t element_group_size    = 0;
+	ssize_t read_count             = 0;
+	size_t section_data_size       = 0;
+	size_t table_entries_data_size = 0;
+	uint64_t base_offset           = 0;
+	uint32_t number_of_entries     = 0;
+	uint8_t entries_corrupted      = 0;
 
 	if( segment_file == NULL )
 	{
@@ -1144,8 +1149,13 @@ ssize_t libewf_segment_file_read_table_section(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      io_handle->major_version,
-		      &number_of_entries,
+		      &section_data,
+		      &section_data_size,
 		      &base_offset,
+		      &table_entries_data,
+		      &table_entries_data_size,
+		      &number_of_entries,
+		      &entries_corrupted,
 		      error );
 	
 	if( read_count == -1 )
@@ -1157,7 +1167,7 @@ ssize_t libewf_segment_file_read_table_section(
 		 "%s: unable to read table section.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( segment_file->major_version == 1 )
 	{
@@ -1175,6 +1185,7 @@ ssize_t libewf_segment_file_read_table_section(
 		element_group_offset = section->start_offset;
 		element_group_size   = (size64_t) section->data_size;
 	}
+/* TODO use entries_corrupted to mark group as tainted ? */
 	if( number_of_entries > 0 )
 	{
 		/* The EWF-L01 does not define the number of chunks in the volume
@@ -1198,7 +1209,7 @@ ssize_t libewf_segment_file_read_table_section(
 				 "%s: unable to append chunk group.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 		else
@@ -1222,14 +1233,25 @@ ssize_t libewf_segment_file_read_table_section(
 				 chunk_table->last_chunk_filled,
 				 chunk_table->last_chunk_filled + number_of_entries );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
 		chunk_table->last_chunk_filled += (int) number_of_entries;
 
 		segment_file->number_of_chunks += number_of_entries;
 	}
+	memory_free(
+	 section_data );
+
 	return( 1 );
+
+on_error:
+	if( section_data != NULL )
+	{
+		memory_free(
+		 section_data );
+	}
+	return( -1 );
 }
 
 /* Reads the table2 section
@@ -1245,15 +1267,20 @@ ssize_t libewf_segment_file_read_table2_section(
          libmfdata_list_t *chunk_table_list,
          libcerror_error_t **error )
 {
-	static char *function        = "libewf_segment_file_read_table2_section";
-	off64_t group_offset         = 0;
-	size64_t group_size          = 0;
-	ssize_t read_count           = 0;
-	uint64_t base_offset         = 0;
-	uint32_t group_flags         = 0;
-	uint32_t number_of_entries   = 0;
-	int group_number_of_entries  = 0;
-	int group_file_io_pool_entry = 0;
+	uint8_t *section_data          = NULL;
+	uint8_t *table_entries_data    = NULL;
+	static char *function          = "libewf_segment_file_read_table2_section";
+	off64_t group_offset           = 0;
+	size64_t group_size            = 0;
+	size_t section_data_size       = 0;
+	size_t table_entries_data_size = 0;
+	ssize_t read_count             = 0;
+	uint64_t base_offset           = 0;
+	uint32_t group_flags           = 0;
+	uint32_t number_of_entries     = 0;
+	uint8_t entries_corrupted      = 0;
+	int group_number_of_entries    = 0;
+	int group_file_io_pool_entry   = 0;
 
 	if( segment_file == NULL )
 	{
@@ -1305,8 +1332,13 @@ ssize_t libewf_segment_file_read_table2_section(
 	              file_io_pool,
 	              file_io_pool_entry,
 	              io_handle->major_version,
-	              &number_of_entries,
+		      &section_data,
+		      &section_data_size,
 	              &base_offset,
+		      &table_entries_data,
+		      &table_entries_data_size,
+	              &number_of_entries,
+		      &entries_corrupted,
 	              error );
 	
 	if( read_count == -1 )
@@ -1318,8 +1350,9 @@ ssize_t libewf_segment_file_read_table2_section(
 		 "%s: unable to read table2 section.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
+/* TODO use entries_corrupted ? */
 	if( number_of_entries > 0 )
 	{
 		if( libmfdata_list_get_group_by_index(
@@ -1341,7 +1374,7 @@ ssize_t libewf_segment_file_read_table2_section(
 			 chunk_table->last_chunk_compared,
 			 chunk_table->last_chunk_compared + number_of_entries );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( (int) number_of_entries != group_number_of_entries )
 		{
@@ -1352,7 +1385,7 @@ ssize_t libewf_segment_file_read_table2_section(
 			 "%s: mismatch between number of entries in table and table2.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libmfdata_list_set_backup_data_range_by_index(
 		     chunk_table_list,
@@ -1372,11 +1405,22 @@ ssize_t libewf_segment_file_read_table2_section(
 			 chunk_table->last_chunk_compared,
 			 chunk_table->last_chunk_compared + number_of_entries );
 
-			return( -1 );
+			goto on_error;
 		}
 		chunk_table->last_chunk_compared += (int) number_of_entries;
 	}
+	memory_free(
+	 section_data );
+
 	return( 1 );
+
+on_error:
+	if( section_data != NULL )
+	{
+		memory_free(
+		 section_data );
+	}
+	return( -1 );
 }
 
 /* Reads a volume section
@@ -1539,7 +1583,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 
 		return( -1 );
 	}
-	read_count = libewf_section_delta_chunk_read(
+	read_count = libewf_section_delta_chunk_read_header(
 	              section,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -1553,7 +1597,7 @@ ssize_t libewf_segment_file_read_delta_chunk_section(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read delta chunk section.",
+		 "%s: unable to read delta chunk section header.",
 		 function );
 
 		return( -1 );

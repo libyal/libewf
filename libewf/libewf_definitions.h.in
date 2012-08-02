@@ -268,6 +268,13 @@ enum LIBEWF_SECTION_DATA_FLAGS
 	LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED			= 0x00000002UL,
 };
 
+/* The session (table) entry flags definitions
+ */
+enum LIBEWF_SESSION_ENTRY_FLAGS
+{
+	LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK		= 0x00000001UL,
+};
+
 /* The item flags definitions
  */
 enum LIBEWF_ITEM_FLAGS

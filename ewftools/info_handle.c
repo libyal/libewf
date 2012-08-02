@@ -2144,6 +2144,21 @@ int info_handle_media_information_fprint(
 
 		return( -1 );
 	}
+	is_encrypted = libewf_handle_segment_files_encrypted(
+	                info_handle->input_handle,
+	                error );
+
+	if( is_encrypted == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if segment files are encrypted.",
+		 function );
+
+		result = -1;
+	}
 	if( info_handle_section_header_fprint(
 	     info_handle,
 	     "ewf_information",
@@ -2587,22 +2602,7 @@ int info_handle_media_information_fprint(
 			result = -1;
 		}
 	}
-	is_encrypted = libewf_handle_segment_files_encrypted(
-	                info_handle->input_handle,
-	                error );
-
-	if( is_encrypted == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if segment files are encrypted.",
-		 function );
-
-		result = -1;
-	}
-	else if( is_encrypted != 0 )
+	if( is_encrypted != 0 )
 	{
 		if( info_handle_section_value_boolean_fprint(
 		     info_handle,
@@ -2635,6 +2635,11 @@ int info_handle_media_information_fprint(
 		 function );
 
 		result = -1;
+	}
+/* TODO improved this check once encryption support has been implemented */
+	if( is_encrypted != 0 )
+	{
+		return( result );
 	}
 	if( info_handle_section_header_fprint(
 	     info_handle,

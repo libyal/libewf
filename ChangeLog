@@ -1,4 +1,8 @@
 TODO
+* encryption support
+  - read section data at once for encryption
+    what about ltree ?
+
 * throttle number of open files in tools
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
@@ -58,9 +62,6 @@ Optimization:
 
 * Ex01/Lx01 read support
   - verify device info and case data in multi segment files
-  - read section data at once for encryption
-    refactor section function not to use libbfio_pool_read_buffer() but libewf_section_read_data()
-    refactor libewf_section_table_read to read entire table
 
 * Ex01/Lx01 write support
   - pattern fill chunk support
@@ -369,6 +370,12 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120802
+* code clean up
+* worked on encryption support
+* internal library default format is now EnCase 6
+* improved debug output
 
 20120801
 * code clean up

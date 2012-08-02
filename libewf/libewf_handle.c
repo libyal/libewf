@@ -3431,6 +3431,7 @@ int libewf_handle_open_read_section_data(
 #endif
 				read_count = libewf_section_digest_read(
 					      section,
+				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->hash_sections,
@@ -3745,6 +3746,19 @@ int libewf_handle_open_read_section_data(
 					 function );
 
 					goto on_error;
+				}
+			}
+			/* Do a preliminary dection of the EWF format for reading the sector table section
+			 */
+			if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+			{
+				if( header_sections->number_of_header_sections == 1 )
+				{
+					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE1;
+				}
+				else if( internal_handle->media_values->error_granularity == 0 )
+				{
+					internal_handle->io_handle->format = LIBEWF_FORMAT_ENCASE2;
 				}
 			}
 			initialize_chunk_table = 0;
