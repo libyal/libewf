@@ -3190,6 +3190,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               1,
 		               section_offset,
 		               0,
+		               0,
 		               error );
 
 		if( write_count == -1 )
@@ -3245,6 +3246,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
          uint32_t number_of_table_entries,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
+         uint32_t chunks_section_padding_size,
          uint64_t number_of_chunks_written,
          uint32_t section_number_of_chunks,
          libcerror_error_t **error )
@@ -3474,6 +3476,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 				       1,
 				       chunks_section_offset,
 				       chunks_section_size,
+				       0,
 				       error );
 
 			if( write_count == -1 )
@@ -3523,6 +3526,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		               2,
 		               chunks_section_offset,
 		               chunks_section_size,
+		               chunks_section_padding_size,
 		               error );
 
 		if( write_count == -1 )
@@ -3897,7 +3901,7 @@ ssize_t libewf_segment_file_write_chunk(
 
 		return( -1 );
 	}
-	write_size = chunk_data_size;
+	write_size = chunk_data_size + chunk_padding_size;
 
 	/* Write the checksum if necessary
 	 */
@@ -3931,13 +3935,6 @@ ssize_t libewf_segment_file_write_chunk(
 				chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET );
 			}
 		}
-	}
-/* TODO */
-	if( chunk_padding_size > 0 )
-	{
-		/* Check if there is room in chunk buffer to write
-		 * the padding and the rest of the chunk data at the same time
-		 */
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -4113,7 +4110,7 @@ ssize_t libewf_segment_file_write_chunk(
 	     chunk_index,
 	     file_io_pool_entry,
 	     segment_file_offset,
-	     (size64_t) total_write_count,
+	     (size64_t) total_write_count - chunk_padding_size,
 	     range_flags,
 	     error ) != 1 )
 	{

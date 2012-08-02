@@ -268,11 +268,14 @@ ssize_t libewf_section_sha1_hash_write(
 
 ssize_t libewf_section_ltree_read(
          libewf_section_t *section,
+          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         uint8_t **cached_ltree_data,
-         size_t *cached_ltree_data_size,
+         uint8_t **section_data,
+         size_t *section_data_size,
+         uint8_t **ltree_data,
+         size_t *ltree_data_size,
          libcerror_error_t **error );
 
 /* TODO add write */
@@ -284,6 +287,7 @@ ssize_t libewf_section_sectors_write(
          uint8_t format_version,
          off64_t section_offset,
          size64_t chunks_data_size,
+         uint32_t chunks_padding_size,
          libcerror_error_t **error );
 
 ssize_t libewf_section_session_read(

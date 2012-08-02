@@ -40,6 +40,14 @@ typedef struct libewf_single_files libewf_single_files_t;
 
 struct libewf_single_files
 {
+	/* The section data
+	 */
+	uint8_t *section_data;
+
+	/* The section data size
+	 */
+	size_t section_data_size;
+
 	/* The ltree data
 	 */
 	uint8_t *ltree_data;

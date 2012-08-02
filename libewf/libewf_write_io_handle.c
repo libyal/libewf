@@ -421,7 +421,8 @@ int libewf_write_io_handle_initialize_values(
 	{
 		write_io_handle->pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
 	}
-	else if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
+	else if( ( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
+	      || ( io_handle->format == LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 ) )
 	{
 		write_io_handle->pack_flags |= LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING;
 	}
@@ -2649,6 +2650,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		write_io_handle->create_chunks_section               = 0;
 		write_io_handle->number_of_chunks_written_to_section = 0;
 		write_io_handle->chunks_section_write_count          = 0;
+		write_io_handle->chunks_section_padding_size         = 0;
 
 		/* Reserve space in the segment file for the end of the chunks section
 		 */
@@ -2855,10 +2857,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	total_write_count += write_count;
 
-/* TODO version 2 chunk padding keep track of padding size */
-
 	write_io_handle->input_write_count                        += input_data_size;
 	write_io_handle->chunks_section_write_count               += write_count;
+	write_io_handle->chunks_section_padding_size              += chunk_padding_size;
 	write_io_handle->remaining_segment_file_size              -= write_count;
 	write_io_handle->number_of_chunks_written_to_segment_file += 1;
 	write_io_handle->number_of_chunks_written_to_section      += 1;
@@ -2910,9 +2911,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: closing chunks section number of bytes written: %" PRIi64 ".\n",
+			 "%s: closing chunks section number of bytes written: %" PRIi64 " (padding: %" PRIu32 ").\n",
 			 function,
-			 write_io_handle->chunks_section_write_count );
+			 write_io_handle->chunks_section_write_count,
+			 write_io_handle->chunks_section_padding_size );
 		}
 #endif
 		if( write_io_handle->number_of_table_entries < write_io_handle->number_of_chunks_written_to_section )
@@ -2950,6 +2952,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			       write_io_handle->number_of_table_entries,
 			       write_io_handle->chunks_section_offset,
 			       (size64_t) write_io_handle->chunks_section_write_count,
+			       write_io_handle->chunks_section_padding_size,
 			       write_io_handle->number_of_chunks_written,
 			       write_io_handle->number_of_chunks_written_to_section,
 			       error );

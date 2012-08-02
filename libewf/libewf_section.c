@@ -5278,26 +5278,30 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a ltree section
+/* Reads a version 1 ltree section or version 2 singles files data section
+ * The section data will be set to a buffer containing the full section data
+ * The ltree data will be set to a pointer within the section data
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_ltree_read(
          libewf_section_t *section,
+          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         uint8_t **cached_ltree_data,
-         size_t *cached_ltree_data_size,
+         uint8_t **section_data,
+         size_t *section_data_size,
+         uint8_t **ltree_data,
+         size_t *ltree_data_size,
          libcerror_error_t **error )
 {
-	ewf_ltree_header_t *ltree_header = NULL;
-	uint8_t *ltree_data              = NULL;
-	static char *function            = "libewf_section_ltree_read";
-	size64_t section_data_size       = 0;
-	size_t ltree_data_size           = 0;
-	ssize_t read_count               = 0;
-	ssize_t total_read_count         = 0;
-	uint32_t ltree_size              = 0;
+	static char *function     = "libewf_section_ltree_read";
+	ssize_t read_count        = 0;
+	uint32_t ltree_size       = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	size_t trailing_data_size = 0;
+#endif
 
 	if( section == NULL )
 	{
@@ -5322,79 +5326,90 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
-	if( cached_ltree_data == NULL )
+	if( ltree_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid cached ltree.",
+		 "%s: invalid ltree data.",
 		 function );
 
 		return( -1 );
 	}
-	if( cached_ltree_data_size == NULL )
+	if( *ltree_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid ltree data value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( ltree_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid cached ltree data size.",
+		 "%s: invalid ltree data size.",
 		 function );
 
 		return( -1 );
 	}
+	read_count = libewf_section_read_data(
+	              section,
+	              io_handle,
+	              file_io_pool,
+	              file_io_pool_entry,
+	              section_data,
+	              section_data_size,
+	              error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read section data.",
+		 function );
+
+		goto on_error;
+	}
+	else if( read_count == 0 )
+	{
+		return( 0 );
+	}
+	if( section_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing section data.",
+		 function );
+
+		goto on_error;
+	}
+	*ltree_data      = *section_data;
+	*ltree_data_size = *section_data_size;
+
 	if( format_version == 1 )
 	{
-		section_data_size = section->data_size;
-
-		if( section_data_size < (size64_t) sizeof( ewf_ltree_header_t ) )
+		if( *ltree_data_size < sizeof( ewf_ltree_header_t ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid section size value out of bounds.",
+			 "%s: invalid section size value out of bounds - insufficient space for header.",
 			 function );
 
 			goto on_error;
 		}
-		section_data_size -= sizeof( ewf_ltree_header_t );
-
-		ltree_header = memory_allocate_structure(
-		                ewf_ltree_header_t );
-
-		if( ltree_header == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create ltree header.",
-			 function );
-
-			goto on_error;
-		}
-		read_count = libbfio_pool_read_buffer(
-			      file_io_pool,
-			      file_io_pool_entry,
-			      (uint8_t *) ltree_header,
-			      sizeof( ewf_ltree_header_t ),
-			      error );
-		
-		if( read_count != (ssize_t) sizeof( ewf_ltree_header_t ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read ltree header.",
-			 function );
-
-			goto on_error;
-		}
-		total_read_count += read_count;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -5402,13 +5417,13 @@ ssize_t libewf_section_ltree_read(
 			 "%s: ltree header data:\n",
 			 function );
 			libcnotify_print_data(
-			 (uint8_t *) ltree_header,
+			 *ltree_data,
 			 sizeof( ewf_ltree_header_t ),
 			 0 );
 		}
 #endif
 		byte_stream_copy_to_uint32_little_endian(
-		 ltree_header->tree_size,
+		 ( (ewf_ltree_header_t *) *ltree_data )->tree_size,
 		 ltree_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -5418,7 +5433,7 @@ ssize_t libewf_section_ltree_read(
 			 "%s: unknown1:\n",
 			 function );
 			libcnotify_print_data(
-			 ltree_header->unknown1,
+			 ( (ewf_ltree_header_t *) *ltree_data )->unknown1,
 			 16,
 			 0 );
 
@@ -5431,7 +5446,7 @@ ssize_t libewf_section_ltree_read(
 			 "%s: unknown2:\n",
 			 function );
 			libcnotify_print_data(
-			 ltree_header->unknown2,
+			 ( (ewf_ltree_header_t *) *ltree_data )->unknown2,
 			 4,
 			 0 );
 
@@ -5439,7 +5454,7 @@ ssize_t libewf_section_ltree_read(
 			 "%s: unknown3:\n",
 			 function );
 			libcnotify_print_data(
-			 ltree_header->unknown3,
+			 ( (ewf_ltree_header_t *) *ltree_data )->unknown3,
 			 4,
 			 0 );
 
@@ -5447,85 +5462,39 @@ ssize_t libewf_section_ltree_read(
 			 "%s: unknown4:\n",
 			 function );
 			libcnotify_print_data(
-			 ltree_header->unknown4,
+			 ( (ewf_ltree_header_t *) *ltree_data )->unknown4,
 			 20,
 			 0 );
 		}
 #endif
-		memory_free(
-		 ltree_header );
+		*ltree_data      += sizeof( ewf_ltree_header_t );
+		*ltree_data_size -= sizeof( ewf_ltree_header_t );
 
-		ltree_header = NULL;
-
-		if( (size64_t) ltree_size > section_data_size )
+		if( (size_t) ltree_size > *ltree_data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid ltree data size value out of bounds.",
+			 "%s: invalid section size value out of bounds - insufficient space for entries data.",
 			 function );
 
 			goto on_error;
 		}
-		ltree_data_size = (size_t) ltree_size;
+#if defined( HAVE_DEBUG_OUTPUT )
+		else if( (size_t) ltree_size < *ltree_data_size )
+		{
+			trailing_data_size = *ltree_data_size - (size_t) ltree_size;
+		}
+#endif
 	}
-	else if( format_version == 2 )
-	{
-		ltree_data_size = (size_t) section->data_size;
-	}
-	if( ltree_data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid ltree data size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	ltree_data = (uint8_t *) memory_allocate(
-                                  sizeof( uint8_t ) * ltree_data_size );
-
-	if( ltree_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create ltree data.",
-		 function );
-
-		goto on_error;
-	}
-	read_count = libbfio_pool_read_buffer(
-	              file_io_pool,
-	              file_io_pool_entry,
-	              ltree_data,
-	              ltree_data_size,
-	              error );
-
-	if( read_count != (ssize_t) ltree_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read ltree data.",
-		 function );
-
-		goto on_error;
-	}
-	total_read_count += read_count;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( libewf_debug_utf16_stream_print(
 		     "ltree data",
-		     ltree_data,
-		     ltree_data_size,
+		     *ltree_data,
+		     *ltree_data_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -5539,40 +5508,40 @@ ssize_t libewf_section_ltree_read(
 		}
 	}
 #endif
-	if( *cached_ltree_data == NULL )
-	{
-		*cached_ltree_data      = ltree_data;
-		*cached_ltree_data_size = ltree_data_size;
-	}
-	else
-	{
-		memory_free(
-		 ltree_data );
-	}
-	section_data_size -= ltree_data_size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( section_data_size > 0 )
+		if( trailing_data_size > 0 )
 		{
-/* TODO print trailing version 1 data */
+#if defined( HAVE_DEBUG_OUTPUT )
+			libcnotify_printf(
+			 "%s: trailing data:\n",
+			 function );
+			libcnotify_print_data(
+			 *ltree_data + trailing_data_size,
+			 trailing_data_size,
+			 0 );
+
+#elif defined( HAVE_VERBOSE_OUTPUT )
+			libcnotify_printf(
+			 "%s: section has trailing data.\n",
+			 function );
+#endif
 		}
 	}
 #endif
-	return( total_read_count );
+	return( read_count );
 
 on_error:
-	if( ltree_data != NULL )
+	if( *section_data != NULL )
 	{
 		memory_free(
-		 ltree_data );
+		 *section_data );
+
+		*section_data = NULL;
 	}
-	if( ltree_header != NULL )
-	{
-		memory_free(
-		 ltree_header );
-	}
+	*section_data_size = 0;
+
 	return( -1 );
 }
 
@@ -5587,6 +5556,7 @@ ssize_t libewf_section_sectors_write(
          uint8_t format_version,
          off64_t section_offset,
          size64_t chunks_data_size,
+         uint32_t chunks_padding_size,
          libcerror_error_t **error )
 {
 	static char *function               = "libewf_section_sectors_write";
@@ -5631,7 +5601,7 @@ ssize_t libewf_section_sectors_write(
 	     section_offset,
 	     section_descriptor_data_size + chunks_data_size,
 	     chunks_data_size,
-	     0,
+	     chunks_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

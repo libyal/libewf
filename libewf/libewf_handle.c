@@ -3270,9 +3270,12 @@ int libewf_handle_open_read_section_data(
 #endif
 					read_count = libewf_section_ltree_read(
 						      section,
+						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
+						      &( internal_handle->single_files->section_data ),
+						      &( internal_handle->single_files->section_data_size ),
 						      &( internal_handle->single_files->ltree_data ),
 						      &( internal_handle->single_files->ltree_data_size ),
 						      error );
@@ -7583,6 +7586,7 @@ ssize_t libewf_handle_write_finalize(
 			               internal_handle->write_io_handle->number_of_table_entries,
 				       internal_handle->write_io_handle->chunks_section_offset,
 				       (size64_t) internal_handle->write_io_handle->chunks_section_write_count,
+				       internal_handle->write_io_handle->chunks_section_padding_size,
 				       internal_handle->write_io_handle->number_of_chunks_written,
 				       internal_handle->write_io_handle->number_of_chunks_written_to_section,
 			               error );

@@ -273,6 +273,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
          uint32_t number_of_table_entries,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
+         uint32_t chunks_section_padding_size,
          uint64_t number_of_chunks_written,
          uint32_t section_number_of_chunks,
          libcerror_error_t **error );

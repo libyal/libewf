@@ -3,23 +3,22 @@ TODO
   - change libewf_section_ltree_read to only read header ? (also see next item)
 * encryption support
   - read section data at once for encryption
-    what about ltree ? do it like sector table ?
 
 * throttle number of open files in tools
   - getrlimit( RLIMIT_NOFILE, struct rlimit * );
   - check for RLIMIT_FSIZE as well ?
 
 * implement new chunk IO functions where chunk is an object
-* add strict chunk data flag handling
+
+* corruption scenarios
+  - add strict chunk data flag handling
+
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 
 * allow zlib to be replaced by alternative back-end
 
 * replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
 * work on deduplication support
-
-* write debug output
-  - make sure header string is printed after section descriptor
 
 * libewf_filename_create split off wide variant ?
 
@@ -32,6 +31,7 @@ Tests
 * Add 8 TiB image size test
 
 * Ex01/Lx01 format
+  - sector table: start block value ? require larger test image
   - encryption support; make sure the encryption keys are read first
   - section integrity MD5 hash support
   - file naming schema, what's after Ex99 ?
@@ -375,6 +375,7 @@ Closed:
 * improved debug output
 * added support for 64-bit number of chunks, this allows for >= 8 TiB storage
   media with the default chunk size
+* added chunk data alignment support for write
 
 20120801
 * code clean up

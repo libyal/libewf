@@ -105,6 +105,10 @@ struct libewf_write_io_handle
 	 */
 	ssize64_t chunks_section_write_count;
 
+	/* The size of the padding of a section containing chunks
+	 */
+	uint32_t chunks_section_padding_size;
+
         /* The (total) number of chunks written
          */
         uint64_t number_of_chunks_written;

@@ -439,8 +439,9 @@ int libewf_chunk_data_pack_buffer(
      uint8_t pack_flags,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_chunk_data_pack_buffer";
-	int result            = 0;
+	static char *function            = "libewf_chunk_data_pack_buffer";
+	size_t safe_compressed_data_size = 0;
+	int result                       = 0;
 
 	if( data == NULL )
 	{
@@ -611,7 +612,7 @@ int libewf_chunk_data_pack_buffer(
 
 				return( -1 );
 			}
-			*compressed_data_size = compressed_zero_byte_empty_block_size;
+			safe_compressed_data_size = compressed_zero_byte_empty_block_size;
 		}
 		else if( ( ( pack_flags & LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 		      && ( chunk_data_size == (size_t) chunk_size )
@@ -642,7 +643,7 @@ int libewf_chunk_data_pack_buffer(
 
 				return( -1 );
 			}
-			*compressed_data_size = compressed_zero_byte_empty_block_size;
+			safe_compressed_data_size = compressed_zero_byte_empty_block_size;
 		}
 		else
 		{
@@ -655,7 +656,7 @@ int libewf_chunk_data_pack_buffer(
 /* TODO add a light weight entropy test */
 			result = libewf_compress_data(
 			          compressed_data,
-			          compressed_data_size,
+			          &safe_compressed_data_size,
 			          compression_method,
 			          compression_level,
 			          data,
@@ -681,7 +682,7 @@ int libewf_chunk_data_pack_buffer(
 	        	                libcnotify_printf(
 		                         "%s: required compressed data size: %zd.\n",
 		                         function,
-					 *compressed_data_size );
+					 safe_compressed_data_size );
 				}
 #endif
 				if( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
@@ -698,9 +699,9 @@ int libewf_chunk_data_pack_buffer(
 			}
 		}
 		if( ( ( pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) != 0 )
-		 || ( *compressed_data_size < chunk_data_size ) )
+		 || ( safe_compressed_data_size < chunk_data_size ) )
 		{
-			if( *compressed_data_size < 4 )
+			if( safe_compressed_data_size < 4 )
 			{
 				libcerror_error_set(
 				 error,
@@ -717,15 +718,53 @@ int libewf_chunk_data_pack_buffer(
 			{
 				*range_flags |= LIBEWF_RANGE_FLAG_USES_PATTERN_FILL;
 			}
-			else if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+			else
 			{
-				/* Deflate has its own checksum
-				 */
-				byte_stream_copy_to_uint32_little_endian(
-				 &( compressed_data[ *compressed_data_size - 4 ] ),
-				 *chunk_checksum );
+				if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+				{
+					/* Deflate has its own checksum
+					 */
+					byte_stream_copy_to_uint32_little_endian(
+					 &( compressed_data[ safe_compressed_data_size - 4 ] ),
+					 *chunk_checksum );
+				}
 /* TODO what about bzip2 */
+				if( ( pack_flags & LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING ) != 0 )
+				{
+					*chunk_padding_size = safe_compressed_data_size % 16;
+
+					if( *chunk_padding_size != 0 )
+					{
+						*chunk_padding_size = 16 - *chunk_padding_size;
+					}
+					if( ( safe_compressed_data_size + *chunk_padding_size ) > *compressed_data_size )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+						 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+						 "%s: invalid compressed data size value too small.",
+						 function );
+
+						return( -1 );
+					}
+					if( memory_set(
+					     &( compressed_data[ safe_compressed_data_size ] ),
+					     0,
+					     *chunk_padding_size ) == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+						 "%s: unable to clear alignment padding.",
+						 function );
+
+						return( -1 );
+					}
+				}
 			}
+			*compressed_data_size = safe_compressed_data_size;
 		}
 	}
 	if( ( ( *range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
@@ -747,21 +786,55 @@ int libewf_chunk_data_pack_buffer(
 
 			return( -1 );
 		}
-		*compressed_data_size = chunk_data_size;
-
 		if( ( chunk_data_size + 4 ) <= data_size )
 		{
 			byte_stream_copy_from_uint32_little_endian(
 			 &( data[ chunk_data_size ] ),
 			 *chunk_checksum );
 
-			*compressed_data_size += 4;
+			chunk_data_size += 4;
 		}
 		else
 		{
 			*chunk_io_flags = LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET;
 		}
 		*range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
+
+		if( ( pack_flags & LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING ) != 0 )
+		{
+			*chunk_padding_size = chunk_data_size % 16;
+
+			if( *chunk_padding_size != 0 )
+			{
+				*chunk_padding_size = 16 - *chunk_padding_size;
+			}
+			if( ( chunk_data_size + *chunk_padding_size ) > data_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: invalid data size value too small.",
+				 function );
+
+				return( -1 );
+			}
+			if( memory_set(
+			     &( data[ chunk_data_size ] ),
+			     0,
+			     *chunk_padding_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear alignment padding.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		*compressed_data_size = chunk_data_size;
 	}
 	return( 1 );
 }

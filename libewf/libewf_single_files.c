@@ -128,10 +128,10 @@ int libewf_single_files_free(
 	}
 	if( *single_files != NULL )
 	{
-		if( ( *single_files )->ltree_data != NULL )
+		if( ( *single_files )->section_data != NULL )
 		{
 			memory_free(
-			 ( *single_files )->ltree_data );
+			 ( *single_files )->section_data );
 		}
 		if( ( *single_files )->root_file_entry_node != NULL )
 		{
