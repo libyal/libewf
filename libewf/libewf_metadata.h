@@ -205,12 +205,6 @@ int libewf_handle_set_sha1_hash(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-int libewf_handle_get_number_of_chunks_written(
-     libewf_handle_t *handle,
-     uint32_t *number_of_chunks,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
 int libewf_handle_set_read_zero_chunk_on_error(
      libewf_handle_t *handle,
      uint8_t zero_on_error,

@@ -152,6 +152,71 @@ int libewf_handle_get_amount_of_sectors(
 	         error ) );
 }
 
+/* Retrieves the number of chunks written
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_number_of_chunks_written(
+     libewf_handle_t *handle,
+     uint32_t *number_of_chunks,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_number_of_chunks_written";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle write.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_chunks == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of chunks.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO is it necessary to expand this to 64-bit ?
+ * will support up to 8 TiB with chunk size of 32 KiB
+ */
+	if( internal_handle->write_io_handle->number_of_chunks_written > (uint64_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of chunks written value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_chunks = internal_handle->write_io_handle->number_of_chunks_written;
+
+	return( 1 );
+}
+
 /* Retrieves the amount of chunks written
  * Returns 1 if successful or -1 on error
  */

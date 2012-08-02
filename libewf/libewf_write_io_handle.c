@@ -1286,7 +1286,7 @@ int libewf_write_io_handle_initialize_resume(
 	/* Set write IO handle values
 	 */
 	write_io_handle->input_write_count        = (ssize64_t) io_handle->current_offset;
-	write_io_handle->number_of_chunks_written = chunk_table->last_chunk_compared;
+	write_io_handle->number_of_chunks_written = (uint64_t) chunk_table->last_chunk_compared;
 	write_io_handle->write_finalized          = 0;
 
 	if( reopen_segment_file != 0 )
@@ -1305,8 +1305,8 @@ int libewf_write_io_handle_initialize_resume(
 		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
 		                                             - write_io_handle->resume_segment_file_offset;
 
-		write_io_handle->number_of_chunks_written_to_segment = segment_file->number_of_chunks
-		                                                     - number_of_unusable_chunks;
+		write_io_handle->number_of_chunks_written_to_segment_file = segment_file->number_of_chunks
+		                                                          - number_of_unusable_chunks;
 
 		if( libmfdata_file_list_get_file_by_index(
 		     segment_files_list,
@@ -1349,15 +1349,10 @@ int libewf_write_io_handle_initialize_resume(
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_calculate_chunks_per_segment_file(
-     uint32_t *chunks_per_segment_file,
-     size64_t remaining_segment_file_size,
-     uint32_t maximum_chunks_per_section,
-     uint32_t number_of_chunks_written_to_segment,
-     uint32_t number_of_chunks_written,
+     libewf_write_io_handle_t *write_io_handle,
      libewf_media_values_t *media_values,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t unrestrict_offset_table,
      libcerror_error_t **error )
 {
 	static char *function                      = "libewf_write_io_handle_calculate_chunks_per_segment_file";
@@ -1366,24 +1361,24 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	int64_t remaining_number_of_chunks         = 0;
 	int64_t required_chunk_sections            = 0;
 
-	if( chunks_per_segment_file == NULL )
+	if( write_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks per segment file.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( maximum_chunks_per_section == 0 )
+	if( write_io_handle->maximum_chunks_per_section == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum chunks per section.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing maximum chunks per section.",
 		 function );
 
 		return( -1 );
@@ -1402,7 +1397,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 /* TODO check if media values -> number of chunks is in bounds */
 	/* Calculate the maximum number of chunks within this segment file
 	 */
-	maximum_chunks_per_segment_file = remaining_segment_file_size;
+	maximum_chunks_per_segment_file = write_io_handle->remaining_segment_file_size;
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
@@ -1416,16 +1411,16 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	/* Determine the number of required chunk sections
 	 */
-	if( unrestrict_offset_table == 0 )
+	if( write_io_handle->unrestrict_offset_table == 0 )
 	{
 		required_chunk_sections = maximum_chunks_per_segment_file
-		                        % maximum_chunks_per_section;
+		                        % write_io_handle->maximum_chunks_per_section;
 	}
 	else
 	{
 		required_chunk_sections = 1;
 	}
-	calculated_chunks_per_segment_file = remaining_segment_file_size;
+	calculated_chunks_per_segment_file = write_io_handle->remaining_segment_file_size;
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
@@ -1493,7 +1488,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	if( media_values->media_size > 0 )
 	{
 		remaining_number_of_chunks = (int64_t) media_values->number_of_chunks
-		                           - (int64_t) number_of_chunks_written;
+		                           - (int64_t) write_io_handle->number_of_chunks_written;
 
 		/* Check if less chunks remain than the number of chunks calculated
 		 */
@@ -1504,10 +1499,8 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	/* Make sure to return the total number of chunks per segment file
 	 */
-	if( number_of_chunks_written_to_segment > 0 )
-	{
-		calculated_chunks_per_segment_file += number_of_chunks_written_to_segment;
-	}
+	calculated_chunks_per_segment_file += (int64_t) write_io_handle->number_of_chunks_written_to_segment_file;
+
 	/* Fail safe segment should contain at least 1 chunk
 	 */
 	if( calculated_chunks_per_segment_file <= 0 )
@@ -1520,7 +1513,7 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	{
 		calculated_chunks_per_segment_file = UINT32_MAX;
 	}
-	*chunks_per_segment_file = (uint32_t) calculated_chunks_per_segment_file;
+	write_io_handle->chunks_per_segment_file = (uint64_t) calculated_chunks_per_segment_file;
 
 	return( 1 );
 }
@@ -1529,39 +1522,35 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_calculate_chunks_per_section(
-     uint32_t *chunks_per_section,
-     uint32_t maximum_chunks_per_section,
-     uint32_t number_of_chunks_written_to_segment,
-     uint32_t chunks_per_segment_file,
-     uint8_t unrestrict_offset_table,
+     libewf_write_io_handle_t *write_io_handle,
      libcerror_error_t **error )
 {
-	static char *function               = "libewf_write_io_handle_calculate_chunks_per_section";
-	uint32_t remaining_number_of_chunks = 0;
+	static char *function              = "libewf_write_io_handle_calculate_chunks_per_section";
+	int64_t remaining_number_of_chunks = 0;
 
-	if( chunks_per_section == NULL )
+	if( write_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks per section.",
+		 "%s: invalid write IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( maximum_chunks_per_section == 0 )
+	if( write_io_handle->maximum_chunks_per_section == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum chunks per section.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing maximum chunks per section.",
 		 function );
 
 		return( -1 );
 	}
-	if( number_of_chunks_written_to_segment > chunks_per_segment_file )
+	if( write_io_handle->number_of_chunks_written_to_segment_file > write_io_handle->chunks_per_segment_file )
 	{
 		libcerror_error_set(
 		 error,
@@ -1572,12 +1561,13 @@ int libewf_write_io_handle_calculate_chunks_per_section(
 
 		return( -1 );
 	}
-        remaining_number_of_chunks = chunks_per_segment_file - number_of_chunks_written_to_segment;
+        remaining_number_of_chunks = (int64_t) write_io_handle->chunks_per_segment_file
+	                           - (int64_t) write_io_handle->number_of_chunks_written_to_segment_file;
 
-	if( ( unrestrict_offset_table == 0 )
-	 && ( remaining_number_of_chunks > (int64_t) maximum_chunks_per_section ) )
+	if( ( write_io_handle->unrestrict_offset_table == 0 )
+	 && ( remaining_number_of_chunks > (int64_t) write_io_handle->maximum_chunks_per_section ) )
 	{
-		remaining_number_of_chunks = (int64_t) maximum_chunks_per_section;
+		remaining_number_of_chunks = (int64_t) write_io_handle->maximum_chunks_per_section;
 	}
 	/* Fail safe no more than 2^31 values are allowed
 	 */
@@ -1585,7 +1575,7 @@ int libewf_write_io_handle_calculate_chunks_per_section(
 	{
 		remaining_number_of_chunks = INT32_MAX;
 	}
-	*chunks_per_section = (uint32_t) remaining_number_of_chunks;
+	write_io_handle->chunks_per_section = (uint32_t) remaining_number_of_chunks;
 
 	return( 1 );
 }
@@ -1594,18 +1584,25 @@ int libewf_write_io_handle_calculate_chunks_per_section(
  * Returns 1 if full, 0 if not or -1 on error
  */
 int libewf_write_io_handle_test_segment_file_full(
-     ssize64_t remaining_segment_file_size,
-     uint32_t number_of_chunks_written_to_segment,
+     libewf_write_io_handle_t *write_io_handle,
      libewf_media_values_t *media_values,
-     ssize64_t input_write_count,
-     uint32_t chunks_per_segment_file,
-     uint32_t number_of_chunks_written,
      uint8_t segment_file_type,
      uint8_t format,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_test_segment_file_full";
 
+	if( write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( media_values == NULL )
 	{
 		libcerror_error_set(
@@ -1620,7 +1617,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	/* Check if the maximum number of chunks has been reached
 	 */
 	if( ( media_values->number_of_chunks != 0 )
-	 && ( media_values->number_of_chunks == (uint32_t) number_of_chunks_written ) )
+	 && ( media_values->number_of_chunks == write_io_handle->number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1630,13 +1627,12 @@ int libewf_write_io_handle_test_segment_file_full(
 			 function );
 		}
 #endif
-
 		return( 1 );
 	}
 	/* Check if the end of the input has been reached
 	*/
 	if( ( media_values->media_size != 0 )
-	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
+	 && ( write_io_handle->input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1654,7 +1650,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		if( number_of_chunks_written_to_segment >= chunks_per_segment_file )
+		if( write_io_handle->number_of_chunks_written_to_segment_file >= write_io_handle->chunks_per_segment_file )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -1669,7 +1665,7 @@ int libewf_write_io_handle_test_segment_file_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
+	else if( write_io_handle->remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1698,22 +1694,26 @@ int libewf_write_io_handle_test_segment_file_full(
  * Returns 1 if full, 0 if not or -1 on error
  */
 int libewf_write_io_handle_test_chunks_section_full(
-     off64_t chunks_section_offset,
-     ssize64_t remaining_segment_file_size,
+     libewf_write_io_handle_t *write_io_handle,
      libewf_media_values_t *media_values,
-     ssize64_t input_write_count,
      off64_t segment_file_offset,
-     uint32_t maximum_chunks_per_section,
-     uint32_t number_of_chunks_written_to_section,
-     uint32_t number_of_chunks_written,
-     uint32_t chunks_per_section,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t unrestrict_offset_table,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_test_chunks_section_full";
 
+	if( write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( media_values == NULL )
 	{
 		libcerror_error_set(
@@ -1721,6 +1721,17 @@ int libewf_write_io_handle_test_chunks_section_full(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( write_io_handle->maximum_chunks_per_section == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing maximum chunks per section.",
 		 function );
 
 		return( -1 );
@@ -1736,20 +1747,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 
 		return( -1 );
 	}
-	if( maximum_chunks_per_section == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum chunks per section.",
-		 function );
-
-		return( -1 );
-	}
 	/* Check if a chunks section has been opened
 	 */
-	if( chunks_section_offset == 0 )
+	if( write_io_handle->chunks_section_offset == 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1765,7 +1765,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	/* Check if the maximum number of chunks has been reached
 	 */
 	if( ( media_values->number_of_chunks != 0 )
-	 && ( media_values->number_of_chunks == (uint32_t) number_of_chunks_written ) )
+	 && ( media_values->number_of_chunks == write_io_handle->number_of_chunks_written ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1781,7 +1781,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	/* Check if the end of the input has been reached
 	*/
 	if( ( media_values->media_size != 0 )
-	 && ( input_write_count >= (ssize64_t) media_values->media_size ) )
+	 && ( write_io_handle->input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1795,8 +1795,8 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Check if the maximum number of chunks restriction should apply
 	 */
-	if( ( unrestrict_offset_table == 0 )
-	 && ( number_of_chunks_written_to_section >= maximum_chunks_per_section ) )
+	if( ( write_io_handle->unrestrict_offset_table == 0 )
+	 && ( write_io_handle->number_of_chunks_written_to_section >= write_io_handle->maximum_chunks_per_section ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1810,7 +1810,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Fail safe no more than 2^31 chunks are allowed
 	 */
-	if( number_of_chunks_written_to_section > (uint32_t) INT32_MAX )
+	if( write_io_handle->number_of_chunks_written_to_section > (uint32_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1824,7 +1824,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Prevent offset overflow
 	 */
-	if( ( segment_file_offset - chunks_section_offset ) > (off64_t) INT32_MAX )
+	if( ( segment_file_offset - write_io_handle->chunks_section_offset ) > (off64_t) INT32_MAX )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1841,7 +1841,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		if( number_of_chunks_written_to_section >= chunks_per_section )
+		if( write_io_handle->number_of_chunks_written_to_section >= write_io_handle->chunks_per_section )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -1857,7 +1857,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 	}
 	/* Determine if a chunk would fit in the segment file
 	 */
-	else if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
+	else if( write_io_handle->remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + 4 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1878,7 +1878,6 @@ int libewf_write_io_handle_test_chunks_section_full(
 		 function );
 	}
 #endif
-
 	return( 0 );
 }
 
@@ -2486,9 +2485,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	if( segment_file == NULL )
 	{
-		write_io_handle->create_chunks_section               = 1;
-		write_io_handle->chunks_per_section                  = 0;
-		write_io_handle->number_of_chunks_written_to_segment = 0;
+		write_io_handle->create_chunks_section                    = 1;
+		write_io_handle->chunks_per_section                       = 0;
+		write_io_handle->number_of_chunks_written_to_segment_file = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -2562,15 +2561,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( segment_file->number_of_chunks == 0 )
 		{
 			if( libewf_write_io_handle_calculate_chunks_per_segment_file(
-			     &( write_io_handle->chunks_per_segment_file ),
-			     write_io_handle->remaining_segment_file_size,
-			     write_io_handle->maximum_chunks_per_section,
-			     write_io_handle->number_of_chunks_written_to_segment,
-			     write_io_handle->number_of_chunks_written,
+			     write_io_handle,
 			     media_values,
 			     io_handle->segment_file_type,
 			     io_handle->format,
-			     write_io_handle->unrestrict_offset_table,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2586,7 +2580,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: calculated number of chunks per segment file: %" PRIu32 ".\n",
+				 "%s: calculated number of chunks per segment file: %" PRIu64 ".\n",
 				 function,
 				 write_io_handle->chunks_per_segment_file );
 			}
@@ -2680,15 +2674,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( segment_file->number_of_chunks == 0 )
 		{
 			if( libewf_write_io_handle_calculate_chunks_per_segment_file(
-			     &( write_io_handle->chunks_per_segment_file ),
-			     write_io_handle->remaining_segment_file_size,
-			     write_io_handle->maximum_chunks_per_section,
-			     write_io_handle->number_of_chunks_written_to_segment,
-			     write_io_handle->number_of_chunks_written,
+			     write_io_handle,
 			     media_values,
 			     io_handle->segment_file_type,
 			     io_handle->format,
-			     write_io_handle->unrestrict_offset_table,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2704,7 +2693,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: calculated number of chunks per segment file: %" PRIu32 ".\n",
+				 "%s: calculated number of chunks per segment file: %" PRIu64 ".\n",
 				 function,
 				 write_io_handle->chunks_per_segment_file );
 			}
@@ -2715,11 +2704,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			write_io_handle->chunks_per_segment_file = segment_file->number_of_chunks;
 		}
 		if( libewf_write_io_handle_calculate_chunks_per_section(
-		     &( write_io_handle->chunks_per_section ),
-		     write_io_handle->maximum_chunks_per_section,
-		     write_io_handle->number_of_chunks_written_to_segment,
-		     write_io_handle->chunks_per_segment_file,
-		     write_io_handle->unrestrict_offset_table,
+		     write_io_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2872,12 +2857,12 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 /* TODO version 2 chunk padding keep track of padding size */
 
-	write_io_handle->input_write_count                   += input_data_size;
-	write_io_handle->chunks_section_write_count          += write_count;
-	write_io_handle->remaining_segment_file_size         -= write_count;
-	write_io_handle->number_of_chunks_written_to_segment += 1;
-	write_io_handle->number_of_chunks_written_to_section += 1;
-	write_io_handle->number_of_chunks_written            += 1;
+	write_io_handle->input_write_count                        += input_data_size;
+	write_io_handle->chunks_section_write_count               += write_count;
+	write_io_handle->remaining_segment_file_size              -= write_count;
+	write_io_handle->number_of_chunks_written_to_segment_file += 1;
+	write_io_handle->number_of_chunks_written_to_section      += 1;
+	write_io_handle->number_of_chunks_written                 += 1;
 
 	/* Reserve space in the segment file for the chunk table entries
 	 */
@@ -2901,18 +2886,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	/* Check if the current chunks section is full, if so close the current section
 	 */
 	result = libewf_write_io_handle_test_chunks_section_full(
-		  write_io_handle->chunks_section_offset,
-		  write_io_handle->remaining_segment_file_size,
+		  write_io_handle,
 		  media_values,
-		  write_io_handle->input_write_count,
 		  segment_file_offset,
-		  write_io_handle->maximum_chunks_per_section,
-		  write_io_handle->number_of_chunks_written_to_section,
-		  write_io_handle->number_of_chunks_written,
-		  write_io_handle->chunks_per_section,
 		  io_handle->segment_file_type,
 		  io_handle->format,
-		  write_io_handle->unrestrict_offset_table,
 		  error );
 
 	if( result == -1 )
@@ -2996,12 +2974,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		/* Check if the current segment file is full, if so close the current segment file
 		 */
 		result = libewf_write_io_handle_test_segment_file_full(
-			  write_io_handle->remaining_segment_file_size,
-			  write_io_handle->number_of_chunks_written_to_segment,
+			  write_io_handle,
 			  media_values,
-			  write_io_handle->input_write_count,
-			  write_io_handle->chunks_per_segment_file,
-			  write_io_handle->number_of_chunks_written,
 			  io_handle->segment_file_type,
 			  io_handle->format,
 			  error );
@@ -3041,7 +3015,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 					       file_io_pool,
 					       file_io_pool_entry,
 					       segment_file_offset,
-					       write_io_handle->number_of_chunks_written_to_segment,
+					       write_io_handle->number_of_chunks_written_to_segment_file,
 					       0,
 					       hash_sections,
 					       hash_values,
@@ -3627,9 +3601,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_finalize_write_sections_corrections(
+     libewf_write_io_handle_t *write_io_handle,
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     uint32_t number_of_chunks_written_to_last_segment,
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
      libmfcache_cache_t *segment_files_cache,
@@ -3638,7 +3612,6 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_sector_list_t *sessions,
      libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
-     ewf_data_t **cached_data_section,
      libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
@@ -3648,6 +3621,17 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 	int last_segment_file               = 0;
 	int segment_files_list_index        = 0;
 
+	if( write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( libmfdata_file_list_get_number_of_files(
 	     segment_files_list,
 	     &number_of_segment_files,
@@ -3736,7 +3720,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     io_handle,
 		     file_io_pool,
 		     file_io_pool_entry,
-		     number_of_chunks_written_to_last_segment,
+		     write_io_handle->number_of_chunks_written_to_segment_file,
 		     last_segment_file,
 		     media_values,
 		     hash_values,
@@ -3744,7 +3728,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     sessions,
 		     tracks,
 		     acquiry_errors,
-		     cached_data_section,
+		     &( write_io_handle->data_section ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(

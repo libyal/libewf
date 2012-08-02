@@ -119,13 +119,11 @@ AX_LIBSMRAW_CHECK_ENABLE
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE
 
-dnl Check for headers
-AC_CHECK_HEADERS([sys/utsname.h])
-
-dnl Check for functions
+dnl Check for headers and functions
 AS_IF(
  [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_FUNCS([getegid geteuid getuid uname])
+ [AC_CHECK_HEADERS([sys/resource.h sys/utsname.h])
+ AC_CHECK_FUNCS([getegid geteuid getrlimit getuid uname])
  ])
 
 dnl Check if ewftools should be build as static executables

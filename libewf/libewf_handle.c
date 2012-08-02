@@ -7617,7 +7617,7 @@ ssize_t libewf_handle_write_finalize(
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
 		               segment_file_offset,
-		               internal_handle->write_io_handle->number_of_chunks_written_to_segment,
+		               internal_handle->write_io_handle->number_of_chunks_written_to_segment_file,
 		               1,
 		               internal_handle->hash_sections,
 		               internal_handle->hash_values,
@@ -7663,9 +7663,9 @@ ssize_t libewf_handle_write_finalize(
 		/* Correct the sections in the segment files
 		 */
 		if( libewf_write_io_handle_finalize_write_sections_corrections(
+		     internal_handle->write_io_handle,
 		     internal_handle->io_handle,
 		     internal_handle->file_io_pool,
-		     internal_handle->write_io_handle->number_of_chunks_written_to_segment,
 		     internal_handle->media_values,
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
@@ -7674,7 +7674,6 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->sessions,
 		     internal_handle->tracks,
 		     internal_handle->acquiry_errors,
-		     &( internal_handle->write_io_handle->data_section ),
 		     error ) != 1 )
 
 		{

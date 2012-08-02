@@ -88,6 +88,12 @@ int libewf_handle_get_amount_of_sectors(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_handle_get_number_of_chunks_written(
+     libewf_handle_t *handle,
+     uint32_t *number_of_chunks,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_get_write_amount_of_chunks(
      libewf_handle_t *handle,
      uint32_t *amount_of_chunks,

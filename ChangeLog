@@ -1,23 +1,22 @@
 TODO
+* refactor read/write compressed string
+  - change libewf_section_ltree_read to only read header ? (also see next item)
 * encryption support
   - read section data at once for encryption
-    what about ltree ?
+    what about ltree ? do it like sector table ?
 
 * throttle number of open files in tools
+  - getrlimit( RLIMIT_NOFILE, struct rlimit * );
+  - check for RLIMIT_FSIZE as well ?
+
 * implement new chunk IO functions where chunk is an object
 * add strict chunk data flag handling
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 
 * allow zlib to be replaced by alternative back-end
 
-* refactor read/write compressed string
-  - change libewf_section_ltree_read to only read header ?
-
-* make chunks_per_segment_file 64-bit
 * replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
 * work on deduplication support
-
-* internally mark Ex01 and Lx01 format and have ewfinfo print a string representation
 
 * write debug output
   - make sure header string is printed after section descriptor
@@ -26,23 +25,13 @@ TODO
 
 Tests
   - validate SMART forced compression of uncompressed chunks
-  - test with memwatch
+  - check for memory issues (memwatch)
 
 * Document how libewf deals with corruption scenarios
 * Add 2 TiB image size test
-
-* Ex01/Lx01
-  - make sure to correctly deal with aligment padding
-  - complete: libewf_chunk_table_fill_v2
-  - add generic way to parse file object data
-  - rename table to sector table ?
-
-Optimization:
-  - libewf_device_info_parse do this directly from the UTF16 stream ?
-  - libewf_case_data_parse do this directly from the UTF16 stream ?
+* Add 8 TiB image size test
 
 * Ex01/Lx01 format
-  - bzip2 compression support (+/-)
   - encryption support; make sure the encryption keys are read first
   - section integrity MD5 hash support
   - file naming schema, what's after Ex99 ?
@@ -61,11 +50,17 @@ Optimization:
   - open single files ?
 
 * Ex01/Lx01 read support
+  - bzip2 compression support (test)
   - verify device info and case data in multi segment files
+  - add generic way to parse file object data ?
+  - make sure to correctly deal with aligment padding (should only affect one the Lx01 tables)
+  - complete: libewf_chunk_table_fill_v2
 
 * Ex01/Lx01 write support
-  - pattern fill chunk support
-  - write section data at once for encryption
+  - bzip2 compression support (set in ewftools, test)
+  - pattern fill chunk support (set chunk table entry, test)
+  - encryption support
+  - encryption support: write section data at once for encryption
     refactor to use libewf_section_write_data()
 
 * Ex01/Lx01 extensions
@@ -235,6 +230,8 @@ Additional (integrity) checks:
   - correct size
 
 Possible performance improvements:
+* libewf_device_info_parse do this directly from the UTF16 stream ?
+* libewf_case_data_parse do this directly from the UTF16 stream ?
 * tune read and write buffer sizes
   - read/write block size seems to have little effect for dd on average
   - buffered bfio ?
@@ -376,6 +373,8 @@ Closed:
 * worked on encryption support
 * internal library default format is now EnCase 6
 * improved debug output
+* added support for 64-bit number of chunks, this allows for >= 8 TiB storage
+  media with the default chunk size
 
 20120801
 * code clean up

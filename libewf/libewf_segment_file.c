@@ -1238,7 +1238,7 @@ ssize_t libewf_segment_file_read_table_section(
 		}
 		chunk_table->last_chunk_filled += (int) number_of_entries;
 
-		segment_file->number_of_chunks += number_of_entries;
+		segment_file->number_of_chunks += (uint64_t) number_of_entries;
 	}
 	memory_free(
 	 section_data );
@@ -3032,14 +3032,15 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          const uint8_t *table_entries_data,
          size_t table_entries_data_size,
          uint32_t number_of_table_entries,
-         uint32_t number_of_chunks_written,
+         uint64_t number_of_chunks_written,
          uint32_t chunks_per_section,
          libcerror_error_t **error )
 {	
-	libewf_section_t *section = NULL;
-	static char *function     = "libewf_segment_file_write_chunks_section_start";
-	ssize_t write_count       = 0;
-	int number_of_chunks      = 0;
+	libewf_section_t *section           = NULL;
+	static char *function               = "libewf_segment_file_write_chunks_section_start";
+	ssize_t write_count                 = 0;
+	uint64_t estimated_number_of_chunks = 0;
+	int number_of_chunks                = 0;
 
 	if( segment_file == NULL )
 	{
@@ -3103,11 +3104,24 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	}
 	/* The chunks_per_section contains the estimated number of chunks for this section
 	 */
-	if( (uint32_t) number_of_chunks < ( number_of_chunks_written + chunks_per_section ) )
+	estimated_number_of_chunks = number_of_chunks_written + chunks_per_section;
+
+	if( estimated_number_of_chunks > (uint64_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: estimated number of chunks value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_chunks < (int) estimated_number_of_chunks )
 	{
 		if( libmfdata_list_resize(
 		     chunk_table_list,
-		     (int) ( number_of_chunks_written + chunks_per_section ),
+		     (int) estimated_number_of_chunks,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3231,7 +3245,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
          uint32_t number_of_table_entries,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
-         uint32_t number_of_chunks,
+         uint64_t number_of_chunks_written,
          uint32_t section_number_of_chunks,
          libcerror_error_t **error )
 {
@@ -3240,6 +3254,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 	uint8_t *table_section_string   = NULL;
 	static char *function           = "libewf_segment_file_write_chunks_section_final";
 	off64_t base_offset             = 0;
+	uint64_t chunk_index            = 0;
 	ssize_t total_write_count       = 0;
 	ssize_t write_count             = 0;
 
@@ -3296,7 +3311,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 			return( -1 );
 		}
 	}
-	if( ( section_number_of_chunks > number_of_chunks )
+	if( ( (uint64_t) section_number_of_chunks > number_of_chunks_written )
 	 || ( section_number_of_chunks > number_of_table_entries ) )
 	{
 		libcerror_error_set(
@@ -3304,6 +3319,19 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: section number of chunks value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	chunk_index = number_of_chunks_written - section_number_of_chunks;
+
+	if( chunk_index > (uint64_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: chunk index value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -3316,7 +3344,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 	}
 	if( libewf_chunk_table_generate_table_entries_data(
 	     chunk_table_list,
-	     number_of_chunks - section_number_of_chunks,
+	     (int) chunk_index,
 	     io_handle->major_version,
 	     table_entries_data,
 	     table_entries_data_size,
@@ -3606,7 +3634,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 	 */
 	if( libmfdata_list_set_group_by_index(
 	     chunk_table_list,
-	     number_of_chunks - section_number_of_chunks,
+	     (int) chunk_index,
 	     (int) section_number_of_chunks,
 	     file_io_pool_entry,
 	     group_section->start_offset,
@@ -3620,8 +3648,8 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set chunk group: %d - %d.",
 		 function,
-		 number_of_chunks - section_number_of_chunks,
-		 number_of_chunks );
+		 (int) chunk_index,
+		 (int) number_of_chunks_written );
 
 		goto on_error;
 	}
@@ -3692,7 +3720,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 
 		if( libmfdata_list_set_backup_data_range_by_index(
 		     chunk_table_list,
-		     number_of_chunks - section_number_of_chunks,
+		     (int) chunk_index,
 		     file_io_pool_entry,
 		     group_section->start_offset,
 		     group_section->size,
@@ -3705,8 +3733,8 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set backup data range of chunk group: %d - %d.",
 			 function,
-			 number_of_chunks - section_number_of_chunks,
-			 number_of_chunks );
+			 (int) chunk_index,
+			 (int) number_of_chunks_written );
 
 			goto on_error;
 		}
@@ -4656,7 +4684,7 @@ ssize_t libewf_segment_file_write_close(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
-         uint32_t number_of_chunks_written_to_segment,
+         uint64_t number_of_chunks_written_to_segment_file,
          int last_segment_file,
          libewf_hash_sections_t *hash_sections,
          libfvalue_table_t *hash_values,
@@ -5005,7 +5033,7 @@ ssize_t libewf_segment_file_write_close(
 	total_write_count += write_count;
 	section_offset    += write_count;
 
-	segment_file->number_of_chunks = number_of_chunks_written_to_segment;
+	segment_file->number_of_chunks = number_of_chunks_written_to_segment_file;
 
 	/* Make sure the next time the file is opened it is not truncated
 	 */
@@ -5062,7 +5090,7 @@ int libewf_segment_file_write_sections_correction(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      int file_io_pool_entry,
-     uint32_t number_of_chunks_written_to_segment,
+     uint64_t number_of_chunks_written_to_segment_file,
      int last_segment_file,
      libewf_media_values_t *media_values,
      libfvalue_table_t *hash_values,
@@ -5339,7 +5367,7 @@ int libewf_segment_file_write_sections_correction(
 			       file_io_pool,
 			       file_io_pool_entry,
 			       next_section_start_offset,
-			       number_of_chunks_written_to_segment,
+			       number_of_chunks_written_to_segment_file,
 			       1,
 			       hash_sections,
 			       hash_values,
