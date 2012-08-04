@@ -50,9 +50,8 @@ struct ewfx_delta_chunk_header
 	 */
 	uint8_t padding[ 6 ];
 
-	/* The section checksum of all (previous) delta chunk section data
+	/* The section checksum of all (previous) data
 	 * consists of 4 bytes
-	 * starts with offset 76
 	 */
 	uint8_t checksum[ 4 ];
 

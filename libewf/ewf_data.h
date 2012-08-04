@@ -150,9 +150,8 @@ struct ewf_data
 	 */
 	uint8_t signature[ 5 ];
 
-	/* The section checksum of all (previous) volume data
+	/* The section checksum of all (previous) data
 	 * consists of 4 bytes (32 bits)
-	 * starts with offset 76
 	 */
 	uint8_t checksum[ 4 ];
 };

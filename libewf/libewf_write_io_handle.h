@@ -57,6 +57,10 @@ struct libewf_write_io_handle
 	 */
 	size_t section_descriptor_size;
 
+	/* The size of a (sector) table header
+	 */
+	size_t table_header_size;
+
 	/* The size of a (sector) table entry
 	 */
 	size_t table_entry_size;
@@ -72,6 +76,14 @@ struct libewf_write_io_handle
 	/* A cached version of the data section
 	 */
 	ewf_data_t *data_section;
+
+	/* Cached version of the table section
+	 */
+	uint8_t *table_section_data;
+
+	/* The size of the cached version of the table sectoin
+	 */
+	size_t table_section_data_size;
 
 	/* Cached version of the table entries
 	 */
@@ -197,6 +209,11 @@ int libewf_write_io_handle_initialize_resume(
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
      libewf_segment_table_t *segment_table,
+     libcerror_error_t **error );
+
+int libewf_write_io_handle_resize_table_entries(
+     libewf_write_io_handle_t *write_io_handle,
+     uint32_t number_of_entries,
      libcerror_error_t **error );
 
 int libewf_write_io_handle_calculate_chunks_per_segment_file(

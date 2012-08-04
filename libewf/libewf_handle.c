@@ -7141,7 +7141,6 @@ ssize_t libewf_handle_write_finalize(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_write_finalize";
-	void *reallocation                        = NULL;
 	off64_t segment_file_offset               = 0;
 	size_t chunk_padding_size                 = 0;
 	size_t input_data_size                    = 0;
@@ -7553,26 +7552,20 @@ ssize_t libewf_handle_write_finalize(
 #endif
 			if( internal_handle->write_io_handle->number_of_table_entries < internal_handle->write_io_handle->number_of_chunks_written_to_section )
 			{
-				internal_handle->write_io_handle->table_entries_data_size = internal_handle->write_io_handle->number_of_chunks_written_to_section
-				                                                          * internal_handle->write_io_handle->table_entry_size;
-
-				reallocation = memory_reallocate(
-				                internal_handle->write_io_handle->table_entries_data,
-				                internal_handle->write_io_handle->table_entries_data_size );
-
-				if( reallocation == NULL )
+				if( libewf_write_io_handle_resize_table_entries(
+				     internal_handle->write_io_handle,
+				     internal_handle->write_io_handle->number_of_chunks_written_to_section,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create table entries data.",
+					 "%s: unable to resize table entries.",
 					 function );
 
 					return( -1 );
 				}
-				internal_handle->write_io_handle->table_entries_data      = (uint8_t *) reallocation;
-				internal_handle->write_io_handle->number_of_table_entries = internal_handle->write_io_handle->number_of_chunks_written_to_section;
 			}
 			write_count = libewf_segment_file_write_chunks_section_final(
 				       segment_file,
@@ -7581,6 +7574,8 @@ ssize_t libewf_handle_write_finalize(
 				       file_io_pool_entry,
 				       segment_file_offset,
 				       internal_handle->chunk_table_list,
+			               internal_handle->write_io_handle->table_section_data,
+			               internal_handle->write_io_handle->table_section_data_size,
 			               internal_handle->write_io_handle->table_entries_data,
 			               internal_handle->write_io_handle->table_entries_data_size,
 			               internal_handle->write_io_handle->number_of_table_entries,

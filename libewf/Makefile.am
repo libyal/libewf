@@ -15,6 +15,8 @@ AM_CPPFLAGS = \
 	@LIBMFDATA_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
 	@BZIP2_CPPFLAGS@ \
+	@LIBCRYPTO_CPPFLAGS@ \
+	@LIBHMAC_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
@@ -62,6 +64,7 @@ libewf_la_SOURCES = \
 	libewf_libclocale.h \
 	libewf_libcnotify.h \
 	libewf_libcstring.h \
+	libewf_libhmac.h \
 	libewf_libmfcache.h \
 	libewf_libmfdata.h \
 	libewf_libfvalue.h \
@@ -100,7 +103,10 @@ libewf_la_LIBADD = \
 	@LIBMFCACHE_LIBADD@ \
 	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \
-	@BZIP2_LIBADD@
+	@BZIP2_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBDL_LIBADD@
 
 libewf_la_LDFLAGS = -no-undefined -version-info 3:0:1
 

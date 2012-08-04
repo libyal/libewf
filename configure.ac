@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120802],
+ [20120804],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -95,14 +95,14 @@ AX_ZLIB_CHECK_ENABLE
 dnl Check for bz2lib compression support
 AX_BZIP2_CHECK_ENABLE
 
+dnl Check for enabling libhmac for message digest hash function support
+AX_LIBHMAC_CHECK_ENABLE
+
 dnl Check for library function support
 AX_LIBEWF_CHECK_LOCAL
 
 dnl Check for enabling libcsystem for cross-platform C generic system functions
 AX_LIBCSYSTEM_CHECK_ENABLE
-
-dnl Check for enabling libhmac for message digest hash function support
-AX_LIBHMAC_CHECK_ENABLE
 
 dnl Check for enabling GUID/UUID support
 AX_LIBUUID_CHECK_ENABLE
@@ -216,8 +216,8 @@ AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
 AC_CONFIG_FILES([libmfcache/Makefile])
 AC_CONFIG_FILES([libmfdata/Makefile])
-AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libhmac/Makefile])
+AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])

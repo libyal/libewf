@@ -113,10 +113,11 @@ int libewf_write_io_handle_initialize(
 	}
 	( *write_io_handle )->pack_flags                  = LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM;
 	( *write_io_handle )->section_descriptor_size     = sizeof( ewf_section_descriptor_v1_t );
+	( *write_io_handle )->table_header_size           = sizeof( ewf_table_header_v1_t );
 	( *write_io_handle )->table_entry_size            = sizeof( ewf_table_entry_v1_t );
-	( *write_io_handle )->maximum_segment_file_size   = INT32_MAX;
+	( *write_io_handle )->maximum_segment_file_size   = INT64_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_TABLE_ENTRIES;
+	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
 	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
 
 	return( 1 );
@@ -160,10 +161,10 @@ int libewf_write_io_handle_free(
 			memory_free(
 			 ( *write_io_handle )->data_section );
 		}
-		if( ( *write_io_handle )->table_entries_data != NULL )
+		if( ( *write_io_handle )->table_section_data != NULL )
 		{
 			memory_free(
-			 ( *write_io_handle )->table_entries_data );
+			 ( *write_io_handle )->table_section_data );
 		}
 		if( ( *write_io_handle )->compressed_zero_byte_empty_block != NULL )
 		{
@@ -245,6 +246,8 @@ int libewf_write_io_handle_clone(
 		goto on_error;
 	}
 	( *destination_write_io_handle )->data_section            = NULL;
+	( *destination_write_io_handle )->table_section_data      = NULL;
+	( *destination_write_io_handle )->table_section_data_size = 0;
 	( *destination_write_io_handle )->table_entries_data      = NULL;
 	( *destination_write_io_handle )->table_entries_data_size = 0;
 	( *destination_write_io_handle )->number_of_table_entries = 0;
@@ -280,47 +283,49 @@ int libewf_write_io_handle_clone(
 			goto on_error;
 		}
 	}
-	if( source_write_io_handle->table_entries_data != NULL )
+	if( source_write_io_handle->table_section_data != NULL )
 	{
-		( *destination_write_io_handle )->table_entries_data = (uint8_t *) memory_allocate(
-		                                                                    source_write_io_handle->table_entries_data_size );
+		( *destination_write_io_handle )->table_section_data = (uint8_t *) memory_allocate(
+		                                                                    source_write_io_handle->table_section_data_size );
 
-		if( ( *destination_write_io_handle )->table_entries_data == NULL )
+		if( ( *destination_write_io_handle )->table_section_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create destination table entries data.",
+			 "%s: unable to create destination table section data.",
 			 function );
 
 			goto on_error;
 		}
 		if( memory_copy(
-		     ( *destination_write_io_handle )->table_entries_data,
-		     source_write_io_handle->table_entries_data,
-		     source_write_io_handle->table_entries_data_size ) == NULL )
+		     ( *destination_write_io_handle )->table_section_data,
+		     source_write_io_handle->table_section_data,
+		     source_write_io_handle->table_section_data_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy source to destination table entries data.",
+			 "%s: unable to copy source to destination table section data.",
 			 function );
 
 			goto on_error;
 		}
-		( *destination_write_io_handle )->table_entries_data_size = source_write_io_handle->table_entries_data_size;
+		( *destination_write_io_handle )->table_section_data_size = source_write_io_handle->table_section_data_size;
+
+/* TODO what about table entries data ? */
 	}
 	return( 1 );
 
 on_error:
 	if( *destination_write_io_handle != NULL )
 	{
-		if( ( *destination_write_io_handle )->table_entries_data != NULL )
+		if( ( *destination_write_io_handle )->table_section_data != NULL )
 		{
 			memory_free(
-			 ( *destination_write_io_handle )->table_entries_data );
+			 ( *destination_write_io_handle )->table_section_data );
 		}
 		if( ( *destination_write_io_handle )->data_section != NULL )
 		{
@@ -429,11 +434,13 @@ int libewf_write_io_handle_initialize_values(
 	if( io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
 		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v2_t );
+		write_io_handle->table_header_size       = sizeof( ewf_table_header_v2_t );
 		write_io_handle->table_entry_size        = sizeof( ewf_table_entry_v2_t );
 	}
 	else
 	{
 		write_io_handle->section_descriptor_size = sizeof( ewf_section_descriptor_v1_t );
+		write_io_handle->table_header_size       = sizeof( ewf_table_header_v1_t );
 		write_io_handle->table_entry_size        = sizeof( ewf_table_entry_v1_t );
 	}
 	if( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
@@ -632,7 +639,8 @@ int libewf_write_io_handle_initialize_values(
 
 				/* For EWF-S01 in a worst case scenario the resulting chunk data is + 16 larger than the chunk size
 				 */
-				if( io_handle->format == LIBEWF_FORMAT_SMART )
+				if( ( io_handle->format == LIBEWF_FORMAT_SMART )
+				 || ( io_handle->format == LIBEWF_FORMAT_EWF ) )
 				{
 					write_io_handle->compressed_zero_byte_empty_block_size += 16;
 				}
@@ -1343,6 +1351,71 @@ int libewf_write_io_handle_initialize_resume(
 		}
 		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 	}
+	return( 1 );
+}
+
+/* Resize the table entries
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_resize_table_entries(
+     libewf_write_io_handle_t *write_io_handle,
+     uint32_t number_of_entries,
+     libcerror_error_t **error )
+{
+	void *reallocation    = NULL;
+	static char *function = "libewf_write_io_handle_resize_table_entries";
+
+	if( write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_entries < write_io_handle->number_of_table_entries )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: number of entries values out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	write_io_handle->table_entries_data_size = number_of_entries
+	                                         * write_io_handle->table_entry_size;
+
+	/* Reserve space for the header, entries and footer
+	 */
+	write_io_handle->table_section_data_size = write_io_handle->table_header_size
+						 + write_io_handle->table_entries_data_size
+						 + 16;
+
+	reallocation = memory_reallocate(
+			write_io_handle->table_section_data,
+			write_io_handle->table_section_data_size );
+
+	if( reallocation == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create table section data.",
+		 function );
+
+		return( -1 );
+	}
+	write_io_handle->table_section_data      = (uint8_t *) reallocation;
+	write_io_handle->table_entries_data      = write_io_handle->table_section_data
+						 + write_io_handle->table_header_size;
+	write_io_handle->number_of_table_entries = number_of_entries;
+
 	return( 1 );
 }
 
@@ -2239,7 +2312,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
-	void *reallocation                  = NULL;
 	static char *function               = "libewf_write_io_handle_write_new_chunk";
 	off64_t segment_file_offset         = 0;
 	ssize_t total_write_count           = 0;
@@ -2733,37 +2805,31 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		{
 			if( write_io_handle->number_of_table_entries < write_io_handle->chunks_per_section )
 			{
-				write_io_handle->table_entries_data_size = write_io_handle->chunks_per_section
-									 * write_io_handle->table_entry_size;
-
-				reallocation = memory_reallocate(
-						write_io_handle->table_entries_data,
-						write_io_handle->table_entries_data_size );
-
-				if( reallocation == NULL )
+				if( libewf_write_io_handle_resize_table_entries(
+				     write_io_handle,
+				     write_io_handle->chunks_per_section,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create table entries data.",
+					 "%s: unable to resize table entries.",
 					 function );
 
 					return( -1 );
 				}
-				write_io_handle->table_entries_data      = (uint8_t *) reallocation;
-				write_io_handle->number_of_table_entries = write_io_handle->chunks_per_section;
 			}
 			if( memory_set(
-			     write_io_handle->table_entries_data,
+			     write_io_handle->table_section_data,
 			     0,
-			     write_io_handle->table_entries_data_size ) == NULL )
+			     write_io_handle->table_section_data_size ) == NULL )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to clear table entries data.",
+				 "%s: unable to clear table section data.",
 				 function );
 
 				return( -1 );
@@ -2777,6 +2843,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 				       file_io_pool_entry,
 				       write_io_handle->chunks_section_offset,
 				       chunk_table_list,
+				       write_io_handle->table_section_data,
+				       write_io_handle->table_section_data_size,
 				       write_io_handle->table_entries_data,
 				       write_io_handle->table_entries_data_size,
 				       write_io_handle->number_of_table_entries,
@@ -2919,26 +2987,20 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 #endif
 		if( write_io_handle->number_of_table_entries < write_io_handle->number_of_chunks_written_to_section )
 		{
-			write_io_handle->table_entries_data_size = write_io_handle->number_of_chunks_written_to_section
-			                                         * write_io_handle->table_entry_size;
-
-			reallocation = memory_reallocate(
-			                write_io_handle->table_entries_data,
-			                write_io_handle->table_entries_data_size );
-
-			if( reallocation == NULL )
+			if( libewf_write_io_handle_resize_table_entries(
+			     write_io_handle,
+			     write_io_handle->number_of_chunks_written_to_section,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create table entries data.",
+				 "%s: unable to resize table entries.",
 				 function );
 
 				return( -1 );
 			}
-			write_io_handle->table_entries_data      = (uint8_t *) reallocation;
-			write_io_handle->number_of_table_entries = write_io_handle->number_of_chunks_written_to_section;
 		}
 		write_count = libewf_segment_file_write_chunks_section_final(
 			       segment_file,
@@ -2947,6 +3009,8 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			       file_io_pool_entry,
 			       segment_file_offset,
 			       chunk_table_list,
+			       write_io_handle->table_section_data,
+			       write_io_handle->table_section_data_size,
 			       write_io_handle->table_entries_data,
 			       write_io_handle->table_entries_data_size,
 			       write_io_handle->number_of_table_entries,

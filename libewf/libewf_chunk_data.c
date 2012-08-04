@@ -653,6 +653,8 @@ int libewf_chunk_data_pack_buffer(
 			{
 				compression_level = LIBEWF_COMPRESSION_DEFAULT;
 			}
+			safe_compressed_data_size = *compressed_data_size;
+
 /* TODO add a light weight entropy test */
 			result = libewf_compress_data(
 			          compressed_data,

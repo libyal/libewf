@@ -1694,6 +1694,7 @@ ssize_t libewf_segment_file_write_device_information_section(
 	 */
 	write_count = libewf_section_write_compressed_string(
 	               section,
+	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               2,
@@ -1831,6 +1832,7 @@ ssize_t libewf_segment_file_write_case_data_section(
 	 */
 	write_count = libewf_section_write_compressed_string(
 	               section,
+	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               2,
@@ -1959,6 +1961,7 @@ ssize_t libewf_segment_file_write_header_section(
 	 */
 	write_count = libewf_section_write_compressed_string(
 	               section,
+	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -2098,6 +2101,7 @@ ssize_t libewf_segment_file_write_header2_section(
 	 */
 	write_count = libewf_section_write_compressed_string(
 	               section,
+	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -2237,6 +2241,7 @@ ssize_t libewf_segment_file_write_xheader_section(
 	 */
 	write_count = libewf_section_write_compressed_string(
 	               section,
+	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -3029,7 +3034,9 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
-         const uint8_t *table_entries_data,
+         uint8_t *table_section_data,
+         size_t table_section_data_size,
+         uint8_t *table_entries_data,
          size_t table_entries_data_size,
          uint32_t number_of_table_entries,
          uint64_t number_of_chunks_written,
@@ -3154,12 +3161,15 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 */
 		write_count = libewf_section_table_write(
 		               section,
+		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               1,
 		               (uint8_t *) "table",
 		               5,
 		               section_offset,
+		               table_section_data,
+		               table_section_data_size,
 		               0,
 		               table_entries_data,
 		               table_entries_data_size,
@@ -3241,6 +3251,8 @@ ssize_t libewf_segment_file_write_chunks_section_final(
          int file_io_pool_entry,
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
+         uint8_t *table_section_data,
+         size_t table_section_data_size,
          uint8_t *table_entries_data,
          size_t table_entries_data_size,
          uint32_t number_of_table_entries,
@@ -3253,9 +3265,8 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 {
 	libewf_section_t *group_section = NULL;
 	libewf_section_t *section       = NULL;
-	uint8_t *table_section_string   = NULL;
 	static char *function           = "libewf_segment_file_write_chunks_section_final";
-	off64_t base_offset             = 0;
+	uint64_t base_offset            = 0;
 	uint64_t chunk_index            = 0;
 	ssize_t total_write_count       = 0;
 	ssize_t write_count             = 0;
@@ -3428,12 +3439,15 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 			 */
 			write_count = libewf_section_table_write(
 				       section,
+				       io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
 				       1,
 				       (uint8_t *) "table",
 				       5,
 				       chunks_section_offset,
+				       table_section_data,
+				       table_section_data_size,
 				       0,
 				       table_entries_data,
 				       table_entries_data_size,
@@ -3448,9 +3462,8 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to rewrite %s section.",
-				 function,
-				 (char *) table_section_string );
+				 "%s: unable to write table section.",
+				 function );
 
 				goto on_error;
 			}
@@ -3485,7 +3498,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to rewrite sectors section.",
+				 "%s: unable to write sectors section.",
 				 function );
 
 				goto on_error;
@@ -3577,12 +3590,15 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		}
 		write_count = libewf_section_table_write(
 		               section,
+		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               segment_file->major_version,
 		               (uint8_t *) "table",
 		               5,
 		               section_offset,
+		               table_section_data,
+		               table_section_data_size,
 		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,
@@ -3676,12 +3692,15 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		}
 		write_count = libewf_section_table_write(
 		               section,
+		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               1,
 		               (uint8_t *) "table2",
 		               6,
 		               section_offset,
+		               table_section_data,
+		               table_section_data_size,
 		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,
@@ -3696,7 +3715,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to rewrite table2 section.",
+			 "%s: unable to write table2 section.",
 			 function );
 
 			goto on_error;
@@ -4394,6 +4413,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 			}
 			write_count = libewf_section_digest_write(
 				       section,
+				       io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
 				       section_offset,
@@ -4450,6 +4470,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 		}
 		write_count = libewf_section_md5_hash_write(
 			       section,
+			       io_handle,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       segment_file->major_version,
@@ -4508,6 +4529,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 			}
 			write_count = libewf_section_sha1_hash_write(
 				       section,
+				       io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
 				       segment_file->major_version,
@@ -4617,6 +4639,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 		 */
 		write_count = libewf_section_write_compressed_string(
 			       section,
+			       io_handle,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       1,
@@ -4857,6 +4880,7 @@ ssize_t libewf_segment_file_write_close(
 				}
 				write_count = libewf_section_session_write(
 					       section,
+					       io_handle,
 					       file_io_pool,
 					       file_io_pool_entry,
 					       segment_file->major_version,
@@ -4940,6 +4964,7 @@ ssize_t libewf_segment_file_write_close(
 				}
 				write_count = libewf_section_error_write(
 					       section,
+					       io_handle,
 					       file_io_pool,
 					       file_io_pool_entry,
 					       segment_file->major_version,

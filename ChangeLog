@@ -1,4 +1,6 @@
 TODO
+* move libewf_section_last_write functionality to segment file ?
+
 * refactor read/write compressed string
   - change libewf_section_ltree_read to only read header ? (also see next item)
 * encryption support
@@ -367,6 +369,12 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120804
+* worked on libewf_section_write_data
+* worked on section data integrity hash support
+* worked on encryption support
+* worked on EWF1 ltree header
 
 20120802
 * code clean up

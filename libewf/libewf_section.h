@@ -142,7 +142,14 @@ ssize_t libewf_section_read_data(
          size_t *section_data_size,
          libcerror_error_t **error );
 
-/* TODO libewf_section_write_data */
+ssize_t libewf_section_write_data(
+         libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         const uint8_t *section_data,
+         size_t section_data_size,
+         libcerror_error_t **error );
 
 ssize_t libewf_section_last_write(
          libewf_section_t *section,
@@ -166,6 +173,7 @@ ssize_t libewf_section_compressed_string_read(
 
 ssize_t libewf_section_write_compressed_string(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -207,6 +215,7 @@ ssize_t libewf_section_digest_read(
 
 ssize_t libewf_section_digest_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
@@ -224,6 +233,7 @@ ssize_t libewf_section_error_read(
 
 ssize_t libewf_section_error_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -242,6 +252,7 @@ ssize_t libewf_section_md5_hash_read(
 
 ssize_t libewf_section_md5_hash_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -259,6 +270,7 @@ ssize_t libewf_section_sha1_hash_read(
 
 ssize_t libewf_section_sha1_hash_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -303,6 +315,7 @@ ssize_t libewf_section_session_read(
 
 ssize_t libewf_section_session_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -328,14 +341,17 @@ ssize_t libewf_section_table_read(
 
 ssize_t libewf_section_table_write(
          libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
-         off64_t base_offset,
-         const uint8_t *table_entries_data,
+         uint8_t *section_data,
+         size_t section_data_size,
+         uint64_t base_offset,
+         uint8_t *table_entries_data,
          size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
