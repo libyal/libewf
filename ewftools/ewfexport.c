@@ -27,6 +27,10 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_SYS_RESOURCE_H )
+#include <sys/resource.h>
+#endif
+
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
@@ -213,6 +217,9 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+#if defined( HAVE_GETRLIMIT )
+	struct rlimit limit_data;
+#endif
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
 	libcstring_system_character_t * const *argv_filenames         = NULL;
@@ -502,6 +509,35 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( HAVE_GETRLIMIT )
+	if( getrlimit(
+            RLIMIT_NOFILE,
+            &limit_data ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to determine limit: number of open file descriptors.\n" );
+	}
+	if( limit_data.rlim_max > (rlim_t) INT_MAX )
+	{
+		limit_data.rlim_max = (rlim_t) INT_MAX;
+	}
+	if( limit_data.rlim_max > 0 )
+	{
+		limit_data.rlim_max /= 2;
+	}
+	if( export_handle_set_maximum_number_of_open_handles(
+	     ewfexport_export_handle,
+	     (int) limit_data.rlim_max,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set maximum number of open file handles.\n" );
+
+		goto on_error;
+	}
+#endif
 	if( libcsystem_signal_attach(
 	     ewfexport_signal_handler,
 	     &error ) != 1 )

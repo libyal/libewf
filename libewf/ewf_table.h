@@ -79,10 +79,10 @@ typedef struct ewf_table_header_v2 ewf_table_header_v2_t;
 
 struct ewf_table_header_v2
 {
-	/* Unknown
+	/* The first chunk number
 	 * Consists of 8 bytes
 	 */
-	uint8_t unknown1[ 8 ];
+	uint8_t first_chunk_number[ 8 ];
 
 	/* The number of entries
 	 * Consists of 4 bytes
@@ -92,7 +92,7 @@ struct ewf_table_header_v2
 	/* Unknown
 	 * Consists of 4 bytes
 	 */
-	uint8_t unknown2[ 4 ];
+	uint8_t unknown1[ 4 ];
 
 	/* The section checksum of all (previous) table header data
 	 * Consists of 4 bytes

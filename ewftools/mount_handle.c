@@ -214,6 +214,44 @@ int mount_handle_signal_abort(
 	return( 1 );
 }
 
+/* Sets the maximum number of (concurrent) open file handles
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_set_maximum_number_of_open_handles(
+     mount_handle_t *mount_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_handle_set_maximum_number_of_open_handles";
+
+	if( mount_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_set_maximum_number_of_open_handles(
+	     mount_handle->input_handle,
+	     maximum_number_of_open_handles,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set maximum number of open handles in input handle.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the format
  * Returns 1 if successful, 0 if unsupported value or -1 on error
  */

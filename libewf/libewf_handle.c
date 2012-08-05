@@ -2707,8 +2707,6 @@ int libewf_handle_open_read_section_data(
 	ssize_t read_count                          = 0;
 	int initialize_chunk_table                  = 0;
 	int header_section_found                    = 0;
-	int read_case_data                          = 0;
-	int read_device_information                 = 0;
 	int single_files_section_found              = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2733,6 +2731,17 @@ int libewf_handle_open_read_section_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->read_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing read IO handle.",
 		 function );
 
 		return( -1 );
@@ -2878,30 +2887,30 @@ int libewf_handle_open_read_section_data(
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-					if( read_device_information == 0 )
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      internal_handle->io_handle,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->io_handle->compression_method,
+						      &string_data,
+						      &string_data_size,
+						      error );
+
+					if( read_count == -1 )
 					{
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      internal_handle->io_handle,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->io_handle->compression_method,
-							      &string_data,
-							      &string_data_size,
-							      error );
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read device information file object string.",
+						 function );
 
-						if( read_count == -1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read device information file object string.",
-							 function );
-
-							goto on_error;
-						}
-						else if( read_count != 0 )
+						goto on_error;
+					}
+					else if( read_count != 0 )
+					{
+						if( internal_handle->read_io_handle->device_information == NULL )
 						{
 							if( libewf_device_information_parse(
 							     string_data,
@@ -2919,18 +2928,35 @@ int libewf_handle_open_read_section_data(
 
 								goto on_error;
 							}
-							memory_free(
-							 string_data );
+							internal_handle->read_io_handle->device_information      = string_data;
+							internal_handle->read_io_handle->device_information_size = string_data_size;
 
-							string_data = NULL;
-
-							read_device_information = 1;
-
-							if( read_case_data != 0 )
+							if( internal_handle->read_io_handle->case_data != NULL )
 							{
 								initialize_chunk_table = 1;
 							}
 						}
+						else
+						{
+							if( ( internal_handle->read_io_handle->device_information_size != string_data_size )
+							 || ( memory_compare(
+							       internal_handle->read_io_handle->device_information,
+							       string_data,
+							       16 ) != 0 ) )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_INPUT,
+								 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+								 "%s: device information value mismatch.",
+								 function );
+
+								goto on_error;
+							}
+							memory_free(
+							 string_data );
+						}
+						string_data = NULL;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
@@ -2938,30 +2964,30 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_CASE_DATA:
-					if( read_case_data == 0 )
+					read_count = libewf_section_compressed_string_read(
+						      section,
+						      internal_handle->io_handle,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->io_handle->compression_method,
+						      &string_data,
+						      &string_data_size,
+						      error );
+
+					if( read_count == -1 )
 					{
-						read_count = libewf_section_compressed_string_read(
-							      section,
-							      internal_handle->io_handle,
-							      file_io_pool,
-							      file_io_pool_entry,
-							      internal_handle->io_handle->compression_method,
-							      &string_data,
-							      &string_data_size,
-							      error );
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read case data file object string.",
+						 function );
 
-						if( read_count == -1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read case data file object string.",
-							 function );
-
-							goto on_error;
-						}
-						else if( read_count != 0 )
+						goto on_error;
+					}
+					else if( read_count != 0 )
+					{
+						if( internal_handle->read_io_handle->case_data == NULL )
 						{
 							if( libewf_case_data_parse(
 							     string_data,
@@ -2980,18 +3006,35 @@ int libewf_handle_open_read_section_data(
 
 								goto on_error;
 							}
-							memory_free(
-							 string_data );
+							internal_handle->read_io_handle->case_data      = string_data;
+							internal_handle->read_io_handle->case_data_size = string_data_size;
 
-							string_data = NULL;
-
-							read_case_data = 1;
-
-							if( read_device_information != 0 )
+							if( internal_handle->read_io_handle->device_information != NULL )
 							{
 								initialize_chunk_table = 1;
 							}
 						}
+						else
+						{
+							if( ( internal_handle->read_io_handle->case_data_size != string_data_size )
+							 || ( memory_compare(
+							       internal_handle->read_io_handle->case_data,
+							       string_data,
+							       16 ) != 0 ) )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_INPUT,
+								 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+								 "%s: case data value mismatch.",
+								 function );
+
+								goto on_error;
+							}
+							memory_free(
+							 string_data );
+						}
+						string_data = NULL;
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
@@ -7425,9 +7468,14 @@ ssize_t libewf_handle_write_finalize(
 		               internal_handle->io_handle,
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
+		               &( internal_handle->write_io_handle->case_data ),
+		               &( internal_handle->write_io_handle->case_data_size ),
+		               &( internal_handle->write_io_handle->device_information ),
+		               &( internal_handle->write_io_handle->device_information_size ),
+		               &( internal_handle->write_io_handle->data_section ),
 		               internal_handle->media_values,
 		               internal_handle->header_values,
-		               &( internal_handle->write_io_handle->data_section ),
+		               internal_handle->write_io_handle->timestamp,
 		               error );
 
 		if( write_count == -1 )

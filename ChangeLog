@@ -1,15 +1,4 @@
 TODO
-* move libewf_section_last_write functionality to segment file ?
-
-* refactor read/write compressed string
-  - change libewf_section_ltree_read to only read header ? (also see next item)
-* encryption support
-  - read section data at once for encryption
-
-* throttle number of open files in tools
-  - getrlimit( RLIMIT_NOFILE, struct rlimit * );
-  - check for RLIMIT_FSIZE as well ?
-
 * implement new chunk IO functions where chunk is an object
 
 * corruption scenarios
@@ -289,6 +278,7 @@ Tools:
 * locale support
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
+* when writing check getrlimit( RLIMIT_FSIZE )
 * check char/wchar in/output
 * add getoptlong support
 * make compilation resilient for missing crypto library
@@ -322,7 +312,7 @@ Tools:
   - create a tool to analyse a single segment file
   - implement low and high level api separation
 * ewfmount
-  - Windows use ImDisk
+  - Windows use ImDisk or Dokan
   - MacOS native API support ?
 * process status
   - improve and remove "This could take a while." ?
@@ -369,6 +359,12 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120805
+* refactored libewf_section_last_write functionality from section to segment file
+* added libcaes support
+* added support to ewftools to throttle number of open file descriptors used
+  by library about 50% of the available descriptor is currently claimed
 
 20120804
 * worked on libewf_section_write_data

@@ -27,6 +27,10 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_SYS_RESOURCE_H )
+#include <sys/resource.h>
+#endif
+
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
@@ -120,12 +124,15 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+#if defined( HAVE_GETRLIMIT )
+	struct rlimit limit_data;
+#endif
 	libcstring_system_character_t * const *argv_filenames = NULL;
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
-	libcsystem_glob_t *glob                                = NULL;
+	libcsystem_glob_t *glob                               = NULL;
 #endif
-	libcerror_error_t *error                               = NULL;
+	libcerror_error_t *error                              = NULL;
 
 	libcstring_system_character_t *option_date_format     = NULL;
 	libcstring_system_character_t *option_header_codepage = NULL;
@@ -518,6 +525,35 @@ int main( int argc, char * const argv[] )
 	argv_filenames      = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 
+#endif
+#if defined( HAVE_GETRLIMIT )
+	if( getrlimit(
+            RLIMIT_NOFILE,
+            &limit_data ) != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to determine limit: number of open file descriptors.\n" );
+	}
+	if( limit_data.rlim_max > (rlim_t) INT_MAX )
+	{
+		limit_data.rlim_max = (rlim_t) INT_MAX;
+	}
+	if( limit_data.rlim_max > 0 )
+	{
+		limit_data.rlim_max /= 2;
+	}
+	if( info_handle_set_maximum_number_of_open_handles(
+	     ewfinfo_info_handle,
+	     (int) limit_data.rlim_max,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to set maximum number of open file handles.\n" );
+
+		goto on_error;
+	}
 #endif
 	if( libcsystem_signal_attach(
 	     ewfinfo_signal_handler,

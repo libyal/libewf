@@ -77,6 +77,11 @@ int info_handle_signal_abort(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
+int info_handle_set_maximum_number_of_open_handles(
+     info_handle_t *info_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error );
+
 int info_handle_open_input(
      info_handle_t *info_handle,
      libcstring_system_character_t * const * filenames,

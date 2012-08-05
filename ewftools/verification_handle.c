@@ -405,6 +405,44 @@ int verification_handle_signal_abort(
 	return( 1 );
 }
 
+/* Sets the maximum number of (concurrent) open file handles
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_set_maximum_number_of_open_handles(
+     verification_handle_t *verification_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error )
+{
+	static char *function = "verification_handle_set_maximum_number_of_open_handles";
+
+	if( verification_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_set_maximum_number_of_open_handles(
+	     verification_handle->input_handle,
+	     maximum_number_of_open_handles,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set maximum number of open handles in input handle.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Opens the input of the verification handle
  * Returns 1 if successful or -1 on error
  */

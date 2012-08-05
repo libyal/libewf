@@ -157,6 +157,16 @@ int libewf_read_io_handle_free(
 
 			result = -1;
 		}
+		if( ( *read_io_handle )->case_data != NULL )
+		{
+			memory_free(
+			 ( *read_io_handle )->case_data );
+		}
+		if( ( *read_io_handle )->device_information != NULL )
+		{
+			memory_free(
+			 ( *read_io_handle )->device_information );
+		}
 		memory_free(
 		 *read_io_handle );
 

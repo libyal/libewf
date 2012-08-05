@@ -24,6 +24,15 @@
 #include <memory.h>
 #include <types.h>
 
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 #include "libewf_case_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_debug.h"
@@ -1148,7 +1157,7 @@ ssize_t libewf_segment_file_read_table_section(
 		      io_handle,
 		      file_io_pool,
 		      file_io_pool_entry,
-		      io_handle->major_version,
+		      segment_file->major_version,
 		      &section_data,
 		      &section_data_size,
 		      &base_offset,
@@ -1331,7 +1340,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
-	              io_handle->major_version,
+	              segment_file->major_version,
 		      &section_data,
 		      &section_data_size,
 	              &base_offset,
@@ -1640,15 +1649,15 @@ ssize_t libewf_segment_file_write_device_information_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
+         uint8_t **device_information,
+         size_t *device_information_size,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
          libcerror_error_t **error )
 {
-	libewf_section_t *section      = NULL;
-	uint8_t *device_information    = NULL;
-	static char *function          = "libewf_segment_file_write_device_information_section";
-	size_t device_information_size = 0;
-	ssize_t write_count            = 0;
+	libewf_section_t *section = NULL;
+	static char *function     = "libewf_segment_file_write_device_information_section";
+	ssize_t write_count       = 0;
 
 	if( segment_file == NULL )
 	{
@@ -1661,21 +1670,46 @@ ssize_t libewf_segment_file_write_device_information_section(
 
 		return( -1 );
 	}
-	if( libewf_device_information_generate(
-	     &device_information,
-	     &device_information_size,
-	     media_values,
-	     header_values,
-	     error ) != 1 )
+	if( device_information == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to generate device information.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information.",
 		 function );
 
-		goto on_error;
+		return( -1 );
+	}
+	if( device_information_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *device_information == NULL )
+	{
+		if( libewf_device_information_generate(
+		     device_information,
+		     device_information_size,
+		     media_values,
+		     header_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to generate device information.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( libewf_section_initialize(
 	     &section,
@@ -1704,8 +1738,8 @@ ssize_t libewf_segment_file_write_device_information_section(
 	               section_offset,
 	               io_handle->compression_method,
 	               LIBEWF_COMPRESSION_DEFAULT,
-	               device_information,
-	               device_information_size - 2,
+	               *device_information,
+	               *device_information_size - 2,
 	               error );
 
 	if( write_count == -1 )
@@ -1719,11 +1753,6 @@ ssize_t libewf_segment_file_write_device_information_section(
 
 		goto on_error;
 	}
-	memory_free(
-	 device_information );
-
-	device_information = NULL;
-
 	if( libewf_list_append_value(
 	     segment_file->section_list,
 	     (intptr_t *) section,
@@ -1741,11 +1770,6 @@ ssize_t libewf_segment_file_write_device_information_section(
 	return( write_count );
 
 on_error:
-	if( device_information != NULL )
-	{
-		memory_free(
-		 device_information );
-	}
 	if( section != NULL )
 	{
 		libewf_section_free(
@@ -1764,15 +1788,15 @@ ssize_t libewf_segment_file_write_case_data_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
+         uint8_t **case_data,
+         size_t *case_data_size,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
          time_t timestamp,
          libcerror_error_t **error )
 {
 	libewf_section_t *section = NULL;
-	uint8_t *case_data        = NULL;
 	static char *function     = "libewf_segment_file_write_case_data_section";
-	size_t case_data_size     = 0;
 	ssize_t write_count       = 0;
 
 	if( segment_file == NULL )
@@ -1797,23 +1821,48 @@ ssize_t libewf_segment_file_write_case_data_section(
 
 		return( -1 );
 	}
-	if( libewf_case_data_generate(
-	     &case_data,
-	     &case_data_size,
-	     media_values,
-	     header_values,
-	     timestamp,
-	     io_handle->format,
-	     error ) != 1 )
+	if( case_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to generate case data.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data.",
 		 function );
 
-		goto on_error;
+		return( -1 );
+	}
+	if( case_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( *case_data == NULL )
+	{
+		if( libewf_case_data_generate(
+		     case_data,
+		     case_data_size,
+		     media_values,
+		     header_values,
+		     timestamp,
+		     io_handle->format,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to generate case data.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( libewf_section_initialize(
 	     &section,
@@ -1842,8 +1891,8 @@ ssize_t libewf_segment_file_write_case_data_section(
 	               section_offset,
 	               io_handle->compression_method,
 	               LIBEWF_COMPRESSION_DEFAULT,
-	               case_data,
-	               case_data_size - 2,
+	               *case_data,
+	               *case_data_size - 2,
 	               error );
 
 	if( write_count == -1 )
@@ -1857,11 +1906,6 @@ ssize_t libewf_segment_file_write_case_data_section(
 
 		goto on_error;
 	}
-	memory_free(
-	 case_data );
-
-	case_data = NULL;
-
 	if( libewf_list_append_value(
 	     segment_file->section_list,
 	     (intptr_t *) section,
@@ -1879,11 +1923,6 @@ ssize_t libewf_segment_file_write_case_data_section(
 	return( write_count );
 
 on_error:
-	if( case_data != NULL )
-	{
-		memory_free(
-		 case_data );
-	}
 	if( section != NULL )
 	{
 		libewf_section_free(
@@ -2675,10 +2714,14 @@ ssize_t libewf_segment_file_write_last_section(
          int last_segment_file,
          libcerror_error_t **error )
 {
-	libewf_section_t *section  = NULL;
-	static char *function      = "libewf_segment_file_write_last_section";
-	uint32_t last_section_type = 0;
-	ssize_t write_count        = 0;
+	libewf_section_t *section           = NULL;
+	uint8_t *section_type_string        = NULL;
+	static char *function               = "libewf_segment_file_write_last_section";
+	size_t section_descriptor_data_size = 0;
+	size_t section_size                 = 0;
+	size_t section_type_string_length   = 0;
+	ssize_t write_count                 = 0;
+	uint32_t section_type               = 0;
 
 	if( segment_file == NULL )
 	{
@@ -2702,13 +2745,33 @@ ssize_t libewf_segment_file_write_last_section(
 
 		return( -1 );
 	}
-	if( last_segment_file == 0 )
+	if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
-		last_section_type = LIBEWF_SECTION_TYPE_NEXT;
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
 	}
 	else
 	{
-		last_section_type = LIBEWF_SECTION_TYPE_DONE;
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	if( last_segment_file == 0 )
+	{
+		section_type               = LIBEWF_SECTION_TYPE_NEXT;
+		section_type_string        = (uint8_t *) "next";
+		section_type_string_length = 4;
+	}
+	else
+	{
+		section_type               = LIBEWF_SECTION_TYPE_DONE;
+		section_type_string        = (uint8_t *) "done";
+		section_type_string_length = 4;
+	}
+	/* The version 1 EWF-E01 and EWF-L01 formats leave the size of this section empty
+	 */
+	if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL ) )
+	{
+		section_size = section_descriptor_data_size;
 	}
 	/* Write next or done section
 	 */
@@ -2725,23 +2788,40 @@ ssize_t libewf_segment_file_write_last_section(
 
 		goto on_error;
 	}
-	write_count = libewf_section_last_write(
-		       section,
-		       file_io_pool,
-		       file_io_pool_entry,
-		       segment_file->major_version,
-		       section_offset,
-		       last_section_type,
-		       segment_file->type,
+	if( libewf_section_set_values(
+	     section,
+	     section_type,
+	     section_type_string,
+	     section_type_string_length,
+	     section_offset,
+	     section_size,
+	     0,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set section values.",
+		 function );
+
+		goto on_error;
+	}
+	write_count = libewf_section_descriptor_write(
+	               section,
+	               file_io_pool,
+	               file_io_pool_entry,
+	               segment_file->major_version,
 	               error );
 
-	if( write_count == -1 )
+	if( write_count != (ssize_t) section_descriptor_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write section.",
+		 "%s: unable to write section descriptor data.",
 		 function );
 
 		goto on_error;
@@ -2782,9 +2862,14 @@ ssize_t libewf_segment_file_write_start(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t **case_data,
+         size_t *case_data_size,
+         uint8_t **device_information,
+         size_t *device_information_size,
+         ewf_data_t **data_section,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
-         ewf_data_t **cached_data_section,
+         time_t timestamp,
          libcerror_error_t **error )
 {
 	libewf_section_t *section = NULL;
@@ -2792,9 +2877,6 @@ ssize_t libewf_segment_file_write_start(
 	off64_t section_offset    = 0;
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
-
-/* TODO pass timestamp from write IO handle */
-	time_t timestamp = time( NULL );
 
 	if( segment_file == NULL )
 	{
@@ -2927,7 +3009,7 @@ ssize_t libewf_segment_file_write_start(
 				       file_io_pool_entry,
 				       section_offset,
 				       media_values,
-				       cached_data_section,
+				       data_section,
 			               error );
 
 			if( write_count == -1 )
@@ -2969,6 +3051,8 @@ ssize_t libewf_segment_file_write_start(
 			       file_io_pool,
 			       file_io_pool_entry,
 			       section_offset,
+			       device_information,
+			       device_information_size,
 			       media_values,
 			       header_values,
 			       error );
@@ -2993,6 +3077,8 @@ ssize_t libewf_segment_file_write_start(
 			       file_io_pool,
 			       file_io_pool_entry,
 			       section_offset,
+			       case_data,
+			       case_data_size,
 			       media_values,
 			       header_values,
 			       timestamp,
@@ -3358,7 +3444,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 	if( libewf_chunk_table_generate_table_entries_data(
 	     chunk_table_list,
 	     (int) chunk_index,
-	     io_handle->major_version,
+	     segment_file->major_version,
 	     table_entries_data,
 	     table_entries_data_size,
 	     section_number_of_chunks,

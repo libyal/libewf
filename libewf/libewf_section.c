@@ -1578,128 +1578,6 @@ on_error:
 	return( -1 );
 }
 
-/* Writes the last section descriptor
- * This is used for the next and done sections,
- * these sections point back towards themselves
- * Returns the number of bytes written or -1 on error
- */
-ssize_t libewf_section_last_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         off64_t section_offset,
-         uint32_t type,
-         uint8_t segment_file_type,
-         libcerror_error_t **error )
-{
-	uint8_t *type_string                = NULL;
-	static char *function               = "libewf_section_last_write";
-	size64_t section_size               = 0;
-	size_t section_descriptor_data_size = 0;
-	size_t type_string_length           = 0;
-	ssize_t write_count                 = 0;
-
-	if( section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	if( format_version == 1 )
-	{
-		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
-	}
-	else if( format_version == 2 )
-	{
-		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format version.",
-		 function );
-
-		return( -1 );
-	}
-	if( type == LIBEWF_SECTION_TYPE_NEXT )
-	{
-		type_string        = (uint8_t *) "next";
-		type_string_length = 4;
-	}
-	else if( type == LIBEWF_SECTION_TYPE_DONE )
-	{
-		type_string        = (uint8_t *) "done";
-		type_string_length = 4;
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported type: 0x08%" PRIx32 ".",
-		 function,
-		 type );
-
-		return( -1 );
-	}
-	/* The version 1 EWF-E01 and EWF-L01 formats leave the size of this section empty
-	 */
-	if( ( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
-	 && ( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL ) )
-	{
-		section_size = section_descriptor_data_size;
-	}
-	if( libewf_section_set_values(
-	     section,
-	     type,
-	     type_string,
-	     type_string_length,
-	     section_offset,
-	     section_size,
-	     0,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set section values.",
-		 function );
-
-		return( -1 );
-	}
-	write_count = libewf_section_descriptor_write(
-	               section,
-	               file_io_pool,
-	               file_io_pool_entry,
-	               format_version,
-	               error );
-
-	if( write_count != (ssize_t) section_descriptor_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write section descriptor data.",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
-}
-
 /* Reads a compressed string section and decompresses it
  * Returns the number of bytes read or -1 on error
  */
@@ -7252,11 +7130,11 @@ ssize_t libewf_section_table_read(
 	size_t table_header_data_size = 0;
 	size_t table_footer_data_size = 0;
 	ssize_t read_count            = 0;
+	uint64_t first_chunk_number   = 0;
 	uint32_t calculated_checksum  = 0;
 	uint32_t stored_checksum      = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit          = 0;
 	uint32_t value_32bit          = 0;
 #endif
 
@@ -7520,6 +7398,10 @@ ssize_t libewf_section_table_read(
 	}
 	else if( format_version == 2 )
 	{
+		byte_stream_copy_to_uint64_little_endian(
+		 ( (ewf_table_header_v2_t *) table_data )->first_chunk_number,
+		 first_chunk_number );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_table_header_v2_t *) table_data )->number_of_entries,
 		 *number_of_entries );
@@ -7533,13 +7415,10 @@ ssize_t libewf_section_table_read(
 	{
 		if( format_version == 2 )
 		{
-			byte_stream_copy_to_uint64_little_endian(
-			 ( (ewf_table_header_v2_t *) table_data )->unknown1,
-			 value_64bit );
 			libcnotify_printf(
-			 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx64 "\n",
+			 "%s: first chunk number\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 value_64bit );
+			 first_chunk_number );
 		}
 		libcnotify_printf(
 		 "%s: number of entries\t\t\t\t: %" PRIu32 "\n",
@@ -7572,10 +7451,10 @@ ssize_t libewf_section_table_read(
 		else if( format_version == 2 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_table_header_v2_t *) table_data )->unknown2,
+			 ( (ewf_table_header_v2_t *) table_data )->unknown1,
 			 value_32bit );
 			libcnotify_printf(
-			 "%s: unknown2\t\t\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 value_32bit );
 		}

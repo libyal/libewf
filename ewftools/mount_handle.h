@@ -73,6 +73,11 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error );
 
+int mount_handle_set_maximum_number_of_open_handles(
+     mount_handle_t *mount_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error );
+
 int mount_handle_set_format(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *string,

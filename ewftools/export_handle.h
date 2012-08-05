@@ -213,6 +213,11 @@ int export_handle_signal_abort(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
+int export_handle_set_maximum_number_of_open_handles(
+     export_handle_t *export_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error );
+
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,

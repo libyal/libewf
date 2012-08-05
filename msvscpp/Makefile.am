@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	ewfverify/ewfverify.vcproj \
 	ewf.net/ewf.net_dll.vcproj \
 	libbfio/libbfio.vcproj \
+	libcaes/libcaes.vcproj \
 	libcerror/libcerror.vcproj \
 	libcfile/libcfile.vcproj \
 	libclocale/libclocale.vcproj \

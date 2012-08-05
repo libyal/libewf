@@ -25,6 +25,15 @@
 #include <common.h>
 #include <types.h>
 
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 #include "libewf_chunk_table.h"
 #include "libewf_hash_sections.h"
 #include "libewf_io_handle.h"
@@ -175,6 +184,8 @@ ssize_t libewf_segment_file_write_device_information_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
+         uint8_t **device_information,
+         size_t *device_information_size,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
          libcerror_error_t **error );
@@ -185,6 +196,8 @@ ssize_t libewf_segment_file_write_case_data_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
+         uint8_t **case_data,
+         size_t *case_data_size,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
          time_t timestamp,
@@ -242,9 +255,14 @@ ssize_t libewf_segment_file_write_start(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
+         uint8_t **case_data,
+         size_t *case_data_size,
+         uint8_t **device_information,
+         size_t *device_information_size,
+         ewf_data_t **data_section,
          libewf_media_values_t *media_values,
          libfvalue_table_t *header_values,
-         ewf_data_t **cached_data_section,
+         time_t timestamp,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_chunks_section_start(

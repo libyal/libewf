@@ -16,6 +16,7 @@ SUBDIRS = \
 	libmfcache \
 	libmfdata \
 	libhmac \
+	libcaes \
 	libewf \
 	libodraw \
 	libsmdev \
@@ -94,6 +95,7 @@ library:
 	(cd $(srcdir)/libmfcache && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libmfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libcaes && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
 
@@ -125,6 +127,7 @@ splint:
 	(cd $(srcdir)/libmfcache && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libmfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libcaes && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libodraw && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmdev && $(MAKE) splint $(AM_MAKEFLAGS))

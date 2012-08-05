@@ -17,6 +17,7 @@ AM_CPPFLAGS = \
 	@BZIP2_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
+	@LIBCAES_CPPFLAGS@ \
 	@MEMWATCH_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
@@ -60,6 +61,7 @@ libewf_la_SOURCES = \
 	libewf_io_handle.c libewf_io_handle.h \
 	libewf_legacy.c libewf_legacy.h \
 	libewf_libbfio.h \
+	libewf_libcaes.h \
 	libewf_libcerror.h \
 	libewf_libclocale.h \
 	libewf_libcnotify.h \
@@ -105,6 +107,7 @@ libewf_la_LIBADD = \
 	@ZLIB_LIBADD@ \
 	@BZIP2_LIBADD@ \
 	@LIBHMAC_LIBADD@ \
+	@LIBCAES_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@
 

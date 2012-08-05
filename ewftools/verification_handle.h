@@ -173,6 +173,11 @@ int verification_handle_signal_abort(
      verification_handle_t *verification_handle,
      libcerror_error_t **error );
 
+int verification_handle_set_maximum_number_of_open_handles(
+     verification_handle_t *verification_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error );
+
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
      libcstring_system_character_t * const * filenames,

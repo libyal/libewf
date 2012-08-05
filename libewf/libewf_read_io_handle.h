@@ -49,6 +49,22 @@ struct libewf_read_io_handle
 	/* A value to indicate if the chunk data should be zeroed on error
 	 */
 	uint8_t zero_on_error;
+
+	/* Cached version of the case data
+	 */
+	uint8_t *case_data;
+
+	/* Size of the cached version of the case data
+	 */
+	size_t case_data_size;
+
+	/* Cached version of the device information
+	 */
+	uint8_t *device_information;
+
+	/* Size of the cached version of the device information
+	 */
+	size_t device_information_size;
 };
 
 int libewf_read_io_handle_initialize(

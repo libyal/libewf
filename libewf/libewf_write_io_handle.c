@@ -24,6 +24,15 @@
 #include <memory.h>
 #include <types.h>
 
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
@@ -245,6 +254,10 @@ int libewf_write_io_handle_clone(
 
 		goto on_error;
 	}
+	( *destination_write_io_handle )->case_data               = NULL;
+	( *destination_write_io_handle )->case_data_size          = 0;
+	( *destination_write_io_handle )->device_information      = NULL;
+	( *destination_write_io_handle )->device_information_size = 0;
 	( *destination_write_io_handle )->data_section            = NULL;
 	( *destination_write_io_handle )->table_section_data      = NULL;
 	( *destination_write_io_handle )->table_section_data_size = 0;
@@ -252,6 +265,68 @@ int libewf_write_io_handle_clone(
 	( *destination_write_io_handle )->table_entries_data_size = 0;
 	( *destination_write_io_handle )->number_of_table_entries = 0;
 
+	if( source_write_io_handle->case_data != NULL )
+	{
+		( *destination_write_io_handle )->case_data = (uint8_t *) memory_allocate(
+		                                                           source_write_io_handle->case_data_size );
+
+		if( ( *destination_write_io_handle )->case_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination case data.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_write_io_handle )->case_data,
+		     source_write_io_handle->case_data,
+		     sizeof( ewf_data_t ) ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination case data.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( source_write_io_handle->device_information != NULL )
+	{
+		( *destination_write_io_handle )->device_information = (uint8_t *) memory_allocate(
+		                                                                    source_write_io_handle->device_information_size );
+
+		if( ( *destination_write_io_handle )->device_information == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination device information.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_write_io_handle )->device_information,
+		     source_write_io_handle->device_information,
+		     sizeof( ewf_data_t ) ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination device information.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	if( source_write_io_handle->data_section != NULL )
 	{
 		( *destination_write_io_handle )->data_section = memory_allocate_structure(
@@ -315,7 +390,10 @@ int libewf_write_io_handle_clone(
 		}
 		( *destination_write_io_handle )->table_section_data_size = source_write_io_handle->table_section_data_size;
 
-/* TODO what about table entries data ? */
+		( *destination_write_io_handle )->table_entries_data = ( *destination_write_io_handle )->table_section_data
+		                                                     + ( *destination_write_io_handle )->table_header_size;
+
+		( *destination_write_io_handle )->table_entries_data_size = source_write_io_handle->table_entries_data_size;
 	}
 	return( 1 );
 
@@ -331,6 +409,16 @@ on_error:
 		{
 			memory_free(
 			 ( *destination_write_io_handle )->data_section );
+		}
+		if( ( *destination_write_io_handle )->device_information != NULL )
+		{
+			memory_free(
+			 ( *destination_write_io_handle )->device_information );
+		}
+		if( ( *destination_write_io_handle )->case_data != NULL )
+		{
+			memory_free(
+			 ( *destination_write_io_handle )->case_data );
 		}
 		memory_free(
 		 *destination_write_io_handle );
@@ -693,6 +781,8 @@ int libewf_write_io_handle_initialize_values(
 			zero_byte_empty_block = NULL;
 		}
 	}
+	write_io_handle->timestamp = time( NULL );
+
 	/* Flag that the write values were initialized
 	 */
 	write_io_handle->values_initialized = 1;
@@ -2610,9 +2700,14 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		               io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
+		               &( write_io_handle->case_data ),
+		               &( write_io_handle->case_data_size ),
+		               &( write_io_handle->device_information ),
+		               &( write_io_handle->device_information_size ),
+		               &( write_io_handle->data_section ),
 		               media_values,
 		               header_values,
-		               &( write_io_handle->data_section ),
+		               write_io_handle->timestamp,
 		               error );
 
 		if( write_count == -1 )
@@ -3524,7 +3619,12 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				       file_io_pool_entry,
 				       NULL,
 				       NULL,
+				       NULL,
+				       NULL,
+				       NULL,
+				       NULL,
 			               NULL,
+			               write_io_handle->timestamp,
 			               error );
 
 			if( write_count == -1 )

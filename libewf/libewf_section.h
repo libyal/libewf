@@ -151,16 +151,6 @@ ssize_t libewf_section_write_data(
          size_t section_data_size,
          libcerror_error_t **error );
 
-ssize_t libewf_section_last_write(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         off64_t section_offset,
-         uint32_t type,
-         uint8_t segment_file_type,
-         libcerror_error_t **error );
-
 ssize_t libewf_section_compressed_string_read(
          libewf_section_t *section,
          libewf_io_handle_t *io_handle,

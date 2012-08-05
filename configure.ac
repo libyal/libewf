@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120804],
+ [20120805],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -98,6 +98,9 @@ AX_BZIP2_CHECK_ENABLE
 dnl Check for enabling libhmac for message digest hash function support
 AX_LIBHMAC_CHECK_ENABLE
 
+dnl Check for enabling libcaes for AES cipher function support
+AX_LIBCAES_CHECK_ENABLE
+
 dnl Check for library function support
 AX_LIBEWF_CHECK_LOCAL
 
@@ -181,7 +184,7 @@ AM_CONDITIONAL(
 
 dnl Check if requires and build requires should be set in spec file
 AS_IF(
- [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno],
+ [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes],
  [AC_SUBST(
   [libewf_spec_requires],
   [Requires:])
@@ -217,6 +220,7 @@ AC_CONFIG_FILES([libfvalue/Makefile])
 AC_CONFIG_FILES([libmfcache/Makefile])
 AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libhmac/Makefile])
+AC_CONFIG_FILES([libcaes/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
@@ -281,6 +285,8 @@ Building:
    MD5 support:                                     $ac_cv_libhmac_md5
    SHA1 support:                                    $ac_cv_libhmac_sha1
    SHA256 support:                                  $ac_cv_libhmac_sha256
+   libcaes support:                                 $ac_cv_libcaes
+   AES support:                                     $ac_cv_libcaes_aes
    libodraw support:                                $ac_cv_libodraw
    libsmdev support:                                $ac_cv_libsmdev
    libsmraw support:                                $ac_cv_libsmraw
