@@ -240,11 +240,11 @@ int libewf_compress_data(
 		if( ( compression_level == LIBEWF_COMPRESSION_DEFAULT )
 		 || ( compression_level == LIBEWF_COMPRESSION_FAST ) )
 		{
-			zlib_compression_level = 1;
+			bzip2_compression_level = 1;
 		}
 		else if( compression_level == LIBEWF_COMPRESSION_BEST )
 		{
-			zlib_compression_level = 9;
+			bzip2_compression_level = 9;
 		}
 		else
 		{
@@ -306,16 +306,10 @@ int libewf_compress_data(
 				 function );
 			}
 #endif
-#if defined( HAVE_COMPRESS_BOUND ) || defined( WINAPI )
-			/* Use compressBound to determine the size of the uncompressed buffer
-			 */
-			zlib_compressed_data_size = compressBound( (uLong) uncompressed_data_size );
-			*compressed_data_size     = (size_t) zlib_compressed_data_size;
-#else
 			/* Estimate that a factor 2 enlargement should suffice
 			 */
 			*compressed_data_size *= 2;
-#endif
+
 			result = 0;
 		}
 		else if( result == BZ_MEM_ERROR )
@@ -337,7 +331,7 @@ int libewf_compress_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
 			 LIBCERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
-			 "%s: zlib returned undefined error: %d.",
+			 "%s: libbz2 returned undefined error: %d.",
 			 function,
 			 result );
 
@@ -633,7 +627,7 @@ int libewf_decompress_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
 			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
-			 "%s: zlib returned undefined error: %d.",
+			 "%s: libbz2 returned undefined error: %d.",
 			 function,
 			 result );
 

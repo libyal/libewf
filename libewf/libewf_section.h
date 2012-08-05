@@ -175,6 +175,7 @@ ssize_t libewf_section_write_compressed_string(
          int8_t compression_level,
          uint8_t *uncompressed_string,
          size_t uncompressed_string_size,
+         size_t fill_size,
          libcerror_error_t **error );
 
 ssize_t libewf_section_data_read(

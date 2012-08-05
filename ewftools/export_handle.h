@@ -61,6 +61,10 @@ struct export_handle
 	 */
 	size_t target_path_size;
 
+	/* The compression method
+	 */
+	uint16_t compression_method;
+
 	/* The compression level
 	 */
 	int8_t compression_level;
@@ -294,6 +298,11 @@ int export_handle_prompt_for_string(
      const libcstring_system_character_t *request_string,
      libcstring_system_character_t **internal_string,
      size_t *internal_string_size,
+     libcerror_error_t **error );
+
+int export_handle_prompt_for_compression_method(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_compression_level(

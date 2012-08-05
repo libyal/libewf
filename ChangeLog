@@ -1,15 +1,27 @@
 TODO
+* update codegear files (libcaes/libhmac)
+
+* add stream write support for EWF-S01 use fill space solution in table section
+
+* fix double _FILE_OFFSET_BITS=64
+
+* fix output: number of entries: 19175 exceeds maximum: 16375
+
+* check if compression level none is passed for SMART
+
+* add man page for ewfrecover
+
 * implement new chunk IO functions where chunk is an object
 
 * corruption scenarios
   - add strict chunk data flag handling
 
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
+* work on deduplication support
 
 * allow zlib to be replaced by alternative back-end
 
 * replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
-* work on deduplication support
 
 * libewf_filename_create split off wide variant ?
 
@@ -22,10 +34,7 @@ Tests
 * Add 8 TiB image size test
 
 * Ex01/Lx01 format
-  - sector table: start block value ? require larger test image
-  - encryption support; make sure the encryption keys are read first
-  - section integrity MD5 hash support
-  - file naming schema, what's after Ex99 ?
+  - encryption support (read/write)
   - analytical data
     - parse (read)
   - case data (write)
@@ -41,39 +50,27 @@ Tests
   - open single files ?
 
 * Ex01/Lx01 read support
-  - bzip2 compression support (test)
-  - verify device info and case data in multi segment files
+  - add support for sector table first chunk number
   - add generic way to parse file object data ?
   - make sure to correctly deal with aligment padding (should only affect one the Lx01 tables)
   - complete: libewf_chunk_table_fill_v2
 
-* Ex01/Lx01 write support
-  - bzip2 compression support (set in ewftools, test)
+* Ex01 write support
+  - add support for sector table first chunk number
   - pattern fill chunk support (set chunk table entry, test)
-  - encryption support
-  - encryption support: write section data at once for encryption
-    refactor to use libewf_section_write_data()
+  - enable secion data integrity hash support
+
+* Lx01 write support
+  - make sure to correctly deal with aligment padding (should only affect one the Lx01 tables)
 
 * Ex01/Lx01 extensions
   - implement SHA256 hash section
+  - allow pattern fill to have a size
+  - hash based imaging?
 
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
   - support for volume letter in -t argument
-
-* add support for device label header value
-
-* ewftools:
-  - replace GUID by set identifier
-
-Check:
-libewf_utf8_string_day_of_month_copy_to_time_elements: UTF-8 string too small.
-libewf_convert_date_header_value: unable to copy day of month value.
-libewf_header_values_parse_utf8_header_string: unable to create date time
-values string.
-
-* improve detection of zlib and makefiles
-* fix double _FILE_OFFSET_BITS=64
 
 * pyewf
   - update (+/-)
@@ -99,10 +96,6 @@ Roadmap:
 * lvf support
   - add support for permissions
   - thread aware support (check)
-* code clean up
-  - handle code
-  - write io handle code
-  - make write debug output similar to read debug output
 * error tollerance
   - allow for missing segment file(s)
   - allow for missing section(s)
@@ -297,6 +290,7 @@ Tools:
   - add support to manually provide sessions for optical images ?
   - add support for unattended write resume ?
   - improve output when encountering a read error
+  - add support to set device label header value
 * ewfacquirestream
   - implement stream handle
 * ewfexport
@@ -326,9 +320,8 @@ Tests
 * write resume from volume/disk section - basically re-image
 
 Deployment:
-* configure move openssl zlib check in to separate function
 * spec file
-  - make flex, yacc and openssl flexible
+  - make flex, yacc include flexible ?
 * add BORLANDC deprecated function support, unable to find suitable macro
   #pragma deprecated( function )
   __declspec(deprecated)
@@ -365,6 +358,10 @@ Closed:
 * added libcaes support
 * added support to ewftools to throttle number of open file descriptors used
   by library about 50% of the available descriptor is currently claimed
+* code clean up
+* worked on compression method support for ewftools
+* fixes for recent changes
+* worked on tests for EWF2
 
 20120804
 * worked on libewf_section_write_data

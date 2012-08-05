@@ -337,6 +337,11 @@ int libewf_chunk_data_pack(
 			else if( ( pack_flags & LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 			{
 				chunk_data->compressed_data_size = compressed_zero_byte_empty_block_size;
+
+				if( ( compressed_zero_byte_empty_block_size % 16 ) != 0 )
+				{
+					chunk_data->compressed_data_size += 16 - ( compressed_zero_byte_empty_block_size % 16 );
+				}
 			}
 			/* If the compression is forced and none of the other compression pack flags are set
 			 * we are dealing with EWF-S01 allow it to have compressed chunks larger than the chunk size

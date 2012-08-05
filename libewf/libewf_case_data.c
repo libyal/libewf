@@ -74,6 +74,7 @@ int libewf_case_data_generate_utf8_string(
 	size_t sectors_per_chunk_string_length                   = 0;
 	size_t system_date_string_length                         = 0;
 	size_t utf8_string_index                                 = 0;
+	uint64_t value_64bit                                     = 0;
 	int number_of_characters                                 = 0;
 	int number_of_tabs                                       = 0;
 	int result                                               = 0;
@@ -604,9 +605,21 @@ int libewf_case_data_generate_utf8_string(
 	}
 	*utf8_string_size += system_date_string_length;
 
+	/* If we do a streamed write reserve space for the final value
+	 */
+	if( media_values->media_size == 0 )
+	{
+		value_64bit   = 1;
+		value_64bit <<= 63;
+		value_64bit  -= 1;
+	}
+	else
+	{
+		value_64bit = media_values->number_of_chunks;
+	}
 	if( libfvalue_string_size_from_integer(
 	     &number_of_chunks_string_length,
-	     media_values->number_of_chunks,
+	     value_64bit,
 	     64,
 	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 	     error ) != 1 )
@@ -1049,11 +1062,23 @@ int libewf_case_data_generate_utf8_string(
 
 	if( number_of_chunks_string_length > 0 )
 	{
+		/* If we do a streamed write reserve space for the final value
+		 */
+		if( media_values->media_size == 0 )
+		{
+			value_64bit   = 1;
+			value_64bit <<= 63;
+			value_64bit  -= 1;
+		}
+		else
+		{
+			value_64bit = media_values->number_of_chunks;
+		}
 		if( libfvalue_utf8_string_with_index_copy_from_integer(
 		     *utf8_string,
 		     *utf8_string_size,
 		     &utf8_string_index,
-		     media_values->number_of_chunks,
+		     value_64bit,
 		     64,
 		     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 		     error ) != 1 )
@@ -1257,7 +1282,7 @@ int libewf_case_data_generate(
 		goto on_error;
 	}
 	*case_data = (uint8_t *) memory_allocate(
-	                                   sizeof( uint8_t ) * *case_data_size );
+	                          sizeof( uint8_t ) * *case_data_size );
 
 	if( *case_data == NULL )
 	{

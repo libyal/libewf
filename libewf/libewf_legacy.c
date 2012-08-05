@@ -198,9 +198,6 @@ int libewf_handle_get_number_of_chunks_written(
 
 		return( -1 );
 	}
-/* TODO is it necessary to expand this to 64-bit ?
- * will support up to 8 TiB with chunk size of 32 KiB
- */
 	if( internal_handle->write_io_handle->number_of_chunks_written > (uint64_t) UINT32_MAX )
 	{
 		libcerror_error_set(
@@ -212,7 +209,7 @@ int libewf_handle_get_number_of_chunks_written(
 
 		return( -1 );
 	}
-	*number_of_chunks = internal_handle->write_io_handle->number_of_chunks_written;
+	*number_of_chunks = (uint32_t) internal_handle->write_io_handle->number_of_chunks_written;
 
 	return( 1 );
 }

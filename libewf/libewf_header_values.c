@@ -6737,7 +6737,7 @@ int libewf_header_values_generate_xheader(
 				  header_value,
 				  0,
 				  *xheader,
-				  value_string_size,
+				  *xheader_size,
 				  &xheader_index,
 				  error );
 

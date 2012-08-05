@@ -384,11 +384,6 @@ int imaging_handle_set_string(
      size_t *internal_string_size,
      libcerror_error_t **error );
 
-int imaging_handle_set_compression_method(
-     imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
-     libcerror_error_t **error );
-
 int imaging_handle_set_compression_values(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,

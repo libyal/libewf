@@ -356,7 +356,7 @@ ssize_t libewf_segment_file_write_close(
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
-         ewf_data_t **cached_data_section,
+         ewf_data_t **data_section,
          libcerror_error_t **error );
 
 int libewf_segment_file_write_sections_correction(
@@ -367,12 +367,18 @@ int libewf_segment_file_write_sections_correction(
      uint64_t number_of_chunks_written_to_segment_file,
      int last_segment_file,
      libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,
      libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
-     ewf_data_t **cached_data_section,
+     uint8_t **case_data,
+     size_t *case_data_size,
+     uint8_t **device_information,
+     size_t *device_information_size,
+     ewf_data_t **data_section,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

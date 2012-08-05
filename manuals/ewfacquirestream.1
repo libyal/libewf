@@ -1,4 +1,4 @@
-.Dd July 22, 2012
+.Dd August 5, 2012
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -9,7 +9,7 @@
 .Op Fl A Ar codepage
 .Op Fl b Ar number_of_sectors
 .Op Fl B Ar number_of_bytes
-.Op Fl c Ar compression_level
+.Op Fl c Ar compression_values
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
 .Op Fl D Ar description
@@ -54,8 +54,10 @@ the codepage of header section, options: ascii (default), windows-874, windows-9
 the number of sectors to read at once (per chunk), options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl B Ar number_of_bytes
 the number of bytes to acquire
-.It Fl c Ar compression_level
-the compression level, options: none (default), empty-block, fast, best
+.It Fl c Ar compression_values
+specify the compression values as: level or method:level
+compression method options: deflate (default), bzip2 (bzip2 is only supported by EWF2 formats)
+compression level options: none (default), empty-block, fast or best
 .It Fl C Ar case_number
 the case number (default is case_number)
 .It Fl d Ar digest_type
@@ -114,7 +116,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfacquirestream \-C 1 \-D Floppy \-E 1.1 \-e 'John D.' \-N 'Just a floppy in my system' \-m removable \-M logical \-t floppy </dev/fd0
-ewfacquirestream 20110801
+ewfacquirestream 20120805
 
 Using the following acquiry parameters:
 Image path and filename:		floppy.E01
@@ -125,8 +127,9 @@ Examiner name:				John D.
 Notes:					Just a floppy in my system
 Media type:				removable
 Volume type:				logical
-Compression used:			none
 EWF file format:			EnCase 5
+Compression method:			deflate
+Compression level:			none
 Acquiry start offet:			0
 Number of bytes to acquire:		0 (until end of input)
 Evidence segment file size:		1.4 GiB (1572864000 bytes)
@@ -134,14 +137,14 @@ Block size:				64 sectors
 Error granularity:			64 sectors
 Retries on read error:			2
 
-Acquiry started at: Sat Feb 28 11:32:41 2009
+Acquiry started at: Sun Aug  5 11:32:41 2012
 
 This could take a while.
 
 Status: acquired 1.4 MiB (1474560 bytes)
         in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Sat Feb 28 11:32:42 2009
+Acquiry completed at: Sun Aug  5 11:32:42 2012
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 

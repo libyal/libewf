@@ -36,9 +36,10 @@ test_acquire_optical_file()
 { 
 	TOC_FILE=$1;
 	OUTPUT_FORMAT=$2;
-	COMPRESSION_LEVEL=$3;
-	MAXIMUM_SEGMENT_SIZE=$4;
-	CHUNK_SIZE=$5;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
+	MAXIMUM_SEGMENT_SIZE=$5;
+	CHUNK_SIZE=$6;
 
 	INPUT_FILES=`echo ${TOC_FILE} | ${SED} 's/_*[0-9]*[.][cC][uU][eE]$//'`;
 
@@ -53,8 +54,9 @@ examiner
 notes
 optical
 logical
-${COMPRESSION_LEVEL}
 ${OUTPUT_FORMAT}
+${COMPRESSION_METHOD}
+${COMPRESSION_LEVEL}
 
 
 ${MAXIMUM_SEGMENT_SIZE}
@@ -80,7 +82,7 @@ EOI
 
 	rm -rf ${TMP};
 
-	echo -n "Testing ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+	echo -n "Testing ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -95,9 +97,10 @@ test_acquire_unattended_optical_file()
 { 
 	TOC_FILE=$1;
 	OUTPUT_FORMAT=$2;
-	COMPRESSION_LEVEL=$3;
-	MAXIMUM_SEGMENT_SIZE=$4;
-	CHUNK_SIZE=$5;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
+	MAXIMUM_SEGMENT_SIZE=$5;
+	CHUNK_SIZE=$6;
 
 	INPUT_FILES=`echo ${TOC_FILE} | ${SED} 's/_*[0-9]*[.][cC][uU][eE]$//'`;
 
@@ -113,7 +116,7 @@ test_acquire_unattended_optical_file()
 	-N notes \
 	-m optical \
 	-M logical \
-	-c ${COMPRESSION_LEVEL} \
+	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
 	-f ${OUTPUT_FORMAT} \
 	-S ${MAXIMUM_SEGMENT_SIZE} \
 	-b ${CHUNK_SIZE} \
@@ -130,7 +133,7 @@ test_acquire_unattended_optical_file()
 
 	rm -rf ${TMP};
 
-	echo -n "Testing unattended ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+	echo -n "Testing unattended ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -189,53 +192,57 @@ fi
 
 for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in encase6;
+	for FORMAT in encase5 encase6;
 	do
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" none 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for COMPRESSION_LEVEL in none empty-block fast best;
+		do
+			if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" 650MB 16;
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+	done
 
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" best 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+	for FORMAT in encase7-v2;
+	do
+		for COMPRESSION_METHOD in deflate bzip2;
+		do
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB 16;
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
+		done
 	done
 done
 
 for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in encase6;
+	for FORMAT in encase5 encase6;
 	do
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" none 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for COMPRESSION_LEVEL in not_acquire_optical_filee empty-block fast best;
+		do
+			if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" 650MB 16;
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+	done
 
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" empty-block 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" fast 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" best 650MB 16;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+	for FORMAT in encase7-v2;
+	do
+		for COMPRESSION_METHOD in deflate bzip2;
+		do
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB 16;
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
+		done
 	done
 done
 

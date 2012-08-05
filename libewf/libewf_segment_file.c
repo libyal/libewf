@@ -1740,6 +1740,7 @@ ssize_t libewf_segment_file_write_device_information_section(
 	               LIBEWF_COMPRESSION_DEFAULT,
 	               *device_information,
 	               *device_information_size - 2,
+	               0,
 	               error );
 
 	if( write_count == -1 )
@@ -1893,6 +1894,7 @@ ssize_t libewf_segment_file_write_case_data_section(
 	               LIBEWF_COMPRESSION_DEFAULT,
 	               *case_data,
 	               *case_data_size - 2,
+	               0,
 	               error );
 
 	if( write_count == -1 )
@@ -2012,6 +2014,7 @@ ssize_t libewf_segment_file_write_header_section(
 	               compression_level,
 	               header_sections->header,
 	               header_sections->header_size - 1,
+	               0,
 	               error );
 
 	if( write_count == -1 )
@@ -2152,6 +2155,7 @@ ssize_t libewf_segment_file_write_header2_section(
 	               LIBEWF_COMPRESSION_DEFAULT,
 	               header_sections->header2,
 	               header_sections->header2_size - 2,
+	               0,
 	               error );
 
 	if( write_count == -1 )
@@ -2292,6 +2296,7 @@ ssize_t libewf_segment_file_write_xheader_section(
 	               LIBEWF_COMPRESSION_DEFAULT,
 	               header_sections->xheader,
 	               header_sections->xheader_size - 1,
+	               0,
 	               error );
 
 	if( write_count == -1 )
@@ -4737,6 +4742,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 			       LIBEWF_COMPRESSION_DEFAULT,
 			       hash_sections->xhash,
 			       hash_sections->xhash_size - 1,
+			       0,
 			       error );
 
 		if( write_count == -1 )
@@ -4798,7 +4804,7 @@ ssize_t libewf_segment_file_write_close(
          libewf_sector_list_t *sessions,
          libewf_sector_list_t *tracks,
          libewf_sector_list_t *acquiry_errors,
-         ewf_data_t **cached_data_section,
+         ewf_data_t **data_section,
 	 libcerror_error_t **error )
 {
 	libewf_section_t *section = NULL;
@@ -4890,7 +4896,7 @@ ssize_t libewf_segment_file_write_close(
 					       file_io_pool_entry,
 					       section_offset,
 					       media_values,
-					       cached_data_section,
+					       data_section,
 					       error );
 
 				if( write_count == -1 )
@@ -5201,12 +5207,18 @@ int libewf_segment_file_write_sections_correction(
      uint64_t number_of_chunks_written_to_segment_file,
      int last_segment_file,
      libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     time_t timestamp,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,
      libewf_sector_list_t *tracks,
      libewf_sector_list_t *acquiry_errors,
-     ewf_data_t **cached_data_section,
+     uint8_t **case_data,
+     size_t *case_data_size,
+     uint8_t **device_information,
+     size_t *device_information_size,
+     ewf_data_t **data_section,
      libcerror_error_t **error )
 {
 	libewf_list_element_t *section_list_element = NULL;
@@ -5249,6 +5261,50 @@ int libewf_segment_file_write_sections_correction(
 
 		return( -1 );
 	}
+	if( device_information == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information.",
+		 function );
+
+		return( -1 );
+	}
+	if( device_information_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device information size.",
+		 function );
+
+		return( -1 );
+	}
+	if( case_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data.",
+		 function );
+
+		return( -1 );
+	}
+	if( case_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid case data size.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -5286,7 +5342,176 @@ int libewf_segment_file_write_sections_correction(
 
 			return( -1 );
 		}
-		if( section->type_string_length == 6 )
+		if( section->type != 0 )
+		{
+			switch( section->type )
+			{
+				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
+					if( *device_information == NULL )
+					{
+						if( libewf_device_information_generate(
+						     device_information,
+						     device_information_size,
+						     media_values,
+						     header_values,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+							 "%s: unable to generate device information.",
+							 function );
+
+							return( -1 );
+						}
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: correcting device information section.\n",
+						 function );
+					}
+#endif
+					if( libbfio_pool_seek_offset(
+					     file_io_pool,
+					     file_io_pool_entry,
+					     section->start_offset,
+					     SEEK_SET,
+					     error ) == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_SEEK_FAILED,
+						 "%s: unable to find offset to correct device information section.",
+						 function );
+
+						return( -1 );
+					}
+					/* Do not include the end of string character in the compressed data
+					 */
+					write_count = libewf_section_write_compressed_string(
+						       section,
+						       io_handle,
+						       file_io_pool,
+						       file_io_pool_entry,
+						       2,
+						       LIBEWF_SECTION_TYPE_DEVICE_INFORMATION,
+						       NULL,
+						       0,
+						       section->start_offset,
+						       io_handle->compression_method,
+						       LIBEWF_COMPRESSION_DEFAULT,
+						       *device_information,
+						       *device_information_size - 2,
+						       (size_t) section->data_size,
+						       error );
+
+					if( write_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_WRITE_FAILED,
+						 "%s: unable to write device information section.",
+						 function );
+
+						return( -1 );
+					}
+					break;
+
+				case LIBEWF_SECTION_TYPE_CASE_DATA:
+					if( *case_data == NULL )
+					{
+						if( libewf_case_data_generate(
+						     case_data,
+						     case_data_size,
+						     media_values,
+						     header_values,
+						     timestamp,
+						     io_handle->format,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+							 "%s: unable to generate case data.",
+							 function );
+
+							return( -1 );
+						}
+					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: correcting case data section.\n",
+						 function );
+					}
+#endif
+					if( libbfio_pool_seek_offset(
+					     file_io_pool,
+					     file_io_pool_entry,
+					     section->start_offset,
+					     SEEK_SET,
+					     error ) == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_SEEK_FAILED,
+						 "%s: unable to find offset to correct case data section.",
+						 function );
+
+						return( -1 );
+					}
+					/* Do not include the end of string character in the compressed data
+					 */
+					write_count = libewf_section_write_compressed_string(
+						       section,
+						       io_handle,
+						       file_io_pool,
+						       file_io_pool_entry,
+						       2,
+						       LIBEWF_SECTION_TYPE_CASE_DATA,
+						       NULL,
+						       0,
+						       section->start_offset,
+						       io_handle->compression_method,
+						       LIBEWF_COMPRESSION_DEFAULT,
+						       *case_data,
+						       *case_data_size - 2,
+						       (size_t) section->data_size,
+						       error );
+
+					if( write_count == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_WRITE_FAILED,
+						 "%s: unable to write case data section.",
+						 function );
+
+						return( -1 );
+					}
+					break;
+
+				case LIBEWF_SECTION_TYPE_NEXT:
+					/* The last segment file should be terminated with a done section and not with a next section
+					 */
+					if( last_segment_file != 0 )
+					{
+						correct_last_next_section = 1;
+						next_section_start_offset = section->start_offset;
+					}
+					break;
+			}
+		}
+		else if( section->type_string_length == 6 )
 		{
 			if( memory_compare(
 			     section->type_string,
@@ -5394,7 +5619,7 @@ int libewf_segment_file_write_sections_correction(
 					       file_io_pool_entry,
 					       section->start_offset,
 					       media_values,
-					       cached_data_section,
+					       data_section,
 					       error );
 
 				if( write_count == -1 )
@@ -5407,19 +5632,6 @@ int libewf_segment_file_write_sections_correction(
 					 function );
 
 					return( -1 );
-				}
-			}
-			/* The last segment file should be terminated with a done section and not with a next section
-			 */
-			else if( last_segment_file != 0 )
-			{
-				if( memory_compare(
-				     section->type_string,
-				     "next",
-				     4 ) == 0 )
-				{
-					correct_last_next_section = 1;
-					next_section_start_offset = section->start_offset;
 				}
 			}
 		}
@@ -5483,7 +5695,7 @@ int libewf_segment_file_write_sections_correction(
 			       sessions,
 			       tracks,
 			       acquiry_errors,
-			       cached_data_section,
+			       data_section,
 			       error );
 
 		if( write_count == -1 )

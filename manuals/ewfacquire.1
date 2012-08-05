@@ -1,4 +1,4 @@
-.Dd July 22, 2012
+.Dd August 5, 2012
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -9,7 +9,7 @@
 .Op Fl A Ar codepage
 .Op Fl b Ar number_of_sectors
 .Op Fl B Ar number_of_bytes
-.Op Fl c Ar compression_level
+.Op Fl c Ar compression_values
 .Op Fl C Ar case_number
 .Op Fl d Ar digest_type
 .Op Fl D Ar description
@@ -67,8 +67,10 @@ the codepage of header section, options: ascii (default), windows-874, windows-9
 the number of sectors to read at once (per chunk), options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl B Ar number_of_bytes
 the number of bytes to acquire
-.It Fl c Ar compression_level
-the compression level, options: none (default), empty-block, fast, best
+.It Fl c Ar compression_values
+specify the compression values as: level or method:level
+compression method options: deflate (default), bzip2 (bzip2 is only supported by EWF2 formats)
+compression level options: none (default), empty-block, fast or best
 .It Fl C Ar case_number
 the case number (default is case_number)
 .It Fl d Ar digest_type
@@ -150,7 +152,7 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20120722
+ewfacquire 20120805
 
 Device information:
 Bus type:
@@ -172,8 +174,9 @@ Examiner name: John D.
 Notes: Just a floppy in my system
 Media type (fixed, removable, optical, memory) [fixed]: removable
 Media characteristics (logical, physical) [logical]:
-Use compression (none, empty-block, fast, best) [none]:
 Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, linen5, linen6, linen7, ewfx) [encase6]: encase5
+Compression method (deflate) [deflate]:
+Compression level (none, empty-block, fast, best) [none]:
 Start to acquire at offset (0 <= value <= 1474560) [0]:
 The number of bytes to acquire (0 <= value <= 1474560) [1474560]:
 Evidence segment file size in bytes (1.0 MiB <= value <= 1.9 GiB) [1.4 GiB]:
@@ -192,8 +195,9 @@ Examiner name:				John D.
 Notes:					Just a floppy in my system
 Media type:				removable
 Is physical:				no
-Compression used:			none
 EWF file format:			Encase 5 (.E01)
+Compression method:			deflate
+Compression level:			none
 Acquiry start offset:			0
 Number of bytes to acquire:		1.4 MiB (1474560 bytes)
 Evidence segment file size:		1.4 GiB (1572864000 bytes)
@@ -205,7 +209,7 @@ Zero sectors on read error:		no
 
 Continue acquiry with these values (yes, no) [yes]:
 
-Acquiry started at: Sat Feb 28 11:32:41 2009
+Acquiry started at: Sun Aug  5 11:32:41 2012
 
 This could take a while.
 
@@ -218,7 +222,7 @@ Status: at 100%.
         acquired 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Sat Feb 28 11:32:42 2009
+Acquiry completed at: Sun Aug  5 11:32:42 2012
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
@@ -228,7 +232,7 @@ MD5 hash calculated over data:		ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ss To convert a split RAW image into an EWF image:
 .Bd -literal
 # ewfacquire usb256.raw.0??
-ewfacquire 20110801
+ewfacquire 20120805
 
 Storage media information:
 Type:					RAW image
@@ -241,7 +245,7 @@ Bytes per sector:			512
 .Ss To convert an optical disc RAW image with a table of contents file into an EWF image:
 .Bd -literal
 # ewfacquire -T cdrom.cue cdrom.iso
-ewfacquire 20110801
+ewfacquire 20120805
 
 Storage media information:
 Type:					Optical disc RAW image

@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib"
+				AdditionalDependencies="advapi32.lib zlib.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				RandomizedBaseAddress="1"
@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib"
+				AdditionalDependencies="advapi32.lib zlib.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -480,6 +480,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_libcaes.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_libcerror.h"
 				>
 			</File>
@@ -497,10 +501,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_libfvalue.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_libcaes.h"
 				>
 			</File>
 			<File

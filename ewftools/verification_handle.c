@@ -3009,8 +3009,8 @@ int verification_handle_set_additional_digest_types(
 	uint8_t calculate_sha1                           = 0;
 	uint8_t calculate_sha256                         = 0;
 	int number_of_segments                           = 0;
-	int segment_index                                = 0;
 	int result                                       = 0;
+	int segment_index                                = 0;
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	libcsplit_wide_split_string_t *string_elements   = NULL;
@@ -3076,7 +3076,7 @@ int verification_handle_set_additional_digest_types(
 		 "%s: unable to retrieve number of segments.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	for( segment_index = 0;
 	     segment_index < number_of_segments;
@@ -3118,7 +3118,7 @@ int verification_handle_set_additional_digest_types(
 			 function,
 			 segment_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( string_segment_size == 5 )
 		{

@@ -339,6 +339,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
      libmfcache_cache_t *segment_files_cache,
+     libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,

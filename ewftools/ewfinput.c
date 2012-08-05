@@ -241,7 +241,6 @@ int ewfinput_determine_ewf_format(
 			}
 		}
 	}
-/* TODO this is a test for now */
 	else if( string_length == 10 )
 	{
 		if( libcstring_system_string_compare(

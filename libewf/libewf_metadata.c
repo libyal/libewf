@@ -1329,26 +1329,25 @@ int libewf_handle_set_format(
 	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
 		/* Wraps .s01 to .s99 and then to .saa up to .zzz
-		 * ( ( ( 'z' - 's' ) * 26 * 26 ) + 99 ) = 4831
+		 * ( ( ( 's' to 'z' = 8 ) * 26 * 26 ) + 99 ) = 4831
 		 */
-		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 4831;
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 5507;
 		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
 	}
 	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
-/* TODO the actual naming scheme is unverified */
-		/* Wraps .Ex01 to .Ex99 and then to .ExAA up to .ExZZ
-		 * ( ( 26 * 26 ) + 99 ) = 775
+		/* Wraps .Ex01 to .Ex99 and then to .ExAA up to .EzZZ
+		 * ( ( ( 'x' to 'z' = 3 ) * 26 * 26 ) + 99 ) = 2127
 		 */
-		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 775;
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 2127;
 		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
 	}
 	else
 	{
 		/* Wraps .E01 to .E99 and then to .EAA up to .ZZZ
-		 * ( ( ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) = 14295
+		 * ( ( ( 'E' to 'Z' or 'e' to 'z' = 22 ) * 26 * 26 ) + 99 ) = 14971
 		 */
-		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 14295;
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 14971;
 		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
 	}
 	/* Determine the maximum number of table entries

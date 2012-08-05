@@ -62,15 +62,18 @@ EOI
 
 test_export_ewf()
 { 
-	OUTPUT_FORMAT=$1;
-	INPUT_FILE=$2;
+	INPUT_FILE=$1;
+	OUTPUT_FORMAT=$2;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
 
 	mkdir ${TMP};
 
 ${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
 ${OUTPUT_FORMAT}
 ${TMP}/export
-none
+${COMPRESSION_METHOD}
+${COMPRESSION_LEVEL}
 
 
 
@@ -81,7 +84,7 @@ EOI
 
 	rm -rf ${TMP};
 
-	echo -n "Testing ewfexport to ewf format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+	echo -n "Testing ewfexport of input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -94,21 +97,24 @@ EOI
 
 test_export_unattended()
 { 
-	OUTPUT_FORMAT=$1;
-	INPUT_FILE=$2;
+	INPUT_FILE=$1;
+	OUTPUT_FORMAT=$2;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
 
 	mkdir ${TMP};
 
 	${EWFEXPORT} -q -u -d sha1 \
-	-t ${TMP}/unattended_export \
+	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
 	-f ${OUTPUT_FORMAT} \
+	-t ${TMP}/unattended_export \
 	${INPUT_FILE}
 
 	RESULT=$?;
 
 	rm -rf ${TMP};
 
-	echo -n "Testing unattended ewfexport to format: ${OUTPUT_FORMAT} of input: ${INPUT_FILE} ";
+	echo -n "Testing ewfexport of input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -158,10 +164,21 @@ do
 
 	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
-		if ! test_export_ewf "${FORMAT}" "${FILENAME}";
+		if ! test_export_ewf "${FILENAME}" "${FORMAT}" deflate none;
 		then
 			exit ${EXIT_FAILURE};
 		fi
+	done
+
+	for FORMAT in encase7-v2;
+	do
+		for COMPRESSION_METHOD in deflate bzip2;
+		do
+			if ! test_export_ewf "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 	done
 done
 
@@ -169,10 +186,21 @@ for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
 do
 	for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 	do
-		if ! test_export_unattended "${FORMAT}" "${FILENAME}";
+		if ! test_export_unattended "${FILENAME}" "${FORMAT}" deflate none;
 		then
 			exit ${EXIT_FAILURE};
 		fi
+	done
+
+	for FORMAT in encase7-v2;
+	do
+		for COMPRESSION_METHOD in deflate bzip2;
+		do
+			if ! test_export_unattended "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 	done
 done
 

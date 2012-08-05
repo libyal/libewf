@@ -36,9 +36,10 @@ test_acquire_file()
 { 
 	INPUT_FILE=$1;
 	OUTPUT_FORMAT=$2;
-	COMPRESSION_LEVEL=$3;
-	MAXIMUM_SEGMENT_SIZE=$4;
-	CHUNK_SIZE=$5;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
+	MAXIMUM_SEGMENT_SIZE=$5;
+	CHUNK_SIZE=$6;
 
 	mkdir ${TMP};
 
@@ -51,8 +52,9 @@ examiner
 notes
 removable
 logical
-${COMPRESSION_LEVEL}
 ${OUTPUT_FORMAT}
+${COMPRESSION_METHOD}
+${COMPRESSION_LEVEL}
 
 
 ${MAXIMUM_SEGMENT_SIZE}
@@ -78,7 +80,7 @@ EOI
 
 	rm -rf ${TMP};
 
-	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -93,9 +95,10 @@ test_acquire_unattended_file()
 { 
 	INPUT_FILE=$1;
 	OUTPUT_FORMAT=$2;
-	COMPRESSION_LEVEL=$3;
-	MAXIMUM_SEGMENT_SIZE=$4;
-	CHUNK_SIZE=$5;
+	COMPRESSION_METHOD=$3;
+	COMPRESSION_LEVEL=$4;
+	MAXIMUM_SEGMENT_SIZE=$5;
+	CHUNK_SIZE=$6;
 
 	mkdir ${TMP};
 
@@ -108,7 +111,7 @@ test_acquire_unattended_file()
 	-N notes \
 	-m removable \
 	-M logical \
-	-c ${COMPRESSION_LEVEL} \
+	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
 	-f ${OUTPUT_FORMAT} \
 	-S ${MAXIMUM_SEGMENT_SIZE} \
 	-b ${CHUNK_SIZE} \
@@ -125,7 +128,7 @@ test_acquire_unattended_file()
 
 	rm -rf ${TMP};
 
-	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -182,29 +185,31 @@ fi
 
 for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
+	for SEGMENT_SIZE in 650MB 1MiB;
 	do
-		for SEGMENT_SIZE in 650MB 1MiB;
+		for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
 		do
-			if ! test_acquire_file "${FILENAME}" "${FORMAT}" none "${SEGMENT_SIZE}" 64;
-			then
-				exit ${EXIT_FAILURE};
-			fi
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
+		done
 
-			if ! test_acquire_file "${FILENAME}" "${FORMAT}" empty-block "${SEGMENT_SIZE}" 64;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" "${FORMAT}" fast "${SEGMENT_SIZE}" 64;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" "${FORMAT}" best "${SEGMENT_SIZE}" 64;
-			then
-				exit ${EXIT_FAILURE};
-			fi
+		for FORMAT in encase7-v2;
+		do
+			for COMPRESSION_METHOD in deflate bzip2;
+			do
+				for COMPRESSION_LEVEL in none empty-block fast best;
+				do
+					if ! test_acquire_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			done
 		done
 	done
 
@@ -212,148 +217,117 @@ do
 	do
 		for SEGMENT_SIZE in 650MB 1MiB;
 		do
-			if ! test_acquire_file "${FILENAME}" encase6 none "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
 
-			if ! test_acquire_file "${FILENAME}" encase6 empty-block "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_file "${FILENAME}" smart deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
 
-			if ! test_acquire_file "${FILENAME}" encase6 fast "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" encase6 best "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-	done
-
-	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
-	do
-		for SEGMENT_SIZE in 650MB 1MiB;
-		do
-			if ! test_acquire_file "${FILENAME}" smart none "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" smart empty-block "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" smart fast "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-
-			if ! test_acquire_file "${FILENAME}" smart best "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
+			for COMPRESSION_METHOD in deflate bzip2;
+			do
+				for COMPRESSION_LEVEL in none empty-block fast best;
+				do
+					if ! test_acquire_file "${FILENAME}" encase7-v2 deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			done
 		done
 	done
 done
 
 for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
+	for SEGMENT_SIZE in 650MB 1MiB;
 	do
-		if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" none 650MB 64;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
+		do
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
+		done
 
-		if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" empty-block 650MB 64;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" fast 650MB 64;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" best 650MB 64;
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for FORMAT in encase7-v2;
+		do
+			for COMPRESSION_METHOD in deflate bzip2;
+			do
+				for COMPRESSION_LEVEL in none empty-block fast best;
+				do
+					if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			done
+		done
 	done
 
 	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
 	do
-		if ! test_acquire_unattended_file "${FILENAME}" encase6 none 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for COMPRESSION_LEVEL in none empty-block fast best;
+		do
+			if ! test_acquire_unattended_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 
-		if ! test_acquire_unattended_file "${FILENAME}" encase6 empty-block 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for COMPRESSION_LEVEL in none empty-block fast best;
+		do
+			if ! test_acquire_unattended_file "${FILENAME}" smart deflate "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
 
-		if ! test_acquire_unattended_file "${FILENAME}" encase6 fast 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" encase6 best 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-	done
-
-	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
-	do
-		if ! test_acquire_unattended_file "${FILENAME}" smart none 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" smart empty-block 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" smart fast 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
-
-		if ! test_acquire_unattended_file "${FILENAME}" smart best 650MB "${CHUNK_SIZE}";
-		then
-			exit ${EXIT_FAILURE};
-		fi
+		for COMPRESSION_METHOD in deflate bzip2;
+		do
+			for COMPRESSION_LEVEL in none empty-block fast best;
+			do
+				if ! test_acquire_unattended_file "${FILENAME}" encase7-v2 "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
+				then
+					exit ${EXIT_FAILURE};
+				fi
+			done
+		done
 	done
 done
 
 for FILENAME in `${LS} ${INPUT_MORE}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
 do
-	if ! test_acquire_file "${FILENAME}" encase6 none 100GB 64;
-	then
-		exit ${EXIT_FAILURE};
-	fi
+	for COMPRESSION_LEVEL in none empty-block fast best;
+	do
+		if ! test_acquire_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" 100GB 64;
+		then
+			exit ${EXIT_FAILURE};
+		fi
+	done
 
-	if ! test_acquire_file "${FILENAME}" encase6 empty-block 100GB 64;
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	if ! test_acquire_file "${FILENAME}" encase6 fast 100GB 64;
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	if ! test_acquire_file "${FILENAME}" encase6 best 100GB 64;
-	then
-		exit ${EXIT_FAILURE};
-	fi
+	for COMPRESSION_METHOD in deflate bzip2;
+	do
+		for COMPRESSION_LEVEL in none empty-block fast best;
+		do
+			if ! test_acquire_file "${FILENAME}" encase7-v2 "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 100GB 64;
+			then
+				exit ${EXIT_FAILURE};
+			fi
+		done
+	done
 done
 
 exit ${EXIT_SUCCESS};

@@ -96,14 +96,14 @@ test_glob()
 	return ${RESULT};
 }
 
-test_glob_sequence()
+test_glob_sequence3()
 { 
 	BASENAME=$1;
 	SCHEMA=$2;
 	FILENAME=$3;
 	LAST=$4;
 
-	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][esEL][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][esEL]01$"`;
 	IS_VALID=$?;
 
 	if [ ${IS_VALID} -ne 0 ];
@@ -202,6 +202,11 @@ test_glob_sequence()
 				SECOND_ITERATOR=0;
 			fi
 
+			if [ ${FIRST_ITERATOR} -ge 26 ];
+			then
+				break;
+			fi
+
 			if [ ${IS_UPPER_CASE} -eq 0 ];
 			then
 				FIRST_BYTE_VALUE=`expr 65 + ${FIRST_ITERATOR}`;
@@ -218,6 +223,138 @@ test_glob_sequence()
 			THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
 
 			EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}";
+		done
+
+		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
+	fi
+
+	mkdir ${TMP};
+	cd ${TMP};
+
+	echo ${FILENAMES} > input;
+
+	touch ${FILENAMES};
+
+	../${EWF_TEST_GLOB} ${BASENAME} > output;
+
+	RESULT=$?;
+
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
+	then
+		if ! ${CMP} -s input output;
+		then
+			RESULT=${EXIT_FAILURE};
+		fi
+	fi
+
+	cd ..;
+	rm -rf ${TMP};
+
+	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
+	return ${RESULT};
+}
+
+test_glob_sequence4()
+{ 
+	BASENAME=$1;
+	SCHEMA=$2;
+	FILENAME=$3;
+	LAST=$4;
+
+	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][EL]x01$"`;
+	IS_VALID=$?;
+
+	if [ ${IS_VALID} -ne 0 ];
+	then
+		echo "Unsupported schema: ${SCHEMA}";
+
+		exit ${EXIT_FAILURE};
+	fi
+
+	RESULT=`echo ${LAST} | ${EGREP} "^[EL][x-z][0-9A-Z][0-9A-Z]$"`;
+	IS_VALID=$?;
+
+	if [ ${IS_VALID} -ne 0 ];
+	then
+		echo "Unsupported last: ${LAST}";
+
+		exit ${EXIT_FAILURE};
+	fi
+
+	FIRST_LETTER=`echo ${SCHEMA} | cut -c 2`;
+	SECOND_LETTER=`echo ${SCHEMA} | cut -c 3`;
+
+	RESULT=`echo ${LAST} | ${EGREP} "^${FIRST_LETTER}${SECOND_LETTER}[0-9][0-9]$"`;
+	LAST_IS_NUMERIC=$?;
+
+	if [ ${LAST_IS_NUMERIC} -eq 0 ];
+	then
+		LAST=`echo ${LAST} | cut -c '3 4'`;
+
+		SEQUENCE=`seq 1 ${LAST}`;
+	else
+		SEQUENCE=`seq 1 99`;
+	fi
+
+	FILENAMES=`for NUMBER in ${SEQUENCE}; do echo -n "${FILENAME}.${FIRST_LETTER}${SECOND_LETTER}${NUMBER} "; echo $FILE; done`;
+
+	if [ ${LAST_IS_NUMERIC} -ne 0 ];
+	then
+		SECOND_ITERATOR=23;
+		THIRD_ITERATOR=0;
+		FOURTH_ITERATOR=0;
+
+		SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
+		THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
+		FOURTH_BYTE_VALUE=`expr 65 + ${FOURTH_ITERATOR}`;
+
+		SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
+		THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
+		FOURTH_LETTER=`chr ${FOURTH_BYTE_VALUE}`;
+
+		EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}${FOURTH_LETTER}";
+
+		until [ ${EXTENSION} = ${LAST} ];
+		do
+			FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
+
+			FOURTH_ITERATOR=`expr ${FOURTH_ITERATOR} + 1`;
+
+			if [ ${FOURTH_ITERATOR} -ge 26 ];
+			then
+				THIRD_ITERATOR=`expr ${THIRD_ITERATOR} + 1`;
+
+				FOURTH_ITERATOR=0;
+			fi
+
+			if [ ${THIRD_ITERATOR} -ge 26 ];
+			then
+				SECOND_ITERATOR=`expr ${SECOND_ITERATOR} + 1`;
+
+				THIRD_ITERATOR=0;
+			fi
+
+			if [ ${SECOND_ITERATOR} -ge 26 ];
+			then
+				break;
+			fi
+
+			SECOND_BYTE_VALUE=`expr 97 + ${SECOND_ITERATOR}`;
+			THIRD_BYTE_VALUE=`expr 65 + ${THIRD_ITERATOR}`;
+			FOURTH_BYTE_VALUE=`expr 65 + ${FOURTH_ITERATOR}`;
+
+			SECOND_LETTER=`chr ${SECOND_BYTE_VALUE}`;
+			THIRD_LETTER=`chr ${THIRD_BYTE_VALUE}`;
+			FOURTH_LETTER=`chr ${FOURTH_BYTE_VALUE}`;
+
+			EXTENSION="${FIRST_LETTER}${SECOND_LETTER}${THIRD_LETTER}${FOURTH_LETTER}";
 		done
 
 		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
@@ -289,12 +426,12 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.e01" ".e01" "PREFIX" "eba";
+if ! test_glob_sequence3 "PREFIX.e01" ".e01" "PREFIX" "eba";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.e01" ".e01" "PREFIX" "faa";
+if ! test_glob_sequence3 "PREFIX.e01" ".e01" "PREFIX" "faa";
 then
 	exit ${EXIT_FAILURE};
 fi
@@ -316,12 +453,12 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.s01" ".s01" "PREFIX" "sba";
+if ! test_glob_sequence3 "PREFIX.s01" ".s01" "PREFIX" "sba";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.s01" ".s01" "PREFIX" "taa";
+if ! test_glob_sequence3 "PREFIX.s01" ".s01" "PREFIX" "taa";
 then
 	exit ${EXIT_FAILURE};
 fi
@@ -343,12 +480,12 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.E01" ".E01" "PREFIX" "EBA";
+if ! test_glob_sequence3 "PREFIX.E01" ".E01" "PREFIX" "EBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.E01" ".E01" "PREFIX" "FAA";
+if ! test_glob_sequence3 "PREFIX.E01" ".E01" "PREFIX" "FAA";
 then
 	exit ${EXIT_FAILURE};
 fi
@@ -370,12 +507,12 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "LBA";
+if ! test_glob_sequence3 "PREFIX.L01" ".L01" "PREFIX" "LBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test_glob_sequence "PREFIX.L01" ".L01" "PREFIX" "MAA";
+if ! test_glob_sequence3 "PREFIX.L01" ".L01" "PREFIX" "MAA";
 then
 	exit ${EXIT_FAILURE};
 fi
@@ -397,6 +534,16 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+if ! test_glob_sequence4 "PREFIX.Ex01" ".Ex01" "PREFIX" "ExBA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence4 "PREFIX.Ex01" ".Ex01" "PREFIX" "EyAA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
 # .Lx01
 
 if ! test_glob "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01";
@@ -410,6 +557,16 @@ then
 fi
 
 if ! test_glob "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09 PREFIX.Lx10 PREFIX.Lx11";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence4 "PREFIX.Lx01" ".Lx01" "PREFIX" "LxBA";
+then
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test_glob_sequence4 "PREFIX.Lx01" ".Lx01" "PREFIX" "LyAA";
 then
 	exit ${EXIT_FAILURE};
 fi

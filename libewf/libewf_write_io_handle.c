@@ -127,7 +127,7 @@ int libewf_write_io_handle_initialize(
 	( *write_io_handle )->maximum_segment_file_size   = INT64_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
-	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
+	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) 14971;
 
 	return( 1 );
 
@@ -165,6 +165,16 @@ int libewf_write_io_handle_free(
 	}
 	if( *write_io_handle != NULL )
 	{
+		if( ( *write_io_handle )->case_data != NULL )
+		{
+			memory_free(
+			 ( *write_io_handle )->case_data );
+		}
+		if( ( *write_io_handle )->device_information != NULL )
+		{
+			memory_free(
+			 ( *write_io_handle )->device_information );
+		}
 		if( ( *write_io_handle )->data_section != NULL )
 		{
 			memory_free(
@@ -3774,6 +3784,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_media_values_t *media_values,
      libmfdata_file_list_t *segment_files_list,
      libmfcache_cache_t *segment_files_cache,
+     libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
      libewf_sector_list_t *sessions,
@@ -3890,11 +3901,17 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		     write_io_handle->number_of_chunks_written_to_segment_file,
 		     last_segment_file,
 		     media_values,
+		     header_values,
+		     write_io_handle->timestamp,
 		     hash_values,
 		     hash_sections,
 		     sessions,
 		     tracks,
 		     acquiry_errors,
+		     &( write_io_handle->case_data ),
+		     &( write_io_handle->case_data_size ),
+		     &( write_io_handle->device_information ),
+		     &( write_io_handle->device_information_size ),
 		     &( write_io_handle->data_section ),
 		     error ) != 1 )
 		{

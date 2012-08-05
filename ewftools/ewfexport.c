@@ -105,7 +105,7 @@ void usage_fprint(
 	                 "Format) to raw data or another EWF format.\n\n" );
 
 	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b number_of_sectors ]\n"
-	                 "                 [ -B number_of_bytes ] [ -c compression_level ]\n"
+	                 "                 [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
@@ -121,14 +121,17 @@ void usage_fprint(
 	                 "\t           4096, 8192, 16384 or 32768 (not used for raw and files\n"
 	                 "\t           formats)\n" );
 	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
-	fprintf( stream, "\t-c:        specify the compression level, options: none (default),\n"
-	                 "\t           empty-block, fast or best (not used for raw and files format)\n" );
+	fprintf( stream, "\t-c:        specify the compression values as: level or method:level\n"
+	                 "\t           compression method options: deflate (default), bzip2\n"
+	                 "\t           (bzip2 is only supported by EWF2 formats)\n"
+	                 "\t           compression level options: none (default), empty-block,\n"
+	                 "\t           fast or best\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
 	                 "\t           options: sha1, sha256 (not used for raw and files format)\n" );
 	fprintf( stream, "\t-f:        specify the output format to write to, options:\n"
 	                 "\t           raw (default), files (restricted to logical volume files), ewf,\n"
 	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
-	                 "\t           encase7, linen5, linen6, linen7, ewfx\n" );
+	                 "\t           encase7, encase7-v2, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
@@ -233,7 +236,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *acquiry_software_version       = NULL;
 	libcstring_system_character_t *log_filename                   = NULL;
 	libcstring_system_character_t *option_additional_digest_types = NULL;
-	libcstring_system_character_t *option_compression_level       = NULL;
+	libcstring_system_character_t *option_compression_values      = NULL;
 	libcstring_system_character_t *option_format                  = NULL;
 	libcstring_system_character_t *option_header_codepage         = NULL;
 	libcstring_system_character_t *option_maximum_segment_size    = NULL;
@@ -353,7 +356,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				option_compression_level = optarg;
+				option_compression_values = optarg;
 
 				break;
 
@@ -637,28 +640,6 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( option_compression_level != NULL )
-	{
-		result = export_handle_set_compression_values(
-			  ewfexport_export_handle,
-			  option_compression_level,
-			  &error );
-
-		if( result == -1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set compression values.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unsupported compression level defaulting to: none.\n" );
-		}
-	}
 	if( option_format != NULL )
 	{
 		result = export_handle_set_output_format(
@@ -679,6 +660,28 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported output format defaulting to: raw.\n" );
+		}
+	}
+	if( option_compression_values != NULL )
+	{
+		result = export_handle_set_compression_values(
+			  ewfexport_export_handle,
+			  option_compression_values,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set compression values.\n" );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression values defaulting to method: deflate with level: none.\n" );
 		}
 	}
 	if( option_sectors_per_chunk != NULL )
@@ -903,11 +906,24 @@ int main( int argc, char * const argv[] )
 		}
 		if( ewfexport_export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 		{
-			if( option_compression_level == NULL )
+			if( option_compression_values == NULL )
 			{
+				result = export_handle_prompt_for_compression_method(
+					  ewfexport_export_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Compression method" ),
+					  &error );
+
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine compression method.\n" );
+
+					goto on_error;
+				}
 				result = export_handle_prompt_for_compression_level(
 					  ewfexport_export_handle,
-				          _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
+				          _LIBCSTRING_SYSTEM_STRING( "Compression level" ),
 					  &error );
 
 				if( result == -1 )

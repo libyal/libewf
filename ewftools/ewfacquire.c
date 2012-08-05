@@ -109,7 +109,7 @@ void ewfacquire_usage_fprint(
 	                 "format (Expert Witness Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfacquire [ -A codepage ] [ -b number_of_sectors ]\n"
-	                 "                  [ -B number_of_bytes ] [ -c compression_level ]\n"
+	                 "                  [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
 	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
 	                 "                  [ -g number_of_sectors ] [ -l log_filename ]\n"
@@ -129,8 +129,11 @@ void ewfacquire_usage_fprint(
 	                 "\t        options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096,\n"
 	                 "\t        8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-B:     specify the number of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c:     specify the compression level, options: none (default),\n"
-	                 "\t        empty-block, fast or best\n" );
+	fprintf( stream, "\t-c:     specify the compression values as: level or method:level\n"
+	                 "\t        compression method options: deflate (default), bzip2\n"
+	                 "\t        (bzip2 is only supported by EWF2 formats)\n"
+	                 "\t        compression level options: none (default), empty-block,\n"
+	                 "\t        fast or best\n" );
 	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options:\n"
 	                 "\t        sha1, sha256\n" );
@@ -1261,7 +1264,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_additional_digest_types   = NULL;
 	libcstring_system_character_t *option_bytes_per_sector          = NULL;
 	libcstring_system_character_t *option_case_number               = NULL;
-	libcstring_system_character_t *option_compression_level         = NULL;
+	libcstring_system_character_t *option_compression_values        = NULL;
 	libcstring_system_character_t *option_description               = NULL;
 	libcstring_system_character_t *option_examiner_name             = NULL;
 	libcstring_system_character_t *option_evidence_number           = NULL;
@@ -1367,7 +1370,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'c':
-				option_compression_level = optarg;
+				option_compression_values = optarg;
 
 				break;
 
@@ -1839,28 +1842,6 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( option_compression_level != NULL )
-	{
-		result = imaging_handle_set_compression_values(
-			  ewfacquire_imaging_handle,
-			  option_compression_level,
-			  &error );
-
-		if( result == -1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to set compression values.\n" );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			fprintf(
-			 stderr,
-			 "Unsupported compression level defaulting to: none.\n" );
-		}
-	}
 	if( option_format != NULL )
 	{
 		result = imaging_handle_set_format(
@@ -1881,6 +1862,28 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported EWF format defaulting to: encase6.\n" );
+		}
+	}
+	if( option_compression_values != NULL )
+	{
+		result = imaging_handle_set_compression_values(
+			  ewfacquire_imaging_handle,
+			  option_compression_values,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set compression values.\n" );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported compression values defaulting to method: deflate with level: none.\n" );
 		}
 	}
 	if( option_media_type != NULL )
@@ -2391,22 +2394,6 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-			if( option_compression_level == NULL )
-			{
-				result = imaging_handle_prompt_for_compression_level(
-					  ewfacquire_imaging_handle,
-				          _LIBCSTRING_SYSTEM_STRING( "Use compression" ),
-					  &error );
-
-				if( result == -1 )
-				{
-					fprintf(
-					 stderr,
-					 "Unable to determine compression level.\n" );
-
-					goto on_error;
-				}
-			}
 			if( option_format == NULL )
 			{
 				result = imaging_handle_prompt_for_format(
@@ -2419,6 +2406,35 @@ int main( int argc, char * const argv[] )
 					fprintf(
 					 stderr,
 					 "Unable to determine format.\n" );
+
+					goto on_error;
+				}
+			}
+			if( option_compression_values== NULL )
+			{
+				result = imaging_handle_prompt_for_compression_method(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Compression method" ),
+					  &error );
+
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine compression method.\n" );
+
+					goto on_error;
+				}
+				result = imaging_handle_prompt_for_compression_level(
+					  ewfacquire_imaging_handle,
+				          _LIBCSTRING_SYSTEM_STRING( "Compression level" ),
+					  &error );
+
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to determine compression level.\n" );
 
 					goto on_error;
 				}
@@ -2632,7 +2648,7 @@ int main( int argc, char * const argv[] )
 		else if( acquiry_parameters_confirmed == 0 )
 		{
 			option_case_number              = NULL;
-			option_compression_level        = NULL;
+			option_compression_values       = NULL;
 			option_description              = NULL;
 			option_evidence_number          = NULL;
 			option_examiner_name            = NULL;

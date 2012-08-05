@@ -7698,8 +7698,24 @@ ssize_t libewf_handle_write_finalize(
 		internal_handle->media_values->number_of_sectors = (uint64_t) ( internal_handle->write_io_handle->input_write_count / internal_handle->media_values->bytes_per_sector );
 		internal_handle->media_values->media_size        = (size64_t) internal_handle->write_io_handle->input_write_count;
 
-		/* Flush the data section write cache
+		/* Flush the section write caches
 		 */
+		if( internal_handle->write_io_handle->case_data != NULL )
+		{
+			memory_free(
+			 internal_handle->write_io_handle->case_data );
+
+			internal_handle->write_io_handle->case_data      = NULL;
+			internal_handle->write_io_handle->case_data_size = 0;
+		}
+		if( internal_handle->write_io_handle->device_information != NULL )
+		{
+			memory_free(
+			 internal_handle->write_io_handle->device_information );
+
+			internal_handle->write_io_handle->device_information      = NULL;
+			internal_handle->write_io_handle->device_information_size = 0;
+		}
 		if( internal_handle->write_io_handle->data_section != NULL )
 		{
 			memory_free(
@@ -7716,6 +7732,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->media_values,
 		     internal_handle->segment_files_list,
 		     internal_handle->segment_files_cache,
+		     internal_handle->header_values,
 		     internal_handle->hash_values,
 		     internal_handle->hash_sections,
 		     internal_handle->sessions,

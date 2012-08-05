@@ -1812,13 +1812,14 @@ ssize_t libewf_section_write_compressed_string(
          int8_t compression_level,
          uint8_t *uncompressed_string,
          size_t uncompressed_string_size,
+         size_t fill_size,
          libcerror_error_t **error )
 {
 	uint8_t *compressed_string          = NULL;
 	static char *function               = "libewf_section_write_compressed_string";
 	void *reallocation                  = NULL;
-	size_t alignment_padding_size       = 0;
 	size_t compressed_string_size       = 0;
+	size_t padding_size                 = 0;
 	size_t section_descriptor_data_size = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
@@ -1877,13 +1878,23 @@ ssize_t libewf_section_write_compressed_string(
 		 0 );
 	}
 #endif
-	compressed_string_size = uncompressed_string_size;
-	alignment_padding_size = compressed_string_size % 16;
-
-	if( alignment_padding_size != 0 )
+	if( fill_size > uncompressed_string_size )
 	{
-		alignment_padding_size  = 16 - alignment_padding_size;
-		compressed_string_size += alignment_padding_size;
+		compressed_string_size = fill_size;
+	}
+	else
+	{
+		compressed_string_size = uncompressed_string_size;
+	}
+	if( format_version == 2 )
+	{
+		padding_size = compressed_string_size % 16;
+
+		if( padding_size != 0 )
+		{
+			padding_size            = 16 - padding_size;
+			compressed_string_size += padding_size;
+		}
 	}
 	compressed_string = (uint8_t *) memory_allocate(
 	                                 sizeof( uint8_t ) * compressed_string_size );
@@ -1895,6 +1906,20 @@ ssize_t libewf_section_write_compressed_string(
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create compressed string.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     compressed_string,
+	     0,
+	     compressed_string_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear compressed string.",
 		 function );
 
 		goto on_error;
@@ -1921,12 +1946,15 @@ ssize_t libewf_section_write_compressed_string(
 
 			goto on_error;
 		}
-		alignment_padding_size = compressed_string_size % 16;
-
-		if( alignment_padding_size != 0 )
+		if( format_version == 2 )
 		{
-			alignment_padding_size  = 16 - alignment_padding_size;
-			compressed_string_size += alignment_padding_size;
+			padding_size = compressed_string_size % 16;
+
+			if( padding_size != 0 )
+			{
+				padding_size            = 16 - padding_size;
+				compressed_string_size += padding_size;
+			}
 		}
 		reallocation = memory_reallocate(
 		                compressed_string,
@@ -1945,6 +1973,20 @@ ssize_t libewf_section_write_compressed_string(
 		}
 		compressed_string = (uint8_t *) reallocation;
 
+		if( memory_set(
+		     compressed_string,
+		     0,
+		     compressed_string_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear compressed string.",
+			 function );
+
+			goto on_error;
+		}
 		result = libewf_compress_data(
 		          compressed_string,
 		          &compressed_string_size,
@@ -1965,18 +2007,34 @@ ssize_t libewf_section_write_compressed_string(
 
 		goto on_error;
 	}
-	if( format_version == 1 )
+	if( fill_size != 0 )
 	{
-		alignment_padding_size = 0;
+		if( compressed_string_size > fill_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid compressed string size value exceeds fill size.",
+			 function );
+
+			goto on_error;
+		}
+		padding_size           = fill_size - compressed_string_size;
+		compressed_string_size = fill_size;
+	}
+	else if( format_version == 1 )
+	{
+		padding_size = 0;
 	}
 	else if( format_version == 2 )
 	{
-		alignment_padding_size = compressed_string_size % 16;
+		padding_size = compressed_string_size % 16;
 
-		if( alignment_padding_size != 0 )
+		if( padding_size != 0 )
 		{
-			alignment_padding_size  = 16 - alignment_padding_size;
-			compressed_string_size += alignment_padding_size;
+			padding_size            = 16 - padding_size;
+			compressed_string_size += padding_size;
 		}
 	}
 	if( libewf_section_set_values(
@@ -1987,7 +2045,7 @@ ssize_t libewf_section_write_compressed_string(
 	     section_offset,
 	     (size64_t) ( section_descriptor_data_size + compressed_string_size ),
 	     (size64_t) compressed_string_size,
-	     (uint32_t) alignment_padding_size,
+	     (uint32_t) padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5740,7 +5798,7 @@ ssize_t libewf_section_session_read(
 	uint8_t *session_entry_data      = NULL;
 	uint8_t *section_data            = NULL;
 	static char *function            = "libewf_section_session_read";
-	size64_t section_data_size       = 0;
+	size_t section_data_size         = 0;
 	size_t session_entry_data_size   = 0;
 	size_t session_entries_data_size = 0;
 	size_t session_footer_data_size  = 0;
@@ -6977,7 +7035,7 @@ ssize_t libewf_section_session_write(
 					 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
 					 (uint32_t) session_first_sector );
 				}
-				else if( format_version == 1 )
+				else if( format_version == 2 )
 				{
 					byte_stream_copy_from_uint64_little_endian(
 					 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
@@ -7524,27 +7582,30 @@ ssize_t libewf_section_table_read(
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 /* TODO what about linen7 */
-		if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 ) )
+		if( format_version == 1 )
 		{
-			if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 )
+			if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+			 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 ) )
 			{
-				libcnotify_printf(
-				 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
-				 function,
-				 *number_of_entries,
-				 EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 );
+				if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 )
+				{
+					libcnotify_printf(
+					 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
+					 function,
+					 *number_of_entries,
+					 EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 );
+				}
 			}
-		}
-		else
-		{
-			if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES )
+			else
 			{
-				libcnotify_printf(
-				 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
-				 function,
-				 *number_of_entries,
-				 EWF_MAXIMUM_TABLE_ENTRIES );
+				if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES )
+				{
+					libcnotify_printf(
+					 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
+					 function,
+					 *number_of_entries,
+					 EWF_MAXIMUM_TABLE_ENTRIES );
+				}
 			}
 		}
 #endif

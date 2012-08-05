@@ -1952,6 +1952,7 @@ int imaging_handle_prompt_for_compression_method(
 {
 	libcstring_system_character_t *fixed_string_variable = NULL;
 	static char *function                                = "imaging_handle_prompt_for_compression_method";
+	uint8_t compression_methods_amount                   = 0;
 	int result                                           = 0;
 
 	if( imaging_handle == NULL )
@@ -1965,13 +1966,21 @@ int imaging_handle_prompt_for_compression_method(
 
 		return( -1 );
 	}
+	if( imaging_handle->ewf_format != LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		compression_methods_amount = 1;
+	}
+	else
+	{
+		compression_methods_amount = EWFINPUT_COMPRESSION_METHODS_AMOUNT;
+	}
 	result = ewfinput_get_fixed_string_variable(
 	          imaging_handle->notify_stream,
 	          imaging_handle->input_buffer,
 	          IMAGING_HANDLE_INPUT_BUFFER_SIZE,
 	          request_string,
 	          ewfinput_compression_methods,
-	          EWFINPUT_COMPRESSION_METHODS_AMOUNT,
+	          compression_methods_amount,
 	          EWFINPUT_COMPRESSION_METHODS_DEFAULT,
 	          &fixed_string_variable,
 	          error );
@@ -3013,47 +3022,6 @@ on_error:
 	return( -1 );
 }
 
-/* Sets the compression method
- * Returns 1 if successful, 0 if unsupported value or -1 on error
- */
-int imaging_handle_set_compression_method(
-     imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
-     libcerror_error_t **error )
-{
-	static char *function = "imaging_handle_set_compression_method";
-	int result            = 0;
-
-	if( imaging_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid imaging handle.",
-		 function );
-
-		return( -1 );
-	}
-	result = ewfinput_determine_compression_method(
-	          string,
-	          &( imaging_handle->compression_method ),
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine compression method.",
-		 function );
-
-		return( -1 );
-	}
-	return( result );
-}
-
 /* Sets the compression values
  * Returns 1 if successful, 0 if unsupported value or -1 on error
  */
@@ -3062,8 +3030,19 @@ int imaging_handle_set_compression_values(
      const libcstring_system_character_t *string,
      libcerror_error_t **error )
 {
-	static char *function = "imaging_handle_set_compression_values";
-	int result            = 0;
+	libcstring_system_character_t *string_segment    = NULL;
+	static char *function                            = "imaging_handle_set_compression_values";
+	size_t string_segment_size                       = 0;
+	size_t string_length                             = 0;
+	int number_of_segments                           = 0;
+	int result                                       = 0;
+	int segment_index                                = 0;
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	libcsplit_wide_split_string_t *string_elements   = NULL;
+#else
+	libcsplit_narrow_split_string_t *string_elements = NULL;
+#endif
 
 	if( imaging_handle == NULL )
 	{
@@ -3076,8 +3055,174 @@ int imaging_handle_set_compression_values(
 
 		return( -1 );
 	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_string_split(
+	     string,
+	     string_length + 1,
+	     (wchar_t) ':',
+	     &string_elements,
+	     error ) != 1 )
+#else
+	if( libcsplit_narrow_string_split(
+	     string,
+	     string_length + 1,
+	     (char) ':',
+	     &string_elements,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_get_number_of_segments(
+	     string_elements,
+	     &number_of_segments,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( number_of_segments != 1 )
+	 && ( number_of_segments != 2 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: number of segments is out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_segments == 2 )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		if( libcsplit_wide_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+#else
+		if( libcsplit_narrow_split_string_get_segment_by_index(
+		     string_elements,
+		     segment_index,
+		     &string_segment,
+		     &string_segment_size,
+		     error ) != 1 )
+#endif
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve string segment: %d.",
+			 function,
+			 segment_index );
+
+			goto on_error;
+		}
+		if( string_segment == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing string segment: %d.",
+			 function,
+			 segment_index );
+
+			goto on_error;
+		}
+		result = ewfinput_determine_compression_method(
+			  string_segment,
+			  &( imaging_handle->compression_method ),
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine compression method.",
+			 function );
+
+			goto on_error;
+		}
+		if( imaging_handle->ewf_format != LIBEWF_FORMAT_V2_ENCASE7 )
+		{
+			if( imaging_handle->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
+			{
+				imaging_handle->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+
+				result = 0;
+			}
+		}
+		segment_index++;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_get_segment_by_index(
+	     string_elements,
+	     segment_index,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_get_segment_by_index(
+	     string_elements,
+	     segment_index,
+	     &string_segment,
+	     &string_segment_size,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve string segment: %d.",
+		 function,
+		 segment_index );
+
+		goto on_error;
+	}
+	if( string_segment == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing string segment: %d.",
+		 function,
+		 segment_index );
+
+		goto on_error;
+	}
 	result = ewfinput_determine_compression_values(
-	          string,
+	          string_segment,
 	          &( imaging_handle->compression_level ),
 	          &( imaging_handle->compression_flags ),
 	          error );
@@ -3091,9 +3236,43 @@ int imaging_handle_set_compression_values(
 		 "%s: unable to determine compression values.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcsplit_wide_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+#else
+	if( libcsplit_narrow_split_string_free(
+	     &string_elements,
+	     error ) != 1 )
+#endif
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split string.",
+		 function );
+
+		goto on_error;
 	}
 	return( result );
+
+on_error:
+	if( string_elements != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libcsplit_wide_split_string_free(
+		 &string_elements,
+		 NULL );
+#else
+		libcsplit_narrow_split_string_free(
+		 &string_elements,
+		 NULL );
+#endif
+	}
+	return( -1 );
 }
 
 /* Sets the format
@@ -3684,8 +3863,8 @@ int imaging_handle_set_additional_digest_types(
 	uint8_t calculate_sha1                           = 0;
 	uint8_t calculate_sha256                         = 0;
 	int number_of_segments                           = 0;
-	int segment_index                                = 0;
 	int result                                       = 0;
+	int segment_index                                = 0;
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	libcsplit_wide_split_string_t *string_elements   = NULL;
@@ -3751,7 +3930,7 @@ int imaging_handle_set_additional_digest_types(
 		 "%s: unable to retrieve number of segments.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	for( segment_index = 0;
 	     segment_index < number_of_segments;
@@ -3793,7 +3972,7 @@ int imaging_handle_set_additional_digest_types(
 			 function,
 			 segment_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( string_segment_size == 5 )
 		{
@@ -4295,22 +4474,7 @@ int imaging_handle_set_output_values(
 
 		return( -1 );
 	}
-	if( libewf_handle_set_compression_values(
-	     imaging_handle->output_handle,
-	     imaging_handle->compression_level,
-	     imaging_handle->compression_flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set compression values.",
-		 function );
-
-		return( -1 );
-	}
-	/* Format needs to be set before segment file size
+	/* Format needs to be set before segment file size and compression values
 	 */
 	if( libewf_handle_set_format(
 	     imaging_handle->output_handle,
@@ -4322,6 +4486,35 @@ int imaging_handle_set_output_values(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set format.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_set_compression_method(
+	     imaging_handle->output_handle,
+	     imaging_handle->compression_method,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set compression method.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_set_compression_values(
+	     imaging_handle->output_handle,
+	     imaging_handle->compression_level,
+	     imaging_handle->compression_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set compression values.",
 		 function );
 
 		return( -1 );
@@ -4445,22 +4638,7 @@ int imaging_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( libewf_handle_set_compression_values(
-		     imaging_handle->secondary_output_handle,
-		     imaging_handle->compression_level,
-		     imaging_handle->compression_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set compression values in secondary output handle.",
-			 function );
-
-			return( -1 );
-		}
-		/* Format needs to be set before segment file size
+		/* Format needs to be set before segment file size and compression values
 		 */
 		if( libewf_handle_set_format(
 		     imaging_handle->secondary_output_handle,
@@ -4472,6 +4650,35 @@ int imaging_handle_set_output_values(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set format in secondary output handle.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_handle_set_compression_method(
+		     imaging_handle->secondary_output_handle,
+		     imaging_handle->compression_method,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set compression method in secondary output handle.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_handle_set_compression_values(
+		     imaging_handle->secondary_output_handle,
+		     imaging_handle->compression_level,
+		     imaging_handle->compression_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set compression values in secondary output handle.",
 			 function );
 
 			return( -1 );
@@ -4548,7 +4755,7 @@ int imaging_handle_set_output_values(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to generate GUID.",
+			 "%s: unable to generate GUID for set identifier.",
 			 function );
 
 			return( -1 );
@@ -5521,41 +5728,6 @@ int imaging_handle_print_parameters(
 
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Compression used:\t\t\t" );
-
-	if( imaging_handle->compression_level == LIBEWF_COMPRESSION_FAST )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "fast" );
-	}
-	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_BEST )
-	{
-		fprintf(
-		 imaging_handle->notify_stream,
-		 "best" );
-	}
-	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_NONE )
-	{
-		if( ( imaging_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
-		{
-			fprintf(
-			 imaging_handle->notify_stream,
-			 "empty-block" );
-		}
-		else
-		{
-			fprintf(
-			 imaging_handle->notify_stream,
-			 "none" );
-		}
-	}
-	fprintf(
-	 imaging_handle->notify_stream,
-	 "\n" );
-
-	fprintf(
-	 imaging_handle->notify_stream,
 	 "EWF file format:\t\t\t" );
 
 	switch( imaging_handle->ewf_format )
@@ -5649,6 +5821,61 @@ int imaging_handle_print_parameters(
 			 imaging_handle->notify_stream,
 			 "extended EWF (ewfx) (.e01)" );
 			break;
+	}
+	fprintf(
+	 imaging_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 imaging_handle->notify_stream,
+	 "Compression method:\t\t\t" );
+
+	if( imaging_handle->compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "deflate" );
+	}
+	else if( imaging_handle->compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "bzip2" );
+	}
+	fprintf(
+	 imaging_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 imaging_handle->notify_stream,
+	 "Compression level:\t\t\t" );
+
+	if( imaging_handle->compression_level == LIBEWF_COMPRESSION_FAST )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "fast" );
+	}
+	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_BEST )
+	{
+		fprintf(
+		 imaging_handle->notify_stream,
+		 "best" );
+	}
+	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_NONE )
+	{
+		if( ( imaging_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "empty-block" );
+		}
+		else
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 "none" );
+		}
 	}
 	fprintf(
 	 imaging_handle->notify_stream,

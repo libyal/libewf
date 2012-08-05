@@ -93,7 +93,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Missing filenames.\n" );
+		 "Glob missing filenames.\n" );
 
 		return( EXIT_FAILURE );
 	}
