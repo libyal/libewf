@@ -1,4 +1,16 @@
 TODO
+* add codepages 949 and 950
+
+* complete ewfrecover
+  - max segment size
+  - add project files: msvscpp, codegear
+
+* corruption scenarios
+  - add strict chunk data flag handling
+  - document how libewf deals with corruption scenarios
+
+* implement new chunk IO functions where chunk is an object
+
 * update codegear files (libcaes/libhmac)
 
 * add stream write support for EWF-S01 use fill space solution in table section
@@ -6,15 +18,6 @@ TODO
 * fix double _FILE_OFFSET_BITS=64
 
 * fix output: number of entries: 19175 exceeds maximum: 16375
-
-* check if compression level none is passed for SMART
-
-* add man page for ewfrecover
-
-* implement new chunk IO functions where chunk is an object
-
-* corruption scenarios
-  - add strict chunk data flag handling
 
 * add light-weight function to determine byte frequency ? to check if compression is viable ?
 * work on deduplication support
@@ -25,11 +28,9 @@ TODO
 
 * libewf_filename_create split off wide variant ?
 
-Tests
+* check if compression level none is passed for SMART
   - validate SMART forced compression of uncompressed chunks
-  - check for memory issues (memwatch)
 
-* Document how libewf deals with corruption scenarios
 * Add 2 TiB image size test
 * Add 8 TiB image size test
 
@@ -79,9 +80,6 @@ Tests
 * ewfmount
   - check access rights on fuse mount point
   - add stat info on readdir (see regfmount)
-* complete ewfrecover
-  - max segment size
-  - add project files: msvscpp, codegear
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -131,7 +129,6 @@ Roadmap:
 Code clean up:
 * clean up configure.ac and acinclude.m4
   - refactor dfxml check
-  - refactor zlib check - to acinclude
 * ewfinfo
   - move DFXML code to separate code files, what about separate library ?
   - implement a statefull XML writer e.g. open/close_section, open/close_value
@@ -352,6 +349,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120806
+* worked on ewfrecover man page
 
 20120805
 * refactored libewf_section_last_write functionality from section to segment file

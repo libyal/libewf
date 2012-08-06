@@ -2377,72 +2377,75 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-	if( libewf_handle_get_sectors_per_chunk(
-	     info_handle->input_handle,
-	     &value_32bit,
-	     error ) != 1 )
+	if( is_encrypted == 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve sectors per chunk.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( info_handle_section_value_32bit_fprint(
-		     info_handle,
-		     "sectors_per_chunk",
-		     "Sectors per chunk",
-		     17,
-		     value_32bit,
+		if( libewf_handle_get_sectors_per_chunk(
+		     info_handle->input_handle,
+		     &value_32bit,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print section 32-bit value: sectors_per_chunk.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sectors per chunk.",
 			 function );
 
 			result = -1;
 		}
-	}
-	if( libewf_handle_get_error_granularity(
-	     info_handle->input_handle,
-	     &value_32bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve error granularity.",
-		 function );
+		else
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "sectors_per_chunk",
+			     "Sectors per chunk",
+			     17,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: sectors_per_chunk.",
+				 function );
 
-		result = -1;
-	}
-	else if( value_32bit != 0 )
-	{
-		if( info_handle_section_value_32bit_fprint(
-		     info_handle,
-		     "error_granularity",
-		     "Error granularity",
-		     17,
-		     value_32bit,
+				result = -1;
+			}
+		}
+		if( libewf_handle_get_error_granularity(
+		     info_handle->input_handle,
+		     &value_32bit,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print section 32-bit value: error_granularity.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve error granularity.",
 			 function );
 
 			result = -1;
+		}
+		else if( value_32bit != 0 )
+		{
+			if( info_handle_section_value_32bit_fprint(
+			     info_handle,
+			     "error_granularity",
+			     "Error granularity",
+			     17,
+			     value_32bit,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section 32-bit value: error_granularity.",
+				 function );
+
+				result = -1;
+			}
 		}
 	}
 	if( libewf_handle_get_compression_method(
@@ -2488,56 +2491,59 @@ int info_handle_media_information_fprint(
 			result = -1;
 		}
 	}
-	if( libewf_handle_get_compression_values(
-	     info_handle->input_handle,
-	     &compression_level,
-	     &compression_flags,
-	     error ) != 1 )
+	if( is_encrypted == 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve compression values.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( compression_level == LIBEWF_COMPRESSION_NONE )
-		{
-			value_string = _LIBCSTRING_SYSTEM_STRING( "no compression" );
-		}
-		else if( compression_level == LIBEWF_COMPRESSION_FAST )
-		{
-			value_string = _LIBCSTRING_SYSTEM_STRING( "good (fast) compression" );
-		}
-		else if( compression_level == LIBEWF_COMPRESSION_BEST )
-		{
-			value_string = _LIBCSTRING_SYSTEM_STRING( "best compression" );
-		}
-		else
-		{
-			value_string = _LIBCSTRING_SYSTEM_STRING( "unknown compression" );
-		}
-		if( info_handle_section_value_string_fprint(
-		     info_handle,
-		     "compression_level",
-		     17,
-		     "Compression level",
-		     17,
-		     value_string,
+		if( libewf_handle_get_compression_values(
+		     info_handle->input_handle,
+		     &compression_level,
+		     &compression_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print section value string: compression_level.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve compression values.",
 			 function );
 
 			result = -1;
+		}
+		else
+		{
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "no compression" );
+			}
+			else if( compression_level == LIBEWF_COMPRESSION_FAST )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "good (fast) compression" );
+			}
+			else if( compression_level == LIBEWF_COMPRESSION_BEST )
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "best compression" );
+			}
+			else
+			{
+				value_string = _LIBCSTRING_SYSTEM_STRING( "unknown compression" );
+			}
+			if( info_handle_section_value_string_fprint(
+			     info_handle,
+			     "compression_level",
+			     17,
+			     "Compression level",
+			     17,
+			     value_string,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print section value string: compression_level.",
+				 function );
+
+				result = -1;
+			}
 		}
 	}
 	if( libewf_handle_get_segment_file_set_identifier(

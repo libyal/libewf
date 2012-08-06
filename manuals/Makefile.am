@@ -4,6 +4,7 @@ man_MANS = \
 	ewfexport.1 \
 	ewfinfo.1 \
 	ewfmount.1 \
+	ewfrecover.1 \
 	ewfverify.1 \
 	libewf.3
 
@@ -13,6 +14,7 @@ EXTRA_DIST = \
 	ewfexport.1 \
 	ewfinfo.1 \
 	ewfmount.1 \
+	ewfrecover.1 \
 	ewfverify.1 \
 	libewf.3
 

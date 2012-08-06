@@ -1,0 +1,95 @@
+.Dd August 6, 2012
+.Dt ewfrecover
+.Os libewf
+.Sh NAME
+.Nm ewfrecover
+.Nd exports media data stored in EWF files
+.Sh SYNOPSIS
+.Nm ewfrecover
+.Op Fl A Ar codepage
+.Op Fl l Ar log_filename
+.Op Fl p Ar process_buffer_size
+.Op Fl t Ar target
+.Op Fl hquvV
+.Ar ewf_files
+.Sh DESCRIPTION
+.Nm ewfrecover
+is a utility to recover corrupt EWF files.
+.Pp
+.Nm ewfrecover
+is part of the
+.Nm libewf
+package.
+.Nm libewf
+is a library to support the Expert Witness Compression Format (EWF).
+.Pp
+.Ar ewf_files
+the first or the entire set of EWF segment files
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl A Ar codepage
+the codepage of header section, options: ascii (default), windows-874, windows-932, windows-936, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257 or windows-1258
+.It Fl h
+shows this help
+.It Fl l Ar log_filename
+logs recover errors and the digest (hash) to the log filename
+.It Fl p Ar process_buffer_size
+the process buffer size (default is the chunk size)
+.It Fl t Ar target
+the target file to recover to (default is recover)
+.It Fl v
+verbose output to stderr
+.It Fl V
+print version
+.El
+.Sh ENVIRONMENT
+None
+.Sh FILES
+None
+.Sh EXAMPLES
+.Nm ewfrecover
+will ask the information it needs.
+.Ss Recovering a corrupted image
+.Bd -literal
+ewfrecover corrupt.E01 
+ewfrecover 20120805
+
+Export started at: Mon Aug  6 07:09:34 2012
+
+This could take a while.
+
+.Dl ...
+
+Export completed at: Mon Aug  6 07:09:34 2012
+
+MD5 hash calculated over data:		d41d8cd98f00b204e9800998ecf8427e
+ewfrecover: SUCCESS
+.Ed
+.Ss Trying to recover a non-corrupted image
+.Bd -literal
+ewfrecover notcorrupt.E01 
+ewfrecover 20120805
+
+EWF file(s) are not corrupted.
+.Ed
+.Sh DIAGNOSTICS
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
+.Sh BUGS
+Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
+http://code.google.com/p/libewf/
+.Sh AUTHOR
+.Pp
+These man pages were written by Joachim Metz.
+.Sh COPYRIGHT
+.Pp
+Copyright 2006-2012 Joachim Metz <joachim.metz@gmail.com>.
+.Pp
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.Sh SEE ALSO
+.Xr ewfacquire 1 ,
+.Xr ewfacquirestream 1 ,
+.Xr ewfexport 1 ,
+.Xr ewfinfo 1 ,
+.Xr ewfmount 1 ,
+.Xr ewfverify 1

@@ -78,7 +78,7 @@ void usage_fprint(
 	                 "\t           log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
-	fprintf( stream, "\t-t:        specify the target file to recover to\n" );
+	fprintf( stream, "\t-t:        specify the target file to recover to (default is recover)\n" );
 	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
