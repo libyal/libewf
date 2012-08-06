@@ -64,9 +64,10 @@ void usage_fprint(
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
 	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default),\n"
-	                 "\t           windows-874, windows-932, windows-936, windows-1250,\n"
-	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
-	                 "\t           windows-1255, windows-1256, windows-1257 or windows-1258\n" );
+	                 "\t           windows-874, windows-932, windows-936, windows-949,\n"
+	                 "\t           windows-950, windows-1250, windows-1251, windows-1252,\n"
+	                 "\t           windows-1253, windows-1254, windows-1255, windows-1256,\n"
+	                 "\t           windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-d:        specify the date format, options: ctime (default),\n"
 	                 "\t           dm (day/month), md (month/day), iso8601\n" );
 	fprintf( stream, "\t-e:        only show EWF read error information\n" );

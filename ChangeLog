@@ -1,17 +1,20 @@
 TODO
-* add codepages 949 and 950
+* fix issues in tests
+
+* codegear
+  - fix static project files
+  - add checks to disable compiler warnings
+
+* analyze recent SMART files
 
 * complete ewfrecover
   - max segment size
-  - add project files: msvscpp, codegear
 
 * corruption scenarios
   - add strict chunk data flag handling
   - document how libewf deals with corruption scenarios
 
 * implement new chunk IO functions where chunk is an object
-
-* update codegear files (libcaes/libhmac)
 
 * add stream write support for EWF-S01 use fill space solution in table section
 
@@ -23,8 +26,6 @@ TODO
 * work on deduplication support
 
 * allow zlib to be replaced by alternative back-end
-
-* replace libfvalue_value_copy_to_utf8_string with libfvalue_value_copy_to_utf8_string_with_index
 
 * libewf_filename_create split off wide variant ?
 
@@ -352,6 +353,10 @@ Closed:
 
 20120806
 * worked on ewfrecover man page
+* updated codegear files
+* added ewfrecover to codegear and msvscpp files
+* added codepages 949 and 950
+* bug fixes for xhash
 
 20120805
 * refactored libewf_section_last_write functionality from section to segment file

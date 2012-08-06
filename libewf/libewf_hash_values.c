@@ -569,26 +569,6 @@ int libewf_hash_values_generate_xhash(
 #endif
 			continue;
 		}
-		result = libfvalue_value_has_data(
-		          hash_value,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data of hash value: %s.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			continue;
-		}
 		result = libfvalue_value_get_utf8_string_size(
 		          hash_value,
 		          0,
@@ -607,7 +587,8 @@ int libewf_hash_values_generate_xhash(
 
 			goto on_error;
 		}
-		if( value_string_size > 1 )
+		if( ( result != 0 )
+		 && ( value_string_size > 1 ) )
 		{
 			/* Reserve space for a leading tab, <identifier>value</identifier> and a newline
 			 */
@@ -718,26 +699,6 @@ int libewf_hash_values_generate_xhash(
 #endif
 			continue;
 		}
-		result = libfvalue_value_has_data(
-		          hash_value,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data of hash value: %s.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		else if( result == 0 )
-		{
-			continue;
-		}
 		result = libfvalue_value_get_utf8_string_size(
 		          hash_value,
 		          0,
@@ -756,7 +717,8 @@ int libewf_hash_values_generate_xhash(
 
 			goto on_error;
 		}
-		if( value_string_size > 1 )
+		if( ( result != 0 )
+		 && ( value_string_size > 1 ) )
 		{
 			( *xhash )[ xhash_index++ ] = (uint8_t) '\t';
 			( *xhash )[ xhash_index++ ] = (uint8_t) '<';
@@ -780,11 +742,12 @@ int libewf_hash_values_generate_xhash(
 
 			( *xhash )[ xhash_index++ ] = (uint8_t) '>';
 
-			if( libfvalue_value_copy_to_utf8_string(
+			if( libfvalue_value_copy_to_utf8_string_with_index(
 			     hash_value,
 			     0,
-			     &( ( *xhash )[ xhash_index ] ),
-			     value_string_size,
+			     *xhash,
+			     *xhash_size,
+			     &xhash_index,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -797,10 +760,8 @@ int libewf_hash_values_generate_xhash(
 
 				goto on_error;
 			}
-			xhash_index += value_string_size - 1;
-
-			( *xhash )[ xhash_index++ ] = (uint8_t) '<';
-			( *xhash )[ xhash_index++ ] = (uint8_t) '/';
+			( *xhash )[ xhash_index - 1 ] = (uint8_t) '<';
+			( *xhash )[ xhash_index++   ] = (uint8_t) '/';
 
 			if( libcstring_narrow_string_copy(
 			     (char *) &( ( *xhash )[ xhash_index ] ),

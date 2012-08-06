@@ -3,6 +3,7 @@ EXTRA_DIST = \
 	ewfacquirestream/ewfacquirestream.vcproj \
 	ewfexport/ewfexport.vcproj \
 	ewfinfo/ewfinfo.vcproj \
+	ewfrecover/ewfrecover.vcproj \
 	ewfverify/ewfverify.vcproj \
 	ewf.net/ewf.net_dll.vcproj \
 	libbfio/libbfio.vcproj \

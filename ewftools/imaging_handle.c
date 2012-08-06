@@ -5414,7 +5414,7 @@ ssize_t imaging_handle_finalize(
 		if( imaging_handle_set_hash_value(
 		     imaging_handle,
 		     "SHA1",
-		     5,
+		     4,
 		     imaging_handle->calculated_sha1_hash_string,
 		     40,
 		     error ) != 1 )
@@ -5434,7 +5434,7 @@ ssize_t imaging_handle_finalize(
 		if( imaging_handle_set_hash_value(
 		     imaging_handle,
 		     "SHA256",
-		     7,
+		     6,
 		     imaging_handle->calculated_sha256_hash_string,
 		     64,
 		     error ) != 1 )

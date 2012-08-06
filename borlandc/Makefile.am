@@ -7,9 +7,12 @@ CODEGEAR_FILES = \
 	codegear/ewfexport/ewfexport_static.cbproj \
 	codegear/ewfinfo/ewfinfo.cbproj \
 	codegear/ewfinfo/ewfinfo_static.cbproj \
+	codegear/ewfrecover/ewfrecover.cbproj \
+	codegear/ewfrecover/ewfrecover_static.cbproj \
 	codegear/ewfverify/ewfverify.cbproj \
 	codegear/ewfverify/ewfverify_static.cbproj \
 	codegear/libbfio/libbfio.cbproj \
+	codegear/libcaes/libcaes.cbproj \
 	codegear/libcerror/libcerror.cbproj \
 	codegear/libcfile/libcfile.cbproj \
 	codegear/libclocale/libclocale.cbproj \

@@ -6154,6 +6154,7 @@ ssize_t libewf_handle_write_chunk(
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
 	uint32_t chunk_data_flags                 = 0;
+	uint32_t chunk_padding_size               = 0;
 	int chunk_exists                          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -6412,11 +6413,6 @@ ssize_t libewf_handle_write_chunk(
 	}
 	else
 	{
-/* TODO
- * set chunk padding size
- */
-		uint32_t chunk_padding_size = 0;
-
 		write_count = libewf_write_io_handle_write_new_chunk(
 		               internal_handle->write_io_handle,
 		               internal_handle->io_handle,
