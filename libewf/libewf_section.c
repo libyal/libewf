@@ -7533,6 +7533,7 @@ ssize_t libewf_section_table_read(
          uint8_t format_version,
          uint8_t **section_data,
          size_t *section_data_size,
+         uint64_t *first_chunk_index,
          uint64_t *base_offset,
          uint8_t **table_entries_data,
          size_t *table_entries_data_size,
@@ -7547,7 +7548,6 @@ ssize_t libewf_section_table_read(
 	size_t table_header_data_size = 0;
 	size_t table_footer_data_size = 0;
 	ssize_t read_count            = 0;
-	uint64_t first_chunk_number   = 0;
 	uint32_t calculated_checksum  = 0;
 	uint32_t stored_checksum      = 0;
 
@@ -7635,6 +7635,17 @@ ssize_t libewf_section_table_read(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( first_chunk_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first chunk index.",
 		 function );
 
 		return( -1 );
@@ -7817,7 +7828,7 @@ ssize_t libewf_section_table_read(
 	{
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_table_header_v2_t *) table_data )->first_chunk_number,
-		 first_chunk_number );
+		 *first_chunk_index );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_table_header_v2_t *) table_data )->number_of_entries,
@@ -7835,7 +7846,7 @@ ssize_t libewf_section_table_read(
 			libcnotify_printf(
 			 "%s: first chunk number\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 first_chunk_number );
+			 *first_chunk_index );
 		}
 		libcnotify_printf(
 		 "%s: number of entries\t\t\t\t: %" PRIu32 "\n",
@@ -8195,6 +8206,7 @@ ssize_t libewf_section_table_write(
          off64_t section_offset,
          uint8_t *section_data,
          size_t section_data_size,
+         uint64_t first_chunk_index,
          uint64_t base_offset,
          uint8_t *table_entries_data,
          size_t table_entries_data_size,
@@ -8420,6 +8432,10 @@ ssize_t libewf_section_table_write(
 	}
 	else if( format_version == 2 )
 	{
+		byte_stream_copy_from_uint64_little_endian(
+		 ( (ewf_table_header_v2_t *) table_data )->first_chunk_number,
+		 first_chunk_index );
+
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_table_header_v2_t *) table_data )->number_of_entries,
 		 number_of_entries );

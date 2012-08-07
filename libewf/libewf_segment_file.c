@@ -1103,6 +1103,7 @@ ssize_t libewf_segment_file_read_table_section(
 	size_t section_data_size       = 0;
 	size_t table_entries_data_size = 0;
 	uint64_t base_offset           = 0;
+	uint64_t first_chunk_index     = 0;
 	uint32_t number_of_entries     = 0;
 	uint8_t entries_corrupted      = 0;
 
@@ -1160,6 +1161,7 @@ ssize_t libewf_segment_file_read_table_section(
 		      segment_file->major_version,
 		      &section_data,
 		      &section_data_size,
+		      &first_chunk_index,
 		      &base_offset,
 		      &table_entries_data,
 		      &table_entries_data_size,
@@ -1193,6 +1195,18 @@ ssize_t libewf_segment_file_read_table_section(
 		 */
 		element_group_offset = section->start_offset;
 		element_group_size   = (size64_t) section->data_size;
+
+		if( first_chunk_index != (uint64_t) chunk_table->last_chunk_filled )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: out of order first chunk number not yet supported.",
+			 function );
+
+			return( -1 );
+		}
 	}
 /* TODO use entries_corrupted to mark group as tainted ? */
 	if( number_of_entries > 0 )
@@ -1285,6 +1299,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	size_t table_entries_data_size = 0;
 	ssize_t read_count             = 0;
 	uint64_t base_offset           = 0;
+	uint64_t first_chunk_index     = 0;
 	uint32_t group_flags           = 0;
 	uint32_t number_of_entries     = 0;
 	uint8_t entries_corrupted      = 0;
@@ -1343,6 +1358,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	              segment_file->major_version,
 		      &section_data,
 		      &section_data_size,
+	              &first_chunk_index,
 	              &base_offset,
 		      &table_entries_data,
 		      &table_entries_data_size,
@@ -3261,6 +3277,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               section_offset,
 		               table_section_data,
 		               table_section_data_size,
+		               number_of_chunks_written,
 		               0,
 		               table_entries_data,
 		               table_entries_data_size,
@@ -3539,6 +3556,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 				       chunks_section_offset,
 				       table_section_data,
 				       table_section_data_size,
+				       chunk_index,
 				       0,
 				       table_entries_data,
 				       table_entries_data_size,
@@ -3690,6 +3708,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		               section_offset,
 		               table_section_data,
 		               table_section_data_size,
+		               chunk_index,
 		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,
@@ -3792,6 +3811,7 @@ ssize_t libewf_segment_file_write_chunks_section_final(
 		               section_offset,
 		               table_section_data,
 		               table_section_data_size,
+		               chunk_index,
 		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,

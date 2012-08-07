@@ -474,7 +474,7 @@ int libewf_chunk_table_read_offsets(
      libbfio_pool_t *file_io_pool,
      libmfdata_list_t *chunk_table_list,
      int element_index,
-     int number_of_elements LIBEWF_ATTRIBUTE_UNUSED,
+     int number_of_elements,
      libmfcache_cache_t *cache LIBEWF_ATTRIBUTE_UNUSED,
      int file_io_pool_entry,
      off64_t element_group_offset,
@@ -491,11 +491,11 @@ int libewf_chunk_table_read_offsets(
 	size_t table_entries_data_size    = 0;
 	ssize_t read_count                = 0;
 	uint64_t base_offset              = 0;
+	uint64_t first_chunk_index        = 0;
 	uint32_t number_of_entries        = 0;
 	uint8_t entries_corrupted         = 0;
 	int result                        = 0;
 
-	LIBEWF_UNREFERENCED_PARAMETER( number_of_elements )
 	LIBEWF_UNREFERENCED_PARAMETER( cache )
 
 	if( io_handle == NULL )
@@ -612,6 +612,7 @@ int libewf_chunk_table_read_offsets(
 		      chunk_table->io_handle->major_version,
 		      &section_data,
 		      &section_data_size,
+		      &first_chunk_index,
 		      &base_offset,
 		      &table_entries_data,
 		      &table_entries_data_size,
@@ -631,6 +632,8 @@ int libewf_chunk_table_read_offsets(
 		goto on_error;
 	}
 	element_group_size -= read_count;
+
+/* TODO check bounds of first_chunk_index ? */
 
 	if( number_of_entries == 0 )
 	{

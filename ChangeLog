@@ -1,7 +1,4 @@
 TODO
-* code clean up
-  - can libewf_section_sectors_write be refactored away ?
-
 * codegear
   - add checks to disable compiler warnings
 
@@ -50,13 +47,11 @@ TODO
   - open single files ?
 
 * Ex01/Lx01 read support
-  - add support for sector table first chunk number
   - add generic way to parse file object data ?
   - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
   - complete: libewf_chunk_table_fill_v2
 
 * Ex01 write support
-  - add support for sector table first chunk number
   - pattern fill chunk support (set chunk table entry, test)
   - enable secion data integrity hash support
 
@@ -169,7 +164,7 @@ Features
     although if linux write fails (write_count != write_size) before ENOSPC is set
     there is still room left on the device, but cannot be claimed by libewf
 * what about header values parsing with preservation of timestamps?
-  - change localtime to gmtime in libewf_date_time_values_copy_to_string ?  (NO!)
+  - change localtime to gmtime in libewf_date_time_values_copy_to_string ? (NO!)
   - force set header value to require string formatted in the date format ?
 
 Recovery and analysis:
@@ -353,6 +348,7 @@ Closed:
 * updated codegear files
 * fix for writing Ex01 SHA1 hash section
 * worked on libewf_section_ltree_write
+* worked on support for sector table first chunk number
 
 20120806
 * worked on ewfrecover man page
