@@ -1,11 +1,9 @@
 TODO
-* fix issues in tests
+* code clean up
+  - can libewf_section_sectors_write be refactored away ?
 
 * codegear
-  - fix static project files
   - add checks to disable compiler warnings
-
-* analyze recent SMART files
 
 * complete ewfrecover
   - max segment size
@@ -29,7 +27,7 @@ TODO
 
 * libewf_filename_create split off wide variant ?
 
-* check if compression level none is passed for SMART
+* check if compression level none is passed for EWF-S01
   - validate SMART forced compression of uncompressed chunks
 
 * Add 2 TiB image size test
@@ -54,7 +52,7 @@ TODO
 * Ex01/Lx01 read support
   - add support for sector table first chunk number
   - add generic way to parse file object data ?
-  - make sure to correctly deal with aligment padding (should only affect one the Lx01 tables)
+  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
   - complete: libewf_chunk_table_fill_v2
 
 * Ex01 write support
@@ -63,7 +61,7 @@ TODO
   - enable secion data integrity hash support
 
 * Lx01 write support
-  - make sure to correctly deal with aligment padding (should only affect one the Lx01 tables)
+  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
 
 * Ex01/Lx01 extensions
   - implement SHA256 hash section
@@ -350,6 +348,11 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120807
+* updated codegear files
+* fix for writing Ex01 SHA1 hash section
+* worked on libewf_section_ltree_write
 
 20120806
 * worked on ewfrecover man page

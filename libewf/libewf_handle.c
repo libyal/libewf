@@ -3752,14 +3752,26 @@ int libewf_handle_open_read_section_data(
 #endif
 		if( read_count == -1 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read section: %s.",
-			 function,
-			 (char *) section->type_string );
-
+			if( section->type_string_length > 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read section: %s.",
+				 function,
+				 (char *) section->type_string );
+			}
+			else
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read section: 0x%08" PRIx32 ".",
+				 function,
+				 section->type );
+			}
 			goto on_error;
 		}
 		if( initialize_chunk_table != 0 )

@@ -38,10 +38,10 @@ struct ewf_ltree_header
 	 */
 	uint8_t integrity_hash[ 16 ];
 
-	/* The size of the tree in bytes
+	/* The size of the data in bytes
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t tree_size[ 4 ];
+	uint8_t data_size[ 4 ];
 
 	/* Unknown
 	 * consists of 4 bytes

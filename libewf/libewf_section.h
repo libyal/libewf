@@ -281,7 +281,18 @@ ssize_t libewf_section_ltree_read(
          size_t *ltree_data_size,
          libcerror_error_t **error );
 
-/* TODO add write */
+ssize_t libewf_section_ltree_write(
+         libewf_section_t *section,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         uint8_t format_version,
+         off64_t section_offset,
+         uint8_t *section_data,
+         size_t section_data_size,
+         uint8_t *ltree_data,
+         size_t ltree_data_size,
+         libcerror_error_t **error );
 
 ssize_t libewf_section_sectors_write(
          libewf_section_t *section,

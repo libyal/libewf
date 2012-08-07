@@ -75,38 +75,38 @@
 			<None Include="..\..\..\ewftools\log_handle.h">
 				<BuildOrder>17</BuildOrder>
 			</None>
-			<None Include="..\..\..\ewftools\ewfcommon.h">
-				<BuildOrder>18</BuildOrder>
-			</None>
-			<None Include="..\..\..\ewftools\storage_media_buffer.h">
-				<BuildOrder>19</BuildOrder>
-			</None>
+			<CppCompile Include="..\..\..\ewftools\ewfrecover.c">
+				<BuildOrder>22</BuildOrder>
+			</CppCompile>
 			<CppCompile Include="..\..\..\ewftools\byte_size_string.c">
 				<BuildOrder>20</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\ewftools\byte_size_string.h">
 				<BuildOrder>21</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\ewftools\ewfrecover.c">
-				<BuildOrder>22</BuildOrder>
+			<CppCompile Include="..\..\..\ewftools\export_handle.c">
+				<BuildOrder>44</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\ewftools\digest_hash.h">
-				<BuildOrder>24</BuildOrder>
+			<None Include="..\..\..\ewftools\export_handle.h">
+				<BuildOrder>43</BuildOrder>
 			</None>
-			<None Include="..\..\..\ewftools\recover_handle.h">
-				<BuildOrder>25</BuildOrder>
+			<None Include="..\..\..\ewftools\ewfcommon.h">
+				<BuildOrder>18</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\ewftools_libuna.h">
+				<BuildOrder>31</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\guid.c">
 				<BuildOrder>27</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\ewftools\recover_handle.c">
-				<BuildOrder>28</BuildOrder>
-			</CppCompile>
 			<None Include="..\..\..\ewftools\ewfinput.h">
 				<BuildOrder>29</BuildOrder>
 			</None>
-			<None Include="..\..\..\ewftools\ewftools_libuna.h">
-				<BuildOrder>31</BuildOrder>
+			<None Include="..\..\..\ewftools\storage_media_buffer.h">
+				<BuildOrder>19</BuildOrder>
+			</None>
+			<None Include="..\..\..\ewftools\digest_hash.h">
+				<BuildOrder>24</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\ewftools\ewfinput.c">
 				<BuildOrder>33</BuildOrder>
@@ -193,6 +193,10 @@
 			<LibFiles Include="..\Release\libsmraw.lib">
 				<IgnorePath>true</IgnorePath>
 				<BuildOrder>44</BuildOrder>
+			</LibFiles>
+			<LibFiles Include="..\Release\libcaes.lib">
+				<IgnorePath>true</IgnorePath>
+				<BuildOrder>45</BuildOrder>
 			</LibFiles>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

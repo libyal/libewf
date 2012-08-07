@@ -42,11 +42,14 @@
 			<Projects Include="zlib\zlib_static.cbproj">
 				<Dependencies/>
 			</Projects>
-			<Projects Include="libewf\libewf_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libmfcache\libmfcache.cbproj;libmfdata\libmfdata.cbproj;libfvalue\libfvalue.cbproj;zlib\zlib_static.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
-			</Projects>
 			<Projects Include="libhmac\libhmac.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="libcaes\libcaes.cbproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="libewf\libewf_static.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libbfio\libbfio.cbproj;libfvalue\libfvalue.cbproj;libmfcache\libmfcache.cbproj;libmfdata\libmfdata.cbproj;zlib\zlib_static.cbproj;libhmac\libhmac.cbproj;libcaes\libcaes.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="libodraw\libodraw.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
@@ -61,19 +64,22 @@
 				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libuna\libuna.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquire\ewfacquire_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libodraw\libodraw.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libodraw\libodraw.cbproj;libsmdev\libsmdev.cbproj;libsmraw\libsmraw.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfacquirestream\ewfacquirestream_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfexport\ewfexport_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libsmraw\libsmraw.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfinfo\ewfinfo_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libewf\libewf_static.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
+			</Projects>
+			<Projects Include="ewfrecover\ewfrecover_static.cbproj">
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libbfio\libbfio.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libsmraw\libsmraw.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
 			</Projects>
 			<Projects Include="ewfverify\ewfverify_static.cbproj">
-				<Dependencies>libcstring\libcstring.cbproj;libuna\libuna.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libcerror\libcerror.cbproj;libcfile\libcfile.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcpath\libcpath.cbproj;libcsplit\libcsplit.cbproj</Dependencies>
+				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj;libclocale\libclocale.cbproj;libcnotify\libcnotify.cbproj;libcsplit\libcsplit.cbproj;libuna\libuna.cbproj;libcfile\libcfile.cbproj;libcpath\libcpath.cbproj;libewf\libewf_static.cbproj;libhmac\libhmac.cbproj;libcsystem\libcsystem.cbproj</Dependencies>
 			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
@@ -200,15 +206,6 @@
 		<Target Name="zlib_static:Make">
 			<MSBuild Targets="Make" Projects="zlib\zlib_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libbfio;libmfcache;libmfdata;libfvalue;zlib_static;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="libewf_static">
-			<MSBuild Projects="libewf\libewf_static.cbproj"/>
-		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libbfio:Clean;libmfcache:Clean;libmfdata:Clean;libfvalue:Clean;zlib_static:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="libewf_static:Clean">
-			<MSBuild Targets="Clean" Projects="libewf\libewf_static.cbproj"/>
-		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libbfio:Make;libmfcache:Make;libmfdata:Make;libfvalue:Make;zlib_static:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="libewf_static:Make">
-			<MSBuild Targets="Make" Projects="libewf\libewf_static.cbproj"/>
-		</Target>
 		<Target DependsOnTargets="libcstring;libcerror" Name="libhmac">
 			<MSBuild Projects="libhmac\libhmac.cbproj"/>
 		</Target>
@@ -217,6 +214,24 @@
 		</Target>
 		<Target DependsOnTargets="libcstring:Make;libcerror:Make" Name="libhmac:Make">
 			<MSBuild Targets="Make" Projects="libhmac\libhmac.cbproj"/>
+		</Target>
+		<Target Name="libcaes">
+			<MSBuild Projects="libcaes\libcaes.cbproj"/>
+		</Target>
+		<Target Name="libcaes:Clean">
+			<MSBuild Targets="Clean" Projects="libcaes\libcaes.cbproj"/>
+		</Target>
+		<Target Name="libcaes:Make">
+			<MSBuild Targets="Make" Projects="libcaes\libcaes.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libfvalue;libmfcache;libmfdata;zlib_static;libhmac;libcaes" Name="libewf_static">
+			<MSBuild Projects="libewf\libewf_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libfvalue:Clean;libmfcache:Clean;libmfdata:Clean;zlib_static:Clean;libhmac:Clean;libcaes:Clean" Name="libewf_static:Clean">
+			<MSBuild Targets="Clean" Projects="libewf\libewf_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libfvalue:Make;libmfcache:Make;libmfdata:Make;zlib_static:Make;libhmac:Make;libcaes:Make" Name="libewf_static:Make">
+			<MSBuild Targets="Make" Projects="libewf\libewf_static.cbproj"/>
 		</Target>
 		<Target DependsOnTargets="libcstring;libuna;libbfio;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="libodraw">
 			<MSBuild Projects="libodraw\libodraw.cbproj"/>
@@ -254,59 +269,68 @@
 		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libuna:Make" Name="libcsystem:Make">
 			<MSBuild Targets="Make" Projects="libcsystem\libcsystem.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libbfio;libewf_static;libhmac;libodraw;libsmdev;libsmraw;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="ewfacquire_static">
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libewf_static;libhmac;libodraw;libsmdev;libsmraw;libcsystem" Name="ewfacquire_static">
 			<MSBuild Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="ewfacquire_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcsystem:Clean" Name="ewfacquire_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="ewfacquire_static:Make">
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcsystem:Make" Name="ewfacquire_static:Make">
 			<MSBuild Targets="Make" Projects="ewfacquire\ewfacquire_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libbfio;libewf_static;libhmac;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="ewfacquirestream_static">
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libewf_static;libhmac;libcsystem" Name="ewfacquirestream_static">
 			<MSBuild Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="ewfacquirestream_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libcsystem:Clean" Name="ewfacquirestream_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="ewfacquirestream_static:Make">
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libcsystem:Make" Name="ewfacquirestream_static:Make">
 			<MSBuild Targets="Make" Projects="ewfacquirestream\ewfacquirestream_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libbfio;libewf_static;libhmac;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="ewfexport_static">
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libewf_static;libhmac;libsmraw;libcsystem" Name="ewfexport_static">
 			<MSBuild Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="ewfexport_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libsmraw:Clean;libcsystem:Clean" Name="ewfexport_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="ewfexport_static:Make">
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libsmraw:Make;libcsystem:Make" Name="ewfexport_static:Make">
 			<MSBuild Targets="Make" Projects="ewfexport\ewfexport_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libewf_static;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="ewfinfo_static">
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libewf_static;libcsystem" Name="ewfinfo_static">
 			<MSBuild Projects="ewfinfo\ewfinfo_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libewf_static:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="ewfinfo_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libewf_static:Clean;libcsystem:Clean" Name="ewfinfo_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfinfo\ewfinfo_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libewf_static:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="ewfinfo_static:Make">
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libewf_static:Make;libcsystem:Make" Name="ewfinfo_static:Make">
 			<MSBuild Targets="Make" Projects="ewfinfo\ewfinfo_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring;libuna;libewf_static;libhmac;libcerror;libcfile;libclocale;libcnotify;libcpath;libcsplit" Name="ewfverify_static">
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libewf_static;libhmac;libsmraw;libcsystem" Name="ewfrecover_static">
+			<MSBuild Projects="ewfrecover\ewfrecover_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libewf_static:Clean;libhmac:Clean;libsmraw:Clean;libcsystem:Clean" Name="ewfrecover_static:Clean">
+			<MSBuild Targets="Clean" Projects="ewfrecover\ewfrecover_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libewf_static:Make;libhmac:Make;libsmraw:Make;libcsystem:Make" Name="ewfrecover_static:Make">
+			<MSBuild Targets="Make" Projects="ewfrecover\ewfrecover_static.cbproj"/>
+		</Target>
+		<Target DependsOnTargets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libewf_static;libhmac;libcsystem" Name="ewfverify_static">
 			<MSBuild Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Clean;libuna:Clean;libewf_static:Clean;libhmac:Clean;libcerror:Clean;libcfile:Clean;libclocale:Clean;libcnotify:Clean;libcpath:Clean;libcsplit:Clean" Name="ewfverify_static:Clean">
+		<Target DependsOnTargets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libewf_static:Clean;libhmac:Clean;libcsystem:Clean" Name="ewfverify_static:Clean">
 			<MSBuild Targets="Clean" Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
-		<Target DependsOnTargets="libcstring:Make;libuna:Make;libewf_static:Make;libhmac:Make;libcerror:Make;libcfile:Make;libclocale:Make;libcnotify:Make;libcpath:Make;libcsplit:Make" Name="ewfverify_static:Make">
+		<Target DependsOnTargets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libewf_static:Make;libhmac:Make;libcsystem:Make" Name="ewfverify_static:Make">
 			<MSBuild Targets="Make" Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libfvalue;libmfcache;libmfdata;zlib_static;libewf_static;libhmac;libodraw;libsmdev;libsmraw;libcsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfverify_static"/>
+			<CallTarget Targets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libfvalue;libmfcache;libmfdata;zlib_static;libhmac;libcaes;libewf_static;libodraw;libsmdev;libsmraw;libcsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfrecover_static;ewfverify_static"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libfvalue:Clean;libmfcache:Clean;libmfdata:Clean;zlib_static:Clean;libewf_static:Clean;libhmac:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfverify_static:Clean"/>
+			<CallTarget Targets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libfvalue:Clean;libmfcache:Clean;libmfdata:Clean;zlib_static:Clean;libhmac:Clean;libcaes:Clean;libewf_static:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfrecover_static:Clean;ewfverify_static:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libfvalue:Make;libmfcache:Make;libmfdata:Make;zlib_static:Make;libewf_static:Make;libhmac:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfverify_static:Make"/>
+			<CallTarget Targets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libfvalue:Make;libmfcache:Make;libmfdata:Make;zlib_static:Make;libhmac:Make;libcaes:Make;libewf_static:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfrecover_static:Make;ewfverify_static:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>
