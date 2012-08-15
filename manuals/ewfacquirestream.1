@@ -1,0 +1,165 @@
+.Dd August 6, 2012
+.Dt ewfacquirestream
+.Os libewf
+.Sh NAME
+.Nm ewfacquirestream
+.Nd acquires data in the EWF format from stdin
+.Sh SYNOPSIS
+.Nm ewfacquirestream
+.Op Fl A Ar codepage
+.Op Fl b Ar number_of_sectors
+.Op Fl B Ar number_of_bytes
+.Op Fl c Ar compression_values
+.Op Fl C Ar case_number
+.Op Fl d Ar digest_type
+.Op Fl D Ar description
+.Op Fl e Ar examiner_name
+.Op Fl E Ar evidence_number
+.Op Fl f Ar format
+.Op Fl l Ar log_filename
+.Op Fl m Ar media_type
+.Op Fl M Ar media_flags
+.Op Fl N Ar notes
+.Op Fl o Ar offset
+.Op Fl p Ar process_buffer_size
+.Op Fl P Ar bytes_per_sector
+.Op Fl S Ar segment_file_size
+.Op Fl t Ar target
+.Op Fl 2 Ar secondary_target
+.Op Fl hqsvV
+.Sh DESCRIPTION
+.Nm ewfacquirestream
+is a utility to acquire media data from stdin and store it in EWF format (Expert Witness Format).
+.Nm ewfacquirestream
+acquires media data in a format equivalent to EnCase and FTK imager, including meta data. Under Linux, FreeBSD, NetBSD, OpenBSD, MacOS\-X/Darwin
+.Pp
+.Nm ewfacquirestream
+is part of the
+.Nm libewf
+package.
+.Nm libewf
+is a library to support the Expert Witness Compression Format (EWF).
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl A Ar codepage
+the codepage of header section, options: ascii (default), windows-874, windows-932, windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257 or windows-1258
+.It Fl b Ar number_of_sectors
+the number of sectors to read at once (per chunk), options: 16, 32, 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl B Ar number_of_bytes
+the number of bytes to acquire
+.It Fl c Ar compression_values
+specify the compression values as: level or method:level
+compression method options: deflate (default), bzip2 (bzip2 is only supported by EWF2 formats)
+compression level options: none (default), empty-block, fast or best
+.It Fl C Ar case_number
+the case number (default is case_number)
+.It Fl d Ar digest_type
+calculate additional digest (hash) types besides md5, options: sha1, sha256
+.It Fl D Ar description
+the description (default is description)
+.It Fl e Ar examiner_name
+the examiner name (default is examiner_name)
+.It Fl E Ar evidence_number
+the evidence number (default is evidence_number)
+.It Fl f Ar format
+the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5, encase6 (default), encase7, linen5, linen6, linen7, ewfx.
+.Nm libewf
+does not support streamed writes for other EWF formats.
+.It Fl h
+shows this help
+.It Fl l Ar log_filename
+logs acquiry errors and the digest (hash) to the log filename
+.It Fl m Ar media_type
+the media type, options: fixed (default), removable, optical, memory
+.It Fl M Ar media_flags
+the media flags, options: logical, physical (default)
+.It Fl N Ar notes
+the notes (default is notes)
+.It Fl o Ar offset
+the offset to start to acquire (default is 0)
+.It Fl p Ar process_buffer_size
+the process buffer size (default is the chunk size)
+.It Fl P Ar bytes_per_sector
+the number of bytes per sector (default is 512)
+.It Fl q
+quiet shows minimal status information
+.It Fl s
+swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
+.It Fl S Ar segment_file_size
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 and encase7 format and 1.9 GiB for other formats)
+.It Fl t Ar target
+the target file (without extension) to write to (default is image)
+.It Fl v
+verbose output to stderr
+.It Fl V
+print version
+.It Fl 2 Ar secondary_target
+the secondary target file (without extension) to write to
+.El
+.Pp
+.Nm ewfacquirestream
+will read from stding until it encounters a read error.
+On read error it will stop no error information is stored in the EWF file(s).
+.Pp
+Empty block compression detects blocks of sectors with entirely the same byte data and compresses them using the default compression level.
+.Sh ENVIRONMENT
+None
+.Sh FILES
+None
+.Sh EXAMPLES
+.Bd -literal
+# ewfacquirestream \-C 1 \-D Floppy \-E 1.1 \-e 'John D.' \-N 'Just a floppy in my system' \-m removable \-M logical \-t floppy </dev/fd0
+ewfacquirestream 20120805
+
+Using the following acquiry parameters:
+Image path and filename:		floppy.E01
+Case number:				1
+Description:				Floppy
+Evidence number:			1.1
+Examiner name:				John D.
+Notes:					Just a floppy in my system
+Media type:				removable
+Volume type:				logical
+EWF file format:			EnCase 5
+Compression method:			deflate
+Compression level:			none
+Acquiry start offet:			0
+Number of bytes to acquire:		0 (until end of input)
+Evidence segment file size:		1.4 GiB (1572864000 bytes)
+Block size:				64 sectors
+Error granularity:			64 sectors
+Retries on read error:			2
+
+Acquiry started at: Sun Aug  5 11:32:41 2012
+
+This could take a while.
+
+Status: acquired 1.4 MiB (1474560 bytes)
+        in 1 second(s) with 1 MiB/s (1474560 bytes/second).
+
+Acquiry completed at: Sun Aug  5 11:32:42 2012
+
+Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
+
+MD5 hash calculated over data:		ae1ce8f5ac079d3ee93f97fe3792bda3
+.Ed
+.Sh DIAGNOSTICS
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
+.Sh BUGS
+Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
+http://code.google.com/p/libewf/
+.Sh AUTHOR
+These man pages were written by Joachim Metz.
+.Sh COPYRIGHT
+.Pp
+Copyright 2006-2012 Joachim Metz <joachim.metz@gmail.com>.
+.Pp
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.Sh SEE ALSO
+.Xr ewfacquire 1 ,
+.Xr ewfexport 1 ,
+.Xr ewfinfo 1 ,
+.Xr ewfmount 1 ,
+.Xr ewfrecover 1 ,
+.Xr ewfverify 1
