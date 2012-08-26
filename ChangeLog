@@ -1,4 +1,9 @@
 TODO
+* ewfacquire:
+  - allow for multi stage imaging, where user suspends and resumes
+    imaging process
+
+* check behavior of ewfacquire resume and specified offset
 * msvscpp
   - add bzip2 support
 * codegear

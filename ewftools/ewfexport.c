@@ -312,9 +312,6 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to set stdout to binary mode.\n" );
 
-		usage_fprint(
-		 stdout );
-
 		goto on_error;
 	}
 #endif

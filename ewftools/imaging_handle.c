@@ -5537,7 +5537,7 @@ int imaging_handle_print_parameters(
 	}
 	fprintf(
 	 imaging_handle->notify_stream,
-	 "Image path and filename:\t\t%" PRIs_LIBCSTRING_SYSTEM ".",
+	 "Image path and filename:\t\t%" PRIs_LIBCSTRING_SYSTEM "",
 	 imaging_handle->target_filename );
 
 	if( resume_acquiry == 0 )
@@ -5546,20 +5546,20 @@ int imaging_handle_print_parameters(
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
-			 "s01" );
+			 ".s01" );
 		}
 		else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
 		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
-			 "e01" );
+			 ".e01" );
 		}
 		else
 		{
 			fprintf(
 			 imaging_handle->notify_stream,
-			 "E01" );
+			 ".E01" );
 		}
 	}
 	fprintf(
