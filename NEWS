@@ -1,5 +1,0 @@
-library:
-* switched to v2 API
-  - breaks libewf_check_file_signature, libewf_check_file_signature_wide,
-    libewf_glob, libewf_glob_wide
-
