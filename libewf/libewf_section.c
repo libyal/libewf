@@ -2160,6 +2160,7 @@ ssize_t libewf_section_data_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
+         int *set_identifier_change,
          libcerror_error_t **error )
 {
 	uint8_t *section_data        = NULL;
@@ -2207,6 +2208,17 @@ ssize_t libewf_section_data_read(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( set_identifier_change == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid set identifier change.",
 		 function );
 
 		return( -1 );
@@ -2478,102 +2490,8 @@ ssize_t libewf_section_data_read(
 
 		goto on_error;
 	}
-	if( ( ( (ewf_data_t *) section_data )->media_type != 0 )
-	 && ( ( (ewf_data_t *) section_data )->media_type != media_values->media_type ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: media type does not match.",
-		 function );
+	*set_identifier_change = 0;
 
-		goto on_error;
-	}
-	if( ( number_of_chunks != 0 )
-	 && ( (uint64_t) number_of_chunks != media_values->number_of_chunks ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: number of chunks does not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( sectors_per_chunk != 0 )
-	 && ( sectors_per_chunk != media_values->sectors_per_chunk ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: sectors per chunk does not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( bytes_per_sector != 0 )
-	 && ( bytes_per_sector != media_values->bytes_per_sector ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: bytes per sector does not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( number_of_sectors != 0 )
-	 && ( number_of_sectors != media_values->number_of_sectors ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: number of sectors does not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( ( (ewf_data_t *) section_data )->media_flags != 0 )
-	 && ( ( (ewf_data_t *) section_data )->media_flags != media_values->media_flags ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: media flags do not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( ( (ewf_data_t *) section_data )->compression_level != 0 )
-	 && ( ( (ewf_data_t *) section_data )->compression_level != io_handle->compression_level ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: compression level does not match.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( error_granularity != 0 )
-	 && ( error_granularity != media_values->error_granularity ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: error granularity does not match.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( ( (ewf_data_t *) section_data )->set_identifier[ 0 ] != 0 )
 	 || ( ( (ewf_data_t *) section_data )->set_identifier[ 1 ] != 0 )
 	 || ( ( (ewf_data_t *) section_data )->set_identifier[ 2 ] != 0 )
@@ -2596,11 +2514,124 @@ ssize_t libewf_section_data_read(
 		     ( (ewf_data_t *) section_data )->set_identifier,
 		     16 ) != 0 )
 		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: set identifier change.",
+				 function );
+			}
+#endif
+			*set_identifier_change = 1;
+		}
+	}
+	if( *set_identifier_change != 0 )
+	{
+/* TODO part of error tolerability changes
+		media_values->media_type        = ( (ewf_data_t *) section_data )->media_type;
+		media_values->number_of_chunks  = number_of_chunks;
+		media_values->sectors_per_chunk = sectors_per_chunk;
+		media_values->bytes_per_sector  = bytes_per_sector;
+		media_values->number_of_sectors = number_of_sectors;
+		media_values->media_flags       = ( (ewf_data_t *) section_data )->media_flags;
+		io_handle->compression_level    = ( (ewf_data_t *) section_data )->compression_level;
+		media_values->error_granularity = error_granularity;
+*/
+	}
+	else
+	{
+		if( ( ( (ewf_data_t *) section_data )->media_type != 0 )
+		 && ( ( (ewf_data_t *) section_data )->media_type != media_values->media_type ) )
+		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: mismatch in set identifier.",
+			 "%s: media type does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( number_of_chunks != 0 )
+		 && ( (uint64_t) number_of_chunks != media_values->number_of_chunks ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: number of chunks does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( sectors_per_chunk != 0 )
+		 && ( sectors_per_chunk != media_values->sectors_per_chunk ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: sectors per chunk does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( bytes_per_sector != 0 )
+		 && ( bytes_per_sector != media_values->bytes_per_sector ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: bytes per sector does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( number_of_sectors != 0 )
+		 && ( number_of_sectors != media_values->number_of_sectors ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: number of sectors does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( ( (ewf_data_t *) section_data )->media_flags != 0 )
+		 && ( ( (ewf_data_t *) section_data )->media_flags != media_values->media_flags ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: media flags do not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( ( (ewf_data_t *) section_data )->compression_level != 0 )
+		 && ( ( (ewf_data_t *) section_data )->compression_level != io_handle->compression_level ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: compression level does not match.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( error_granularity != 0 )
+		 && ( error_granularity != media_values->error_granularity ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: error granularity does not match.",
 			 function );
 
 			goto on_error;

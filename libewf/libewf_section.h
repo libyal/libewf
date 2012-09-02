@@ -184,6 +184,7 @@ ssize_t libewf_section_data_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,
+         int *set_identifier_change,
          libcerror_error_t **error );
 
 ssize_t libewf_section_data_write(

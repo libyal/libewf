@@ -1,7 +1,7 @@
 TODO
-* ewfacquire:
-  - allow for multi stage imaging, where user suspends and resumes
-    imaging process
+* add support for set identifier change ?
+* check alignment of:
+  section_data_read CHS cylinders, SMART logs start sector
 
 * check behavior of ewfacquire resume and specified offset
 * msvscpp
@@ -91,6 +91,11 @@ TODO
   - read performance: flag if checksum has be checked
   - add flags to by-pass cache ? direct read/write
 * check performance
+
+Error tolerance:
+* add setting to be less strict
+  - non matching data section (set identifier)
+  - expand number of chunks
 
 Roadmap:
 * lvf support
@@ -290,6 +295,8 @@ Tools:
   - add support for unattended write resume ?
   - improve output when encountering a read error
   - add support to set device label header value
+  - allow for multi stage imaging, where user suspends and resumes
+    imaging process
 * ewfacquirestream
   - implement stream handle
 * ewfexport
@@ -307,6 +314,8 @@ Tools:
 * ewfmount
   - Windows use ImDisk or Dokan
   - MacOS native API support ?
+* ewfverify
+  - allow for multi stage verification, where user suspends and resumes
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
@@ -351,6 +360,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120902
+* code clean up
 
 20120815
 * Changes to zlib location in msvscpp and codegear project files

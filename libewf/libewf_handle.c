@@ -2707,6 +2707,7 @@ int libewf_handle_open_read_section_data(
 	ssize_t read_count                          = 0;
 	int initialize_chunk_table                  = 0;
 	int header_section_found                    = 0;
+	int set_identifier_change                   = 0;
 	int single_files_section_found              = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -3355,8 +3356,26 @@ int libewf_handle_open_read_section_data(
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
-					      error );
+				              &set_identifier_change,
+				              error );
 
+				if( set_identifier_change != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_INPUT,
+					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+					 "%s: set identifier does not match.",
+					 function );
+
+					goto on_error;
+
+/* TODO part of error tolerability changes
+					chunk_table->previous_last_chunk_filled = 0;
+					chunk_table->last_chunk_filled          = 0;
+					chunk_table->last_chunk_compared        = 0;
+				}
+*/
 #if defined( HAVE_VERBOSE_OUTPUT )
 				known_section = 1;
 #endif
@@ -3993,7 +4012,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -4045,7 +4064,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -4065,7 +4084,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			libewf_segment_file_free(
 			 &segment_file,
@@ -4090,7 +4109,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set segment file: %d in list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			libewf_segment_file_free(
 			 &segment_file,
@@ -4320,7 +4339,7 @@ int libewf_handle_open_read_segment_files(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read section data from segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -4435,7 +4454,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve data file: %d from segment files list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			goto on_error;
 		}
@@ -4556,7 +4575,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set segment file: %d in segment files list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			goto on_error;
 		}
@@ -7515,7 +7534,7 @@ ssize_t libewf_handle_write_finalize(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -7534,7 +7553,7 @@ ssize_t libewf_handle_write_finalize(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d value from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -7546,7 +7565,7 @@ ssize_t libewf_handle_write_finalize(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -7569,7 +7588,7 @@ ssize_t libewf_handle_write_finalize(
 			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 internal_handle->write_io_handle->resume_segment_file_offset,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
