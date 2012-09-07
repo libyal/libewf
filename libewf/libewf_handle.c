@@ -3374,8 +3374,8 @@ int libewf_handle_open_read_section_data(
 					chunk_table->previous_last_chunk_filled = 0;
 					chunk_table->last_chunk_filled          = 0;
 					chunk_table->last_chunk_compared        = 0;
-				}
 */
+				}
 #if defined( HAVE_VERBOSE_OUTPUT )
 				known_section = 1;
 #endif
