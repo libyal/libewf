@@ -1,4 +1,4 @@
-.Dd August 6, 2012
+.Dd September 15, 2012
 .Dt ewfmount
 .Os libewf
 .Sh NAME
@@ -7,6 +7,7 @@
 .Sh SYNOPSIS
 .Nm ewfmount
 .Op Fl f Ar format
+.Op Fl X Ar extended_options
 .Op Fl hvV
 .Ar ewf_files
 .Sh DESCRIPTION
@@ -35,6 +36,8 @@ shows this help
 verbose output to stderr
 .It Fl V
 print version
+.It Fl X Ar extended_options
+extended options to pass to sub system
 .El
 .Sh ENVIRONMENT
 None

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120815],
+ [20120915],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -58,6 +58,9 @@ AX_LIBCSTRING_CHECK_ENABLE
 
 dnl Check for enabling libcerror for cross-platform C error functions
 AX_LIBCERROR_CHECK_ENABLE
+
+dnl Check for enabling libcdata for cross-platform C generic data functions
+AX_LIBCDATA_CHECK_ENABLE
 
 dnl Check for enabling libclocale for cross-platform C locale functions
 AX_LIBCLOCALE_CHECK_ENABLE
@@ -165,26 +168,9 @@ AS_IF(
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
 
-dnl Set memwatch support
-ac_cv_enable_memwatch=no
-
-AS_IF(
- [test "x$ac_cv_enable_memwatch" != xno],
- [AC_SUBST(
-  [MEMWATCH_CPPFLAGS],
-  ["-DMEMWATCH -DMEMWATCH_STDIO"])
- AC_SUBST(
-  [MEMWATCH_LIBADD],
-  [../common/libmemwatch.la])
- ])
-
-AM_CONDITIONAL(
- [HAVE_MEMWATCH],
- [test "x$ac_cv_enable_memwatch" != xno])
-
 dnl Check if requires and build requires should be set in spec file
 AS_IF(
- [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes],
+ [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcdata" = xyes ||  test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes],
  [AC_SUBST(
   [libewf_spec_requires],
   [Requires:])
@@ -209,6 +195,7 @@ AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([common/Makefile])
 AC_CONFIG_FILES([libcstring/Makefile])
 AC_CONFIG_FILES([libcerror/Makefile])
+AC_CONFIG_FILES([libcdata/Makefile])
 AC_CONFIG_FILES([libclocale/Makefile])
 AC_CONFIG_FILES([libcnotify/Makefile])
 AC_CONFIG_FILES([libcsplit/Makefile])
@@ -268,6 +255,7 @@ AC_MSG_NOTICE([
 Building:
    libcstring support:                              $ac_cv_libcstring
    libcerror support:                               $ac_cv_libcerror
+   libcdata support:                                $ac_cv_libcdata
    libclocale support:                              $ac_cv_libclocale
    libcnotify support:                              $ac_cv_libcnotify
    libcsplit support:                               $ac_cv_libcsplit

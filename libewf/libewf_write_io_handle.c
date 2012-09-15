@@ -41,6 +41,7 @@
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libfvalue.h"
@@ -828,18 +829,20 @@ int libewf_write_io_handle_initialize_resume(
      libewf_segment_table_t *segment_table,
      libcerror_error_t **error )
 {
-	libewf_list_element_t *section_list_element = NULL;
-	libewf_section_t *section                   = NULL;
-	libewf_segment_file_t *segment_file         = NULL;
-	static char *function                       = "libewf_write_io_handle_initialize_resume";
-	uint8_t backtrace_to_last_chunks_sections   = 0;
-	uint8_t reopen_segment_file                 = 0;
-	int file_io_pool_entry                      = 0;
-	int number_of_chunks                        = 0;
-	int number_of_segment_files                 = 0;
-	int number_of_unusable_chunks               = 0;
-	int segment_files_list_index                = 0;
-	int supported_section                       = 0;
+	libcdata_list_element_t *previous_section_list_element = NULL;
+	libcdata_list_element_t *section_list_element          = NULL;
+	libewf_section_t *previous_section                     = NULL;
+	libewf_section_t *section                              = NULL;
+	libewf_segment_file_t *segment_file                    = NULL;
+	static char *function                                  = "libewf_write_io_handle_initialize_resume";
+	uint8_t backtrace_to_last_chunks_sections              = 0;
+	uint8_t reopen_segment_file                            = 0;
+	int file_io_pool_entry                                 = 0;
+	int number_of_chunks                                   = 0;
+	int number_of_segment_files                            = 0;
+	int number_of_unusable_chunks                          = 0;
+	int segment_files_list_index                           = 0;
+	int supported_section                                  = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -917,7 +920,7 @@ int libewf_write_io_handle_initialize_resume(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment file: %d from list.",
 		 function,
-		 segment_files_list_index + 1 );
+		 segment_files_list_index );
 
 		return( -1 );
 	}
@@ -932,32 +935,34 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	if( segment_file->section_list == NULL )
+	if( libcdata_list_get_last_element(
+	     segment_file->section_list,
+	     &section_list_element,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment file - missing section list.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve last element from section list.",
 		 function );
 
 		return( -1 );
 	}
-	section_list_element = segment_file->section_list->last_element;
-
-	if( section_list_element == NULL )
+	if( libcdata_list_element_get_value(
+	     section_list_element,
+	     (intptr_t **) &section,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing last section list element.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from section list element.",
 		 function );
 
 		return( -1 );
 	}
-	section = (libewf_section_t *) section_list_element->value;
-
 	if( section == NULL )
 	{
 		libcerror_error_set(
@@ -1028,11 +1033,37 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( backtrace_to_last_chunks_sections != 0 )
 	{
-		while( section_list_element->previous_element != NULL )
+		if( libcdata_list_element_get_previous_element(
+		     section_list_element,
+		     &section_list_element,
+		     error ) != 1 )
 		{
-			section_list_element = section_list_element->previous_element;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve previous element from section list element.",
+			 function );
 
-			if( section_list_element->value == NULL )
+			return( -1 );
+		}
+		while( section_list_element != NULL )
+		{
+			if( libcdata_list_element_get_value(
+			     section_list_element,
+			     (intptr_t **) &section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value from section list element.",
+				 function );
+
+				return( -1 );
+			}
+			if( section == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -1043,14 +1074,26 @@ int libewf_write_io_handle_initialize_resume(
 
 				return( -1 );
 			}
-			section = (libewf_section_t *) section_list_element->value;
-
 			if( memory_compare(
 			     (void *) section->type_string,
 			     (void *) "table",
 			     5 ) == 0 )
 			{
 				break;
+			}
+			if( libcdata_list_element_get_previous_element(
+			     section_list_element,
+			     &section_list_element,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve previous element from section list element.",
+				 function );
+
+				return( -1 );
 			}
 		}
 		if( section_list_element == NULL )
@@ -1108,18 +1151,35 @@ int libewf_write_io_handle_initialize_resume(
 		{
 			/* Determine if the table section also contains chunks
 			 */
-			if( section_list_element->previous_element == NULL )
+			if( libcdata_list_element_get_previous_element(
+			     section_list_element,
+			     &previous_section_list_element,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing previous section list element.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve previous element from section list element.",
 				 function );
 
 				return( -1 );
 			}
-			if( section_list_element->previous_element->value == NULL )
+			if( libcdata_list_element_get_value(
+			     previous_section_list_element,
+			     (intptr_t **) &previous_section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value from previous section list element.",
+				 function );
+
+				return( -1 );
+			}
+			if( previous_section == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -1131,7 +1191,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type_string,
+			     (void *) previous_section->type_string,
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
@@ -1141,7 +1201,7 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->value )->type_string );
+				 previous_section->type_string );
 
 				return( -1 );
 			}
@@ -1185,8 +1245,8 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			/* The sections containing the chunks and offsets were read partially
 			 */
-			section_list_element = section_list_element->previous_element;
-			section  = (libewf_section_t *) section_list_element->value;
+			section_list_element = previous_section_list_element;
+			section              = previous_section;
 
 			if( libmfdata_list_resize(
 			     chunk_table_list,
@@ -1220,18 +1280,35 @@ int libewf_write_io_handle_initialize_resume(
 		{
 			/* Determine if the table section also contains chunks
 			 */
-			if( section_list_element->previous_element == NULL )
+			if( libcdata_list_element_get_previous_element(
+			     section_list_element,
+			     &previous_section_list_element,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing previous section list element.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve previous element from section list element.",
 				 function );
 
 				return( -1 );
 			}
-			if( section_list_element->previous_element->value == NULL )
+			if( libcdata_list_element_get_value(
+			     previous_section_list_element,
+			     (intptr_t **) &previous_section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value from previous section list element.",
+				 function );
+
+				return( -1 );
+			}
+			if( previous_section == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -1243,7 +1320,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->value )->type_string,
+			     (void *) previous_section->type_string,
 			     (void *) "table",
 			     6 ) != 0 )
 			{
@@ -1253,22 +1330,39 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->value )->type_string );
+				 previous_section->type_string );
 
 				return( -1 );
 			}
-			if( section_list_element->previous_element->previous_element == NULL )
+			if( libcdata_list_element_get_previous_element(
+			     previous_section_list_element,
+			     &previous_section_list_element,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid second previous section list element.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve previous element from previous section list element.",
 				 function );
 
 				return( -1 );
 			}
-			if( section_list_element->previous_element->previous_element->value == NULL )
+			if( libcdata_list_element_get_value(
+			     previous_section_list_element,
+			     (intptr_t **) &previous_section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value from second previous section list element.",
+				 function );
+
+				return( -1 );
+			}
+			if( previous_section == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -1280,7 +1374,7 @@ int libewf_write_io_handle_initialize_resume(
 				return( -1 );
 			}
 			if( memory_compare(
-			     (void *) ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type_string,
+			     (void *) previous_section->type_string,
 			     (void *) "sectors",
 			     8 ) != 0 )
 			{
@@ -1290,7 +1384,7 @@ int libewf_write_io_handle_initialize_resume(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported second previous section: %s.",
 				 function,
-				 ( (libewf_section_t *) section_list_element->previous_element->previous_element->value )->type_string );
+				 previous_section->type_string );
 
 				return( -1 );
 			}
@@ -1334,8 +1428,8 @@ int libewf_write_io_handle_initialize_resume(
 			}
 			/* The sections containing the chunks and offsets were read partially
 			 */
-			section_list_element = section_list_element->previous_element->previous_element;
-			section              = (libewf_section_t *) section_list_element->value;
+			section_list_element = previous_section_list_element;
+			section              = previous_section;
 
 			if( libmfdata_list_resize(
 			     chunk_table_list,
@@ -1429,7 +1523,7 @@ int libewf_write_io_handle_initialize_resume(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -1445,7 +1539,7 @@ int libewf_write_io_handle_initialize_resume(
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to reopen segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2633,7 +2727,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2645,7 +2739,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2668,7 +2762,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			libcnotify_printf(
 			 "%s: creating segment file with segment number: %d.\n",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 		}
 #endif
 		if( libewf_write_io_handle_create_segment_file(
@@ -2692,7 +2786,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to create segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2783,7 +2877,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2806,7 +2900,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -2997,7 +3091,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 	"%s: writing %" PRIzd " bytes to segment file: %d.\n",
 		 function,
 		 chunk_buffer_size,
-		 segment_files_list_index + 1 );
+		 segment_files_list_index );
 	}
 #endif
 	write_count = libewf_segment_file_write_chunk(
@@ -3176,7 +3270,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 					libcnotify_printf(
 				 	"%s: closing segment file with segment number: %d.\n",
 					 function,
-					 segment_files_list_index + 1 );
+					 segment_files_list_index );
 				}
 #endif
 				/* Finish and close the segment file
@@ -3240,21 +3334,21 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
-	libewf_list_element_t *last_list_element = NULL;
-	libewf_section_t *last_section           = NULL;
-	libewf_segment_file_t *segment_file      = NULL;
-	static char *function                    = "libewf_write_io_handle_write_existing_chunk";
-	off64_t existing_chunk_offset            = 0;
-	off64_t segment_file_offset              = 0;
-	size64_t existing_chunk_size             = 0;
-	size64_t required_segment_file_size      = 0;
-	ssize_t total_write_count                = 0;
-	ssize_t write_count                      = 0;
-	uint32_t existing_range_flags            = 0;
-	uint8_t no_section_append                = 0;
-	int file_io_pool_entry                   = -1;
-	int number_of_segment_files              = 0;
-	int segment_files_list_index             = 0;
+	libcdata_list_element_t *last_section_list_element = NULL;
+	libewf_section_t *last_section                     = NULL;
+	libewf_segment_file_t *segment_file                = NULL;
+	static char *function                              = "libewf_write_io_handle_write_existing_chunk";
+	off64_t existing_chunk_offset                      = 0;
+	off64_t segment_file_offset                        = 0;
+	size64_t existing_chunk_size                       = 0;
+	size64_t required_segment_file_size                = 0;
+	ssize_t total_write_count                          = 0;
+	ssize_t write_count                                = 0;
+	uint32_t existing_range_flags                      = 0;
+	uint8_t no_section_append                          = 0;
+	int file_io_pool_entry                             = -1;
+	int number_of_segment_files                        = 0;
+	int segment_files_list_index                       = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -3409,7 +3503,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve delta segment file: %d from list.",
 				 function,
-				 segment_files_list_index + 1 );
+				 segment_files_list_index );
 
 				return( -1 );
 			}
@@ -3428,7 +3522,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve delta segment file: %d value from list.",
 				 function,
-				 segment_files_list_index + 1 );
+				 segment_files_list_index );
 
 				return( -1 );
 			}
@@ -3440,37 +3534,39 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: missing delta segment file: %d.",
 				 function,
-				 segment_files_list_index + 1 );
+				 segment_files_list_index );
 
 				return( -1 );
 			}
-			if( segment_file->section_list == NULL )
+			if( libcdata_list_get_last_element(
+			     segment_file->section_list,
+			     &last_section_list_element,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file - missing section list.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve last element from section list.",
 				 function );
 
 				return( -1 );
 			}
-			last_list_element = segment_file->section_list->last_element;
-
-			if( last_list_element == NULL )
+			if( libcdata_list_element_get_value(
+			     last_section_list_element,
+			     (intptr_t **) &last_section,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing last section list element.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value from last section list element.",
 				 function );
 
 				return( -1 );
 			}
-			last_section = (libewf_section_t *) last_list_element->value;
-
-			if( last_list_element->value == NULL )
+			if( last_section == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -3514,7 +3610,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					 "%s: unable to seek offset: %" PRIi64 " in delta segment file: %d.",
 					 function,
 					 last_section->start_offset,
-					 segment_files_list_index + 1 );
+					 segment_files_list_index );
 
 					return( -1 );
 				}
@@ -3559,9 +3655,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			}
 			else
 			{
-				if( libewf_list_remove_element(
+				if( libcdata_list_remove_element(
 				     segment_file->section_list,
-				     last_list_element,
+				     last_section_list_element,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -3573,24 +3669,20 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 					return( -1 );
 				}
-				if( libewf_section_free(
-				     (libewf_section_t **) &( last_list_element->value ),
+				if( libcdata_list_element_free(
+				     &last_section_list_element,
+				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_section_free,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free last section values.",
+					 "%s: unable to free last section list element.",
 					 function );
-
-					memory_free(
-					 last_list_element );
 
 					return( -1 );
 				}
-				memory_free(
-				 last_list_element );
 			}
 		}
 		if( segment_file == NULL )
@@ -3616,7 +3708,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to create delta segment file: %d.",
 				 function,
-				 segment_files_list_index + 1 );
+				 segment_files_list_index );
 
 				return( -1 );
 			}
@@ -3669,7 +3761,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve delta segment file: %d value from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -3681,7 +3773,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -3858,7 +3950,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -3877,7 +3969,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -3889,7 +3981,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}
@@ -3921,7 +4013,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write sections correction to segment file: %d.",
 			 function,
-			 segment_files_list_index + 1 );
+			 segment_files_list_index );
 
 			return( -1 );
 		}

@@ -27,9 +27,9 @@
 
 #include "libewf_extern.h"
 #include "libewf_handle.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_single_file_entry.h"
-#include "libewf_tree_type.h"
 #include "libewf_types.h"
 
 #if defined( __cplusplus )
@@ -46,7 +46,7 @@ struct libewf_internal_file_entry
 
 	/* The file entry tree node
 	 */
-	libewf_tree_node_t *file_entry_tree_node;
+	libcdata_tree_node_t *file_entry_tree_node;
 
 	/* The file entry flags
 	 */
@@ -60,7 +60,7 @@ struct libewf_internal_file_entry
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
-     libewf_tree_node_t *file_entry_tree_node,
+     libcdata_tree_node_t *file_entry_tree_node,
      uint8_t flags,
      libcerror_error_t **error );
 

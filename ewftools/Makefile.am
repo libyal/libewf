@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBCSPLIT_CPPFLAGS@ \
@@ -20,7 +21,6 @@ AM_CPPFLAGS = \
 	@LIBSMRAW_CPPFLAGS@ \
 	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
-	@MEMWATCH_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
@@ -78,8 +78,7 @@ ewfacquire_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -120,8 +119,7 @@ ewfacquirestream_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -147,8 +145,7 @@ ewfdebug_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -191,8 +188,7 @@ ewfexport_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -225,8 +221,7 @@ ewfinfo_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfmount_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -258,8 +253,7 @@ ewfmount_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfrecover_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -301,8 +295,7 @@ ewfrecover_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -339,8 +332,7 @@ ewfverify_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@ \
-	@MEMWATCH_LIBADD@
+	@LIBINTL@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

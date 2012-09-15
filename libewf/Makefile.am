@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBCSPLIT_CPPFLAGS@ \
@@ -17,8 +18,7 @@ AM_CPPFLAGS = \
 	@BZIP2_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
-	@LIBCAES_CPPFLAGS@ \
-	@MEMWATCH_CPPFLAGS@
+	@LIBCAES_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
 
@@ -37,7 +37,6 @@ libewf_la_SOURCES = \
 	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_analytical_data.c libewf_analytical_data.h \
-	libewf_array_type.c libewf_array_type.h \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
@@ -62,6 +61,7 @@ libewf_la_SOURCES = \
 	libewf_legacy.c libewf_legacy.h \
 	libewf_libbfio.h \
 	libewf_libcaes.h \
+	libewf_libcdata.h \
 	libewf_libcerror.h \
 	libewf_libclocale.h \
 	libewf_libcnotify.h \
@@ -86,7 +86,6 @@ libewf_la_SOURCES = \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
 	libewf_support.c libewf_support.h \
-	libewf_tree_type.c libewf_tree_type.h \
 	libewf_types.h \
 	libewf_unused.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
@@ -94,6 +93,7 @@ libewf_la_SOURCES = \
 libewf_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \

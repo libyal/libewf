@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
@@ -31,7 +32,6 @@
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_files.h"
-#include "libewf_tree_type.h"
 
 /* Initialize the single files
  * Returns 1 if successful or -1 on error
@@ -135,7 +135,7 @@ int libewf_single_files_free(
 		}
 		if( ( *single_files )->root_file_entry_node != NULL )
 		{
-			if( libewf_tree_node_free(
+			if( libcdata_tree_node_free(
 			     &( ( *single_files )->root_file_entry_node ),
 			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
 			     error ) != 1 )
@@ -552,7 +552,7 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
-			if( libewf_tree_node_initialize(
+			if( libcdata_tree_node_initialize(
 			     &( single_files->root_file_entry_node ),
 			     error ) != 1 )
 			{
@@ -991,7 +991,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_file_entry(
-     libewf_tree_node_t *parent_file_entry_node,
+     libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      libfvalue_split_utf8_string_t *types,
@@ -1000,7 +1000,7 @@ int libewf_single_files_parse_file_entry(
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
 	libfvalue_split_utf8_string_t *values         = NULL;
-	libewf_tree_node_t *file_entry_node           = NULL;
+	libcdata_tree_node_t *file_entry_node         = NULL;
 	uint8_t *line_string                          = NULL;
 	uint8_t *type_string                          = NULL;
 	uint8_t *value_string                         = NULL;
@@ -1639,7 +1639,7 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	if( libewf_tree_node_set_value(
+	if( libcdata_tree_node_set_value(
 	     parent_file_entry_node,
 	     (intptr_t *) single_file_entry,
 	     error ) != 1 )
@@ -1682,7 +1682,7 @@ int libewf_single_files_parse_file_entry(
 	}
 	while( number_of_sub_entries > 0 )
 	{
-		if( libewf_tree_node_initialize(
+		if( libcdata_tree_node_initialize(
 		     &file_entry_node,
 		     error ) != 1 )
 		{
@@ -1712,7 +1712,7 @@ int libewf_single_files_parse_file_entry(
 
 			goto on_error;
 		}
-		if( libewf_tree_node_append_node(
+		if( libcdata_tree_node_append_node(
 		     parent_file_entry_node,
 		     file_entry_node,
 		     error ) != 1 )
@@ -1735,7 +1735,7 @@ int libewf_single_files_parse_file_entry(
 on_error:
 	if( file_entry_node != NULL )
 	{
-		libewf_tree_node_free(
+		libcdata_tree_node_free(
 		 &file_entry_node,
 		 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
 		 NULL );

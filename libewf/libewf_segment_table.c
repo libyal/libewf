@@ -23,8 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libewf_array_type.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libclocale.h"
 #include "libewf_libcstring.h"
@@ -94,7 +94,7 @@ int libewf_segment_table_initialize(
 
 		goto on_error;
 	}
-	if( libewf_array_initialize(
+	if( libcdata_array_initialize(
 	     &( ( *segment_table )->segment_files_array ),
 	     0,
 	     error ) != 1 )
@@ -151,7 +151,7 @@ int libewf_segment_table_free(
 			memory_free(
 			 ( *segment_table )->basename );
 		}
-		if( libewf_array_free(
+		if( libcdata_array_free(
 		     &( ( *segment_table )->segment_files_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
 		     error ) != 1 )
@@ -271,7 +271,7 @@ int libewf_segment_table_clone(
 		}
 		( *destination_segment_table )->basename_size = source_segment_table->basename_size;
 	}
-	if( libewf_array_clone(
+	if( libcdata_array_clone(
 	     &( ( *destination_segment_table )->segment_files_array ),
 	     source_segment_table->segment_files_array,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,

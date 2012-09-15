@@ -27,12 +27,12 @@
 #include "libewf_extern.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
-#include "libewf_tree_type.h"
 #include "libewf_types.h"
 
 /* Initializes the file entry and its values
@@ -41,7 +41,7 @@
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
-     libewf_tree_node_t *file_entry_tree_node,
+     libcdata_tree_node_t *file_entry_tree_node,
      uint8_t flags,
      libcerror_error_t **error )
 {
@@ -119,7 +119,7 @@ int libewf_file_entry_initialize(
 	}
 	else
 	{
-		if( libewf_tree_node_clone(
+		if( libcdata_tree_node_clone(
 		     &( internal_file_entry->file_entry_tree_node ),
 		     file_entry_tree_node,
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
@@ -184,7 +184,7 @@ int libewf_file_entry_free(
 		{
 			if( internal_file_entry->file_entry_tree_node != NULL )
 			{
-				if( libewf_tree_node_free(
+				if( libcdata_tree_node_free(
 				     &( internal_file_entry->file_entry_tree_node ),
 				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
 				     error ) != 1 )
@@ -215,6 +215,7 @@ int libewf_file_entry_get_type(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_type";
 
 	if( file_entry == NULL )
@@ -230,19 +231,22 @@ int libewf_file_entry_get_type(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_type(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     type,
 	     error ) != 1 )
 	{
@@ -267,6 +271,7 @@ int libewf_file_entry_get_flags(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_flags";
 
 	if( file_entry == NULL )
@@ -282,19 +287,22 @@ int libewf_file_entry_get_flags(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_flags(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     flags,
 	     error ) != 1 )
 	{
@@ -319,6 +327,7 @@ int libewf_file_entry_get_media_data_offset(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
 
 	if( file_entry == NULL )
@@ -334,19 +343,22 @@ int libewf_file_entry_get_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_data_offset(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     media_data_offset,
 	     error ) != 1 )
 	{
@@ -371,6 +383,7 @@ int libewf_file_entry_get_media_data_size(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_size";
 
 	if( file_entry == NULL )
@@ -386,19 +399,22 @@ int libewf_file_entry_get_media_data_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_data_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     media_data_size,
 	     error ) != 1 )
 	{
@@ -423,6 +439,7 @@ int libewf_file_entry_get_duplicate_media_data_offset(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
 
 	if( file_entry == NULL )
@@ -438,19 +455,22 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_duplicate_data_offset(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     duplicate_media_data_offset,
 	     error ) != 1 )
 	{
@@ -476,6 +496,7 @@ int libewf_file_entry_get_utf8_name_size(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_name_size";
 
 	if( file_entry == NULL )
@@ -491,19 +512,22 @@ int libewf_file_entry_get_utf8_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_utf8_name_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     utf8_name_size,
 	     error ) != 1 )
 	{
@@ -530,6 +554,7 @@ int libewf_file_entry_get_utf8_name(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_name_size";
 
 	if( file_entry == NULL )
@@ -545,19 +570,22 @@ int libewf_file_entry_get_utf8_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_utf8_name(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     utf8_name,
 	     utf8_name_size,
 	     error ) != 1 )
@@ -584,6 +612,7 @@ int libewf_file_entry_get_utf16_name_size(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_name_size";
 
 	if( file_entry == NULL )
@@ -599,19 +628,22 @@ int libewf_file_entry_get_utf16_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_utf16_name_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     utf16_name_size,
 	     error ) != 1 )
 	{
@@ -638,6 +670,7 @@ int libewf_file_entry_get_utf16_name(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_name_size";
 
 	if( file_entry == NULL )
@@ -653,19 +686,22 @@ int libewf_file_entry_get_utf16_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_utf16_name(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     utf16_name,
 	     utf16_name_size,
 	     error ) != 1 )
@@ -691,6 +727,7 @@ int libewf_file_entry_get_size(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_size";
 
 	if( file_entry == NULL )
@@ -706,19 +743,22 @@ int libewf_file_entry_get_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     size,
 	     error ) != 1 )
 	{
@@ -743,6 +783,7 @@ int libewf_file_entry_get_creation_time(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_creation_time";
 
 	if( file_entry == NULL )
@@ -758,19 +799,22 @@ int libewf_file_entry_get_creation_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_creation_time(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     creation_time,
 	     error ) != 1 )
 	{
@@ -795,6 +839,7 @@ int libewf_file_entry_get_modification_time(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_modification_time";
 
 	if( file_entry == NULL )
@@ -810,19 +855,22 @@ int libewf_file_entry_get_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_modification_time(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     modification_time,
 	     error ) != 1 )
 	{
@@ -847,6 +895,7 @@ int libewf_file_entry_get_access_time(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_access_time";
 
 	if( file_entry == NULL )
@@ -862,19 +911,22 @@ int libewf_file_entry_get_access_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_access_time(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     access_time,
 	     error ) != 1 )
 	{
@@ -899,6 +951,7 @@ int libewf_file_entry_get_entry_modification_time(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_entry_modification_time";
 
 	if( file_entry == NULL )
@@ -914,19 +967,22 @@ int libewf_file_entry_get_entry_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_entry_modification_time(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     entry_modification_time,
 	     error ) != 1 )
 	{
@@ -952,6 +1008,7 @@ int libewf_file_entry_get_utf8_hash_value_md5(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_hash_value_md5";
 	int result                                        = 0;
 
@@ -968,19 +1025,22 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_single_file_entry_get_utf8_hash_value_md5(
-	          (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	          single_file_entry,
 	          utf8_string,
 	          utf8_string_size,
 	          error );
@@ -1010,6 +1070,7 @@ int libewf_file_entry_get_utf16_hash_value_md5(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_hash_value_md5";
 	int result                                        = 0;
 
@@ -1026,19 +1087,22 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_single_file_entry_get_utf16_hash_value_md5(
-	          (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	          single_file_entry,
 	          utf16_string,
 	          utf16_string_size,
 	          error );
@@ -1068,6 +1132,7 @@ ssize_t libewf_file_entry_read_buffer(
          libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_read_buffer";
 	off64_t data_offset                               = 0;
 	off64_t duplicate_data_offset                     = 0;
@@ -1090,17 +1155,6 @@ ssize_t libewf_file_entry_read_buffer(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
-		 function );
-
-		return( -1 );
-	}
 	if( buffer == NULL )
 	{
 		libcerror_error_set(
@@ -1134,8 +1188,22 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_single_file_entry_get_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     &size,
 	     error ) != 1 )
 	{
@@ -1149,7 +1217,7 @@ ssize_t libewf_file_entry_read_buffer(
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_data_offset(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     &data_offset,
 	     error ) != 1 )
 	{
@@ -1163,7 +1231,7 @@ ssize_t libewf_file_entry_read_buffer(
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_data_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     &data_size,
 	     error ) != 1 )
 	{
@@ -1177,7 +1245,7 @@ ssize_t libewf_file_entry_read_buffer(
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_flags(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     &flags,
 	     error ) != 1 )
 	{
@@ -1222,7 +1290,7 @@ ssize_t libewf_file_entry_read_buffer(
 			return( -1 );
 		}
 		if( libewf_single_file_entry_get_duplicate_data_offset(
-		     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+		     single_file_entry,
 		     &duplicate_data_offset,
 		     error ) != 1 )
 		{
@@ -1375,6 +1443,7 @@ off64_t libewf_file_entry_seek_offset(
          libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_seek_offset";
 	size64_t size                                     = 0;
 
@@ -1391,19 +1460,22 @@ off64_t libewf_file_entry_seek_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_single_file_entry_get_size(
-	     (libewf_single_file_entry_t *) internal_file_entry->file_entry_tree_node->value,
+	     single_file_entry,
 	     &size,
 	     error ) != 1 )
 	{
@@ -1537,7 +1609,7 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libewf_tree_node_get_number_of_sub_nodes(
+	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     internal_file_entry->file_entry_tree_node,
 	     number_of_sub_file_entries,
 	     error ) != 1 )
@@ -1564,7 +1636,7 @@ int libewf_file_entry_get_sub_file_entry(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	static char *function                             = "libewf_file_entry_get_sub_file_entry";
 
 	if( file_entry == NULL )
@@ -1613,7 +1685,7 @@ int libewf_file_entry_get_sub_file_entry(
 
 		return( -1 );
 	}
-	if( libewf_tree_node_get_sub_node_by_index(
+	if( libcdata_tree_node_get_sub_node_by_index(
 	     internal_file_entry->file_entry_tree_node,
              sub_file_entry_index,
              &sub_node,
@@ -1670,7 +1742,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	static char *function                             = "libewf_file_entry_get_sub_file_entry_by_utf8_name";
 	int result                                        = 0;
 
@@ -1773,9 +1845,10 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *node                          = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *node                        = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	uint8_t *utf8_string_segment                      = NULL;
 	static char *function                             = "libewf_file_entry_get_sub_file_entry_by_utf8_path";
 	size_t utf8_string_index                          = 0;
@@ -1795,17 +1868,6 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
-		 function );
-
-		return( -1 );
-	}
 	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
@@ -1850,9 +1912,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-	node = internal_file_entry->file_entry_tree_node;
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
 
-	if( node->value == NULL )
+		return( -1 );
+	}
+	if( single_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1863,6 +1937,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
+	node = internal_file_entry->file_entry_tree_node;
+
 	if( utf8_string_length > 0 )
 	{
 		/* Ignore a leading separator
@@ -1965,7 +2041,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	static char *function                             = "libewf_file_entry_get_sub_file_entry_by_utf16_name";
 	int result                                        = 0;
 
@@ -2068,10 +2144,11 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *node                          = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
-	uint16_t *utf16_string_segment                     = NULL;
+	libcdata_tree_node_t *node                        = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
+	uint16_t *utf16_string_segment                    = NULL;
 	static char *function                             = "libewf_file_entry_get_sub_file_entry_by_utf16_path";
 	size_t utf16_string_index                         = 0;
 	size_t utf16_string_segment_length                = 0;
@@ -2090,17 +2167,6 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->file_entry_tree_node == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing file entry tree node.",
-		 function );
-
-		return( -1 );
-	}
 	if( utf16_string == NULL )
 	{
 		libcerror_error_set(
@@ -2145,9 +2211,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-	node = internal_file_entry->file_entry_tree_node;
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
 
-	if( node->value == NULL )
+		return( -1 );
+	}
+	if( single_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2158,6 +2236,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
+	node = internal_file_entry->file_entry_tree_node;
+
 	if( utf16_string_length > 0 )
 	{
 		/* Ignore a leading separator

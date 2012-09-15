@@ -34,7 +34,6 @@
 #include "libewf_libcnotify.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
-#include "libewf_list_type.h"
 #include "libewf_section.h"
 #include "libewf_unused.h"
 

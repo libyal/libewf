@@ -25,27 +25,27 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_single_file_entry.h"
-#include "libewf_tree_type.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 int libewf_single_file_tree_get_sub_node_by_utf8_name(
-     libewf_tree_node_t *single_file_tree_node,
+     libcdata_tree_node_t *single_file_tree_node,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libewf_tree_node_t **single_file_tree_sub_node,
+     libcdata_tree_node_t **single_file_tree_sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error );
 
 int libewf_single_file_tree_get_sub_node_by_utf16_name(
-     libewf_tree_node_t *single_file_tree_node,
+     libcdata_tree_node_t *single_file_tree_node,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libewf_tree_node_t **single_file_tree_sub_node,
+     libcdata_tree_node_t **single_file_tree_sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error );
 

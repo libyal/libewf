@@ -76,7 +76,8 @@ void usage_fprint(
 	fprintf( stream, "Use ewfmount to mount the EWF format (Expert Witness\n"
                          "Compression Format)\n\n" );
 
-	fprintf( stream, "Usage: ewfmount [ -f format ] [ -hvV ] ewf_files mount_point\n\n" );
+	fprintf( stream, "Usage: ewfmount [ -f format ] [ -X extended_options ] [ -hvV ]\n"
+	                 "                ewf_files mount_point\n\n" );
 
 	fprintf( stream, "\tewf_files:   the first or the entire set of EWF segment files\n\n" );
 	fprintf( stream, "\tmount_point: the directory to serve as mount point\n\n" );
@@ -87,6 +88,7 @@ void usage_fprint(
 	fprintf( stream, "\t-v:          verbose output to stderr\n"
 	                 "\t             ewfmount will remain running in the foregroud\n" );
 	fprintf( stream, "\t-V:          print version\n" );
+	fprintf( stream, "\t-X:          extended options to pass to sub system\n" );
 }
 
 /* Signal handler for ewfmount
@@ -95,7 +97,7 @@ void ewfmount_signal_handler(
       libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "ewfmount_signal_handler";
+	static char *function    = "ewfmount_signal_handler";
 
 	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
 
@@ -144,7 +146,7 @@ int ewfmount_fuse_open(
      const char *path,
      struct fuse_file_info *file_info )
 {
-	libcerror_error_t *error         = NULL;
+	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_open";
 	size_t path_length              = 0;
@@ -284,7 +286,7 @@ int ewfmount_fuse_read(
      off_t offset,
      struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error         = NULL;
+	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_read";
 	size_t path_length              = 0;
@@ -486,7 +488,7 @@ int ewfmount_fuse_readdir(
      off_t offset LIBCSYSTEM_ATTRIBUTE_UNUSED,
      struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error             = NULL;
+	libcerror_error_t *error            = NULL;
 	libewf_file_entry_t *file_entry     = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
 	char *name                          = NULL;
@@ -821,7 +823,7 @@ int ewfmount_fuse_getattr(
      const char *path,
      struct stat *stat_info )
 {
-	libcerror_error_t *error         = NULL;
+	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "ewfmount_fuse_getattr";
 	size64_t file_size              = 0;
@@ -1136,7 +1138,7 @@ void ewfmount_fuse_destroy(
       void *private_data LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "ewfmount_fuse_destroy";
+	static char *function    = "ewfmount_fuse_destroy";
 
 	LIBCSYSTEM_UNREFERENCED_PARAMETER( private_data )
 
@@ -1182,16 +1184,17 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t * const *argv_filenames = NULL;
+	libcstring_system_character_t * const *argv_filenames  = NULL;
 
-	libewf_error_t *error                                 = NULL;
-	libcstring_system_character_t *option_format          = NULL;
-	libcstring_system_character_t *mount_point            = NULL;
-	char *program                                         = "ewfmount";
-	libcstring_system_integer_t option                    = 0;
-	int number_of_filenames                               = 0;
-	int result                                            = 0;
-	int verbose                                           = 0;
+	libewf_error_t *error                                  = NULL;
+	libcstring_system_character_t *option_extended_options = NULL;
+	libcstring_system_character_t *option_format           = NULL;
+	libcstring_system_character_t *mount_point             = NULL;
+	char *program                                          = "ewfmount";
+	libcstring_system_integer_t option                     = 0;
+	int number_of_filenames                                = 0;
+	int result                                             = 0;
+	int verbose                                            = 0;
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
 	libcsystem_glob_t *glob                                = NULL;
@@ -1199,8 +1202,10 @@ int main( int argc, char * const argv[] )
 
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
-	struct fuse_chan *ewfmount_fuse_channel               = NULL;
-	struct fuse *ewfmount_fuse_handle                     = NULL;
+
+	struct fuse_args ewfmount_fuse_arguments               = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *ewfmount_fuse_channel                = NULL;
+	struct fuse *ewfmount_fuse_handle                      = NULL;
 #endif
 
 	libcnotify_stream_set(
@@ -1241,7 +1246,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "f:hvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "f:hvVX:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1278,6 +1283,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'X':
+				option_extended_options = optarg;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -1431,6 +1441,41 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	if( option_extended_options != NULL )
+	{
+		/* This argument is required but ignored
+		 */
+		if( fuse_opt_add_arg(
+		     &ewfmount_fuse_arguments,
+		     "" ) != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable add fuse arguments.\n" );
+
+			goto on_error;
+		}
+		if( fuse_opt_add_arg(
+		     &ewfmount_fuse_arguments,
+		     "-o" ) != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable add fuse arguments.\n" );
+
+			goto on_error;
+		}
+		if( fuse_opt_add_arg(
+		     &ewfmount_fuse_arguments,
+		     option_extended_options ) != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable add fuse arguments.\n" );
+
+			goto on_error;
+		}
+	}
 	ewfmount_fuse_operations.open    = &ewfmount_fuse_open;
 	ewfmount_fuse_operations.read    = &ewfmount_fuse_read;
 	ewfmount_fuse_operations.readdir = &ewfmount_fuse_readdir;
@@ -1439,7 +1484,7 @@ int main( int argc, char * const argv[] )
 
 	ewfmount_fuse_channel = fuse_mount(
 	                         mount_point,
-	                         NULL );
+	                         &ewfmount_fuse_arguments );
 
 	if( ewfmount_fuse_channel == NULL )
 	{
@@ -1451,7 +1496,7 @@ int main( int argc, char * const argv[] )
 	}
 	ewfmount_fuse_handle = fuse_new(
 	                        ewfmount_fuse_channel,
-	                        NULL,
+	                        &ewfmount_fuse_arguments,
 	                        &ewfmount_fuse_operations,
 	                        sizeof( struct fuse_operations ),
 	                        ewfmount_mount_handle );
@@ -1490,6 +1535,9 @@ int main( int argc, char * const argv[] )
 	fuse_destroy(
 	 ewfmount_fuse_handle );
 
+	fuse_opt_free_args(
+	 &ewfmount_fuse_arguments );
+
 	return( EXIT_SUCCESS );
 #else
 	fprintf(
@@ -1513,6 +1561,8 @@ on_error:
 		fuse_destroy(
 		 ewfmount_fuse_handle );
 	}
+	fuse_opt_free_args(
+	 &ewfmount_fuse_arguments );
 #endif
 	if( ewfmount_mount_handle != NULL )
 	{

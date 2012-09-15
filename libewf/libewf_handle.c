@@ -38,6 +38,7 @@
 #include "libewf_header_values.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
@@ -2697,21 +2698,21 @@ int libewf_handle_open_read_section_data(
      int file_io_pool_entry,
      libcerror_error_t **error )
 {
-	libewf_header_sections_t *header_sections   = NULL;
-	libewf_list_element_t *section_list_element = NULL;
-	libewf_section_t *section                   = NULL;
-	uint8_t *string_data                        = NULL;
-	static char *function                       = "libewf_handle_open_read_section_data";
-	off64_t section_data_offset                 = 0;
-	size_t string_data_size                     = 0;
-	ssize_t read_count                          = 0;
-	int initialize_chunk_table                  = 0;
-	int header_section_found                    = 0;
-	int set_identifier_change                   = 0;
-	int single_files_section_found              = 0;
+	libewf_header_sections_t *header_sections     = NULL;
+	libcdata_list_element_t *section_list_element = NULL;
+	libewf_section_t *section                     = NULL;
+	uint8_t *string_data                          = NULL;
+	static char *function                         = "libewf_handle_open_read_section_data";
+	off64_t section_data_offset                   = 0;
+	size_t string_data_size                       = 0;
+	ssize_t read_count                            = 0;
+	int initialize_chunk_table                    = 0;
+	int header_section_found                      = 0;
+	int set_identifier_change                     = 0;
+	int single_files_section_found                = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	int known_section                           = 0;
+	int known_section                             = 0;
 #endif
 
 	if( internal_handle == NULL )
@@ -2780,17 +2781,6 @@ int libewf_handle_open_read_section_data(
 
 		return( -1 );
 	}
-	if( segment_file->section_list == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment file - missing section list.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_header_sections_initialize(
 	     &header_sections,
 	     error ) != 1 )
@@ -2804,8 +2794,21 @@ int libewf_handle_open_read_section_data(
 
 		goto on_error;
 	}
-	section_list_element = segment_file->section_list->first_element;
+	if( libcdata_list_get_element_by_index(
+	     segment_file->section_list,
+	     0,
+	     &section_list_element,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first element from section list.",
+		 function );
 
+		goto on_error;
+	}
 	if( section_list_element == NULL )
 	{
 		libcerror_error_set(
@@ -2819,8 +2822,20 @@ int libewf_handle_open_read_section_data(
 	}
 	while( section_list_element != NULL )
 	{
-		section = (libewf_section_t *) section_list_element->value;
+		if( libcdata_list_element_get_value(
+		     section_list_element,
+		     (intptr_t **) &section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from section list element.",
+			 function );
 
+			goto on_error;
+		}
 		if( section == NULL )
 		{
 			libcerror_error_set(
@@ -3840,7 +3855,20 @@ int libewf_handle_open_read_section_data(
 			}
 			initialize_chunk_table = 0;
 		}
-		section_list_element = section_list_element->next_element;
+		if( libcdata_list_element_get_next_element(
+		     section_list_element,
+		     &section_list_element,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next element from section list element.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( header_section_found != 0 )
 	{
@@ -4214,7 +4242,7 @@ int libewf_handle_open_read_segment_files(
 				{
 					section_offset += sizeof( ewf_section_descriptor_v1_t );
 				}
-				if( libewf_list_append_value(
+				if( libcdata_list_append_value(
 				     segment_file->section_list,
 				     (intptr_t *) section,
 				     error ) != 1 )
@@ -4256,7 +4284,7 @@ int libewf_handle_open_read_segment_files(
 				}
 				section_offset -= section->size;
 
-				if( libewf_list_prepend_value(
+				if( libcdata_list_prepend_value(
 				     segment_file->section_list,
 				     (intptr_t *) section,
 				     error ) != 1 )
@@ -4718,7 +4746,7 @@ int libewf_handle_open_read_delta_segment_files(
 			{
 				section_offset += sizeof( ewf_section_descriptor_v1_t );
 			}
-			if( libewf_list_append_value(
+			if( libcdata_list_append_value(
 			     segment_file->section_list,
 			     (intptr_t *) section,
 			     error ) != 1 )
@@ -9858,9 +9886,10 @@ int libewf_file_get_file_entry_by_utf8_path(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *node                          = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *node                        = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	uint8_t *utf8_string_segment                      = NULL;
 	static char *function                             = "libewf_file_get_file_entry_by_utf8_path";
 	size_t utf8_string_index                          = 0;
@@ -9939,7 +9968,21 @@ int libewf_file_get_file_entry_by_utf8_path(
 	{
 		return( 0 );
 	}
-	if( internal_handle->single_files->root_file_entry_node->value == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_handle->single_files->root_file_entry_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from root file entry node.",
+		 function );
+
+		return( -1 );
+	}
+	if( single_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -10054,9 +10097,10 @@ int libewf_file_get_file_entry_by_utf16_path(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
 	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libewf_tree_node_t *node                          = NULL;
-	libewf_tree_node_t *sub_node                      = NULL;
+	libcdata_tree_node_t *node                        = NULL;
+	libcdata_tree_node_t *sub_node                    = NULL;
 	uint16_t *utf16_string_segment                    = NULL;
 	static char *function                             = "libewf_file_get_file_entry_by_utf16_path";
 	size_t utf16_string_index                         = 0;
@@ -10135,7 +10179,21 @@ int libewf_file_get_file_entry_by_utf16_path(
 	{
 		return( 0 );
 	}
-	if( internal_handle->single_files->root_file_entry_node->value == NULL )
+	if( libcdata_tree_node_get_value(
+	     internal_handle->single_files->root_file_entry_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from root file entry node.",
+		 function );
+
+		return( -1 );
+	}
+	if( single_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,

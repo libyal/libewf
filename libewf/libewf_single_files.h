@@ -26,10 +26,10 @@
 #include <types.h>
 
 #include "libewf_extern.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 #include "libewf_single_file_entry.h"
-#include "libewf_tree_type.h"
 #include "libewf_types.h"
 
 #if defined( __cplusplus )
@@ -58,7 +58,7 @@ struct libewf_single_files
 
 	/* The single file entry tree
 	 */
-	libewf_tree_node_t *root_file_entry_node;
+	libcdata_tree_node_t *root_file_entry_node;
 };
 
 int libewf_single_files_initialize(
@@ -90,7 +90,7 @@ int libewf_single_files_parse_record_values(
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry(
-     libewf_tree_node_t *parent_file_entry_node,
+     libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
      libfvalue_split_utf8_string_t *types,

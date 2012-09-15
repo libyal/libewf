@@ -22,20 +22,20 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
-#include "libewf_tree_type.h"
 
 /* Retrieves the single file entry sub node for the specific UTF-8 formatted name
  * Returns 1 if successful, 0 if no such sub single file entry or -1 on error
  */
 int libewf_single_file_tree_get_sub_node_by_utf8_name(
-     libewf_tree_node_t *node,
+     libcdata_tree_node_t *node,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libewf_tree_node_t **sub_node,
+     libcdata_tree_node_t **sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error )
 {
@@ -77,7 +77,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 		return( -1 );
 	}
-	if( libewf_tree_node_get_number_of_sub_nodes(
+	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
 	     &number_of_sub_nodes,
 	     error ) != 1 )
@@ -91,26 +91,40 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 		goto on_error;
 	}
-	*sub_node = node->first_sub_node;
+	if( libcdata_tree_node_get_sub_node_by_index(
+	     node,
+	     0,
+	     sub_node,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first sub node.",
+		 function );
 
+		goto on_error;
+	}
 	for( sub_node_index = 0;
 	     sub_node_index < number_of_sub_nodes;
 	     sub_node_index++ )
 	{
-		if( *sub_node == NULL )
+		if( libcdata_tree_node_get_value(
+		     *sub_node,
+		     (intptr_t **) sub_single_file_entry,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing sub node: %d.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from sub node: %d.",
 			 function,
 			 sub_node_index );
 
 			goto on_error;
 		}
-		*sub_single_file_entry = (libewf_single_file_entry_t *) ( *sub_node )->value;
-
 		if( *sub_single_file_entry == NULL )
 		{
 			libcerror_error_set(
@@ -121,7 +135,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 			 function,
 			 sub_node_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( ( *sub_single_file_entry )->name != NULL )
 		{
@@ -147,7 +161,21 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 		{
 			break;
 		}
-		*sub_node = ( *sub_node )->next_node;
+		if( libcdata_tree_node_get_next_node(
+		     *sub_node,
+		     sub_node,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next node from sub node: %d.",
+			 function,
+			 sub_node_index );
+
+			goto on_error;
+		}
 	}
 	if( sub_node_index >= number_of_sub_nodes )
 	{
@@ -169,10 +197,10 @@ on_error:
  * Returns 1 if successful, 0 if no such sub single file entry or -1 on error
  */
 int libewf_single_file_tree_get_sub_node_by_utf16_name(
-     libewf_tree_node_t *node,
+     libcdata_tree_node_t *node,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libewf_tree_node_t **sub_node,
+     libcdata_tree_node_t **sub_node,
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error )
 {
@@ -214,7 +242,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 		return( -1 );
 	}
-	if( libewf_tree_node_get_number_of_sub_nodes(
+	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
 	     &number_of_sub_nodes,
 	     error ) != 1 )
@@ -228,26 +256,40 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 		goto on_error;
 	}
-	*sub_node = node->first_sub_node;
+	if( libcdata_tree_node_get_sub_node_by_index(
+	     node,
+	     0,
+	     sub_node,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first sub node.",
+		 function );
 
+		goto on_error;
+	}
 	for( sub_node_index = 0;
 	     sub_node_index < number_of_sub_nodes;
 	     sub_node_index++ )
 	{
-		if( *sub_node == NULL )
+		if( libcdata_tree_node_get_value(
+		     *sub_node,
+		     (intptr_t **) sub_single_file_entry,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: corruption detected - missing sub node: %d.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from sub node: %d.",
 			 function,
 			 sub_node_index );
 
 			goto on_error;
 		}
-		*sub_single_file_entry = (libewf_single_file_entry_t *) ( *sub_node )->value;
-
 		if( *sub_single_file_entry == NULL )
 		{
 			libcerror_error_set(
@@ -258,7 +300,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 			 function,
 			 sub_node_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( ( *sub_single_file_entry )->name != NULL )
 		{
@@ -284,7 +326,21 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		{
 			break;
 		}
-		*sub_node = ( *sub_node )->next_node;
+		if( libcdata_tree_node_get_next_node(
+		     *sub_node,
+		     sub_node,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next node from sub node: %d.",
+			 function,
+			 sub_node_index );
+
+			goto on_error;
+		}
 	}
 	if( sub_node_index >= number_of_sub_nodes )
 	{

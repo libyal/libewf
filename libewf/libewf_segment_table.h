@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_array_type.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcstring.h"
 #include "libewf_libmfdata.h"
@@ -54,7 +54,7 @@ struct libewf_segment_table
 
 	/* The segment files (handles) array
 	 */
-	libewf_array_t *segment_files_array;
+	libcdata_array_t *segment_files_array;
 
 	/* Flags
 	 */

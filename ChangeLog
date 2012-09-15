@@ -1,4 +1,7 @@
 TODO
+* update msvscpp files
+* update codegear files
+
 * add support for set identifier change ?
 * check alignment of:
   section_data_read CHS cylinders, SMART logs start sector
@@ -82,6 +85,7 @@ TODO
 * ewfmount
   - check access rights on fuse mount point
   - add stat info on readdir (see regfmount)
+  - provide means to have a similar naming approach as mount_ewf.py
 * ideas for libmfdata
   - merge table offsets into groups on write (with backup range) in
     libewf_segment_file_write_chunks_section_correction() ?
@@ -360,6 +364,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20120915
+* added -X option to ewfmount
 
 20120902
 * code clean up

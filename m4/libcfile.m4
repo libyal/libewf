@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20120526
+dnl Version: 20120825
 
 dnl Function to detect if libcfile is available
 dnl ac_libcfile_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -212,8 +212,8 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
 
 dnl Function to detect if libcfile dependencies are available
 AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
- [dnl Headers included in libcfile/libcfile_file.h and libcfile/libcfile_support.h
- AC_CHECK_HEADERS([errno.h sys/stat.h])
+ [dnl Headers included in libcfile/libcfile_file.h, libcfile/libcfile_stream.h and libcfile/libcfile_support.h
+ AC_CHECK_HEADERS([errno.h stdio.h sys/stat.h])
 
  dnl Headers included in libcfile/libcfile_file.h
  AC_CHECK_HEADERS([fcntl.h unistd.h])
@@ -271,7 +271,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
   ])
 
  dnl File stream functions used in libcfile/libcfile_stream.h
- AC_CHECK_FUNCS([fclose feof fopen fread fseeko fseeko64 ftello ftello64 fwrite])
+ AC_CHECK_FUNCS([fclose feof fileno fopen fread fseeko fseeko64 ftello ftello64 fwrite])
 
  AS_IF(
   [test "x$ac_cv_func_fclose" != xyes],
@@ -284,13 +284,6 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
   [test "x$ac_cv_func_feof" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: feof],
-   [1])
-  ])
- 
- AS_IF(
-  [test "x$ac_cv_func_fgets" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: fgets],
    [1])
   ])
  

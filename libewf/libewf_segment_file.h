@@ -38,11 +38,11 @@
 #include "libewf_hash_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libmfcache.h"
 #include "libewf_libmfdata.h"
-#include "libewf_list_type.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
 #include "libewf_sector_list.h"
@@ -95,7 +95,7 @@ struct libewf_segment_file
 
         /* The list of all the sections
          */
-        libewf_list_t *section_list;
+        libcdata_list_t *section_list;
 
 	/* The number of chunks
 	 */

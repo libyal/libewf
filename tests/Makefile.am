@@ -7,8 +7,7 @@ AM_CPPFLAGS = \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
-	@MEMWATCH_CPPFLAGS@
+	@LIBCSYSTEM_CPPFLAGS@
 
 if HAVE_PYTHON
 TESTS_PYEWF  = \
@@ -71,8 +70,7 @@ ewf_test_glob_SOURCES = \
 
 ewf_test_glob_LDADD = \
 	@LIBCSTRING_LIBADD@ \
-	../libewf/libewf.la \
-        @MEMWATCH_LIBADD@
+	../libewf/libewf.la
 
 ewf_test_read_SOURCES = \
 	ewf_test_definitions.h \
@@ -82,10 +80,9 @@ ewf_test_read_SOURCES = \
 	ewf_test_read.c
 
 ewf_test_read_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
 	../libewf/libewf.la \
-        @MEMWATCH_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@
 
 ewf_test_read_write_SOURCES = \
 	ewf_test_definitions.h \
@@ -99,8 +96,7 @@ ewf_test_read_write_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 ewf_test_read_write_delta_SOURCES = \
 	ewf_test_definitions.h \
@@ -114,8 +110,7 @@ ewf_test_read_write_delta_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 ewf_test_seek_SOURCES = \
 	ewf_test_libcerror.h \
@@ -124,10 +119,9 @@ ewf_test_seek_SOURCES = \
 	ewf_test_seek.c
 
 ewf_test_seek_LDADD = \
-	@LIBCSTRING_LIBADD@ \
+	../libewf/libewf.la
 	@LIBCERROR_LIBADD@ \
-	../libewf/libewf.la \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 ewf_test_truncate_SOURCES = \
 	ewf_test_libcerror.h \
@@ -144,8 +138,7 @@ ewf_test_truncate_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 ewf_test_write_SOURCES = \
 	ewf_test_definitions.h \
@@ -158,8 +151,7 @@ ewf_test_write_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_definitions.h \
@@ -173,8 +165,7 @@ ewf_test_write_chunk_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
-        @MEMWATCH_LIBADD@
+	@LIBCSTRING_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
