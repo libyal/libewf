@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1057,7 +1057,6 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 		return( -1 );
 	}
 	return( result );
-
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
@@ -1119,7 +1118,128 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 		return( -1 );
 	}
 	return( result );
+}
 
+/* Retrieves the UTF-8 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_file_entry_get_utf8_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_utf8_hash_value_sha1";
+	int result                                        = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_single_file_entry_get_utf8_hash_value_sha1(
+	          single_file_entry,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: SHA1.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_file_entry_get_utf16_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_get_utf16_hash_value_sha1";
+	int result                                        = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_single_file_entry_get_utf16_hash_value_sha1(
+	          single_file_entry,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: SHA1.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Reads data at the current offset

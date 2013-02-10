@@ -1,7 +1,7 @@
 /*
  * Low level reading functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,7 +28,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libmfcache.h"
+#include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -280,7 +280,7 @@ int libewf_read_io_handle_read_chunk_data(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libmfdata_list_t *chunk_table_list,
-     libmfcache_cache_t *chunk_table_cache,
+     libfcache_cache_t *chunk_table_cache,
      int chunk_index,
      off64_t chunk_offset,
      libewf_chunk_data_t **chunk_data,

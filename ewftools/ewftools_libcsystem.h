@@ -2,7 +2,7 @@
  * Library for system independent implementation of functionality
  * for programs
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,7 +27,6 @@
  */
 #if defined( HAVE_LOCAL_LIBCSYSTEM )
 
-#include <libcsystem_date_time.h>
 #include <libcsystem_definitions.h>
 #include <libcsystem_file_io.h>
 #include <libcsystem_file_stream.h>

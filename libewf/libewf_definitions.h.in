@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -200,7 +200,7 @@ enum LIBEWF_CHUNK_IO_FLAGS
 {
 	/* Indicates the checksum should be read or written
 	 */
-	LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET			= 0x01,
+	LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET			= 0x01,
 
 	/* Indicates the padding should be read or written
 	 */
@@ -209,6 +209,19 @@ enum LIBEWF_CHUNK_IO_FLAGS
 	/* Indicates the chunk is packed
 	 */
 	LIBEWF_CHUNK_IO_FLAG_IS_PACKED				= 0x04,
+};
+
+/* The chunk data item flags definitions
+ */
+enum LIBEWF_CHUNK_DATA_ITEM_FLAGS
+{
+        /* The data is not managed by the chunk data item
+	 */
+	LIBEWF_CHUNK_DATA_ITEM_FLAG_NON_MANAGED_DATA		= 0x00,
+
+        /* The data is managed by the chunk data item
+	 */
+	LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA		= 0x01
 };
 
 /* The (single) file entry types

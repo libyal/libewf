@@ -1,7 +1,7 @@
 /*
  * Single file entry functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -136,6 +136,11 @@ int libewf_single_file_entry_free(
 			memory_free(
 			 ( *single_file_entry )->md5_hash );
 		}
+		if( ( *single_file_entry )->sha1_hash != NULL )
+		{
+			memory_free(
+			 ( *single_file_entry )->sha1_hash );
+		}
 		memory_free(
 		 *single_file_entry );
 
@@ -215,8 +220,9 @@ int libewf_single_file_entry_clone(
 
 		return( -1 );
 	}
-	( *destination_single_file_entry )->name     = NULL;
-	( *destination_single_file_entry )->md5_hash = NULL;
+	( *destination_single_file_entry )->name      = NULL;
+	( *destination_single_file_entry )->md5_hash  = NULL;
+	( *destination_single_file_entry )->sha1_hash = NULL;
 
 	if( source_single_file_entry->name != NULL )
 	{
@@ -282,11 +288,48 @@ int libewf_single_file_entry_clone(
 		}
 		( *destination_single_file_entry )->md5_hash_size = source_single_file_entry->md5_hash_size;
 	}
+	if( source_single_file_entry->sha1_hash != NULL )
+	{
+		( *destination_single_file_entry )->sha1_hash = (uint8_t *) memory_allocate(
+		                                                             sizeof( uint8_t ) * source_single_file_entry->sha1_hash_size );
+
+		if( ( *destination_single_file_entry )->sha1_hash == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination SHA1 hash.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_single_file_entry )->sha1_hash,
+		     source_single_file_entry->sha1_hash,
+		     source_single_file_entry->sha1_hash_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source to destination SHA1 hash.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_single_file_entry )->sha1_hash_size = source_single_file_entry->sha1_hash_size;
+	}
 	return( 1 );
 
 on_error:
 	if( *destination_single_file_entry != NULL )
 	{
+		if( ( *destination_single_file_entry )->sha1_hash != NULL )
+		{
+			memory_free(
+			 ( *destination_single_file_entry )->sha1_hash );
+		}
 		if( ( *destination_single_file_entry )->md5_hash != NULL )
 		{
 			memory_free(
@@ -1073,6 +1116,160 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy MD5 hash to UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_single_file_entry_get_utf8_hash_value_sha1(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_utf8_hash_value_sha1";
+
+	if( single_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-8 string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size < single_file_entry->sha1_hash_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: UTF-8 string too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( single_file_entry->sha1_hash_size == 0 )
+	{
+		return( 0 );
+	}
+	if( memory_copy(
+	     utf8_string,
+	     single_file_entry->sha1_hash,
+	     single_file_entry->sha1_hash_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy SHA1 hash to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_single_file_entry_get_utf16_hash_value_sha1(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_utf16_hash_value_sha1";
+
+	if( single_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-16 string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_size < single_file_entry->sha1_hash_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: UTF-16 string too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( single_file_entry->sha1_hash_size == 0 )
+	{
+		return( 0 );
+	}
+	if( libuna_utf16_string_copy_from_utf8(
+	     utf16_string,
+	     utf16_string_size,
+	     single_file_entry->sha1_hash,
+	     single_file_entry->sha1_hash_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy SHA1 hash to UTF-16 string.",
 		 function );
 
 		return( -1 );

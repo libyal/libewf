@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20120915],
+ [20130128],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -36,6 +36,7 @@ AC_PATH_PROG(PKGCONFIG,[pkg-config])
 
 dnl Support of internationalization (i18n)
 AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.18.1])
 
 dnl Check for compiler language support
 AC_C_CONST
@@ -83,11 +84,11 @@ AX_LIBCPATH_CHECK_ENABLE
 dnl Check for enabling libbfio for basic file IO support
 AX_LIBBFIO_CHECK_ENABLE
 
+dnl Check for enabling libfcache for file value cache support
+AX_LIBFCACHE_CHECK_ENABLE
+
 dnl Check for enabling libfvalue for file value support
 AX_LIBFVALUE_CHECK_ENABLE
-
-dnl Check for enabling libmfcache for multi-file value cache support
-AX_LIBMFCACHE_CHECK_ENABLE
 
 dnl Check for enabling libmfdata for multi-file data types support
 AX_LIBMFDATA_CHECK_ENABLE
@@ -125,11 +126,12 @@ AX_LIBSMRAW_CHECK_ENABLE
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE
 
-dnl Check for headers and functions
+dnl Check for headers and functions used in tools
 AS_IF(
  [test "x$ac_cv_enable_winapi" = xno],
  [AC_CHECK_HEADERS([sys/resource.h sys/utsname.h])
- AC_CHECK_FUNCS([getegid geteuid getrlimit getuid uname])
+ AC_HEADER_TIME
+ AC_CHECK_FUNCS([getegid geteuid getrlimit getuid time uname])
  ])
 
 dnl Check if ewftools should be build as static executables
@@ -170,7 +172,7 @@ CFLAGS="$CFLAGS -Wall";
 
 dnl Check if requires and build requires should be set in spec file
 AS_IF(
- [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcdata" = xyes ||  test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfcache" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes],
+ [test "x$ac_cv_libcstring" = xyes || test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcdata" = xyes ||  test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfcache" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_libmfdata" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_bzip2" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes],
  [AC_SUBST(
   [libewf_spec_requires],
   [Requires:])
@@ -179,10 +181,15 @@ AS_IF(
   [BuildRequires:])
  ])
 
-dnl Set the date for dpkg files
+dnl Set the date for the dpkg files
 AC_SUBST(
- [DATE],
+ [DPKG_DATE],
  [`date -R 2> /dev/null`])
+
+dnl Set the date for the spec file
+AC_SUBST(
+ [SPEC_DATE],
+ [`date +"%a %b %e %Y" 2> /dev/null`])
 
 dnl Set the current working directory for PackageMaker files
 AC_SUBST(
@@ -203,8 +210,8 @@ AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libcfile/Makefile])
 AC_CONFIG_FILES([libcpath/Makefile])
 AC_CONFIG_FILES([libbfio/Makefile])
+AC_CONFIG_FILES([libfcache/Makefile])
 AC_CONFIG_FILES([libfvalue/Makefile])
-AC_CONFIG_FILES([libmfcache/Makefile])
 AC_CONFIG_FILES([libmfdata/Makefile])
 AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([libcaes/Makefile])
@@ -237,6 +244,7 @@ AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([libewf/libewf.rc])
 AC_CONFIG_FILES([ewf.net/ewf.net.rc])
+AC_CONFIG_FILES([pyewf/setup.py])
 AC_CONFIG_FILES([macosx/libewf.pmdoc/01bin.xml])
 AC_CONFIG_FILES([macosx/libewf.pmdoc/02include.xml])
 AC_CONFIG_FILES([macosx/libewf.pmdoc/03lib.xml])
@@ -263,8 +271,8 @@ Building:
    libcfile support:                                $ac_cv_libcfile
    libcpath support:                                $ac_cv_libcpath
    libbfio support:                                 $ac_cv_libbfio
+   libfcache support:                               $ac_cv_libfcache
    libfvalue support:                               $ac_cv_libfvalue
-   libmfcache support:                              $ac_cv_libmfcache
    libmfdata support:                               $ac_cv_libmfdata
    ADLER32 checksum support:                        $ac_cv_with_adler32
    DEFLATE compression support:                     $ac_cv_zlib

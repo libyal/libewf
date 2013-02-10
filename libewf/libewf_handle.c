@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -43,7 +43,7 @@
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
-#include "libewf_libmfcache.h"
+#include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_metadata.h"
 #include "libewf_restart_data.h"
@@ -593,7 +593,7 @@ int libewf_handle_clone(
 	}
 	if( internal_source_handle->segment_files_cache != NULL )
 	{
-		if( libmfcache_cache_clone(
+		if( libfcache_cache_clone(
 		     &( internal_destination_handle->segment_files_cache ),
 		     internal_source_handle->segment_files_cache,
 		     error ) != 1 )
@@ -661,7 +661,7 @@ int libewf_handle_clone(
 	}
 	if( internal_source_handle->chunk_table_cache != NULL )
 	{
-		if( libmfcache_cache_clone(
+		if( libfcache_cache_clone(
 		     &( internal_destination_handle->chunk_table_cache ),
 		     internal_source_handle->chunk_table_cache,
 		     error ) != 1 )
@@ -763,7 +763,7 @@ on_error:
 		}
 		if( internal_destination_handle->chunk_table_cache != NULL )
 		{
-			libmfcache_cache_free(
+			libfcache_cache_free(
 			 &( internal_destination_handle->chunk_table_cache ),
 			 NULL );
 		}
@@ -781,7 +781,7 @@ on_error:
 		}
 		if( internal_destination_handle->segment_files_cache != NULL )
 		{
-			libmfcache_cache_free(
+			libfcache_cache_free(
 			 &( internal_destination_handle->segment_files_cache ),
 			 NULL );
 		}
@@ -910,7 +910,7 @@ int libewf_handle_open(
 	static char *function                     = "libewf_handle_open";
 	size_t filename_length                    = 0;
 	int file_io_pool_entry                    = 0;
-	int filename_iterator                     = 0;
+	int filename_index                        = 0;
 
 	if( handle == NULL )
 	{
@@ -987,12 +987,12 @@ int libewf_handle_open(
 	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
-		for( filename_iterator = 0;
-		     filename_iterator < number_of_filenames;
-		     filename_iterator++ )
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
 		{
 			filename_length = libcstring_narrow_string_length(
-					   filenames[ filename_iterator ] );
+					   filenames[ filename_index ] );
 
 			/* Make sure there is more to the filename than the extension
 			 */
@@ -1004,7 +1004,7 @@ int libewf_handle_open(
 				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: filename: %s is too small.",
 				 function,
-				 filenames[ filename_iterator ] );
+				 filenames[ filename_index ] );
 
 				goto on_error;
 			}
@@ -1039,7 +1039,7 @@ int libewf_handle_open(
 #endif
 			if( libbfio_file_set_name(
 			     file_io_handle,
-			     filenames[ filename_iterator ],
+			     filenames[ filename_index ],
 			     filename_length,
 			     error ) != 1 )
 			{
@@ -1077,34 +1077,34 @@ int libewf_handle_open(
 				 "%s: added file IO pool entry: %d with filename: %s.\n",
 				 function,
 				 file_io_pool_entry,
-				 filenames[ filename_iterator ] );
+				 filenames[ filename_index ] );
 			}
 #endif
-			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'L' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 's' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'S' ) )
+			if( ( filenames[ filename_index ][ filename_length - 3 ] == 'e' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'E' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'l' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'L' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 's' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'S' ) )
 			{
-				if( ( filenames[ filename_iterator ][ filename_length - 2 ] == '0' )
-				 && ( filenames[ filename_iterator ][ filename_length - 1 ] == '1' ) )
+				if( ( filenames[ filename_index ][ filename_length - 2 ] == '0' )
+				 && ( filenames[ filename_index ][ filename_length - 1 ] == '1' ) )
 				{
-					first_segment_filename = filenames[ filename_iterator ];
+					first_segment_filename = filenames[ filename_index ];
 
 					if( first_delta_segment_filename == NULL )
 					{
-						first_delta_segment_filename = filenames[ filename_iterator ];
+						first_delta_segment_filename = filenames[ filename_index ];
 					}
 				}
 			}
-			else if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'd' )
-			      || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'D' ) )
+			else if( ( filenames[ filename_index ][ filename_length - 3 ] == 'd' )
+			      || ( filenames[ filename_index ][ filename_length - 3 ] == 'D' ) )
 			{
-				if( ( filenames[ filename_iterator ][ filename_length - 2 ] == '0' )
-				 && ( filenames[ filename_iterator ][ filename_length - 1 ] == '1' ) )
+				if( ( filenames[ filename_index ][ filename_length - 2 ] == '0' )
+				 && ( filenames[ filename_index ][ filename_length - 1 ] == '1' ) )
 				{
-					first_delta_segment_filename = filenames[ filename_iterator ];
+					first_delta_segment_filename = filenames[ filename_index ];
 				}
 			}
 		}
@@ -1312,7 +1312,7 @@ int libewf_handle_open_wide(
 	static char *function                     = "libewf_handle_open_wide";
 	size_t filename_length                    = 0;
 	int file_io_pool_entry                    = 0;
-	int filename_iterator                     = 0;
+	int filename_index                        = 0;
 
 	if( handle == NULL )
 	{
@@ -1389,12 +1389,12 @@ int libewf_handle_open_wide(
 	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
-		for( filename_iterator = 0;
-		     filename_iterator < number_of_filenames;
-		     filename_iterator++ )
+		for( filename_index = 0;
+		     filename_index < number_of_filenames;
+		     filename_index++ )
 		{
 			filename_length = libcstring_wide_string_length(
-					   filenames[ filename_iterator ] );
+					   filenames[ filename_index ] );
 
 			/* Make sure there is more to the filename than the extension
 			 */
@@ -1406,7 +1406,7 @@ int libewf_handle_open_wide(
 				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 				 "%s: filename: %ls is too small.",
 				 function,
-				 filenames[ filename_iterator ] );
+				 filenames[ filename_index ] );
 
 				goto on_error;
 			}
@@ -1441,7 +1441,7 @@ int libewf_handle_open_wide(
 #endif
 			if( libbfio_file_set_name_wide(
 			     file_io_handle,
-			     filenames[ filename_iterator ],
+			     filenames[ filename_index ],
 			     filename_length,
 			     error ) != 1 )
 			{
@@ -1479,34 +1479,34 @@ int libewf_handle_open_wide(
 				 "%s: added file IO pool entry: %d with filename: %ls.\n",
 				 function,
 				 file_io_pool_entry,
-				 filenames[ filename_iterator ] );
+				 filenames[ filename_index ] );
 			}
 #endif
-			if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'e' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'E' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'l' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'L' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 's' )
-			 || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'S' ) )
+			if( ( filenames[ filename_index ][ filename_length - 3 ] == 'e' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'E' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'l' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'L' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 's' )
+			 || ( filenames[ filename_index ][ filename_length - 3 ] == 'S' ) )
 			{
-				if( ( filenames[ filename_iterator ][ filename_length - 2 ] == '0' )
-				 && ( filenames[ filename_iterator ][ filename_length - 1 ] == '1' ) )
+				if( ( filenames[ filename_index ][ filename_length - 2 ] == '0' )
+				 && ( filenames[ filename_index ][ filename_length - 1 ] == '1' ) )
 				{
-					first_segment_filename = filenames[ filename_iterator ];
+					first_segment_filename = filenames[ filename_index ];
 
 					if( first_delta_segment_filename == NULL )
 					{
-						first_delta_segment_filename = filenames[ filename_iterator ];
+						first_delta_segment_filename = filenames[ filename_index ];
 					}
 				}
 			}
-			else if( ( filenames[ filename_iterator ][ filename_length - 3 ] == 'd' )
-			      || ( filenames[ filename_iterator ][ filename_length - 3 ] == 'D' ) )
+			else if( ( filenames[ filename_index ][ filename_length - 3 ] == 'd' )
+			      || ( filenames[ filename_index ][ filename_length - 3 ] == 'D' ) )
 			{
-				if( ( filenames[ filename_iterator ][ filename_length - 2 ] == '0' )
-				 && ( filenames[ filename_iterator ][ filename_length - 1 ] == '1' ) )
+				if( ( filenames[ filename_index ][ filename_length - 2 ] == '0' )
+				 && ( filenames[ filename_index ][ filename_length - 1 ] == '1' ) )
 				{
-					first_delta_segment_filename = filenames[ filename_iterator ];
+					first_delta_segment_filename = filenames[ filename_index ];
 				}
 			}
 		}
@@ -1905,7 +1905,7 @@ int libewf_handle_open_file_io_pool(
 
 		goto on_error;
 	}
-	if( libmfcache_cache_initialize(
+	if( libfcache_cache_initialize(
 	     &( internal_handle->segment_files_cache ),
 	     8,
 	     error ) != 1 )
@@ -1937,7 +1937,7 @@ int libewf_handle_open_file_io_pool(
 	     &( internal_handle->chunk_table_list ),
 	     (intptr_t *) chunk_table,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_table_free,
-	     &libewf_chunk_table_clone,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_chunk_table_clone,
 	     &libewf_chunk_table_read_chunk,
 	     &libewf_chunk_table_read_offsets,
 	     LIBMFDATA_FLAG_IO_HANDLE_MANAGED,
@@ -1956,7 +1956,7 @@ int libewf_handle_open_file_io_pool(
 
 		goto on_error;
 	}
-	if( libmfcache_cache_initialize(
+	if( libfcache_cache_initialize(
 	     &( internal_handle->chunk_table_cache ),
 	     8,
 	     error ) != 1 )
@@ -2444,7 +2444,7 @@ on_error:
 	}
 	if( internal_handle->chunk_table_cache != NULL )
 	{
-		libmfcache_cache_free(
+		libfcache_cache_free(
 		 &( internal_handle->chunk_table_cache ),
 		 NULL );
 	}
@@ -2456,7 +2456,7 @@ on_error:
 	}
 	if( internal_handle->segment_files_cache != NULL )
 	{
-		libmfcache_cache_free(
+		libfcache_cache_free(
 		 &( internal_handle->segment_files_cache ),
 		 NULL );
 	}
@@ -4957,7 +4957,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->segment_files_cache != NULL )
 	{
-		if( libmfcache_cache_free(
+		if( libfcache_cache_free(
 		     &( internal_handle->segment_files_cache ),
 		     error ) != 1 )
 		{
@@ -5021,7 +5021,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->chunk_table_cache != NULL )
 	{
-		if( libmfcache_cache_free(
+		if( libfcache_cache_free(
 		     &( internal_handle->chunk_table_cache ),
 		     error ) != 1 )
 		{
@@ -5282,7 +5282,7 @@ ssize_t libewf_handle_prepare_read_chunk(
  * Will read until the requested size is filled or the entire chunk is read
  * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
  * and is used for uncompressed chunks only
- * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
  * otherwise the checksum is considered part of the data in the chunk buffer
  * The value chunk_buffer_size contains the size of the chunk buffer
  * Returns the number of bytes read or -1 on error
@@ -5540,7 +5540,7 @@ ssize_t libewf_handle_read_chunk(
 				 (uint8_t *) checksum_buffer,
 				 *chunk_checksum );
 
-				*chunk_io_flags |= LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET;
+				*chunk_io_flags |= LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET;
 			}
 		}
 	}
@@ -5882,7 +5882,7 @@ ssize_t libewf_handle_read_random(
  * This function should be used before libewf_handle_write_chunk
  * The chunk_buffer_size should contain the actual chunk size
  * The function sets the is_compressed, chunk_checksum and chunk_io_flags values
- * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
  * and needs to be written separately from the chunk data, in case of an uncompressed chunk
  * Returns the resulting chunk size or -1 on error
  */
@@ -5908,6 +5908,9 @@ ssize_t libewf_handle_prepare_write_chunk(
 	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
 	int chunk_exists                          = 0;
 	int result                                = 0;
+
+/* TODO chunk data rewrite */
+	size_t compressed_chunk_buffer_offset     = 0;
 
 	if( handle == NULL )
 	{
@@ -6156,6 +6159,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	     chunk_buffer,
 	     chunk_buffer_size,
 	     compressed_chunk_buffer,
+	     &compressed_chunk_buffer_offset,
 	     compressed_chunk_buffer_size,
 	     internal_handle->media_values->chunk_size,
 	     chunk_buffer_size,
@@ -6208,12 +6212,11 @@ ssize_t libewf_handle_write_chunk(
          int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
+	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_chunk";
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
-	uint32_t chunk_data_flags                 = 0;
-	uint32_t chunk_padding_size               = 0;
 	int chunk_exists                          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -6315,7 +6318,7 @@ ssize_t libewf_handle_write_chunk(
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( chunk_buffer == NULL )
@@ -6327,7 +6330,7 @@ ssize_t libewf_handle_write_chunk(
 		 "%s: invalid chunk buffer.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if SIZE_OF_SIZE_T > 4
 	if( chunk_buffer_size > (size_t) UINT32_MAX )
@@ -6339,7 +6342,7 @@ ssize_t libewf_handle_write_chunk(
 		 "%s: invalid chunk buffer size value exceeds maximum.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #endif
 	if( data_size > internal_handle->media_values->chunk_size )
@@ -6351,7 +6354,7 @@ ssize_t libewf_handle_write_chunk(
 		 "%s: data size cannot be larger than maximum chunk size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
@@ -6374,7 +6377,7 @@ ssize_t libewf_handle_write_chunk(
 		 "%s: invalid chunk index value exceeds maximum.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size ) )
@@ -6396,7 +6399,7 @@ ssize_t libewf_handle_write_chunk(
 			 "%s: unable to retrieve the number of chunks in the chunk table list.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		libcnotify_printf(
 		 "%s: writing chunk: %" PRIu64 " of total: %d.\n",
@@ -6411,14 +6414,62 @@ ssize_t libewf_handle_write_chunk(
 		 data_size );
 	}
 #endif
+	if( libewf_chunk_data_initialize(
+	     &chunk_data,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk data: %" PRIu64 ".",
+		 function,
+		 chunk_index );
+
+		goto on_error;
+	}
 	if( is_compressed != 0 )
 	{
-		chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
+		chunk_data->range_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
 	}
-	else
+	else if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
 	{
-		chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
+		/* Check if the chunk and checksum buffers are aligned
+		 * if so write the chunk and checksum at the same time
+		 */
+		if( checksum_buffer == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid checksum buffer.",
+			 function );
+
+			goto on_error;
+		}
+		byte_stream_copy_from_uint32_little_endian(
+		 (uint8_t *) checksum_buffer,
+		 chunk_checksum );
+
+		if( checksum_buffer == &( ( (uint8_t *) chunk_buffer )[ chunk_buffer_size ] ) )
+		{
+			chunk_buffer_size += 4;
+
+			chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET );
+		}
+		else
+		{
+			chunk_data->checksum_buffer = checksum_buffer;
+		}
+		chunk_data->range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 	}
+	chunk_data->data                = (uint8_t *) chunk_buffer;
+	chunk_data->allocated_data_size = chunk_buffer_size;
+	chunk_data->flags               = LIBEWF_CHUNK_DATA_ITEM_FLAG_NON_MANAGED_DATA;
+	chunk_data->chunk_io_flags      = chunk_io_flags;
+
 	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
@@ -6437,7 +6488,7 @@ ssize_t libewf_handle_write_chunk(
 			 function,
 			 chunk_index );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( chunk_exists == 0 )
 		{
@@ -6449,8 +6500,12 @@ ssize_t libewf_handle_write_chunk(
 			 function,
 			 chunk_index );
 
-			return( -1 );
+			goto on_error;
 		}
+		chunk_data->data_size = data_size;
+
+		chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_DELTA;
+
 		write_count = libewf_write_io_handle_write_existing_chunk(
 		               internal_handle->write_io_handle,
 		               internal_handle->io_handle,
@@ -6461,17 +6516,14 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->delta_segment_table,
 		               internal_handle->chunk_table_list,
 		               (int) chunk_index,
-		               (uint8_t *) chunk_buffer,
+		               chunk_data,
 		               chunk_buffer_size,
-		               data_size,
-		               chunk_data_flags,
-		               (uint8_t *) checksum_buffer,
-		               chunk_checksum,
-		               chunk_io_flags,
 		               error );
 	}
 	else
 	{
+		chunk_data->data_size = chunk_buffer_size;
+
 		write_count = libewf_write_io_handle_write_new_chunk(
 		               internal_handle->write_io_handle,
 		               internal_handle->io_handle,
@@ -6488,15 +6540,8 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->tracks,
 		               internal_handle->acquiry_errors,
 		               (int) chunk_index,
+		               chunk_data,
 		               data_size,
-		               (uint8_t *) chunk_buffer,
-		               chunk_buffer_size,
-		               (uint32_t) chunk_buffer_size,
-		               chunk_padding_size,
-		               chunk_data_flags,
-		               (uint8_t *) checksum_buffer,
-		               chunk_checksum,
-		               chunk_io_flags,
 		               error );
 	}
 	if( write_count < 0 )
@@ -6508,11 +6553,33 @@ ssize_t libewf_handle_write_chunk(
 		 "%s: unable to write raw chunk data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	internal_handle->io_handle->current_offset += (off64_t) data_size;
 
+	if( libewf_chunk_data_free(
+	     &chunk_data,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free chunk data.",
+		 function );
+
+		goto on_error;
+	}
 	return( (ssize_t) chunk_buffer_size );
+
+on_error:
+	if( chunk_data != NULL )
+	{
+		libewf_chunk_data_free(
+		 &chunk_data,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Writes (media) data at the current offset
@@ -6531,13 +6598,11 @@ ssize_t libewf_handle_write_buffer(
 	static char *function                     = "libewf_handle_write_buffer";
 	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
-	size_t chunk_padding_size                 = 0;
 	size_t input_data_size                    = 0;
 	size_t write_size                         = 0;
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
 	uint64_t chunk_data_offset                = 0;
-	uint32_t chunk_data_flags                 = 0;
 	int chunk_exists                          = 0;
 	int write_chunk                           = 0;
 
@@ -6903,7 +6968,6 @@ ssize_t libewf_handle_write_buffer(
 			     LIBEWF_COMPRESSION_METHOD_NONE,
 			     LIBEWF_COMPRESSION_NONE,
 			     0,
-			     &chunk_padding_size,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 			     LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM,
@@ -6929,13 +6993,8 @@ ssize_t libewf_handle_write_buffer(
 				       internal_handle->delta_segment_table,
 				       internal_handle->chunk_table_list,
 				       (int) chunk_index,
-				       chunk_data->data,
-				       chunk_data->allocated_data_size,
-				       chunk_data->data_size,
-				       LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM,
-				       NULL,
-				       0,
-				       0,
+				       chunk_data,
+				       input_data_size,
 				       error );
 
 			if( write_count <= 0 )
@@ -7075,7 +7134,6 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->io_handle->compression_method,
 				     internal_handle->io_handle->compression_level,
 				     internal_handle->io_handle->compression_flags,
-				     &chunk_padding_size,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 				     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 				     internal_handle->write_io_handle->pack_flags,
@@ -7090,14 +7148,6 @@ ssize_t libewf_handle_write_buffer(
 					 chunk_index );
 
 					return( -1 );
-				}
-				if( ( internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-				{
-					chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
-				}
-				else
-				{
-					chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
 				}
 				write_count = libewf_write_io_handle_write_new_chunk(
 					       internal_handle->write_io_handle,
@@ -7115,15 +7165,8 @@ ssize_t libewf_handle_write_buffer(
 					       internal_handle->tracks,
 					       internal_handle->acquiry_errors,
 					       (int) chunk_index,
+					       internal_handle->chunk_data,
 					       input_data_size,
-					       internal_handle->chunk_data->data,
-					       internal_handle->chunk_data->allocated_data_size,
-					       internal_handle->chunk_data->data_size,
-					       chunk_padding_size,
-					       chunk_data_flags,
-					       NULL,
-					       0,
-					       0,
 					       error );
 
 				if( write_count <= 0 )
@@ -7240,12 +7283,10 @@ ssize_t libewf_handle_write_finalize(
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_write_finalize";
 	off64_t segment_file_offset               = 0;
-	size_t chunk_padding_size                 = 0;
 	size_t input_data_size                    = 0;
 	ssize_t write_count                       = 0;
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
-	uint32_t chunk_data_flags                 = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
 	int segment_files_list_index              = 0;
@@ -7366,7 +7407,6 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->io_handle->compression_method,
 		     internal_handle->io_handle->compression_level,
 		     internal_handle->io_handle->compression_flags,
-		     &chunk_padding_size,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 		     internal_handle->write_io_handle->pack_flags,
@@ -7381,14 +7421,6 @@ ssize_t libewf_handle_write_finalize(
 			 chunk_index );
 
 			return( -1 );
-		}
-		if( ( internal_handle->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-		{
-			chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
-		}
-		else
-		{
-			chunk_data_flags = LIBEWF_CHUNK_DATA_FLAG_HAS_CHECKSUM;
 		}
 		write_count = libewf_write_io_handle_write_new_chunk(
 			       internal_handle->write_io_handle,
@@ -7406,15 +7438,8 @@ ssize_t libewf_handle_write_finalize(
 			       internal_handle->tracks,
 			       internal_handle->acquiry_errors,
 			       (int) chunk_index,
+			       internal_handle->chunk_data,
 			       input_data_size,
-			       internal_handle->chunk_data->data,
-			       internal_handle->chunk_data->allocated_data_size,
-			       internal_handle->chunk_data->data_size,
-			       chunk_padding_size,
-			       chunk_data_flags,
-			       NULL,
-			       0,
-			       0,
 			       error );
 
 		if( write_count <= 0 )

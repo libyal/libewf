@@ -1,4 +1,4 @@
-.Dd August 6, 2012
+.Dd January 20, 2013
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -207,11 +207,11 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size, libewf_error_t **error"
+.Fn libewf_handle_set_md5_hash "libewf_handle_t *handle, const uint8_t *md5_hash, size_t size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_sha1_hash "libewf_handle_t *handle, uint8_t *sha1_hash, size_t size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_sha1_hash "libewf_handle_t *handle, uint8_t *sha1_hash, size_t size, libewf_error_t **error"
+.Fn libewf_handle_set_sha1_hash "libewf_handle_t *handle, const uint8_t *sha1_hash, size_t size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_read_zero_chunk_on_error "libewf_handle_t *handle, uint8_t zero_on_error, libewf_error_t **error"
 .Ft int
@@ -381,6 +381,10 @@ Single file entry functions
 .Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf16_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf8_hash_value_sha1 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf16_hash_value_sha1 "libewf_file_entry_t *file_entry, uint8_t *utf16_string, size_t utf16_string_size, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_file_entry_read_buffer "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
@@ -547,7 +551,7 @@ http://code.google.com/p/libewf/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2006-2012 Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2006-2013 Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 the libewf.h include file

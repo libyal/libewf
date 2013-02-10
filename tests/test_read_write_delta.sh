@@ -2,7 +2,7 @@
 #
 # Expert Witness Compression Format (EWF) library read/write testing script
 #
-# Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #

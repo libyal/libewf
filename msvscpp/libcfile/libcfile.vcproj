@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libuna"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE"
-				SmallerTypeCheck="true"
+				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				WarnAsError="false"
@@ -192,10 +192,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcfile\libcfile_stream.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcfile\libcfile_libcerror.h"
 				>
 			</File>
@@ -209,6 +205,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcfile\libcfile_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcfile\libcfile_stream.h"
 				>
 			</File>
 			<File

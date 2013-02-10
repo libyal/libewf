@@ -72,7 +72,6 @@
 				FixedBaseAddress="0"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\dnewf.lib"
-				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -155,7 +154,6 @@
 				FixedBaseAddress="0"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\dnewf.lib"
-				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"

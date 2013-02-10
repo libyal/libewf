@@ -10,7 +10,7 @@ AM_CPPFLAGS = \
 	@LIBCSYSTEM_CPPFLAGS@
 
 if HAVE_PYTHON
-TESTS_PYEWF  = \
+TESTS_PYEWF = \
 	test_pyewf.sh
 endif
 

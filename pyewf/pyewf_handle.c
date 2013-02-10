@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -44,65 +44,66 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  METH_NOARGS,
 	  "signal_abort() -> None\n"
 	  "\n"
-	  "Signals the handle to abort the current activity" },
+	  "Signals the handle to abort the current activity." },
 
 	/* Functions to access the media data */
 
 	{ "open",
 	  (PyCFunction) pyewf_handle_open,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "open(filenames, access_flags) -> None\n"
+	  "open(filenames, mode='r') -> None\n"
 	  "\n"
-	  "Opens file(s)" },
+	  "Opens file(s) from a sequence (list) of all the segment filenames.\n"
+	  "Use pyewf.glob() to determine the segment filenames from first (e.g. E01)." },
 
 	{ "close",
 	  (PyCFunction) pyewf_handle_close,
 	  METH_NOARGS,
 	  "close() -> None\n"
 	  "\n"
-	  "Closes file(s)" },
+	  "Closes file(s)." },
 
 	{ "read_buffer",
 	  (PyCFunction) pyewf_handle_read_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "read_buffer(size) -> String\n"
 	  "\n"
-	  "Reads a buffer of media data from the file(s)" },
+	  "Reads a buffer of media data." },
 
 	{ "read_random",
 	  (PyCFunction) pyewf_handle_read_random,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "read_random(size, offset) -> String\n"
 	  "\n"
-	  "Reads a buffer of media data at a specific offset from the file(s)" },
+	  "Reads a buffer of media data at a specific offset." },
 
 	{ "write_buffer",
 	  (PyCFunction) pyewf_handle_write_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "write_buffer(string, size) -> None\n"
 	  "\n"
-	  "Writes a buffer of media data to the file(s)" },
+	  "Writes a buffer of media data." },
 
 	{ "write_random",
 	  (PyCFunction) pyewf_handle_write_random,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "write_random(string, size, offset) -> None\n"
 	  "\n"
-	  "Writes a buffer of media data at a specific offset to the file(s)" },
+	  "Writes a buffer of media data at a specific offset." },
 
 	{ "seek_offset",
 	  (PyCFunction) pyewf_handle_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "seek_offset(offset, whence) -> None\n"
 	  "\n"
-	  "Seeks an offset within the media data" },
+	  "Seeks an offset within the media data." },
 
 	{ "get_offset",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "get_offset() -> Integer\n"
+	  "get_offset() -> Long\n"
 	  "\n"
-	  "Retrieved the current offset within the media data" },
+	  "Retrieves the current offset within the media data." },
 
 	/* Some Pythonesque aliases */
 
@@ -111,82 +112,80 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "read(size) -> String\n"
 	  "\n"
-	  "Reads a buffer of media data from the file(s)" },
+	  "Reads a buffer of media data." },
 
 	{ "write",
 	  (PyCFunction) pyewf_handle_write_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "write(string, size) -> None\n"
 	  "\n"
-	  "Writes a buffer of media data to the file(s)" },
+	  "Writes a buffer of media data." },
 
 	{ "seek",
 	  (PyCFunction) pyewf_handle_seek_offset,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "seek(offset, whence) -> None\n"
 	  "\n"
-	  "Seeks an offset within the media data" },
+	  "Seeks an offset within the media data." },
 
 	{ "tell",
 	  (PyCFunction) pyewf_handle_get_offset,
 	  METH_NOARGS,
-	  "tell() -> Integer\n"
+	  "tell() -> Long\n"
 	  "\n"
-	  "Retrieves the current offset within the media data" },
+	  "Retrieves the current offset within the media data." },
 
 	/* Functions to access the metadata */
 
 	{ "get_media_size",
 	  (PyCFunction) pyewf_handle_get_media_size,
 	  METH_NOARGS,
-	  "get_media_size() -> Integer\n"
+	  "get_media_size() -> Long\n"
 	  "\n"
-	  "Retrieves the size of the media data" },
+	  "Retrieves the size of the media data." },
 
 	{ "get_header_codepage",
 	  (PyCFunction) pyewf_handle_get_header_codepage,
 	  METH_NOARGS,
 	  "get_header_codepage() -> String\n"
 	  "\n"
-	  "Returns the codepage used for header strings in the file(s)" },
+	  "Returns the codepage used for header strings." },
 
-#ifdef TODO
 	{ "set_header_codepage",
 	  (PyCFunction) pyewf_handle_set_header_codepage,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "set_header_codepage(codepage) -> None\n"
 	  "\n"
-	  "Set the codepage used for header strings in the file(s)\n"
-	  "Expects the codepage to be a String containing a Python codec definition" },
-#endif
+	  "Set the codepage used for header strings.\n"
+	  "Expects the codepage to be a String containing a Python codec definition." },
 
 	{ "get_header_value",
 	  (PyCFunction) pyewf_handle_get_header_value,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "get_header_value(identifier) -> Unicode string or None\n"
 	  "\n"
-	  "Retrieves a header value by its name" },
+	  "Retrieves a header value by its identifier (name)." },
 
 	{ "get_header_values",
 	  (PyCFunction) pyewf_handle_get_header_values,
 	  METH_NOARGS,
 	  "get_header_values() -> Dictionary\n"
 	  "\n"
-	  "Retrieves all header values" },
+	  "Retrieves all header values." },
 
 	{ "get_hash_value",
 	  (PyCFunction) pyewf_handle_get_hash_value,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "get_hash_value(identifier) -> Unicode string or None\n"
 	  "\n"
-	  "Retrieves a hash value by its name" },
+	  "Retrieves a hash value by its identifier (name)." },
 
 	{ "get_hash_values",
 	  (PyCFunction) pyewf_handle_get_hash_values,
 	  METH_NOARGS,
 	  "get_hash_values() -> Dictionary\n"
 	  "\n"
-	  "Retrieves all hash values" },
+	  "Retrieves all hash values." },
 
 	/* Functions to access the (single) file entries */
 
@@ -195,7 +194,7 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  METH_NOARGS,
 	  "get_root_file_entry() -> Object\n"
 	  "\n"
-	  "Retrieves the root file entry" },
+	  "Retrieves the root file entry." },
 
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
@@ -203,17 +202,16 @@ PyMethodDef pyewf_handle_object_methods[] = {
 
 PyGetSetDef pyewf_handle_object_get_set_definitions[] = {
 
-/* TODO setter : pyewf_handle_set_header_codepage */
 	{ "header_codepage",
 	  (getter) pyewf_handle_get_header_codepage,
-	  (setter) 0,
-	  "The codepage used for header strings in the file(s)",
+	  (setter) pyewf_handle_set_header_codepage,
+	  "The codepage used for header strings.",
 	  NULL },
 
 	{ "media_size",
 	  (getter) pyewf_handle_get_media_size,
 	  (setter) 0,
-	  "The media size",
+	  "The media size.",
 	  NULL },
 
 	/* Sentinel */
@@ -321,7 +319,7 @@ PyTypeObject pyewf_handle_type_object = {
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_new(
-           PyObject *self )
+           void )
 {
 	static char *function        = "pyewf_handle_new";
 	pyewf_handle_t *pyewf_handle = NULL;
@@ -370,8 +368,7 @@ PyObject *pyewf_handle_new_open(
 {
 	PyObject *pyewf_handle = NULL;
 
-	pyewf_handle = pyewf_handle_new(
-	                self );
+	pyewf_handle = pyewf_handle_new();
 
 	pyewf_handle_open(
 	 (pyewf_handle_t *) pyewf_handle,
@@ -380,6 +377,8 @@ PyObject *pyewf_handle_new_open(
 
 	return( pyewf_handle );
 }
+
+/* TODO new open file pool - list of file objects */
 
 /* Intializes a handle object
  * Returns 0 if successful or -1 on error
@@ -443,8 +442,8 @@ void pyewf_handle_free(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function   = "pyewf_handle_free";
-	int result              = 0;
+	static char *function    = "pyewf_handle_free";
+	int result               = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -526,7 +525,8 @@ PyObject *pyewf_handle_signal_abort(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function   = "pyewf_handle_signal_abort";
+	static char *function    = "pyewf_handle_signal_abort";
+	int result               = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -537,9 +537,15 @@ PyObject *pyewf_handle_signal_abort(
 
 		return( NULL );
 	}
-	if( libewf_handle_signal_abort(
-	     pyewf_handle->handle,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_signal_abort(
+	          pyewf_handle->handle,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -564,6 +570,9 @@ PyObject *pyewf_handle_signal_abort(
 
 		return( NULL );
 	}
+	Py_IncRef(
+	 Py_None );
+
 	return( Py_None );
 }
 
@@ -577,9 +586,10 @@ PyObject *pyewf_handle_open(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	char **filenames            = NULL;
-	static char *keyword_list[] = { "filenames", "access_flags", NULL };
+	char *mode                  = NULL;
+	static char *keyword_list[] = { "filenames", "mode", NULL };
 	PyObject *sequence_object   = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_handle_open";
@@ -601,22 +611,72 @@ PyObject *pyewf_handle_open(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	      keywords,
-	      "O|i",
+	      "O|s",
 	      keyword_list,
 	      &sequence_object,
-	      &access_flags ) == 0 )
+	      &mode ) == 0 )
 	{
-		goto on_error;
+		return( NULL );
 	}
 	if( PySequence_Check(
 	     sequence_object ) == 0 )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: argument: files must be a list or tuple.",
+		 "%s: argument: files must be a sequence object.",
 		 function );
 
-		goto on_error;
+		return( NULL );
+	}
+        if( mode == NULL )
+	{
+		access_flags = LIBEWF_OPEN_READ;
+	}
+	else if( mode[ 0 ] == 'r' )
+	{
+		if( mode[ 1 ] == '+' )
+		{
+			if( ( mode[ 2 ] == 0 )
+			 || ( ( mode[ 2 ] == 'b' )
+			  &&  ( mode[ 3 ] == 0 ) ) )
+			{
+				access_flags = LIBEWF_OPEN_READ_WRITE;
+			}
+		}
+		else if( ( mode[ 1 ] == 0 )
+		      || ( ( mode[ 1 ] == 'b' )
+		       &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_READ;
+		}
+	}
+	else if( mode[ 0 ] == 'w' )
+	{
+		if( ( mode[ 1 ] == 0 )
+		 || ( ( mode[ 1 ] == 'b' )
+		  &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_WRITE;
+		}
+	}
+	else if( mode[ 0 ] == 'a' )
+	{
+		if( ( mode[ 1 ] == 0 )
+		 || ( ( mode[ 1 ] == 'b' )
+		  &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_WRITE_RESUME;
+		}
+	}
+	if( access_flags == 0 )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: unsupported mode: %s.",
+		 function,
+		 mode );
+
+		return( NULL );
 	}
 	number_of_filenames = PySequence_Size(
 	                       sequence_object );
@@ -631,7 +691,7 @@ PyObject *pyewf_handle_open(
 
 		goto on_error;
 	}
-	filenames = (char **) memory_allocate(
+	filenames = (char **) PyMem_Malloc(
 	                       sizeof( char * ) * number_of_filenames );
 
 	if( filenames == NULL )
@@ -653,7 +713,7 @@ PyObject *pyewf_handle_open(
 		 "%s: unable to clear filenames.",
 		 function );
 
-		memory_free(
+		PyMem_Free(
 		 filenames );
 
 		return( NULL );
@@ -669,7 +729,7 @@ PyObject *pyewf_handle_open(
 		filename_length = PyString_Size(
 		                   string_object );
 
-		filenames[ filename_index ] = (char *) memory_allocate(
+		filenames[ filename_index ] = (char *) PyMem_Malloc(
 		                                        sizeof( char ) * ( filename_length + 1 ) );
 
 		if( filenames[ filename_index ] == NULL )
@@ -741,11 +801,14 @@ PyObject *pyewf_handle_open(
 	     filename_index < number_of_filenames;
 	     filename_index++ )
 	{
-		memory_free(
+		PyMem_Free(
 		 filenames[ filename_index ] );
 	}
-	memory_free(
+	PyMem_Free(
 	 filenames );
+
+	Py_IncRef(
+	 Py_None );
 
 	return( Py_None );
 
@@ -754,10 +817,10 @@ on_error:
 	{
 		for( ; filename_index > 0; filename_index-- )
 		{
-			memory_free(
+			PyMem_Free(
 			 filenames[ filename_index - 1 ] );
 		}
-		memory_free(
+		PyMem_Free(
 		 filenames );
 	}
 	return( NULL );
@@ -772,8 +835,8 @@ PyObject *pyewf_handle_close(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function   = "pyewf_handle_close";
-	int result              = 0;
+	static char *function    = "pyewf_handle_close";
+	int result               = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -817,6 +880,9 @@ PyObject *pyewf_handle_close(
 
 		return( NULL );
 	}
+	Py_IncRef(
+	 Py_None );
+
 	return( Py_None );
 }
 
@@ -830,7 +896,7 @@ PyObject *pyewf_handle_read_buffer(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
@@ -928,7 +994,7 @@ PyObject *pyewf_handle_read_random(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
@@ -1040,7 +1106,7 @@ PyObject *pyewf_handle_write_buffer(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_buffer";
 	static char *keyword_list[] = { "size", NULL };
@@ -1139,7 +1205,7 @@ PyObject *pyewf_handle_write_random(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *result_data       = NULL;
 	static char *function       = "pyewf_handle_write_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
@@ -1250,7 +1316,7 @@ PyObject *pyewf_handle_seek_offset(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyewf_handle_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
 	off64_t offset              = 0;
@@ -1310,11 +1376,14 @@ PyObject *pyewf_handle_seek_offset(
 
 		return( NULL );
 	}
+	Py_IncRef(
+	 Py_None );
+
 	return( Py_None );
 }
 
-/* Retrieves the current offset in the media data
- * Returns a Python object holding the offset if successful or NULL on error
+/* Retrieves the offset
+ * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_offset(
            pyewf_handle_t *pyewf_handle )
@@ -1322,8 +1391,9 @@ PyObject *pyewf_handle_get_offset(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function   = "pyewf_handle_get_offset";
-	off64_t current_offset  = 0;
+	static char *function    = "pyewf_handle_get_offset";
+	off64_t offset           = 0;
+	int result               = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -1334,18 +1404,22 @@ PyObject *pyewf_handle_get_offset(
 
 		return( NULL );
 	}
-	/* Make sure libewf handle is set to NULL
-	 */
-	if( libewf_handle_get_offset(
-	     pyewf_handle->handle,
-	     &current_offset,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_offset(
+	          pyewf_handle->handle,
+	          &offset,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
+                {
 			PyErr_Format(
 			 PyExc_IOError,
 			 "%s: unable to retrieve offset.",
@@ -1364,8 +1438,31 @@ PyObject *pyewf_handle_get_offset(
 
 		return( NULL );
 	}
+#if defined( HAVE_LONG_LONG )
+	if( offset > (off64_t) LLONG_MAX )
+	{
+		PyErr_Format(
+		 PyExc_OverflowError,
+		 "%s: offset value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
 	return( PyLong_FromLongLong(
-	         current_offset ) );
+	         (long long) offset ) );
+#else
+	if( offset > (off64_t) LONG_MAX )
+	{
+		PyErr_Format(
+		 PyExc_OverflowError,
+		 "%s: offset value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
+	return( PyLong_FromLong(
+	         (long) offset ) );
+#endif
 }
 
 /* Retrieves the root file entry
@@ -1380,6 +1477,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 	libewf_file_entry_t *root_file_entry = NULL;
 	PyObject *file_entry_object          = NULL;
 	static char *function                = "pyewf_handle_get_root_file_entry";
+	int result                           = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -1390,10 +1488,16 @@ PyObject *pyewf_handle_get_root_file_entry(
 
 		return( NULL );
 	}
-	if( libewf_handle_get_root_file_entry(
-	     pyewf_handle->handle,
-	     &root_file_entry,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_root_file_entry(
+	          pyewf_handle->handle,
+	          &root_file_entry,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -1419,7 +1523,8 @@ PyObject *pyewf_handle_get_root_file_entry(
 		goto on_error;
 	}
 	file_entry_object = pyewf_file_entry_new(
-	                     NULL );
+	                     root_file_entry,
+	                     pyewf_handle );
 
 	if( file_entry_object == NULL )
 	{
@@ -1430,8 +1535,6 @@ PyObject *pyewf_handle_get_root_file_entry(
 
 		goto on_error;
 	}
-	( (pyewf_file_entry_t *) file_entry_object )->file_entry = root_file_entry;
-
 	return( file_entry_object );
 
 on_error:

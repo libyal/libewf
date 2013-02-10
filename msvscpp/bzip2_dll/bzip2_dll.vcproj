@@ -70,7 +70,6 @@
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)bzip2.lib"
-				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -150,7 +149,6 @@
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)bzip2.lib"
-				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"

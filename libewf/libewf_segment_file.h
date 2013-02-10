@@ -1,7 +1,7 @@
 /*
  * Segment file reading/writing functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,6 +34,7 @@
 #include <time.h>
 #endif
 
+#include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_hash_sections.h"
 #include "libewf_io_handle.h"
@@ -41,7 +42,7 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
-#include "libewf_libmfcache.h"
+#include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
@@ -136,7 +137,7 @@ int libewf_segment_file_read(
      libbfio_pool_t *file_io_pool,
      int file_io_pool_entry,
      libmfdata_file_t *file,
-     libmfcache_cache_t *cache,
+     libfcache_cache_t *cache,
      uint8_t read_flags,
      libcerror_error_t **error );
 
@@ -300,21 +301,14 @@ ssize_t libewf_segment_file_write_chunks_section_final(
          uint32_t section_number_of_chunks,
          libcerror_error_t **error );
 
-ssize_t libewf_segment_file_write_chunk(
+ssize_t libewf_segment_file_write_chunk_data(
          libewf_segment_file_t *segment_file,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libmfdata_list_t *chunk_table_list,
          int chunk_index,
-         uint8_t *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t chunk_data_size,
-         size_t chunk_padding_size,
-         uint32_t chunk_data_flags,
-         uint8_t *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
+         libewf_chunk_data_t *chunk_data,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_write_delta_chunk(
@@ -324,11 +318,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          off64_t section_offset,
          libmfdata_list_t *chunk_table_list,
          int chunk_index,
-         uint8_t *chunk_buffer,
-         size_t chunk_size,
-         uint8_t *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
+         libewf_chunk_data_t *chunk_data,
 	 uint8_t no_section_append,
          libcerror_error_t **error );
 

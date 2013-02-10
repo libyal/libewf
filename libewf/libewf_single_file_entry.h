@@ -1,7 +1,7 @@
 /*
  * Single file entry functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -95,6 +95,14 @@ struct libewf_single_file_entry
 	/* The MD5 digest hash size
 	 */
 	size_t md5_hash_size;
+
+	/* The SHA1 digest hash
+	 */
+	uint8_t *sha1_hash;
+
+	/* The SHA1 digest hash size
+	 */
+	size_t sha1_hash_size;
 };
 
 int libewf_single_file_entry_initialize(
@@ -189,6 +197,18 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf16_hash_value_md5(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_single_file_entry_get_utf8_hash_value_sha1(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_single_file_entry_get_utf16_hash_value_sha1(
      libewf_single_file_entry_t *single_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,

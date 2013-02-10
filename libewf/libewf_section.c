@@ -1,7 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -891,43 +891,97 @@ ssize_t libewf_section_descriptor_read(
 				section->type = LIBEWF_SECTION_TYPE_SESSION_TABLE;
 			}
 		}
-		/* Make sure to check if the section next value is sane
-		 * the end offset of the next and done sections point back at themselves
-		 */
-		if( ( section->end_offset == section->start_offset )
-		 && ( section->size == sizeof( ewf_section_descriptor_v1_t ) ) )
+		if( section->size != 0 )
 		{
-			if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
-			 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+			/* Make sure to check if the section next value is sane
+			 * the end offset of the next and done sections point back at themselves
+			 */
+			if( section->end_offset == section->start_offset )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
-				 function,
-				 section->end_offset,
-				 section->start_offset );
+				if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
+				 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
+					 function,
+					 section->end_offset,
+					 section->start_offset );
 
-				goto on_error;
+					goto on_error;
+				}
+				if( section->size != sizeof( ewf_section_descriptor_v1_t ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid section size value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			else
+			{
+				file_offset += (off64_t) section->size;
+
+				if( section->end_offset != file_offset )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
+					 function,
+					 section->end_offset,
+					 file_offset );
+
+					goto on_error;
+				}
 			}
 		}
 		else
 		{
-			file_offset += (off64_t) section->size;
-
-			if( section->end_offset != file_offset )
+			/* Make sure to check if the section next value is sane
+			 * the end offset of the next and done sections point back at themselves
+			 */
+			if( section->end_offset == section->start_offset )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
-				 function,
-				 section->end_offset,
-				 file_offset );
+				if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
+				 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
+					 function,
+					 section->end_offset,
+					 section->start_offset );
 
-				goto on_error;
+					goto on_error;
+				}
+				section->size = (size64_t) sizeof( ewf_section_descriptor_v1_t );
+			}
+			else
+			{
+				file_offset += (off64_t) sizeof( ewf_section_descriptor_v1_t );
+
+				if( section->end_offset < file_offset )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid section next offset value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				section->size = (size64_t) ( section->end_offset - section->start_offset );
 			}
 		}
 	}
@@ -1818,6 +1872,7 @@ ssize_t libewf_section_write_compressed_string(
 	uint8_t *compressed_string          = NULL;
 	static char *function               = "libewf_section_write_compressed_string";
 	void *reallocation                  = NULL;
+	size_t compressed_string_offset     = 0;
 	size_t compressed_string_size       = 0;
 	size_t padding_size                 = 0;
 	size_t section_descriptor_data_size = 0;
@@ -2007,6 +2062,13 @@ ssize_t libewf_section_write_compressed_string(
 
 		goto on_error;
 	}
+/* TODO bzip2 support
+	if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+	{
+		compressed_string_offset = 4;
+		compressed_string_size  -= 4;
+	}
+*/
 	if( fill_size != 0 )
 	{
 		if( compressed_string_size > fill_size )
@@ -2086,7 +2148,7 @@ ssize_t libewf_section_write_compressed_string(
 		 "%s: compressed string:\n",
 		 function );
 		libcnotify_print_data(
-		 compressed_string,
+		 &( compressed_string[ compressed_string_offset ] ),
 		 compressed_string_size,
 		 0 );
 	}
@@ -2096,7 +2158,7 @@ ssize_t libewf_section_write_compressed_string(
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
-	               compressed_string,
+	               &( compressed_string[ compressed_string_offset ] ),
 	               compressed_string_size,
 	               error );
 
@@ -10025,7 +10087,6 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
          uint8_t *checksum_buffer,
-         uint32_t chunk_checksum,
          int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
@@ -10037,6 +10098,10 @@ ssize_t libewf_section_delta_chunk_write(
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
 	uint32_t write_size          = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint32_t chunk_checksum      = 0;
+#endif
 
 	if( section == NULL )
 	{
@@ -10084,44 +10149,25 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	write_size = chunk_data_size;
 
-	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
+/* TODO chunk data rewrite  */
+	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
+	 && ( checksum_buffer != NULL ) )
 	{
-		if( checksum_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid checksum buffer.",
-			 function );
-
-			return( -1 );
-		}
-		byte_stream_copy_from_uint32_little_endian(
-		 checksum_buffer,
-		 chunk_checksum );
-
-		if( checksum_buffer == &( chunk_buffer[ chunk_data_size ] ) )
-		{
-			write_size += 4;
-
-			chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET );
-		}
 		chunk_data_size += 4;
 	}
-	if( write_size > (uint32_t) INT32_MAX )
+	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid write size value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 	section_data_size = sizeof( ewfx_delta_chunk_header_t )
-	                  + write_size;
+	                  + chunk_data_size;
 
 	if( libewf_section_set_values(
 	     section,
@@ -10255,9 +10301,28 @@ ssize_t libewf_section_delta_chunk_write(
 		 chunk_index,
 		 chunk_data_size );
 
-		if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) == 0 )
-		 && ( chunk_data_size >= 4 ) )
+/* TODO chunk data rewrite  */
+		if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
+		 && ( checksum_buffer != NULL ) )
 		{
+			byte_stream_copy_to_uint32_little_endian(
+			 checksum_buffer,
+			 chunk_checksum );
+		}
+/* TODO chunk data rewrite */
+		else
+		{
+			if( chunk_data_size < 4 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid chunk data size value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
 			byte_stream_copy_to_uint32_little_endian(
 			 &( chunk_buffer[ chunk_data_size - 4 ] ),
 			 chunk_checksum );
@@ -10301,7 +10366,9 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	total_write_count += write_count;
 
-	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) != 0 )
+/* TODO chunk data rewrite  */
+	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
+	 && ( checksum_buffer != NULL ) )
 	{
 		write_count = libbfio_pool_write_buffer(
 		               file_io_pool,

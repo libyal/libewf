@@ -122,7 +122,7 @@ enum LIBEWF_COMPRESSION_LEVELS
  *              is only done once
  * bit 2	set to 1 for pattern fill compression
  *              this implies empty block compression using the pattern fill method
- * bit 2-8	not used
+ * bit 3-8	not used
  */
 enum LIBEWF_COMPRESSION_FLAGS
 {
@@ -207,7 +207,7 @@ enum LIBEWF_CHUNK_IO_FLAGS
 {
 	/* Indicates the checksum should be read or written
 	 */
-	LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET			= 0x01,
+	LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET			= 0x01,
 
 	/* Indicates the padding should be read or written
 	 */
@@ -216,6 +216,19 @@ enum LIBEWF_CHUNK_IO_FLAGS
 	/* Indicates the chunk is packed
 	 */
 	LIBEWF_CHUNK_IO_FLAG_IS_PACKED				= 0x04,
+};
+
+/* The chunk data item flags definitions
+ */
+enum LIBEWF_CHUNK_DATA_ITEM_FLAGS
+{
+        /* The data is not managed by the chunk data item
+	 */
+	LIBEWF_CHUNK_DATA_ITEM_FLAG_NON_MANAGED_DATA		= 0x00,
+
+        /* The data is managed by the chunk data item
+	 */
+	LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA		= 0x01
 };
 
 /* The (single) file entry types

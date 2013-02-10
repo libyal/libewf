@@ -1,7 +1,7 @@
 /*
  * Hash values functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -64,7 +64,7 @@ int libewf_hash_values_initialize(
  */
 int libewf_hash_values_parse_md5_hash(
      libfvalue_table_t *hash_values,
-     uint8_t *md5_hash,
+     const uint8_t *md5_hash,
      size_t md5_hash_size,
      libcerror_error_t **error )
 {
@@ -227,7 +227,7 @@ on_error:
  */
 int libewf_hash_values_parse_sha1_hash(
      libfvalue_table_t *hash_values,
-     uint8_t *sha1_hash,
+     const uint8_t *sha1_hash,
      size_t sha1_hash_size,
      libcerror_error_t **error )
 {

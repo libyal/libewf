@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -164,6 +164,20 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf16_hash_value_md5(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_hash_value_sha1(
      libewf_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,

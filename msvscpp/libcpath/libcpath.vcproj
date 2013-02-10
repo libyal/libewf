@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcsplit;..\..\libuna"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCPATH"
-				SmallerTypeCheck="true"
+				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				WarnAsError="false"

@@ -1,7 +1,7 @@
 /*
  * Date and time values functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1025,7 +1025,7 @@ int libewf_utf8_string_day_of_month_copy_to_time_elements(
 		return( -1 );
 	}
 	if( ( value_64bit < 1 )
-	 || ( value_64bit >= 31 ) )
+	 || ( value_64bit >= 32 ) )
 	{
 		libcerror_error_set(
 		 error,

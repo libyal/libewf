@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libewf file entry
  *
- * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "pyewf_handle.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
@@ -44,13 +45,18 @@ struct pyewf_file_entry
 	/* The libewf file entry
 	 */
 	libewf_file_entry_t *file_entry;
+
+	/* The handle object
+	 */
+	pyewf_handle_t *handle_object;
 };
 
 extern PyMethodDef pyewf_file_entry_object_methods[];
 extern PyTypeObject pyewf_file_entry_type_object;
 
 PyObject *pyewf_file_entry_new(
-           PyObject *self );
+           libewf_file_entry_t *file_entry,
+           pyewf_handle_t *handle_object );
 
 int pyewf_file_entry_init(
      pyewf_file_entry_t *pyewf_file_entry );
@@ -82,13 +88,25 @@ PyObject *pyewf_file_entry_get_size(
 PyObject *pyewf_file_entry_get_creation_time(
            pyewf_file_entry_t *pyewf_file_entry );
 
+PyObject *pyewf_file_entry_get_creation_time_as_integer(
+           pyewf_file_entry_t *pyewf_file_entry );
+
 PyObject *pyewf_file_entry_get_modification_time(
+           pyewf_file_entry_t *pyewf_file_entry );
+
+PyObject *pyewf_file_entry_get_modification_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry );
 
 PyObject *pyewf_file_entry_get_access_time(
            pyewf_file_entry_t *pyewf_file_entry );
 
+PyObject *pyewf_file_entry_get_access_time_as_integer(
+           pyewf_file_entry_t *pyewf_file_entry );
+
 PyObject *pyewf_file_entry_get_entry_modification_time(
+           pyewf_file_entry_t *pyewf_file_entry );
+
+PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry );
 
 PyObject *pyewf_file_entry_get_name(
@@ -99,6 +117,10 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 
 PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
            pyewf_file_entry_t *pyewf_file_entry );
+
+PyObject *pyewf_file_entry_get_sub_file_entry_by_index(
+           pyewf_file_entry_t *pyewf_file_entry,
+           int sub_file_entry_index );
 
 PyObject *pyewf_file_entry_get_sub_file_entry(
            pyewf_file_entry_t *pyewf_file_entry,

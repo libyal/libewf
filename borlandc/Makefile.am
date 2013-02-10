@@ -25,9 +25,9 @@ CODEGEAR_FILES = \
 	codegear/libewf/libewf_static.cbproj \
 	codegear/libewf.groupproj \
 	codegear/libewf_static.groupproj \
+	codegear/libfcache/libfcache.cbproj \
 	codegear/libfvalue/libfvalue.cbproj \
 	codegear/libhmac/libhmac.cbproj \
-	codegear/libmfcache/libmfcache.cbproj \
 	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libodraw/libodraw.cbproj \
 	codegear/libsmdev/libsmdev.cbproj \

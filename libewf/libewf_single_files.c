@@ -1,7 +1,7 @@
 /*
  * Single file entries functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1015,6 +1015,7 @@ int libewf_single_files_parse_file_entry(
 	int number_of_types                           = 0;
 	int number_of_values                          = 0;
 	int value_index                               = 0;
+	int zero_values_only                          = 0;
 
 	if( parent_file_entry_node == NULL )
 	{
@@ -1300,6 +1301,68 @@ int libewf_single_files_parse_file_entry(
 			      && ( type_string[ 2 ] == (uint8_t) 'b' ) )
 			{
 			}
+			else if( ( type_string[ 0 ] == (uint8_t) 's' )
+			      && ( type_string[ 1 ] == (uint8_t) 'h' )
+			      && ( type_string[ 2 ] == (uint8_t) 'a' ) )
+			{
+				single_file_entry->sha1_hash = (uint8_t *) memory_allocate(
+				                                            sizeof( uint8_t ) * value_string_size );
+
+				if( single_file_entry->sha1_hash == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create MD5 hash.",
+					 function );
+
+					goto on_error;
+				}
+				zero_values_only = 1;
+
+				for( value_string_index = 0;
+				     value_string_index < value_string_size - 1;
+				     value_string_index++ )
+				{
+					if( ( value_string[ value_string_index ] >= (uint8_t) '0' )
+					 && ( value_string[ value_string_index ] <= (uint8_t) '9' ) )
+					{
+						single_file_entry->sha1_hash[ value_string_index ] = value_string[ value_string_index ];
+					}
+					else if( ( value_string[ value_string_index ] >= (uint8_t) 'A' )
+					      && ( value_string[ value_string_index ] <= (uint8_t) 'F' ) )
+					{
+						single_file_entry->sha1_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + value_string[ value_string_index ];
+					}
+					else if( ( value_string[ value_string_index ] >= (uint8_t) 'a' )
+					      && ( value_string[ value_string_index ] <= (uint8_t) 'f' ) )
+					{
+						single_file_entry->sha1_hash[ value_string_index ] = value_string[ value_string_index ];
+					}
+					else
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+						 "%s: unsupported character in MD5 hash.",
+						 function );
+
+						goto on_error;
+					}
+					if( value_string[ value_string_index ] != (uint8_t) '0' )
+					{
+						zero_values_only = 0;
+					}
+				}
+				single_file_entry->sha1_hash[ value_string_size - 1 ] = 0;
+
+				if( zero_values_only == 0 )
+				{
+					single_file_entry->sha1_hash_size = value_string_size;
+				}
+			}
 		}
 		else if( type_string_size == 3 )
 		{
@@ -1422,7 +1485,7 @@ int libewf_single_files_parse_file_entry(
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
 				single_file_entry->md5_hash = (uint8_t *) memory_allocate(
-									   sizeof( uint8_t ) * value_string_size );
+				                                           sizeof( uint8_t ) * value_string_size );
 
 				if( single_file_entry->md5_hash == NULL )
 				{
@@ -1435,6 +1498,8 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
+				zero_values_only = 1;
+
 				for( value_string_index = 0;
 				     value_string_index < value_string_size - 1;
 				     value_string_index++ )
@@ -1465,10 +1530,17 @@ int libewf_single_files_parse_file_entry(
 
 						goto on_error;
 					}
+					if( value_string[ value_string_index ] != (uint8_t) '0' )
+					{
+						zero_values_only = 0;
+					}
 				}
 				single_file_entry->md5_hash[ value_string_size - 1 ] = 0;
 
-				single_file_entry->md5_hash_size = value_string_size;
+				if( zero_values_only == 0 )
+				{
+					single_file_entry->md5_hash_size = value_string_size;
+				}
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'i' )
 			      && ( type_string[ 1 ] == (uint8_t) 'd' ) )

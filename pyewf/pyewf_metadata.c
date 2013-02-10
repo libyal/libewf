@@ -2,7 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -21,13 +21,13 @@
  */
 
 #include <common.h>
-#include <memory.h>
 #include <types.h>
 
 #include "pyewf.h"
 #include "pyewf_codepage.h"
 #include "pyewf_handle.h"
 #include "pyewf_libcerror.h"
+#include "pyewf_libclocale.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
@@ -42,29 +42,45 @@ PyObject *pyewf_handle_get_media_size(
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function   = "pyewf_handle_get_media_size";
-	size64_t media_size     = 0;
+	static char *function    = "pyewf_handle_get_media_size";
+	size64_t media_size      = 0;
+	int result               = 0;
 
-	if( libewf_handle_get_media_size(
-	     pyewf_handle->handle,
-	     &media_size,
-	     &error ) != 1 )
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_media_size(
+	          pyewf_handle->handle,
+	          &media_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
 		     error_string,
 		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
+                {
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: failed to retrieve media size.",
+			 "%s: unable to retrieve media size.",
 			 function );
 		}
 		else
 		{
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: failed to retrieve media size.\n%s",
+			 "%s: unable to retrieve media size.\n%s",
 			 function,
 			 error_string );
 		}
@@ -73,11 +89,34 @@ PyObject *pyewf_handle_get_media_size(
 
 		return( NULL );
 	}
+#if defined( HAVE_LONG_LONG )
+	if( media_size > (size64_t) LLONG_MAX )
+	{
+		PyErr_Format(
+		 PyExc_OverflowError,
+		 "%s: media size value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
 	return( PyLong_FromLongLong(
-	         media_size ) );
+	         (long long) media_size ) );
+#else
+	if( media_size > (size64_t) LONG_MAX )
+	{
+		PyErr_Format(
+		 PyExc_OverflowError,
+		 "%s: media size value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
+	return( PyLong_FromLong(
+	         (long) media_size ) );
+#endif
 }
 
-/* Retrieves the codepage used for header strings in the file
+/* Retrieves the codepage used for header strings
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_header_codepage(
@@ -85,11 +124,12 @@ PyObject *pyewf_handle_get_header_codepage(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error     = NULL;
+	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
 	const char *codepage_string = NULL;
 	static char *function       = "pyewf_handle_get_header_codepage";
 	int header_codepage         = 0;
+	int result                  = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -100,10 +140,16 @@ PyObject *pyewf_handle_get_header_codepage(
 
 		return( NULL );
 	}
-	if( libewf_handle_get_header_codepage(
-	     pyewf_handle->handle,
-	     &header_codepage,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_header_codepage(
+	          pyewf_handle->handle,
+	          &header_codepage,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -156,10 +202,7 @@ PyObject *pyewf_handle_get_header_codepage(
 	return( string_object );
 }
 
-#ifdef TODO
-/* TODO implement libclocale */
-
-/* Sets the codepage used for header strings in the file
+/* Sets the codepage used for header strings
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_set_header_codepage(
@@ -169,13 +212,14 @@ PyObject *pyewf_handle_set_header_codepage(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error       = NULL;
+	libcerror_error_t *error      = NULL;
 	char *codepage_string         = NULL;
 	static char *keyword_list[]   = { "codepage", NULL };
 	static char *function         = "pyewf_handle_set_header_codepage";
 	size_t codepage_string_length = 0;
 	uint32_t feature_flags        = 0;
 	int header_codepage           = 0;
+	int result                    = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -224,14 +268,14 @@ PyObject *pyewf_handle_set_header_codepage(
 		{
 			PyErr_Format(
 			 PyExc_RuntimeError,
-			 "%s: unable to determine header codepage.",
+			 "%s: unable to determine ASCII codepage.",
 			 function );
 		}
 		else
 		{
 			PyErr_Format(
 			 PyExc_RuntimeError,
-			 "%s: unable to determine header codepage.\n%s",
+			 "%s: unable to determine ASCII codepage.\n%s",
 			 function,
 			 error_string );
 		}
@@ -240,10 +284,16 @@ PyObject *pyewf_handle_set_header_codepage(
 
 		return( NULL );
 	}
-	if( libewf_handle_set_header_codepage(
-	     pyewf_file->handle,
-	     header_codepage,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_set_header_codepage(
+	          pyewf_handle->handle,
+	          header_codepage,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -252,14 +302,14 @@ PyObject *pyewf_handle_set_header_codepage(
 		{
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to set header codepage.",
+			 "%s: unable to set ASCII codepage.",
 			 function );
 		}
 		else
 		{
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to set header codepage.\n%s",
+			 "%s: unable to set ASCII codepage.\n%s",
 			 function,
 			 error_string );
 		}
@@ -274,8 +324,6 @@ PyObject *pyewf_handle_set_header_codepage(
 	return( Py_None );
 }
 
-#endif /* TODO */
-
 /* Retrieves a header value
  * Returns a Python object holding the offset if successful or NULL on error
  */
@@ -286,7 +334,7 @@ PyObject *pyewf_handle_get_header_value(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error               = NULL;
+	libcerror_error_t *error              = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
 	static char *keyword_list[]           = { "identifier", NULL };
@@ -297,6 +345,15 @@ PyObject *pyewf_handle_get_header_value(
 	size_t header_value_size              = 0;
 	int result                            = 0;
 
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
@@ -304,10 +361,12 @@ PyObject *pyewf_handle_get_header_value(
 	     keyword_list,
 	     &header_value_identifier ) == 0 )
 	{
-		goto on_error;
+		return( NULL );
 	}
 	header_value_identifier_length = libcstring_narrow_string_length(
 	                                  header_value_identifier );
+
+	Py_BEGIN_ALLOW_THREADS
 
 	result = libewf_handle_get_utf8_header_value_size(
 	          pyewf_handle->handle,
@@ -315,6 +374,8 @@ PyObject *pyewf_handle_get_header_value(
 	          header_value_identifier_length,
 	          &header_value_size,
 	          &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( result == -1 )
 	{
@@ -347,9 +408,12 @@ PyObject *pyewf_handle_get_header_value(
 	 */
 	else if( result == 0 )
 	{
+		Py_IncRef(
+		 Py_None );
+
 		return( Py_None );
 	}
-	header_value = (char *) memory_allocate(
+	header_value = (char *) PyMem_Malloc(
 	                         sizeof( char ) * header_value_size );
 
 	if( header_value == NULL )
@@ -361,13 +425,17 @@ PyObject *pyewf_handle_get_header_value(
 
 		goto on_error;
 	}
+	Py_BEGIN_ALLOW_THREADS
+
 	result = libewf_handle_get_utf8_header_value(
 	          pyewf_handle->handle,
 	          (uint8_t *) header_value_identifier,
 	          header_value_identifier_length,
 	          (uint8_t *) header_value,
 	          header_value_size,
-	          NULL );
+	          &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( result == -1 )
 	{
@@ -400,14 +468,21 @@ PyObject *pyewf_handle_get_header_value(
 	 */
 	else if( result == 0 )
 	{
-		memory_free(
+		PyMem_Free(
 		 header_value );
+
+		Py_IncRef(
+		 Py_None );
 
 		return( Py_None );
 	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
 	string_object = PyUnicode_DecodeUTF8(
 	                 header_value,
-	                 (Py_ssize_t) header_value_size,
+	                 (Py_ssize_t) header_value_size - 1,
 	                 errors );
 
 	if( string_object == NULL )
@@ -420,7 +495,7 @@ PyObject *pyewf_handle_get_header_value(
 
 		goto on_error;
 	}
-	memory_free(
+	PyMem_Free(
 	 header_value );
 
 	return( string_object );
@@ -428,7 +503,7 @@ PyObject *pyewf_handle_get_header_value(
 on_error:
 	if( header_value != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 header_value );
 	}
 	return( NULL );
@@ -456,10 +531,25 @@ PyObject *pyewf_handle_get_header_values(
 	uint32_t header_value_index           = 0;
 	int result                            = 0;
 
-	if( libewf_handle_get_number_of_header_values(
-	     pyewf_handle->handle,
-	     &number_of_header_values,
-	     &error ) != 1 )
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_number_of_header_values(
+	          pyewf_handle->handle,
+	          &number_of_header_values,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -490,11 +580,17 @@ PyObject *pyewf_handle_get_header_values(
 	     header_value_index < number_of_header_values;
 	     header_value_index++ )
 	{
-		if( libewf_handle_get_header_value_identifier_size(
-		     pyewf_handle->handle,
-		     header_value_index,
-		     &header_value_identifier_size,
-		     &error ) != 1 )
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_handle_get_header_value_identifier_size(
+		          pyewf_handle->handle,
+		          header_value_index,
+		          &header_value_identifier_size,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
 		{
 			if( libcerror_error_backtrace_sprint(
 			     error,
@@ -521,7 +617,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			goto on_error;
 		}
-		header_value_identifier = (char *) memory_allocate(
+		header_value_identifier = (char *) PyMem_Malloc(
 		                                    sizeof( char ) * header_value_identifier_size );
 
 		if( header_value_identifier == NULL )
@@ -533,12 +629,18 @@ PyObject *pyewf_handle_get_header_values(
 
 			goto on_error;
 		}
-		if( libewf_handle_get_header_value_identifier(
-		     pyewf_handle->handle,
-		     header_value_index,
-		     (uint8_t *) header_value_identifier,
-		     header_value_identifier_size,
-		     &error ) != 1 )
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_handle_get_header_value_identifier(
+		          pyewf_handle->handle,
+		          header_value_index,
+		          (uint8_t *) header_value_identifier,
+		          header_value_identifier_size,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
 		{
 			if( libcerror_error_backtrace_sprint(
 			     error,
@@ -568,12 +670,16 @@ PyObject *pyewf_handle_get_header_values(
 		header_value_identifier_length = libcstring_narrow_string_length(
 						  header_value_identifier );
 
+		Py_BEGIN_ALLOW_THREADS
+
 		result = libewf_handle_get_utf8_header_value_size(
 		          pyewf_handle->handle,
 		          (uint8_t *) header_value_identifier,
 		          header_value_identifier_length,
 		          &header_value_size,
 		          &error );
+
+		Py_END_ALLOW_THREADS
 
 		if( result == -1 )
 		{
@@ -607,14 +713,11 @@ PyObject *pyewf_handle_get_header_values(
 		if( ( result != 0 )
 		 && ( header_value_size > 0 ) )
 		{
-			header_value = (char *) memory_allocate(
+			header_value = (char *) PyMem_Malloc(
 			                         sizeof( char ) * header_value_size );
 
 			if( header_value == NULL )
 			{
-				memory_free(
-				 header_value_identifier );
-
 				PyErr_Format(
 				 PyExc_MemoryError,
 				 "%s: unable to create header value.",
@@ -622,13 +725,19 @@ PyObject *pyewf_handle_get_header_values(
 
 				goto on_error;
 			}
-			if( libewf_handle_get_utf8_header_value(
-			     pyewf_handle->handle,
-			     (uint8_t *) header_value_identifier,
-			     header_value_identifier_length,
-			     (uint8_t *) header_value,
-			     header_value_size,
-			     &error ) != 1 )
+			Py_BEGIN_ALLOW_THREADS
+
+			result = libewf_handle_get_utf8_header_value(
+			          pyewf_handle->handle,
+			          (uint8_t *) header_value_identifier,
+			          header_value_identifier_length,
+			          (uint8_t *) header_value,
+			          header_value_size,
+			          &error );
+
+			Py_END_ALLOW_THREADS
+
+			if( result != 1 )
 			{
 				if( libcerror_error_backtrace_sprint(
 				     error,
@@ -655,9 +764,13 @@ PyObject *pyewf_handle_get_header_values(
 
 				goto on_error;
 			}
+			/* Pass the string length to PyUnicode_DecodeUTF8
+			 * otherwise it makes the end of string character is part
+			 * of the string
+			 */
 			string_object = PyUnicode_DecodeUTF8(
 			                 header_value,
-			                 header_value_size,
+			                 header_value_size - 1,
 			                 errors );
 
 			if( string_object == NULL )
@@ -685,12 +798,12 @@ PyObject *pyewf_handle_get_header_values(
 			}
 			string_object = NULL;
 
-			memory_free(
+			PyMem_Free(
 			 header_value );
 
 			header_value = NULL;
 		}
-		memory_free(
+		PyMem_Free(
 		 header_value_identifier );
 
 		header_value_identifier = NULL;
@@ -705,12 +818,12 @@ on_error:
 	}
 	if( header_value != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 header_value );
 	}
 	if( header_value_identifier != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 header_value_identifier );
 	}
 	if( dictionary_object != NULL )
@@ -742,6 +855,15 @@ PyObject *pyewf_handle_get_hash_value(
 	size_t hash_value_size              = 0;
 	int result                          = 0;
 
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
@@ -749,10 +871,12 @@ PyObject *pyewf_handle_get_hash_value(
 	     keyword_list,
 	     &hash_value_identifier ) == 0 )
 	{
-		goto on_error;
+		return( NULL );
 	}
 	hash_value_identifier_length = libcstring_narrow_string_length(
 	                                hash_value_identifier );
+
+	Py_BEGIN_ALLOW_THREADS
 
 	result = libewf_handle_get_utf8_hash_value_size(
 	          pyewf_handle->handle,
@@ -760,6 +884,8 @@ PyObject *pyewf_handle_get_hash_value(
 	          hash_value_identifier_length,
 	          &hash_value_size,
 	          &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( result == -1 )
 	{
@@ -792,9 +918,12 @@ PyObject *pyewf_handle_get_hash_value(
 	 */
 	else if( result == 0 )
 	{
+		Py_IncRef(
+		 Py_None );
+
 		return( Py_None );
 	}
-	hash_value = (char *) memory_allocate(
+	hash_value = (char *) PyMem_Malloc(
 	                       sizeof( char ) * hash_value_size );
 
 	if( hash_value == NULL )
@@ -806,13 +935,17 @@ PyObject *pyewf_handle_get_hash_value(
 
 		goto on_error;
 	}
+	Py_BEGIN_ALLOW_THREADS
+
 	result = libewf_handle_get_utf8_hash_value(
 	          pyewf_handle->handle,
 	          (uint8_t *) hash_value_identifier,
 	          hash_value_identifier_length,
 	          (uint8_t *) hash_value,
 	          hash_value_size,
-	          NULL );
+	          &error );
+
+	Py_END_ALLOW_THREADS
 
 	if( result == -1 )
 	{
@@ -845,14 +978,21 @@ PyObject *pyewf_handle_get_hash_value(
 	 */
 	else if( result == 0 )
 	{
-		memory_free(
+		PyMem_Free(
 		 hash_value );
+
+		Py_IncRef(
+		 Py_None );
 
 		return( Py_None );
 	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
 	string_object = PyUnicode_DecodeUTF8(
 	                 hash_value,
-	                 (Py_ssize_t) hash_value_size,
+	                 (Py_ssize_t) hash_value_size - 1,
 	                 errors );
 
 	if( string_object == NULL )
@@ -865,7 +1005,7 @@ PyObject *pyewf_handle_get_hash_value(
 
 		goto on_error;
 	}
-	memory_free(
+	PyMem_Free(
 	 hash_value );
 
 	return( string_object );
@@ -873,7 +1013,7 @@ PyObject *pyewf_handle_get_hash_value(
 on_error:
 	if( hash_value != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 hash_value );
 	}
 	return( NULL );
@@ -887,7 +1027,7 @@ PyObject *pyewf_handle_get_hash_values(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error             = NULL;
+	libcerror_error_t *error            = NULL;
 	PyObject *dictionary_object         = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_values";
@@ -901,10 +1041,25 @@ PyObject *pyewf_handle_get_hash_values(
 	uint32_t hash_value_index           = 0;
 	int result                          = 0;
 
-	if( libewf_handle_get_number_of_hash_values(
-	     pyewf_handle->handle,
-	     &number_of_hash_values,
-	     &error ) != 1 )
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_number_of_hash_values(
+	          pyewf_handle->handle,
+	          &number_of_hash_values,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -935,11 +1090,17 @@ PyObject *pyewf_handle_get_hash_values(
 	     hash_value_index < number_of_hash_values;
 	     hash_value_index++ )
 	{
-		if( libewf_handle_get_hash_value_identifier_size(
-		     pyewf_handle->handle,
-		     hash_value_index,
-		     &hash_value_identifier_size,
-		     &error ) != 1 )
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_handle_get_hash_value_identifier_size(
+		          pyewf_handle->handle,
+		          hash_value_index,
+		          &hash_value_identifier_size,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
 		{
 			if( libcerror_error_backtrace_sprint(
 			     error,
@@ -966,7 +1127,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 			goto on_error;
 		}
-		hash_value_identifier = (char *) memory_allocate(
+		hash_value_identifier = (char *) PyMem_Malloc(
 		                                  sizeof( char ) * hash_value_identifier_size );
 
 		if( hash_value_identifier == NULL )
@@ -978,12 +1139,18 @@ PyObject *pyewf_handle_get_hash_values(
 
 			goto on_error;
 		}
-		if( libewf_handle_get_hash_value_identifier(
-		     pyewf_handle->handle,
-		     hash_value_index,
-		     (uint8_t *) hash_value_identifier,
-		     hash_value_identifier_size,
-		     &error ) != 1 )
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libewf_handle_get_hash_value_identifier(
+		          pyewf_handle->handle,
+		          hash_value_index,
+		          (uint8_t *) hash_value_identifier,
+		          hash_value_identifier_size,
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
 		{
 			if( libcerror_error_backtrace_sprint(
 			     error,
@@ -1013,12 +1180,16 @@ PyObject *pyewf_handle_get_hash_values(
 		hash_value_identifier_length = libcstring_narrow_string_length(
 		                                hash_value_identifier );
 
+		Py_BEGIN_ALLOW_THREADS
+
 		result = libewf_handle_get_utf8_hash_value_size(
 		          pyewf_handle->handle,
 		          (uint8_t *) hash_value_identifier,
 		          hash_value_identifier_length,
 		          &hash_value_size,
 		          &error );
+
+		Py_END_ALLOW_THREADS
 
 		if( result == -1 )
 		{
@@ -1052,14 +1223,11 @@ PyObject *pyewf_handle_get_hash_values(
 		if( ( result != 0 )
 		 && ( hash_value_size > 0 ) )
 		{
-			hash_value = (char *) memory_allocate(
+			hash_value = (char *) PyMem_Malloc(
 			                       sizeof( char ) * hash_value_size );
 
 			if( hash_value == NULL )
 			{
-				memory_free(
-				 hash_value_identifier );
-
 				PyErr_Format(
 				 PyExc_MemoryError,
 				 "%s: unable to create hash value.",
@@ -1067,13 +1235,19 @@ PyObject *pyewf_handle_get_hash_values(
 
 				goto on_error;
 			}
-			if( libewf_handle_get_utf8_hash_value(
-			     pyewf_handle->handle,
-			     (uint8_t *) hash_value_identifier,
-			     hash_value_identifier_length,
-			     (uint8_t *) hash_value,
-			     hash_value_size,
-			     &error ) != 1 )
+			Py_BEGIN_ALLOW_THREADS
+
+			result = libewf_handle_get_utf8_hash_value(
+			          pyewf_handle->handle,
+			          (uint8_t *) hash_value_identifier,
+			          hash_value_identifier_length,
+			          (uint8_t *) hash_value,
+			          hash_value_size,
+			          &error );
+
+			Py_END_ALLOW_THREADS
+
+			if( result != 1 )
 			{
 				if( libcerror_error_backtrace_sprint(
 				     error,
@@ -1100,9 +1274,13 @@ PyObject *pyewf_handle_get_hash_values(
 
 				goto on_error;
 			}
+			/* Pass the string length to PyUnicode_DecodeUTF8
+			 * otherwise it makes the end of string character is part
+			 * of the string
+			 */
 			string_object = PyUnicode_DecodeUTF8(
 			                 hash_value,
-			                 hash_value_size,
+			                 hash_value_size - 1,
 			                 errors );
 
 			if( string_object == NULL )
@@ -1130,12 +1308,12 @@ PyObject *pyewf_handle_get_hash_values(
 			}
 			string_object = NULL;
 
-			memory_free(
+			PyMem_Free(
 			 hash_value );
 
 			hash_value = NULL;
 		}
-		memory_free(
+		PyMem_Free(
 		 hash_value_identifier );
 
 		hash_value_identifier = NULL;
@@ -1150,12 +1328,12 @@ on_error:
 	}
 	if( hash_value != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 hash_value );
 	}
 	if( hash_value_identifier != NULL )
 	{
-		memory_free(
+		PyMem_Free(
 		 hash_value_identifier );
 	}
 	if( dictionary_object != NULL )

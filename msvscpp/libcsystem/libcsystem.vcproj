@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCSYSTEM"
-				SmallerTypeCheck="true"
+				SmallerTypeCheck="false"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				WarnAsError="false"
@@ -154,10 +154,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libcsystem\libcsystem_date_time.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcsystem\libcsystem_getopt.c"
 				>
 			</File>
@@ -183,10 +179,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\libcsystem\libcsystem_date_time.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\libcsystem\libcsystem_definitions.h"
 				>

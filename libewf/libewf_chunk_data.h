@@ -1,7 +1,7 @@
 /*
  * Chunk data functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -39,6 +39,10 @@ struct libewf_chunk_data
 	 */
 	size_t allocated_data_size;
 
+	/* The unpacked data size
+	 */
+	size_t unpacked_data_size;
+
 	/* The data
 	 */
 	uint8_t *data;
@@ -51,13 +55,34 @@ struct libewf_chunk_data
 	 */
 	uint8_t *compressed_data;
 
+	/* The compressed data offset
+	 */
+	size_t compressed_data_offset;
+
 	/* The compressed data size
 	 */
 	size_t compressed_data_size;
 
+	/* The padding size
+	 */
+	size_t padding_size;
+
 	/* The chunk data range flags
 	 */
 	uint32_t range_flags;
+
+	/* The flags
+	 */
+	uint8_t flags;
+
+/* TODO chunk data rewrite */
+	/* Reference to the checksum buffer
+	 */
+	uint8_t *checksum_buffer;
+
+	/* The chunk IO flags
+	 */
+	int8_t chunk_io_flags;
 };
 
 int libewf_chunk_data_initialize(
@@ -75,7 +100,6 @@ int libewf_chunk_data_pack(
      uint16_t compression_method,
      int8_t compression_level,
      uint8_t compression_flags,
-     size_t *chunk_padding_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
      uint8_t pack_flags,
@@ -85,6 +109,7 @@ int libewf_chunk_data_pack_buffer(
      uint8_t *data,
      size_t data_size,
      uint8_t *compressed_data,
+     size_t *compressed_data_offset,
      size_t *compressed_data_size,
      uint32_t chunk_size,
      size_t chunk_data_size,

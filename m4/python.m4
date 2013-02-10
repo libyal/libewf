@@ -1,6 +1,6 @@
 dnl Functions for Python bindings
 dnl
-dnl Version: 20111006
+dnl Version: 20121203
 
 dnl Function to detect if Python build environment is available
 AC_DEFUN([AX_PYTHON_CHECK],
@@ -11,6 +11,7 @@ AC_DEFUN([AX_PYTHON_CHECK],
   [for Python include path])
 
  PYTHON_INCLUDE_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_inc() "`;
+
  AC_MSG_RESULT(
   [$PYTHON_INCLUDE_DIR])
 
@@ -27,30 +28,32 @@ AC_DEFUN([AX_PYTHON_CHECK],
  AC_MSG_CHECKING(
   [for Python library path])
 
- python_path=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
+ PYTHON_LIBRARY_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
+
  AC_MSG_RESULT(
-  [$python_path])
+  [$PYTHON_LIBRARY_DIR])
 
  AC_SUBST(
   [PYTHON_LDFLAGS],
-  ["-L$python_path -lpython$PYTHON_VERSION"])
+  ["-L$PYTHON_LIBRARY_DIR -lpython$PYTHON_VERSION"])
 
- python_site=`echo $python_path | sed "s/config/site-packages/"`;
+ PYTHON_SITE_PACKAGES_DIR=`echo $PYTHON_LIBRARY_DIR | sed "s/config/site-packages/"`;
 
  AC_SUBST(
-  [PYTHON_SITE_PKG],
-  [$python_site])
+  [PYTHON_SITE_PACKAGES_DIR],
+  [$PYTHON_SITE_PACKAGES_DIR])
 
  dnl Determine the Python libraries which must be linked in when embedding
  AC_MSG_CHECKING(
   [for Python extra libraries])
 
  PYTHON_EXTRA_LIBS=`$PYTHON -c "import distutils.sysconfig;conf = distutils.sysconfig.get_config_var;print conf('LOCALMODLIBS')+' '+conf('LIBS')"`;
+
  AC_MSG_RESULT(
   [$PYTHON_EXTRA_LIBS])
 
  AC_SUBST(
- [PYTHON_EXTRA_LIBS])
+  [PYTHON_EXTRA_LIBS])
  ])
 
 dnl Function to detect if to enable Python

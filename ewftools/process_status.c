@@ -1,7 +1,7 @@
 /*
  * Process status functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -91,6 +91,50 @@ int process_status_initialize(
 		 "%s: unable to clear process status.",
 		 function );
 
+		memory_free(
+		 *process_status );
+
+		*process_status = NULL;
+
+		return( -1 );
+	}
+	if( libcdatetime_timestamp_initialize(
+	     &( ( *process_status )->start_timestamp ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create start timestamp.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdatetime_timestamp_initialize(
+	     &( ( *process_status )->current_timestamp ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create current timestamp.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdatetime_timestamp_initialize(
+	     &( ( *process_status )->last_timestamp ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create last timestamp.",
+		 function );
+
 		goto on_error;
 	}
 	( *process_status )->status_process_string    = status_process_string;
@@ -120,6 +164,7 @@ int process_status_free(
      libcerror_error_t **error )
 {
 	static char *function = "process_status_free";
+	int result            = 1;
 
 	if( process_status == NULL )
 	{
@@ -134,12 +179,51 @@ int process_status_free(
 	}
 	if( *process_status != NULL )
 	{
+		if( libcdatetime_timestamp_free(
+		     &( ( *process_status )->start_timestamp ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free start timestamp.",
+			 function );
+
+			result = -1;
+		}
+		if( libcdatetime_timestamp_free(
+		     &( ( *process_status )->current_timestamp ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free current timestamp.",
+			 function );
+
+			result = -1;
+		}
+		if( libcdatetime_timestamp_free(
+		     &( ( *process_status )->last_timestamp ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free last timestamp.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 *process_status );
 
 		*process_status = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Starts the process status information
@@ -165,9 +249,20 @@ int process_status_start(
 		return( -1 );
 	}
 	process_status->last_percentage = -1;
-	process_status->start_timestamp = libcsystem_date_time_time(
-	                                   NULL );
 
+	if( libcdatetime_timestamp_set_current_time(
+	     process_status->start_timestamp,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set start timestamp to current time.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->print_status_information != 0 )
 	 && ( process_status->status_process_string != NULL ) )
@@ -211,7 +306,6 @@ int process_status_update(
 	time_t seconds_current   = 0;
 	time_t seconds_total     = 0;
 	time_t seconds_remaining = 0;
-	time_t timestamp_current = 0;
 	int8_t new_percentage    = 0;
 
 	if( process_status == NULL )
@@ -234,12 +328,23 @@ int process_status_update(
 		{
 			new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
 		}
+		if( libcdatetime_timestamp_set_current_time(
+		     process_status->current_timestamp,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set current timestamp to current time.",
+			 function );
+
+			return( -1 );
+		}
 		/* Estimate the remaining time
 		 */
-		timestamp_current = time( NULL );
-
 		if( ( new_percentage > process_status->last_percentage )
-		 && ( timestamp_current > process_status->last_timestamp ) )
+		 && ( process_status->current_timestamp > process_status->last_timestamp ) )
 		{
 			process_status->last_percentage = new_percentage;
 
@@ -269,12 +374,12 @@ int process_status_update(
 			 process_status->output_stream,
 			 ".\n" );
 
-			if( ( timestamp_current > process_status->start_timestamp )
+			if( ( process_status->current_timestamp > process_status->start_timestamp )
 			 && ( new_percentage > 0 ) )
 			{
-				process_status->last_timestamp = timestamp_current;
+				process_status->last_timestamp = process_status->current_timestamp;
 
-				seconds_current   = timestamp_current - process_status->start_timestamp;
+				seconds_current   = process_status->current_timestamp - process_status->start_timestamp;
 				seconds_total     = ( ( seconds_current * 100 ) / new_percentage );
 				seconds_remaining = seconds_total - seconds_current;
 
@@ -317,9 +422,8 @@ int process_status_update_unknown_total(
      size64_t bytes_read,
      libcerror_error_t **error )
 {
-	static char *function    = "process_status_update_unknown_total";
-	time_t seconds_current   = 0;
-	time_t timestamp_current = 0;
+	static char *function  = "process_status_update_unknown_total";
+	time_t seconds_current = 0;
 
 	if( process_status == NULL )
 	{
@@ -336,9 +440,20 @@ int process_status_update_unknown_total(
 	 && ( process_status->print_status_information != 0 )
 	 && ( process_status->status_update_string != NULL ) )
 	{
-		timestamp_current = time( NULL );
+		if( libcdatetime_timestamp_set_current_time(
+		     process_status->current_timestamp,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set current timestamp to current time.",
+			 function );
 
-		if( timestamp_current > process_status->last_timestamp )
+			return( -1 );
+		}
+		if( process_status->current_timestamp > process_status->last_timestamp )
 		{
 			/* Update state
 			 * - if no status was printed before
@@ -347,9 +462,9 @@ int process_status_update_unknown_total(
 			 */
 			if( ( process_status->last_bytes_total == 0 )
 			 || ( bytes_read > ( process_status->last_bytes_total + ( 10 * 1024 * 1024 ) ) )
-			 || ( ( timestamp_current - process_status->last_timestamp ) > 30 ) )
+			 || ( ( process_status->current_timestamp - process_status->last_timestamp ) > 30 ) )
 			{
-				process_status->last_timestamp   = timestamp_current;
+				process_status->last_timestamp   = process_status->current_timestamp;
 				process_status->last_bytes_total = bytes_read;
 
 				fprintf(
@@ -365,7 +480,7 @@ int process_status_update_unknown_total(
 				 process_status->output_stream,
 				 "\n" );
 
-				seconds_current = timestamp_current - process_status->start_timestamp;
+				seconds_current = process_status->current_timestamp - process_status->start_timestamp;
 
 				fprintf(
 				 process_status->output_stream,
@@ -400,9 +515,9 @@ int process_status_stop(
 {
 	libcstring_system_character_t time_string[ 32 ];
 
-	static char *function                      = "process_status_start";
+	static char *function                              = "process_status_start";
 	const libcstring_system_character_t *status_string = NULL;
-	time_t seconds_total                       = 0;
+	time_t seconds_total                               = 0;
 
 	if( process_status == NULL )
 	{
@@ -428,9 +543,19 @@ int process_status_stop(
 
 		return( -1 );
 	}
-	process_status->last_timestamp = libcsystem_date_time_time(
-	                                  NULL );
+	if( libcdatetime_timestamp_set_current_time(
+	     process_status->last_timestamp,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set last timestamp to current time.",
+		 function );
 
+		return( -1 );
+	}
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->print_status_information != 0 )
 	 && ( process_status->status_process_string != NULL ) )

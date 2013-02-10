@@ -2,7 +2,7 @@
 <config>
 	<identifier>com.google.code.p.libewf.share.pkg</identifier>
 	<version>@VERSION@</version>
-	<description></description>
+	<description/>
 	<post-install type="none"/>
 	<requireAuthorization/>
 	<installFrom>@PWD@/macosx/tmp/share</installFrom>

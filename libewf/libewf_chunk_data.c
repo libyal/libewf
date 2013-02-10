@@ -1,7 +1,7 @@
 /*
  * Chunk data functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -66,8 +66,7 @@ int libewf_chunk_data_initialize(
 
 		return( -1 );
 	}
-	if( ( data_size == 0 )
-	 || ( data_size > (size_t) SSIZE_MAX ) )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -106,30 +105,33 @@ int libewf_chunk_data_initialize(
 
 		goto on_error;
 	}
-	/* The allocated data size should be rounded to the next 16-byte increment
-	 */
-	if( ( data_size % 16 ) != 0 )
+	if( data_size > 0 )
 	{
-		data_size += 16;
+		/* The allocated data size should be rounded to the next 16-byte increment
+		 */
+		if( ( data_size % 16 ) != 0 )
+		{
+			data_size += 16;
+		}
+		data_size = ( data_size / 16 ) * 16;
+
+		( *chunk_data )->data = (uint8_t *) memory_allocate(
+		                                     sizeof( uint8_t ) * data_size );
+
+		if( ( *chunk_data )->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
+			 function );
+
+			goto on_error;
+		}
+		( *chunk_data )->allocated_data_size = data_size;
+		( *chunk_data )->flags               = LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA;
 	}
-	data_size = ( data_size / 16 ) * 16;
-
-	( *chunk_data )->data = (uint8_t *) memory_allocate(
-	                                     sizeof( uint8_t ) * data_size );
-
-	if( ( *chunk_data )->data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create data.",
-		 function );
-
-		goto on_error;
-	}
-	( *chunk_data )->allocated_data_size = data_size;
-
 	return( 1 );
 
 on_error:
@@ -165,10 +167,13 @@ int libewf_chunk_data_free(
 	}
 	if( *chunk_data != NULL )
 	{
-		if( ( *chunk_data )->data != NULL )
+		if( ( ( *chunk_data )->flags & LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA ) != 0 )
 		{
-			memory_free(
-			 ( *chunk_data )->data );
+			if( ( *chunk_data )->data != NULL )
+			{
+				memory_free(
+				 ( *chunk_data )->data );
+			}
 		}
 		if( ( *chunk_data )->compressed_data != NULL )
 		{
@@ -193,7 +198,6 @@ int libewf_chunk_data_pack(
      uint16_t compression_method,
      int8_t compression_level,
      uint8_t compression_flags,
-     size_t *chunk_padding_size,
      const uint8_t *compressed_zero_byte_empty_block,
      size_t compressed_zero_byte_empty_block_size,
      uint8_t pack_flags,
@@ -239,17 +243,6 @@ int libewf_chunk_data_pack(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: chunk size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_padding_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk padding size.",
 		 function );
 
 		return( -1 );
@@ -370,10 +363,11 @@ int libewf_chunk_data_pack(
 		     chunk_data->data,
 		     chunk_data->allocated_data_size,
 		     chunk_data->compressed_data,
+		     &( chunk_data->compressed_data_offset ),
 		     &( chunk_data->compressed_data_size ),
 		     chunk_size,
 		     chunk_data->data_size,
-		     chunk_padding_size,
+		     &( chunk_data->padding_size ),
 		     compression_method,
 		     compression_level,
 		     &( chunk_data->range_flags ),
@@ -397,10 +391,13 @@ int libewf_chunk_data_pack(
 
 		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
-			memory_free(
-			 chunk_data->data );
-
-			chunk_data->data = chunk_data->compressed_data;
+			if( ( chunk_data->flags & LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA ) != 0 )
+			{
+				memory_free(
+				 chunk_data->data );
+			}
+			chunk_data->data  = chunk_data->compressed_data;
+			chunk_data->flags = LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA;
 
 			chunk_data->compressed_data      = NULL;
 			chunk_data->compressed_data_size = 0;
@@ -430,6 +427,7 @@ int libewf_chunk_data_pack_buffer(
      uint8_t *data,
      size_t data_size,
      uint8_t *compressed_data,
+     size_t *compressed_data_offset,
      size_t *compressed_data_size,
      uint32_t chunk_size,
      size_t chunk_data_size,
@@ -563,6 +561,17 @@ int libewf_chunk_data_pack_buffer(
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: compressed data points to the same buffer as data.",
+			 function );
+
+			return( -1 );
+		}
+		if( compressed_data_offset == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid compressed data offset.",
 			 function );
 
 			return( -1 );
@@ -735,7 +744,16 @@ int libewf_chunk_data_pack_buffer(
 					 &( compressed_data[ safe_compressed_data_size - 4 ] ),
 					 *chunk_checksum );
 				}
-/* TODO what about bzip2 */
+/* TODO bzip2 support */
+#ifdef IGNORE
+				else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+				{
+					/* Some parts of the bzip2 compressed block are not stored
+					 */
+					*compressed_data_offset    = 4;
+					safe_compressed_data_size -= 4;
+				}
+#endif
 				if( ( pack_flags & LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING ) != 0 )
 				{
 					*chunk_padding_size = safe_compressed_data_size % 16;
@@ -803,7 +821,7 @@ int libewf_chunk_data_pack_buffer(
 		}
 		else
 		{
-			*chunk_io_flags = LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET;
+			*chunk_io_flags = LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET;
 		}
 		*range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
 
@@ -1169,7 +1187,7 @@ int libewf_chunk_data_unpack_buffer(
 		}
 		*data_size -= 4;
 
-		if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET ) == 0 )
+		if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) == 0 )
 		{
 			byte_stream_copy_to_uint32_little_endian(
 			 &( data[ *data_size ] ),

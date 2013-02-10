@@ -1,7 +1,7 @@
 /*
  * Metadata functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1524,7 +1524,7 @@ int libewf_handle_get_segment_file_set_identifier(
  */
 int libewf_handle_set_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *set_identifier,
+     const uint8_t *set_identifier,
      size_t size,
      libcerror_error_t **error )
 {
@@ -1725,7 +1725,7 @@ int libewf_handle_get_md5_hash(
  */
 int libewf_handle_set_md5_hash(
      libewf_handle_t *handle,
-     uint8_t *md5_hash,
+     const uint8_t *md5_hash,
      size_t size,
      libcerror_error_t **error )
 {
@@ -1974,7 +1974,7 @@ int libewf_handle_get_sha1_hash(
  */
 int libewf_handle_set_sha1_hash(
      libewf_handle_t *handle,
-     uint8_t *sha1_hash,
+     const uint8_t *sha1_hash,
      size_t size,
      libcerror_error_t **error )
 {

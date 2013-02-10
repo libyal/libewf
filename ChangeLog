@@ -1,6 +1,11 @@
 TODO
-* update msvscpp files
-* update codegear files
+* pyewf
+  - change header and hash values into sequence objects
+  - setup.py: non Windows support
+* ewftools: rename argv_filenames to source_filenames (see libvmdk)
+* add bzip2 compression support
+* complete work on ewfmount dokan support
+* update codegear files - libcdata
 
 * add support for set identifier change ?
 * check alignment of:
@@ -316,7 +321,8 @@ Tools:
   - create a tool to analyse a single segment file
   - implement low and high level api separation
 * ewfmount
-  - Windows use ImDisk or Dokan
+  - Windows finish Dokan implementation
+  - Windows add ImDisk implementation ?
   - MacOS native API support ?
 * ewfverify
   - allow for multi stage verification, where user suspends and resumes
@@ -364,6 +370,30 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130128
+* updated docstrings in pyewf
+* fix for corruption scenario
+
+20130126
+* fixes in pyewf examples
+
+20130120
+* replaced mfcache by new fcache
+
+20130119
+* 2013 update
+* updated pyewf
+* added pyewf/setup.py with thanks to Michael Cohen
+
+20130105
+* bug fix for 31th day of the month issue
+
+20120916
+* added detection of empty ha value containing "00000000000000000000000000000000"
+* worked on bzip2 compression
+* worked on chunk data rewrite
+* ewfmount: worked on Dokan sub system support
 
 20120915
 * added -X option to ewfmount

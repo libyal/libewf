@@ -1,7 +1,7 @@
 /*
  * Chunk table functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -32,7 +32,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libmfcache.h"
+#include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_section.h"
 #include "libewf_unused.h"
@@ -160,8 +160,8 @@ int libewf_chunk_table_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_table_clone(
-     intptr_t **destination_chunk_table,
-     intptr_t *source_chunk_table,
+     libewf_chunk_table_t **destination_chunk_table,
+     libewf_chunk_table_t *source_chunk_table,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_clone";
@@ -194,7 +194,7 @@ int libewf_chunk_table_clone(
 
 		return( 1 );
 	}
-	*destination_chunk_table = memory_allocate_structure_as_value(
+	*destination_chunk_table = memory_allocate_structure(
 	                            libewf_chunk_table_t );
 
 	if( *destination_chunk_table == NULL )
@@ -243,7 +243,7 @@ int libewf_chunk_table_read_chunk(
      intptr_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libmfdata_list_element_t *list_element,
-     libmfcache_cache_t *cache,
+     libfcache_cache_t *cache,
      int file_io_pool_entry,
      off64_t element_data_offset,
      size64_t element_data_size,
@@ -474,10 +474,11 @@ int libewf_chunk_table_read_offsets(
      libmfdata_list_t *chunk_table_list,
      int element_index,
      int number_of_elements,
-     libmfcache_cache_t *cache LIBEWF_ATTRIBUTE_UNUSED,
+     libfcache_cache_t *cache LIBEWF_ATTRIBUTE_UNUSED,
      int file_io_pool_entry,
      off64_t element_group_offset,
      size64_t element_group_size,
+     uint32_t element_group_flags LIBEWF_ATTRIBUTE_UNUSED,
      uint8_t read_flags,
      libcerror_error_t **error )
 {
@@ -496,6 +497,7 @@ int libewf_chunk_table_read_offsets(
 	int result                        = 0;
 
 	LIBEWF_UNREFERENCED_PARAMETER( cache )
+	LIBEWF_UNREFERENCED_PARAMETER( element_group_flags )
 
 	if( io_handle == NULL )
 	{

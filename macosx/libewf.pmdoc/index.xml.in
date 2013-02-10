@@ -2,7 +2,7 @@
 	<properties>
 		<title>libewf</title>
 		<build>@PWD@/macosx/libewf.mpkg</build>
-		<organization>com.google.code.p.libewf</organization>
+		<organization>com.google.code.p</organization>
 		<userSees ui="both"/>
 		<min-target os="1"/>
 		<domain system="true"/>

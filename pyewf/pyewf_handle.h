@@ -2,7 +2,7 @@
  * Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -51,12 +51,14 @@ extern PyMethodDef pyewf_handle_object_methods[];
 extern PyTypeObject pyewf_handle_type_object;
 
 PyObject *pyewf_handle_new(
-           PyObject *self );
+           void );
 
 PyObject *pyewf_handle_new_open(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
+
+/* TODO new open file pool - list of file objects */
 
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle );

@@ -1,7 +1,7 @@
 /*
- * The internal libmfcache header
+ * The internal libclocale header
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2011-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,31 +19,33 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_LIBMFCACHE_H )
-#define _LIBEWF_LIBMFCACHE_H
+#if !defined( _PYEWF_LIBCLOCALE_H )
+#define _PYEWF_LIBCLOCALE_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBMFCACHE for local use of libmfcache
+/* Define HAVE_LOCAL_LIBCLOCALE for local use of libclocale
  */
-#if defined( HAVE_LOCAL_LIBMFCACHE )
+#if defined( HAVE_LOCAL_LIBCLOCALE )
 
-#include <libmfcache_cache.h>
-#include <libmfcache_date_time.h>
-#include <libmfcache_definitions.h>
-#include <libmfcache_types.h>
+#include <libclocale_codepage.h>
+#include <libclocale_definitions.h>
+#include <libclocale_locale.h>
+#include <libclocale_support.h>
 
-#else
+#elif defined( HAVE_LIBCLOCALE_H )
 
-/* If libtool DLL support is enabled set LIBMFCACHE_DLL_IMPORT
- * before including libmfcache.h
+/* If libtool DLL support is enabled set LIBCLOCALE_DLL_IMPORT
+ * before including libclocale.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBMFCACHE_DLL_IMPORT
+#define LIBCLOCALE_DLL_IMPORT
 #endif
 
-#include <libmfcache.h>
+#include <libclocale.h>
 
+#else
+#error Missing libclocale.h
 #endif
 
 #endif

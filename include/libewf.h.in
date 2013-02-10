@@ -395,7 +395,7 @@ ssize_t libewf_handle_prepare_read_chunk(
  * Will read until the requested size is filled or the entire chunk is read
  * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
  * and is used for uncompressed chunks only
- * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
  * otherwise the checksum is considered part of the data in the chunk buffer
  * The value chunk_buffer_size contains the size of the chunk buffer
  * Returns the number of bytes read or -1 on error
@@ -436,7 +436,7 @@ ssize_t libewf_handle_read_random(
  * This function should be used before libewf_handle_write_chunk
  * The chunk_buffer_size should contain the actual chunk size
  * The function sets the is_compressed, chunk_checksum and chunk_io_flags values
- * The LIBEWF_CHUNK_IO_FLAG_CHECKUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
+ * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
  * and needs to be written separately from the chunk data, in case of an uncompressed chunk
  * Returns the resulting chunk size or -1 on error
  */
@@ -1075,7 +1075,7 @@ int libewf_handle_get_segment_file_set_identifier(
 LIBEWF_EXTERN \
 int libewf_handle_set_segment_file_set_identifier(
      libewf_handle_t *handle,
-     uint8_t *set_identifier,
+     const uint8_t *set_identifier,
      size_t size,
      libewf_error_t **error );
 
@@ -1095,7 +1095,7 @@ int libewf_handle_get_md5_hash(
 LIBEWF_EXTERN \
 int libewf_handle_set_md5_hash(
      libewf_handle_t *handle,
-     uint8_t *md5_hash,
+     const uint8_t *md5_hash,
      size_t size,
      libewf_error_t **error );
 
@@ -1115,7 +1115,7 @@ int libewf_handle_get_sha1_hash(
 LIBEWF_EXTERN \
 int libewf_handle_set_sha1_hash(
      libewf_handle_t *handle,
-     uint8_t *sha1_hash,
+     const uint8_t *sha1_hash,
      size_t size,
      libewf_error_t **error );
 
@@ -2339,6 +2339,26 @@ int libewf_file_entry_get_utf16_hash_value_md5(
      size_t utf16_string_size,
      libewf_error_t **error );
 
+/* Retrieves the UTF-8 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded SHA1 hash value
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
 /* Reads data at the current offset
  * Returns the number of bytes read or -1 on error
  */
@@ -3074,7 +3094,7 @@ LIBEWF_EXTERN int libewf_set_guid(
 /* Retrieves the GUID
  * Returns 1 if successful or -1 on error
  *
- * This function is deprecated use libewf_handle_set_segment_file_get_identifier instead
+ * This function is deprecated use libewf_handle_get_segment_file_set_identifier instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \

@@ -34,6 +34,10 @@
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
+/* Define to make ewf_test_read_write_delta generate verbose output
+#define EWF_TEST_READ_WRITE_DELTA_VERBOSE
+ */
+
 /* Tests reading/writing data of a specific size at a specific offset
  * Return 1 if successful, 0 if not or -1 on error
  */
@@ -66,15 +70,13 @@ int ewf_test_read_write_delta(
 
 		goto on_error;
 	}
-/*
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_DELTA_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
 	libewf_notify_set_stream(
 	 stderr,
 	 NULL );
 #endif
-*/
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -301,7 +303,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_offset   = NULL;
 	libcstring_system_character_t *option_size     = NULL;
 	libcstring_system_character_t *target_filename = NULL;
-	libcerror_error_t *error                        = NULL;
+	libcerror_error_t *error                       = NULL;
 	libcstring_system_integer_t option             = 0;
 	off64_t write_offset                           = 0;
 	size64_t write_size                            = 0;

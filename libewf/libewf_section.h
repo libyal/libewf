@@ -1,7 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -414,7 +414,6 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
          uint8_t *checksum_buffer,
-         uint32_t chunk_checksum,
          int8_t chunk_io_flags,
          libcerror_error_t **error );
 

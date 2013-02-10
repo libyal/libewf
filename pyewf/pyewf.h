@@ -2,7 +2,7 @@
  * Python bindings for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2012, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,29 +37,17 @@ extern "C" {
 PyObject *pyewf_get_version(
            PyObject *self );
 
-PyObject *pyewf_get_access_flags_read(
-           PyObject *self );
-
-PyObject *pyewf_get_access_flags_read_write(
-           PyObject *self );
-
-PyObject *pyewf_get_access_flags_write(
-           PyObject *self );
-
-PyObject *pyewf_get_access_flags_write_resume(
-           PyObject *self );
-
 PyObject *pyewf_check_file_signature(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_glob(
+PyObject *pyewf_check_file_signature_file_object(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_set_notify_values(
+PyObject *pyewf_glob(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );
