@@ -1,7 +1,17 @@
 Mac OS X
 * missing libtoolize
+* building multiple architure binaries
+* building ewfmount
 
 
 Missing libtoolize
 Use glibtoolize instead
+
+
+Building multiple architecture binaries
+See: http://code.google.com/p/libewf/wiki/Building
+
+
+Building ewfmount
+See: http://code.google.com/p/libewf/wiki/Mounting
 

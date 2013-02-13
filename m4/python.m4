@@ -1,64 +1,82 @@
 dnl Functions for Python bindings
 dnl
-dnl Version: 20121203
+dnl Version: 20130212
+
+dnl Function to check if pyhton-config binary is available
+dnl "python$PYTHON_VERSION-config"
+AC_DEFUN([AX_PROG_PYTHON_CONFIG],
+ [AC_REQUIRE([AM_PATH_PYTHON])
+ AS_IF(
+  [test x"$PYTHON" != x],
+  [AC_CHECK_PROGS(
+   [PYTHON_CONFIG],
+   [python$PYTHON_VERSION-config])
+  ])
+ AS_IF(
+  [test x"$PYTHON_CONFIG" = x],
+  [AC_MSG_ERROR(
+   [Cannot find python-config]) ])
+ AC_SUBST(
+  [PYTHON_CONFIG],
+  [$PYTHON_CONFIG])
+ ])
 
 dnl Function to detect if Python build environment is available
 AC_DEFUN([AX_PYTHON_CHECK],
- [AC_REQUIRE([AM_PATH_PYTHON])
-
- dnl Check for Python include path
- AC_MSG_CHECKING(
-  [for Python include path])
-
- PYTHON_INCLUDE_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_inc() "`;
-
- AC_MSG_RESULT(
-  [$PYTHON_INCLUDE_DIR])
-
- AC_SUBST(
-  [PYTHON_CPPFLAGS],
-  [-I$PYTHON_INCLUDE_DIR])
+ [AX_PROG_PYTHON_CONFIG
 
  AS_IF(
-  [test ! -r $PYTHON_INCLUDE_DIR/Python.h],
-  [AC_MSG_ERROR(
-  [Missing Python include file]) ])
+  [test x"$PYTHON_CONFIG" != x],
+  [dnl Check for Python includes
+  PYTHON_INCLUDES=`$PYTHON_CONFIG --includes`
 
- dnl Check for Python library path
- AC_MSG_CHECKING(
-  [for Python library path])
+  AC_MSG_CHECKING(
+   [for Python includes])
+  AC_MSG_RESULT(
+   [$PYTHON_INCLUDES])
 
- PYTHON_LIBRARY_DIR=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() "`;
+  dnl Check for Python libraries
+  PYTHON_LIBS=`$PYTHON_CONFIG --libs`
 
- AC_MSG_RESULT(
-  [$PYTHON_LIBRARY_DIR])
+  AC_MSG_CHECKING(
+   [for Python libraries])
+  AC_MSG_RESULT(
+   [$PYTHON_LIBS])
 
- AC_SUBST(
-  [PYTHON_LDFLAGS],
-  ["-L$PYTHON_LIBRARY_DIR -lpython$PYTHON_VERSION"])
+  dnl Check for the existence of Python.h
+  BACKUP_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
 
- PYTHON_SITE_PACKAGES_DIR=`echo $PYTHON_LIBRARY_DIR | sed "s/config/site-packages/"`;
+  AC_CHECK_HEADERS(
+   [Python.h],
+   [ac_cv_header_python_h=yes],
+   [ac_cv_header_python_h=no])
 
- AC_SUBST(
-  [PYTHON_SITE_PACKAGES_DIR],
-  [$PYTHON_SITE_PACKAGES_DIR])
+  CPPFLAGS="$BACKUP_CPPFLAGS"
+ ])
 
- dnl Determine the Python libraries which must be linked in when embedding
- AC_MSG_CHECKING(
-  [for Python extra libraries])
+ AS_IF(
+  [test x"$ac_cv_header_python_h" != xyes],
+  [ac_cv_enable_python=no],
+  [ac_cv_enable_python=$PYTHON_VERSION
+  AC_SUBST(
+   [PYTHON_CPPFLAGS],
+   [$PYTHON_INCLUDES])
 
- PYTHON_EXTRA_LIBS=`$PYTHON -c "import distutils.sysconfig;conf = distutils.sysconfig.get_config_var;print conf('LOCALMODLIBS')+' '+conf('LIBS')"`;
+  AC_SUBST(
+   [PYTHON_LDFLAGS],
+   [$PYTHON_LIBS])
 
- AC_MSG_RESULT(
-  [$PYTHON_EXTRA_LIBS])
-
- AC_SUBST(
-  [PYTHON_EXTRA_LIBS])
+  AC_SUBST(
+   [PYTHON_SITE_PACKAGES_DIR],
+   [$am_cv_python_pythondir])
+  ])
  ])
 
 dnl Function to detect if to enable Python
 AC_DEFUN([AX_PYTHON_CHECK_ENABLE],
- [AX_COMMON_ARG_ENABLE(
+ [dnl Deprecated way of enabling Python bindings
+ AX_COMMON_ARG_ENABLE(
   [python],
   [python],
   [build Python bindings],
@@ -67,11 +85,10 @@ AC_DEFUN([AX_PYTHON_CHECK_ENABLE],
  AS_IF(
   [test "x$ac_cv_enable_python" != xno],
   [AM_PATH_PYTHON([2.5])
-  AX_PYTHON_CHECK
-  ac_cv_enable_python=yes])
+  AX_PYTHON_CHECK])
 
  AS_IF(
-  [test "x$ac_cv_enable_python" = xyes],
+  [test "x$ac_cv_enable_python" != xno],
   [AC_DEFINE(
    [HAVE_PYTHON],
    [1],
@@ -80,6 +97,6 @@ AC_DEFUN([AX_PYTHON_CHECK_ENABLE],
 
  AM_CONDITIONAL(
   HAVE_PYTHON,
-  [test "x$ac_cv_enable_python" = xyes])
+  [test "x$ac_cv_enable_python" != xno])
 ])
 
