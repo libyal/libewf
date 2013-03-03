@@ -1624,7 +1624,7 @@ SectorRange^ Handle::GetAcquiryError( int index )
 	SectorRange ^sector_range      = nullptr;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::GetAcquiryError";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -1640,7 +1640,7 @@ SectorRange^ Handle::GetAcquiryError( int index )
 	result = libewf_handle_get_acquiry_error(
 	          handle,
 	          (uint32_t) index,
-	          &ewf_start_sector,
+	          &ewf_first_sector,
 	          &ewf_number_of_sectors,
 	          &error );
 
@@ -1668,7 +1668,7 @@ SectorRange^ Handle::GetAcquiryError( int index )
 			     error_string );
 	}
 	sector_range = gcnew SectorRange( Marshal::ReadInt64(
-	                                   (IntPtr) &ewf_start_sector ),
+	                                   (IntPtr) &ewf_first_sector ),
 	                                  Marshal::ReadInt64(
 	                                   (IntPtr) &ewf_number_of_sectors ) );
 
@@ -1683,7 +1683,7 @@ void Handle::AppendAcquiryError( SectorRange^ sector_range )
 	libewf_handle_t *handle        = NULL;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::AppendAcquiryError";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -1697,8 +1697,8 @@ void Handle::AppendAcquiryError( SectorRange^ sector_range )
 	 this->ewf_handle );
 
 	Marshal::WriteInt64(
-	 (IntPtr) &ewf_start_sector,
-	 sector_range->start_sector );
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
 
 	Marshal::WriteInt64(
 	 (IntPtr) &ewf_number_of_sectors,
@@ -1706,7 +1706,7 @@ void Handle::AppendAcquiryError( SectorRange^ sector_range )
 
 	result = libewf_handle_append_checksum_error(
 	          handle,
-	          ewf_start_sector,
+	          ewf_first_sector,
 	          ewf_number_of_sectors,
 	          &error );
 
@@ -1795,7 +1795,7 @@ SectorRange^ Handle::GetChecksumError( int index )
 	SectorRange ^sector_range      = nullptr;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::GetChecksumError";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -1811,7 +1811,7 @@ SectorRange^ Handle::GetChecksumError( int index )
 	result = libewf_handle_get_checksum_error(
 	          handle,
 	          (uint32_t) index,
-	          &ewf_start_sector,
+	          &ewf_first_sector,
 	          &ewf_number_of_sectors,
 	          &error );
 
@@ -1839,7 +1839,7 @@ SectorRange^ Handle::GetChecksumError( int index )
 			     error_string );
 	}
 	sector_range = gcnew SectorRange( Marshal::ReadInt64(
-	                                   (IntPtr) &ewf_start_sector ),
+	                                   (IntPtr) &ewf_first_sector ),
 	                                  Marshal::ReadInt64(
 	                                   (IntPtr) &ewf_number_of_sectors ) );
 
@@ -1854,7 +1854,7 @@ void Handle::AppendChecksumError( SectorRange^ sector_range )
 	libewf_handle_t *handle        = NULL;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::AppendChecksumError";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -1868,8 +1868,8 @@ void Handle::AppendChecksumError( SectorRange^ sector_range )
 	 this->ewf_handle );
 
 	Marshal::WriteInt64(
-	 (IntPtr) &ewf_start_sector,
-	 sector_range->start_sector );
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
 
 	Marshal::WriteInt64(
 	 (IntPtr) &ewf_number_of_sectors,
@@ -1877,7 +1877,7 @@ void Handle::AppendChecksumError( SectorRange^ sector_range )
 
 	result = libewf_handle_append_checksum_error(
 	          handle,
-	          ewf_start_sector,
+	          ewf_first_sector,
 	          ewf_number_of_sectors,
 	          &error );
 
@@ -1966,7 +1966,7 @@ SectorRange^ Handle::GetSession( int index )
 	SectorRange ^sector_range      = nullptr;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::GetSession";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -1982,7 +1982,7 @@ SectorRange^ Handle::GetSession( int index )
 	result = libewf_handle_get_session(
 	          handle,
 	          (uint32_t) index,
-	          &ewf_start_sector,
+	          &ewf_first_sector,
 	          &ewf_number_of_sectors,
 	          &error );
 
@@ -2010,7 +2010,7 @@ SectorRange^ Handle::GetSession( int index )
 			     error_string );
 	}
 	sector_range = gcnew SectorRange( Marshal::ReadInt64(
-	                                   (IntPtr) &ewf_start_sector ),
+	                                   (IntPtr) &ewf_first_sector ),
 	                                  Marshal::ReadInt64(
 	                                   (IntPtr) &ewf_number_of_sectors ) );
 
@@ -2025,7 +2025,7 @@ void Handle::AppendSession( SectorRange^ sector_range )
 	libewf_handle_t *handle        = NULL;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::AppendSession";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -2039,8 +2039,8 @@ void Handle::AppendSession( SectorRange^ sector_range )
 	 this->ewf_handle );
 
 	Marshal::WriteInt64(
-	 (IntPtr) &ewf_start_sector,
-	 sector_range->start_sector );
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
 
 	Marshal::WriteInt64(
 	 (IntPtr) &ewf_number_of_sectors,
@@ -2048,7 +2048,7 @@ void Handle::AppendSession( SectorRange^ sector_range )
 
 	result = libewf_handle_append_session(
 	          handle,
-	          ewf_start_sector,
+	          ewf_first_sector,
 	          ewf_number_of_sectors,
 	          &error );
 
@@ -2137,7 +2137,7 @@ SectorRange^ Handle::GetTrack( int index )
 	SectorRange ^sector_range      = nullptr;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::GetTrack";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -2153,7 +2153,7 @@ SectorRange^ Handle::GetTrack( int index )
 	result = libewf_handle_get_track(
 	          handle,
 	          (uint32_t) index,
-	          &ewf_start_sector,
+	          &ewf_first_sector,
 	          &ewf_number_of_sectors,
 	          &error );
 
@@ -2181,7 +2181,7 @@ SectorRange^ Handle::GetTrack( int index )
 			     error_string );
 	}
 	sector_range = gcnew SectorRange( Marshal::ReadInt64(
-	                                   (IntPtr) &ewf_start_sector ),
+	                                   (IntPtr) &ewf_first_sector ),
 	                                  Marshal::ReadInt64(
 	                                   (IntPtr) &ewf_number_of_sectors ) );
 
@@ -2196,7 +2196,7 @@ void Handle::AppendTrack( SectorRange^ sector_range )
 	libewf_handle_t *handle        = NULL;
 	System::String^ error_string   = nullptr;
 	System::String^ function       = "Handle::AppendTrack";
-	uint64_t ewf_start_sector      = 0;
+	uint64_t ewf_first_sector      = 0;
 	uint64_t ewf_number_of_sectors = 0;
 	int result                     = 0;
 
@@ -2210,8 +2210,8 @@ void Handle::AppendTrack( SectorRange^ sector_range )
 	 this->ewf_handle );
 
 	Marshal::WriteInt64(
-	 (IntPtr) &ewf_start_sector,
-	 sector_range->start_sector );
+	 (IntPtr) &ewf_first_sector,
+	 sector_range->first_sector );
 
 	Marshal::WriteInt64(
 	 (IntPtr) &ewf_number_of_sectors,
@@ -2219,7 +2219,7 @@ void Handle::AppendTrack( SectorRange^ sector_range )
 
 	result = libewf_handle_append_track(
 	          handle,
-	          ewf_start_sector,
+	          ewf_first_sector,
 	          ewf_number_of_sectors,
 	          &error );
 

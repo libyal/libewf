@@ -12,8 +12,8 @@ AM_CPPFLAGS = \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
-	@LIBFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
+	@LIBMFDATA_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
 	@BZIP2_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
@@ -40,7 +40,6 @@ libewf_la_SOURCES = \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
-	libewf_chunk_group.c libewf_chunk_group.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
@@ -69,17 +68,19 @@ libewf_la_SOURCES = \
 	libewf_libcstring.h \
 	libewf_libhmac.h \
 	libewf_libfcache.h \
-	libewf_libfdata.h \
+	libewf_libmfdata.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
+	libewf_list_type.c libewf_list_type.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
-	libewf_sector_range.c libewf_sector_range.h \
+	libewf_sector_list.c libewf_sector_list.h \
 	libewf_segment_file.c libewf_segment_file.h \
+	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
@@ -101,8 +102,8 @@ libewf_la_LIBADD = \
 	@LIBCPATH_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBFCACHE_LIBADD@ \
-	@LIBFDATA_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
+	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \
 	@BZIP2_LIBADD@ \
 	@LIBHMAC_LIBADD@ \
@@ -126,6 +127,6 @@ distclean: clean
 	/bin/rm -f Makefile
 
 splint:
-	@echo "Running splint on libewf ..."
-	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(libewf_la_SOURCES)
+	@echo "Running splint on libewf ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(libewf_la_SOURCES) 
 

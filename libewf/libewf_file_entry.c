@@ -9,12 +9,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,14 +35,14 @@
 #include "libewf_single_file_tree.h"
 #include "libewf_types.h"
 
-/* Creates a file entry
- * Make sure the value file_entry is referencing, is set to NULL
+/* Initializes the file entry and its values
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
      libcdata_tree_node_t *file_entry_tree_node,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -67,6 +67,18 @@ int libewf_file_entry_initialize(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid file entry value already set.",
 		 function );
+
+		return( -1 );
+	}
+	if( ( flags & ~( LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported flags: 0x%02" PRIx8 ".",
+		 function,
+		 flags );
 
 		return( -1 );
 	}
@@ -98,9 +110,32 @@ int libewf_file_entry_initialize(
 
 		goto on_error;
 	}
-	internal_file_entry->internal_handle      = internal_handle;
-	internal_file_entry->file_entry_tree_node = file_entry_tree_node;
+	internal_file_entry->internal_handle = internal_handle;
+	internal_file_entry->flags           = flags;
 
+	if( ( flags & LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) == 0 )
+	{
+		internal_file_entry->file_entry_tree_node = file_entry_tree_node;
+	}
+	else
+	{
+		if( libcdata_tree_node_clone(
+		     &( internal_file_entry->file_entry_tree_node ),
+		     file_entry_tree_node,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
+		     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_single_file_entry_clone,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy file entry tree node.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	*file_entry = (libewf_file_entry_t *) internal_file_entry;
 
 	return( 1 );
@@ -123,6 +158,7 @@ int libewf_file_entry_free(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_free";
+	int result                                        = 1;
 
 	if( file_entry == NULL )
 	{
@@ -140,12 +176,34 @@ int libewf_file_entry_free(
 		internal_file_entry = (libewf_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
-		/* The internal_handle and file_entry_tree_node references are freed elsewhere
+		/* The internal_handle reference is freed elsewhere
 		 */
+		/* If not managed the file_entry_tree_node reference is freed elsewhere
+		 */
+		if( ( internal_file_entry->flags & LIBEWF_ITEM_FLAG_MANAGED_FILE_ENTRY_TREE_NODE ) != 0 )
+		{
+			if( internal_file_entry->file_entry_tree_node != NULL )
+			{
+				if( libcdata_tree_node_free(
+				     &( internal_file_entry->file_entry_tree_node ),
+				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_single_file_entry_free,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free file entry tree node.",
+					 function );
+
+					return( -1 );
+				}
+			}
+		}
 		memory_free(
 		 internal_file_entry );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the type
@@ -1777,6 +1835,7 @@ int libewf_file_entry_get_sub_file_entry(
 	     sub_file_entry,
 	     internal_file_entry->internal_handle,
 	     sub_node,
+	     LIBEWF_ITEM_FLAGS_DEFAULT,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1878,6 +1937,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 		     sub_file_entry,
 		     internal_file_entry->internal_handle,
 		     sub_node,
+		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2073,6 +2133,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 		     sub_file_entry,
 		     internal_file_entry->internal_handle,
 		     sub_node,
+		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2175,6 +2236,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 		     sub_file_entry,
 		     internal_file_entry->internal_handle,
 		     sub_node,
+		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2370,6 +2432,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 		     sub_file_entry,
 		     internal_file_entry->internal_handle,
 		     sub_node,
+		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

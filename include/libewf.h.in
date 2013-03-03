@@ -1,5 +1,5 @@
 /*
- * Library to access the Expert Witness Compression Format (EWF)
+ * Library to support the Expert Witness Compression Format (EWF)
  *
  * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -120,9 +120,7 @@ int libewf_check_file_signature_file_io_handle(
 #endif
 
 /* Globs the segment files according to the EWF naming schema
- * Make sure the value filenames is referencing, is set to NULL
- *
- * If the format is known the filename should contain the base of the filename
+ * if the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -135,7 +133,7 @@ int libewf_glob(
      int *number_of_filenames,
      libewf_error_t **error );
 
-/* Frees globbed filenames
+/* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -146,9 +144,7 @@ int libewf_glob_free(
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 /* Globs the segment files according to the EWF naming schema
- * Make sure the value filenames is referencing, is set to NULL
- *
- * If the format is known the filename should contain the base of the filename
+ * if the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -161,7 +157,7 @@ int libewf_glob_wide(
      int *number_of_filenames,
      libewf_error_t **error );
 
-/* Frees globbed wide filenames
+/* Frees the globbed wide filenames
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -249,7 +245,7 @@ int libewf_notify_stream_close(
  * Error functions
  * ------------------------------------------------------------------------- */
 
-/* Frees an error
+/* Frees the error including elements
  */
 LIBEWF_EXTERN \
 void libewf_error_free(
@@ -295,8 +291,8 @@ int libewf_error_backtrace_sprint(
  * File/Handle functions
  * ------------------------------------------------------------------------- */
 
-/* Creates a handle
- * Make sure the value handle is referencing, is set to NULL
+/* Initialize the handle
+ * The handle must point to a NULL pointer to be allocated
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -304,7 +300,7 @@ int libewf_handle_initialize(
      libewf_handle_t **handle,
      libewf_error_t **error );
 
-/* Frees a handle
+/* Frees the handle including elements
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -765,7 +761,7 @@ int libewf_handle_get_filename_wide(
 #endif
 
 #if defined( LIBEWF_HAVE_BFIO )
-/* Retrieves the file IO handle of the (delta) segment file of the current chunk
+/* Retrieves the file io handle of the (delta) segment file of the current chunk
  * Returns 1 if successful, 0 if no such file IO handle or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1167,7 +1163,7 @@ LIBEWF_EXTERN \
 int libewf_handle_get_acquiry_error(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *start_sector,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libewf_error_t **error );
 
@@ -1177,7 +1173,7 @@ int libewf_handle_get_acquiry_error(
 LIBEWF_EXTERN \
 int libewf_handle_append_acquiry_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1196,8 +1192,8 @@ int libewf_handle_get_number_of_checksum_errors(
 LIBEWF_EXTERN \
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t error_index,
-     uint64_t *start_sector,
+     uint32_t index,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libewf_error_t **error );
 
@@ -1207,7 +1203,7 @@ int libewf_handle_get_checksum_error(
 LIBEWF_EXTERN \
 int libewf_handle_append_checksum_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1227,7 +1223,7 @@ LIBEWF_EXTERN \
 int libewf_handle_get_session(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *start_sector,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libewf_error_t **error );
 
@@ -1237,7 +1233,7 @@ int libewf_handle_get_session(
 LIBEWF_EXTERN \
 int libewf_handle_append_session(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1257,7 +1253,7 @@ LIBEWF_EXTERN \
 int libewf_handle_get_track(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *start_sector,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libewf_error_t **error );
 
@@ -1267,7 +1263,7 @@ int libewf_handle_get_track(
 LIBEWF_EXTERN \
 int libewf_handle_append_track(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1781,7 +1777,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \
 int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1819,7 +1815,7 @@ LIBEWF_EXTERN \
 int libewf_handle_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *start_sector,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libewf_error_t **error );
 
@@ -1832,7 +1828,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \
 int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -1857,7 +1853,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \
 int libewf_handle_add_session(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libewf_error_t **error );
 
@@ -3215,7 +3211,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_acquiry_error(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   off64_t *start_sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
 
 /* Add an acquiry error
@@ -3226,7 +3222,7 @@ LIBEWF_EXTERN int libewf_get_acquiry_error(
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_acquiry_error(
                    libewf_handle_t *handle,
-                   off64_t start_sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 /* Retrieves the amount of checksum errors
@@ -3248,7 +3244,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_crc_error(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   off64_t *start_sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
 
 /* Add a checksum error
@@ -3259,7 +3255,7 @@ LIBEWF_EXTERN int libewf_get_crc_error(
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_crc_error(
                    libewf_handle_t *handle,
-                   off64_t start_sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 /* Retrieves the amount of sessions
@@ -3281,7 +3277,7 @@ LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_get_session(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   off64_t *start_sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
 
 /* Add a session
@@ -3292,7 +3288,7 @@ LIBEWF_EXTERN int libewf_get_session(
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN int libewf_add_session(
                    libewf_handle_t *handle,
-                   off64_t start_sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 /* Retrieves the header codepage

@@ -1,5 +1,5 @@
 /*
- * Sector range functions
+ * Segment file handle functions
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SECTOR_RANGE_H )
-#define _LIBEWF_SECTOR_RANGE_H
+#if !defined( _LIBEWF_SEGMENT_FILE_HANDLE_H )
+#define _LIBEWF_SEGMENT_FILE_HANDLE_H
 
 #include <common.h>
 #include <types.h>
@@ -31,46 +31,27 @@
 extern "C" {
 #endif
 
-typedef struct libewf_sector_range libewf_sector_range_t;
+typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
 
-struct libewf_sector_range
+struct libewf_segment_file_handle
 {
-	/* The start sector
+	/* The segment file index
 	 */
-	uint64_t start_sector;
-
-	/* The end sector
-	 */
-	uint64_t end_sector;
-
-	/* The number of sectors
-	 */
-	uint64_t number_of_sectors;
+	int segment_file_index;
 };
 
-int libewf_sector_range_initialize(
-     libewf_sector_range_t **sector_range,
+int libewf_segment_file_handle_initialize(
+     libewf_segment_file_handle_t **segment_file_handle,
+     int file_io_pool_entry,
      libcerror_error_t **error );
 
-int libewf_sector_range_free(
-     libewf_sector_range_t **sector_range,
+int libewf_segment_file_handle_free(
+     libewf_segment_file_handle_t **segment_file_handle,
      libcerror_error_t **error );
 
-int libewf_sector_range_clone(
-     libewf_sector_range_t **destination_sector_range,
-     libewf_sector_range_t *source_sector_range,
-     libcerror_error_t **error );
-
-int libewf_sector_range_get(
-     libewf_sector_range_t *sector_range,
-     uint64_t *start_sector,
-     uint64_t *number_of_sectors,
-     libcerror_error_t **error );
-
-int libewf_sector_range_set(
-     libewf_sector_range_t *sector_range,
-     uint64_t start_sector,
-     uint64_t number_of_sectors,
+int libewf_segment_file_handle_clone(
+     libewf_segment_file_handle_t **destination_segment_file_handle,
+     libewf_segment_file_handle_t *source_segment_file_handle,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

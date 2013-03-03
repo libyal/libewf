@@ -43,8 +43,7 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
-/* Creates header values
- * Make sure the value header_values is referencing, is set to NULL
+/* Initializes the header values
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_initialize(

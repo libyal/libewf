@@ -25,8 +25,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_hash_sections.h"
 
-/* Creates hash sections
- * Make sure the value hash_sections is referencing, is set to NULL
+/* Initialize the hash sections
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_initialize(
@@ -98,7 +97,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees hash sections
+/* Frees the hash sections including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_free(

@@ -28,8 +28,7 @@
 
 #include "ewf_definitions.h"
 
-/* Creates media values
- * Make sure the value media_values is referencing, is set to NULL
+/* Initialize the media values
  * Returns 1 if successful or -1 on error
  */
 int libewf_media_values_initialize(
@@ -106,7 +105,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees media values
+/* Frees the media values including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_media_values_free(

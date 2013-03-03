@@ -224,7 +224,7 @@ int guid_to_string(
 
 		return( -1 );
 	}
-	if( string_size < 37 )
+	if( string_size < GUID_STRING_SIZE )
 	{
 		libcerror_error_set(
 		 error,

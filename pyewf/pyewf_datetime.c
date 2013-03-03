@@ -43,21 +43,6 @@ PyObject *pyewf_datetime_new_from_fat_date_time(
 	uint8_t month              = 0;
 	uint8_t seconds            = 0;
 
-	/* The day of month is stored in the next 5 bits
-	 */
-	day_of_month    = fat_date_time & 0x1f;
-	fat_date_time >>= 5;
-
-	/* The month is stored in the next 4 bits
-	 */
-	month           = fat_date_time & 0x0f;
-	fat_date_time >>= 4;
-
-	/* The year is stored in the next 7 bits starting at 1980
-	 */
-	year            = 1980 + ( fat_date_time & 0x7f );
-	fat_date_time >>= 7;
-
 	/* The number of seconds are stored in the lower 5 bits
 	 * in intervals of 2 seconds
 	 */
@@ -71,7 +56,22 @@ PyObject *pyewf_datetime_new_from_fat_date_time(
 
 	/* The number of hours are stored in the next 5 bits
 	 */
-	hours = fat_date_time & 0x1f;
+	hours           = fat_date_time & 0x1f;
+	fat_date_time >>= 5;
+
+	/* The day of month is stored in the next 5 bits
+	 */
+	day_of_month    = fat_date_time & 0x1f;
+	fat_date_time >>= 5;
+
+	/* The month is stored in the next 4 bits
+	 */
+	month           = fat_date_time & 0x0f;
+	fat_date_time >>= 4;
+
+	/* The year is stored in the next 7 bits starting at 1980
+	 */
+	year = 1980 + ( fat_date_time & 0x7f );
 
 	/* February (2)
 	 */

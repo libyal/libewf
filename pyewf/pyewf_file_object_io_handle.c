@@ -29,8 +29,7 @@
 #include "pyewf_libcstring.h"
 #include "pyewf_python.h"
 
-/* Creates a file object IO handle
- * Make sure the value file_object_io_handle is referencing, is set to NULL
+/* Initializes the file object IO handle
  * Returns 1 if successful or -1 on error
  */
 int pyewf_file_object_io_handle_initialize(
@@ -203,7 +202,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a file object IO handle
+/* Frees the file object IO handle and its attributes
  * Returns 1 if succesful or -1 on error
  */
 int pyewf_file_object_io_handle_free(

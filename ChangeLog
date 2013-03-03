@@ -1,62 +1,11 @@
 TODO
-* fix allocation of segment tables
-* fix last_chunk_data_offset calculation for table2
-  in combination with libewf_chunk_group_correct_v1
-* fix read of chunk groups in segment file on demand
-* ewftools: allow to set date and time
-* chunk data
-  - related calculation into chunk data
-  - change API to have chunk type
-* libmfdata/libfdata merge
-  - fix reading delta chunks
-
-  - reimplement chunk table using layered approach (+/-)
-
-  - sections list on write: cache section descriptors instead of free-ing them?
-
-  - add delta segment files cache ? caching happens based on element index
-    but will cause a cache miss - 2 separate caches more efficient ?
-
-  - split segment file and delta segment file to separate code files?
-    - yes, no need for chunk groups in delta segment files
-
-  - segment files cache on write set to 1 ?
-
-  - create a single chunk groups cache ? instead per segment file ?
-
-  - check if chunks groups list is filled in on demand scenario
-
-  - only use backup range (table2) during initial phase?
-    - nope also necessary during reread
-
-  - use mapped offset to determine first chunk index (+/-)
-    - what about base offset ?
-    - make mapped offsets absolute ?
-
-  - refactor chunk table to:
-    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
-      successive calls to fdata types
-    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
-      back to read IO handle ?
-
-  - handle: replace chunk_index calcuations by current_chunk_index tracking ?
-  - libewf_filename_create: change to accept ( segment_number - 1 )
-  - libewf_write_io_handle_initialize_resume: re-map mapped offset ranges ?
-
-  - write_io_handle->number_of_table_entries still needed ?
-
-  - add write support to the various fdata lists ?
-
-  - add delta chunks range list to libewf_chunk_table_chunk_exists_for_offset ?
-  - add delta chunks range list to libewf_chunk_table_set_chunk_data_by_offset ?
-    and refactor it to have a generic solution if range list is not set fall back
-
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support
 * ewftools: rename argv_filenames to source_filenames (see libvmdk)
 * add bzip2 compression support
 * complete work on ewfmount dokan support
+* update codegear files - libcdata
 
 * add support for set identifier change ?
 * check alignment of:
@@ -74,13 +23,8 @@ TODO
   - try to read the chunks by calculating the checksums and see where they align
 
 * corruption scenarios
-  - libewf_segment_file_read deal with corrupted segment file header ?
   - add strict chunk data flag handling
   - document how libewf deals with corruption scenarios
-  - valid table and table2 with different information
-    (for now use table if number of entries is not 0)
-  - tainted table and table2
-  - tainted table or table2 (use the one that is not tainted)
 
 * implement new chunk IO functions where chunk is an object
 
@@ -127,7 +71,6 @@ TODO
 * Ex01 write support
   - pattern fill chunk support (set chunk table entry, test)
   - enable secion data integrity hash support
-  - add support for write resume
 
 * Lx01 write support
   - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
@@ -144,10 +87,19 @@ TODO
 * pyewf
   - update (+/-)
   - file entry data ? instead of file entry
+  - set codepage support (requires libclocale)
 * ewfmount
   - check access rights on fuse mount point
   - add stat info on readdir (see regfmount)
   - provide means to have a similar naming approach as mount_ewf.py
+* ideas for libmfdata
+  - merge table offsets into groups on write (with backup range) in
+    libewf_segment_file_write_chunks_section_correction() ?
+  - add group value size
+  - pre-allocate cache and re-use cached buffers ?
+  - set chunk (data) size in chunk table (value size) ?
+  - read performance: flag if checksum has be checked
+  - add flags to by-pass cache ? direct read/write
 * check performance
 
 Error tolerance:
@@ -420,60 +372,6 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
-
-20130411
-* changes for libmfdata and libfdata merge
-
-20130410
-* changes for libmfdata and libfdata merge
-
-20130409
-* changes for libmfdata and libfdata merge
-
-20130408
-* changes for libmfdata and libfdata merge
-
-20130407
-* changes for libmfdata and libfdata merge
-
-20130406
-* changes for libmfdata and libfdata merge
-
-20130405
-* changes for libmfdata and libfdata merge
-
-20130404
-* fixes for local library Makefiles
-* changes for libmfdata and libfdata merge
-* textual changes
-* updated dependencies
-* remove libewf_segment_file_handle
-
-20130403
-* changes for libmfdata and libfdata merge
-  - replaced libmfdata_file_list_t (delta) segment files list by libfdata_list_t
-  - replaced libcdata_list_t section list by libfdata_list_t sections list
-* bug fixes for delta segment file handling
-
-20130402
-* changes to zlib.m4 for adler32 detection
-* moved README.mingw to wiki
-* changes for libmfdata and libfdata merge
-
-20130331
-* updated codegear files
-
-20130330
-* updated dependencies
-* updates for libsmdev
-* added error tolerance for Logicube image with missing checksum in data section
-* code clean up
-* worked on libcdata integration
-* update msvscpp files
-
-20130305
-* fixed missing file in libcmulti distribution
-* small build fixes
 
 20130303
 * updated python configure scrips

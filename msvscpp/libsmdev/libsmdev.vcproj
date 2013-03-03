@@ -39,8 +39,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBSMDEV"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBSMDEV"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -101,8 +101,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBSMDEV"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBSMDEV"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -151,11 +151,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_ata.c"
+				RelativePath="..\..\libsmdev\libsmdev_array_type.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_debug.c"
+				RelativePath="..\..\libsmdev\libsmdev_ata.c"
 				>
 			</File>
 			<File
@@ -163,7 +163,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_error_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_legacy.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_list_type.c"
 				>
 			</File>
 			<File
@@ -172,6 +184,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_offset_list.c"
 				>
 			</File>
 			<File
@@ -209,15 +225,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_array_type.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_ata.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_codepage.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_debug.h"
 				>
 			</File>
 			<File
@@ -229,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_error_string.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_extern.h"
 				>
 			</File>
@@ -237,15 +257,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_libcdata.h"
+				RelativePath="..\..\libsmdev\libsmdev_legacy.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_libcerror.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_libcfile.h"
 				>
 			</File>
 			<File
@@ -265,11 +281,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmdev\libsmdev_list_type.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmdev\libsmdev_metadata.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_offset_list.h"
 				>
 			</File>
 			<File

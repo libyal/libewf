@@ -567,7 +567,7 @@ int libewf_decompress_data(
 			  (char *) uncompressed_data,
 			  &bzip2_uncompressed_data_size,
 			  (char *) compressed_data,
-			  (unsigned int) compressed_data_size,
+			  (uLong) compressed_data_size,
 			  0,
 			  0 );
 

@@ -10,8 +10,8 @@ Package: libewf
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Library to access the Expert Witness Compression Format (EWF)
- libewf is a library to access the Expert Witness Compression Format (EWF).
+Description: Library to support the Expert Witness Compression Format (EWF)
+ libewf is a library to support the Expert Witness Compression Format (EWF).
  libewf allows you to read media information of EWF files in the SMART (EWF-S01)
  format and the EnCase (EWF-E01, EWF-L01, EWF2-Ex01 and EWF2-Lx01) formats.
  Supports files created by EnCase 1 to 7, linen 5 to 7 and FTK Imager.

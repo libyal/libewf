@@ -25,8 +25,8 @@
 #include "ewftools_libcerror.h"
 #include "storage_media_buffer.h"
 
-/* Creates a storage media buffer
- * Make sure the value buffer is referencing, is set to NULL
+/* Initialize a buffer
+ * Make sure the value buffer is pointing to is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_initialize(
@@ -186,7 +186,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a storage media buffer
+/* Frees a buffer
  * Returns 1 if successful or -1 on error
  */
 int storage_media_buffer_free(

@@ -1,4 +1,4 @@
-/*
+/* 
  * Imaging handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -50,8 +50,7 @@
 #define IMAGING_HANDLE_STRING_SIZE		1024
 #define IMAGING_HANDLE_NOTIFY_STREAM		stdout
 
-/* Creates an imaging handle
- * Make sure the value imaging_handle is referencing, is set to NULL
+/* Initializes the imaging handle
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_initialize(
@@ -222,7 +221,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees an imaging handle
+/* Frees the imaging handle and its elements
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_free(
@@ -5251,7 +5250,7 @@ int imaging_handle_append_read_error(
 	}
 	return( 1 );
 }
-
+ 
 /* Appends a session to the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -5309,7 +5308,7 @@ int imaging_handle_append_session(
 	}
 	return( 1 );
 }
-
+ 
 /* Appends a track to the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -5367,7 +5366,7 @@ int imaging_handle_append_track(
 	}
 	return( 1 );
 }
-
+ 
 /* Finalizes the imaging handle
  * Returns the number of input bytes written or -1 on error
  */

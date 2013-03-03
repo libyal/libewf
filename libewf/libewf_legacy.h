@@ -114,7 +114,7 @@ int libewf_handle_get_amount_of_acquiry_errors(
 LIBEWF_EXTERN \
 int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error );
 
@@ -134,14 +134,14 @@ LIBEWF_EXTERN \
 int libewf_handle_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *start_sector,
+     uint64_t *first_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error );
 
@@ -154,7 +154,7 @@ int libewf_handle_get_amount_of_sessions(
 LIBEWF_EXTERN \
 int libewf_handle_add_session(
      libewf_handle_t *handle,
-     uint64_t start_sector,
+     uint64_t first_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error );
 
@@ -607,13 +607,13 @@ LIBEWF_EXTERN \
 int libewf_get_acquiry_error(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *start_sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors );
 
 LIBEWF_EXTERN \
 int libewf_add_acquiry_error(
      libewf_handle_t *handle,
-     off64_t start_sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN \
@@ -625,13 +625,13 @@ LIBEWF_EXTERN \
 int libewf_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *start_sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors );
 
 LIBEWF_EXTERN \
 int libewf_add_crc_error(
      libewf_handle_t *handle,
-     off64_t start_sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN \
@@ -643,13 +643,13 @@ LIBEWF_EXTERN \
 int libewf_get_session(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *start_sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors );
 
 LIBEWF_EXTERN \
 int libewf_add_session(
      libewf_handle_t *handle,
-     off64_t start_sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN \

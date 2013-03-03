@@ -1,4 +1,4 @@
-/*
+/* 
  * Info handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -48,8 +48,7 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
-/* Creates an info handle
- * Make sure the value info_handle is referencing, is set to NULL
+/* Initializes the info handle
  * Returns 1 if successful or -1 on error
  */
 int info_handle_initialize(
@@ -139,7 +138,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees an info handle
+/* Frees the info handle and its elements
  * Returns 1 if successful or -1 on error
  */
 int info_handle_free(
@@ -2140,7 +2139,7 @@ int info_handle_media_information_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
-        libcstring_system_character_t guid_string[ 48 ];
+        libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ GUID_SIZE ];
 
 	libcstring_system_character_t segment_file_version[ 4 ] = { '0', '.', '0', 0 };
@@ -2584,7 +2583,7 @@ int info_handle_media_information_fprint(
 		     GUID_SIZE,
 		     _BYTE_STREAM_ENDIAN_LITTLE,
 		     guid_string,
-		     48,
+		     GUID_STRING_SIZE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

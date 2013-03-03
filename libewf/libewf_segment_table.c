@@ -23,30 +23,26 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libewf_definitions.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libclocale.h"
 #include "libewf_libcstring.h"
-#include "libewf_libfdata.h"
+#include "libewf_libmfdata.h"
 #include "libewf_libuna.h"
 #include "libewf_segment_file.h"
+#include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 
-/* Creates a segment table
- * Make sure the value segment_table is referencing, is set to NULL
+/* Initialize the segment table
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
-     libewf_io_handle_t *io_handle,
      size64_t maximum_segment_size,
-     uint8_t is_delta,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_initialize";
-	int result            = 0;
 
 	if( segment_table == NULL )
 	{
@@ -66,17 +62,6 @@ int libewf_segment_table_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid segment table value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -107,71 +92,18 @@ int libewf_segment_table_initialize(
 		 "%s: unable to clear segment table.",
 		 function );
 
-		memory_free(
-		 *segment_table );
-
-		*segment_table = NULL;
-
-		return( -1 );
-	}
-	if( is_delta == 0 )
-	{
-/* TODO add write support ? */
-		result = libfdata_list_initialize(
-			  &( ( *segment_table )->segment_files_list ),
-			  (intptr_t *) io_handle,
-			  NULL,
-			  NULL,
-			  (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
-			  NULL,
-			  LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
-			  error );
-	}
-	else
-	{
-/* TODO add write support ? */
-		result = libfdata_list_initialize(
-			  &( ( *segment_table )->segment_files_list ),
-			  (intptr_t *) io_handle,
-			  NULL,
-			  NULL,
-		          (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_delta_segment_file_read_element_data,
-			  NULL,
-			  LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
-			  error );
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment files list.",
-		 function );
-
 		goto on_error;
 	}
-	if( is_delta == 0 )
-	{
-		result = libfcache_cache_initialize(
-		          &( ( *segment_table )->segment_files_cache ),
-		          LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES,
-		          error );
-	}
-	else
-	{
-		result = libfcache_cache_initialize(
-		          &( ( *segment_table )->segment_files_cache ),
-		          LIBEWF_MAXIMUM_CACHE_ENTRIES_DELTA_SEGMENT_FILES,
-		          error );
-	}
-	if( result != 1 )
+	if( libcdata_array_initialize(
+	     &( ( *segment_table )->segment_files_array ),
+	     0,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment files cache.",
+		 "%s: unable to create segment files array.",
 		 function );
 
 		goto on_error;
@@ -183,12 +115,6 @@ int libewf_segment_table_initialize(
 on_error:
 	if( *segment_table != NULL )
 	{
-		if( ( *segment_table )->segment_files_list != NULL )
-		{
-			libfdata_list_free(
-			 &( ( *segment_table )->segment_files_list ),
-			 NULL );
-		}
 		memory_free(
 		 *segment_table );
 
@@ -197,7 +123,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a segment table
+/* Frees the segment table including elements
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_free(
@@ -225,28 +151,16 @@ int libewf_segment_table_free(
 			memory_free(
 			 ( *segment_table )->basename );
 		}
-		if( libfdata_list_free(
-		     &( ( *segment_table )->segment_files_list ),
+		if( libcdata_array_free(
+		     &( ( *segment_table )->segment_files_array ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment files list.",
-			 function );
-
-			result = -1;
-		}
-		if( libfcache_cache_free(
-		     &( ( *segment_table )->segment_files_cache ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment files cache.",
+			 "%s: unable to free the segment files array.",
 			 function );
 
 			result = -1;
@@ -323,12 +237,7 @@ int libewf_segment_table_clone(
 		 "%s: unable to clear source to destination segment table.",
 		 function );
 
-		memory_free(
-		 *destination_segment_table );
-
-		*destination_segment_table = NULL;
-
-		return( -1 );
+		goto on_error;
 	}
 	if( source_segment_table->basename != NULL )
 	{
@@ -362,30 +271,18 @@ int libewf_segment_table_clone(
 		}
 		( *destination_segment_table )->basename_size = source_segment_table->basename_size;
 	}
-	if( libfdata_list_clone(
-	     &( ( *destination_segment_table )->segment_files_list ),
-	     source_segment_table->segment_files_list,
+	if( libcdata_array_clone(
+	     &( ( *destination_segment_table )->segment_files_array ),
+	     source_segment_table->segment_files_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_segment_file_handle_clone,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination segment files list.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_clone(
-	     &( ( *destination_segment_table )->segment_files_cache ),
-	     source_segment_table->segment_files_cache,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination segment files cache.",
+		 "%s: unable to create destination segments files.",
 		 function );
 
 		goto on_error;
@@ -397,12 +294,6 @@ int libewf_segment_table_clone(
 on_error:
 	if( *destination_segment_table != NULL )
 	{
-		if( ( *destination_segment_table )->segment_files_list != NULL )
-		{
-			libfdata_list_free(
-			 &( ( *destination_segment_table )->segment_files_list ),
-			 NULL );
-		}
 		if( ( *destination_segment_table )->basename != NULL )
 		{
 			memory_free(
@@ -1395,499 +1286,6 @@ int libewf_segment_table_set_maximum_segment_size(
 	}
 	segment_table->maximum_segment_size = maximum_segment_size;
 
-	return( 1 );
-}
-
-/* Retrieves the number of segments
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_get_number_of_segments(
-     libewf_segment_table_t *segment_table,
-     uint32_t *number_of_segments,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_segment_table_get_number_of_segments";
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_segments == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of segments.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_segments = segment_table->number_of_segments;
-
-	return( 1 );
-}
-
-/* Retrieves a specific segment from the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_get_segment_by_index(
-     libewf_segment_table_t *segment_table,
-     uint32_t segment_number,
-     int *file_io_pool_entry,
-     size64_t *segment_file_size,
-     libcerror_error_t **error )
-{
-	static char *function  = "libewf_segment_table_get_segment_by_index";
-	off64_t element_offset = 0;
-	uint32_t element_flags = 0;
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-#if SIZEOF_INT <= 4
-	if( segment_number > (uint32_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment number value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( libfdata_list_get_element_by_index(
-	     segment_table->segment_files_list,
-	     (int) segment_number,
-	     file_io_pool_entry,
-	     &element_offset,
-	     segment_file_size,
-	     &element_flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element: %" PRIu32 " from segment files list.",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves a segment at a specific offset from the segment table
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int libewf_segment_table_get_segment_at_offset(
-     libewf_segment_table_t *segment_table,
-     off64_t offset,
-     int *file_io_pool_entry,
-     size64_t *segment_file_size,
-     libcerror_error_t **error )
-{
-	static char *function            = "libewf_segment_table_get_segment_at_offset";
-	off64_t element_offset           = 0;
-	off64_t segment_file_data_offset = 0;
-	uint32_t element_flags           = 0;
-	int result                       = 0;
-	int segment_number               = 0;
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfdata_list_get_element_at_offset(
-	          segment_table->segment_files_list,
-	          offset,
-	          &segment_number,
-	          &segment_file_data_offset,
-	          file_io_pool_entry,
-	          &element_offset,
-	          segment_file_size,
-	          &element_flags,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element at offset: %" PRIi64 " from segment files list.",
-		 function,
-		 offset );
-
-		return( -1 );
-	}
-	return( result );
-}
-
-/* Sets the segment storage media size for a specific segment in the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_set_segment_storage_media_size_by_index(
-     libewf_segment_table_t *segment_table,
-     uint32_t segment_number,
-     size64_t storage_media_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_segment_table_set_segment_storage_media_size_by_index";
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-#if SIZEOF_INT <= 4
-	if( segment_number > (uint32_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment number value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( libfdata_list_set_mapped_size_by_index(
-	     segment_table->segment_files_list,
-	     (int) segment_number,
-	     storage_media_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to set mapped size of element: %" PRIu32 " in segment files list.",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves a specific segment file from the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_get_segment_file_by_index(
-     libewf_segment_table_t *segment_table,
-     uint32_t segment_number,
-     libbfio_pool_t *file_io_pool,
-     libewf_segment_file_t **segment_file,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_segment_table_get_segment_file_by_index";
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-#if SIZEOF_INT <= 4
-	if( segment_number > (uint32_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment number value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( libfdata_list_get_element_value_by_index(
-	     segment_table->segment_files_list,
-	     (intptr_t *) file_io_pool,
-	     segment_table->segment_files_cache,
-	     (int) segment_number,
-	     (intptr_t **) segment_file,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element value: %" PRIu32 " from segment files list.",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves a segment file at a specific offset from the segment table
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int libewf_segment_table_get_segment_file_at_offset(
-     libewf_segment_table_t *segment_table,
-     off64_t offset,
-     libbfio_pool_t *file_io_pool,
-     uint32_t *segment_number,
-     off64_t *segment_file_data_offset,
-     libewf_segment_file_t **segment_file,
-     libcerror_error_t **error )
-{
-	static char *function        = "libewf_segment_table_get_segment_file_at_offset";
-	int result                   = 0;
-	int segment_files_list_index = 0;
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment number.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfdata_list_get_element_value_at_offset(
-	          segment_table->segment_files_list,
-	          (intptr_t *) file_io_pool,
-	          segment_table->segment_files_cache,
-	          offset,
-	          &segment_files_list_index,
-	          segment_file_data_offset,
-	          (intptr_t **) segment_file,
-	          0,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element at offset: %" PRIi64 " from segment files list.",
-		 function,
-		 offset );
-
-		return( -1 );
-	}
-	else if( result != 0 )
-	{
-#if SIZEOF_INT <= 4
-		if( segment_files_list_index < 0 )
-#else
-		if( ( segment_files_list_index < 0 )
-		 || ( segment_files_list_index > (int) UINT32_MAX ) )
-#endif
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid segment files list index value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		*segment_number = (uint32_t) segment_files_list_index;
-	}
-	return( result );
-}
-
-/* Sets a specific segment file in the segment table
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_set_segment_file_by_index(
-     libewf_segment_table_t *segment_table,
-     libbfio_pool_t *file_io_pool,
-     uint32_t segment_number,
-     libewf_segment_file_t *segment_file,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_segment_table_set_segment_file_by_index";
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-#if SIZEOF_INT <= 4
-	if( segment_number > (uint32_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment number value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( libfdata_list_set_element_value_by_index(
-	     segment_table->segment_files_list,
-	     (intptr_t *) file_io_pool,
-	     segment_table->segment_files_cache,
-	     (int) segment_number,
-	     (intptr_t *) segment_file,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set element value: %" PRIu32 " segment files list.",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Appends a segment to the segment table based on the segment file
- * Returns 1 if successful or -1 on error
- */
-int libewf_segment_table_append_segment_by_segment_file(
-     libewf_segment_table_t *segment_table,
-     libewf_segment_file_t *segment_file,
-     int file_io_pool_entry,
-     size64_t segment_file_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_segment_table_append_segment_by_segment_file";
-
-	if( segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.",
-		 function );
-
-		return( -1 );
-	}
-#if SIZEOF_INT <= 4
-	if( segment_file->segment_number > (uint32_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment file - segment number value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( segment_file->segment_number > segment_table->number_of_segments )
-	{
-		if( libfdata_list_resize(
-		     segment_table->segment_files_list,
-		     (int) segment_file->segment_number,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to resize segment files list.",
-			 function );
-
-			return( -1 );
-		}
-		segment_table->number_of_segments = segment_file->segment_number;
-	}
-	if( libfdata_list_set_element_by_index(
-	     segment_table->segment_files_list,
-	     (int) ( segment_file->segment_number - 1 ),
-	     file_io_pool_entry,
-	     0,
-	     segment_file_size,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set element: %" PRIu32 " in segment files list.",
-		 function,
-		 segment_file->segment_number );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 

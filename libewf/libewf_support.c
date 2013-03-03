@@ -499,9 +499,7 @@ int libewf_check_file_signature_file_io_handle(
 }
 
 /* Globs the segment files according to the EWF naming schema
- * Make sure the value filenames is referencing, is set to NULL
- *
- * If the format is known the filename should contain the base of the filename
+ * if format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -542,7 +540,7 @@ int libewf_glob(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid filename length value out of bounds.",
+		 "%s: invalid filename length.",
 		 function );
 
 		return( -1 );
@@ -582,17 +580,6 @@ int libewf_glob(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
-		 function );
-
-		return( -1 );
-	}
-	if( *filenames != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid filenames value already set.",
 		 function );
 
 		return( -1 );
@@ -887,7 +874,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees globbed filenames
+/* Frees the globbed filenames
  * Returns 1 if successful or -1 on error
  */
 int libewf_glob_free(
@@ -936,9 +923,7 @@ int libewf_glob_free(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Globs the segment files according to the EWF naming schema
- * Make sure the value filenames is referencing, is set to NULL
- *
- * If the format is known the filename should contain the base of the filename
+ * if format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -979,7 +964,7 @@ int libewf_glob_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid filename length value out of bounds.",
+		 "%s: invalid filename length.",
 		 function );
 
 		return( -1 );
@@ -1019,17 +1004,6 @@ int libewf_glob_wide(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.",
-		 function );
-
-		return( -1 );
-	}
-	if( *filenames != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid filenames value already set.",
 		 function );
 
 		return( -1 );
@@ -1324,7 +1298,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees globbed wide filenames
+/* Frees the globbed wide filenames
  * Returns 1 if successful or -1 on error
  */
 int libewf_glob_wide_free(

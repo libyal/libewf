@@ -1,4 +1,4 @@
-/*
+/* 
  * Mount handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -28,8 +28,7 @@
 #include "ewftools_libewf.h"
 #include "mount_handle.h"
 
-/* Creates a mount handle
- * Make sure the value mount_handle is referencing, is set to NULL
+/* Initializes the mount handle
  * Returns 1 if successful or -1 on error
  */
 int mount_handle_initialize(
@@ -116,7 +115,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a mount handle
+/* Frees the mount handle and its elements
  * Returns 1 if successful or -1 on error
  */
 int mount_handle_free(

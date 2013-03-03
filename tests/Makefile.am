@@ -87,7 +87,6 @@ ewf_test_read_LDADD = \
 ewf_test_read_write_SOURCES = \
 	ewf_test_definitions.h \
 	ewf_test_libcerror.h \
-	ewf_test_libcnotify.h \
 	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
@@ -96,7 +95,6 @@ ewf_test_read_write_SOURCES = \
 ewf_test_read_write_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCNOTIFY_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 

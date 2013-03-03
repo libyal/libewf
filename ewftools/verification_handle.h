@@ -1,4 +1,4 @@
-/*
+/* 
  * Verification handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>

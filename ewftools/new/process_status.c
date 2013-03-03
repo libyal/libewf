@@ -156,7 +156,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees process status information
+/* Frees the process status information
  * Returns 1 if successful or -1 on error
  */
 int process_status_free(

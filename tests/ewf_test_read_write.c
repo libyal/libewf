@@ -1,7 +1,7 @@
 /*
  * Expert Witness Compression Format (EWF) library read/write testing program
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,7 +30,6 @@
 
 #include "ewf_test_definitions.h"
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcnotify.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
@@ -122,16 +121,7 @@ int ewf_test_read_write_buffer(
 			      read_size,
 			      error );
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: read count: %" PRIzd ".\n",
-			 function,
-			 read_count );
-		}
-#endif
-		if( read_count == -1 )
+		if( read_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -182,16 +172,7 @@ int ewf_test_read_write_buffer(
 			       (size_t) read_count,
 			       error );
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: write count: %" PRIzd ".\n",
-			 function,
-			 write_count );
-		}
-#endif
-		if( write_count == -1 )
+		if( write_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -265,15 +246,6 @@ int ewf_test_read_write_chunk(
 			      &process_checksum,
 			      error );
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: read count: %" PRIzd ".\n",
-			 function,
-			 read_count );
-		}
-#endif
 		if( read_count < 0 )
 		{
 			libcerror_error_set(
@@ -358,15 +330,6 @@ int ewf_test_read_write_chunk(
 				 &process_checksum,
 				 error );
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: process count: %" PRIzd ".\n",
-			 function,
-			 process_count );
-		}
-#endif
 		if( process_count < 0 )
 		{
 			libcerror_error_set(
@@ -404,15 +367,6 @@ int ewf_test_read_write_chunk(
 				       process_checksum,
 				       error );
 		}
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: write count: %" PRIzd ".\n",
-			 function,
-			 write_count );
-		}
-#endif
 		if( write_count < 0 )
 		{
 			libcerror_error_set(
