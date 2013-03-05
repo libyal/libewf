@@ -373,6 +373,9 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20130305
+* fixed missing file in libcmulti distribution
+
 20130303
 * updated python configure scrips
 * updated macosx files
