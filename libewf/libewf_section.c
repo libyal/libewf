@@ -2407,7 +2407,7 @@ ssize_t libewf_section_data_read(
 		 ( (ewf_data_t *) section_data )->chs_cylinders,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: CHS number of cylinders\t\t\t\t: %" PRIu32 "\n",
+		 "%s: CHS number of cylinders\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -2460,7 +2460,7 @@ ssize_t libewf_section_data_read(
 		 ( (ewf_data_t *) section_data )->smart_logs_start_sector,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: SMART logs start sector\t\t\t\t: %" PRIu32 "\n",
+		 "%s: SMART logs start sector\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -2539,7 +2539,8 @@ ssize_t libewf_section_data_read(
 
 		goto on_error;
 	}
-	if( stored_checksum != calculated_checksum )
+	if( ( stored_checksum != 0 )
+	 && ( stored_checksum != calculated_checksum ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -5459,7 +5460,7 @@ ssize_t libewf_section_ltree_read(
 	uint32_t data_size           = 0;
 	uint32_t stored_checksum     = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 	size_t trailing_data_size    = 0;
 #endif
 
@@ -5746,7 +5747,7 @@ ssize_t libewf_section_ltree_read(
 
 			goto on_error;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			if( trailing_data_size > 0 )
@@ -8950,7 +8951,7 @@ ssize_t libewf_section_volume_e01_read(
 		 ( (ewf_volume_t *) section_data )->smart_logs_start_sector,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: SMART logs start sector\t\t: %" PRIu32 "\n",
+		 "%s: SMART logs start sector\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 

@@ -375,6 +375,7 @@ Closed:
 
 20130305
 * fixed missing file in libcmulti distribution
+* small build fixes
 
 20130303
 * updated python configure scrips

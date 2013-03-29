@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20120825
+dnl Version: 20130329
 
 dnl Function to detect if libcfile is available
 dnl ac_libcfile_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -66,6 +66,11 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      [ac_cv_libcfile=no])
     AC_CHECK_LIB(
      cfile,
+     libcfile_file_open_with_error_code,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
      libcfile_file_close,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
@@ -76,7 +81,17 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      [ac_cv_libcfile=no])
     AC_CHECK_LIB(
      cfile,
+     libcfile_file_read_buffer_with_error_code,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
      libcfile_file_write_buffer,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
+     libcfile_file_write_buffer_with_error_code,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
     AC_CHECK_LIB(
@@ -104,12 +119,32 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      libcfile_file_get_size,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
+     libcfile_file_is_device,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
+     libcfile_file_io_control_read,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
+    AC_CHECK_LIB(
+     cfile,
+     libcfile_file_io_control_read_with_error_code,
+     [ac_cv_libcfile_dummy=yes],
+     [ac_cv_libcfile=no])
  
     AS_IF(
      [test "x$ac_cv_enable_wide_character_type" != xno],
      [AC_CHECK_LIB(
       cfile,
       libcfile_file_open_wide,
+      [ac_cv_libcfile_dummy=yes],
+      [ac_cv_libcfile=no])
+     AC_CHECK_LIB(
+      cfile,
+      libcfile_file_open_wide_with_error_code,
       [ac_cv_libcfile_dummy=yes],
       [ac_cv_libcfile=no])
      ])
@@ -216,10 +251,10 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
  AC_CHECK_HEADERS([errno.h stdio.h sys/stat.h])
 
  dnl Headers included in libcfile/libcfile_file.h
- AC_CHECK_HEADERS([fcntl.h unistd.h])
+ AC_CHECK_HEADERS([cygwin/fs.h fcntl.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h unistd.h])
 
  dnl File input/output functions used in libcfile/libcfile_file.h
- AC_CHECK_FUNCS([close fstat ftruncate lseek open read write])
+ AC_CHECK_FUNCS([close fstat ftruncate ioctl lseek open read write])
 
  AS_IF(
   [test "x$ac_cv_func_close" != xyes],
@@ -239,6 +274,13 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
   [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
+   [1])
+  ])
+ 
+ AS_IF(
+  [test "x$ac_cv_func_ioctl" != xyes],
+  [AC_MSG_FAILURE(
+   [Missing function: ioctl],
    [1])
   ])
  

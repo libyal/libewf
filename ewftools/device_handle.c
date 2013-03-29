@@ -521,6 +521,17 @@ int device_handle_open_smdev_input(
 
 		return( -1 );
 	}
+	if( device_handle->smdev_input_handle != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid device handle - device input handle already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( filenames == NULL )
 	{
 		libcerror_error_set(
@@ -532,16 +543,16 @@ int device_handle_open_smdev_input(
 
 		return( -1 );
 	}
-	if( device_handle->smdev_input_handle != NULL )
+	if( number_of_filenames != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid device handle - device input handle already set.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: number of filenames value out of bounds.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libsmdev_handle_initialize(
 	     &( device_handle->smdev_input_handle ),
@@ -559,15 +570,13 @@ int device_handle_open_smdev_input(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libsmdev_handle_open_wide(
 	     device_handle->smdev_input_handle,
-	     (wchar_t * const *) filenames,
-	     number_of_filenames,
+	     filenames[ 0 ],
 	     LIBSMDEV_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libsmdev_handle_open(
 	     device_handle->smdev_input_handle,
-	     (char * const *) filenames,
-	     number_of_filenames,
+	     filenames[ 0 ],
 	     LIBSMDEV_OPEN_READ,
 	     error ) != 1 )
 #endif

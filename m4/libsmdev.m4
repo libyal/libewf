@@ -1,6 +1,6 @@
 dnl Functions for libsmdev
 dnl
-dnl Version: 20120630
+dnl Version: 20130327
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -283,7 +283,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
  dnl Headers included in libsmdev/libsmdev_metadata.c
  AS_IF(
   [test "x$ac_cv_enable_winapi" = xno],
-  [AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h])
+  [AC_CHECK_HEADERS([cygwin/fs.h linux/fs.h sys/disk.h sys/disklabel.h])
  ])
 
  dnl Headers included in libsmdev/libsmdev_ata.c
