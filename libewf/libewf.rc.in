@@ -21,7 +21,7 @@ BEGIN
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "FileDescription",		"Library to support the Expert Witness Compression Format (EWF)\0"
+      VALUE "FileDescription",		"Library to access the Expert Witness Compression Format (EWF)\0"
       VALUE "FileVersion",		"@VERSION@" "\0"
       VALUE "InternalName",		"libewf.dll\0"
       VALUE "LegalCopyright",		"(c) 2006-2013 Joachim Metz <joachim.metz@gmail.com>\0"

@@ -124,7 +124,7 @@ int libewf_single_files_free(
 		 "%s: invalid single files.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *single_files != NULL )
 	{
@@ -180,7 +180,7 @@ int libewf_single_files_parse(
 		 "%s: invalid single files.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( single_files->ltree_data == NULL )
 	{
@@ -299,7 +299,7 @@ int libewf_single_files_parse_file_entries(
 		 "%s: invalid single files.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( entries_string == NULL )
 	{
@@ -692,7 +692,7 @@ int libewf_single_files_parse_record_values(
 		 "%s: invalid media size.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( line_index == NULL )
 	{
@@ -703,7 +703,7 @@ int libewf_single_files_parse_record_values(
 		 "%s: invalid line index.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( libfvalue_split_utf8_string_get_segment_by_index(
 	     lines,
@@ -1026,7 +1026,7 @@ int libewf_single_files_parse_file_entry(
 		 "%s: invalid parent file entry node.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( line_index == NULL )
 	{
@@ -1037,7 +1037,7 @@ int libewf_single_files_parse_file_entry(
 		 "%s: invalid line index.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( format == NULL )
 	{
@@ -1853,7 +1853,7 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 		 "%s: invalid line index.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( libfvalue_split_utf8_string_get_segment_by_index(
 	     lines,
@@ -1933,7 +1933,7 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	}
 	if( value_string_size == 2 )
 	{
-		if( value_string[ 0 ] != (uint8_t) '0' ) 
+		if( value_string[ 0 ] != (uint8_t) '0' )
 		{
 			libcerror_error_set(
 			 error,
@@ -2057,7 +2057,7 @@ int libewf_single_files_parse_file_entry_offset_values(
 		 "%s: invalid single file entry.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( libfvalue_utf8_string_split(
 	     offset_values_string,

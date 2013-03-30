@@ -1,4 +1,4 @@
-/* 
+/*
  * Export handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -51,7 +51,7 @@ struct export_handle
 {
 	/* The user input buffer
 	 */
-	libcstring_system_character_t *input_buffer; 
+	libcstring_system_character_t *input_buffer;
 
 	/* The target path
 	 */

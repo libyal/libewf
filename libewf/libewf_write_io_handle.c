@@ -162,7 +162,7 @@ int libewf_write_io_handle_free(
 		 "%s: invalid write IO handle.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *write_io_handle != NULL )
 	{

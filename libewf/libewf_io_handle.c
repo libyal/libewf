@@ -126,7 +126,7 @@ int libewf_io_handle_free(
 		 "%s: invalid IO handle.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *io_handle != NULL )
 	{

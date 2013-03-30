@@ -1,4 +1,4 @@
-/* 
+/*
  * Imaging handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -5250,7 +5250,7 @@ int imaging_handle_append_read_error(
 	}
 	return( 1 );
 }
- 
+
 /* Appends a session to the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -5308,7 +5308,7 @@ int imaging_handle_append_session(
 	}
 	return( 1 );
 }
- 
+
 /* Appends a track to the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -5366,7 +5366,7 @@ int imaging_handle_append_track(
 	}
 	return( 1 );
 }
- 
+
 /* Finalizes the imaging handle
  * Returns the number of input bytes written or -1 on error
  */

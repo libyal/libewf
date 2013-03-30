@@ -1,4 +1,4 @@
-/* 
+/*
  * Info handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -2139,7 +2139,7 @@ int info_handle_media_information_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
-        libcstring_system_character_t guid_string[ GUID_STRING_SIZE ];
+        libcstring_system_character_t guid_string[ 48 ];
         uint8_t guid[ GUID_SIZE ];
 
 	libcstring_system_character_t segment_file_version[ 4 ] = { '0', '.', '0', 0 };
@@ -2583,7 +2583,7 @@ int info_handle_media_information_fprint(
 		     GUID_SIZE,
 		     _BYTE_STREAM_ENDIAN_LITTLE,
 		     guid_string,
-		     GUID_STRING_SIZE,
+		     48,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

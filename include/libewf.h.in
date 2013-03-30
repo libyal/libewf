@@ -1,5 +1,5 @@
 /*
- * Library to support the Expert Witness Compression Format (EWF)
+ * Library to access the Expert Witness Compression Format (EWF)
  *
  * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -761,7 +761,7 @@ int libewf_handle_get_filename_wide(
 #endif
 
 #if defined( LIBEWF_HAVE_BFIO )
-/* Retrieves the file io handle of the (delta) segment file of the current chunk
+/* Retrieves the file IO handle of the (delta) segment file of the current chunk
  * Returns 1 if successful, 0 if no such file IO handle or -1 on error
  */
 LIBEWF_EXTERN \

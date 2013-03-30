@@ -33,7 +33,6 @@ extern "C" {
 #endif
 
 #define GUID_SIZE		16
-#define GUID_STRING_SIZE	37
 
 enum GUID_TYPES
 {

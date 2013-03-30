@@ -373,6 +373,12 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20130330
+* updated dependencies
+* updates for libsmdev
+* added error tolerance for Logicube image with missing checksum in data section
+* code clean up
+
 20130305
 * fixed missing file in libcmulti distribution
 * small build fixes

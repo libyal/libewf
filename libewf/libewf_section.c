@@ -2523,35 +2523,37 @@ ssize_t libewf_section_data_read(
 		 "\n" );
 	}
 #endif
-	if( libewf_checksum_calculate_adler32(
-	     &calculated_checksum,
-	     section_data,
-	     section_data_size - 4,
-	     1,
-	     error ) != 1 )
+	if( stored_checksum != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to calculate checksum.",
-		 function );
+		if( libewf_checksum_calculate_adler32(
+		     &calculated_checksum,
+		     section_data,
+		     section_data_size - 4,
+		     1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to calculate checksum.",
+			 function );
 
-		goto on_error;
-	}
-	if( ( stored_checksum != 0 )
-	 && ( stored_checksum != calculated_checksum ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
-		 function,
-		 stored_checksum,
-		 calculated_checksum );
+			goto on_error;
+		}
+		if( stored_checksum != calculated_checksum )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
+			 function,
+			 stored_checksum,
+			 calculated_checksum );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	*set_identifier_change = 0;
 
@@ -7148,7 +7150,7 @@ ssize_t libewf_section_session_write(
 			      && ( current_sector < session_last_sector ) )
 			{
 				if( ( track_last_sector == 0 )
-				 || ( track_last_sector < session_first_sector ) ) 
+				 || ( track_last_sector < session_first_sector ) )
 				{
 					number_of_entries++;
 				}
@@ -7447,7 +7449,7 @@ ssize_t libewf_section_session_write(
 		      && ( current_sector < session_last_sector ) )
 		{
 			if( ( track_last_sector == 0 )
-			 || ( track_last_sector < session_first_sector ) ) 
+			 || ( track_last_sector < session_first_sector ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )

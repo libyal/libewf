@@ -245,15 +245,54 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
   ])
  ])
 
+dnl Function to detect if posix_fadvise is available
+AC_DEFUN([AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE],
+ [AC_CHECK_FUNCS([posix_fadvise])
+
+ AS_IF(
+  [test "x$ac_cv_func_posix_fadvise" = xyes],
+  [AC_MSG_CHECKING(
+    [whether posix_fadvise can be linked])
+
+   SAVE_CFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS -Wall -Werror"
+   AC_LANG_PUSH(C)
+
+   AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM(
+     [[#include <fcntl.h>]],
+     [[#if !defined( POSIX_FADV_SEQUENTIAL )
+#define POSIX_FADV_SEQUENTIAL 2
+#endif
+posix_fadvise( 0, 0, 0, POSIX_FADV_SEQUENTIAL )]] )],
+     [ac_cv_func_posix_fadvise=yes],
+     [ac_cv_func_posix_fadvise=no])
+
+   AC_LANG_POP(C)
+   CFLAGS="$SAVE_CFLAGS"
+
+   AS_IF(
+    [test "x$ac_cv_func_posix_fadvise" = xyes],
+    [AC_MSG_RESULT(
+     [yes])
+    AC_DEFINE(
+     [HAVE_POSIX_FADVISE],
+     [1],
+     [Define to 1 if you have the posix_fadvise function.]) ],
+    [AC_MSG_RESULT(
+     [no]) ])
+  ])
+ ])
+
 dnl Function to detect if libcfile dependencies are available
 AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
- [dnl Headers included in libcfile/libcfile_file.h, libcfile/libcfile_stream.h and libcfile/libcfile_support.h
+ [dnl Headers included in libcfile/libcfile_file.c, libcfile/libcfile_stream.c and libcfile/libcfile_support.c
  AC_CHECK_HEADERS([errno.h stdio.h sys/stat.h])
 
- dnl Headers included in libcfile/libcfile_file.h
+ dnl Headers included in libcfile/libcfile_file.c
  AC_CHECK_HEADERS([cygwin/fs.h fcntl.h linux/fs.h sys/disk.h sys/disklabel.h sys/ioctl.h unistd.h])
 
- dnl File input/output functions used in libcfile/libcfile_file.h
+ dnl File input/output functions used in libcfile/libcfile_file.c
  AC_CHECK_FUNCS([close fstat ftruncate ioctl lseek open read write])
 
  AS_IF(
@@ -263,6 +302,8 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [1])
   ])
  
+ AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE
+
  AS_IF(
   [test "x$ac_cv_func_fstat" != xyes],
   [AC_MSG_FAILURE(
@@ -312,7 +353,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [1])
   ])
 
- dnl File stream functions used in libcfile/libcfile_stream.h
+ dnl File stream functions used in libcfile/libcfile_stream.c
  AC_CHECK_FUNCS([fclose feof fileno fopen fread fseeko fseeko64 ftello ftello64 fwrite])
 
  AS_IF(
@@ -364,7 +405,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [1])
   ])
  
- dnl File input/output functions used in libcfile/libcfile_support.h
+ dnl File input/output functions used in libcfile/libcfile_support.c
  AC_CHECK_FUNCS([stat])
 
  AS_IF(

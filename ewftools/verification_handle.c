@@ -1,4 +1,4 @@
-/* 
+/*
  * Verification handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -3746,7 +3746,7 @@ int verification_handle_checksum_errors_fprint(
 	}
 	if( number_of_errors > 0 )
 	{
-		fprintf( 
+		fprintf(
 		stream,
 		 "Sector validation errors:\n" );
 		fprintf(
@@ -3839,7 +3839,7 @@ int verification_handle_checksum_errors_fprint(
 				else if( result != 0 )
 				{
 					filename = libcstring_system_string_allocate(
-					            filename_size ); 
+					            filename_size );
 
 					if( filename == NULL )
 					{

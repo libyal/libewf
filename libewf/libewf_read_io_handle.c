@@ -140,7 +140,7 @@ int libewf_read_io_handle_free(
 		 "%s: invalid read IO handle.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *read_io_handle != NULL )
 	{

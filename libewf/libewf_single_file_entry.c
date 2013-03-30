@@ -122,7 +122,7 @@ int libewf_single_file_entry_free(
 		 "%s: invalid single file entry.",
 		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	if( *single_file_entry != NULL )
 	{

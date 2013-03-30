@@ -354,7 +354,7 @@ enum LIBEWF_CHUNK_DATA_FLAGS
  */
 #define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBMFDATA_RANGE_FLAG_IS_COMPRESSED
 
-/* The chunk data range included the checksum 
+/* The chunk data range included the checksum
  */
 #define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBMFDATA_RANGE_FLAG_USER_DEFINED_1
 
