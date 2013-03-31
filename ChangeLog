@@ -1,5 +1,7 @@
 TODO
 * add libewf_sector_range_clone function
+* libmfdata/libfdata merge
+  - reimplement chunk table using layered approach
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support
@@ -88,19 +90,10 @@ TODO
 * pyewf
   - update (+/-)
   - file entry data ? instead of file entry
-  - set codepage support (requires libclocale)
 * ewfmount
   - check access rights on fuse mount point
   - add stat info on readdir (see regfmount)
   - provide means to have a similar naming approach as mount_ewf.py
-* ideas for libmfdata
-  - merge table offsets into groups on write (with backup range) in
-    libewf_segment_file_write_chunks_section_correction() ?
-  - add group value size
-  - pre-allocate cache and re-use cached buffers ?
-  - set chunk (data) size in chunk table (value size) ?
-  - read performance: flag if checksum has be checked
-  - add flags to by-pass cache ? direct read/write
 * check performance
 
 Error tolerance:
@@ -373,6 +366,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130331
+* updated codegear files
 
 20130330
 * updated dependencies

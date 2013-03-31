@@ -17,7 +17,7 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 			<BCC_SmartPCHCache>false</BCC_SmartPCHCache>
 			<BCC_PCHUsage>None</BCC_PCHUsage>
-			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\libcerror;..\..\..\libclocale;..\..\..\libcnotify;..\..\..\libcsplit;..\..\..\libuna;..\..\..\libcfile;..\..\..\libcpath;..\..\..\libbfio;..\..\..\libfcache;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libhmac;..\..\..\libcaes;..\..\..\..\zlib;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(BCC_IncludePath)</BCC_IncludePath>
+			<BCC_IncludePath>..\..\..\include;..\..\..\common;..\..\..\libcstring;..\..\..\libcerror;..\..\..\libcdata;..\..\..\libclocale;..\..\..\libcnotify;..\..\..\libcsplit;..\..\..\libuna;..\..\..\libcfile;..\..\..\libcpath;..\..\..\libbfio;..\..\..\libfcache;..\..\..\libfvalue;..\..\..\libmfdata;..\..\..\libhmac;..\..\..\libcaes;..\..\..\..\zlib;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(BCC_IncludePath)</BCC_IncludePath>
 			<_TCHARMapping>wchar_t</_TCHARMapping>
 			<OutputExt>lib</OutputExt>
 			<FinalOutputDir>..\Release</FinalOutputDir>
@@ -26,7 +26,7 @@
 			<AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
 			<ProjectType>CppStaticLibrary</ProjectType>
 			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
-			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBHMAC;HAVE_LOCAL_LIBCAES;HAVE_ZLIB_H;ZLIB_WINAPI;HAVE_LOCAL_LIBEWF;$(Defines)</Defines>
+			<Defines>NO_STRICT;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFVALUE;HAVE_LOCAL_LIBMFDATA;HAVE_LOCAL_LIBHMAC;HAVE_LOCAL_LIBCAES;HAVE_ZLIB_H;ZLIB_WINAPI;HAVE_LOCAL_LIBEWF;$(Defines)</Defines>
 			<IncludePath>..\..\..\libewf;$(CG_BOOST_ROOT)\boost\tr1\tr1;$(BDS)\include;$(BDS)\include\dinkumware;$(BDS)\include\vcl;$(CG_BOOST_ROOT);$(IncludePath)</IncludePath>
 			<ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk</ILINK_LibraryPath>
 			<BCC_wpar>false</BCC_wpar>
@@ -40,210 +40,304 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libewf\libewf_write_io_handle.h">
+				<BuildOrder>0</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libewf\libewf.c">
+				<BuildOrder>1</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_analytical_data.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_array_type.c">
+				<BuildOrder>2</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_case_data.c">
+				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_checksum.c">
+				<BuildOrder>4</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_chunk_data.c">
+				<BuildOrder>5</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_chunk_table.c">
+				<BuildOrder>6</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_compression.c">
+				<BuildOrder>7</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_date_time.c">
+				<BuildOrder>8</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_date_time_values.c">
+				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_debug.c">
+				<BuildOrder>10</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_device_information.c">
+				<BuildOrder>11</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_error.c">
+				<BuildOrder>12</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_file_entry.c">
+				<BuildOrder>13</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_filename.c">
+				<BuildOrder>14</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_handle.c">
+				<BuildOrder>15</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_hash_sections.c">
+				<BuildOrder>16</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_hash_values.c">
+				<BuildOrder>17</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_header_sections.c">
+				<BuildOrder>18</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_header_values.c">
+				<BuildOrder>19</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_io_handle.c">
+				<BuildOrder>20</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_legacy.c">
+				<BuildOrder>21</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_media_values.c">
+				<BuildOrder>22</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_metadata.c">
+				<BuildOrder>23</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_notify.c">
+				<BuildOrder>24</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_read_io_handle.c">
+				<BuildOrder>25</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_restart_data.c">
+				<BuildOrder>26</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_section.c">
+				<BuildOrder>27</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_sector_range.c">
+				<BuildOrder>28</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_file.c">
+				<BuildOrder>29</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_file_handle.c">
+				<BuildOrder>30</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_table.c">
+				<BuildOrder>31</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_single_file_entry.c">
+				<BuildOrder>32</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_single_file_tree.c">
+				<BuildOrder>33</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_single_files.c">
+				<BuildOrder>34</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_support.c">
-			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_tree_type.c">
+				<BuildOrder>35</BuildOrder>
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_write_io_handle.c">
+				<BuildOrder>36</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libewf\ewf_data.h">
+				<BuildOrder>37</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_definitions.h">
+				<BuildOrder>38</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_digest.h">
+				<BuildOrder>39</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_error.h">
+				<BuildOrder>40</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_file_header.h">
+				<BuildOrder>41</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_hash.h">
+				<BuildOrder>42</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_ltree.h">
+				<BuildOrder>43</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_section.h">
+				<BuildOrder>44</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_session.h">
+				<BuildOrder>45</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_table.h">
+				<BuildOrder>46</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewf_volume.h">
+				<BuildOrder>47</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\ewfx_delta_chunk.h">
+				<BuildOrder>48</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_analytical_data.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_array_type.h">
+				<BuildOrder>49</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_case_data.h">
+				<BuildOrder>50</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_checksum.h">
+				<BuildOrder>51</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_chunk_data.h">
+				<BuildOrder>52</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_chunk_table.h">
+				<BuildOrder>53</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_codepage.h">
+				<BuildOrder>54</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_compression.h">
+				<BuildOrder>55</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_date_time.h">
+				<BuildOrder>56</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_date_time_values.h">
+				<BuildOrder>57</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_debug.h">
+				<BuildOrder>58</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_definitions.h">
+				<BuildOrder>59</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_device_information.h">
+				<BuildOrder>60</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_error.h">
+				<BuildOrder>61</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_extern.h">
+				<BuildOrder>62</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_file_entry.h">
+				<BuildOrder>63</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_filename.h">
+				<BuildOrder>64</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_handle.h">
+				<BuildOrder>65</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_hash_sections.h">
+				<BuildOrder>66</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_hash_values.h">
+				<BuildOrder>67</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_header_sections.h">
+				<BuildOrder>68</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_header_values.h">
+				<BuildOrder>69</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_io_handle.h">
+				<BuildOrder>70</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_legacy.h">
+				<BuildOrder>71</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_libbfio.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_libcerror.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_libclocale.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_libcnotify.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_libcstring.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_libfvalue.h">
+				<BuildOrder>72</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_libcaes.h">
+				<BuildOrder>73</BuildOrder>
 			</None>
-			<None Include="..\..\..\libewf\libewf_libhmac.h">
+			<None Include="..\..\..\libewf\libewf_libcdata.h">
+				<BuildOrder>74</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libcerror.h">
+				<BuildOrder>75</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libclocale.h">
+				<BuildOrder>76</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libcnotify.h">
+				<BuildOrder>77</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libcstring.h">
+				<BuildOrder>78</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_libfcache.h">
+				<BuildOrder>79</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libfvalue.h">
+				<BuildOrder>80</BuildOrder>
+			</None>
+			<None Include="..\..\..\libewf\libewf_libhmac.h">
+				<BuildOrder>81</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_libmfdata.h">
+				<BuildOrder>82</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_libuna.h">
+				<BuildOrder>83</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_media_values.h">
+				<BuildOrder>84</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_metadata.h">
+				<BuildOrder>85</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_notify.h">
+				<BuildOrder>86</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_read_io_handle.h">
+				<BuildOrder>87</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_restart_data.h">
+				<BuildOrder>88</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_section.h">
+				<BuildOrder>89</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_sector_range.h">
+				<BuildOrder>90</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_file.h">
+				<BuildOrder>91</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_file_handle.h">
+				<BuildOrder>92</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_table.h">
+				<BuildOrder>93</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_single_file_entry.h">
+				<BuildOrder>94</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_single_file_tree.h">
+				<BuildOrder>95</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_single_files.h">
+				<BuildOrder>96</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_support.h">
-			</None>
-			<None Include="..\..\..\libewf\libewf_tree_type.h">
+				<BuildOrder>97</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_types.h">
+				<BuildOrder>98</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_unused.h">
+				<BuildOrder>99</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

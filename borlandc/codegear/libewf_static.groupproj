@@ -9,6 +9,9 @@
 			<Projects Include="libcerror\libcerror.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj</Dependencies>
 			</Projects>
+			<Projects Include="libcdata\libcdata.cbproj">
+				<Dependencies/>
+			</Projects>
 			<Projects Include="libclocale\libclocale.cbproj">
 				<Dependencies>libcstring\libcstring.cbproj;libcerror\libcerror.cbproj</Dependencies>
 			</Projects>
@@ -106,6 +109,15 @@
 		</Target>
 		<Target DependsOnTargets="libcstring:Make" Name="libcerror:Make">
 			<MSBuild Targets="Make" Projects="libcerror\libcerror.cbproj"/>
+		</Target>
+		<Target Name="libcdata">
+			<MSBuild Projects="libcdata\libcdata.cbproj"/>
+		</Target>
+		<Target Name="libcdata:Clean">
+			<MSBuild Targets="Clean" Projects="libcdata\libcdata.cbproj"/>
+		</Target>
+		<Target Name="libcdata:Make">
+			<MSBuild Targets="Make" Projects="libcdata\libcdata.cbproj"/>
 		</Target>
 		<Target DependsOnTargets="libcstring;libcerror" Name="libclocale">
 			<MSBuild Projects="libclocale\libclocale.cbproj"/>
@@ -324,13 +336,13 @@
 			<MSBuild Targets="Make" Projects="ewfverify\ewfverify_static.cbproj"/>
 		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="libcstring;libcerror;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libfvalue;libfcache;libmfdata;zlib_static;libhmac;libcaes;libewf_static;libodraw;libsmdev;libsmraw;libcsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfrecover_static;ewfverify_static"/>
+			<CallTarget Targets="libcstring;libcerror;libcdata;libclocale;libcnotify;libcsplit;libuna;libcfile;libcpath;libbfio;libfvalue;libfcache;libmfdata;zlib_static;libhmac;libcaes;libewf_static;libodraw;libsmdev;libsmraw;libcsystem;ewfacquire_static;ewfacquirestream_static;ewfexport_static;ewfinfo_static;ewfrecover_static;ewfverify_static"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="libcstring:Clean;libcerror:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libfvalue:Clean;libfcache:Clean;libmfdata:Clean;zlib_static:Clean;libhmac:Clean;libcaes:Clean;libewf_static:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfrecover_static:Clean;ewfverify_static:Clean"/>
+			<CallTarget Targets="libcstring:Clean;libcerror:Clean;libcdata:Clean;libclocale:Clean;libcnotify:Clean;libcsplit:Clean;libuna:Clean;libcfile:Clean;libcpath:Clean;libbfio:Clean;libfvalue:Clean;libfcache:Clean;libmfdata:Clean;zlib_static:Clean;libhmac:Clean;libcaes:Clean;libewf_static:Clean;libodraw:Clean;libsmdev:Clean;libsmraw:Clean;libcsystem:Clean;ewfacquire_static:Clean;ewfacquirestream_static:Clean;ewfexport_static:Clean;ewfinfo_static:Clean;ewfrecover_static:Clean;ewfverify_static:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="libcstring:Make;libcerror:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libfvalue:Make;libfcache:Make;libmfdata:Make;zlib_static:Make;libhmac:Make;libcaes:Make;libewf_static:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfrecover_static:Make;ewfverify_static:Make"/>
+			<CallTarget Targets="libcstring:Make;libcerror:Make;libcdata:Make;libclocale:Make;libcnotify:Make;libcsplit:Make;libuna:Make;libcfile:Make;libcpath:Make;libbfio:Make;libfvalue:Make;libfcache:Make;libmfdata:Make;zlib_static:Make;libhmac:Make;libcaes:Make;libewf_static:Make;libodraw:Make;libsmdev:Make;libsmraw:Make;libcsystem:Make;ewfacquire_static:Make;ewfacquirestream_static:Make;ewfexport_static:Make;ewfinfo_static:Make;ewfrecover_static:Make;ewfverify_static:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>

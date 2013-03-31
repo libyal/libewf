@@ -13,6 +13,7 @@ CODEGEAR_FILES = \
 	codegear/ewfverify/ewfverify_static.cbproj \
 	codegear/libbfio/libbfio.cbproj \
 	codegear/libcaes/libcaes.cbproj \
+	codegear/libcdata/libcdata.cbproj \
 	codegear/libcerror/libcerror.cbproj \
 	codegear/libcfile/libcfile.cbproj \
 	codegear/libclocale/libclocale.cbproj \

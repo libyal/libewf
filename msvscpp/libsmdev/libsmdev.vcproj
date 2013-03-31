@@ -151,11 +151,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_array_type.c"
+				RelativePath="..\..\libsmdev\libsmdev_ata.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_ata.c"
+				RelativePath="..\..\libsmdev\libsmdev_debug.c"
 				>
 			</File>
 			<File
@@ -163,19 +163,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_error_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_legacy.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_list_type.c"
 				>
 			</File>
 			<File
@@ -184,10 +172,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_notify.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_offset_list.c"
 				>
 			</File>
 			<File
@@ -225,15 +209,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_array_type.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_ata.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_codepage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libsmdev\libsmdev_debug.h"
 				>
 			</File>
 			<File
@@ -245,19 +229,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_error_string.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_extern.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_legacy.h"
 				>
 			</File>
 			<File
@@ -289,19 +265,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_list_type.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_metadata.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_notify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_offset_list.h"
 				>
 			</File>
 			<File
