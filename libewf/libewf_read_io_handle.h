@@ -28,11 +28,11 @@
 #include "libewf_chunk_data.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
-#include "libewf_sector_list.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -44,7 +44,7 @@ struct libewf_read_io_handle
 {
 	/* The sectors with checksum errors
 	 */
-	libewf_sector_list_t *checksum_errors;
+	libcdata_range_list_t *checksum_errors;
 
 	/* A value to indicate if the chunk data should be zeroed on error
 	 */

@@ -197,7 +197,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyewf\pyewf_file.c"
+				RelativePath="..\..\pyewf\pyewf_file_entries.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyewf\pyewf_file_entry.c"
 				>
 			</File>
 			<File
@@ -205,15 +209,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyewf\pyewf_record.c"
+				RelativePath="..\..\pyewf\pyewf_handle.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyewf\pyewf_records.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_strings.c"
+				RelativePath="..\..\pyewf\pyewf_metadata.c"
 				>
 			</File>
 		</Filter>
@@ -235,11 +235,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyewf\pyewf_file.h"
+				RelativePath="..\..\pyewf\pyewf_file_entries.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyewf\pyewf_file_entry.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\pyewf\pyewf_file_object_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyewf\pyewf_handle.h"
 				>
 			</File>
 			<File
@@ -263,19 +271,11 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyewf\pyewf_metadata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyewf\pyewf_python.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_record.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_records.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_strings.h"
 				>
 			</File>
 		</Filter>

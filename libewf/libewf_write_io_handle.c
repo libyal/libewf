@@ -50,7 +50,6 @@
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_section.h"
-#include "libewf_sector_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_unused.h"
@@ -2490,9 +2489,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libfvalue_table_t *header_values,
          libfvalue_table_t *hash_values,
          libewf_hash_sections_t *hash_sections,
-         libewf_sector_list_t *sessions,
-         libewf_sector_list_t *tracks,
-         libewf_sector_list_t *acquiry_errors,
+         libcdata_array_t *sessions,
+         libcdata_array_t *tracks,
+         libcdata_range_list_t *acquiry_errors,
          int chunk_index,
          libewf_chunk_data_t *chunk_data,
          size_t input_data_size,
@@ -3858,9 +3857,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
-     libewf_sector_list_t *sessions,
-     libewf_sector_list_t *tracks,
-     libewf_sector_list_t *acquiry_errors,
+     libcdata_array_t *sessions,
+     libcdata_array_t *tracks,
+     libcdata_range_list_t *acquiry_errors,
      libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;

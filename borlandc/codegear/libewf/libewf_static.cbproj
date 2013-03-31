@@ -85,8 +85,6 @@
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_legacy.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_list_type.c">
-			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_media_values.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_metadata.c">
@@ -99,7 +97,7 @@
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_section.c">
 			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_sector_list.c">
+			<CppCompile Include="..\..\..\libewf\libewf_sector_range.c">
 			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_file.c">
 			</CppCompile>
@@ -213,8 +211,6 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_libuna.h">
 			</None>
-			<None Include="..\..\..\libewf\libewf_list_type.h">
-			</None>
 			<None Include="..\..\..\libewf\libewf_media_values.h">
 			</None>
 			<None Include="..\..\..\libewf\libewf_metadata.h">
@@ -227,7 +223,7 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_section.h">
 			</None>
-			<None Include="..\..\..\libewf\libewf_sector_list.h">
+			<None Include="..\..\..\libewf\libewf_sector_range.h">
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_file.h">
 			</None>

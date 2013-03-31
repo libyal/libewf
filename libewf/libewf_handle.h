@@ -30,6 +30,7 @@
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
@@ -38,7 +39,6 @@
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
 #include "libewf_segment_table.h"
-#include "libewf_sector_list.h"
 #include "libewf_single_files.h"
 #include "libewf_types.h"
 #include "libewf_write_io_handle.h"
@@ -73,15 +73,15 @@ struct libewf_internal_handle
 
 	/* The stored sessions information
 	 */
-	libewf_sector_list_t *sessions;
+	libcdata_array_t *sessions;
 
 	/* The stored tracks information
 	 */
-	libewf_sector_list_t *tracks;
+	libcdata_array_t *tracks;
 
 	/* The sectors with acquiry read errors
 	 */
-	libewf_sector_list_t *acquiry_errors;
+	libcdata_range_list_t *acquiry_errors;
 
 	/* The file IO pool
 	 */

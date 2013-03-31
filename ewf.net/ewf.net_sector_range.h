@@ -31,11 +31,11 @@ namespace EWF {
 public ref class SectorRange sealed
 {
 	public:
-		System::UInt64 first_sector;
+		System::UInt64 start_sector;
 		System::UInt64 number_of_sectors;
 
 	public:
-		SectorRange( System::UInt64 first_sector,
+		SectorRange( System::UInt64 start_sector,
 		             System::UInt64 number_of_sectors );
 
 		/* Implicit defined:

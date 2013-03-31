@@ -1,4 +1,5 @@
 TODO
+* add libewf_sector_range_clone function
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support
@@ -378,6 +379,8 @@ Closed:
 * updates for libsmdev
 * added error tolerance for Logicube image with missing checksum in data section
 * code clean up
+* worked on libcdata integration
+* update msvscpp files
 
 20130305
 * fixed missing file in libcmulti distribution

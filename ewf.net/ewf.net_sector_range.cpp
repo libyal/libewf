@@ -34,10 +34,10 @@ using namespace System;
 
 namespace EWF {
 
-SectorRange::SectorRange( System::UInt64 first_sector,
+SectorRange::SectorRange( System::UInt64 start_sector,
                           System::UInt64 number_of_sectors )
 {
-	this->first_sector      = first_sector;
+	this->start_sector      = start_sector;
 	this->number_of_sectors = number_of_sectors;
 }
 

@@ -71,14 +71,13 @@ libewf_la_SOURCES = \
 	libewf_libmfdata.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
-	libewf_list_type.c libewf_list_type.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
-	libewf_sector_list.c libewf_sector_list.h \
+	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \

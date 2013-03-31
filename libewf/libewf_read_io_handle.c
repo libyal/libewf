@@ -26,13 +26,13 @@
 #include "libewf_definitions.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libfcache.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
-#include "libewf_sector_list.h"
 
 /* Initialize the read IO handle
  * Returns 1 if successful or -1 on error
@@ -93,7 +93,7 @@ int libewf_read_io_handle_initialize(
 
 		goto on_error;
 	}
-	if( libewf_sector_list_initialize(
+	if( libcdata_range_list_initialize(
 	     &( ( *read_io_handle )->checksum_errors ),
 	     error ) != 1 )
 	{
@@ -101,7 +101,7 @@ int libewf_read_io_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create checksum errors sector list.",
+		 "%s: unable to create checksum errors range list.",
 		 function );
 
 		goto on_error;
@@ -144,7 +144,7 @@ int libewf_read_io_handle_free(
 	}
 	if( *read_io_handle != NULL )
 	{
-		if( libewf_sector_list_free(
+		if( libcdata_range_list_free(
 		     &( ( *read_io_handle )->checksum_errors ),
 		     error ) != 1 )
 		{
@@ -152,7 +152,7 @@ int libewf_read_io_handle_free(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free checksum errors sector list.",
+			 "%s: unable to free checksum errors range list.",
 			 function );
 
 			result = -1;
@@ -241,7 +241,7 @@ int libewf_read_io_handle_clone(
 
 		goto on_error;
 	}
-	if( libewf_sector_list_clone(
+	if( libcdata_range_list_clone(
 	     &( ( *destination_read_io_handle )->checksum_errors ),
 	     source_read_io_handle->checksum_errors,
 	     error ) != 1 )
@@ -250,7 +250,7 @@ int libewf_read_io_handle_clone(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination checksum errors.",
+		 "%s: unable to create destination checksum errors range list.",
 		 function );
 
 		goto on_error;
@@ -533,18 +533,17 @@ int libewf_read_io_handle_read_chunk_data(
 		{
 			number_of_sectors = (uint32_t) ( (uint64_t) media_values->number_of_sectors - start_sector );
 		}
-		if( libewf_sector_list_append_sector(
+		if( libcdata_range_list_append_range(
 		     read_io_handle->checksum_errors,
 		     start_sector,
 		     number_of_sectors,
-		     1,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append checksum error to sectors list.",
+			 "%s: unable to append checksum error to range list.",
 			 function );
 
 			return( -1 );

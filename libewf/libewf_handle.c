@@ -47,7 +47,7 @@
 #include "libewf_libmfdata.h"
 #include "libewf_metadata.h"
 #include "libewf_restart_data.h"
-#include "libewf_sector_list.h"
+#include "libewf_sector_range.h"
 #include "libewf_segment_file.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
@@ -149,33 +149,35 @@ int libewf_handle_initialize(
 
 		goto on_error;
 	}
-	if( libewf_sector_list_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->sessions ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sessions sector list.",
+		 "%s: unable to create sessions array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_initialize(
+	if( libcdata_array_initialize(
 	     &( internal_handle->tracks ),
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create tracks sector list.",
+		 "%s: unable to create tracks array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_initialize(
+	if( libcdata_range_list_initialize(
 	     &( internal_handle->acquiry_errors ),
 	     error ) != 1 )
 	{
@@ -183,7 +185,7 @@ int libewf_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create acquiry errors sector list.",
+		 "%s: unable to create acquiry errors range list.",
 		 function );
 
 		goto on_error;
@@ -200,14 +202,16 @@ on_error:
 	{
 		if( internal_handle->tracks != NULL )
 		{
-			libewf_sector_list_free(
+			libcdata_array_free(
 			 &( internal_handle->tracks ),
+			 NULL,
 			 NULL );
 		}
 		if( internal_handle->sessions != NULL )
 		{
-			libewf_sector_list_free(
+			libcdata_array_free(
 			 &( internal_handle->sessions ),
+			 NULL,
 			 NULL );
 		}
 		if( internal_handle->media_values != NULL )
@@ -298,33 +302,35 @@ int libewf_handle_free(
 
 			result = -1;
 		}
-		if( libewf_sector_list_free(
+		if( libcdata_array_free(
 		     &( internal_handle->sessions ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sessions sector list.",
+			 "%s: unable to free sessions array.",
 			 function );
 
 			result = -1;
 		}
-		if( libewf_sector_list_free(
+		if( libcdata_array_free(
 		     &( internal_handle->tracks ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free tracks sector list.",
+			 "%s: unable to free tracks array.",
 			 function );
 
 			result = -1;
 		}
-		if( libewf_sector_list_free(
+		if( libcdata_range_list_free(
 		     &( internal_handle->acquiry_errors ),
 		     error ) != 1 )
 		{
@@ -332,7 +338,7 @@ int libewf_handle_free(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free acquiry errors sector list.",
+			 "%s: unable to free acquiry errors range list.",
 			 function );
 
 			result = -1;
@@ -463,35 +469,39 @@ int libewf_handle_clone(
 
 		goto on_error;
 	}
-	if( libewf_sector_list_clone(
+	if( libcdata_array_clone(
 	     &( internal_destination_handle->sessions ),
 	     internal_source_handle->sessions,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_sector_range_clone,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination sessions.",
+		 "%s: unable to create destination sessions array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_clone(
+	if( libcdata_array_clone(
 	     &( internal_destination_handle->tracks ),
 	     internal_source_handle->tracks,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_sector_range_clone,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination tracks.",
+		 "%s: unable to create destination tracks array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_clone(
+	if( libcdata_range_list_clone(
 	     &( internal_destination_handle->acquiry_errors ),
 	     internal_source_handle->acquiry_errors,
 	     error ) != 1 )
@@ -500,7 +510,7 @@ int libewf_handle_clone(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination acquiry errors.",
+		 "%s: unable to create destination acquiry errors range list.",
 		 function );
 
 		goto on_error;
@@ -817,20 +827,22 @@ on_error:
 		}
 		if( internal_destination_handle->acquiry_errors != NULL )
 		{
-			libewf_sector_list_free(
+			libcdata_range_list_free(
 			 &( internal_destination_handle->acquiry_errors ),
 			 NULL );
 		}
 		if( internal_destination_handle->tracks != NULL )
 		{
-			libewf_sector_list_free(
+			libcdata_array_free(
 			 &( internal_destination_handle->tracks ),
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 			 NULL );
 		}
 		if( internal_destination_handle->sessions != NULL )
 		{
-			libewf_sector_list_free(
+			libcdata_array_free(
 			 &( internal_destination_handle->sessions ),
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 			 NULL );
 		}
 		if( internal_destination_handle->media_values != NULL )
@@ -2011,7 +2023,7 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( internal_handle->read_io_handle != NULL )
 	{
-		if( libewf_sector_list_empty(
+		if( libcdata_range_list_empty(
 		     internal_handle->read_io_handle->checksum_errors,
 		     error ) != 1 )
 		{
@@ -2019,39 +2031,41 @@ int libewf_handle_open_file_io_pool(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty checksum errors sector list.",
+			 "%s: unable to empty checksum errors range list.",
 			 function );
 
 			goto on_error;
 		}
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_array_empty(
 	     internal_handle->sessions,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty sessions sector list.",
+		 "%s: unable to empty sessions array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_array_empty(
 	     internal_handle->tracks,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty tracks sector list.",
+		 "%s: unable to empty tracks array.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_range_list_empty(
 	     internal_handle->acquiry_errors,
 	     error ) != 1 )
 	{
@@ -2059,7 +2073,7 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty acquiry errors sector list.",
+		 "%s: unable to empty acquiry errors range list.",
 		 function );
 
 		goto on_error;
@@ -5101,7 +5115,7 @@ int libewf_handle_close(
 	}
 	if( internal_handle->read_io_handle != NULL )
 	{
-		if( libewf_sector_list_empty(
+		if( libcdata_range_list_empty(
 		     internal_handle->read_io_handle->checksum_errors,
 		     error ) != 1 )
 		{
@@ -5109,39 +5123,41 @@ int libewf_handle_close(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty checksum errors sector list.",
+			 "%s: unable to empty checksum errors range list.",
 			 function );
 
 			result = -1;
 		}
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_array_empty(
 	     internal_handle->sessions,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty sessions sector list.",
+		 "%s: unable to empty sessions array.",
 		 function );
 
 		result = -1;
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_array_empty(
 	     internal_handle->tracks,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty tracks sector list.",
+		 "%s: unable to empty tracks array.",
 		 function );
 
 		result = -1;
 	}
-	if( libewf_sector_list_empty(
+	if( libcdata_range_list_empty(
 	     internal_handle->acquiry_errors,
 	     error ) != 1 )
 	{
@@ -5149,7 +5165,7 @@ int libewf_handle_close(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty acquiry errors sector list.",
+		 "%s: unable to empty acquiry errors range list.",
 		 function );
 
 		result = -1;

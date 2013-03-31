@@ -59,10 +59,10 @@ struct ewf_session_entry_v1
 	 */
 	uint8_t flags[ 4 ];
 
-	/* The first sector of the session
+	/* The start sector of the session
 	 * Consists of 4 bytes
 	 */
-	uint8_t first_sector[ 4 ];
+	uint8_t start_sector[ 4 ];
 
 	/* Unknown
 	 * Consists of 24 bytes
@@ -100,10 +100,10 @@ typedef struct ewf_session_entry_v2 ewf_session_entry_v2_t;
 
 struct ewf_session_entry_v2
 {
-	/* The first sector of the session
+	/* The start sector of the session
 	 * Consists of 8 bytes
 	 */
-	uint8_t first_sector[ 8 ];
+	uint8_t start_sector[ 8 ];
 
 	/* The flags
 	 * Consists of 4 bytes

@@ -254,10 +254,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_list_type.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_media_values.c"
 				>
 			</File>
@@ -282,7 +278,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_sector_list.c"
+				RelativePath="..\..\libewf\libewf_sector_range.c"
 				>
 			</File>
 			<File
@@ -512,10 +508,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_list_type.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_media_values.h"
 				>
 			</File>
@@ -540,7 +532,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_sector_list.h"
+				RelativePath="..\..\libewf\libewf_sector_range.h"
 				>
 			</File>
 			<File

@@ -54,10 +54,10 @@ typedef struct ewf_error_entry_v1 ewf_error_entry_v1_t;
 
 struct ewf_error_entry_v1
 {
-	/* The first sector
+	/* The start sector
 	 * Consists of 4 bytes
 	 */
-	uint8_t first_sector[ 4 ];
+	uint8_t start_sector[ 4 ];
 
 	/* The number of sectors
 	 * Consists of 4 bytes
@@ -94,10 +94,10 @@ typedef struct ewf_error_entry_v2 ewf_error_entry_v2_t;
 
 struct ewf_error_entry_v2
 {
-	/* The first sector
+	/* The start sector
 	 * Consists of 8 bytes
 	 */
-	uint8_t first_sector[ 8 ];
+	uint8_t start_sector[ 8 ];
 
 	/* The number of sectors
 	 * Consists of 4 bytes

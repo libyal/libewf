@@ -29,10 +29,10 @@
 #include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
-#include "libewf_sector_list.h"
 #include "libewf_single_files.h"
 
 #include "ewf_data.h"
@@ -220,7 +220,7 @@ ssize_t libewf_section_error_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         libewf_sector_list_t *acquiry_errors,
+         libcdata_range_list_t *acquiry_errors,
          libcerror_error_t **error );
 
 ssize_t libewf_section_error_write(
@@ -230,7 +230,7 @@ ssize_t libewf_section_error_write(
          int file_io_pool_entry,
          uint8_t format_version,
          off64_t section_offset,
-         libewf_sector_list_t *acquiry_errors,
+         libcdata_range_list_t *acquiry_errors,
          libcerror_error_t **error );
 
 ssize_t libewf_section_md5_hash_read(
@@ -312,8 +312,8 @@ ssize_t libewf_section_session_read(
          int file_io_pool_entry,
          uint8_t format_version,
          libewf_media_values_t *media_values,
-         libewf_sector_list_t *sessions,
-         libewf_sector_list_t *tracks,
+         libcdata_array_t *sessions,
+         libcdata_array_t *tracks,
          libcerror_error_t **error );
 
 ssize_t libewf_section_session_write(
@@ -323,8 +323,8 @@ ssize_t libewf_section_session_write(
          int file_io_pool_entry,
          uint8_t format_version,
          off64_t section_offset,
-         libewf_sector_list_t *sessions,
-         libewf_sector_list_t *tracks,
+         libcdata_array_t *sessions,
+         libcdata_array_t *tracks,
          libcerror_error_t **error );
 
 ssize_t libewf_section_table_read(
