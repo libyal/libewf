@@ -401,7 +401,7 @@ Building:
    libfcache support:                               $ac_cv_libfcache
    libfvalue support:                               $ac_cv_libfvalue
    libmfdata support:                               $ac_cv_libmfdata
-   ADLER32 checksum support:                        $ac_cv_with_adler32
+   ADLER32 checksum support:                        $ac_cv_adler32
    DEFLATE compression support:                     $ac_cv_zlib
    BZIP2 compression support:                       $ac_cv_bzip2
    libhmac support:                                 $ac_cv_libhmac
