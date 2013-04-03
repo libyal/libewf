@@ -44,8 +44,9 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -821,7 +822,7 @@ int libewf_write_io_handle_initialize_resume(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
@@ -834,6 +835,9 @@ int libewf_write_io_handle_initialize_resume(
 	libewf_section_t *section                              = NULL;
 	libewf_segment_file_t *segment_file                    = NULL;
 	static char *function                                  = "libewf_write_io_handle_initialize_resume";
+	off64_t data_range_offset                              = 0;
+	size64_t data_range_size                               = 0;
+	uint32_t data_range_flags                              = 0;
 	uint8_t backtrace_to_last_chunks_sections              = 0;
 	uint8_t reopen_segment_file                            = 0;
 	int file_io_pool_entry                                 = 0;
@@ -876,7 +880,7 @@ int libewf_write_io_handle_initialize_resume(
 
 		return( -1 );
 	}
-	if( libmfdata_file_list_get_number_of_files(
+	if( libfdata_list_get_number_of_elements(
 	     segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
@@ -904,9 +908,9 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	segment_files_list_index = number_of_segment_files - 1;
 
-	if( libmfdata_file_list_get_file_value_by_index(
+	if( libfdata_list_get_element_value_by_index(
 	     segment_files_list,
-	     file_io_pool,
+	     (intptr_t *) file_io_pool,
 	     segment_files_cache,
 	     segment_files_list_index,
 	     (intptr_t **) &segment_file,
@@ -1510,10 +1514,13 @@ int libewf_write_io_handle_initialize_resume(
 		write_io_handle->number_of_chunks_written_to_segment_file = segment_file->number_of_chunks
 		                                                          - number_of_unusable_chunks;
 
-		if( libmfdata_file_list_get_file_by_index(
+		if( libfdata_list_get_element_by_index(
 		     segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
+		     &data_range_offset,
+		     &data_range_size,
+		     &data_range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2155,7 +2162,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 int libewf_write_io_handle_create_segment_file(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
      uint8_t segment_file_type,
@@ -2412,10 +2419,13 @@ int libewf_write_io_handle_create_segment_file(
 			goto on_error;
 		}
 	}
-	if( libmfdata_file_list_append_file(
+	if( libfdata_list_append_element(
 	     segment_files_list,
 	     segment_files_list_index,
 	     *file_io_pool_entry,
+	     0,
+	     0,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2428,13 +2438,13 @@ int libewf_write_io_handle_create_segment_file(
 
 		goto on_error;
 	}
-	if( libmfdata_file_list_set_file_value_by_index(
+	if( libfdata_list_set_element_value_by_index(
 	     segment_files_list,
 	     segment_files_cache,
 	     *segment_files_list_index,
 	     (intptr_t *) *segment_file,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
-	     LIBMFDATA_FILE_VALUE_FLAG_MANAGED,
+	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2482,7 +2492,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libmfdata_file_list_t *segment_files_list,
+         libfdata_list_t *segment_files_list,
          libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *segment_table,
          libmfdata_list_t *chunk_table_list,
@@ -2499,7 +2509,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_write_new_chunk";
+	off64_t data_range_offset           = 0;
 	off64_t segment_file_offset         = 0;
+	size64_t data_range_size            = 0;
+	uint32_t data_range_flags           = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	int chunk_exists                    = 0;
@@ -2663,7 +2676,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 input_data_size );
 	}
 #endif
-	if( libmfdata_file_list_get_number_of_files(
+	if( libfdata_list_get_number_of_elements(
 	     segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
@@ -2693,9 +2706,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	{
 		segment_files_list_index = number_of_segment_files - 1;
 
-		if( libmfdata_file_list_get_file_value_by_index(
+		if( libfdata_list_get_element_value_by_index(
 		     segment_files_list,
-		     file_io_pool,
+		     (intptr_t *) file_io_pool,
 		     segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t **) &segment_file,
@@ -2846,10 +2859,13 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	else
 	{
-		if( libmfdata_file_list_get_file_by_index(
+		if( libfdata_list_get_element_by_index(
 		     segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
+		     &data_range_offset,
+		     &data_range_size,
+		     &data_range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3295,7 +3311,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libmfdata_file_list_t *delta_segment_files_list,
+         libfdata_list_t *delta_segment_files_list,
          libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
@@ -3308,12 +3324,15 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	libewf_section_t *last_section                     = NULL;
 	libewf_segment_file_t *segment_file                = NULL;
 	static char *function                              = "libewf_write_io_handle_write_existing_chunk";
+	off64_t data_range_offset                          = 0;
 	off64_t existing_chunk_offset                      = 0;
 	off64_t segment_file_offset                        = 0;
+	size64_t data_range_size                           = 0;
 	size64_t existing_chunk_size                       = 0;
 	size64_t required_segment_file_size                = 0;
 	ssize_t total_write_count                          = 0;
 	ssize_t write_count                                = 0;
+	uint32_t data_range_flags                          = 0;
 	uint32_t existing_range_flags                      = 0;
 	uint8_t no_section_append                          = 0;
 	int file_io_pool_entry                             = -1;
@@ -3441,7 +3460,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 #endif
 	if( ( existing_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 	{
-		if( libmfdata_file_list_get_number_of_files(
+		if( libfdata_list_get_number_of_elements(
 		     delta_segment_files_list,
 		     &number_of_segment_files,
 		     error ) != 1 )
@@ -3473,10 +3492,13 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 			/* Check if a new delta segment file should be created
 			 */
-			if( libmfdata_file_list_get_file_by_index(
+			if( libfdata_list_get_element_by_index(
 			     delta_segment_files_list,
 			     segment_files_list_index,
 			     &file_io_pool_entry,
+			     &data_range_offset,
+			     &data_range_size,
+			     &data_range_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3489,9 +3511,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 				return( -1 );
 			}
-			if( libmfdata_file_list_get_file_value_by_index(
+			if( libfdata_list_get_element_value_by_index(
 			     delta_segment_files_list,
-			     file_io_pool,
+			     (intptr_t *) file_io_pool,
 			     segment_files_cache,
 			     segment_files_list_index,
 			     (intptr_t **) &segment_file,
@@ -3728,9 +3750,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	else
 	{
-		if( libmfdata_file_list_get_file_value_by_index(
+		if( libfdata_list_get_element_value_by_index(
 		     delta_segment_files_list,
-		     file_io_pool,
+		     (intptr_t *) file_io_pool,
 		     segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t **) &segment_file,
@@ -3852,7 +3874,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,
@@ -3864,6 +3886,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_finalize_write_sections_corrections";
+	off64_t data_range_offset           = 0;
+	size64_t data_range_size            = 0;
+	uint32_t data_range_flags           = 0;
 	int file_io_pool_entry              = 0;
 	int number_of_segment_files         = 0;
 	int last_segment_file               = 0;
@@ -3880,7 +3905,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 
 		return( -1 );
 	}
-	if( libmfdata_file_list_get_number_of_files(
+	if( libfdata_list_get_number_of_elements(
 	     segment_files_list,
 	     &number_of_segment_files,
 	     error ) != 1 )
@@ -3916,10 +3941,13 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 		}
 		segment_file = NULL;
 
-		if( libmfdata_file_list_get_file_by_index(
+		if( libfdata_list_get_element_by_index(
 		     segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
+		     &data_range_offset,
+		     &data_range_size,
+		     &data_range_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3932,9 +3960,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 
 			return( -1 );
 		}
-		if( libmfdata_file_list_get_file_value_by_index(
+		if( libfdata_list_get_element_value_by_index(
 		     segment_files_list,
-		     file_io_pool,
+		     (intptr_t *) file_io_pool,
 		     segment_files_cache,
 		     segment_files_list_index,
 		     (intptr_t **) &segment_file,

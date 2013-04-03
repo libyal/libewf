@@ -39,8 +39,9 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcdata.h"
-#include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfdata.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
@@ -234,7 +235,7 @@ int libewf_write_io_handle_initialize_resume(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
@@ -275,7 +276,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 int libewf_write_io_handle_create_segment_file(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
      uint8_t segment_file_type,
@@ -292,7 +293,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libmfdata_file_list_t *segment_files_list,
+         libfdata_list_t *segment_files_list,
          libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *segment_table,
          libmfdata_list_t *chunk_table_list,
@@ -312,7 +313,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libmfdata_file_list_t *delta_segment_files_list,
+         libfdata_list_t *delta_segment_files_list,
          libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
@@ -326,7 +327,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libmfdata_file_list_t *segment_files_list,
+     libfdata_list_t *segment_files_list,
      libfcache_cache_t *segment_files_cache,
      libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,

@@ -370,6 +370,8 @@ Closed:
 
 20130403
 * changes for libmfdata and libfdata merge
+  - replaced libmfdata_file_list by libfdata_list
+* bug fixes for delta segment file handling
 
 20130402
 * changes to zlib.m4 for adler32 detection

@@ -32,8 +32,9 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfdata.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
@@ -105,11 +106,11 @@ struct libewf_internal_handle
 
 	/* The segment files list
 	 */
-	libmfdata_file_list_t *segment_files_list;
+	libfdata_list_t *segment_files_list;
 
 	/* The delta segment files list
 	 */
-	libmfdata_file_list_t *delta_segment_files_list;
+	libfdata_list_t *delta_segment_files_list;
 
 	/* The segment files cache
 	 */
