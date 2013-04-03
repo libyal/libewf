@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
+	@LIBFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
 	@LIBMFDATA_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
@@ -68,8 +69,9 @@ libewf_la_SOURCES = \
 	libewf_libcstring.h \
 	libewf_libhmac.h \
 	libewf_libfcache.h \
-	libewf_libmfdata.h \
+	libewf_libfdata.h \
 	libewf_libfvalue.h \
+	libewf_libmfdata.h \
 	libewf_libuna.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_metadata.c libewf_metadata.h \
@@ -101,6 +103,7 @@ libewf_la_LIBADD = \
 	@LIBCPATH_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBFCACHE_LIBADD@ \
+	@LIBFDATA_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
 	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \

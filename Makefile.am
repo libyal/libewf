@@ -15,6 +15,7 @@ SUBDIRS = \
 	libcpath \
 	libbfio \
 	libfcache \
+	libfdata \
 	libfvalue \
 	libmfdata \
 	libhmac \
@@ -94,6 +95,7 @@ library:
 	(cd $(srcdir)/libcpath && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libbfio && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfcache && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libmfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) $(AM_MAKEFLAGS))
@@ -128,6 +130,7 @@ splint:
 	(cd $(srcdir)/libcpath && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libbfio && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfcache && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libmfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) splint $(AM_MAKEFLAGS))
