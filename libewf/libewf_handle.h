@@ -216,6 +216,7 @@ int libewf_handle_open_read_segment_files(
 int libewf_handle_open_read_delta_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
+     libewf_chunk_table_t *chunk_table,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \

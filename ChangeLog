@@ -3,6 +3,10 @@ TODO
 * add libewf_sector_range_clone function
 * libmfdata/libfdata merge
   - reimplement chunk table using layered approach
+  - sections list on write: cache section descriptors instead of free-ing them?
+  - add delta segment files cache ? caching happens based on element index
+    but will cause a cache miss - 2 separate caches more efficient ?
+  - check ewfacquirestream
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support
@@ -27,6 +31,7 @@ TODO
   - try to read the chunks by calculating the checksums and see where they align
 
 * corruption scenarios
+  - libewf_segment_file_read deal with corrupted segment file header ?
   - add strict chunk data flag handling
   - document how libewf deals with corruption scenarios
 
@@ -370,7 +375,8 @@ Closed:
 
 20130403
 * changes for libmfdata and libfdata merge
-  - replaced libmfdata_file_list by libfdata_list
+  - replaced libmfdata_file_list_t (delta) segment files list by libfdata_list_t
+  - replaced libcdata_list_t section list by libfdata_list_t sections list
 * bug fixes for delta segment file handling
 
 20130402

@@ -92,21 +92,12 @@ int libewf_segment_table_initialize(
 		 "%s: unable to clear segment table.",
 		 function );
 
-		goto on_error;
-	}
-	if( libcdata_array_initialize(
-	     &( ( *segment_table )->segment_files_array ),
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment files array.",
-		 function );
+		memory_free(
+		 *segment_table );
 
-		goto on_error;
+		*segment_table = NULL;
+
+		return( -1 );
 	}
 	( *segment_table )->maximum_segment_size = maximum_segment_size;
 
@@ -131,7 +122,6 @@ int libewf_segment_table_free(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_free";
-	int result            = 1;
 
 	if( segment_table == NULL )
 	{
@@ -151,26 +141,12 @@ int libewf_segment_table_free(
 			memory_free(
 			 ( *segment_table )->basename );
 		}
-		if( libcdata_array_free(
-		     &( ( *segment_table )->segment_files_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free the segment files array.",
-			 function );
-
-			result = -1;
-		}
 		memory_free(
 		 *segment_table );
 
 		*segment_table = NULL;
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Clones the segment table
@@ -237,7 +213,12 @@ int libewf_segment_table_clone(
 		 "%s: unable to clear source to destination segment table.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *destination_segment_table );
+
+		*destination_segment_table = NULL;
+
+		return( -1 );
 	}
 	if( source_segment_table->basename != NULL )
 	{
@@ -270,22 +251,6 @@ int libewf_segment_table_clone(
 			goto on_error;
 		}
 		( *destination_segment_table )->basename_size = source_segment_table->basename_size;
-	}
-	if( libcdata_array_clone(
-	     &( ( *destination_segment_table )->segment_files_array ),
-	     source_segment_table->segment_files_array,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_handle_free,
-	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_segment_file_handle_clone,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination segments files.",
-		 function );
-
-		goto on_error;
 	}
 	( *destination_segment_table )->maximum_segment_size = source_segment_table->maximum_segment_size;
 

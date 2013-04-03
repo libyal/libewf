@@ -1720,6 +1720,7 @@ int libewf_handle_open_file_io_pool(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_open_file_io_pool";
+	size64_t segment_file_size                = 0;
 	ssize_t read_count                        = 0;
 	uint32_t maximum_delta_segment_number     = 0;
 	uint32_t maximum_segment_number           = 0;
@@ -1882,6 +1883,8 @@ int libewf_handle_open_file_io_pool(
 			goto on_error;
 		}
 	}
+/* TODO pass segment table of equiv for key information ? */
+/* TODO add write support ? */
 	if( libfdata_list_initialize(
 	     &( internal_handle->segment_files_list ),
 	     NULL,
@@ -1922,14 +1925,14 @@ int libewf_handle_open_file_io_pool(
 	}
 	if( libfcache_cache_initialize(
 	     &( internal_handle->segment_files_cache ),
-	     8,
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to segment files table cache.",
+		 "%s: unable to create segment files table cache.",
 		 function );
 
 		goto on_error;
@@ -2115,6 +2118,22 @@ int libewf_handle_open_file_io_pool(
 		     file_io_pool_entry < number_of_file_io_handles;
 		     file_io_pool_entry++ )
 		{
+			if( libbfio_pool_get_size(
+			     file_io_pool,
+			     file_io_pool_entry,
+			     &segment_file_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of file IO pool entry: %d.",
+				 function,
+				 file_io_pool_entry );
+
+				goto on_error;
+			}
 			if( libbfio_pool_get_handle(
 			     file_io_pool,
 			     file_io_pool_entry,
@@ -2128,10 +2147,6 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to retrieve file IO handle: %d from pool.",
 				 function,
 				 file_io_pool_entry );
-
-				libewf_segment_file_free(
-				 &segment_file,
-				 NULL );
 
 				goto on_error;
 			}
@@ -2159,10 +2174,6 @@ int libewf_handle_open_file_io_pool(
 				 "%s: unable to read segment file header.",
 				 function );
 
-				libewf_segment_file_free(
-				 &segment_file,
-				 NULL );
-
 				goto on_error;
 			}
 			if( segment_file->segment_number == 0 )
@@ -2174,10 +2185,6 @@ int libewf_handle_open_file_io_pool(
 				 "%s: invalid segment number: 0 in file IO pool entry: %d.",
 				 function,
 				 file_io_pool_entry );
-
-				libewf_segment_file_free(
-				 &segment_file,
-				 NULL );
 
 				goto on_error;
 			}
@@ -2200,10 +2207,6 @@ int libewf_handle_open_file_io_pool(
 						 "%s: unable to resize segment files list.",
 						 function );
 
-						libewf_segment_file_free(
-						 &segment_file,
-						 NULL );
-
 						goto on_error;
 					}
 					maximum_segment_number = segment_file->segment_number;
@@ -2213,7 +2216,7 @@ int libewf_handle_open_file_io_pool(
 				     (int) ( segment_file->segment_number - 1 ),
 				     file_io_pool_entry,
 				     0,
-				     0,
+				     segment_file_size,
 				     0,
 				     error ) != 1 )
 				{
@@ -2224,10 +2227,6 @@ int libewf_handle_open_file_io_pool(
 					 "%s: unable to set segment file: %" PRIu16 " in list.",
 					 function,
 					 segment_file->segment_number );
-
-					libewf_segment_file_free(
-					 &segment_file,
-					 NULL );
 
 					goto on_error;
 				}
@@ -2248,10 +2247,6 @@ int libewf_handle_open_file_io_pool(
 						 "%s: unable to resize delta segment files list.",
 						 function );
 
-						libewf_segment_file_free(
-						 &segment_file,
-						 NULL );
-
 						goto on_error;
 					}
 					maximum_delta_segment_number = segment_file->segment_number;
@@ -2261,7 +2256,7 @@ int libewf_handle_open_file_io_pool(
 				     (int) ( segment_file->segment_number - 1 ),
 				     file_io_pool_entry,
 				     0,
-				     0,
+				     segment_file_size,
 				     0,
 				     error ) != 1 )
 				{
@@ -2272,10 +2267,6 @@ int libewf_handle_open_file_io_pool(
 					 "%s: unable to set delta segment file: %" PRIu16 " in list.",
 					 function,
 					 segment_file->segment_number );
-
-					libewf_segment_file_free(
-					 &segment_file,
-					 NULL );
 
 					goto on_error;
 				}
@@ -2296,10 +2287,6 @@ int libewf_handle_open_file_io_pool(
 						 "%s: unable to reopen file IO pool entry: %d.",
 						 function,
 						 file_io_pool_entry );
-
-						libewf_segment_file_free(
-						 &segment_file,
-						 NULL );
 
 						goto on_error;
 					}
@@ -2355,6 +2342,7 @@ int libewf_handle_open_file_io_pool(
 			if( libewf_handle_open_read_delta_segment_files(
 			     internal_handle,
 			     file_io_pool,
+			     chunk_table,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2447,6 +2435,12 @@ int libewf_handle_open_file_io_pool(
 	return( 1 );
 
 on_error:
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
 	if( internal_handle->single_files != NULL )
 	{
 		libewf_single_files_free(
@@ -2510,206 +2504,6 @@ on_error:
 	return( -1 );
 }
 
-/* Opens a segment file for reading
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libewf_handle_open_read_segment_file(
-         libewf_internal_handle_t *internal_handle,
-         uint32_t segment_number,
-         libewf_segment_file_t *segment_file,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libcerror_error_t **error )
-{
-	static char *function = "libewf_handle_open_read_segment_file";
-	ssize_t read_count    = 0;
-
-	if( internal_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_segment_file_read_file_header(
-		      segment_file,
-		      file_io_pool,
-		      file_io_pool_entry,
-		      error );
-
-	if( read_count < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read segment file header.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
-	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
-	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported segment file type.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->segment_number != segment_number )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: segment number mismatch.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->segment_number == 1 )
-	{
-		internal_handle->io_handle->segment_file_type  = segment_file->type;
-		internal_handle->io_handle->major_version      = segment_file->major_version;
-		internal_handle->io_handle->minor_version      = segment_file->minor_version;
-		internal_handle->io_handle->compression_method = segment_file->compression_method;
-
-		if( segment_file->major_version == 2 )
-		{
-			if( memory_copy(
-			     internal_handle->media_values->set_identifier,
-			     segment_file->set_identifier,
-			     16 ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy segment file set identifier to media values.",
-				 function );
-
-				return( -1 );
-			}
-			if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
-			 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: unsupported compression method.",
-				 function );
-
-				return( -1 );
-			}
-		}
-	}
-	else
-	{
-		if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-		 && ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 ) )
-		{
-			segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-		}
-		else if( segment_file->type != internal_handle->io_handle->segment_file_type )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_INPUT,
-			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: segment file type value mismatch.",
-			 function );
-
-			return( -1 );
-		}
-		if( ( segment_file->major_version != internal_handle->io_handle->major_version )
-		 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_INPUT,
-			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: segment file format version value mismatch.",
-			 function );
-
-			return( -1 );
-		}
-		if( internal_handle->io_handle->major_version == 2 )
-		{
-			if( segment_file->compression_method != internal_handle->io_handle->compression_method )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_INPUT,
-				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-				 "%s: segment file compression method value mismatch.",
-				 function );
-
-				return( -1 );
-			}
-			if( memory_compare(
-			     internal_handle->media_values->set_identifier,
-			     segment_file->set_identifier,
-			     16 ) != 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_INPUT,
-				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-				 "%s: segment file set identifier value mismatch.",
-				 function );
-
-				return( -1 );
-			}
-		}
-	}
-	return( read_count );
-}
-
 /* Reads the section data from a segment file
  * Returns 1 if successful or -1 on error
  */
@@ -2721,21 +2515,23 @@ int libewf_handle_open_read_section_data(
      int file_io_pool_entry,
      libcerror_error_t **error )
 {
-	libewf_header_sections_t *header_sections     = NULL;
-	libcdata_list_element_t *section_list_element = NULL;
-	libewf_section_t *section                     = NULL;
-	uint8_t *string_data                          = NULL;
-	static char *function                         = "libewf_handle_open_read_section_data";
-	off64_t section_data_offset                   = 0;
-	size_t string_data_size                       = 0;
-	ssize_t read_count                            = 0;
-	int initialize_chunk_table                    = 0;
-	int header_section_found                      = 0;
-	int set_identifier_change                     = 0;
-	int single_files_section_found                = 0;
+	libewf_header_sections_t *header_sections = NULL;
+	libewf_section_t *section                 = NULL;
+	libfcache_cache_t *sections_cache         = NULL;
+	uint8_t *string_data                      = NULL;
+	static char *function                     = "libewf_handle_open_read_section_data";
+	off64_t section_data_offset               = 0;
+	size_t string_data_size                   = 0;
+	ssize_t read_count                        = 0;
+	int initialize_chunk_table                = 0;
+	int header_section_found                  = 0;
+	int number_of_sections                    = 0;
+	int section_index                         = 0;
+	int set_identifier_change                 = 0;
+	int single_files_section_found            = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	int known_section                             = 0;
+	int known_section                         = 0;
 #endif
 
 	if( internal_handle == NULL )
@@ -2804,6 +2600,20 @@ int libewf_handle_open_read_section_data(
 
 		return( -1 );
 	}
+	if( libfcache_cache_initialize(
+	     &sections_cache,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sections cache.",
+		 function );
+
+		goto on_error;
+	}
 	if( libewf_header_sections_initialize(
 	     &header_sections,
 	     error ) != 1 )
@@ -2817,45 +2627,40 @@ int libewf_handle_open_read_section_data(
 
 		goto on_error;
 	}
-	if( libcdata_list_get_element_by_index(
-	     segment_file->section_list,
-	     0,
-	     &section_list_element,
+	if( libfdata_list_get_number_of_elements(
+	     segment_file->sections_list,
+	     &number_of_sections,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve first element from section list.",
+		 "%s: unable to retrieve the number of sections in the sections list.",
 		 function );
 
 		goto on_error;
 	}
-	if( section_list_element == NULL )
+	for( section_index = 0;
+	     section_index < number_of_sections;
+	     section_index++ )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing first section list element.",
-		 function );
-
-		 goto on_error;
-	}
-	while( section_list_element != NULL )
-	{
-		if( libcdata_list_element_get_value(
-		     section_list_element,
+		if( libfdata_list_get_element_value_by_index(
+		     segment_file->sections_list,
+		     (intptr_t *) file_io_pool,
+		     sections_cache,
+		     section_index,
 		     (intptr_t **) &section,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value from section list element.",
-			 function );
+			 "%s: unable to retrieve section: %d from sections list.",
+			 function,
+			 section_index );
 
 			goto on_error;
 		}
@@ -2865,8 +2670,9 @@ int libewf_handle_open_read_section_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing section.",
-			 function );
+			 "%s: missing section: %d.",
+			 function,
+			 section_index );
 
 			goto on_error;
 		}
@@ -3171,7 +2977,6 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_INCREMENT_DATA:
-/* TODO */
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -3253,14 +3058,12 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS:
-/* TODO */
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
 					break;
 
 				case LIBEWF_SECTION_TYPE_MEMORY_EXTENTS_TABLE:
-/* TODO */
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -3275,7 +3078,6 @@ int libewf_handle_open_read_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_FINAL_INFORMATION:
-/* TODO */
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -3785,6 +3587,26 @@ int libewf_handle_open_read_section_data(
 #endif
 			}
 		}
+		else if( section->type_string_length == 11 )
+		{
+			if( memory_compare(
+			     (void *) section->type_string,
+			     (void *) "delta_chunk",
+			     11 ) == 0 )
+			{
+				read_count = libewf_segment_file_read_delta_chunk_section(
+					      segment_file,
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      internal_handle->chunk_table_list,
+					      error );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+				known_section     = 1;
+#endif
+			}
+		}
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -3878,20 +3700,6 @@ int libewf_handle_open_read_section_data(
 			}
 			initialize_chunk_table = 0;
 		}
-		if( libcdata_list_element_get_next_element(
-		     section_list_element,
-		     &section_list_element,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve next element from section list element.",
-			 function );
-
-			goto on_error;
-		}
 	}
 	if( header_section_found != 0 )
 	{
@@ -3950,6 +3758,19 @@ int libewf_handle_open_read_section_data(
 
 		goto on_error;
 	}
+	if( libfcache_cache_free(
+	     &sections_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free sections cache.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
@@ -3964,6 +3785,12 @@ on_error:
 		 &header_sections,
 		 NULL );
 	}
+	if( sections_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &sections_cache,
+		 NULL );
+	}
 	return( -1 );
 }
 
@@ -3976,19 +3803,14 @@ int libewf_handle_open_read_segment_files(
      libewf_chunk_table_t *chunk_table,
      libcerror_error_t **error )
 {
-	libewf_section_t *section           = NULL;
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_handle_open_read_segment_files";
-	off64_t data_range_offset           = 0;
-	off64_t section_offset              = 0;
-	size64_t data_range_size            = 0;
+	off64_t element_offset              = 0;
 	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
-	ssize_t read_count                  = 0;
-	uint32_t data_range_flags           = 0;
+	uint32_t element_flags              = 0;
 	int file_io_pool_entry              = 0;
 	int number_of_segment_files         = 0;
-	int last_section                    = 0;
 	int last_segment_file               = 0;
 	int segment_files_list_index        = 0;
 
@@ -4058,9 +3880,9 @@ int libewf_handle_open_read_segment_files(
 		     internal_handle->segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &element_offset,
+		     &segment_file_size,
+		     &element_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4070,22 +3892,6 @@ int libewf_handle_open_read_segment_files(
 			 "%s: unable to retrieve segment file: %d from list.",
 			 function,
 			 segment_files_list_index );
-
-			return( -1 );
-		}
-		if( libbfio_pool_get_size(
-		     file_io_pool,
-		     file_io_pool_entry,
-		     &segment_file_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size of file IO pool entry: %d.",
-			 function,
-			 file_io_pool_entry );
 
 			return( -1 );
 		}
@@ -4111,276 +3917,174 @@ int libewf_handle_open_read_segment_files(
 				return( -1 );
 			}
 		}
-		if( libewf_segment_file_initialize(
-		     &segment_file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment file: %d.",
-			 function,
-			 segment_files_list_index );
-
-			return( -1 );
-		}
-		read_count = libewf_handle_open_read_segment_file(
-		              internal_handle,
-		              (uint32_t) ( segment_files_list_index + 1 ),
-		              segment_file,
-		              file_io_pool,
-		              file_io_pool_entry,
-		              error );
-
-		if( read_count == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read segment file: %d.",
-			 function,
-			 segment_files_list_index );
-
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			return( -1 );
-		}
-		/* The segment file is cached here in case of resume
-		 */
-		if( libfdata_list_set_element_value_by_index(
+		if( libfdata_list_get_element_value_by_index(
 		     internal_handle->segment_files_list,
+		     (intptr_t *) file_io_pool,
 		     internal_handle->segment_files_cache,
 		     segment_files_list_index,
-		     (intptr_t *) segment_file,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
-		     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+		     (intptr_t **) &segment_file,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file: %d in list.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file: %d from segment files list.",
 			 function,
 			 segment_files_list_index );
 
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
+			return( -1 );
+		}
+		if( segment_file == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file: %d.",
+			 function,
+			 segment_files_list_index );
 
 			return( -1 );
 		}
-		/* The segment file is now handled by the segment files list
-		 * and no longer needs to be explicitly freed
-		 */
+		if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
+		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
+		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported segment file type.",
+			 function );
 
-/* TODO refactor to function read section descriptors */
-		/* Read the section descriptors:
-		 * EWF version 1 read from front to back
-		 * EWF version 2 read from back to front
-		 */
-		if( segment_file->major_version == 1 )
-		{
-			section_offset = (off64_t) read_count;
+			return( -1 );
 		}
-		else if( segment_file->major_version == 2 )
+		if( segment_file->segment_number != (uint32_t) ( segment_files_list_index + 1 ) )
 		{
-			section_offset = (off64_t) segment_file_size - sizeof( ewf_section_descriptor_v2_t );
-		}
-		last_section = 0;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+			 "%s: segment number mismatch ( stored: %" PRIu32 ", expected: %d ).",
+			 function,
+			 segment_file->segment_number,
+			 segment_files_list_index + 1 );
 
-		while( ( section_offset > 0 )
-		    && ( (size64_t) section_offset < segment_file_size ) )
+			return( -1 );
+		}
+		if( segment_file->segment_number == 1 )
 		{
-			if( libewf_section_initialize(
-			     &section,
-			     error ) != 1 )
+			internal_handle->io_handle->segment_file_type  = segment_file->type;
+			internal_handle->io_handle->major_version      = segment_file->major_version;
+			internal_handle->io_handle->minor_version      = segment_file->minor_version;
+			internal_handle->io_handle->compression_method = segment_file->compression_method;
+
+			if( segment_file->major_version == 2 )
+			{
+				if( memory_copy(
+				     internal_handle->media_values->set_identifier,
+				     segment_file->set_identifier,
+				     16 ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+					 "%s: unable to copy segment file set identifier to media values.",
+					 function );
+
+					return( -1 );
+				}
+				if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
+				 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: unsupported compression method.",
+					 function );
+
+					return( -1 );
+				}
+			}
+		}
+		else
+		{
+			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+			 && ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 ) )
+			{
+				segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+			}
+			else if( segment_file->type != internal_handle->io_handle->segment_file_type )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create section.",
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+				 "%s: segment file type value mismatch.",
 				 function );
 
 				return( -1 );
 			}
-			read_count = libewf_section_descriptor_read(
-			              section,
-			              file_io_pool,
-			              file_io_pool_entry,
-			              section_offset,
-			              segment_file->major_version,
-			              error );
-
-			if( read_count == -1 )
+			if( ( segment_file->major_version != internal_handle->io_handle->major_version )
+			 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read section descriptor.",
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+				 "%s: segment file format version value mismatch.",
 				 function );
 
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					if( ( error != NULL )
-					 && ( *error != NULL ) )
-					{
-						libcnotify_print_error_backtrace(
-						 *error );
-					}
-				}
-#endif
-				libcerror_error_free(
-				 error );
-
-				libewf_section_free(
-				 &section,
-				 NULL );
-
-				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
-
-				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
-
-				break;
+				return( -1 );
 			}
-			if( segment_file->major_version == 1 )
+			if( internal_handle->io_handle->major_version == 2 )
 			{
-				if( section->type == LIBEWF_SECTION_TYPE_NEXT )
-				{
-					last_section = 1;
-				}
-				else if( section->type == LIBEWF_SECTION_TYPE_DONE )
-				{
-					last_section      = 1;
-					last_segment_file = 1;
-				}
-				segment_file->last_section_offset = section_offset;
-
-				section_offset += section->size;
-
-/* TODO move into section descriptor read ? */
-				if( ( last_section != 0 )
-				 && ( section->size == 0 ) )
-				{
-					section_offset += sizeof( ewf_section_descriptor_v1_t );
-				}
-				if( libcdata_list_append_value(
-				     segment_file->section_list,
-				     (intptr_t *) section,
-				     error ) != 1 )
+				if( segment_file->compression_method != internal_handle->io_handle->compression_method )
 				{
 					libcerror_error_set(
 					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append section to list.",
+					 LIBCERROR_ERROR_DOMAIN_INPUT,
+					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+					 "%s: segment file compression method value mismatch.",
 					 function );
-
-					libewf_section_free(
-					 &section,
-					 NULL );
 
 					return( -1 );
 				}
-			}
-			else if( segment_file->major_version == 2 )
-			{
-				if( section->type == LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS )
-				{
-/* TODO get key info */
-					internal_handle->io_handle->format       = LIBEWF_FORMAT_V2_ENCASE7;
-					internal_handle->io_handle->is_encrypted = 1;
-				}
-				if( segment_file->last_section_offset == 0 )
-				{
-					if( section->type == LIBEWF_SECTION_TYPE_NEXT )
-					{
-						last_section = 1;
-					}
-					else if( section->type == LIBEWF_SECTION_TYPE_DONE )
-					{
-						last_section      = 1;
-						last_segment_file = 1;
-					}
-					segment_file->last_section_offset = section_offset;
-				}
-				section_offset -= section->size;
-
-				if( libcdata_list_prepend_value(
-				     segment_file->section_list,
-				     (intptr_t *) section,
-				     error ) != 1 )
+				if( memory_compare(
+				     internal_handle->media_values->set_identifier,
+				     segment_file->set_identifier,
+				     16 ) != 0 )
 				{
 					libcerror_error_set(
 					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to prepend section to list.",
+					 LIBCERROR_ERROR_DOMAIN_INPUT,
+					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+					 "%s: segment file set identifier value mismatch.",
 					 function );
-
-					libewf_section_free(
-					 &section,
-					 NULL );
 
 					return( -1 );
 				}
-			}
-			section = NULL;
-
-			if( ( segment_file->major_version == 1 )
-			 && ( last_section != 0 ) )
-			{
-				break;
 			}
 		}
-		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED ) == 0 )
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_LAST ) != 0 )
 		{
-			if( last_section == 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing next or done section.",
-				 function );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					if( ( error != NULL )
-					 && ( *error != NULL ) )
-					{
-						libcnotify_print_error_backtrace(
-						 *error );
-					}
-				}
-#endif
-				libcerror_error_free(
-				 error );
-
-				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_CORRUPTED;
-
-				internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			else if( libcnotify_verbose != 0 )
-			{
-				if( (size64_t) section_offset < segment_file_size )
-				{
-					libcnotify_printf(
-					 "%s: trailing data in segment file: %" PRIu16 "\n",
-					 function,
-					 segment_files_list_index );
-				}
-			}
-#endif
+			last_segment_file = 1;
+		}
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_ENCRYPTED ) != 0 )
+		{
+/* TODO get key info */
+			internal_handle->io_handle->format       = LIBEWF_FORMAT_V2_ENCASE7;
+			internal_handle->io_handle->is_encrypted = 1;
+		}
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED ) != 0 )
+		{
+			internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
 		}
 		if( libewf_handle_open_read_section_data(
 		     internal_handle,
@@ -4425,7 +4129,7 @@ int libewf_handle_open_read_segment_files(
 		libcerror_error_free(
 		 error );
 
-		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED;
+		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
 	}
 	return( 1 );
 }
@@ -4436,27 +4140,19 @@ int libewf_handle_open_read_segment_files(
 int libewf_handle_open_read_delta_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
+     libewf_chunk_table_t *chunk_table,
      libcerror_error_t **error )
 {
-	libewf_section_t *section           = NULL;
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_handle_open_read_delta_segment_files";
-	off64_t data_range_offset           = 0;
-	off64_t section_offset              = 0;
-	size64_t data_range_size            = 0;
+	off64_t element_offset              = 0;
 	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
-	ssize_t read_count                  = 0;
-	uint32_t data_range_flags           = 0;
+	uint32_t element_flags              = 0;
 	int file_io_pool_entry              = 0;
 	int number_of_segment_files         = 0;
-	int last_section                    = 0;
 	int last_segment_file               = 0;
 	int segment_files_list_index        = 0;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-	int known_section                   = 0;
-#endif
 
 	if( internal_handle == NULL )
 	{
@@ -4492,7 +4188,7 @@ int libewf_handle_open_read_delta_segment_files(
 		 "%s: unable to retrieve number of delta segment files in list.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( number_of_segment_files <= 1 )
 	{
@@ -4506,9 +4202,9 @@ int libewf_handle_open_read_delta_segment_files(
 		     internal_handle->delta_segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &element_offset,
+		     &segment_file_size,
+		     &element_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4519,23 +4215,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 function,
 			 segment_files_list_index );
 
-			goto on_error;
-		}
-		if( libbfio_pool_get_size(
-		     file_io_pool,
-		     file_io_pool_entry,
-		     &segment_file_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size of file IO pool entry: %d.",
-			 function,
-			 file_io_pool_entry );
-
-			goto on_error;
+			return( -1 );
 		}
 		if( ( segment_files_list_index == 0 )
 		 && ( number_of_segment_files > 1 ) )
@@ -4556,42 +4236,39 @@ int libewf_handle_open_read_delta_segment_files(
 				 "%s: unable to set maximum segment size in delta segment table.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 		}
-		if( libewf_segment_file_initialize(
-		     &segment_file,
+		if( libfdata_list_get_element_value_by_index(
+		     internal_handle->delta_segment_files_list,
+		     (intptr_t *) file_io_pool,
+		     internal_handle->segment_files_cache,
+		     segment_files_list_index,
+		     (intptr_t **) &segment_file,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment file.",
-			 function );
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file: %d from delta segment files list.",
+			 function,
+			 segment_files_list_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		read_count = libewf_segment_file_read_file_header(
-			      segment_file,
-			      file_io_pool,
-			      file_io_pool_entry,
-			      error );
-
-		if( read_count < 0 )
+		if( segment_file == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read segment file header.",
-			 function );
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file: %d.",
+			 function,
+			 segment_files_list_index );
 
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			goto on_error;
+			return( -1 );
 		}
 		if( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
 		{
@@ -4602,11 +4279,7 @@ int libewf_handle_open_read_delta_segment_files(
 			 "%s: unsupported segment file type.",
 			 function );
 
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			goto on_error;
+			return( -1 );
 		}
 		if( segment_file->segment_number != (uint32_t) ( segment_files_list_index + 1 ) )
 		{
@@ -4614,217 +4287,36 @@ int libewf_handle_open_read_delta_segment_files(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_INPUT,
 			 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-			 "%s: segment number mismatch.",
-			 function );
+			 "%s: segment number mismatch ( stored: %" PRIu32 ", expected: %d ).",
+			 function,
+			 segment_file->segment_number,
+			 segment_files_list_index + 1 );
 
-			libewf_segment_file_free(
-			 &segment_file,
-			 NULL );
-
-			goto on_error;
+			return( -1 );
 		}
-		if( libfdata_list_set_element_value_by_index(
-		     internal_handle->delta_segment_files_list,
-		     internal_handle->segment_files_cache,
-		     segment_files_list_index,
-		     (intptr_t *) segment_file,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
-		     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_LAST ) != 0 )
+		{
+			last_segment_file = 1;
+		}
+/* TODO use this function for now ? */
+		if( libewf_handle_open_read_section_data(
+		     internal_handle,
+		     chunk_table,
+		     segment_file,
+		     file_io_pool,
+		     file_io_pool_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set segment file: %d in segment files list.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section data from segment file: %d.",
 			 function,
 			 segment_files_list_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		section_offset = (off64_t) read_count;
-		last_section   = 0;
-
-		while( (size64_t) section_offset < segment_file_size )
-		{
-			if( libewf_section_initialize(
-			     &section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create section.",
-				 function );
-
-				goto on_error;
-			}
-			read_count = libewf_section_descriptor_read(
-			              section,
-			              file_io_pool,
-			              file_io_pool_entry,
-			              section_offset,
-			              segment_file->major_version,
-			              error );
-
-			if( read_count == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read section descriptor.",
-				 function );
-
-				goto on_error;
-			}
-			if( section->type_string_length == 4 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "done",
-				     4 ) == 0 )
-				{
-					if( ( segment_files_list_index + 1 ) != number_of_segment_files )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_INPUT,
-						 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-						 "%s: last segment number mismatch.",
-						 function );
-
-						goto on_error;
-					}
-					/* Nothing to do for the done section
-					 */
-					last_section      = 1;
-					last_segment_file = 1;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-					known_section     = 1;
-#endif
-				}
-				else if( memory_compare(
-				          (void *) section->type_string,
-				          (void *) "next",
-				          4 ) == 0 )
-				{
-					/* Nothing to do for the next section
-					 */
-					last_section  = 1;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-					known_section     = 1;
-#endif
-				}
-			}
-			else if( section->type_string_length == 11 )
-			{
-				if( memory_compare(
-				     (void *) section->type_string,
-				     (void *) "delta_chunk",
-				     11 ) == 0 )
-				{
-					read_count = libewf_segment_file_read_delta_chunk_section(
-						      segment_file,
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->chunk_table_list,
-						      error );
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-					known_section     = 1;
-#endif
-				}
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( known_section == 0 )
-				{
-					if( section->type_string_length == 0 )
-					{
-						libcnotify_printf(
-						 "%s: unsupported section type: 0x%08" PRIx32 ".\n",
-						 function,
-						 section->type_string );
-					}
-					else
-					{
-						libcnotify_printf(
-						 "%s: unsupported section type: %s.\n",
-						 function,
-						 (char *) section->type_string );
-					}
-				}
-			}
-#endif
-			if( read_count == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read section: %s.",
-				 function,
-				 (char *) section->type_string );
-
-				goto on_error;
-			}
-			section_offset += section->size;
-
-			if( ( last_section != 0 )
-			 && ( section->size == 0 ) )
-			{
-				section_offset += sizeof( ewf_section_descriptor_v1_t );
-			}
-			if( libcdata_list_append_value(
-			     segment_file->section_list,
-			     (intptr_t *) section,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append section to list.",
-				 function );
-
-				goto on_error;
-			}
-			section = NULL;
-
-			if( last_section != 0 )
-			{
-				break;
-			}
-		}
-		if( last_section == 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing next or done section.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( (size64_t) section_offset < segment_file_size )
-			{
-				libcnotify_printf(
-				 "%s: trailing data in segment file: %" PRIu16 "\n",
-				 function,
-				 segment_files_list_index );
-			}
-		}
-#endif
 		segment_file = NULL;
 	}
 	if( last_segment_file == 0 )
@@ -4836,18 +4328,9 @@ int libewf_handle_open_read_delta_segment_files(
 		 "%s: missing done section.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	return( 1 );
-
-on_error:
-	if( section != NULL )
-	{
-		libewf_section_free(
-		 &section,
-		 NULL );
-	}
-	return( -1 );
 }
 
 /* Closes the EWF handle
@@ -7319,14 +6802,14 @@ ssize_t libewf_handle_write_finalize(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
 	static char *function                     = "libewf_handle_write_finalize";
-	off64_t data_range_offset                 = 0;
+	off64_t element_offset                    = 0;
 	off64_t segment_file_offset               = 0;
-	size64_t data_range_size                  = 0;
+	size64_t element_size                     = 0;
 	size_t input_data_size                    = 0;
 	ssize_t write_count                       = 0;
 	ssize_t write_finalize_count              = 0;
 	uint64_t chunk_index                      = 0;
-	uint32_t data_range_flags                 = 0;
+	uint32_t element_flags                    = 0;
 	int file_io_pool_entry                    = -1;
 	int number_of_segment_files               = 0;
 	int segment_files_list_index              = 0;
@@ -7619,9 +7102,9 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->segment_files_list,
 		     segment_files_list_index,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &element_offset,
+		     &element_size,
+		     &element_flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -8125,7 +7608,7 @@ int libewf_handle_segment_files_corrupted(
 
 		return( -1 );
 	}
-	if( ( internal_handle->segment_table->flags & LIBEWF_SEGMENT_TABLE_FLAG_CORRUPTED ) != 0 )
+	if( ( internal_handle->segment_table->flags & LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED ) != 0 )
 	{
 		return( 1 );
 	}
@@ -9927,7 +9410,6 @@ int libewf_handle_get_root_file_entry(
 	     root_file_entry,
 	     internal_handle,
 	     internal_handle->single_files->root_file_entry_node,
-	     LIBEWF_ITEM_FLAGS_DEFAULT,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -10137,7 +9619,6 @@ int libewf_file_get_file_entry_by_utf8_path(
 		     file_entry,
 		     internal_handle,
 		     node,
-		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -10348,7 +9829,6 @@ int libewf_file_get_file_entry_by_utf16_path(
 		     file_entry,
 		     internal_handle,
 		     node,
-		     LIBEWF_ITEM_FLAGS_DEFAULT,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

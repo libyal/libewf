@@ -41,8 +41,9 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libfvalue.h"
 #include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
+#include "libewf_libfvalue.h"
 #include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
@@ -93,9 +94,13 @@ struct libewf_segment_file
 	 */
 	off64_t last_section_offset;
 
-        /* The list of all the sections
+        /* The the sections list
          */
-        libcdata_list_t *section_list;
+        libfdata_list_t *sections_list;
+
+	/* The chunk groups list
+	 */
+	libfdata_list_t *chunk_groups_list;
 
 	/* The number of chunks
 	 */
@@ -132,11 +137,38 @@ ssize_t libewf_segment_file_write_file_header(
          libcerror_error_t **error );
 
 int libewf_segment_file_read(
-     intptr_t *io_handle,
+     intptr_t *data_handle,
      libbfio_pool_t *file_io_pool,
-     int file_io_pool_entry,
-     libmfdata_file_t *file,
+     libfdata_list_element_t *element,
      libfcache_cache_t *cache,
+     int file_io_pool_entry,
+     off64_t segment_file_offset,
+     size64_t segment_file_size,
+     uint32_t element_flags,
+     uint8_t read_flags,
+     libcerror_error_t **error );
+
+int libewf_segment_file_read_section_element_data(
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_element_t *element,
+     libfcache_cache_t *cache,
+     int file_io_pool_entry,
+     off64_t segment_file_offset,
+     size64_t element_size,
+     uint32_t element_flags,
+     uint8_t read_flags,
+     libcerror_error_t **error );
+
+int libewf_segment_file_read_chunk_group_element_data(
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_element_t *element,
+     libfcache_cache_t *cache,
+     int file_io_pool_entry,
+     off64_t segment_file_offset,
+     size64_t element_size,
+     uint32_t element_flags,
      uint8_t read_flags,
      libcerror_error_t **error );
 

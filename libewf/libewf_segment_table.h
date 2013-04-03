@@ -52,10 +52,6 @@ struct libewf_segment_table
 	 */
 	size64_t maximum_segment_size;
 
-	/* The segment files (handles) array
-	 */
-	libcdata_array_t *segment_files_array;
-
 	/* Flags
 	 */
 	uint8_t flags;

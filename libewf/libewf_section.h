@@ -31,7 +31,6 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
-#include "libewf_libmfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_single_files.h"
 

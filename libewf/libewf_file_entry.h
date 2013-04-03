@@ -61,7 +61,6 @@ int libewf_file_entry_initialize(
      libewf_file_entry_t **file_entry,
      libewf_internal_handle_t *internal_handle,
      libcdata_tree_node_t *file_entry_tree_node,
-     uint8_t flags,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
