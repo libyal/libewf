@@ -7,6 +7,12 @@ TODO
   - add delta segment files cache ? caching happens based on element index
     but will cause a cache miss - 2 separate caches more efficient ?
   - check ewfacquirestream
+  - split segment file and delta segment file to separate code files?
+    - yes, no need for chunk groups in delta segment files
+  - segment files cache on write set to 1 ?
+  - create a single chunk groups cache ? instead per segment file ?
+  - add stream like read/write to list ?
+  - check if chunks groups list is filled in on demand scenario
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support

@@ -25,7 +25,10 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -151,6 +154,18 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
      const uint8_t *data,
      size_t data_size,
      uint64_t *pattern,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_read_element_data(
+     intptr_t *data_handle,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_element_t *list_element,
+     libfcache_cache_t *cache,
+     int file_io_pool_entry,
+     off64_t chunk_data_offset,
+     size64_t chunk_data_size,
+     uint32_t chunk_data_flags,
+     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

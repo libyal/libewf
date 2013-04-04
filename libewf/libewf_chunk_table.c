@@ -612,6 +612,7 @@ int libewf_chunk_table_read_offsets(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      chunk_table->io_handle->major_version,
+		      chunk_table->io_handle->segment_file_type,
 		      &section_data,
 		      &section_data_size,
 		      &first_chunk_index,

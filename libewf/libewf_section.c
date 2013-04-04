@@ -7813,6 +7813,7 @@ ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t **section_data,
          size_t *section_data_size,
          uint64_t *first_chunk_index,
@@ -7866,7 +7867,7 @@ ssize_t libewf_section_table_read(
 
 		/* The original EWF and SMART (EWF-S01) formats do not contain a table footer
 		 */
-		if( io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		{
 			table_footer_data_size = 4;
 		}
@@ -8000,7 +8001,7 @@ ssize_t libewf_section_table_read(
 	}
 	/* In original EWF, SMART (EWF-S01) and EnCase1 EWF-E01 the trailing data will be the chunk data
 	 */
-	if( ( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		*section_data_size = (size_t) table_header_data_size;
@@ -8274,7 +8275,7 @@ ssize_t libewf_section_table_read(
 
 			goto on_error;
 		}
-		if( ( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 		{
 			memory_free(
@@ -8483,6 +8484,7 @@ ssize_t libewf_section_table_write(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
@@ -8494,7 +8496,6 @@ ssize_t libewf_section_table_write(
          size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t segment_file_type,
          libcerror_error_t **error )
 {
 	uint8_t *table_data                 = NULL;

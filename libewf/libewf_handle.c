@@ -1883,16 +1883,15 @@ int libewf_handle_open_file_io_pool(
 			goto on_error;
 		}
 	}
-/* TODO pass segment table of equiv for key information ? */
 /* TODO add write support ? */
 	if( libfdata_list_initialize(
 	     &( internal_handle->segment_files_list ),
+	     (intptr_t *) internal_handle->io_handle,
 	     NULL,
 	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read,
-	     NULL,
-	     0,
+	     LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1904,14 +1903,15 @@ int libewf_handle_open_file_io_pool(
 
 		goto on_error;
 	}
+/* TODO add write support ? */
 	if( libfdata_list_initialize(
 	     &( internal_handle->delta_segment_files_list ),
+	     (intptr_t *) internal_handle->io_handle,
 	     NULL,
 	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_delta_segment_file_read_element_data,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read,
-	     NULL,
-	     0,
+	     LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1932,7 +1932,7 @@ int libewf_handle_open_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment files table cache.",
+		 "%s: unable to create segment files cache.",
 		 function );
 
 		goto on_error;
@@ -2103,6 +2103,7 @@ int libewf_handle_open_file_io_pool(
 		}
 		if( libewf_segment_file_initialize(
 		     &segment_file,
+		     internal_handle->io_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2909,7 +2910,6 @@ int libewf_handle_open_read_section_data(
 					read_count = libewf_segment_file_read_table_section(
 						      segment_file,
 						      section,
-						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      internal_handle->media_values,
@@ -3228,7 +3228,6 @@ int libewf_handle_open_read_section_data(
 				read_count = libewf_segment_file_read_volume_section(
 					      segment_file,
 					      section,
-					      internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
@@ -3420,7 +3419,6 @@ int libewf_handle_open_read_section_data(
 				read_count = libewf_segment_file_read_table2_section(
 					      segment_file,
 					      section,
-					      internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      chunk_table,
@@ -3439,7 +3437,6 @@ int libewf_handle_open_read_section_data(
 				read_count = libewf_segment_file_read_volume_section(
 					      segment_file,
 					      section,
-					      internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
@@ -3668,6 +3665,9 @@ int libewf_handle_open_read_section_data(
 
 				goto on_error;
 			}
+/* TODO refactor */
+			internal_handle->io_handle->chunk_size = internal_handle->media_values->chunk_size;
+
 			if( internal_handle->media_values->number_of_chunks > 0 )
 			{
 				if( libmfdata_list_resize(
@@ -3806,6 +3806,7 @@ int libewf_handle_open_read_segment_files(
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_handle_open_read_segment_files";
 	off64_t element_offset              = 0;
+	off64_t storage_media_offset        = 0;
 	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
 	uint32_t element_flags              = 0;
@@ -3948,21 +3949,6 @@ int libewf_handle_open_read_segment_files(
 
 			return( -1 );
 		}
-		if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-		 && ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported segment file type.",
-			 function );
-
-			return( -1 );
-		}
 		if( segment_file->segment_number != (uint32_t) ( segment_files_list_index + 1 ) )
 		{
 			libcerror_error_set(
@@ -3999,38 +3985,10 @@ int libewf_handle_open_read_segment_files(
 
 					return( -1 );
 				}
-				if( ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
-				 && ( segment_file->compression_method != LIBEWF_COMPRESSION_METHOD_BZIP2 ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-					 "%s: unsupported compression method.",
-					 function );
-
-					return( -1 );
-				}
 			}
 		}
 		else
 		{
-			if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
-			 && ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 ) )
-			{
-				segment_file->type = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-			}
-			else if( segment_file->type != internal_handle->io_handle->segment_file_type )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_INPUT,
-				 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-				 "%s: segment file type value mismatch.",
-				 function );
-
-				return( -1 );
-			}
 			if( ( segment_file->major_version != internal_handle->io_handle->major_version )
 			 || ( segment_file->minor_version != internal_handle->io_handle->minor_version ) )
 			{
@@ -4104,6 +4062,25 @@ int libewf_handle_open_read_segment_files(
 
 			return( -1 );
 		}
+		if( libfdata_list_set_mapped_range_by_index(
+		     internal_handle->segment_files_list,
+		     segment_files_list_index,
+		     storage_media_offset,
+		     segment_file->storage_media_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to set mapped range of element: %d in segment files list.",
+			 function,
+			 segment_files_list_index );
+
+			return( -1 );
+		}
+		storage_media_offset += segment_file->storage_media_size;
+
 		segment_file = NULL;
 	}
 	if( last_segment_file == 0 )
@@ -4270,17 +4247,6 @@ int libewf_handle_open_read_delta_segment_files(
 
 			return( -1 );
 		}
-		if( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported segment file type.",
-			 function );
-
-			return( -1 );
-		}
 		if( segment_file->segment_number != (uint32_t) ( segment_files_list_index + 1 ) )
 		{
 			libcerror_error_set(
@@ -4358,6 +4324,17 @@ int libewf_handle_close(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->write_io_handle != NULL )
 	 && ( internal_handle->write_io_handle->write_finalized == 0 ) )
 	{
@@ -4408,6 +4385,8 @@ int libewf_handle_close(
 	}
 	internal_handle->file_io_pool                    = NULL;
 	internal_handle->file_io_pool_created_in_library = 0;
+
+	internal_handle->io_handle->segment_file_type    = LIBEWF_SEGMENT_FILE_TYPE_UNDEFINED;
 
 	if( internal_handle->read_io_handle != NULL )
 	{
@@ -5123,13 +5102,19 @@ ssize_t libewf_handle_read_buffer(
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_segment_file_t *segment_file       = NULL;
+	libfdata_list_t *chunks_list              = NULL;
 	static char *function                     = "libewf_handle_read_buffer";
 	off64_t chunk_offset                      = 0;
+	off64_t storage_media_offset_chunk_group  = 0;
+	off64_t storage_media_offset_segment_file = 0;
 	size_t buffer_offset                      = 0;
 	size_t read_size                          = 0;
 	ssize_t total_read_count                  = 0;
 	uint64_t chunk_index                      = 0;
 	uint64_t chunk_data_offset                = 0;
+	int chunk_groups_list_index               = 0;
+	int segment_files_list_index              = 0;
 
 	if( handle == NULL )
 	{
@@ -5229,6 +5214,66 @@ ssize_t libewf_handle_read_buffer(
 	{
 		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
 	}
+/* TODO check delta segment files list first add an overlay bitmap ? bit per chunk ?
+ */
+	if( libfdata_list_get_element_value_at_offset(
+	     internal_handle->segment_files_list,
+	     (intptr_t *) internal_handle->file_io_pool,
+	     internal_handle->segment_files_cache,
+	     internal_handle->io_handle->current_offset,
+	     &segment_files_list_index,
+	     &storage_media_offset_segment_file,
+	     (intptr_t **) &segment_file,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file at offset: %" PRIi64 " from segment files list.",
+		 function,
+		 internal_handle->io_handle->current_offset );
+
+		return( -1 );
+	}
+fprintf( stderr, "X: %d - %" PRIi64 "\n", segment_files_list_index, storage_media_offset_segment_file );
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment file: %d.",
+		 function,
+		 segment_files_list_index );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_element_value_at_offset(
+	     segment_file->chunk_groups_list,
+	     (intptr_t *) internal_handle->file_io_pool,
+	     segment_file->chunk_groups_cache,
+	     storage_media_offset_segment_file,
+	     &chunk_groups_list_index,
+	     &storage_media_offset_chunk_group,
+	     (intptr_t **) &chunks_list,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunks list from segment file: %d at offset: %" PRIi64 ".",
+		 function,
+		 segment_files_list_index,
+		 storage_media_offset_segment_file );
+
+		return( -1 );
+	}
+fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media_offset_chunk_group );
+/* TODO */
 	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
@@ -7068,7 +7113,6 @@ ssize_t libewf_handle_write_finalize(
 		}
 		write_count = libewf_segment_file_write_start(
 		               segment_file,
-		               internal_handle->io_handle,
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
 		               &( internal_handle->write_io_handle->case_data ),
@@ -7223,7 +7267,6 @@ ssize_t libewf_handle_write_finalize(
 			}
 			write_count = libewf_segment_file_write_chunks_section_final(
 				       segment_file,
-				       internal_handle->io_handle,
 				       internal_handle->file_io_pool,
 				       file_io_pool_entry,
 				       segment_file_offset,
@@ -7266,7 +7309,6 @@ ssize_t libewf_handle_write_finalize(
 #endif
 		write_count = libewf_segment_file_write_close(
 		               segment_file,
-		               internal_handle->io_handle,
 		               internal_handle->file_io_pool,
 		               file_io_pool_entry,
 		               segment_file_offset,

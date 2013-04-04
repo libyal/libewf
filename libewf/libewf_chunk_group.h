@@ -20,31 +20,65 @@
  */
 
 #if !defined( _LIBEWF_CHUNK_GROUP_H )
-#define _LIBEWF_GROUP_TABLE_H
+#define _LIBEWF_CHUNK_GROUP_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
+#include "libewf_section.h"
+
+#include "ewf_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_chunk_group_read_element_data(
-     intptr_t *data_handle,
-     libbfio_pool_t *file_io_pool,
-     libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+int libewf_chunk_group_fill_v1(
+     libfdata_list_t *chunks_list,
+     size32_t chunk_size,
      int file_io_pool_entry,
-     off64_t segment_file_offset,
-     size64_t element_size,
-     uint32_t element_flags,
-     uint8_t read_flags,
+     libewf_section_t *table_section,
+     off64_t base_offset,
+     uint32_t number_of_offsets,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint8_t tainted,
+     libcerror_error_t **error );
+
+int libewf_chunk_group_fill_v2(
+     libfdata_list_t *chunks_list,
+     size32_t chunk_size,
+     int file_io_pool_entry,
+     libewf_section_t *table_section,
+     uint32_t number_of_offsets,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint8_t tainted,
+     libcerror_error_t **error );
+
+int libewf_chunk_group_correct_v1(
+     libfdata_list_t *chunks_list,
+     size32_t chunk_size,
+     int file_io_pool_entry,
+     libewf_section_t *table_section,
+     off64_t base_offset,
+     uint32_t number_of_offsets,
+     const uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint8_t tainted,
+     libcerror_error_t **error );
+
+int libewf_chunk_group_generate_table_entries_data(
+     libfdata_list_t *chunks_list,
+     uint8_t format_version,
+     uint8_t *table_entries_data,
+     size_t table_entries_data_size,
+     uint32_t number_of_entries,
+     off64_t base_offset,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -75,6 +75,10 @@ struct libewf_io_handle
 	 */
 	uint8_t is_encrypted;
 
+	/* The size of an individual chunk
+	 */
+	size32_t chunk_size;
+
 	/* The header codepage
 	 */
 	int header_codepage;

@@ -542,7 +542,7 @@ int libewf_glob(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid filename length.",
+		 "%s: invalid filename length value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -979,7 +979,7 @@ int libewf_glob_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid filename length.",
+		 "%s: invalid filename length value out of bounds.",
 		 function );
 
 		return( -1 );

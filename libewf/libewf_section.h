@@ -332,6 +332,7 @@ ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t **section_data,
          size_t *section_data_size,
          uint64_t *first_chunk_index,
@@ -348,6 +349,7 @@ ssize_t libewf_section_table_write(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
@@ -359,7 +361,6 @@ ssize_t libewf_section_table_write(
          size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t segment_file_type,
          libcerror_error_t **error );
 
 ssize_t libewf_section_volume_e01_read(
