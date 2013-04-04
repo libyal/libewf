@@ -50,7 +50,8 @@
 #define IMAGING_HANDLE_STRING_SIZE		1024
 #define IMAGING_HANDLE_NOTIFY_STREAM		stdout
 
-/* Initializes the imaging handle
+/* Creates an imaging handle
+ * Make sure the value imaging_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_initialize(
@@ -221,7 +222,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the imaging handle and its elements
+/* Frees an imaging handle
  * Returns 1 if successful or -1 on error
  */
 int imaging_handle_free(

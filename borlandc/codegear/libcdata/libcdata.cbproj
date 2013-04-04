@@ -39,64 +39,48 @@
 		</PropertyGroup>
 		<ItemGroup>
 			<None Include="..\..\..\libcdata\libcdata_unused.h">
-				<BuildOrder>0</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_array.c">
-				<BuildOrder>1</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_array.h">
-				<BuildOrder>2</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_btree.c">
-				<BuildOrder>3</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_btree.h">
-				<BuildOrder>4</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcdata\libcdata_error.c">
+			</CppCompile>
+			<None Include="..\..\..\libcdata\libcdata_error.h">
 			</None>
 			<None Include="..\..\..\libcdata\libcdata_definitions.h">
-				<BuildOrder>5</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcdata\libcdata_extern.h">
-				<BuildOrder>6</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcdata\libcdata_libcerror.h">
-				<BuildOrder>7</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcdata\libcdata_libcstring.h">
-				<BuildOrder>8</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_list.c">
-				<BuildOrder>9</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_list.h">
-				<BuildOrder>10</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_list_element.c">
-				<BuildOrder>11</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_list_element.h">
-				<BuildOrder>12</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_range_list.c">
-				<BuildOrder>13</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_range_list.h">
-				<BuildOrder>14</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_support.c">
-				<BuildOrder>15</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_support.h">
-				<BuildOrder>16</BuildOrder>
 			</None>
 			<CppCompile Include="..\..\..\libcdata\libcdata_tree_node.c">
-				<BuildOrder>17</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcdata\libcdata_tree_node.h">
-				<BuildOrder>18</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcdata\libcdata_types.h">
-				<BuildOrder>19</BuildOrder>
 			</None>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>

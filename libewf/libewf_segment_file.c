@@ -67,7 +67,8 @@ const uint8_t ewf1_lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0d, 0x0
 const uint8_t ewf2_evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x32, 0x0d, 0x0a, 0x81, 0x00 };
 const uint8_t ewf2_lef_file_signature[ 8 ] = { 0x4c, 0x45, 0x46, 0x32, 0x0d, 0x0a, 0x81, 0x00 };
 
-/* Initialize the segment file
+/* Creates a segment file
+ * Make sure the value segment_file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_initialize(
@@ -131,7 +132,6 @@ int libewf_segment_file_initialize(
 
 		return( -1 );
 	}
-/* TODO add read support */
 /* TODO add write support */
 	if( libfdata_list_initialize(
 	     &( ( *segment_file )->sections_list ),
@@ -191,7 +191,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the segment file including elements
+/* Frees a segment file
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_free(

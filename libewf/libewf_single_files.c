@@ -33,7 +33,8 @@
 #include "libewf_single_file_entry.h"
 #include "libewf_single_files.h"
 
-/* Initialize the single files
+/* Creates single files
+ * Make sure the value single_files is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_initialize(
@@ -105,7 +106,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the single files including elements
+/* Frees single files
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_free(

@@ -33,7 +33,8 @@
 
 #include "ewf_definitions.h"
 
-/* Initialize the header sections
+/* Creates header sections
+ * Make sure the value header_sections is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_initialize(
@@ -105,7 +106,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the header sections including elements
+/* Frees header sections
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_free(

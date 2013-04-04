@@ -37,7 +37,8 @@
 #include "ewftools_libcsystem.h"
 #include "log_handle.h"
 
-/* Initializes the log handle
+/* Creates a log handle
+ * Make sure the value log_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int log_handle_initialize(
@@ -109,7 +110,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the log handle and its elements
+/* Frees a log handle
  * Returns 1 if successful or -1 on error
  */
 int log_handle_free(

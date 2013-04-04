@@ -120,7 +120,9 @@ int libewf_check_file_signature_file_io_handle(
 #endif
 
 /* Globs the segment files according to the EWF naming schema
- * if the format is known the filename should contain the base of the filename
+ * Make sure the value filenames is referencing, is set to NULL
+ *
+ * If the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -133,7 +135,7 @@ int libewf_glob(
      int *number_of_filenames,
      libewf_error_t **error );
 
-/* Frees the globbed filenames
+/* Frees globbed filenames
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -144,7 +146,9 @@ int libewf_glob_free(
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
 /* Globs the segment files according to the EWF naming schema
- * if the format is known the filename should contain the base of the filename
+ * Make sure the value filenames is referencing, is set to NULL
+ *
+ * If the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
  * Returns 1 if successful or -1 on error
  */
@@ -157,7 +161,7 @@ int libewf_glob_wide(
      int *number_of_filenames,
      libewf_error_t **error );
 
-/* Frees the globbed wide filenames
+/* Frees globbed wide filenames
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -245,7 +249,7 @@ int libewf_notify_stream_close(
  * Error functions
  * ------------------------------------------------------------------------- */
 
-/* Frees the error including elements
+/* Frees an error
  */
 LIBEWF_EXTERN \
 void libewf_error_free(
@@ -291,8 +295,8 @@ int libewf_error_backtrace_sprint(
  * File/Handle functions
  * ------------------------------------------------------------------------- */
 
-/* Initialize the handle
- * The handle must point to a NULL pointer to be allocated
+/* Creates a handle
+ * Make sure the value handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
@@ -300,7 +304,7 @@ int libewf_handle_initialize(
      libewf_handle_t **handle,
      libewf_error_t **error );
 
-/* Frees the handle including elements
+/* Frees a handle
  * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \

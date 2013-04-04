@@ -28,7 +28,8 @@
 #include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
 
-/* Initialize the IO handle
+/* Creates an IO handle
+ * Make sure the value io_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_io_handle_initialize(
@@ -108,7 +109,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the IO handle including elements
+/* Frees an IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_io_handle_free(

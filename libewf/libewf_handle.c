@@ -60,8 +60,8 @@
 #include "ewf_data.h"
 #include "ewf_file_header.h"
 
-/* Initialize the handle
- * The handle must point to a NULL pointer to be allocated
+/* Creates a handle
+ * Make sure the value handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_initialize(
@@ -233,7 +233,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the handle including elements
+/* Frees a handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_free(

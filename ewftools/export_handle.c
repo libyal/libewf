@@ -52,7 +52,8 @@
 #define EXPORT_HANDLE_STRING_SIZE		1024
 #define EXPORT_HANDLE_NOTIFY_STREAM		stderr
 
-/* Initializes the export handle
+/* Creates an export handle
+ * Make sure the value export_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int export_handle_initialize(
@@ -213,7 +214,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the export handle and its elements
+/* Frees an export handle
  * Returns 1 if successful or -1 on error
  */
 int export_handle_free(

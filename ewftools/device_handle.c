@@ -84,7 +84,8 @@ const char *device_handle_get_track_type(
 	return( "UNKNOWN" );
 }
 
-/* Initializes the device handle
+/* Creates a device handle
+ * Make sure the value device_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int device_handle_initialize(
@@ -197,7 +198,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the device handle and its elements
+/* Frees a device handle
  * Returns 1 if successful or -1 on error
  */
 int device_handle_free(

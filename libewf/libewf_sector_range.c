@@ -26,8 +26,8 @@
 #include "libewf_libcerror.h"
 #include "libewf_sector_range.h"
 
-/* Initialize a session value
- * Make sure the value is pointing to is set to NULL
+/* Creates a sector range
+ * Make sure the value sector_range is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_sector_range_initialize(
@@ -42,7 +42,7 @@ int libewf_sector_range_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid session value.",
+		 "%s: invalid sector range.",
 		 function );
 
 		return( -1 );
@@ -67,7 +67,7 @@ int libewf_sector_range_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create session value.",
+		 "%s: unable to create sector range.",
 		 function );
 
 		goto on_error;
@@ -81,7 +81,7 @@ int libewf_sector_range_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear session value.",
+		 "%s: unable to clear sector range.",
 		 function );
 
 		goto on_error;
@@ -99,7 +99,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a session value
+/* Frees a sector range
  * Returns 1 if successful or -1 on error
  */
 int libewf_sector_range_free(
@@ -114,7 +114,7 @@ int libewf_sector_range_free(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid session value.",
+		 "%s: invalid sector range.",
 		 function );
 
 		return( -1 );
@@ -208,7 +208,7 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves a session value
+/* Retrieves a sector range
  * Returns 1 if successful or -1 on error
  */
 int libewf_sector_range_get(
@@ -225,7 +225,7 @@ int libewf_sector_range_get(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid session value.",
+		 "%s: invalid sector range.",
 		 function );
 
 		return( -1 );
@@ -258,7 +258,7 @@ int libewf_sector_range_get(
 	return( 1 );
 }
 
-/* Sets a session value
+/* Sets a sector range
  * Returns 1 if successful or -1 on error
  */
 int libewf_sector_range_set(
@@ -275,7 +275,7 @@ int libewf_sector_range_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid session value.",
+		 "%s: invalid sector range.",
 		 function );
 
 		return( -1 );

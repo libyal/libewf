@@ -26,7 +26,8 @@
 #include "libewf_libcerror.h"
 #include "libewf_segment_file_handle.h"
 
-/* Initialize the segment file handle
+/* Creates a segment file handle
+ * Make sure the value segment_file_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_initialize(
@@ -112,7 +113,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the segment file handle
+/* Frees a segment file handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_free(

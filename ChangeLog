@@ -80,6 +80,7 @@ TODO
 * Ex01 write support
   - pattern fill chunk support (set chunk table entry, test)
   - enable secion data integrity hash support
+  - add support for write resume
 
 * Lx01 write support
   - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
@@ -372,6 +373,12 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130404
+* fixes for local library Makefiles
+* changes for libmfdata and libfdata merge
+* textual changes
+* updated dependencies
 
 20130403
 * changes for libmfdata and libfdata merge

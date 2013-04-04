@@ -34,7 +34,8 @@
 #include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 
-/* Initialize the segment table
+/* Creates a segment table
+ * Make sure the value segment_table is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_initialize(
@@ -114,7 +115,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the segment table including elements
+/* Frees a segment table
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_free(

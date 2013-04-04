@@ -162,6 +162,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcdata\libcdata_error.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcdata\libcdata_list.c"
 				>
 			</File>
@@ -197,6 +201,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcdata\libcdata_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcdata\libcdata_error.h"
 				>
 			</File>
 			<File

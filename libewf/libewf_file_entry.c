@@ -35,7 +35,8 @@
 #include "libewf_single_file_tree.h"
 #include "libewf_types.h"
 
-/* Initializes the file entry and its values
+/* Creates a file entry
+ * Make sure the value file_entry is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_initialize(

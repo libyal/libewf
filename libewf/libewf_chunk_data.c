@@ -34,7 +34,8 @@
 
 #include "ewf_definitions.h"
 
-/* Initialize the chunk data
+/* Creates chunk data
+ * Make sure the value chunk_data is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_data_initialize(
@@ -145,7 +146,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the chunk data including elements
+/* Frees chunk data
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_data_free(

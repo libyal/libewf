@@ -34,7 +34,8 @@
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
 
-/* Initialize the read IO handle
+/* Creates a read IO handle
+ * Make sure the value read_io_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_read_io_handle_initialize(
@@ -121,7 +122,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the read IO handle including elements
+/* Frees a read IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_read_io_handle_free(

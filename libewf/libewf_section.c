@@ -102,6 +102,7 @@ int libewf_section_test_zero(
 }
 
 /* Creates a section
+ * Make sure the value section is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_initialize(
@@ -173,7 +174,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the section
+/* Frees a section
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_free(

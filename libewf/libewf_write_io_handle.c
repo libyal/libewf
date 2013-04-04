@@ -62,7 +62,8 @@
 #include "ewf_table.h"
 #include "ewfx_delta_chunk.h"
 
-/* Initialize the write IO handle
+/* Creates a write IO handle
+ * Make sure the value write_io_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_initialize(
@@ -143,7 +144,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the write IO handle including elements
+/* Frees a write IO handle
  * Returns 1 if successful or -1 on error
  */
 int libewf_write_io_handle_free(
@@ -829,25 +830,25 @@ int libewf_write_io_handle_initialize_resume(
      libewf_segment_table_t *segment_table,
      libcerror_error_t **error )
 {
-	libewf_section_t *previous_section        = NULL;
-	libewf_section_t *section                 = NULL;
-	libewf_segment_file_t *segment_file       = NULL;
-	libfcache_cache_t *sections_cache         = NULL;
-	static char *function                     = "libewf_write_io_handle_initialize_resume";
-	off64_t data_range_offset                 = 0;
-	size64_t data_range_size                  = 0;
-	uint32_t data_range_flags                 = 0;
-	uint8_t backtrace_to_last_chunks_sections = 0;
-	uint8_t reopen_segment_file               = 0;
-	int file_io_pool_entry                    = 0;
-	int number_of_chunks                      = 0;
-	int number_of_sections                    = 0;
-	int number_of_segment_files               = 0;
-	int number_of_unusable_chunks             = 0;
-	int previous_section_index                = 0;
-	int section_index                         = 0;
-	int segment_files_list_index              = 0;
-	int supported_section                     = 0;
+	libewf_section_t *previous_section       = NULL;
+	libewf_section_t *section                = NULL;
+	libewf_segment_file_t *segment_file      = NULL;
+	libfcache_cache_t *sections_cache        = NULL;
+	static char *function                    = "libewf_write_io_handle_initialize_resume";
+	off64_t data_range_offset                = 0;
+	size64_t data_range_size                 = 0;
+	uint32_t data_range_flags                = 0;
+	uint8_t backtrack_to_last_chunks_section = 0;
+	uint8_t reopen_segment_file              = 0;
+	int file_io_pool_entry                   = 0;
+	int number_of_chunks                     = 0;
+	int number_of_sections                   = 0;
+	int number_of_segment_files              = 0;
+	int number_of_unusable_chunks            = 0;
+	int previous_section_index               = 0;
+	int section_index                        = 0;
+	int segment_files_list_index             = 0;
+	int supported_section                    = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -1001,6 +1002,25 @@ int libewf_write_io_handle_initialize_resume(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( section->type_string_length > 0 )
+		{
+			libcnotify_printf(
+			 "%s: last read section: %s.\n",
+			 function,
+			 (char *) section->type_string );
+		}
+		else if( section->type != 0 )
+		{
+			libcnotify_printf(
+			 "%s: last read section: 0x%08" PRIx32 ".\n",
+			 function,
+			 section->type );
+		}
+	}
+#endif
 	if( section->type_string_length == 4 )
 	{
 		if( memory_compare(
@@ -1010,7 +1030,7 @@ int libewf_write_io_handle_initialize_resume(
 		{
 			if( segment_files_list_index == 0 )
 			{
-				backtrace_to_last_chunks_sections = 1;
+				backtrack_to_last_chunks_section = 1;
 			}
 		}
 		else if( memory_compare(
@@ -1018,7 +1038,7 @@ int libewf_write_io_handle_initialize_resume(
 			  (void *) "hash",
 			  4 ) == 0 )
 		{
-			backtrace_to_last_chunks_sections = 1;
+			backtrack_to_last_chunks_section = 1;
 		}
 	}
 	else if( section->type_string_length == 5 )
@@ -1028,7 +1048,7 @@ int libewf_write_io_handle_initialize_resume(
 		     (void *) "xhash",
 		     6 ) == 0 )
 		{
-			backtrace_to_last_chunks_sections = 1;
+			backtrack_to_last_chunks_section = 1;
 		}
 	}
 	else if( section->type_string_length == 5 )
@@ -1038,14 +1058,14 @@ int libewf_write_io_handle_initialize_resume(
 		     (void *) "digest",
 		     7 ) == 0 )
 		{
-			backtrace_to_last_chunks_sections = 1;
+			backtrack_to_last_chunks_section = 1;
 		}
 		else if( memory_compare(
 			  (void *) section->type_string,
 			  (void *) "error2",
 			  7 ) == 0 )
 		{
-			backtrace_to_last_chunks_sections = 1;
+			backtrack_to_last_chunks_section = 1;
 		}
 	}
 	else if( section->type_string_length == 7 )
@@ -1055,11 +1075,19 @@ int libewf_write_io_handle_initialize_resume(
 		     (void *) "session",
 		     8 ) == 0 )
 		{
-			backtrace_to_last_chunks_sections = 1;
+			backtrack_to_last_chunks_section = 1;
 		}
 	}
-	if( backtrace_to_last_chunks_sections != 0 )
+	if( backtrack_to_last_chunks_section != 0 )
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: backtracking to last chunks section.\n",
+			 function );
+		}
+#endif
 		while( section_index >= 0 )
 		{
 			if( libfdata_list_get_element_value_by_index(
@@ -1100,6 +1128,7 @@ int libewf_write_io_handle_initialize_resume(
 			{
 				break;
 			}
+			section_index--;
 		}
 		if( section_index < 0 )
 		{
@@ -1112,6 +1141,25 @@ int libewf_write_io_handle_initialize_resume(
 
 			goto on_error;
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( section->type_string_length > 0 )
+			{
+				libcnotify_printf(
+				 "%s: last chunks section: %s.\n",
+				 function,
+				 (char *) section->type_string );
+			}
+			else if( section->type != 0 )
+			{
+				libcnotify_printf(
+				 "%s: last chunks section: 0x%08" PRIx32 ".\n",
+				 function,
+				 section->type );
+			}
+		}
+#endif
 	}
 	if( section->type_string_length == 4 )
 	{

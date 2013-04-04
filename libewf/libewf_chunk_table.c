@@ -40,7 +40,8 @@
 #include "ewf_definitions.h"
 #include "ewf_table.h"
 
-/* Initialize the chunk table
+/* Creates a chunk table
+ * Make sure the value chunk_table is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_table_initialize(
@@ -126,7 +127,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the chunk table including elements
+/* Frees a chunk table
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_table_free(

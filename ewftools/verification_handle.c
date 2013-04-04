@@ -42,7 +42,8 @@
 #define VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE	32
 #define VERIFICATION_HANDLE_NOTIFY_STREAM		stdout
 
-/* Initializes the verification handle
+/* Creates a verification handle
+ * Make sure the value verification_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_initialize(
@@ -241,7 +242,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the verification handle and its elements
+/* Frees a verification handle
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_free(

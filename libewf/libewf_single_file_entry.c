@@ -29,7 +29,8 @@
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
 
-/* Initialize the single file entry
+/* Creates a single file entry
+ * Make sure the value single_file_entry is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_file_entry_initialize(
@@ -104,7 +105,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the single file entry including elements
+/* Frees a single file entry
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_file_entry_free(
