@@ -129,9 +129,6 @@
 			<CppCompile Include="..\..\..\libewf\libewf_segment_file.c">
 				<BuildOrder>29</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="..\..\..\libewf\libewf_segment_file_handle.c">
-				<BuildOrder>30</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="..\..\..\libewf\libewf_segment_table.c">
 				<BuildOrder>31</BuildOrder>
 			</CppCompile>
@@ -314,9 +311,6 @@
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_file.h">
 				<BuildOrder>91</BuildOrder>
-			</None>
-			<None Include="..\..\..\libewf\libewf_segment_file_handle.h">
-				<BuildOrder>92</BuildOrder>
 			</None>
 			<None Include="..\..\..\libewf\libewf_segment_table.h">
 				<BuildOrder>93</BuildOrder>

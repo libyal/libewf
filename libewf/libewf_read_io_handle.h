@@ -31,7 +31,7 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_media_values.h"
 
 #if defined( __cplusplus )
@@ -85,11 +85,12 @@ int libewf_read_io_handle_read_chunk_data(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libmfdata_list_t *chunk_table_list,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
      libfcache_cache_t *chunk_table_cache,
-     int chunk_index,
-     off64_t chunk_offset,
+     off64_t storage_media_offset,
      libewf_chunk_data_t **chunk_data,
+     off64_t *chunk_data_offset,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

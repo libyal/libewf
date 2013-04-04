@@ -4798,11 +4798,19 @@ ssize_t libewf_handle_read_chunk(
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_segment_file_t *segment_file       = NULL;
+	libfdata_list_t *chunks_list              = NULL;
 	uint8_t *chunk_data_buffer                = NULL;
 	static char *function                     = "libewf_handle_read_chunk";
+	off64_t storage_media_offset_chunk_group  = 0;
+	off64_t storage_media_offset_segment_file = 0;
 	size_t data_size                          = 0;
 	size_t read_size                          = 0;
 	uint64_t chunk_index                      = 0;
+	int chunk_groups_list_index               = 0;
+	int chunks_list_index                     = 0;
+	int segment_files_list_index              = 0;
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -4943,8 +4951,7 @@ ssize_t libewf_handle_read_chunk(
 	{
 		return( 0 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset
-	            / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
@@ -4957,6 +4964,7 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
+/* TODO refactor */
 	/* This function will expand element groups
 	 */
 	if( libmfdata_list_get_element_value_by_index(
@@ -5102,19 +5110,12 @@ ssize_t libewf_handle_read_buffer(
 {
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_segment_file_t *segment_file       = NULL;
-	libfdata_list_t *chunks_list              = NULL;
 	static char *function                     = "libewf_handle_read_buffer";
-	off64_t chunk_offset                      = 0;
-	off64_t storage_media_offset_chunk_group  = 0;
-	off64_t storage_media_offset_segment_file = 0;
+	off64_t chunk_data_offset                 = 0;
+	uint64_t chunk_index                      = 0;
 	size_t buffer_offset                      = 0;
 	size_t read_size                          = 0;
 	ssize_t total_read_count                  = 0;
-	uint64_t chunk_index                      = 0;
-	uint64_t chunk_data_offset                = 0;
-	int chunk_groups_list_index               = 0;
-	int segment_files_list_index              = 0;
 
 	if( handle == NULL )
 	{
@@ -5214,94 +5215,8 @@ ssize_t libewf_handle_read_buffer(
 	{
 		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
 	}
-/* TODO check delta segment files list first add an overlay bitmap ? bit per chunk ?
- */
-	if( libfdata_list_get_element_value_at_offset(
-	     internal_handle->segment_files_list,
-	     (intptr_t *) internal_handle->file_io_pool,
-	     internal_handle->segment_files_cache,
-	     internal_handle->io_handle->current_offset,
-	     &segment_files_list_index,
-	     &storage_media_offset_segment_file,
-	     (intptr_t **) &segment_file,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file at offset: %" PRIi64 " from segment files list.",
-		 function,
-		 internal_handle->io_handle->current_offset );
-
-		return( -1 );
-	}
-fprintf( stderr, "X: %d - %" PRIi64 "\n", segment_files_list_index, storage_media_offset_segment_file );
-	if( segment_file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file: %d.",
-		 function,
-		 segment_files_list_index );
-
-		return( -1 );
-	}
-	if( libfdata_list_get_element_value_at_offset(
-	     segment_file->chunk_groups_list,
-	     (intptr_t *) internal_handle->file_io_pool,
-	     segment_file->chunk_groups_cache,
-	     storage_media_offset_segment_file,
-	     &chunk_groups_list_index,
-	     &storage_media_offset_chunk_group,
-	     (intptr_t **) &chunks_list,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunks list from segment file: %d at offset: %" PRIi64 ".",
-		 function,
-		 segment_files_list_index,
-		 storage_media_offset_segment_file );
-
-		return( -1 );
-	}
-fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media_offset_chunk_group );
-/* TODO */
 	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
 
-	if( chunk_index >= (uint64_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk index value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	chunk_offset = chunk_index * internal_handle->media_values->chunk_size;
-
-	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_offset;
-
-	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk data offset value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	while( buffer_size > 0 )
 	{
 		if( libewf_read_io_handle_read_chunk_data(
@@ -5309,18 +5224,19 @@ fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media
 		     internal_handle->io_handle,
 		     internal_handle->file_io_pool,
 		     internal_handle->media_values,
-		     internal_handle->chunk_table_list,
+		     internal_handle->segment_files_list,
+		     internal_handle->segment_files_cache,
 		     internal_handle->chunk_table_cache,
-		     (int) chunk_index,
-		     chunk_offset,
+		     internal_handle->io_handle->current_offset,
 		     &chunk_data,
+		     &chunk_data_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read chunk data: %" PRIu64 ".",
+			 "%s: unable to read chunk: %" PRIu64 " data.",
 			 function,
 			 chunk_index );
 
@@ -5332,20 +5248,21 @@ fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing chunk data: %" PRIu64 ".",
+			 "%s: missing chunk: %" PRIu64 " data.",
 			 function,
 			 chunk_index );
 
 			return( -1 );
 		}
-		if( chunk_data_offset > chunk_data->data_size )
+		if( (off64_t) chunk_data_offset > (off64_t) chunk_data->data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: chunk offset exceeds chunk data size.",
-			 function );
+			 "%s: chunk: %" PRIu64 " offset exceeds data size.",
+			 function,
+			 chunk_index );
 
 			return( -1 );
 		}
@@ -5368,8 +5285,9 @@ fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy chunk data to buffer.",
-			 function );
+			 "%s: unable to copy chunk: %" PRIu64 " data to buffer.",
+			 function,
+			 chunk_index );
 
 			return( -1 );
 		}
@@ -5377,9 +5295,6 @@ fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media
 		buffer_size      -= read_size;
 		total_read_count += (ssize_t) read_size;
 		chunk_index      += 1;
-		chunk_offset     += internal_handle->media_values->chunk_size;
-		chunk_data        = NULL;
-		chunk_data_offset = 0;
 
 		internal_handle->io_handle->current_offset += (off64_t) read_size;
 
@@ -5391,6 +5306,8 @@ fprintf( stderr, "Y: %d - %" PRIi64 "\n", chunk_groups_list_index, storage_media
 		{
 			break;
 		}
+		chunk_data        = NULL;
+		chunk_data_offset = 0;
 	}
 	return( total_read_count );
 }
@@ -5611,6 +5528,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 			return( -1 );
 		}
+/* TODO refactor */
 		chunk_exists = libmfdata_list_is_set(
 		                internal_handle->chunk_table_list,
 		                (int) chunk_index,
@@ -6161,13 +6079,13 @@ ssize_t libewf_handle_write_buffer(
 	libewf_chunk_data_t *chunk_data           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_buffer";
+	off64_t chunk_data_offset                 = 0;
 	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
 	size_t input_data_size                    = 0;
 	size_t write_size                         = 0;
 	ssize_t write_count                       = 0;
 	uint64_t chunk_index                      = 0;
-	uint64_t chunk_data_offset                = 0;
 	int chunk_exists                          = 0;
 	int write_chunk                           = 0;
 
@@ -6333,7 +6251,7 @@ ssize_t libewf_handle_write_buffer(
 
 	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_offset;
 
-	if( chunk_data_offset >= (uint64_t) SSIZE_MAX )
+	if( chunk_data_offset >= (off64_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -6386,18 +6304,19 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->io_handle,
 				     internal_handle->file_io_pool,
 				     internal_handle->media_values,
-				     internal_handle->chunk_table_list,
+				     internal_handle->segment_files_list,
+				     internal_handle->segment_files_cache,
 				     internal_handle->chunk_table_cache,
-				     (int) chunk_index,
-				     chunk_offset,
+				     internal_handle->io_handle->current_offset,
 				     &chunk_data,
+				     &chunk_data_offset,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read chunk data: %" PRIu64 ".",
+					 "%s: unable to read chunk: %" PRIu64 " data.",
 					 function,
 					 chunk_index );
 
@@ -6409,20 +6328,21 @@ ssize_t libewf_handle_write_buffer(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: missing chunk data: %" PRIu64 ".",
+					 "%s: missing chunk: %" PRIu64 " data.",
 					 function,
 					 chunk_index );
 
 					return( -1 );
 				}
-				if( chunk_data_offset > chunk_data->data_size )
+				if( (off64_t) chunk_data_offset > (off64_t) chunk_data->data_size )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: chunk offset exceeds chunk data size.",
-					 function );
+					 "%s: chunk: %" PRIu64 " offset exceeds data size.",
+					 function,
+					 chunk_index );
 
 					return( -1 );
 				}

@@ -31,7 +31,6 @@
 #include "libewf_libmfdata.h"
 #include "libewf_libuna.h"
 #include "libewf_segment_file.h"
-#include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 
 /* Creates a segment table

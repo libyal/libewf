@@ -37,6 +37,7 @@
  */
 int libewf_chunk_group_fill_v1(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -156,8 +157,9 @@ int libewf_chunk_group_fill_v1(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: chunk offset: %" PRIu32 " larger than stored chunk offset: %" PRIu32 ".\n",
+					 "%s: chunk: %" PRIu64 " offset: %" PRIu32 " larger than stored offset: %" PRIu32 ".\n",
 					 function,
+					 chunk_index,
 					 current_offset,
 					 stored_offset );
 				}
@@ -168,8 +170,9 @@ int libewf_chunk_group_fill_v1(
 			else if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk offset: %" PRIu32 " larger than next chunk offset: %" PRIu32 ".\n",
+				 "%s: chunk: %" PRIu64 " offset: %" PRIu32 " larger than next offset: %" PRIu32 ".\n",
 				 function,
+				 chunk_index,
 				 current_offset,
 				 next_offset );
 			}
@@ -185,8 +188,9 @@ int libewf_chunk_group_fill_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid chunk size value is zero.\n",
-				 function );
+				 "%s: invalid chunk: %" PRIu64 " size value is zero.\n",
+				 function,
+				 chunk_index );
 			}
 			corrupted = 1;
 		}
@@ -195,8 +199,9 @@ int libewf_chunk_group_fill_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid chunk size value exceeds maximum.\n",
-				 function );
+				 "%s: invalid chunk: %" PRIu64 " size value exceeds maximum.\n",
+				 function,
+				 chunk_index );
 			}
 			corrupted = 1;
 		}
@@ -220,25 +225,31 @@ int libewf_chunk_group_fill_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk\t\t\t: %" PRIu64 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_index );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
 			 function,
 			 table_entry_index,
 			 base_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 current_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_size );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data flags:\n",
+			 "%s: table entry: %05" PRIu32 " chunk data flags:\n",
 			 function,
 			 table_entry_index );
 
@@ -313,8 +324,9 @@ int libewf_chunk_group_fill_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
+				 "%s: chunk: %" PRIu64 " offset overflow at: %" PRIu32 ".\n",
 				 function,
+				 chunk_index,
 				 current_offset );
 			}
 #endif
@@ -322,6 +334,7 @@ int libewf_chunk_group_fill_v1(
 			is_compressed = 0;
 		}
 		table_entry_index++;
+		chunk_index++;
 	}
 	byte_stream_copy_to_uint32_little_endian(
 	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
@@ -354,8 +367,9 @@ int libewf_chunk_group_fill_v1(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid last chunk offset value exceeds maximum.",
-		 function );
+		 "%s: invalid last chunk: %" PRIu64 " offset value exceeds maximum.",
+		 function,
+		 chunk_index );
 
 		return( -1 );
 	}
@@ -371,8 +385,9 @@ int libewf_chunk_group_fill_v1(
 	else if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: invalid last chunk offset value exceeds table section end offset.\n",
-		 function );
+		 "%s: invalid last chunk: %" PRIu64 " offset value exceeds table section end offset.\n",
+		 function,
+		 chunk_index );
 	}
 #endif
 	if( last_chunk_data_size <= 0 )
@@ -381,8 +396,9 @@ int libewf_chunk_group_fill_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: invalid last chunk size value is zero or less.\n",
-			 function );
+			 "%s: invalid last chunk: %" PRIu64 " size value is zero or less.\n",
+			 function,
+			 chunk_index );
 		}
 #endif
 		corrupted = 1;
@@ -393,8 +409,9 @@ int libewf_chunk_group_fill_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: invalid last chunk size value exceeds maximum.\n",
-			 function );
+			 "%s: invalid last chunk: %" PRIu64 " size value exceeds maximum.\n",
+			 function,
+			 chunk_index );
 		}
 #endif
 		corrupted = 1;
@@ -419,25 +436,31 @@ int libewf_chunk_group_fill_v1(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
+		 "%s: table entry: %05" PRIu32 " chunk\t\t\t: %" PRIu64 "\n",
+		 function,
+		 table_entry_index,
+		 chunk_index );
+
+		libcnotify_printf(
+		 "%s: table entry: %05" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 table_entry_index,
 		 base_offset );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+		 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
 		 function,
 		 table_entry_index,
 		 current_offset );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data size\t: %" PRIu32 " (calculated)\n",
+		 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 " (calculated)\n",
 		 function,
 		 table_entry_index,
 		 last_chunk_data_size );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data flags:\n",
+		 "%s: table entry: %05" PRIu32 " chunk data flags:\n",
 		 function,
 		 table_entry_index );
 
@@ -518,6 +541,7 @@ int libewf_chunk_group_fill_v1(
  */
 int libewf_chunk_group_fill_v2(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -600,11 +624,17 @@ int libewf_chunk_group_fill_v2(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " chunk\t\t\t: %" PRIu64 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_index );
+
 			if( ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
 			 && ( ( chunk_data_flags & LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL ) != 0 ) )
 			{
 				libcnotify_printf(
-				 "%s: table entry: % 8" PRIu32 " chunk pattern fill\t: 0x%08" PRIx64 "\n",
+				 "%s: table entry: %05" PRIu32 " chunk pattern fill\t: 0x%08" PRIx64 "\n",
 				 function,
 				 table_entry_index,
 				 chunk_data_offset );
@@ -612,19 +642,19 @@ int libewf_chunk_group_fill_v2(
 			else
 			{
 				libcnotify_printf(
-				 "%s: table entry: % 8" PRIu32 " chunk data offset\t: 0x%08" PRIx64 "\n",
+				 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx64 "\n",
 				 function,
 				 table_entry_index,
 				 chunk_data_offset );
 			}
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_size );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data flags\t: 0x%08" PRIx32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data flags\t: 0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_flags );
@@ -718,6 +748,7 @@ int libewf_chunk_group_fill_v2(
 		storage_media_offset += chunk_size;
 
 		table_entry_index++;
+		chunk_index++;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -735,6 +766,7 @@ int libewf_chunk_group_fill_v2(
  */
 int libewf_chunk_group_correct_v1(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -858,8 +890,9 @@ int libewf_chunk_group_correct_v1(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: chunk offset: %" PRIu32 " larger than stored chunk offset: %" PRIu32 ".\n",
+					 "%s: chunk: %" PRIu64 " offset: %" PRIu32 " larger than stored offset: %" PRIu32 ".\n",
 					 function,
+					 chunk_index,
 					 current_offset,
 					 stored_offset );
 				}
@@ -870,8 +903,9 @@ int libewf_chunk_group_correct_v1(
 			else if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk offset: %" PRIu32 " larger than next chunk offset: %" PRIu32 ".\n",
+				 "%s: chunk: %" PRIu64 " offset: %" PRIu32 " larger than next offset: %" PRIu32 ".\n",
 				 function,
+				 chunk_index,
 				 current_offset,
 				 next_offset );
 			}
@@ -887,8 +921,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid chunk size value is zero.\n",
-				 function );
+				 "%s: invalid chunk: %" PRIu64 " size value is zero.\n",
+				 function,
+				 chunk_index );
 			}
 			corrupted = 1;
 		}
@@ -897,8 +932,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid chunk size value exceeds maximum.\n",
-				 function );
+				 "%s: invalid chunk: %" PRIu64 " size value exceeds maximum.\n",
+				 function,
+				 chunk_index );
 			}
 			corrupted = 1;
 		}
@@ -920,25 +956,31 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk\t\t\t: %" PRIu64 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_index );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
 			 function,
 			 table_entry_index,
 			 base_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 current_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_size );
 
 			libcnotify_printf(
-			 "%s: table entry: % 8" PRIu32 " chunk data flags:\n",
+			 "%s: table entry: %05" PRIu32 " chunk data flags:\n",
 			 function,
 			 table_entry_index );
 
@@ -991,9 +1033,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk: %" PRIu32 " offset mismatch.\n",
+				 "%s: chunk: %" PRIu64 " offset mismatch.\n",
 				 function,
-				 table_entry_index );
+				 chunk_index );
 			}
 #endif
 			mismatch = 1;
@@ -1004,9 +1046,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk: %" PRIu32 " size mismatch.\n",
+				 "%s: chunk: %" PRIu64 " size mismatch.\n",
 				 function,
-				 table_entry_index );
+				 chunk_index );
 			}
 #endif
 			mismatch = 1;
@@ -1018,9 +1060,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk: %" PRIu32 " compression flag mismatch.\n",
+				 "%s: chunk: %" PRIu64 " compression flag mismatch.\n",
 				 function,
-				 table_entry_index );
+				 chunk_index );
 			}
 #endif
 			mismatch = 1;
@@ -1079,8 +1121,9 @@ int libewf_chunk_group_correct_v1(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: chunk offset overflow at: %" PRIu32 ".\n",
+				 "%s: chunk: %" PRIu64 " offset overflow at: %" PRIu32 ".\n",
 				 function,
+				 chunk_index,
 				 current_offset );
 			}
 #endif
@@ -1120,8 +1163,9 @@ int libewf_chunk_group_correct_v1(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid last chunk offset value exceeds maximum.",
-		 function );
+		 "%s: invalid last chunk: %" PRIu64 " offset value exceeds maximum.",
+		 function,
+		 chunk_index );
 
 		return( -1 );
 	}
@@ -1137,8 +1181,9 @@ int libewf_chunk_group_correct_v1(
 	else if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: invalid last chunk offset value exceeds table section end offset.\n",
-		 function );
+		 "%s: invalid last chunk: %" PRIu64 " offset value exceeds table section end offset.\n",
+		 function,
+		 chunk_index );
 	}
 #endif
 	last_chunk_data_size -= table_section->size;
@@ -1149,8 +1194,9 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: invalid last chunk size value is zero or less.\n",
-			 function );
+			 "%s: invalid last chunk: %" PRIu64 " size value is zero or less.\n",
+			 function,
+			 chunk_index );
 		}
 #endif
 		corrupted = 1;
@@ -1161,8 +1207,9 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: invalid last chunk size value exceeds maximum.\n",
-			 function );
+			 "%s: invalid last chunk: %" PRIu64 " size value exceeds maximum.\n",
+			 function,
+			 chunk_index );
 		}
 #endif
 		corrupted = 1;
@@ -1185,25 +1232,31 @@ int libewf_chunk_group_correct_v1(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
+		 "%s: table entry: %05" PRIu32 " chunk\t\t\t: %" PRIu64 "\n",
+		 function,
+		 table_entry_index,
+		 chunk_index );
+
+		libcnotify_printf(
+		 "%s: table entry: %05" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 table_entry_index,
 		 base_offset );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+		 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
 		 function,
 		 table_entry_index,
 		 current_offset );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data size\t: %" PRIu32 " (calculated)\n",
+		 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 " (calculated)\n",
 		 function,
 		 table_entry_index,
 		 last_chunk_data_size );
 
 		libcnotify_printf(
-		 "%s: table entry: % 8" PRIu32 " chunk data flags:\n",
+		 "%s: table entry: %05" PRIu32 " chunk data flags:\n",
 		 function,
 		 table_entry_index );
 
@@ -1256,9 +1309,9 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: chunk: %" PRIu32 " offset mismatch.\n",
+			 "%s: chunk: %" PRIu64 " offset mismatch.\n",
 			 function,
-			 table_entry_index );
+			 chunk_index );
 		}
 #endif
 		mismatch = 1;
@@ -1269,9 +1322,9 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: chunk: %" PRIu32 " size mismatch.\n",
+			 "%s: chunk: %" PRIu64 " size mismatch.\n",
 			 function,
-			 table_entry_index );
+			 chunk_index );
 		}
 #endif
 		mismatch = 1;
@@ -1283,9 +1336,9 @@ int libewf_chunk_group_correct_v1(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: chunk: %" PRIu32 " compression flag mismatch.\n",
+			 "%s: chunk: %" PRIu64 " compression flag mismatch.\n",
 			 function,
-			 table_entry_index );
+			 chunk_index );
 		}
 #endif
 		mismatch = 1;
@@ -1350,6 +1403,7 @@ int libewf_chunk_group_correct_v1(
  */
 int libewf_chunk_group_generate_table_entries_data(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      uint8_t format_version,
      uint8_t *table_entries_data,
      size_t table_entries_data_size,
@@ -1475,9 +1529,9 @@ int libewf_chunk_group_generate_table_entries_data(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk: %" PRIu32 " offset value out of bounds.",
+				 "%s: invalid chunk: %" PRIu64 " offset value out of bounds.",
 				 function,
-				 table_entry_index );
+				 chunk_index );
 
 				return( -1 );
 			}
@@ -1499,9 +1553,9 @@ int libewf_chunk_group_generate_table_entries_data(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk: %" PRIu32 " size value out of bounds.",
+				 "%s: invalid chunk: %" PRIu64 " size value out of bounds.",
 				 function,
-				 table_entry_index );
+				 chunk_index );
 
 				return( -1 );
 			}

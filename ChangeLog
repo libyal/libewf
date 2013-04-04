@@ -1,25 +1,40 @@
 TODO
 * ewftools: allow to set date and time
-* add libewf_sector_range_clone function
 * libmfdata/libfdata merge
-  - reimplement chunk table using layered approach
+  - reimplement chunk table using layered approach (+/-)
+
   - sections list on write: cache section descriptors instead of free-ing them?
+
   - add delta segment files cache ? caching happens based on element index
     but will cause a cache miss - 2 separate caches more efficient ?
-  - check ewfacquirestream
+
   - split segment file and delta segment file to separate code files?
     - yes, no need for chunk groups in delta segment files
+
   - segment files cache on write set to 1 ?
+
   - create a single chunk groups cache ? instead per segment file ?
+
   - add stream like read/write to list ?
+
   - check if chunks groups list is filled in on demand scenario
+
+  - only use backup range (table2) during initial phase?
+    - nope also necessary during reread
+
+  - use mapped offset to determine first chunk index (+/-)
+    - what about base offset ?
+
+  - refactor chunk table to
+    - manage chunk lookups
+    - check if chunks exists
+
 * pyewf
   - change header and hash values into sequence objects
   - setup.py: non Windows support
 * ewftools: rename argv_filenames to source_filenames (see libvmdk)
 * add bzip2 compression support
 * complete work on ewfmount dokan support
-* update codegear files - libcdata
 
 * add support for set identifier change ?
 * check alignment of:
@@ -385,6 +400,7 @@ Closed:
 * changes for libmfdata and libfdata merge
 * textual changes
 * updated dependencies
+* remove libewf_segment_file_handle
 
 20130403
 * changes for libmfdata and libfdata merge

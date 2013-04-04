@@ -36,7 +36,6 @@
 #include "libewf_libfvalue.h"
 #include "libewf_metadata.h"
 #include "libewf_sector_range.h"
-#include "libewf_segment_file_handle.h"
 #include "libewf_types.h"
 
 #include "ewf_definitions.h"

@@ -82,7 +82,6 @@ libewf_la_SOURCES = \
 	libewf_section.c libewf_section.h \
 	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
-	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \

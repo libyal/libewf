@@ -1445,9 +1445,9 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_data_read_element_data(
-     intptr_t *data_handle LIBEWF_ATTRIBUTE_UNUSED,
+     libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     libfdata_list_element_t *list_element,
+     libfdata_list_element_t *element,
      libfcache_cache_t *cache,
      int file_io_pool_entry,
      off64_t chunk_data_offset,
@@ -1458,17 +1458,39 @@ int libewf_chunk_data_read_element_data(
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_chunk_data_read_element_data";
+	off64_t storage_media_offset    = 0;
+	size64_t storage_media_size     = 0;
 	ssize_t read_count              = 0;
+	uint64_t chunk_index            = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t chunk_checksum         = 0;
 #endif
 
-/* TODO is there a way to determine the chunk index ? */
-
-	LIBEWF_UNREFERENCED_PARAMETER( data_handle )
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
 
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->chunk_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid IO handle - missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( chunk_data_size == (size64_t) 0 )
 	 || ( chunk_data_size > (size64_t) SSIZE_MAX ) )
 	{
@@ -1492,6 +1514,23 @@ int libewf_chunk_data_read_element_data(
 
 		return( -1 );
 	}
+	if( libfdata_list_element_get_mapped_range(
+	     element,
+	     &storage_media_offset,
+	     &storage_media_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve mapped range from element.",
+		 function );
+
+		goto on_error;
+	}
+	chunk_index = storage_media_offset / io_handle->chunk_size;
+
 	if( libewf_chunk_data_initialize(
 	     &chunk_data,
 	     (size_t) chunk_data_size,
@@ -1501,8 +1540,9 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk data.",
-		 function );
+		 "%s: unable to create chunk: %" PRIu64 " data.",
+		 function,
+		 chunk_index );
 
 		goto on_error;
 	}
@@ -1512,8 +1552,9 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk data.",
-		 function );
+		 "%s: missing chunk: %" PRIu64 " data.",
+		 function,
+		 chunk_index );
 
 		goto on_error;
 	}
@@ -1528,8 +1569,9 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek chunk offset: %" PRIi64 " in file IO pool entry: %d.",
+		 "%s: unable to seek chunk: %" PRIu64 " offset: %" PRIi64 " in file IO pool entry: %d.",
 		 function,
+		 chunk_index,
 		 chunk_data_offset,
 		 file_io_pool_entry );
 
@@ -1548,8 +1590,9 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk data.",
-		 function );
+		 "%s: unable to read chunk: %" PRIu64 " data.",
+		 function,
+		 chunk_index );
 
 		goto on_error;
 	}
@@ -1562,19 +1605,22 @@ int libewf_chunk_data_read_element_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: chunk: file IO pool entry\t: %d\n",
+		 "%s: chunk: %" PRIu64 " file IO pool entry\t: %d\n",
 		 function,
+		 chunk_index,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk: %" PRIu64 " offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
+		 chunk_index,
 		 chunk_data_offset,
 		 chunk_data_offset );
 
 		libcnotify_printf(
-		 "%s: chunk: size\t\t\t: %" PRIu64 "\n",
+		 "%s: chunk: %" PRIu64 " size\t\t\t: %" PRIu64 "\n",
 		 function,
+		 chunk_index,
 		 chunk_data_size );
 
 		if( ( ( chunk_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
@@ -1585,13 +1631,15 @@ int libewf_chunk_data_read_element_data(
 			 chunk_checksum );
 		}
 		libcnotify_printf(
-		 "%s: chunk: checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: chunk: %" PRIu64 " checksum\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
+		 chunk_index,
 		 chunk_checksum );
 
 		libcnotify_printf(
-		 "%s: chunk: flags:\n",
-		 function );
+		 "%s: chunk: %" PRIu64 " flags:\n",
+		 function,
+		 chunk_index );
 
 		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{
@@ -1613,7 +1661,7 @@ int libewf_chunk_data_read_element_data(
 	}
 #endif
 	if( libfdata_list_element_set_element_value(
-	     list_element,
+	     element,
 	     cache,
 	     (intptr_t *) chunk_data,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
@@ -1624,8 +1672,9 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set chunk data as element value.",
-		 function );
+		 "%s: unable to set chunk: %" PRIu64 " data as element value.",
+		 function,
+		 chunk_index );
 
 		goto on_error;
 	}

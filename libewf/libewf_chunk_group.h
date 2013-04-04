@@ -39,6 +39,7 @@ extern "C" {
 
 int libewf_chunk_group_fill_v1(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -51,6 +52,7 @@ int libewf_chunk_group_fill_v1(
 
 int libewf_chunk_group_fill_v2(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -62,6 +64,7 @@ int libewf_chunk_group_fill_v2(
 
 int libewf_chunk_group_correct_v1(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_t *table_section,
@@ -74,6 +77,7 @@ int libewf_chunk_group_correct_v1(
 
 int libewf_chunk_group_generate_table_entries_data(
      libfdata_list_t *chunks_list,
+     uint64_t chunk_index,
      uint8_t format_version,
      uint8_t *table_entries_data,
      size_t table_entries_data_size,

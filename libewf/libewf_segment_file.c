@@ -1776,10 +1776,13 @@ int libewf_segment_file_read_chunk_group_element_data(
 	uint8_t *section_data          = NULL;
 	uint8_t *table_entries_data    = NULL;
 	static char *function          = "libewf_segment_file_read_chunk_group_element_data";
+	off64_t storage_media_offset   = 0;
+	size64_t storage_media_size    = 0;
 	size_t section_data_size       = 0;
 	size_t table_entries_data_size = 0;
 	ssize_t read_count             = 0;
 	uint64_t base_offset           = 0;
+	uint64_t chunk_index           = 0;
 	uint64_t first_chunk_index     = 0;
 	uint32_t number_of_entries     = 0;
 	uint8_t entries_corrupted      = 0;
@@ -1795,6 +1798,39 @@ int libewf_segment_file_read_chunk_group_element_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->chunk_groups_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - missing chunk groups list.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->io_handle )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->io_handle->chunk_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - invalid IO handle - missing chunk size.",
 		 function );
 
 		return( -1 );
@@ -1910,8 +1946,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 	}
 	chunk_group_data_size -= read_count;
 
-/* TODO check bounds of first_chunk_index ? */
-
 	if( number_of_entries == 0 )
 	{
 		libcerror_error_set(
@@ -1943,58 +1977,89 @@ int libewf_segment_file_read_chunk_group_element_data(
 
 		goto on_error;
 	}
-/* TODO is there a way to determine the chunk index ? */
-
-/* TODO
-	if( ( read_flags & LIBMFDATA_READ_FLAG_IS_BACKUP_RANGE ) == 0 )
-*/
+	if( libfdata_list_element_get_mapped_range(
+	     element,
+	     &storage_media_offset,
+	     &storage_media_size,
+	     error ) != 1 )
 	{
-		if( segment_file->major_version == 1 )
-		{
-			result = libewf_chunk_group_fill_v1(
-			          chunks_list,
-			          segment_file->io_handle->chunk_size,
-			          file_io_pool_entry,
-			          section,
-			          (off64_t) base_offset,
-			          number_of_entries,
-			          table_entries_data,
-			          table_entries_data_size,
-			          entries_corrupted,
-			          error );
-		}
-		else if( segment_file->major_version == 2 )
-		{
-			result = libewf_chunk_group_fill_v2(
-			          chunks_list,
-			          segment_file->io_handle->chunk_size,
-			          file_io_pool_entry,
-			          section,
-			          number_of_entries,
-			          table_entries_data,
-			          table_entries_data_size,
-			          entries_corrupted,
-			          error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to fill chunks list.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve mapped range from element.",
+		 function );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-/* TODO
-	else
+	chunk_index = storage_media_offset / segment_file->io_handle->chunk_size;
+
+	if( segment_file->major_version == 1 )
+	{
+		result = libewf_chunk_group_fill_v1(
+			  chunks_list,
+			  chunk_index,
+			  segment_file->io_handle->chunk_size,
+			  file_io_pool_entry,
+			  section,
+			  (off64_t) base_offset,
+			  number_of_entries,
+			  table_entries_data,
+			  table_entries_data_size,
+			  entries_corrupted,
+			  error );
+	}
+	else if( segment_file->major_version == 2 )
+	{
+		result = libewf_chunk_group_fill_v2(
+			  chunks_list,
+			  chunk_index,
+			  segment_file->io_handle->chunk_size,
+			  file_io_pool_entry,
+			  section,
+			  number_of_entries,
+			  table_entries_data,
+			  table_entries_data_size,
+			  entries_corrupted,
+			  error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to fill chunks list.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 section_data );
+
+	section_data = NULL;
+
+	if( libewf_section_free(
+	     &section,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free section.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO read and process backup range if available and neccessary
+	if( entries_corrupted != 0 )
 	{
 		if( segment_file->major_version == 1 )
 		{
 			result = libewf_chunk_group_correct_v1(
 				  chunks_list,
+			          chunk_index,
 			          segment_file->io_handle->chunk_size,
 				  file_io_pool_entry,
 				  section,
@@ -2018,30 +2083,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 		}
 	}
 */
-/* TODO
-	if( entries_corrupted != 0 )
-	{
-		return( 0 );
-	}
-*/
-	memory_free(
-	 section_data );
-
-	section_data = NULL;
-
-	if( libewf_section_free(
-	     &section,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free section.",
-		 function );
-
-		goto on_error;
-	}
 	if( libfdata_list_element_set_element_value(
 	     element,
 	     cache,

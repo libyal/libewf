@@ -30,9 +30,10 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
+#include "libewf_segment_file.h"
 
 /* Creates a read IO handle
  * Make sure the value read_io_handle is referencing, is set to NULL
@@ -276,6 +277,382 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_read_io_handle_read_chunk_data(
+     libewf_read_io_handle_t *read_io_handle,
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_media_values_t *media_values,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
+     libfcache_cache_t *chunk_table_cache,
+     off64_t storage_media_offset,
+     libewf_chunk_data_t **chunk_data,
+     off64_t *chunk_data_offset,
+     libcerror_error_t **error )
+{
+	libewf_segment_file_t *segment_file       = NULL;
+	libfdata_list_t *chunks_list              = NULL;
+	static char *function                     = "libewf_read_io_handle_read_chunk_data";
+	off64_t storage_media_offset_chunk_group  = 0;
+	off64_t storage_media_offset_segment_file = 0;
+	uint64_t start_sector                     = 0;
+	uint32_t number_of_sectors                = 0;
+	int chunk_groups_list_index               = 0;
+	int chunks_list_index                     = 0;
+	int result                                = 0;
+	int segment_files_list_index              = 0;
+
+	if( read_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid read IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk data offset.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO check delta segment files list first add an overlay bitmap ? bit per chunk ?
+ */
+	if( libfdata_list_get_element_value_at_offset(
+	     segment_files_list,
+	     (intptr_t *) file_io_pool,
+	     segment_files_cache,
+	     storage_media_offset,
+	     &segment_files_list_index,
+	     &storage_media_offset_segment_file,
+	     (intptr_t **) &segment_file,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file at offset: %" PRIi64 " from segment files list.",
+		 function,
+		 storage_media_offset );
+
+		return( -1 );
+	}
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment file: %d.",
+		 function,
+		 segment_files_list_index );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_element_value_at_offset(
+	     segment_file->chunk_groups_list,
+	     (intptr_t *) file_io_pool,
+	     segment_file->chunk_groups_cache,
+	     storage_media_offset_segment_file,
+	     &chunk_groups_list_index,
+	     &storage_media_offset_chunk_group,
+	     (intptr_t **) &chunks_list,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunks list from segment file: %d at offset: %" PRIi64 ".",
+		 function,
+		 segment_files_list_index,
+		 storage_media_offset_segment_file );
+
+		return( -1 );
+	}
+	if( chunks_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunks list: %d.",
+		 function,
+		 chunk_groups_list_index );
+
+		return( -1 );
+	}
+	result = libfdata_list_get_element_value_at_offset(
+	          chunks_list,
+	          (intptr_t *) file_io_pool,
+	          chunk_table_cache,
+	          storage_media_offset_chunk_group,
+	          &chunks_list_index,
+	          chunk_data_offset,
+	          (intptr_t **) chunk_data,
+	          0,
+	          error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk data from chunk group: %s in segment file: %d at offset: %" PRIi64 ".",
+		 function,
+		 chunk_groups_list_index,
+		 segment_files_list_index,
+		 storage_media_offset_segment_file );
+
+		return( -1 );
+
+/* TODO refactor
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libcnotify_print_error_backtrace(
+				 *error );
+			}
+		}
+#endif
+		libcerror_error_free(
+		 error );
+
+		chunk_size = media_values->chunk_size;
+
+		if( (size64_t) ( chunk_offset + chunk_size ) > media_values->media_size )
+		{
+			chunk_size = (size_t) ( media_values->media_size - chunk_offset );
+		}
+		if( libewf_chunk_data_initialize(
+		     chunk_data,
+		     chunk_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create chunk data.",
+			 function );
+
+			return( -1 );
+		}
+		if( *chunk_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk data: %d.",
+			 function,
+			 chunk_index );
+
+			return( -1 );
+		}
+		( *chunk_data )->data_size    = chunk_size;
+		( *chunk_data )->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
+
+		if( memory_set(
+		     ( *chunk_data )->data,
+		     0,
+		     ( *chunk_data )->data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to zero chunk data.",
+			 function );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libmfdata_list_set_element_by_index(
+		     chunk_table_list,
+		     chunk_index,
+		     -1,
+		     chunk_offset,
+		     chunk_size,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to set chunk: %d in table.",
+			 function,
+			 chunk_index );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libmfdata_list_set_element_value_by_index(
+		     chunk_table_list,
+		     chunk_table_cache,
+		     chunk_index,
+		     (intptr_t *) *chunk_data,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
+		     LIBMFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to set chunk data: %d as element value.",
+			 function,
+			 chunk_index );
+
+			libewf_chunk_data_free(
+			 chunk_data,
+			 NULL );
+
+			return( -1 );
+		}
+*/
+	}
+	else
+	{
+		if( *chunk_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunks data: %d.",
+			 function,
+			 chunks_list_index );
+
+			return( -1 );
+		}
+		if( libewf_chunk_data_unpack(
+		     *chunk_data,
+		     media_values->chunk_size,
+		     io_handle->compression_method,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to unpack chunk data.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( ( *chunk_data )->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+		{
+			if( read_io_handle->zero_on_error != 0 )
+			{
+				if( memory_set(
+				     ( *chunk_data )->data,
+				     0,
+				     ( *chunk_data )->data_size ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero chunk data.",
+					 function );
+
+					return( -1 );
+				}
+			}
+		}
+	}
+	if( ( ( *chunk_data )->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+	{
+		/* Add checksum error
+		 */
+		start_sector      = ( storage_media_offset - *chunk_data_offset ) / media_values->bytes_per_sector;
+		number_of_sectors = media_values->sectors_per_chunk;
+
+		if( ( start_sector + number_of_sectors ) > (uint64_t) media_values->number_of_sectors )
+		{
+			number_of_sectors = (uint32_t) ( (uint64_t) media_values->number_of_sectors - start_sector );
+		}
+		if( libcdata_range_list_append_range(
+		     read_io_handle->checksum_errors,
+		     start_sector,
+		     number_of_sectors,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append checksum error to range list.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+#ifdef TODO_REMOVE
+
+/* Reads a specific chunk of data
+ * Adds a checksum error if the data is corrupted
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_read_io_handle_read_chunk_data_old(
      libewf_read_io_handle_t *read_io_handle,
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
@@ -552,4 +929,6 @@ int libewf_read_io_handle_read_chunk_data(
 	}
 	return( 1 );
 }
+
+#endif
 

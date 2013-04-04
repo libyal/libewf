@@ -286,10 +286,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_segment_file_handle.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_segment_table.c"
 				>
 			</File>
@@ -537,10 +533,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_segment_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_segment_file_handle.h"
 				>
 			</File>
 			<File
