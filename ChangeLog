@@ -33,6 +33,7 @@ TODO
       back to read IO handle ?
 
   - handle: replace chunk_index calcuations by current_chunk_index tracking ?
+  - libewf_filename_create: change to accept ( segment_number - 1 )
 
 * pyewf
   - change header and hash values into sequence objects

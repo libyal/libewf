@@ -104,18 +104,6 @@ struct libewf_internal_handle
 	 */
 	int maximum_number_of_open_handles;
 
-	/* The segment files list
-	 */
-	libfdata_list_t *segment_files_list;
-
-	/* The delta segment files list
-	 */
-	libfdata_list_t *delta_segment_files_list;
-
-	/* The segment files cache
-	 */
-	libfcache_cache_t *segment_files_cache;
-
 	/* The segment file table
 	 */
 	libewf_segment_table_t *segment_table;

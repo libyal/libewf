@@ -141,6 +141,19 @@ int libewf_segment_file_clone(
      libewf_segment_file_t *source_segment_file,
      libcerror_error_t **error );
 
+int libewf_segment_file_get_number_of_sections(
+     libewf_segment_file_t *segment_file,
+     int *number_of_sections,
+     libcerror_error_t **error );
+
+int libewf_segment_file_get_section_by_index(
+     libewf_segment_file_t *segment_file,
+     int section_index,
+     libbfio_pool_t *file_io_pool,
+     libfcache_cache_t *sections_cache,
+     libewf_section_t **section,
+     libcerror_error_t **error );
+
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_t *segment_file,
          libbfio_pool_t *file_io_pool,

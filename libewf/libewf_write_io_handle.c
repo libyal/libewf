@@ -827,11 +827,9 @@ int libewf_write_io_handle_initialize_resume(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libfdata_list_t *segment_files_list,
-     libfcache_cache_t *segment_files_cache,
+     libewf_segment_table_t *segment_table,
      libmfdata_list_t *chunk_table_list,
      libewf_chunk_table_t *chunk_table,
-     libewf_segment_table_t *segment_table,
      libcerror_error_t **error )
 {
 	libewf_section_t *previous_section       = NULL;
@@ -839,19 +837,17 @@ int libewf_write_io_handle_initialize_resume(
 	libewf_segment_file_t *segment_file      = NULL;
 	libfcache_cache_t *sections_cache        = NULL;
 	static char *function                    = "libewf_write_io_handle_initialize_resume";
-	off64_t data_range_offset                = 0;
-	size64_t data_range_size                 = 0;
-	uint32_t data_range_flags                = 0;
+	size64_t segment_file_size               = 0;
+	uint32_t number_of_segments              = 0;
+	uint32_t segment_number                  = 0;
 	uint8_t backtrack_to_last_chunks_section = 0;
 	uint8_t reopen_segment_file              = 0;
 	int file_io_pool_entry                   = 0;
 	int number_of_chunks                     = 0;
 	int number_of_sections                   = 0;
-	int number_of_segment_files              = 0;
 	int number_of_unusable_chunks            = 0;
 	int previous_section_index               = 0;
 	int section_index                        = 0;
-	int segment_files_list_index             = 0;
 	int supported_section                    = 0;
 
 	if( write_io_handle == NULL )
@@ -901,66 +897,52 @@ int libewf_write_io_handle_initialize_resume(
 
 		goto on_error;
 	}
-	if( libfdata_list_get_number_of_elements(
-	     segment_files_list,
-	     &number_of_segment_files,
+	if( libewf_segment_table_get_number_of_segments(
+	     segment_table,
+	     &number_of_segments,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of segment files.",
+		 "%s: unable to retrieve number of segments.",
 		 function );
 
 		goto on_error;
 	}
-	if( ( number_of_segment_files <= 0 )
-	 || ( number_of_segment_files > (int) UINT16_MAX ) )
+	if( number_of_segments == 0 )
 	{
 		libcerror_error_set(
 		 error,
-	 	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of segment files value out of bounds.",
+		 "%s: invalid number of segments value out of bounds.",
 		 function );
 
 		goto on_error;
 	}
-	segment_files_list_index = number_of_segment_files - 1;
+	segment_number = number_of_segments - 1;
 
-	if( libfdata_list_get_element_value_by_index(
-	     segment_files_list,
-	     (intptr_t *) file_io_pool,
-	     segment_files_cache,
-	     segment_files_list_index,
-	     (intptr_t **) &segment_file,
-	     0,
+	if( libewf_segment_table_get_segment_file_by_index(
+	     segment_table,
+	     segment_number,
+	     file_io_pool,
+	     &segment_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment file: %d from list.",
+		 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
 		 function,
-		 segment_files_list_index );
+		 segment_number );
 
 		goto on_error;
 	}
-	if( segment_file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfdata_list_get_number_of_elements(
-	     segment_file->sections_list,
+	if( libewf_segment_file_get_number_of_sections(
+	     segment_file,
 	     &number_of_sections,
 	     error ) != 1 )
 	{
@@ -968,29 +950,41 @@ int libewf_write_io_handle_initialize_resume(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the number of sections in the sections list.",
+		 "%s: unable to retrieve the number of sections from segment file: %" PRIu32 ".",
+		 function,
+		 segment_number );
+
+		goto on_error;
+	}
+	if( number_of_sections == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of sections value out of bounds.",
 		 function );
 
 		goto on_error;
 	}
 	section_index = number_of_sections - 1;
 	
-	if( libfdata_list_get_element_value_by_index(
-	     segment_file->sections_list,
-	     (intptr_t *) file_io_pool,
-	     sections_cache,
+	if( libewf_segment_file_get_section_by_index(
+	     segment_file,
 	     section_index,
-	     (intptr_t **) &section,
-	     0,
+	     file_io_pool,
+	     sections_cache,
+	     &section,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve section: %d from sections list.",
+		 "%s: unable to retrieve section: %d from segment file: %" PRIu32 ".",
 		 function,
-		 section_index );
+		 section_index,
+		 segment_number );
 
 		goto on_error;
 	}
@@ -1032,7 +1026,7 @@ int libewf_write_io_handle_initialize_resume(
 		     (void *) "data",
 		     4 ) == 0 )
 		{
-			if( segment_files_list_index == 0 )
+			if( segment_number == 0 )
 			{
 				backtrack_to_last_chunks_section = 1;
 			}
@@ -1533,13 +1527,13 @@ int libewf_write_io_handle_initialize_resume(
 
 	if( reopen_segment_file != 0 )
 	{
-		if( write_io_handle->resume_segment_file_offset > (off64_t) segment_table->maximum_segment_size )
+		if( (size64_t) write_io_handle->resume_segment_file_offset > segment_table->maximum_segment_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: resume segment file offset cannot be greater than segment file size.",
+			 "%s: resume segment file offset cannot be greater than maximum segment file size.",
 			 function );
 
 			goto on_error;
@@ -1550,22 +1544,20 @@ int libewf_write_io_handle_initialize_resume(
 		write_io_handle->number_of_chunks_written_to_segment_file = segment_file->number_of_chunks
 		                                                          - number_of_unusable_chunks;
 
-		if( libfdata_list_get_element_by_index(
-		     segment_files_list,
-		     segment_files_list_index,
+		if( libewf_segment_table_get_segment_by_index(
+		     segment_table,
+		     segment_number,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &segment_file_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %d from list.",
+			 "%s: unable to retrieve segment: %" PRIu32 " from segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			goto on_error;
 		}
@@ -1579,9 +1571,9 @@ int libewf_write_io_handle_initialize_resume(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to reopen segment file: %d.",
+			 "%s: unable to re-open segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			goto on_error;
 		}
@@ -2220,16 +2212,13 @@ int libewf_write_io_handle_test_chunks_section_full(
 int libewf_write_io_handle_create_segment_file(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
-     libfdata_list_t *segment_files_list,
-     libfcache_cache_t *segment_files_cache,
      libewf_segment_table_t *segment_table,
      uint8_t segment_file_type,
      uint32_t segment_number,
      uint32_t maximum_number_of_segments,
      const uint8_t *set_identifier,
-     libewf_segment_file_t **segment_file,
-     int *segment_files_list_index,
      int *file_io_pool_entry,
+     libewf_segment_file_t **segment_file,
      libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle        = NULL;
@@ -2260,6 +2249,17 @@ int libewf_write_io_handle_create_segment_file(
 
 		return( -1 );
 	}
+	if( file_io_pool_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file IO pool entry.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file == NULL )
 	{
 		libcerror_error_set(
@@ -2282,34 +2282,12 @@ int libewf_write_io_handle_create_segment_file(
 
 		return( -1 );
 	}
-	if( segment_files_list_index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment files list index.",
-		 function );
-
-		return( -1 );
-	}
-	if( file_io_pool_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file IO pool entry.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_filename_create(
 	     &filename,
 	     &filename_size,
 	     segment_table->basename,
 	     segment_table->basename_size - 1,
-	     segment_number,
+	     segment_number + 1,
 	     maximum_number_of_segments,
 	     segment_file_type,
 	     io_handle->format,
@@ -2319,7 +2297,7 @@ int libewf_write_io_handle_create_segment_file(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file: %" PRIu16 " filename.",
+		 "%s: unable to create segment file: %" PRIu32 " filename.",
 		 function,
 		 segment_number );
 
@@ -2340,7 +2318,7 @@ int libewf_write_io_handle_create_segment_file(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 "%s: creating segment file: %" PRIu32 " with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
 		 function,
 		 segment_number,
 		 filename );
@@ -2444,7 +2422,7 @@ int libewf_write_io_handle_create_segment_file(
 		goto on_error;
 	}
 	( *segment_file )->type           = segment_file_type;
-	( *segment_file )->segment_number = segment_number;
+	( *segment_file )->segment_number = segment_number + 1;
 	( *segment_file )->flags         |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
 
 	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
@@ -2478,43 +2456,36 @@ int libewf_write_io_handle_create_segment_file(
 			goto on_error;
 		}
 	}
-	if( libfdata_list_append_element(
-	     segment_files_list,
-	     segment_files_list_index,
+	if( libewf_segment_table_append_segment_by_segment_file(
+	     segment_table,
+	     *segment_file,
 	     *file_io_pool_entry,
-	     0,
-	     0,
 	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set segment file: %" PRIu16 " in list.",
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append segment: %" PRIu32 " to segment table.",
 		 function,
 		 segment_number );
 
 		goto on_error;
 	}
-	if( libfdata_list_set_element_value_by_index(
-	     segment_files_list,
-	     segment_files_cache,
-	     *segment_files_list_index,
-	     (intptr_t *) *segment_file,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+	if( libewf_segment_table_set_segment_file_by_index(
+	     segment_table,
+	     segment_number,
+	     *segment_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set segment file: %" PRIu16 " value in list.",
+		 "%s: unable to set segment file: %" PRIu32 " in segment table.",
 		 function,
 		 segment_number );
-
-		*segment_file = NULL;
 
 		goto on_error;
 	}
@@ -2551,8 +2522,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libfdata_list_t *segment_files_list,
-         libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *segment_table,
          libmfdata_list_t *chunk_table_list,
          libfvalue_table_t *header_values,
@@ -2568,18 +2537,16 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_write_new_chunk";
-	off64_t data_range_offset           = 0;
 	off64_t segment_file_offset         = 0;
-	size64_t data_range_size            = 0;
-	uint32_t data_range_flags           = 0;
+	size64_t segment_file_size          = 0;
+	uint32_t number_of_segments         = 0;
+	uint32_t segment_number             = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	int chunk_exists                    = 0;
 	int file_io_pool_entry              = -1;
 	int number_of_chunks                = 0;
-	int number_of_segment_files         = 0;
 	int result                          = 0;
-	int segment_files_list_index        = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -2735,52 +2702,38 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 input_data_size );
 	}
 #endif
-	if( libfdata_list_get_number_of_elements(
-	     segment_files_list,
-	     &number_of_segment_files,
+	if( libewf_segment_table_get_number_of_segments(
+	     segment_table,
+	     &number_of_segments,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of segment files.",
+		 "%s: unable to retrieve number of segments from segment table.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( number_of_segment_files < 0 )
-	 || ( number_of_segment_files > (int) UINT16_MAX ) )
+	if( number_of_segments > 0 )
 	{
-		libcerror_error_set(
-		 error,
-	 	 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of segment files value out of bounds.",
-		 function );
+		segment_number = number_of_segments - 1;
 
-		return( -1 );
-	}
-	if( number_of_segment_files != 0 )
-	{
-		segment_files_list_index = number_of_segment_files - 1;
-
-		if( libfdata_list_get_element_value_by_index(
-		     segment_files_list,
-		     (intptr_t *) file_io_pool,
-		     segment_files_cache,
-		     segment_files_list_index,
-		     (intptr_t **) &segment_file,
-		     0,
+		if( libewf_segment_table_get_segment_file_by_index(
+		     segment_table,
+		     segment_number,
+		     file_io_pool,
+		     &segment_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %d from list.",
+			 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -2790,17 +2743,15 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %d.",
+			 "%s: missing segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
 		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN ) == 0 )
 		{
 			segment_file = NULL;
-
-			segment_files_list_index += 1;
 		}
 	}
 	if( segment_file == NULL )
@@ -2813,33 +2764,30 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: creating segment file with segment number: %d.\n",
+			 "%s: creating segment file: %" PRIu32 ".\n",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 		}
 #endif
 		if( libewf_write_io_handle_create_segment_file(
 		     io_handle,
 		     file_io_pool,
-		     segment_files_list,
-		     segment_files_cache,
 		     segment_table,
 		     io_handle->segment_file_type,
-		     (uint32_t) ( segment_files_list_index + 1 ),
+		     segment_number,
 		     write_io_handle->maximum_number_of_segments,
 		     media_values->set_identifier,
-		     &segment_file,
-		     &segment_files_list_index,
 		     &file_io_pool_entry,
+		     &segment_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to create segment file: %d.",
+			 "%s: unable to create segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -2917,22 +2865,20 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	else
 	{
-		if( libfdata_list_get_element_by_index(
-		     segment_files_list,
-		     segment_files_list_index,
+		if( libewf_segment_table_get_segment_by_index(
+		     segment_table,
+		     segment_number,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &segment_file_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %d from list.",
+			 "%s: unable to retrieve segment: %" PRIu32 " from segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -2952,10 +2898,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %d.",
+			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %" PRIu32 ".",
 			 function,
 			 write_io_handle->resume_segment_file_offset,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3142,11 +3088,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	"%s: writing chunk data: %d of size: %" PRIzd " to segment file: %d.\n",
+	 	"%s: writing chunk data: %d of size: %" PRIzd " to segment file: %" PRIu32 ".\n",
 		 function,
 		 chunk_index,
 		 chunk_data->data_size,
-		 segment_files_list_index );
+		 segment_number );
 	}
 #endif
 	write_count = libewf_segment_file_write_chunk_data(
@@ -3314,9 +3260,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-				 	"%s: closing segment file with segment number: %d.\n",
+				 	"%s: closing segment file: %" PRIu32 ".\n",
 					 function,
-					 segment_files_list_index );
+					 segment_number );
 				}
 #endif
 				/* Finish and close the segment file
@@ -3365,8 +3311,6 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          libewf_media_values_t *media_values,
-         libfdata_list_t *delta_segment_files_list,
-         libfcache_cache_t *segment_files_cache,
          libewf_segment_table_t *delta_segment_table,
          libmfdata_list_t *chunk_table_list,
          int chunk_index,
@@ -3376,26 +3320,24 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_write_existing_chunk";
-	off64_t data_range_offset           = 0;
 	off64_t existing_chunk_offset       = 0;
 	off64_t section_offset              = 0;
 	off64_t segment_file_offset         = 0;
-	size64_t data_range_size            = 0;
 	size64_t existing_chunk_size        = 0;
 	size64_t section_size               = 0;
+	size64_t segment_file_size          = 0;
 	size64_t required_segment_file_size = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
-	uint32_t data_range_flags           = 0;
 	uint32_t existing_range_flags       = 0;
+	uint32_t number_of_segments         = 0;
 	uint32_t section_flags              = 0;
+	uint32_t segment_number             = 0;
 	uint8_t no_section_append           = 0;
 	int file_io_pool_entry              = -1;
 	int number_of_sections              = 0;
-	int number_of_segment_files         = 0;
 	int section_file_index              = 0;
 	int section_index                   = 0;
-	int segment_files_list_index        = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -3518,73 +3460,57 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 #endif
 	if( ( existing_range_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) == 0 )
 	{
-		if( libfdata_list_get_number_of_elements(
-		     delta_segment_files_list,
-		     &number_of_segment_files,
+		if( libewf_segment_table_get_number_of_segments(
+		     delta_segment_table,
+		     &number_of_segments,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of delta segment files.",
+			 "%s: unable to retrieve number of segments from delta segment table.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( number_of_segment_files < 0 )
-		 || ( number_of_segment_files > (int) UINT16_MAX ) )
+		if( number_of_segments > 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid number of segment files value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		if( number_of_segment_files != 0 )
-		{
-			segment_files_list_index = number_of_segment_files - 1;
+			segment_number = number_of_segments - 1;
 
 			/* Check if a new delta segment file should be created
 			 */
-			if( libfdata_list_get_element_by_index(
-			     delta_segment_files_list,
-			     segment_files_list_index,
+			if( libewf_segment_table_get_segment_by_index(
+			     delta_segment_table,
+			     segment_number,
 			     &file_io_pool_entry,
-			     &data_range_offset,
-			     &data_range_size,
-			     &data_range_flags,
+			     &segment_file_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve delta segment file: %d from list.",
+				 "%s: unable to retrieve delta segment: %" PRIu32 " from delta segment table.",
 				 function,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
-			if( libfdata_list_get_element_value_by_index(
-			     delta_segment_files_list,
-			     (intptr_t *) file_io_pool,
-			     segment_files_cache,
-			     segment_files_list_index,
-			     (intptr_t **) &segment_file,
-			     0,
+			if( libewf_segment_table_get_segment_file_by_index(
+			     delta_segment_table,
+			     segment_number,
+			     file_io_pool,
+			     &segment_file,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve delta segment file: %d value from list.",
+				 "%s: unable to retrieve delta segment file: %" PRIu32 " value from list.",
 				 function,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
@@ -3594,9 +3520,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing delta segment file: %d.",
+				 "%s: missing delta segment file: %" PRIu32 ".",
 				 function,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
@@ -3665,10 +3591,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIi64 " in delta segment file: %d.",
+					 "%s: unable to seek offset: %" PRIi64 " in delta segment file: %" PRIu32 ".",
 					 function,
 					 section_offset,
-					 segment_files_list_index );
+					 segment_number );
 
 					return( -1 );
 				}
@@ -3735,25 +3661,22 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			if( libewf_write_io_handle_create_segment_file(
 			     io_handle,
 			     file_io_pool,
-			     delta_segment_files_list,
-			     segment_files_cache,
 			     delta_segment_table,
 			     LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA,
-			     (uint32_t) ( segment_files_list_index + 1 ),
+			     segment_number,
 			     write_io_handle->maximum_number_of_segments,
 			     media_values->set_identifier,
-			     &segment_file,
-			     &segment_files_list_index,
 			     &file_io_pool_entry,
+			     &segment_file,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to create delta segment file: %d.",
+				 "%s: unable to create delta segment file: %" PRIu32 ".",
 				 function,
-				 segment_files_list_index );
+				 segment_number );
 
 				return( -1 );
 			}
@@ -3790,22 +3713,20 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	else
 	{
-		if( libfdata_list_get_element_value_by_index(
-		     delta_segment_files_list,
-		     (intptr_t *) file_io_pool,
-		     segment_files_cache,
-		     segment_files_list_index,
-		     (intptr_t **) &segment_file,
-		     0,
+		if( libewf_segment_table_get_segment_file_by_index(
+		     delta_segment_table,
+		     segment_number,
+		     file_io_pool,
+		     &segment_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve delta segment file: %d value from list.",
+			 "%s: unable to retrieve segment file: %" PRIu32 " from delta segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3815,9 +3736,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %d.",
+			 "%s: missing segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -3913,8 +3834,7 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
-     libfdata_list_t *segment_files_list,
-     libfcache_cache_t *segment_files_cache,
+     libewf_segment_table_t *segment_table,
      libfvalue_table_t *header_values,
      libfvalue_table_t *hash_values,
      libewf_hash_sections_t *hash_sections,
@@ -3925,13 +3845,11 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 {
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_write_io_handle_finalize_write_sections_corrections";
-	off64_t data_range_offset           = 0;
-	size64_t data_range_size            = 0;
-	uint32_t data_range_flags           = 0;
+	size64_t segment_file_size          = 0;
+	uint32_t number_of_segments         = 0;
+	uint32_t segment_number             = 0;
 	int file_io_pool_entry              = 0;
-	int number_of_segment_files         = 0;
 	int last_segment_file               = 0;
-	int segment_files_list_index        = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -3944,77 +3862,61 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_number_of_elements(
-	     segment_files_list,
-	     &number_of_segment_files,
+	if( libewf_segment_table_get_number_of_segments(
+	     segment_table,
+	     &number_of_segments,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of segment files.",
+		 "%s: unable to retrieve number of segments from segment table.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( number_of_segment_files < 0 )
-	 || ( number_of_segment_files > (int) UINT16_MAX ) )
+	for( segment_number = 0;
+	     segment_number < number_of_segments;
+	     segment_number++ )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of segment files value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	for( segment_files_list_index = 0;
-	     segment_files_list_index < number_of_segment_files;
-	     segment_files_list_index++ )
-	{
-		if( segment_files_list_index == ( number_of_segment_files - 1 ) )
+		if( segment_number == ( number_of_segments - 1 ) )
 		{
 			last_segment_file = 1;
 		}
 		segment_file = NULL;
 
-		if( libfdata_list_get_element_by_index(
-		     segment_files_list,
-		     segment_files_list_index,
+		if( libewf_segment_table_get_segment_by_index(
+		     segment_table,
+		     segment_number,
 		     &file_io_pool_entry,
-		     &data_range_offset,
-		     &data_range_size,
-		     &data_range_flags,
+		     &segment_file_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %d from list.",
+			 "%s: unable to retrieve segment: %" PRIu32 " from segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
-		if( libfdata_list_get_element_value_by_index(
-		     segment_files_list,
-		     (intptr_t *) file_io_pool,
-		     segment_files_cache,
-		     segment_files_list_index,
-		     (intptr_t **) &segment_file,
-		     0,
+		if( libewf_segment_table_get_segment_file_by_index(
+		     segment_table,
+		     segment_number,
+		     file_io_pool,
+		     &segment_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %d from list.",
+			 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -4024,9 +3926,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %d.",
+			 "%s: missing segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}
@@ -4055,9 +3957,9 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write sections correction to segment file: %d.",
+			 "%s: unable to write sections correction to segment file: %" PRIu32 ".",
 			 function,
-			 segment_files_list_index );
+			 segment_number );
 
 			return( -1 );
 		}

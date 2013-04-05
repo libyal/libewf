@@ -440,6 +440,90 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the number of segments
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_file_get_number_of_sections(
+     libewf_segment_file_t *segment_file,
+     int *number_of_sections,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_segment_file_get_number_of_sections";
+
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_number_of_elements(
+	     segment_file->sections_list,
+	     number_of_sections,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve the number of sections from sections list.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific section from the segment file
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_file_get_section_by_index(
+     libewf_segment_file_t *segment_file,
+     int section_index,
+     libbfio_pool_t *file_io_pool,
+     libfcache_cache_t *sections_cache,
+     libewf_section_t **section,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_segment_file_get_section_by_index";
+
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_element_value_by_index(
+	     segment_file->sections_list,
+	     (intptr_t *) file_io_pool,
+	     sections_cache,
+	     section_index,
+	     (intptr_t **) section,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve section: %d from sections list.",
+		 function,
+		 section_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Reads the segment file header
  * Returns the number of bytes read if successful, or -1 on error
  */

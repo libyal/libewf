@@ -25,12 +25,13 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
-#include "libewf_libcdata.h"
-#include "libewf_libcerror.h"
 #include "libewf_libcstring.h"
-#include "libewf_libmfdata.h"
-#include "libewf_media_values.h"
+#include "libewf_libcstring.h"
+#include "libewf_libfcache.h"
+#include "libewf_libfdata.h"
+#include "libewf_segment_file.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -52,6 +53,18 @@ struct libewf_segment_table
 	 */
 	size64_t maximum_segment_size;
 
+	/* The segment files list
+	 */
+	libfdata_list_t *segment_files_list;
+
+	/* The number of segments
+	 */
+	uint32_t number_of_segments;
+
+	/* The segment files cache
+	 */
+	libfcache_cache_t *segment_files_cache;
+
 	/* Flags
 	 */
 	uint8_t flags;
@@ -59,7 +72,9 @@ struct libewf_segment_table
 
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
+     libewf_io_handle_t *io_handle,
      size64_t maximum_segment_size,
+     uint8_t is_delta,
      libcerror_error_t **error );
 
 int libewf_segment_table_free(
@@ -110,6 +125,61 @@ int libewf_segment_table_set_basename_wide(
 int libewf_segment_table_set_maximum_segment_size(
      libewf_segment_table_t *segment_table,
      size64_t maximum_segment_size,
+     libcerror_error_t **error );
+
+int libewf_segment_table_get_number_of_segments(
+     libewf_segment_table_t *segment_table,
+     uint32_t *number_of_segments,
+     libcerror_error_t **error );
+
+int libewf_segment_table_get_segment_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     int *file_io_pool_entry,
+     size64_t *segment_file_size,
+     libcerror_error_t **error );
+
+int libewf_segment_table_get_segment_at_offset(
+     libewf_segment_table_t *segment_table,
+     off64_t offset,
+     int *file_io_pool_entry,
+     size64_t *segment_file_size,
+     libcerror_error_t **error );
+
+int libewf_segment_table_set_segment_storage_media_range_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     off64_t storage_media_offset,
+     size64_t storage_media_size,
+     libcerror_error_t **error );
+
+int libewf_segment_table_get_segment_file_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     libbfio_pool_t *file_io_pool,
+     libewf_segment_file_t **segment_file,
+     libcerror_error_t **error );
+
+int libewf_segment_table_get_segment_file_at_offset(
+     libewf_segment_table_t *segment_table,
+     off64_t offset,
+     libbfio_pool_t *file_io_pool,
+     uint32_t *segment_number,
+     off64_t *segment_file_data_offset,
+     libewf_segment_file_t **segment_file,
+     libcerror_error_t **error );
+
+int libewf_segment_table_set_segment_file_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     libewf_segment_file_t *segment_file,
+     libcerror_error_t **error );
+
+int libewf_segment_table_append_segment_by_segment_file(
+     libewf_segment_table_t *segment_table,
+     libewf_segment_file_t *segment_file,
+     int file_io_pool_entry,
+     size64_t segment_file_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
