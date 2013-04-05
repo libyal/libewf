@@ -246,7 +246,7 @@ int libewf_handle_get_number_of_checksum_errors(
 LIBEWF_EXTERN \
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t index,
+     uint32_t error_index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error );

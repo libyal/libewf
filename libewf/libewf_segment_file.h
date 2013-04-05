@@ -201,6 +201,15 @@ int libewf_segment_file_read_chunk_group_element_data(
      uint8_t read_flags,
      libcerror_error_t **error );
 
+int libewf_segment_file_get_chunk_group_by_offset(
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     off64_t offset,
+     int *chunk_group_index,
+     off64_t *chunk_group_data_offset,
+     libfdata_list_t **chunks_list,
+     libcerror_error_t **error );
+
 ssize_t libewf_segment_file_read_table_section(
          libewf_segment_file_t *segment_file,
          libewf_section_t *section,

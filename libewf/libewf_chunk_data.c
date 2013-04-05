@@ -108,7 +108,12 @@ int libewf_chunk_data_initialize(
 		 "%s: unable to clear chunk data.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *chunk_data );
+
+		*chunk_data = NULL;
+
+		return( -1 );
 	}
 	if( data_size > 0 )
 	{
@@ -142,6 +147,142 @@ int libewf_chunk_data_initialize(
 on_error:
 	if( *chunk_data != NULL )
 	{
+		memory_free(
+		 *chunk_data );
+
+		*chunk_data = NULL;
+	}
+	return( -1 );
+}
+
+/* Creates chunk data and clears the data
+ * Make sure the value chunk_data is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_data_initialize_clear_data(
+     libewf_chunk_data_t **chunk_data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_chunk_data_initialize_clear_data";
+
+	if( chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	if( *chunk_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid chunk data value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	*chunk_data = memory_allocate_structure(
+	               libewf_chunk_data_t );
+
+	if( *chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create chunk data.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *chunk_data,
+	     0,
+	     sizeof( libewf_chunk_data_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear chunk data.",
+		 function );
+
+		memory_free(
+		 *chunk_data );
+
+		*chunk_data = NULL;
+
+		return( -1 );
+	}
+	if( data_size > 0 )
+	{
+		/* The allocated data size should be rounded to the next 16-byte increment
+		 */
+		if( ( data_size % 16 ) != 0 )
+		{
+			data_size += 16;
+		}
+		data_size = ( data_size / 16 ) * 16;
+
+		( *chunk_data )->data = (uint8_t *) memory_allocate(
+		                                     sizeof( uint8_t ) * data_size );
+
+		if( ( *chunk_data )->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_set(
+		     ( *chunk_data )->data,
+		     0,
+		     sizeof( uint8_t ) * data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear data.",
+			 function );
+
+			goto on_error;
+		}
+		( *chunk_data )->allocated_data_size = data_size;
+		( *chunk_data )->flags               = LIBEWF_CHUNK_DATA_ITEM_FLAG_MANAGED_DATA;
+	}
+	return( 1 );
+
+on_error:
+	if( *chunk_data != NULL )
+	{
+		if( ( *chunk_data )->data != NULL )
+		{
+			memory_free(
+			 ( *chunk_data )->data );
+		}
 		memory_free(
 		 *chunk_data );
 
@@ -1480,7 +1621,7 @@ int libewf_chunk_data_read_element_data(
 
 		return( -1 );
 	}
-	if( io_handle->chunk_size )
+	if( io_handle->chunk_size == 0 )
 	{
 		libcerror_error_set(
 		 error,

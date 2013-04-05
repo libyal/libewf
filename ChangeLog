@@ -24,10 +24,15 @@ TODO
 
   - use mapped offset to determine first chunk index (+/-)
     - what about base offset ?
+    - make mapped offsets absolute ?
 
   - refactor chunk table to
-    - manage chunk lookups
-    - check if chunks exists
+    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
+      successive calls to fdata types
+    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
+      back to read IO handle ?
+
+  - handle: replace chunk_index calcuations by current_chunk_index tracking ?
 
 * pyewf
   - change header and hash values into sequence objects
@@ -394,6 +399,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130405
+* changes for libmfdata and libfdata merge
 
 20130404
 * fixes for local library Makefiles

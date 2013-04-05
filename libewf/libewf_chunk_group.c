@@ -277,28 +277,13 @@ int libewf_chunk_group_fill_v1(
 			 "\n" );
 		}
 #endif
-		if( libfdata_list_append_element(
+		if( libfdata_list_append_element_with_mapped_range(
 		     chunks_list,
 		     &element_index,
 		     file_io_pool_entry,
 		     base_offset + current_offset,
 		     (size64_t) chunk_data_size,
 		     range_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append element: %" PRIu32 " to chunks list.",
-			 function,
-			 table_entry_index );
-
-			return( -1 );
-		}
-		if( libfdata_list_set_mapped_range_by_index(
-		     chunks_list,
-		     element_index,
 		     storage_media_offset,
 		     chunk_size,
 		     error ) != 1 )
@@ -307,9 +292,9 @@ int libewf_chunk_group_fill_v1(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to set mapped range of element: %d in chunks list.",
+			 "%s: unable to append element: %" PRIu32 " with mapped range to chunks list.",
 			 function,
-			 element_index );
+			 table_entry_index );
 
 			return( -1 );
 		}

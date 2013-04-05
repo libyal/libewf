@@ -124,6 +124,10 @@ struct libewf_internal_handle
 	 */
 	libewf_segment_table_t *delta_segment_table;
 
+	/* The chunk table
+	 */
+	libewf_chunk_table_t *chunk_table;
+
 	/* The chunk table (data) list
 	 */
 	libmfdata_list_t *chunk_table_list;
@@ -207,16 +211,21 @@ int libewf_handle_open_file_io_pool(
      int access_flags,
      libcerror_error_t **error );
 
+int libewf_handle_open_read_section_data(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
+     libcerror_error_t **error );
+
 int libewf_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
-     libewf_chunk_table_t *chunk_table,
      libcerror_error_t **error );
 
 int libewf_handle_open_read_delta_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
-     libewf_chunk_table_t *chunk_table,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \

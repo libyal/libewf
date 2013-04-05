@@ -2131,18 +2131,18 @@ int libewf_handle_set_read_zero_chunk_on_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->read_io_handle->zero_on_error = zero_on_error;
+	internal_handle->io_handle->zero_on_error = zero_on_error;
 
 	return( 1 );
 }
@@ -2388,7 +2388,6 @@ int libewf_handle_get_number_of_checksum_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
-	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2403,55 +2402,38 @@ int libewf_handle_get_number_of_checksum_errors(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
+		if( number_of_errors == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*number_of_errors = 0;
 	}
-	if( number_of_errors == NULL )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of errors.",
-		 function );
+		if( libewf_chunk_table_get_number_of_checksum_errors(
+		     internal_handle->chunk_table,
+		     number_of_errors,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of checksum errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( libcdata_range_list_get_number_of_elements(
-	     internal_handle->read_io_handle->checksum_errors,
-	     &number_of_elements,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from checksum errors range list.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_elements < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_errors = (uint32_t) number_of_elements;
-
 	return( 1 );
 }
 
@@ -2460,7 +2442,7 @@ int libewf_handle_get_number_of_checksum_errors(
  */
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t index,
+     uint32_t error_index,
      uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
@@ -2481,20 +2463,20 @@ int libewf_handle_get_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid error index value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libcdata_range_list_get_range(
-	     internal_handle->read_io_handle->checksum_errors,
-	     (int) index,
+	if( libewf_chunk_table_get_checksum_error(
+	     internal_handle->chunk_table,
+	     error_index,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -2505,14 +2487,14 @@ int libewf_handle_get_checksum_error(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve checksum error: %" PRIu32 ".",
 		 function,
-		 index );
+		 error_index );
 
 		return( -1 );
 	}
 	return( 1 );
 }
 
-/* Append a checksum error
+/* Appends a checksum error
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_append_checksum_error(
@@ -2537,19 +2519,8 @@ int libewf_handle_append_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_range_list_append_range(
-	     internal_handle->read_io_handle->checksum_errors,
+	if( libewf_chunk_table_append_checksum_error(
+	     internal_handle->chunk_table,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )

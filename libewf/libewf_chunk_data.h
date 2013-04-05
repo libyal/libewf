@@ -94,6 +94,11 @@ int libewf_chunk_data_initialize(
      size_t data_size,
      libcerror_error_t **error );
 
+int libewf_chunk_data_initialize_clear_data(
+     libewf_chunk_data_t **chunk_data,
+     size_t data_size,
+     libcerror_error_t **error );
+
 int libewf_chunk_data_free(
      libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );

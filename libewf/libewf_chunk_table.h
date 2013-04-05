@@ -29,10 +29,13 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_section.h"
 
 #include "ewf_table.h"
+
+/* TODO refactor */
+#include "libewf_libmfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -65,6 +68,10 @@ struct libewf_chunk_table
 	/* The last chunk that was compared
 	 */
 	int last_chunk_compared;
+
+	/* The sectors with checksum errors
+	 */
+	libcdata_range_list_t *checksum_errors;
 };
 
 int libewf_chunk_table_initialize(
@@ -79,6 +86,24 @@ int libewf_chunk_table_free(
 int libewf_chunk_table_clone(
      libewf_chunk_table_t **destination_chunk_table,
      libewf_chunk_table_t *source_chunk_table,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_get_number_of_checksum_errors(
+     libewf_chunk_table_t *chunk_table,
+     uint32_t *number_of_errors,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_get_checksum_error(
+     libewf_chunk_table_t *chunk_table,
+     uint32_t index,
+     uint64_t *start_sector,
+     uint64_t *number_of_sectors,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_append_checksum_error(
+     libewf_chunk_table_t *chunk_table,
+     uint64_t start_sector,
+     uint64_t number_of_sectors,
      libcerror_error_t **error );
 
 int libewf_chunk_table_read_chunk(
@@ -153,6 +178,58 @@ int libewf_chunk_table_generate_table_entries_data(
      size_t table_entries_data_size,
      uint32_t number_of_entries,
      off64_t base_offset,
+     libcerror_error_t **error );
+
+/* TODO */
+
+/* TODO fix cyclic dependency with segment file
+int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
+     libewf_chunk_table_t *chunk_table,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
+     off64_t offset,
+     int *segment_files_list_index,
+     off64_t *segment_file_data_offset,
+     libewf_segment_file_t **segment_file,
+     int *chunk_groups_list_index,
+     off64_t *chunk_group_data_offset,
+     libfdata_list_t **chunks_list,
+     libcerror_error_t **error );
+*/
+
+int libewf_chunk_table_chunk_exists_for_offset(
+     libewf_chunk_table_t *chunk_table,
+     uint64_t chunk_index,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
+     off64_t offset,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_get_chunk_data_by_offset(
+     libewf_chunk_table_t *chunk_table,
+     uint64_t chunk_index,
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_media_values_t *media_values,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
+     libfcache_cache_t *chunks_list_cache,
+     off64_t offset,
+     libewf_chunk_data_t **chunk_data,
+     off64_t *chunk_data_offset,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_set_chunk_data_by_offset(
+     libewf_chunk_table_t *chunk_table,
+     uint64_t chunk_index,
+     libbfio_pool_t *file_io_pool,
+     libfdata_list_t *segment_files_list,
+     libfcache_cache_t *segment_files_cache,
+     libfcache_cache_t *chunks_list_cache,
+     off64_t offset,
+     libewf_chunk_data_t *chunk_data,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

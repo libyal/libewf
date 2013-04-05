@@ -94,6 +94,7 @@ int libewf_io_handle_initialize(
 	( *io_handle )->minor_version      = 0;
 	( *io_handle )->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	( *io_handle )->compression_level  = LIBEWF_COMPRESSION_NONE;
+	( *io_handle )->zero_on_error      = 1;
 	( *io_handle )->header_codepage    = LIBEWF_CODEPAGE_ASCII;
 
 	return( 1 );
@@ -205,6 +206,8 @@ int libewf_io_handle_clone(
 
 		goto on_error;
 	}
+	( *destination_io_handle )->zero_on_error = source_io_handle->zero_on_error;
+
 	return( 1 );
 
 on_error:

@@ -79,6 +79,10 @@ struct libewf_io_handle
 	 */
 	size32_t chunk_size;
 
+	/* A value to indicate if the chunk data should be zeroed on error
+	 */
+	uint8_t zero_on_error;
+
 	/* The header codepage
 	 */
 	int header_codepage;

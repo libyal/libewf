@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd April 5, 2013
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -225,7 +225,7 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_checksum_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_checksum_error "libewf_handle_t *handle, uint32_t index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_checksum_error "libewf_handle_t *handle, uint32_t error_index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_append_checksum_error "libewf_handle_t *handle, uint64_t start_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
