@@ -30,6 +30,7 @@
 
 #include "ewf_test_definitions.h"
 #include "ewf_test_libcerror.h"
+#include "ewf_test_libcnotify.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
@@ -121,7 +122,16 @@ int ewf_test_read_write_buffer(
 			      read_size,
 			      error );
 
-		if( read_count < 0 )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: read count: %" PRIzd ".\n",
+			 function,
+			 read_count );
+		}
+#endif
+		if( read_count == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -172,7 +182,16 @@ int ewf_test_read_write_buffer(
 			       (size_t) read_count,
 			       error );
 
-		if( write_count < 0 )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: write count: %" PRIzd ".\n",
+			 function,
+			 write_count );
+		}
+#endif
+		if( write_count == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -246,6 +265,15 @@ int ewf_test_read_write_chunk(
 			      &process_checksum,
 			      error );
 
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: read count: %" PRIzd ".\n",
+			 function,
+			 read_count );
+		}
+#endif
 		if( read_count < 0 )
 		{
 			libcerror_error_set(
@@ -330,6 +358,15 @@ int ewf_test_read_write_chunk(
 				 &process_checksum,
 				 error );
 
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: process count: %" PRIzd ".\n",
+			 function,
+			 process_count );
+		}
+#endif
 		if( process_count < 0 )
 		{
 			libcerror_error_set(
@@ -367,6 +404,15 @@ int ewf_test_read_write_chunk(
 				       process_checksum,
 				       error );
 		}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: write count: %" PRIzd ".\n",
+			 function,
+			 write_count );
+		}
+#endif
 		if( write_count < 0 )
 		{
 			libcerror_error_set(

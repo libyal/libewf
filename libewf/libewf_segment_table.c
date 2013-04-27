@@ -29,7 +29,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_libclocale.h"
 #include "libewf_libcstring.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_libuna.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
@@ -234,6 +234,19 @@ int libewf_segment_table_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free segment files list.",
+			 function );
+
+			result = -1;
+		}
+		if( libfcache_cache_free(
+		     &( ( *segment_table )->segment_files_cache ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment files cache.",
 			 function );
 
 			result = -1;
@@ -1536,17 +1549,16 @@ int libewf_segment_table_get_segment_at_offset(
 	return( result );
 }
 
-/* Sets the segment storage media range for a specific segment in the segment table
+/* Sets the segment storage media size for a specific segment in the segment table
  * Returns 1 if successful or -1 on error
  */
-int libewf_segment_table_set_segment_storage_media_range_by_index(
+int libewf_segment_table_set_segment_storage_media_size_by_index(
      libewf_segment_table_t *segment_table,
      uint32_t segment_number,
-     off64_t storage_media_offset,
      size64_t storage_media_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_segment_table_set_segment_storage_media_range_by_index";
+	static char *function = "libewf_segment_table_set_segment_storage_media_size_by_index";
 
 	if( segment_table == NULL )
 	{
@@ -1572,10 +1584,9 @@ int libewf_segment_table_set_segment_storage_media_range_by_index(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_set_mapped_range_by_index(
+	if( libfdata_list_set_mapped_size_by_index(
 	     segment_table->segment_files_list,
 	     (int) segment_number,
-	     storage_media_offset,
 	     storage_media_size,
 	     error ) != 1 )
 	{
@@ -1583,7 +1594,7 @@ int libewf_segment_table_set_segment_storage_media_range_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to set mapped range of element: %" PRIu32 " in segment files list.",
+		 "%s: unable to set mapped size of element: %" PRIu32 " in segment files list.",
 		 function,
 		 segment_number );
 
@@ -1739,6 +1750,7 @@ int libewf_segment_table_get_segment_file_at_offset(
  */
 int libewf_segment_table_set_segment_file_by_index(
      libewf_segment_table_t *segment_table,
+     libbfio_pool_t *file_io_pool,
      uint32_t segment_number,
      libewf_segment_file_t *segment_file,
      libcerror_error_t **error )
@@ -1771,6 +1783,7 @@ int libewf_segment_table_set_segment_file_by_index(
 #endif
 	if( libfdata_list_set_element_value_by_index(
 	     segment_table->segment_files_list,
+	     (intptr_t *) file_io_pool,
 	     segment_table->segment_files_cache,
 	     (int) segment_number,
 	     (intptr_t *) segment_file,

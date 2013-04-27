@@ -2301,6 +2301,7 @@ int libewf_handle_get_acquiry_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_acquiry_error";
+	intptr_t *value                           = NULL;
 
 	if( handle == NULL )
 	{
@@ -2315,11 +2316,12 @@ int libewf_handle_get_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libcdata_range_list_get_range(
+	if( libcdata_range_list_get_range_by_index(
 	     internal_handle->acquiry_errors,
 	     (int) index,
 	     start_sector,
 	     number_of_sectors,
+	     &value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2360,17 +2362,20 @@ int libewf_handle_append_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libcdata_range_list_append_range(
+	if( libcdata_range_list_insert_range(
 	     internal_handle->acquiry_errors,
 	     start_sector,
 	     number_of_sectors,
+	     NULL,
+	     NULL,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append acquiry error.",
+		 "%s: unable to insert acquiry error in range list.",
 		 function );
 
 		return( -1 );

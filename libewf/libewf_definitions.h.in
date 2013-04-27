@@ -25,7 +25,7 @@
 #include <common.h>
 #include <byte_stream.h>
 
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
@@ -351,39 +351,39 @@ enum LIBEWF_CHUNK_DATA_FLAGS
 
 /* The chunk data range is sparse
  */
-#define LIBEWF_RANGE_FLAG_IS_SPARSE				LIBMFDATA_RANGE_FLAG_IS_SPARSE
+#define LIBEWF_RANGE_FLAG_IS_SPARSE				LIBFDATA_RANGE_FLAG_IS_SPARSE
 
 /* The chunk data range is compressed
  */
-#define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBMFDATA_RANGE_FLAG_IS_COMPRESSED
+#define LIBEWF_RANGE_FLAG_IS_COMPRESSED				LIBFDATA_RANGE_FLAG_IS_COMPRESSED
 
 /* The chunk data range included the checksum
  */
-#define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBMFDATA_RANGE_FLAG_USER_DEFINED_1
+#define LIBEWF_RANGE_FLAG_HAS_CHECKSUM				LIBFDATA_RANGE_FLAG_USER_DEFINED_1
 
 /* The chunk data range uses a pattern fill
  */
-#define LIBEWF_RANGE_FLAG_USES_PATTERN_FILL			LIBMFDATA_RANGE_FLAG_USER_DEFINED_2
+#define LIBEWF_RANGE_FLAG_USES_PATTERN_FILL			LIBFDATA_RANGE_FLAG_USER_DEFINED_2
 
 /* The chunk data range refers to a packed (unprocessed) chunk
  */
-#define LIBEWF_RANGE_FLAG_IS_PACKED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_3
-
-/* The chunk data range refers to a delta chunk
- */
-#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBMFDATA_RANGE_FLAG_USER_DEFINED_4
+#define LIBEWF_RANGE_FLAG_IS_PACKED				LIBFDATA_RANGE_FLAG_USER_DEFINED_3
 
 /* The chunk data range is tainted (possibly corrupted)
  */
-#define LIBEWF_RANGE_FLAG_IS_TAINTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_5
+#define LIBEWF_RANGE_FLAG_IS_TAINTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_4
 
 /* The chunk data range is corrupted
  */
-#define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_6
+#define LIBEWF_RANGE_FLAG_IS_CORRUPTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_5
 
 /* The chunk data range is encrypted
  */
-#define LIBEWF_RANGE_FLAG_IS_ENCRYPTED				LIBMFDATA_RANGE_FLAG_USER_DEFINED_7
+#define LIBEWF_RANGE_FLAG_IS_ENCRYPTED				LIBFDATA_RANGE_FLAG_USER_DEFINED_6
+
+/* The chunk data range refers to a delta chunk
+ */
+#define LIBEWF_RANGE_FLAG_IS_DELTA				LIBFDATA_RANGE_FLAG_USER_DEFINED_8
 
 /* Chunk data pack flag definitions
  */
@@ -421,6 +421,7 @@ enum LIBEWF_PACK_FLAGS
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_DELTA_SEGMENT_FILES	4
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES		128
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS		32
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS			8
 
 #endif
 

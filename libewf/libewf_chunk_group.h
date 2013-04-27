@@ -37,6 +37,36 @@
 extern "C" {
 #endif
 
+typedef struct libewf_chunk_group libewf_chunk_group_t;
+
+struct libewf_chunk_group
+{
+	/* The previous last chunk that was filled
+	 */
+	int previous_last_chunk_filled;
+
+	/* The last chunk that was filled
+	 */
+	int last_chunk_filled;
+
+	/* The last chunk that was compared
+	 */
+	int last_chunk_compared;
+};
+
+int libewf_chunk_group_initialize(
+     libewf_chunk_group_t **chunk_group,
+     libcerror_error_t **error );
+
+int libewf_chunk_group_free(
+     libewf_chunk_group_t **chunk_group,
+     libcerror_error_t **error );
+
+int libewf_chunk_group_clone(
+     libewf_chunk_group_t **destination_chunk_group,
+     libewf_chunk_group_t *source_chunk_group,
+     libcerror_error_t **error );
+
 int libewf_chunk_group_fill_v1(
      libfdata_list_t *chunks_list,
      uint64_t chunk_index,

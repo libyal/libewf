@@ -1,6 +1,14 @@
 TODO
+* fix last_chunk_data_offset calculation for table2
+  in combination with libewf_chunk_group_correct_v1
+* fix read of chunk groups in segment file on demand
 * ewftools: allow to set date and time
+* chunk data
+  - related calculation into chunk data
+  - change API to have chunk type
 * libmfdata/libfdata merge
+  - fix reading delta chunks
+
   - reimplement chunk table using layered approach (+/-)
 
   - sections list on write: cache section descriptors instead of free-ing them?
@@ -15,8 +23,6 @@ TODO
 
   - create a single chunk groups cache ? instead per segment file ?
 
-  - add stream like read/write to list ?
-
   - check if chunks groups list is filled in on demand scenario
 
   - only use backup range (table2) during initial phase?
@@ -26,7 +32,7 @@ TODO
     - what about base offset ?
     - make mapped offsets absolute ?
 
-  - refactor chunk table to
+  - refactor chunk table to:
     - optimize use of libewf_chunk_table_chunk_exists_for_offset and
       successive calls to fdata types
     - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
@@ -34,6 +40,15 @@ TODO
 
   - handle: replace chunk_index calcuations by current_chunk_index tracking ?
   - libewf_filename_create: change to accept ( segment_number - 1 )
+  - libewf_write_io_handle_initialize_resume: re-map mapped offset ranges ?
+
+  - write_io_handle->number_of_table_entries still needed ?
+
+  - add write support to the various fdata lists ?
+
+  - add delta chunks range list to libewf_chunk_table_chunk_exists_for_offset ?
+  - add delta chunks range list to libewf_chunk_table_set_chunk_data_by_offset ?
+    and refactor it to have a generic solution if range list is not set fall back
 
 * pyewf
   - change header and hash values into sequence objects
@@ -61,6 +76,10 @@ TODO
   - libewf_segment_file_read deal with corrupted segment file header ?
   - add strict chunk data flag handling
   - document how libewf deals with corruption scenarios
+  - valid table and table2 with different information
+    (for now use table if number of entries is not 0)
+  - tainted table and table2
+  - tainted table or table2 (use the one that is not tainted)
 
 * implement new chunk IO functions where chunk is an object
 
@@ -400,6 +419,24 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130411
+* changes for libmfdata and libfdata merge
+
+20130410
+* changes for libmfdata and libfdata merge
+
+20130409
+* changes for libmfdata and libfdata merge
+
+20130408
+* changes for libmfdata and libfdata merge
+
+20130407
+* changes for libmfdata and libfdata merge
+
+20130406
+* changes for libmfdata and libfdata merge
 
 20130405
 * changes for libmfdata and libfdata merge

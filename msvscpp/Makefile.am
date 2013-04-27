@@ -21,9 +21,9 @@ MSVSCPP_FILES = \
 	libcsystem/libcsystem.vcproj \
 	libewf_dll/libewf_dll.vcproj \
 	libfcache/libfcache.vcproj \
+	libfdata/libfdata.vcproj \
 	libfvalue/libfvalue.vcproj \
 	libhmac/libhmac.vcproj \
-	libmfdata/libmfdata.vcproj \
 	libodraw/libodraw.vcproj \
 	libsmdev/libsmdev.vcproj \
 	libsmraw/libsmraw.vcproj \

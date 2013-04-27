@@ -14,7 +14,6 @@ AM_CPPFLAGS = \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
-	@LIBMFDATA_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
 	@BZIP2_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
@@ -43,7 +42,6 @@ libewf_la_SOURCES = \
 	libewf_chunk_data.c libewf_chunk_data.h \
 	libewf_chunk_group.c libewf_chunk_group.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
-	libewf_chunk_table2.c libewf_chunk_table2.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_date_time.c libewf_date_time.h \
@@ -73,7 +71,6 @@ libewf_la_SOURCES = \
 	libewf_libfcache.h \
 	libewf_libfdata.h \
 	libewf_libfvalue.h \
-	libewf_libmfdata.h \
 	libewf_libuna.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_metadata.c libewf_metadata.h \
@@ -106,7 +103,6 @@ libewf_la_LIBADD = \
 	@LIBFCACHE_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
-	@LIBMFDATA_LIBADD@ \
 	@ZLIB_LIBADD@ \
 	@BZIP2_LIBADD@ \
 	@LIBHMAC_LIBADD@ \

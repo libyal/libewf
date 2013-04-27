@@ -1,6 +1,6 @@
 dnl Functions for libcfile
 dnl
-dnl Version: 20130329
+dnl Version: 20130414
 
 dnl Function to detect if libcfile is available
 dnl ac_libcfile_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -35,7 +35,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
    ac_cv_libcfile_LIBADD="$pkg_cv_libcfile_LIBS"],
    [dnl Check for headers
    AC_CHECK_HEADERS([libcfile.h])
- 
+
    AS_IF(
     [test "x$ac_cv_header_libcfile_h" = xno],
     [ac_cv_libcfile=no],
@@ -47,7 +47,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      libcfile_get_version,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
-   
+
     dnl File functions
     AC_CHECK_LIB(
      cfile,
@@ -134,7 +134,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      libcfile_file_io_control_read_with_error_code,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
- 
+
     AS_IF(
      [test "x$ac_cv_enable_wide_character_type" != xno],
      [AC_CHECK_LIB(
@@ -148,7 +148,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
       [ac_cv_libcfile_dummy=yes],
       [ac_cv_libcfile=no])
      ])
- 
+
     dnl File stream functions
     AC_CHECK_LIB(
      cfile,
@@ -195,7 +195,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
      libcfile_stream_get_size,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
- 
+
     AS_IF(
      [test "x$ac_cv_enable_wide_character_type" != xno],
      [AC_CHECK_LIB(
@@ -204,14 +204,14 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LIB],
       [ac_cv_libcfile_dummy=yes],
       [ac_cv_libcfile=no])
      ])
- 
+
     dnl Support functions
     AC_CHECK_LIB(
      cfile,
      libcfile_file_exists,
      [ac_cv_libcfile_dummy=yes],
      [ac_cv_libcfile=no])
- 
+
     AS_IF(
      [test "x$ac_cv_enable_wide_character_type" != xno],
      [AC_CHECK_LIB(
@@ -301,7 +301,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [Missing function: close],
    [1])
   ])
- 
+
  AX_LIBCFILE_CHECK_FUNC_POSIX_FADVISE
 
  AS_IF(
@@ -310,42 +310,45 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [Missing function: fstat],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
    [1])
   ])
- 
+
  AS_IF(
-  [test "x$ac_cv_func_ioctl" != xyes],
-  [AC_MSG_FAILURE(
-   [Missing function: ioctl],
-   [1])
+  [test x"$ac_cv_enable_winapi" = xno],
+  [AS_IF(
+   [test "x$ac_cv_func_ioctl" != xyes],
+   [AC_MSG_FAILURE(
+    [Missing function: ioctl],
+    [1])
+   ])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_lseek" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: lseek],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_open" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: open],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_read" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: read],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_write" != xyes],
   [AC_MSG_FAILURE(
@@ -362,49 +365,49 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [Missing function: fclose],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_feof" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: feof],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_fopen" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fopen],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_fread" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fread],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_fseeko" != xyes && test "x$ac_cv_func_fseeko64" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fseeko and fseeko64],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_ftello" != xyes && test "x$ac_cv_func_ftello64" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftello and ftello64],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_fwrite" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fwrite],
    [1])
   ])
- 
+
  dnl File input/output functions used in libcfile/libcfile_support.c
  AC_CHECK_FUNCS([stat])
 
@@ -414,7 +417,7 @@ AC_DEFUN([AX_LIBCFILE_CHECK_LOCAL],
    [Missing function: stat],
    [1])
   ])
- 
+
  ac_cv_libcfile_CPPFLAGS="-I../libcfile";
  ac_cv_libcfile_LIBADD="../libcfile/libcfile.la";
 

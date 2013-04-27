@@ -3857,6 +3857,7 @@ ssize_t libewf_section_error_read(
 #endif
 		if( libcdata_range_list_empty(
 		     acquiry_errors,
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3921,17 +3922,20 @@ ssize_t libewf_section_error_read(
 				}
 			}
 #endif
-			if( libcdata_range_list_append_range(
+			if( libcdata_range_list_insert_range(
 			     acquiry_errors,
 			     start_sector,
 			     (uint64_t) number_of_sectors,
+			     NULL,
+			     NULL,
+			     NULL,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append acquiry error to range list.",
+				 "%s: unable to insert acquiry error in range list.",
 				 function );
 
 				goto on_error;
@@ -3978,6 +3982,7 @@ ssize_t libewf_section_error_write(
 	uint8_t *error_entry_data           = NULL;
 	uint8_t *section_data               = NULL;
 	static char *function               = "libewf_section_error_write";
+	intptr_t *value                     = NULL;
 	size_t error_entry_data_size        = 0;
 	size_t error_entries_data_size      = 0;
 	size_t error_footer_data_size       = 0;
@@ -4246,11 +4251,12 @@ ssize_t libewf_section_error_write(
 	     entry_index < number_of_entries;
 	     entry_index++ )
 	{
-		if( libcdata_range_list_get_range(
+		if( libcdata_range_list_get_range_by_index(
 		     acquiry_errors,
 		     entry_index,
 		     &start_sector,
 		     &number_of_sectors,
+		     &value,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -8218,6 +8224,7 @@ ssize_t libewf_section_table_read(
 	table_data      += table_header_data_size;
 	table_data_size -= table_header_data_size;
 
+/* TODO flag that header is corrupted and continue */
 	if( stored_checksum != calculated_checksum )
 	{
 		libcerror_error_set(
@@ -8318,6 +8325,7 @@ ssize_t libewf_section_table_read(
 			table_data      = *section_data;
 			table_data_size = *section_data_size;
 		}
+/* TODO flag that number of entries is corrupted and continue */
 		if( table_data_size < *table_entries_data_size )
 		{
 			libcerror_error_set(
@@ -10265,33 +10273,25 @@ ssize_t libewf_section_delta_chunk_read_header(
 	return( read_count );
 }
 
-/* Writes a delta chunk section
+/* Writes a delta chunk section header
  * Returns the number of bytes written or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write(
+ssize_t libewf_section_delta_chunk_write_header(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
          uint32_t chunk_index,
-         uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
-         uint8_t *checksum_buffer,
-         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
-	static char *function        = "libewf_section_delta_chunk_write";
+	static char *function        = "libewf_section_delta_chunk_write_header";
 	size64_t section_data_size   = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
-	uint32_t write_size          = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t chunk_checksum      = 0;
-#endif
 
 	if( section == NULL )
 	{
@@ -10315,17 +10315,6 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -10336,14 +10325,6 @@ ssize_t libewf_section_delta_chunk_write(
 		 function );
 
 		return( -1 );
-	}
-	write_size = chunk_data_size;
-
-/* TODO chunk data rewrite  */
-	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-	 && ( checksum_buffer != NULL ) )
-	{
-		chunk_data_size += 4;
 	}
 	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
@@ -10397,6 +10378,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
+	section_offset    += write_count;
 	total_write_count += write_count;
 
 	if( memory_set(
@@ -10467,119 +10449,9 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
+	section_offset    += write_count;
 	total_write_count += write_count;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " file IO pool entry\t: %d\n",
-		 function,
-		 chunk_index,
-		 file_io_pool_entry );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 chunk_index,
-		 section_offset + total_write_count,
-		 section_offset + total_write_count );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data size\t\t: %" PRIzd "\n",
-		 function,
-		 chunk_index,
-		 chunk_data_size );
-
-/* TODO chunk data rewrite  */
-		if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-		 && ( checksum_buffer != NULL ) )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 checksum_buffer,
-			 chunk_checksum );
-		}
-/* TODO chunk data rewrite */
-		else
-		{
-			if( chunk_data_size < 4 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk data size value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
-			byte_stream_copy_to_uint32_little_endian(
-			 &( chunk_buffer[ chunk_data_size - 4 ] ),
-			 chunk_checksum );
-		}
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " checksum\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 chunk_index,
-		 chunk_checksum );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data flags:\n",
-		 function,
-		 chunk_index );
-		libcnotify_printf(
-		 "Has checksum\n" );
-		libcnotify_printf(
-		 "Is delta\n" );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
-	write_count = libbfio_pool_write_buffer(
-	               file_io_pool,
-	               file_io_pool_entry,
-	               chunk_buffer,
-	               (size_t) write_size,
-	               error );
-
-	if( write_count != (ssize_t) write_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write chunk data.",
-		 function );
-
-		return( -1 );
-	}
-	total_write_count += write_count;
-
-/* TODO chunk data rewrite  */
-	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-	 && ( checksum_buffer != NULL ) )
-	{
-		write_count = libbfio_pool_write_buffer(
-		               file_io_pool,
-		               file_io_pool_entry,
-			       checksum_buffer,
-			       4,
-		               error );
-
-		if( write_count != (ssize_t) 4 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write checksum.",
-			 function );
-
-			return( -1 );
-		}
-		total_write_count += write_count;
-	}
 	return( total_write_count );
 }
 

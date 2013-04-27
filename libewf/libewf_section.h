@@ -405,16 +405,13 @@ ssize_t libewf_section_delta_chunk_read_header(
          uint32_t *chunk_data_size,
          libcerror_error_t **error );
 
-ssize_t libewf_section_delta_chunk_write(
+ssize_t libewf_section_delta_chunk_write_header(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
          uint32_t chunk_index,
-         uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
-         uint8_t *checksum_buffer,
-         int8_t chunk_io_flags,
          libcerror_error_t **error );
 
 #if defined( __cplusplus )

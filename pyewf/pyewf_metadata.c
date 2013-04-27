@@ -517,7 +517,7 @@ PyObject *pyewf_handle_get_header_values(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error               = NULL;
+	libcerror_error_t *error              = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";

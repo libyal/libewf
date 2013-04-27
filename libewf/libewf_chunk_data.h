@@ -45,7 +45,9 @@ struct libewf_chunk_data
 
 	/* The unpacked data size
 	 */
+/* TODO add ?
 	size_t unpacked_data_size;
+*/
 
 	/* The data
 	 */
@@ -75,15 +77,15 @@ struct libewf_chunk_data
 	 */
 	uint32_t range_flags;
 
+	/* The checksum
+	 */
+	uint32_t checksum;
+
 	/* The flags
 	 */
 	uint8_t flags;
 
 /* TODO chunk data rewrite */
-	/* Reference to the checksum buffer
-	 */
-	uint8_t *checksum_buffer;
-
 	/* The chunk IO flags
 	 */
 	int8_t chunk_io_flags;
@@ -160,6 +162,23 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
      const uint8_t *data,
      size_t data_size,
      uint64_t *pattern,
+     libcerror_error_t **error );
+
+ssize_t libewf_chunk_data_write(
+         libewf_chunk_data_t *chunk_data,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libcerror_error_t **error );
+
+int libewf_chunk_data_get_write_size(
+     libewf_chunk_data_t *chunk_data,
+     uint32_t *write_size,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_get_checksum(
+     libewf_chunk_data_t *chunk_data,
+     uint16_t compression_method,
+     uint32_t *checksum,
      libcerror_error_t **error );
 
 int libewf_chunk_data_read_element_data(

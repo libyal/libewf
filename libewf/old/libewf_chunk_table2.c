@@ -552,17 +552,20 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		{
 			number_of_sectors = (uint64_t) media_values->number_of_sectors - start_sector;
 		}
-		if( libcdata_range_list_append_range(
+		if( libcdata_range_list_insert_range(
 		     chunk_table->checksum_errors,
 		     start_sector,
 		     number_of_sectors,
+		     NULL,
+		     NULL,
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append checksum error to range list.",
+			 "%s: unable to insert checksum error in range list.",
 			 function );
 
 			return( -1 );

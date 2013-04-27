@@ -21,8 +21,10 @@
 
 #include <common.h>
 #include <byte_stream.h>
+#include <memory.h>
 #include <types.h>
 
+#include "libewf_chunk_group.h"
 #include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
@@ -31,6 +33,189 @@
 #include "libewf_section.h"
 
 #include "ewf_definitions.h"
+#include "ewf_table.h"
+
+/* Creates a chunk group
+ * Make sure the value chunk_group is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_group_initialize(
+     libewf_chunk_group_t **chunk_group,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_chunk_group_initialize";
+
+	if( chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group.",
+		 function );
+
+		return( -1 );
+	}
+	if( *chunk_group != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid chunk group value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*chunk_group = memory_allocate_structure(
+	                libewf_chunk_group_t );
+
+	if( *chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create chunk group.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *chunk_group,
+	     0,
+	     sizeof( libewf_chunk_group_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear chunk group.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *chunk_group != NULL )
+	{
+		memory_free(
+		 *chunk_group );
+
+		*chunk_group = NULL;
+	}
+	return( -1 );
+}
+
+/* Frees a chunk group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_group_free(
+     libewf_chunk_group_t **chunk_group,
+     libcerror_error_t **error )
+{
+        static char *function = "libewf_chunk_group_free";
+
+	if( chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group.",
+		 function );
+
+		return( -1 );
+	}
+	if( *chunk_group != NULL )
+	{
+		memory_free(
+		 *chunk_group );
+
+		*chunk_group = NULL;
+	}
+	return( 1 );
+}
+
+/* Clones the chunk group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_group_clone(
+     libewf_chunk_group_t **destination_chunk_group,
+     libewf_chunk_group_t *source_chunk_group,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_chunk_group_clone";
+
+	if( destination_chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination chunk group.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_chunk_group != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination chunk group already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_chunk_group == NULL )
+	{
+		*destination_chunk_group = NULL;
+
+		return( 1 );
+	}
+	*destination_chunk_group = memory_allocate_structure(
+		                    libewf_chunk_group_t );
+
+	if( *destination_chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination chunk group.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_chunk_group,
+	     source_chunk_group,
+	     sizeof( libewf_chunk_group_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination chunk group.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_chunk_group != NULL )
+	{
+		memory_free(
+		 *destination_chunk_group );
+
+		*destination_chunk_group = NULL;
+	}
+	return( -1 );
+}
 
 /* Fills the chunks list from the EWF version 1 sector table entries
  * Returns 1 if successful or -1 on error
@@ -51,7 +236,6 @@ int libewf_chunk_group_fill_v1(
 	static char *function          = "libewf_chunk_group_fill_v1";
 	off64_t last_chunk_data_offset = 0;
 	off64_t last_chunk_data_size   = 0;
-	off64_t storage_media_offset   = 0;
 	uint32_t chunk_data_size       = 0;
 	uint32_t current_offset        = 0;
 	uint32_t next_offset           = 0;
@@ -243,7 +427,7 @@ int libewf_chunk_group_fill_v1(
 			 current_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data size\t\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_size );
@@ -256,35 +440,34 @@ int libewf_chunk_group_fill_v1(
 			if( is_compressed != 0 )
 			{
 				libcnotify_printf(
-				 "Is compressed\n" );
+				 "\tIs compressed\n" );
 			}
 			else
 			{
 				libcnotify_printf(
-				 "Has checksum\n" );
+				 "\tHas checksum\n" );
 			}
 			if( corrupted != 0 )
 			{
 				libcnotify_printf(
-				 "Is corrupted\n" );
+				 "\tIs corrupted\n" );
 			}
 			else if( tainted != 0 )
 			{
 				libcnotify_printf(
-				 "Is tainted\n" );
+				 "\tIs tainted\n" );
 			}
 			libcnotify_printf(
 			 "\n" );
 		}
 #endif
-		if( libfdata_list_append_element_with_mapped_range(
+		if( libfdata_list_append_element_with_mapped_size(
 		     chunks_list,
 		     &element_index,
 		     file_io_pool_entry,
 		     base_offset + current_offset,
 		     (size64_t) chunk_data_size,
 		     range_flags,
-		     storage_media_offset,
 		     chunk_size,
 		     error ) != 1 )
 		{
@@ -292,14 +475,12 @@ int libewf_chunk_group_fill_v1(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append element: %" PRIu32 " with mapped range to chunks list.",
+			 "%s: unable to append element: %" PRIu32 " with mapped size to chunks list.",
 			 function,
 			 table_entry_index );
 
 			return( -1 );
 		}
-		storage_media_offset += chunk_size;
-
 		/* This is to compensate for the crappy > 2 GiB segment file solution in EnCase 6.7
 		 */
 		if( ( overflow == 0 )
@@ -358,6 +539,7 @@ int libewf_chunk_group_fill_v1(
 
 		return( -1 );
 	}
+/* TODO fix for table2 */
 	if( last_chunk_data_offset < table_section->start_offset )
 	{
 		last_chunk_data_size = table_section->start_offset - last_chunk_data_offset;
@@ -439,7 +621,7 @@ int libewf_chunk_group_fill_v1(
 		 current_offset );
 
 		libcnotify_printf(
-		 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 " (calculated)\n",
+		 "%s: table entry: %05" PRIu32 " chunk data size\t\t: %" PRIu32 " (calculated)\n",
 		 function,
 		 table_entry_index,
 		 last_chunk_data_size );
@@ -452,50 +634,34 @@ int libewf_chunk_group_fill_v1(
 		if( is_compressed != 0 )
 		{
 			libcnotify_printf(
-			 "Is compressed\n" );
+			 "\tIs compressed\n" );
 		}
 		else
 		{
 			libcnotify_printf(
-			 "Has checksum\n" );
+			 "\tHas checksum\n" );
 		}
 		if( corrupted != 0 )
 		{
 			libcnotify_printf(
-			 "Is corrupted\n" );
+			 "\tIs corrupted\n" );
 		}
 		else if( tainted != 0 )
 		{
 			libcnotify_printf(
-			 "Is tainted\n" );
+			 "\tIs tainted\n" );
 		}
 		libcnotify_printf(
 		 "\n" );
 	}
 #endif
-	if( libfdata_list_append_element(
+	if( libfdata_list_append_element_with_mapped_size(
 	     chunks_list,
 	     &element_index,
 	     file_io_pool_entry,
 	     last_chunk_data_offset,
 	     (size64_t) last_chunk_data_size,
 	     range_flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append element: %" PRIu32 " to chunks list.",
-		 function,
-		 table_entry_index );
-
-		return( -1 );
-	}
-	if( libfdata_list_set_mapped_range_by_index(
-	     chunks_list,
-	     element_index,
-	     storage_media_offset,
 	     chunk_size,
 	     error ) != 1 )
 	{
@@ -503,14 +669,12 @@ int libewf_chunk_group_fill_v1(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to set mapped range of element: %d in chunks list.",
+		 "%s: unable to append element: %" PRIu32 " with mapped size to chunks list.",
 		 function,
-		 element_index );
+		 table_entry_index );
 
 		return( -1 );
 	}
-	storage_media_offset += chunk_size;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -536,15 +700,14 @@ int libewf_chunk_group_fill_v2(
      uint8_t tainted,
      libcerror_error_t **error )
 {
-	static char *function        = "libewf_chunk_group_fill_v2";
-	off64_t storage_media_offset = 0;
-	off64_t table_entry_offset   = 0;
-	uint64_t chunk_data_offset   = 0;
-	uint32_t chunk_data_flags    = 0;
-	uint32_t chunk_data_size     = 0;
-	uint32_t range_flags         = 0;
-	uint32_t table_entry_index   = 0;
-	int element_index            = 0;
+	static char *function      = "libewf_chunk_group_fill_v2";
+	off64_t table_entry_offset = 0;
+	uint64_t chunk_data_offset = 0;
+	uint32_t chunk_data_flags  = 0;
+	uint32_t chunk_data_size   = 0;
+	uint32_t range_flags       = 0;
+	uint32_t table_entry_index = 0;
+	int element_index          = 0;
 
 	if( chunks_list == NULL )
 	{
@@ -633,7 +796,7 @@ int libewf_chunk_group_fill_v2(
 				 chunk_data_offset );
 			}
 			libcnotify_printf(
-			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data size\t\t: %" PRIu32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_size );
@@ -694,29 +857,13 @@ int libewf_chunk_group_fill_v2(
 		}
 		table_entry_offset += sizeof( ewf_table_entry_v2_t );
 
-		if( libfdata_list_append_element(
+		if( libfdata_list_append_element_with_mapped_size(
 		     chunks_list,
 		     &element_index,
 		     file_io_pool_entry,
 		     chunk_data_offset,
 		     (size64_t) chunk_data_size,
 		     range_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append element: %" PRIu32 " to chunks list.",
-			 function,
-			 table_entry_index );
-
-			return( -1 );
-		}
-		if( libfdata_list_set_mapped_range_by_index(
-		     chunks_list,
-		     element_index,
-		     storage_media_offset,
 		     chunk_size,
 		     error ) != 1 )
 		{
@@ -724,14 +871,12 @@ int libewf_chunk_group_fill_v2(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to set mapped range of element: %d in chunks list.",
+			 "%s: unable to append element: %" PRIu32 " with mapped size to chunks list.",
 			 function,
-			 element_index );
+			 table_entry_index );
 
 			return( -1 );
 		}
-		storage_media_offset += chunk_size;
-
 		table_entry_index++;
 		chunk_index++;
 
@@ -972,22 +1117,22 @@ int libewf_chunk_group_correct_v1(
 			if( is_compressed != 0 )
 			{
 				libcnotify_printf(
-				 "Is compressed\n" );
+				 "\tIs compressed\n" );
 			}
 			else
 			{
 				libcnotify_printf(
-				 "Has checksum\n" );
+				 "\tHas checksum\n" );
 			}
 			if( corrupted != 0 )
 			{
 				libcnotify_printf(
-				 "Is corrupted\n" );
+				 "\tIs corrupted\n" );
 			}
 			else if( tainted != 0 )
 			{
 				libcnotify_printf(
-				 "Is tainted\n" );
+				 "\tIs tainted\n" );
 			}
 			libcnotify_printf(
 			 "\n" );
@@ -1154,6 +1299,7 @@ int libewf_chunk_group_correct_v1(
 
 		return( -1 );
 	}
+/* TODO fix for table2 */
 	if( last_chunk_data_offset < table_section->start_offset )
 	{
 		last_chunk_data_size = table_section->start_offset - last_chunk_data_offset;
@@ -1248,22 +1394,22 @@ int libewf_chunk_group_correct_v1(
 		if( is_compressed != 0 )
 		{
 			libcnotify_printf(
-			 "Is compressed\n" );
+			 "\tIs compressed\n" );
 		}
 		else
 		{
 			libcnotify_printf(
-			 "Has checksum\n" );
+			 "\tHas checksum\n" );
 		}
 		if( corrupted != 0 )
 		{
 			libcnotify_printf(
-			 "Is corrupted\n" );
+			 "\tIs corrupted\n" );
 		}
 		else if( tainted != 0 )
 		{
 			libcnotify_printf(
-			 "Is tainted\n" );
+			 "\tIs tainted\n" );
 		}
 		libcnotify_printf(
 		 "\n" );
@@ -1570,7 +1716,55 @@ int libewf_chunk_group_generate_table_entries_data(
 			 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_flags,
 			 chunk_data_flags );
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " chunk\t\t: %" PRIu64 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_index );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " base offset\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 table_entry_index,
+			 base_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_data_offset );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " chunk data size\t: %" PRIu32 "\n",
+			 function,
+			 table_entry_index,
+			 chunk_data_size );
+
+			libcnotify_printf(
+			 "%s: table entry: %05" PRIu32 " chunk data flags:\n",
+			 function,
+			 table_entry_index );
+
+			if( ( range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0  )
+			{
+				libcnotify_printf(
+				 "\tIs compressed\n" );
+			}
+			if( ( range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+			{
+				libcnotify_printf(
+				 "\tHas checksum\n" );
+			}
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
 		table_entries_data += table_entry_data_size;
+
+		chunk_index++;
 	}
 	return( 1 );
 }

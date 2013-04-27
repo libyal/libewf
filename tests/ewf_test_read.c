@@ -34,8 +34,8 @@
 #include "ewf_test_libewf.h"
 
 /* Define to make ewf_test_read generate verbose output
- */
 #define EWF_TEST_READ_VERBOSE
+ */
 
 /* Tests libewf_handle_get_offset
  * Returns 1 if successful, 0 if not or -1 on error

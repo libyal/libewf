@@ -178,6 +178,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcdata\libcdata_range_list_value.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcdata\libcdata_support.c"
 				>
 			</File>
@@ -229,6 +233,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcdata\libcdata_range_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcdata\libcdata_range_list_value.h"
 				>
 			</File>
 			<File

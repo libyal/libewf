@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
+#include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
@@ -35,7 +36,6 @@
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
-#include "libewf_libmfdata.h"
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_read_io_handle.h"
@@ -116,13 +116,17 @@ struct libewf_internal_handle
 	 */
 	libewf_chunk_table_t *chunk_table;
 
-	/* The chunk table (data) list
+	/* The delta chunks range list
 	 */
-	libmfdata_list_t *chunk_table_list;
+	libfdata_range_list_t *delta_chunks_range_list;
 
-	/* The chunk table cache
+	/* The chunks cache
 	 */
-	libfcache_cache_t *chunk_table_cache;
+	libfcache_cache_t *chunks_cache;
+
+	/* The chunk group
+	 */
+	libewf_chunk_group_t *chunk_group;
 
 	/* The date format for certain header values
 	 */
@@ -199,7 +203,7 @@ int libewf_handle_open_file_io_pool(
      int access_flags,
      libcerror_error_t **error );
 
-int libewf_handle_open_read_section_data(
+int libewf_handle_open_read_segment_file_section_data(
      libewf_internal_handle_t *internal_handle,
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
@@ -209,6 +213,13 @@ int libewf_handle_open_read_section_data(
 int libewf_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
+     libcerror_error_t **error );
+
+int libewf_handle_open_read_delta_segment_file_section_data(
+     libewf_internal_handle_t *internal_handle,
+     libewf_segment_file_t *segment_file,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
      libcerror_error_t **error );
 
 int libewf_handle_open_read_delta_segment_files(

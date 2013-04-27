@@ -140,6 +140,7 @@ test_read_write_delta()
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
 		echo " (FAIL)";
+		echo "Delta segment file size: ${FILESIZE}, expected: ${CALCULATED}";
 	else
 		echo " (PASS)";
 	fi
