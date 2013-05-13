@@ -1,12 +1,12 @@
 <pkgref spec="1.12" uuid="9ECFB3D2-9E23-4F80-8F98-D0DD1897F1C8">
 <config>
-	<identifier>com.google.code.p.libewf.python2.pkg</identifier>
+	<identifier>com.google.code.p.libewf.site-packages.pkg</identifier>
 	<version>@VERSION@</version>
 	<description/>
 	<post-install type="none"/>
 	<requireAuthorization/>
-	<installFrom>@PWD@/macosx/tmp@PYTHON_SITE_PACKAGES_DIR@</installFrom>
-	<installTo mod="true">@PYTHON_SITE_PACKAGES_DIR@</installTo>
+	<installFrom>@PWD@/macosx/tmp/@PYTHON_LIBRARY_DIR@</installFrom>
+	<installTo mod="true">@PYTHON_PACKAGE_DIR@</installTo>
 	<flags>
 		<followSymbolicLinks/>
 	</flags>

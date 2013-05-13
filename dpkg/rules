@@ -7,7 +7,7 @@
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-PYTHON_PACKAGE_DIR=$(shell python -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() ")
+PYTHON_PACKAGE_DIR=$(shell python -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib(True) ")
 
 
 %:

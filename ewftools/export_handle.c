@@ -1,4 +1,4 @@
-/* 
+/*
  * Export handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -52,7 +52,8 @@
 #define EXPORT_HANDLE_STRING_SIZE		1024
 #define EXPORT_HANDLE_NOTIFY_STREAM		stderr
 
-/* Initializes the export handle
+/* Creates an export handle
+ * Make sure the value export_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int export_handle_initialize(
@@ -213,7 +214,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the export handle and its elements
+/* Frees an export handle
  * Returns 1 if successful or -1 on error
  */
 int export_handle_free(
@@ -765,7 +766,7 @@ int export_handle_open_output(
 			 &( export_handle->ewf_output_handle ),
 			 NULL );
 
-			return( 1 );
+			return( -1 );
 		}
 	}
 	else if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
@@ -837,7 +838,7 @@ int export_handle_open_output(
 				 &( export_handle->raw_output_handle ),
 				 NULL );
 
-				return( 1 );
+				return( -1 );
 			}
 		}
 	}
@@ -4280,7 +4281,7 @@ int export_handle_append_read_error(
 	}
 	return( 1 );
 }
- 
+
 /* Finalizes the export handle
  * Returns the number of input bytes written or -1 on error
  */
@@ -6258,7 +6259,7 @@ int export_handle_checksum_errors_fprint(
 				else if( result != 0 )
 				{
 					filename = libcstring_system_string_allocate(
-					            filename_size ); 
+					            filename_size );
 
 
 					if( filename == NULL )

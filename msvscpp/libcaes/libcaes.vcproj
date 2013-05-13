@@ -208,6 +208,10 @@
 				RelativePath="..\..\libcaes\libcaes_types.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libcaes\libcaes_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

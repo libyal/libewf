@@ -38,41 +38,14 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<None Include="..\..\..\libcsystem\libcsystem_unused.h">
-				<BuildOrder>0</BuildOrder>
+			<None Include="..\..\..\libcsystem\libcsystem_libcstring.h">
+				<BuildOrder>15</BuildOrder>
 			</None>
-			<CppCompile Include="..\..\..\libcsystem\libcsystem_date_time.c">
-				<BuildOrder>1</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libcsystem\libcsystem_date_time.h">
-				<BuildOrder>2</BuildOrder>
+			<None Include="..\..\..\libcsystem\libcsystem_libuna.h">
+				<BuildOrder>16</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_definitions.h">
-				<BuildOrder>3</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_file_io.h">
-				<BuildOrder>4</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_file_stream.h">
-				<BuildOrder>5</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_find.h">
-				<BuildOrder>6</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libcsystem\libcsystem_getopt.c">
-				<BuildOrder>7</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libcsystem\libcsystem_getopt.h">
-				<BuildOrder>8</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libcsystem\libcsystem_glob.c">
-				<BuildOrder>9</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libcsystem\libcsystem_glob.h">
-				<BuildOrder>10</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_i18n.h">
-				<BuildOrder>11</BuildOrder>
+			<None Include="..\..\..\libcsystem\libcsystem_libcnotify.h">
+				<BuildOrder>14</BuildOrder>
 			</None>
 			<None Include="..\..\..\libcsystem\libcsystem_libcerror.h">
 				<BuildOrder>12</BuildOrder>
@@ -80,33 +53,54 @@
 			<None Include="..\..\..\libcsystem\libcsystem_libclocale.h">
 				<BuildOrder>13</BuildOrder>
 			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_libcnotify.h">
-				<BuildOrder>14</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_libcstring.h">
-				<BuildOrder>15</BuildOrder>
-			</None>
-			<None Include="..\..\..\libcsystem\libcsystem_libuna.h">
-				<BuildOrder>16</BuildOrder>
-			</None>
 			<CppCompile Include="..\..\..\libcsystem\libcsystem_signal.c">
 				<BuildOrder>17</BuildOrder>
 			</CppCompile>
-			<None Include="..\..\..\libcsystem\libcsystem_signal.h">
-				<BuildOrder>18</BuildOrder>
-			</None>
-			<CppCompile Include="..\..\..\libcsystem\libcsystem_string.c">
-				<BuildOrder>19</BuildOrder>
-			</CppCompile>
-			<None Include="..\..\..\libcsystem\libcsystem_string.h">
-				<BuildOrder>20</BuildOrder>
-			</None>
 			<CppCompile Include="..\..\..\libcsystem\libcsystem_support.c">
 				<BuildOrder>21</BuildOrder>
 			</CppCompile>
 			<None Include="..\..\..\libcsystem\libcsystem_support.h">
 				<BuildOrder>22</BuildOrder>
 			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_string.h">
+				<BuildOrder>20</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_signal.h">
+				<BuildOrder>18</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcsystem\libcsystem_string.c">
+				<BuildOrder>19</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcsystem\libcsystem_i18n.h">
+				<BuildOrder>11</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_definitions.h">
+				<BuildOrder>3</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_file_io.h">
+				<BuildOrder>4</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_unused.h">
+				<BuildOrder>0</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_file_stream.h">
+				<BuildOrder>5</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcsystem\libcsystem_glob.c">
+				<BuildOrder>9</BuildOrder>
+			</CppCompile>
+			<None Include="..\..\..\libcsystem\libcsystem_glob.h">
+				<BuildOrder>10</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_getopt.h">
+				<BuildOrder>8</BuildOrder>
+			</None>
+			<None Include="..\..\..\libcsystem\libcsystem_find.h">
+				<BuildOrder>6</BuildOrder>
+			</None>
+			<CppCompile Include="..\..\..\libcsystem\libcsystem_getopt.c">
+				<BuildOrder>7</BuildOrder>
+			</CppCompile>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

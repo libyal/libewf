@@ -1,7 +1,7 @@
 /*
  * Process status functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2012, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "ewftools_libcdatetime.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
@@ -67,15 +66,11 @@ struct process_status
 
 	/* The start timestamp
 	 */
-	libcdatetime_timestamp_t start_timestamp;
-
-	/* The current timestamp
-	 */
-	libcdatetime_timestamp_t current_timestamp;
+	time_t start_timestamp;
 
 	/* The last timestamp
 	 */
-	libcdatetime_timestamp_t last_timestamp;
+	time_t last_timestamp;
 
 	/* The last bytes total
 	 */
@@ -85,6 +80,21 @@ struct process_status
 	 */
 	int8_t last_percentage;
 };
+
+#if defined( HAVE_CTIME ) || defined( HAVE_CTIME_R ) || defined( WINAPI )
+int process_status_get_ctime_string(
+     const time_t *timestamp,
+     libcstring_system_character_t *string,
+     size_t string_size,
+     libcerror_error_t **error );
+#endif
+
+#if defined( HAVE_GMTIME ) || defined( HAVE_GMTIME_R ) || defined( WINAPI )
+int process_status_get_time_elements_in_utc(
+     const time_t *timestamp,
+     struct tm *time_elements,
+     libcerror_error_t **error );
+#endif
 
 int process_status_initialize(
      process_status_t **process_status,

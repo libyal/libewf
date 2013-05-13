@@ -1,9 +1,9 @@
-.Dd January 20, 2013
+.Dd April 5, 2013
 .Dt libewf 3
 .Os libewf
 .Sh NAME
 .Nm libewf.h
-.Nd Library to read from and write to the Expert Witness Compression Format (EWF) file format
+.Nd Library to access the Expert Witness Compression Format (EWF) file format
 .Sh LIBRARY
 .Lb libewf
 .Sh SYNOPSIS
@@ -219,27 +219,27 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_number_of_acquiry_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_acquiry_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_acquiry_error "libewf_handle_t *handle, uint32_t index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_append_acquiry_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_acquiry_error "libewf_handle_t *handle, uint64_t start_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_checksum_errors "libewf_handle_t *handle, uint32_t *number_of_errors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_checksum_error "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_checksum_error "libewf_handle_t *handle, uint32_t error_index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_append_checksum_error "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_checksum_error "libewf_handle_t *handle, uint64_t start_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_sessions "libewf_handle_t *handle, uint32_t *number_of_sessions, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_session "libewf_handle_t *handle, uint32_t index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_append_session "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_session "libewf_handle_t *handle, uint64_t start_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_number_of_tracks "libewf_handle_t *handle, uint32_t *number_of_tracks, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_track "libewf_handle_t *handle, uint32_t index, uint64_t *first_sector, uint64_t *number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_get_track "libewf_handle_t *handle, uint32_t index, uint64_t *start_sector, uint64_t *number_of_sectors, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_append_track "libewf_handle_t *handle, uint64_t first_sector, uint64_t number_of_sectors, libewf_error_t **error"
+.Fn libewf_handle_append_track "libewf_handle_t *handle, uint64_t start_sector, uint64_t number_of_sectors, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_header_codepage "libewf_handle_t *handle, int *codepage, libewf_error_t **error"
 .Ft int
@@ -551,7 +551,7 @@ http://code.google.com/p/libewf/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2006-2013 Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2006-2013, Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 the libewf.h include file

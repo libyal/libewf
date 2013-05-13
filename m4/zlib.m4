@@ -1,6 +1,6 @@
 dnl Functions for zlib
 dnl
-dnl Version: 20120802
+dnl Version: 20130402
 
 dnl Function to detect if zlib is available
 AC_DEFUN([AX_ZLIB_CHECK_LIB],
@@ -91,26 +91,25 @@ AC_DEFUN([AX_ZLIB_CHECK_LIB],
    z,
    adler32,
    [ac_zlib_dummy=yes])
-
-  AS_IF(
-   [test "x$ac_cv_lib_z_adler32" = xno],
-   [AS_IF(
-    [test "x$ac_cv_with_adler32" = xzlib],
-    [AC_MSG_FAILURE(
-     [Missing function: adler32 in library: zlib.],
-     [1])
-    ])
-   ac_cv_with_adler32=local],
-   [AS_IF(
-    [test "x$ac_cv_with_adler32" != xzlib && test "x$ac_cv_with_adler32" != x && test "x$ac_cv_with_adler32" != xauto-detect],
-    [ac_cv_with_adler32=local],
-    [AC_DEFINE(
-     [HAVE_ADLER32],
-     [1],
-     [Define to 1 if adler32 funtion is available in zlib.])
-    ac_cv_with_adler32=zlib])
-   ])
   ])
+
+ AS_IF(
+  [test "x$ac_cv_lib_z_adler32" = xyes],
+  [AS_IF(
+   [test "x$ac_cv_with_adler32" != xzlib && test "x$ac_cv_with_adler32" != xauto-detect],
+   [ac_cv_adler32=local],
+   [AC_DEFINE(
+    [HAVE_ADLER32],
+    [1],
+    [Define to 1 if adler32 funtion is available in zlib.])
+   ac_cv_adler32=zlib])],
+  [AS_IF(
+   [test "x$ac_cv_with_adler32" = xzlib],
+   [AC_MSG_FAILURE(
+    [Missing function: adler32 in library: zlib.],
+    [1])
+   ])
+  ac_cv_adler32=local])
   
  AS_IF(
   [test "x$ac_cv_zlib" = xzlib],

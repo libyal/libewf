@@ -262,13 +262,13 @@ int libewf_handle_get_amount_of_acquiry_errors(
  */
 int libewf_handle_add_acquiry_error(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
 	return( libewf_handle_append_acquiry_error(
 	         handle,
-	         first_sector,
+	         start_sector,
 	         number_of_sectors,
 	         error ) );
 }
@@ -307,14 +307,14 @@ int libewf_handle_get_amount_of_crc_errors(
 int libewf_handle_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *first_sector,
+     uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
 {
 	return( libewf_handle_get_checksum_error(
 	         handle,
 	         index,
-	         first_sector,
+	         start_sector,
 	         number_of_sectors,
 	         error ) );
 }
@@ -324,13 +324,13 @@ int libewf_handle_get_crc_error(
  */
 int libewf_handle_add_crc_error(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
 	return( libewf_handle_append_checksum_error(
 	         handle,
-	         first_sector,
+	         start_sector,
 	         number_of_sectors,
 	         error ) );
 }
@@ -354,13 +354,13 @@ int libewf_handle_get_amount_of_sessions(
  */
 int libewf_handle_add_session(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
 	return( libewf_handle_append_session(
 	         handle,
-	         first_sector,
+	         start_sector,
 	         number_of_sectors,
 	         error ) );
 }
@@ -2969,7 +2969,7 @@ int libewf_get_amount_of_acquiry_errors(
 int libewf_get_acquiry_error(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *first_sector,
+     off64_t *start_sector,
      uint32_t *amount_of_sectors )
 {
 	libcerror_error_t *error         = NULL;
@@ -2996,7 +2996,7 @@ int libewf_get_acquiry_error(
 	result = libewf_handle_get_acquiry_error(
 	          handle,
 	          index,
-	          (uint64_t *) first_sector,
+	          (uint64_t *) start_sector,
 	          &safe_amount_of_sectors,
 	          &error );
 
@@ -3044,7 +3044,7 @@ int libewf_get_acquiry_error(
  */
 int libewf_add_acquiry_error(
      libewf_handle_t *handle,
-     off64_t first_sector,
+     off64_t start_sector,
      uint32_t amount_of_sectors )
 {
 	libcerror_error_t *error = NULL;
@@ -3052,7 +3052,7 @@ int libewf_add_acquiry_error(
 
 	if( libewf_handle_add_acquiry_error(
 	     handle,
-	     (uint64_t) first_sector,
+	     (uint64_t) start_sector,
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
@@ -3111,7 +3111,7 @@ int libewf_get_amount_of_crc_errors(
 int libewf_get_crc_error(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *first_sector,
+     off64_t *start_sector,
      uint32_t *amount_of_sectors )
 {
 	libcerror_error_t *error         = NULL;
@@ -3138,7 +3138,7 @@ int libewf_get_crc_error(
 	result = libewf_handle_get_checksum_error(
 	          handle,
 	          index,
-	          (uint64_t *) first_sector,
+	          (uint64_t *) start_sector,
 	          &safe_amount_of_sectors,
 	          &error );
 
@@ -3186,7 +3186,7 @@ int libewf_get_crc_error(
  */
 int libewf_add_crc_error(
      libewf_handle_t *handle,
-     off64_t first_sector,
+     off64_t start_sector,
      uint32_t amount_of_sectors )
 {
 	libcerror_error_t *error = NULL;
@@ -3194,7 +3194,7 @@ int libewf_add_crc_error(
 
 	if( libewf_handle_append_checksum_error(
 	     handle,
-	     (uint64_t) first_sector,
+	     (uint64_t) start_sector,
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{
@@ -3253,7 +3253,7 @@ int libewf_get_amount_of_sessions(
 int libewf_get_session(
      libewf_handle_t *handle,
      uint32_t index,
-     off64_t *first_sector,
+     off64_t *start_sector,
      uint32_t *amount_of_sectors )
 {
 	libcerror_error_t *error         = NULL;
@@ -3280,7 +3280,7 @@ int libewf_get_session(
 	result = libewf_handle_get_session(
 	          handle,
 	          index,
-	          (uint64_t *) first_sector,
+	          (uint64_t *) start_sector,
 	          &safe_amount_of_sectors,
 	          &error );
 
@@ -3328,7 +3328,7 @@ int libewf_get_session(
  */
 int libewf_add_session(
      libewf_handle_t *handle,
-     off64_t first_sector,
+     off64_t start_sector,
      uint32_t amount_of_sectors )
 {
 	libcerror_error_t *error = NULL;
@@ -3336,7 +3336,7 @@ int libewf_add_session(
 
 	if( libewf_handle_add_session(
 	     handle,
-	     (uint64_t) first_sector,
+	     (uint64_t) start_sector,
 	     (uint64_t) amount_of_sectors,
 	     &error ) != 1 )
 	{

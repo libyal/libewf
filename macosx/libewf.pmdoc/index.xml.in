@@ -26,7 +26,7 @@
 			<pkgref id="com.google.code.p.libewf.share.pkg"/>
 		</choice>
 		<choice title="python" id="choicepython" starts_selected="true" starts_enabled="true" starts_hidden="false">
-			<pkgref id="com.google.code.p.libewf.python2.pkg"/>
+			<pkgref id="com.google.code.p.libewf.site-packages.pkg"/>
 		</choice>
 	</contents>
 	<resources bg-scale="none" bg-align="topleft">

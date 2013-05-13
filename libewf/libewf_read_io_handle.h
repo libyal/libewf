@@ -28,11 +28,11 @@
 #include "libewf_chunk_data.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfcache.h"
-#include "libewf_libmfdata.h"
+#include "libewf_libfdata.h"
 #include "libewf_media_values.h"
-#include "libewf_sector_list.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -42,14 +42,6 @@ typedef struct libewf_read_io_handle libewf_read_io_handle_t;
 
 struct libewf_read_io_handle
 {
-	/* The sectors with checksum errors
-	 */
-	libewf_sector_list_t *checksum_errors;
-
-	/* A value to indicate if the chunk data should be zeroed on error
-	 */
-	uint8_t zero_on_error;
-
 	/* Cached version of the case data
 	 */
 	uint8_t *case_data;
@@ -78,18 +70,6 @@ int libewf_read_io_handle_free(
 int libewf_read_io_handle_clone(
      libewf_read_io_handle_t **destination_read_io_handle,
      libewf_read_io_handle_t *source_read_io_handle,
-     libcerror_error_t **error );
-
-int libewf_read_io_handle_read_chunk_data(
-     libewf_read_io_handle_t *read_io_handle,
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     libewf_media_values_t *media_values,
-     libmfdata_list_t *chunk_table_list,
-     libfcache_cache_t *chunk_table_cache,
-     int chunk_index,
-     off64_t chunk_offset,
-     libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

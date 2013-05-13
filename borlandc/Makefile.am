@@ -13,6 +13,7 @@ CODEGEAR_FILES = \
 	codegear/ewfverify/ewfverify_static.cbproj \
 	codegear/libbfio/libbfio.cbproj \
 	codegear/libcaes/libcaes.cbproj \
+	codegear/libcdata/libcdata.cbproj \
 	codegear/libcerror/libcerror.cbproj \
 	codegear/libcfile/libcfile.cbproj \
 	codegear/libclocale/libclocale.cbproj \
@@ -26,9 +27,9 @@ CODEGEAR_FILES = \
 	codegear/libewf.groupproj \
 	codegear/libewf_static.groupproj \
 	codegear/libfcache/libfcache.cbproj \
+	codegear/libfdata/libfdata.cbproj \
 	codegear/libfvalue/libfvalue.cbproj \
 	codegear/libhmac/libhmac.cbproj \
-	codegear/libmfdata/libmfdata.cbproj \
 	codegear/libodraw/libodraw.cbproj \
 	codegear/libsmdev/libsmdev.cbproj \
 	codegear/libsmraw/libsmraw.cbproj \

@@ -30,12 +30,12 @@
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_metadata.h"
-#include "libewf_sector_list.h"
-#include "libewf_segment_file_handle.h"
+#include "libewf_sector_range.h"
 #include "libewf_types.h"
 
 #include "ewf_definitions.h"
@@ -1329,7 +1329,7 @@ int libewf_handle_set_format(
 	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
 		/* Wraps .s01 to .s99 and then to .saa up to .zzz
-		 * ( ( ( 's' to 'z' = 8 ) * 26 * 26 ) + 99 ) = 4831
+		 * ( ( ( 's' to 'z' = 8 ) * 26 * 26 ) + 99 ) = 5507
 		 */
 		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 5507;
 		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
@@ -2131,18 +2131,18 @@ int libewf_handle_set_read_zero_chunk_on_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 "%s: invalid handle - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->read_io_handle->zero_on_error = zero_on_error;
+	internal_handle->io_handle->zero_on_error = zero_on_error;
 
 	return( 1 );
 }
@@ -2259,7 +2259,7 @@ int libewf_handle_get_number_of_acquiry_errors(
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_range_list_get_number_of_elements(
 	     internal_handle->acquiry_errors,
 	     &number_of_elements,
 	     error ) != 1 )
@@ -2268,7 +2268,7 @@ int libewf_handle_get_number_of_acquiry_errors(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from acquiry errors sector list.",
+		 "%s: unable to retrieve number of elements from acquiry errors range list.",
 		 function );
 
 		return( -1 );
@@ -2295,12 +2295,13 @@ int libewf_handle_get_number_of_acquiry_errors(
 int libewf_handle_get_acquiry_error(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *first_sector,
+     uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_acquiry_error";
+	intptr_t *value                           = NULL;
 
 	if( handle == NULL )
 	{
@@ -2315,11 +2316,12 @@ int libewf_handle_get_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_get_sector(
+	if( libcdata_range_list_get_range_by_index(
 	     internal_handle->acquiry_errors,
 	     (int) index,
-	     first_sector,
+	     start_sector,
 	     number_of_sectors,
+	     &value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2340,7 +2342,7 @@ int libewf_handle_get_acquiry_error(
  */
 int libewf_handle_append_acquiry_error(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
@@ -2360,18 +2362,20 @@ int libewf_handle_append_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_append_sector(
+	if( libcdata_range_list_insert_range(
 	     internal_handle->acquiry_errors,
-	     first_sector,
+	     start_sector,
 	     number_of_sectors,
-	     1,
+	     NULL,
+	     NULL,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append acquiry error.",
+		 "%s: unable to insert acquiry error in range list.",
 		 function );
 
 		return( -1 );
@@ -2389,7 +2393,6 @@ int libewf_handle_get_number_of_checksum_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
-	int number_of_elements                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2404,55 +2407,38 @@ int libewf_handle_get_number_of_checksum_errors(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
+		if( number_of_errors == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*number_of_errors = 0;
 	}
-	if( number_of_errors == NULL )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of errors.",
-		 function );
+		if( libewf_chunk_table_get_number_of_checksum_errors(
+		     internal_handle->chunk_table,
+		     number_of_errors,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of checksum errors.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( libewf_sector_list_get_number_of_elements(
-	     internal_handle->read_io_handle->checksum_errors,
-	     &number_of_elements,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from checksum errors sector list.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_elements < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_errors = (uint32_t) number_of_elements;
-
 	return( 1 );
 }
 
@@ -2461,8 +2447,8 @@ int libewf_handle_get_number_of_checksum_errors(
  */
 int libewf_handle_get_checksum_error(
      libewf_handle_t *handle,
-     uint32_t index,
-     uint64_t *first_sector,
+     uint32_t error_index,
+     uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
 {
@@ -2482,21 +2468,21 @@ int libewf_handle_get_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
+	if( internal_handle->chunk_table == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid error index value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_sector(
-	     internal_handle->read_io_handle->checksum_errors,
-	     (int) index,
-	     first_sector,
+	if( libewf_chunk_table_get_checksum_error(
+	     internal_handle->chunk_table,
+	     error_index,
+	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
 	{
@@ -2506,19 +2492,19 @@ int libewf_handle_get_checksum_error(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve checksum error: %" PRIu32 ".",
 		 function,
-		 index );
+		 error_index );
 
 		return( -1 );
 	}
 	return( 1 );
 }
 
-/* Append a checksum error
+/* Appends a checksum error
  * Returns 1 if successful or -1 on error
  */
 int libewf_handle_append_checksum_error(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
@@ -2538,22 +2524,10 @@ int libewf_handle_append_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->read_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing read IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_sector_list_append_sector(
-	     internal_handle->read_io_handle->checksum_errors,
-	     first_sector,
+	if( libewf_chunk_table_append_checksum_error(
+	     internal_handle->chunk_table,
+	     start_sector,
 	     number_of_sectors,
-	     1,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2578,7 +2552,7 @@ int libewf_handle_get_number_of_sessions(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_sessions";
-	int number_of_elements                    = 0;
+	int number_of_entries                     = 0;
 
 	if( handle == NULL )
 	{
@@ -2604,32 +2578,32 @@ int libewf_handle_get_number_of_sessions(
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->sessions,
-	     &number_of_elements,
+	     &number_of_entries,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from sessions sector list.",
+		 "%s: unable to retrieve number of entries from sessions array.",
 		 function );
 
 		return( -1 );
 	}
-	if( number_of_elements < 0 )
+	if( number_of_entries < 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
+		 "%s: invalid number of entries value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	*number_of_sessions = (uint32_t) number_of_elements;
+	*number_of_sessions = (uint32_t) number_of_entries;
 
 	return( 1 );
 }
@@ -2640,11 +2614,12 @@ int libewf_handle_get_number_of_sessions(
 int libewf_handle_get_session(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *first_sector,
+     uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_session";
 
 	if( handle == NULL )
@@ -2660,10 +2635,25 @@ int libewf_handle_get_session(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_get_sector(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->sessions,
 	     (int) index,
-	     first_sector,
+	     (intptr_t **) &sector_range,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve session sector range: %" PRIu32 " from array.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( libewf_sector_range_get(
+	     sector_range,
+	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
 	{
@@ -2671,7 +2661,7 @@ int libewf_handle_get_session(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve session: %" PRIu32 ".",
+		 "%s: unable to retrieve session: %" PRIu32 " sector range.",
 		 function,
 		 index );
 
@@ -2685,12 +2675,14 @@ int libewf_handle_get_session(
  */
 int libewf_handle_append_session(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_append_session";
+	int entry_index                           = 0;
 
 	if( handle == NULL )
 	{
@@ -2705,23 +2697,59 @@ int libewf_handle_append_session(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_append_sector(
-	     internal_handle->sessions,
-	     first_sector,
+	if( libewf_sector_range_initialize(
+	     &sector_range,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create session sector range.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_range_set(
+	     sector_range,
+	     start_sector,
 	     number_of_sectors,
-	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set session sector range.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_append_entry(
+	     internal_handle->sessions,
+	     &entry_index,
+	     (intptr_t *) sector_range,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append session.",
+		 "%s: unable to append session sector range to array.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( sector_range != NULL )
+	{
+		libewf_sector_range_free(
+		 &sector_range,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the number of tracks
@@ -2734,7 +2762,7 @@ int libewf_handle_get_number_of_tracks(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_tracks";
-	int number_of_elements                    = 0;
+	int number_of_entries                     = 0;
 
 	if( handle == NULL )
 	{
@@ -2760,32 +2788,32 @@ int libewf_handle_get_number_of_tracks(
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_array_get_number_of_entries(
 	     internal_handle->tracks,
-	     &number_of_elements,
+	     &number_of_entries,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from tracks sector list.",
+		 "%s: unable to retrieve number of entries from tracks array.",
 		 function );
 
 		return( -1 );
 	}
-	if( number_of_elements < 0 )
+	if( number_of_entries < 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
+		 "%s: invalid number of entries value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	*number_of_tracks = (uint32_t) number_of_elements;
+	*number_of_tracks = (uint32_t) number_of_entries;
 
 	return( 1 );
 }
@@ -2796,11 +2824,12 @@ int libewf_handle_get_number_of_tracks(
 int libewf_handle_get_track(
      libewf_handle_t *handle,
      uint32_t index,
-     uint64_t *first_sector,
+     uint64_t *start_sector,
      uint64_t *number_of_sectors,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_track";
 
 	if( handle == NULL )
@@ -2816,10 +2845,25 @@ int libewf_handle_get_track(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_get_sector(
+	if( libcdata_array_get_entry_by_index(
 	     internal_handle->tracks,
 	     (int) index,
-	     first_sector,
+	     (intptr_t **) &sector_range,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve track sector range: %" PRIu32 " from array.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( libewf_sector_range_get(
+	     sector_range,
+	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
 	{
@@ -2827,7 +2871,7 @@ int libewf_handle_get_track(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve track: %" PRIu32 ".",
+		 "%s: unable to retrieve track: %" PRIu32 " sector range.",
 		 function,
 		 index );
 
@@ -2841,12 +2885,14 @@ int libewf_handle_get_track(
  */
 int libewf_handle_append_track(
      libewf_handle_t *handle,
-     uint64_t first_sector,
+     uint64_t start_sector,
      uint64_t number_of_sectors,
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_append_track";
+	int entry_index                           = 0;
 
 	if( handle == NULL )
 	{
@@ -2861,23 +2907,59 @@ int libewf_handle_append_track(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_sector_list_append_sector(
-	     internal_handle->tracks,
-	     first_sector,
+	if( libewf_sector_range_initialize(
+	     &sector_range,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create track sector range.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_sector_range_set(
+	     sector_range,
+	     start_sector,
 	     number_of_sectors,
-	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track sector range.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_append_entry(
+	     internal_handle->tracks,
+	     &entry_index,
+	     (intptr_t *) sector_range,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append track.",
+		 "%s: unable to append track sector range to array.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( sector_range != NULL )
+	{
+		libewf_sector_range_free(
+		 &sector_range,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the header codepage

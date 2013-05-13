@@ -52,9 +52,9 @@ int platform_get_operating_system(
 	size_t operating_system_length = 0;
 
 #if defined( WINAPI )
-	DWORD windows_version          = 0; 
+	DWORD windows_version          = 0;
 	DWORD windows_major_version    = 0;
-	DWORD windows_minor_version    = 0; 
+	DWORD windows_minor_version    = 0;
 /*
 	DWORD windows_build_number     = 0;
  */
@@ -75,7 +75,7 @@ int platform_get_operating_system(
 	operating_system = "Windows";
 
 	windows_version = GetVersion();
- 
+
 	windows_major_version = (DWORD) ( LOBYTE( LOWORD( windows_version ) ) );
 	windows_minor_version = (DWORD) ( HIBYTE( LOWORD( windows_version ) ) );
 

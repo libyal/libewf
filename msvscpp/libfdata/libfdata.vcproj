@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="libmfdata"
-	ProjectGUID="{616BDC90-6906-4D02-8D24-46AE4A97554D}"
-	RootNamespace="libmfdata"
+	Name="libfdata"
+	ProjectGUID="{F94DCC2D-2B49-453E-89B3-FD81992677D0}"
+	RootNamespace="libfdata"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -39,8 +39,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBMFDATA"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libcnotify;..\..\libfcache"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libmfdata.lib"
+				OutputFile="$(OutDir)\libfdata.lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -101,8 +101,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBMFDATA"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libcdata;..\..\libcnotify;..\..\libfcache"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libmfdata.lib"
+				OutputFile="$(OutDir)\libfdata.lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -151,51 +151,63 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_array_type.c"
+				RelativePath="..\..\libfdata\libfdata_buffer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_error.c"
+				RelativePath="..\..\libfdata\libfdata_buffer_reference.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_file.c"
+				RelativePath="..\..\libfdata\libfdata_error.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_file_list.c"
+				RelativePath="..\..\libfdata\libfdata_list.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_group.c"
+				RelativePath="..\..\libfdata\libfdata_list_element.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_list.c"
+				RelativePath="..\..\libfdata\libfdata_mapped_range.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_list_element.c"
+				RelativePath="..\..\libfdata\libfdata_notify.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_notify.c"
+				RelativePath="..\..\libfdata\libfdata_range.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_range.c"
+				RelativePath="..\..\libfdata\libfdata_range_list.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_segment.c"
+				RelativePath="..\..\libfdata\libfdata_reference.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_segment_table.c"
+				RelativePath="..\..\libfdata\libfdata_stream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_support.c"
+				RelativePath="..\..\libfdata\libfdata_support.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_tree.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_tree_node.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_vector.c"
 				>
 			</File>
 		</Filter>
@@ -205,83 +217,99 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_array_type.h"
+				RelativePath="..\..\libfdata\libfdata_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_date_time.h"
+				RelativePath="..\..\libfdata\libfdata_buffer_reference.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_definitions.h"
+				RelativePath="..\..\libfdata\libfdata_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_error.h"
+				RelativePath="..\..\libfdata\libfdata_error.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_extern.h"
+				RelativePath="..\..\libfdata\libfdata_extern.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_file.h"
+				RelativePath="..\..\libfdata\libfdata_inline.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_file_list.h"
+				RelativePath="..\..\libfdata\libfdata_libcdata.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_group.h"
+				RelativePath="..\..\libfdata\libfdata_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_inline.h"
+				RelativePath="..\..\libfdata\libfdata_libcnotify.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_libbfio.h"
+				RelativePath="..\..\libfdata\libfdata_libfcache.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_libfcache.h"
+				RelativePath="..\..\libfdata\libfdata_list.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_list.h"
+				RelativePath="..\..\libfdata\libfdata_list_element.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_list_element.h"
+				RelativePath="..\..\libfdata\libfdata_mapped_range.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_notify.h"
+				RelativePath="..\..\libfdata\libfdata_notify.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_range.h"
+				RelativePath="..\..\libfdata\libfdata_range.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_segment.h"
+				RelativePath="..\..\libfdata\libfdata_range_list.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_segment_table.h"
+				RelativePath="..\..\libfdata\libfdata_reference.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_support.h"
+				RelativePath="..\..\libfdata\libfdata_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_types.h"
+				RelativePath="..\..\libfdata\libfdata_support.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libmfdata\libmfdata_unused.h"
+				RelativePath="..\..\libfdata\libfdata_tree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_tree_node.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_unused.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfdata\libfdata_vector.h"
 				>
 			</File>
 		</Filter>

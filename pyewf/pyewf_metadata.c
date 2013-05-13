@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -517,7 +517,7 @@ PyObject *pyewf_handle_get_header_values(
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
-	libcerror_error_t *error               = NULL;
+	libcerror_error_t *error              = NULL;
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";

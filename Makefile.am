@@ -7,6 +7,7 @@ SUBDIRS = \
 	libcerror \
 	libcdata \
 	libclocale \
+	libcmulti \
 	libcnotify \
 	libcsplit \
 	libuna \
@@ -14,8 +15,8 @@ SUBDIRS = \
 	libcpath \
 	libbfio \
 	libfcache \
+	libfdata \
 	libfvalue \
-	libmfdata \
 	libhmac \
 	libcaes \
 	libewf \
@@ -59,10 +60,7 @@ SPEC_FILES = \
 	libewf.spec.in
 
 EXTRA_DIST = \
-	README.dll \
 	README.macosx \
-	README.mingw \
-	README.static \
 	$(DPKG_FILES) \
 	$(GETTEXT_FILES) \
 	$(PKGCONFIG_FILES) \
@@ -87,6 +85,7 @@ library:
 	(cd $(srcdir)/libcerror && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libclocale && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libcmulti && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcnotify && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcsplit && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS))
@@ -94,8 +93,8 @@ library:
 	(cd $(srcdir)/libcpath && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libbfio && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfcache && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libmfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcaes && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS))
@@ -120,6 +119,7 @@ splint:
 	(cd $(srcdir)/libcerror && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libclocale && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libcmulti && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcnotify && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcsplit && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libuna && $(MAKE) splint $(AM_MAKEFLAGS))
@@ -127,8 +127,8 @@ splint:
 	(cd $(srcdir)/libcpath && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libbfio && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfcache && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfvalue && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libmfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libhmac && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcaes && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))

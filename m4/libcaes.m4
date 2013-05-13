@@ -1,6 +1,6 @@
 dnl Functions for libcaes
 dnl
-dnl Version: 20120509
+dnl Version: 20130331
 
 dnl Function to detect if libcaes is available
 dnl ac_libcaes_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -48,7 +48,38 @@ AC_DEFUN([AX_LIBCAES_CHECK_LIB],
      [ac_cv_libcaes_dummy=yes],
      [ac_cv_libcaes=no])
 
-    dnl TODO check if all LIBCAES functions are available
+    dnl AES functions
+    AC_CHECK_LIB(
+     caes,
+     libcaes_context_initialize,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_context_free,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+
+    AC_CHECK_LIB(
+     caes,
+     libcaes_crypt_set_key,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_crypt_cbc,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_crypt_ccm,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_crypt_ecb,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
 
     ac_cv_libcaes_LIBADD="-lcaes"
     ])

@@ -34,12 +34,13 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
 #include "libewf_libhmac.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
-#include "libewf_sector_list.h"
+#include "libewf_sector_range.h"
 #include "libewf_single_files.h"
 #include "libewf_unused.h"
 
@@ -101,6 +102,7 @@ int libewf_section_test_zero(
 }
 
 /* Creates a section
+ * Make sure the value section is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_initialize(
@@ -172,7 +174,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the section
+/* Frees a section
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_free(
@@ -2407,7 +2409,7 @@ ssize_t libewf_section_data_read(
 		 ( (ewf_data_t *) section_data )->chs_cylinders,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: CHS number of cylinders\t\t\t\t: %" PRIu32 "\n",
+		 "%s: CHS number of cylinders\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -2460,7 +2462,7 @@ ssize_t libewf_section_data_read(
 		 ( (ewf_data_t *) section_data )->smart_logs_start_sector,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: SMART logs start sector\t\t\t\t: %" PRIu32 "\n",
+		 "%s: SMART logs start sector\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -2523,34 +2525,37 @@ ssize_t libewf_section_data_read(
 		 "\n" );
 	}
 #endif
-	if( libewf_checksum_calculate_adler32(
-	     &calculated_checksum,
-	     section_data,
-	     section_data_size - 4,
-	     1,
-	     error ) != 1 )
+	if( stored_checksum != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to calculate checksum.",
-		 function );
+		if( libewf_checksum_calculate_adler32(
+		     &calculated_checksum,
+		     section_data,
+		     section_data_size - 4,
+		     1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to calculate checksum.",
+			 function );
 
-		goto on_error;
-	}
-	if( stored_checksum != calculated_checksum )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
-		 function,
-		 stored_checksum,
-		 calculated_checksum );
+			goto on_error;
+		}
+		if( stored_checksum != calculated_checksum )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_INPUT,
+			 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+			 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
+			 function,
+			 stored_checksum,
+			 calculated_checksum );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	*set_identifier_change = 0;
 
@@ -3480,7 +3485,7 @@ ssize_t libewf_section_error_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         libewf_sector_list_t *acquiry_errors,
+         libcdata_range_list_t *acquiry_errors,
          libcerror_error_t **error )
 {
 	uint8_t *error_data            = NULL;
@@ -3493,7 +3498,7 @@ ssize_t libewf_section_error_read(
 	size_t error_header_data_size  = 0;
 	size_t section_data_size       = 0;
 	ssize_t read_count             = 0;
-	uint64_t first_sector          = 0;
+	uint64_t start_sector          = 0;
 	uint32_t calculated_checksum   = 0;
 	uint32_t entry_index           = 0;
 	uint32_t number_of_entries     = 0;
@@ -3850,15 +3855,16 @@ ssize_t libewf_section_error_read(
 			}
 		}
 #endif
-		if( libewf_sector_list_empty(
+		if( libcdata_range_list_empty(
 		     acquiry_errors,
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty acquiry errors sector list.",
+			 "%s: unable to empty acquiry errors range list.",
 			 function );
 
 			goto on_error;
@@ -3870,8 +3876,8 @@ ssize_t libewf_section_error_read(
 			if( format_version == 1 )
 			{
 				byte_stream_copy_to_uint32_little_endian(
-				 ( (ewf_error_entry_v1_t *) error_entry_data )->first_sector,
-				 first_sector );
+				 ( (ewf_error_entry_v1_t *) error_entry_data )->start_sector,
+				 start_sector );
 
 				byte_stream_copy_to_uint32_little_endian(
 				 ( (ewf_error_entry_v1_t *) error_entry_data )->number_of_sectors,
@@ -3880,8 +3886,8 @@ ssize_t libewf_section_error_read(
 			else if( format_version == 2 )
 			{
 				byte_stream_copy_to_uint64_little_endian(
-				 ( (ewf_error_entry_v2_t *) error_entry_data )->first_sector,
-				 first_sector );
+				 ( (ewf_error_entry_v2_t *) error_entry_data )->start_sector,
+				 start_sector );
 
 				byte_stream_copy_to_uint32_little_endian(
 				 ( (ewf_error_entry_v2_t *) error_entry_data )->number_of_sectors,
@@ -3892,10 +3898,10 @@ ssize_t libewf_section_error_read(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: error entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
+				 "%s: error entry: %02" PRIu32 " start sector\t\t\t: %" PRIu64 "\n",
 				 function,
 				 entry_index,
-				 first_sector );
+				 start_sector );
 
 				libcnotify_printf(
 				 "%s: error entry: %02" PRIu32 " number of sectors\t\t: %" PRIu32 "\n",
@@ -3916,18 +3922,20 @@ ssize_t libewf_section_error_read(
 				}
 			}
 #endif
-			if( libewf_sector_list_append_sector(
+			if( libcdata_range_list_insert_range(
 			     acquiry_errors,
-			     first_sector,
+			     start_sector,
 			     (uint64_t) number_of_sectors,
-			     0,
+			     NULL,
+			     NULL,
+			     NULL,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append acquiry error to sector list.",
+				 "%s: unable to insert acquiry error in range list.",
 				 function );
 
 				goto on_error;
@@ -3967,13 +3975,14 @@ ssize_t libewf_section_error_write(
          int file_io_pool_entry,
          uint8_t format_version,
          off64_t section_offset,
-         libewf_sector_list_t *acquiry_errors,
+         libcdata_range_list_t *acquiry_errors,
          libcerror_error_t **error )
 {
 	uint8_t *error_data                 = NULL;
 	uint8_t *error_entry_data           = NULL;
 	uint8_t *section_data               = NULL;
 	static char *function               = "libewf_section_error_write";
+	intptr_t *value                     = NULL;
 	size_t error_entry_data_size        = 0;
 	size_t error_entries_data_size      = 0;
 	size_t error_footer_data_size       = 0;
@@ -3982,7 +3991,7 @@ ssize_t libewf_section_error_write(
 	size_t section_descriptor_data_size = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
-	uint64_t first_sector               = 0;
+	uint64_t start_sector               = 0;
 	uint64_t number_of_sectors          = 0;
 	uint32_t calculated_checksum        = 0;
 	uint32_t section_padding_size       = 0;
@@ -4026,7 +4035,7 @@ ssize_t libewf_section_error_write(
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_range_list_get_number_of_elements(
 	     acquiry_errors,
 	     &number_of_entries,
 	     error ) != 1 )
@@ -4035,7 +4044,7 @@ ssize_t libewf_section_error_write(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from acquiry error sector list.",
+		 "%s: unable to retrieve number of elements from acquiry error range list.",
 		 function );
 
 		goto on_error;
@@ -4242,29 +4251,30 @@ ssize_t libewf_section_error_write(
 	     entry_index < number_of_entries;
 	     entry_index++ )
 	{
-		if( libewf_sector_list_get_sector(
+		if( libcdata_range_list_get_range_by_index(
 		     acquiry_errors,
 		     entry_index,
-		     &first_sector,
+		     &start_sector,
 		     &number_of_sectors,
+		     &value,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve acquiry error: %d from sector list.",
+			 "%s: unable to retrieve acquiry error: %d from range list.",
 			 function,
 			 entry_index );
 
 			goto on_error;
 		}
-/* TODO check bounds fo first_sector and number_of_sectors and print warning if truncation happens */
+/* TODO check bounds fo start_sector and number_of_sectors and print warning if truncation happens */
 		if( format_version == 1 )
 		{
 			byte_stream_copy_from_uint32_little_endian(
-			 ( (ewf_error_entry_v1_t *) error_entry_data )->first_sector,
-			 (uint32_t) first_sector );
+			 ( (ewf_error_entry_v1_t *) error_entry_data )->start_sector,
+			 (uint32_t) start_sector );
 
 			byte_stream_copy_from_uint32_little_endian(
 			 ( (ewf_error_entry_v1_t *) error_entry_data )->number_of_sectors,
@@ -4273,8 +4283,8 @@ ssize_t libewf_section_error_write(
 		else if( format_version == 2 )
 		{
 			byte_stream_copy_from_uint64_little_endian(
-			 ( (ewf_error_entry_v2_t *) error_entry_data )->first_sector,
-			 first_sector );
+			 ( (ewf_error_entry_v2_t *) error_entry_data )->start_sector,
+			 start_sector );
 
 			byte_stream_copy_from_uint32_little_endian(
 			 ( (ewf_error_entry_v2_t *) error_entry_data )->number_of_sectors,
@@ -5459,7 +5469,7 @@ ssize_t libewf_section_ltree_read(
 	uint32_t data_size           = 0;
 	uint32_t stored_checksum     = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 	size_t trailing_data_size    = 0;
 #endif
 
@@ -5746,7 +5756,7 @@ ssize_t libewf_section_ltree_read(
 
 			goto on_error;
 		}
-#if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			if( trailing_data_size > 0 )
@@ -6242,31 +6252,33 @@ ssize_t libewf_section_session_read(
          int file_io_pool_entry,
          uint8_t format_version,
          libewf_media_values_t *media_values,
-         libewf_sector_list_t *sessions,
-         libewf_sector_list_t *tracks,
+         libcdata_array_t *sessions,
+         libcdata_array_t *tracks,
          libcerror_error_t **error )
 {
-	uint8_t *session_data            = NULL;
-	uint8_t *session_entry_data      = NULL;
-	uint8_t *section_data            = NULL;
-	static char *function            = "libewf_section_session_read";
-	size_t section_data_size         = 0;
-	size_t session_entry_data_size   = 0;
-	size_t session_entries_data_size = 0;
-	size_t session_footer_data_size  = 0;
-	size_t session_header_data_size  = 0;
-	ssize_t read_count               = 0;
-	uint64_t first_sector            = 0;
-	uint64_t number_of_sectors       = 0;
-	uint64_t previous_first_sector   = 0;
-	uint64_t session_first_sector    = 0;
-	uint64_t track_first_sector      = 0;
-	uint32_t calculated_checksum     = 0;
-	uint32_t entry_index             = 0;
-	uint32_t flags                   = 0;
-	uint32_t number_of_entries       = 0;
-	uint32_t previous_flags          = 0;
-	uint32_t stored_checksum         = 0;
+	libewf_sector_range_t *sector_range = NULL;
+	uint8_t *session_data               = NULL;
+	uint8_t *session_entry_data         = NULL;
+	uint8_t *section_data               = NULL;
+	static char *function               = "libewf_section_session_read";
+	size_t section_data_size            = 0;
+	size_t session_entry_data_size      = 0;
+	size_t session_entries_data_size    = 0;
+	size_t session_footer_data_size     = 0;
+	size_t session_header_data_size     = 0;
+	ssize_t read_count                  = 0;
+	uint64_t start_sector               = 0;
+	uint64_t number_of_sectors          = 0;
+	uint64_t previous_start_sector      = 0;
+	uint64_t session_start_sector       = 0;
+	uint64_t track_start_sector         = 0;
+	uint32_t calculated_checksum        = 0;
+	uint32_t flags                      = 0;
+	uint32_t number_of_session_entries  = 0;
+	uint32_t previous_flags             = 0;
+	uint32_t session_entry_index        = 0;
+	uint32_t stored_checksum            = 0;
+	int entry_index                     = 0;
 
 	if( section == NULL )
 	{
@@ -6388,7 +6400,7 @@ ssize_t libewf_section_session_read(
 	{
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_session_header_v1_t *) session_data )->number_of_entries,
-		 number_of_entries );
+		 number_of_session_entries );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_session_header_v1_t *) session_data )->checksum,
@@ -6398,7 +6410,7 @@ ssize_t libewf_section_session_read(
 	{
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_session_header_v2_t *) session_data )->number_of_entries,
-		 number_of_entries );
+		 number_of_session_entries );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_session_header_v2_t *) session_data )->checksum,
@@ -6410,7 +6422,7 @@ ssize_t libewf_section_session_read(
 		libcnotify_printf(
 		 "%s: number of entries\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_entries );
+		 number_of_session_entries );
 
 		libcnotify_printf(
 		 "%s: unknown1:\n",
@@ -6492,11 +6504,11 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	if( number_of_entries > 0 )
+	if( number_of_session_entries > 0 )
 	{
 		session_entry_data = session_data;
 
-		session_entries_data_size = number_of_entries * session_entry_data_size;
+		session_entries_data_size = number_of_session_entries * session_entry_data_size;
 
 		if( session_entries_data_size > (size_t) SSIZE_MAX )
 		{
@@ -6629,15 +6641,16 @@ ssize_t libewf_section_session_read(
 			}
 		}
 #endif
-		if( libewf_sector_list_empty(
+		if( libcdata_array_empty(
 		     sessions,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to empty sessions sector list.",
+			 "%s: unable to empty sessions array.",
 			 function );
 
 			goto on_error;
@@ -6649,14 +6662,14 @@ ssize_t libewf_section_session_read(
 			 previous_flags );
 
 			byte_stream_copy_to_uint32_little_endian(
-			 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
-			 previous_first_sector );
+			 ( (ewf_session_entry_v1_t *) session_entry_data )->start_sector,
+			 previous_start_sector );
 		}
 		else if( format_version == 2 )
 		{
 			byte_stream_copy_to_uint64_little_endian(
-			 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
-			 previous_first_sector );
+			 ( (ewf_session_entry_v2_t *) session_entry_data )->start_sector,
+			 previous_start_sector );
 
 			byte_stream_copy_to_uint32_little_endian(
 			 ( (ewf_session_entry_v2_t *) session_entry_data )->flags,
@@ -6670,33 +6683,33 @@ ssize_t libewf_section_session_read(
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
 				 function,
-				 entry_index,
+				 session_entry_index,
 				 previous_flags );
 
 				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu64 ")\n",
+				 "%s: entry: %02" PRIu32 " start sector\t\t\t: 0 (%" PRIu64 ")\n",
 				 function,
-				 entry_index,
-				 previous_first_sector );
+				 session_entry_index,
+				 previous_start_sector );
 			}
 			else if( format_version == 2 )
 			{
 				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " first sector\t\t\t: 0 (%" PRIu64 ")\n",
+				 "%s: entry: %02" PRIu32 " start sector\t\t\t: 0 (%" PRIu64 ")\n",
 				 function,
-				 entry_index,
-				 previous_first_sector );
+				 session_entry_index,
+				 previous_start_sector );
 
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
 				 function,
-				 entry_index,
+				 session_entry_index,
 				 previous_flags );
 			}
 			libcnotify_printf(
 			 "%s: entry: %02" PRIu32 " unknown1:\n",
 			 function,
-			 entry_index );
+			 session_entry_index );
 
 			if( format_version == 1 )
 			{
@@ -6720,12 +6733,12 @@ ssize_t libewf_section_session_read(
 		 * This is either some EnCase specific behavior or the value is used for
 		 * other purposes.
 		 */
-		session_first_sector = 0;
-		track_first_sector   = 0;
+		session_start_sector = 0;
+		track_start_sector   = 0;
 
-		for( entry_index = 1;
-		     entry_index < number_of_entries;
-		     entry_index++ )
+		for( session_entry_index = 1;
+		     session_entry_index < number_of_session_entries;
+		     session_entry_index++ )
 		{
 			if( format_version == 1 )
 			{
@@ -6734,14 +6747,14 @@ ssize_t libewf_section_session_read(
 				 flags );
 
 				byte_stream_copy_to_uint32_little_endian(
-				 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
-				 first_sector );
+				 ( (ewf_session_entry_v1_t *) session_entry_data )->start_sector,
+				 start_sector );
 			}
 			else if( format_version == 2 )
 			{
 				byte_stream_copy_to_uint64_little_endian(
-				 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
-				 first_sector );
+				 ( (ewf_session_entry_v2_t *) session_entry_data )->start_sector,
+				 start_sector );
 
 				byte_stream_copy_to_uint32_little_endian(
 				 ( (ewf_session_entry_v2_t *) session_entry_data )->flags,
@@ -6755,33 +6768,33 @@ ssize_t libewf_section_session_read(
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
 					 function,
-					 entry_index,
+					 session_entry_index,
 					 flags );
 
 					libcnotify_printf(
-					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
+					 "%s: entry: %02" PRIu32 " start sector\t\t\t: %" PRIu64 "\n",
 					 function,
-					 entry_index,
-					 first_sector );
+					 session_entry_index,
+					 start_sector );
 				}
 				else if( format_version == 2 )
 				{
 					libcnotify_printf(
-					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu64 "\n",
+					 "%s: entry: %02" PRIu32 " start sector\t\t\t: %" PRIu64 "\n",
 					 function,
-					 entry_index,
-					 first_sector );
+					 session_entry_index,
+					 start_sector );
 
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0x%08" PRIx32 "\n",
 					 function,
-					 entry_index,
+					 session_entry_index,
 					 flags );
 				}
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " unknown1:\n",
 				 function,
-				 entry_index );
+				 session_entry_index );
 
 				if( format_version == 1 )
 				{
@@ -6801,117 +6814,232 @@ ssize_t libewf_section_session_read(
 #endif
 			session_entry_data += session_entry_data_size;
 
-			if( first_sector < previous_first_sector )
+			if( start_sector < previous_start_sector )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid first sector: %" PRIu32 " value out of bounds.",
+				 "%s: invalid start sector: %" PRIu32 " value out of bounds.",
 				 function,
-				 first_sector );
+				 start_sector );
 
 				goto on_error;
 			}
 			if( ( flags & LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK ) == 0 )
 			{
 /* TODO bounds check */
-				number_of_sectors = first_sector - session_first_sector;
+				number_of_sectors = start_sector - session_start_sector;
 
-				if( libewf_sector_list_append_sector(
-				     sessions,
-				     session_first_sector,
+				if( libewf_sector_range_initialize(
+				     &sector_range,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create session sector range.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_sector_range_set(
+				     sector_range,
+				     session_start_sector,
 				     (uint64_t) number_of_sectors,
-				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set session sector range.",
+					 function );
+
+					goto on_error;
+				}
+				if( libcdata_array_append_entry(
+				     sessions,
+				     &entry_index,
+				     (intptr_t *) sector_range,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append session to sector list.",
+					 "%s: unable to append session sector range to array.",
 					 function );
-	
+
 					goto on_error;
 				}
-				session_first_sector = first_sector;
+				sector_range = NULL;
+
+				session_start_sector = start_sector;
 			}
 			if( ( previous_flags & LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK ) != 0 )
 			{
 /* TODO bounds check */
-				number_of_sectors = first_sector - track_first_sector;
+				number_of_sectors = start_sector - track_start_sector;
 
-				if( libewf_sector_list_append_sector(
-				     tracks,
-				     track_first_sector,
+				if( libewf_sector_range_initialize(
+				     &sector_range,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create track sector range.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_sector_range_set(
+				     sector_range,
+				     track_start_sector,
 				     (uint64_t) number_of_sectors,
-				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set track sector range.",
+					 function );
+
+					goto on_error;
+				}
+				if( libcdata_array_append_entry(
+				     tracks,
+				     &entry_index,
+				     (intptr_t *) sector_range,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append track to sector list.",
+					 "%s: unable to append track sector range to array.",
 					 function );
-	
+
 					goto on_error;
 				}
-				track_first_sector = first_sector;
+				sector_range = NULL;
+
+				track_start_sector = start_sector;
 			}
-			previous_first_sector = first_sector;
+			previous_start_sector = start_sector;
 			previous_flags        = flags;
 		}
-		if( media_values->number_of_sectors > session_first_sector )
+		if( media_values->number_of_sectors > session_start_sector )
 		{
-			number_of_sectors = (uint32_t) ( media_values->number_of_sectors - session_first_sector );
+			number_of_sectors = (uint32_t) ( media_values->number_of_sectors - session_start_sector );
 		}
 		else
 		{
 			number_of_sectors = 0;
 		}
-		if( libewf_sector_list_append_sector(
-		     sessions,
-		     session_first_sector,
+		if( libewf_sector_range_initialize(
+		     &sector_range,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create session sector range.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_sector_range_set(
+		     sector_range,
+		     session_start_sector,
 		     (uint64_t) number_of_sectors,
-		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set session sector range.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_array_append_entry(
+		     sessions,
+		     &entry_index,
+		     (intptr_t *) sector_range,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append session to sector list.",
+			 "%s: unable to append session sector range to array.",
 			 function );
 
 			goto on_error;
 		}
+		sector_range = NULL;
+
 		if( ( flags & LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK ) != 0 )
 		{
-			if( media_values->number_of_sectors > track_first_sector )
+			if( media_values->number_of_sectors > track_start_sector )
 			{
-				number_of_sectors = (uint32_t) ( media_values->number_of_sectors - track_first_sector );
+				number_of_sectors = (uint32_t) ( media_values->number_of_sectors - track_start_sector );
 			}
 			else
 			{
 				number_of_sectors = 0;
 			}
-			if( libewf_sector_list_append_sector(
-			     tracks,
-			     track_first_sector,
+			if( libewf_sector_range_initialize(
+			     &sector_range,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create track sector range.",
+				 function );
+
+				goto on_error;
+			}
+			if( libewf_sector_range_set(
+			     sector_range,
+			     track_start_sector,
 			     (uint64_t) number_of_sectors,
-			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set track sector range.",
+				 function );
+
+				goto on_error;
+			}
+			if( libcdata_array_append_entry(
+			     tracks,
+			     &entry_index,
+			     (intptr_t *) sector_range,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append track to sector list.",
+				 "%s: unable to append track sector range to array.",
 				 function );
 
 				goto on_error;
 			}
+			sector_range = NULL;
 		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -6928,6 +7056,12 @@ ssize_t libewf_section_session_read(
 	return( read_count );
 
 on_error:
+	if( sector_range != NULL )
+	{
+		libewf_sector_range_free(
+		 &sector_range,
+		 NULL );
+	}
 	if( section_data != NULL )
 	{
 		memory_free(
@@ -6946,10 +7080,11 @@ ssize_t libewf_section_session_write(
          int file_io_pool_entry,
          uint8_t format_version,
          off64_t section_offset,
-         libewf_sector_list_t *sessions,
-         libewf_sector_list_t *tracks,
+         libcdata_array_t *sessions,
+         libcdata_array_t *tracks,
          libcerror_error_t **error )
 {
+	libewf_sector_range_t *sector_range = NULL;
 	uint8_t *session_entry_data         = NULL;
 	uint8_t *section_data               = NULL;
 	uint8_t *session_data               = NULL;
@@ -6963,17 +7098,17 @@ ssize_t libewf_section_session_write(
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint64_t current_sector             = 0;
-	uint64_t session_first_sector       = 0;
+	uint64_t session_start_sector       = 0;
 	uint64_t session_last_sector        = 0;
 	uint64_t session_number_of_sectors  = 0;
-	uint64_t track_first_sector         = 0;
+	uint64_t track_start_sector         = 0;
 	uint64_t track_last_sector          = 0;
 	uint64_t track_number_of_sectors    = 0;
 	uint32_t calculated_checksum        = 0;
-	uint32_t entry_index                = 0;
 	uint32_t section_padding_size       = 0;
+	uint32_t session_entry_index        = 0;
 	int number_of_sessions              = 0;
-	int number_of_entries               = 0;
+	int number_of_session_entries       = 0;
 	int number_of_tracks                = 0;
 	int session_index                   = 0;
 	int track_index                     = 0;
@@ -7015,7 +7150,7 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_array_get_number_of_entries(
 	     sessions,
 	     &number_of_sessions,
 	     error ) != 1 )
@@ -7024,7 +7159,7 @@ ssize_t libewf_section_session_write(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from sessions sector list.",
+		 "%s: unable to retrieve number of entries from sessions array.",
 		 function );
 
 		goto on_error;
@@ -7040,7 +7175,7 @@ ssize_t libewf_section_session_write(
 
 		goto on_error;
 	}
-	if( libewf_sector_list_get_number_of_elements(
+	if( libcdata_array_get_number_of_entries(
 	     tracks,
 	     &number_of_tracks,
 	     error ) != 1 )
@@ -7049,7 +7184,7 @@ ssize_t libewf_section_session_write(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from tracks sector list.",
+		 "%s: unable to retrieve number of entries from tracks array.",
 		 function );
 
 		goto on_error;
@@ -7068,12 +7203,12 @@ ssize_t libewf_section_session_write(
 	if( ( number_of_sessions != 0 )
 	 && ( number_of_tracks == 0 ) )
 	{
-		number_of_entries = number_of_sessions;
+		number_of_session_entries = number_of_sessions;
 	}
 	else if( ( number_of_sessions == 0 )
 	      && ( number_of_tracks != 0 ) )
 	{
-		number_of_entries = number_of_tracks;
+		number_of_session_entries = number_of_tracks;
 	}
 	else if( ( number_of_sessions != 0 )
 	      && ( number_of_tracks != 0 ) )
@@ -7087,10 +7222,25 @@ ssize_t libewf_section_session_write(
 			if( ( session_index < number_of_sessions )
 			 && ( current_sector >= session_last_sector ) )
 			{
-				if( libewf_sector_list_get_sector(
+				if( libcdata_array_get_entry_by_index(
 				     sessions,
 				     session_index,
-				     &session_first_sector,
+				     (intptr_t **) &sector_range,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve session sector range: %d from array.",
+					 function,
+					 session_index );
+
+					goto on_error;
+				}
+				if( libewf_sector_range_get(
+				     sector_range,
+				     &session_start_sector,
 				     &session_number_of_sectors,
 				     error ) != 1 )
 				{
@@ -7098,13 +7248,13 @@ ssize_t libewf_section_session_write(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve session: %d from sector list.",
+					 "%s: unable to retrieve session: %d sector range.",
 					 function,
 					 session_index );
 
 					goto on_error;
 				}
-				session_last_sector = session_first_sector
+				session_last_sector = session_start_sector
 						    + session_number_of_sectors;
 
 				session_index++;
@@ -7112,10 +7262,25 @@ ssize_t libewf_section_session_write(
 			if( ( track_index < number_of_tracks )
 			 && ( current_sector >= track_last_sector ) )
 			{
-				if( libewf_sector_list_get_sector(
+				if( libcdata_array_get_entry_by_index(
 				     tracks,
 				     track_index,
-				     &track_first_sector,
+				     (intptr_t **) &sector_range,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve track sector range: %d from array.",
+					 function,
+					 track_index );
+
+					goto on_error;
+				}
+				if( libewf_sector_range_get(
+				     sector_range,
+				     &track_start_sector,
 				     &track_number_of_sectors,
 				     error ) != 1 )
 				{
@@ -7123,33 +7288,33 @@ ssize_t libewf_section_session_write(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve track: %d from sector list.",
+					 "%s: unable to retrieve track: %d sector range.",
 					 function,
 					 track_index );
 
 					goto on_error;
 				}
-				track_last_sector = track_first_sector
+				track_last_sector = track_start_sector
 						  + track_number_of_sectors;
 
 				track_index++;
 			}
 			if( ( number_of_tracks > 0 )
-			 && ( current_sector >= track_first_sector )
+			 && ( current_sector >= track_start_sector )
 			 && ( current_sector < track_last_sector ) )
 			{
-				number_of_entries++;
+				number_of_session_entries++;
 
 				current_sector = track_last_sector;
 			}
 			else if( ( number_of_sessions > 0 )
-			      && ( current_sector >= session_first_sector )
+			      && ( current_sector >= session_start_sector )
 			      && ( current_sector < session_last_sector ) )
 			{
 				if( ( track_last_sector == 0 )
-				 || ( track_last_sector < session_first_sector ) ) 
+				 || ( track_last_sector < session_start_sector ) )
 				{
-					number_of_entries++;
+					number_of_session_entries++;
 				}
 				current_sector = session_last_sector;
 			}
@@ -7157,7 +7322,7 @@ ssize_t libewf_section_session_write(
 		while( ( session_index < number_of_sessions )
 		    || ( track_index < number_of_tracks ) );
 	}
-	if( number_of_entries == 0 )
+	if( number_of_session_entries == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -7174,13 +7339,13 @@ ssize_t libewf_section_session_write(
 		libcnotify_printf(
 		 "%s: number of entries\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_entries );
+		 number_of_session_entries );
 
 		libcnotify_printf(
 		 "\n" );
 	}
 #endif
-	session_entries_data_size = number_of_entries * session_entry_data_size;
+	session_entries_data_size = number_of_session_entries * session_entry_data_size;
 
 	section_data_size = session_header_data_size
 	                  + session_entries_data_size
@@ -7258,18 +7423,18 @@ ssize_t libewf_section_session_write(
 	}
 	session_data = section_data;
 
-/* TODO check if number_of_entries is in bounds */
+/* TODO check if number_of_session_entries is in bounds */
 	if( format_version == 1 )
 	{
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_session_header_v1_t *) session_data )->number_of_entries,
-		 (uint32_t) number_of_entries );
+		 (uint32_t) number_of_session_entries );
 	}
 	else if( format_version == 2 )
 	{
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_session_header_v2_t *) session_data )->number_of_entries,
-		 (uint32_t) number_of_entries );
+		 (uint32_t) number_of_session_entries );
 
 		session_header_data_size -= 12;
 	}
@@ -7319,10 +7484,10 @@ ssize_t libewf_section_session_write(
 
 	session_entry_data   = session_data;
 	current_sector       = 0;
-	session_first_sector = 0;
+	session_start_sector = 0;
 	session_index        = 0;
 	session_last_sector  = 0;
-	track_first_sector   = 0;
+	track_start_sector   = 0;
 	track_index          = 0;
 	track_last_sector    = 0;
 
@@ -7331,10 +7496,25 @@ ssize_t libewf_section_session_write(
 		if( ( session_index < number_of_sessions )
 		 && ( current_sector >= session_last_sector ) )
 		{
-			if( libewf_sector_list_get_sector(
+			if( libcdata_array_get_entry_by_index(
 			     sessions,
 			     session_index,
-			     &session_first_sector,
+			     (intptr_t **) &sector_range,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve session sector range: %d from array.",
+				 function,
+				 session_index );
+
+				goto on_error;
+			}
+			if( libewf_sector_range_get(
+			     sector_range,
+			     &session_start_sector,
 			     &session_number_of_sectors,
 			     error ) != 1 )
 			{
@@ -7342,13 +7522,13 @@ ssize_t libewf_section_session_write(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve session: %d from sector list.",
+				 "%s: unable to retrieve session: %d sector range.",
 				 function,
 				 session_index );
 
 				goto on_error;
 			}
-			session_last_sector = session_first_sector
+			session_last_sector = session_start_sector
 					    + session_number_of_sectors;
 
 			session_index++;
@@ -7356,10 +7536,25 @@ ssize_t libewf_section_session_write(
 		if( ( track_index < number_of_tracks )
 		 && ( current_sector >= track_last_sector ) )
 		{
-			if( libewf_sector_list_get_sector(
+			if( libcdata_array_get_entry_by_index(
 			     tracks,
 			     track_index,
-			     &track_first_sector,
+			     (intptr_t **) &sector_range,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve track sector range: %d from array.",
+				 function,
+				 track_index );
+
+				goto on_error;
+			}
+			if( libewf_sector_range_get(
+			     sector_range,
+			     &track_start_sector,
 			     &track_number_of_sectors,
 			     error ) != 1 )
 			{
@@ -7367,19 +7562,19 @@ ssize_t libewf_section_session_write(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve track: %d from sector list.",
+				 "%s: unable to retrieve track: %d sector range.",
 				 function,
 				 track_index );
 
 				goto on_error;
 			}
-			track_last_sector = track_first_sector
+			track_last_sector = track_start_sector
 					  + track_number_of_sectors;
 
 			track_index++;
 		}
 		if( ( number_of_tracks > 0 )
-		 && ( current_sector >= track_first_sector )
+		 && ( current_sector >= track_start_sector )
 		 && ( current_sector < track_last_sector ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -7388,18 +7583,18 @@ ssize_t libewf_section_session_write(
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 1\n",
 				 function,
-				 entry_index );
+				 session_entry_index );
 
 				libcnotify_printf(
-				 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+				 "%s: entry: %02" PRIu32 " start sector\t\t\t: %" PRIu32 "\n",
 				 function,
-				 entry_index,
-				 track_first_sector );
+				 session_entry_index,
+				 track_start_sector );
 
 				libcnotify_printf(
 				 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
 				 function,
-				 entry_index,
+				 session_entry_index,
 				 track_last_sector );
 
 				libcnotify_printf(
@@ -7410,10 +7605,10 @@ ssize_t libewf_section_session_write(
 			 * This is either some EnCase specific behavior or the value is used for
 			 * other purposes.
 			 */
-			if( ( entry_index == 0 )
-			 && ( track_first_sector == 0 ) )
+			if( ( session_entry_index == 0 )
+			 && ( track_start_sector == 0 ) )
 			{
-				track_first_sector = 16;
+				track_start_sector = 16;
 			}
 			if( format_version == 1 )
 			{
@@ -7422,14 +7617,14 @@ ssize_t libewf_section_session_write(
 				 LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK );
 
 				byte_stream_copy_from_uint32_little_endian(
-				 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
-				 (uint32_t) track_first_sector );
+				 ( (ewf_session_entry_v1_t *) session_entry_data )->start_sector,
+				 (uint32_t) track_start_sector );
 			}
 			else if( format_version == 2 )
 			{
 				byte_stream_copy_from_uint64_little_endian(
-				 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
-				 track_first_sector );
+				 ( (ewf_session_entry_v2_t *) session_entry_data )->start_sector,
+				 track_start_sector );
 
 				byte_stream_copy_from_uint32_little_endian(
 				 ( (ewf_session_entry_v2_t *) session_entry_data )->flags,
@@ -7437,16 +7632,16 @@ ssize_t libewf_section_session_write(
 			}
 			session_entry_data += session_entry_data_size;
 
-			entry_index++;
+			session_entry_index++;
 
 			current_sector = track_last_sector;
 		}
 		else if( ( number_of_sessions > 0 )
-		      && ( current_sector >= session_first_sector )
+		      && ( current_sector >= session_start_sector )
 		      && ( current_sector < session_last_sector ) )
 		{
 			if( ( track_last_sector == 0 )
-			 || ( track_last_sector < session_first_sector ) ) 
+			 || ( track_last_sector < session_start_sector ) )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -7454,18 +7649,18 @@ ssize_t libewf_section_session_write(
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " flags\t\t\t\t: 0\n",
 					 function,
-					 entry_index );
+					 session_entry_index );
 
 					libcnotify_printf(
-					 "%s: entry: %02" PRIu32 " first sector\t\t\t: %" PRIu32 "\n",
+					 "%s: entry: %02" PRIu32 " start sector\t\t\t: %" PRIu32 "\n",
 					 function,
-					 entry_index,
-					 session_first_sector );
+					 session_entry_index,
+					 session_start_sector );
 
 					libcnotify_printf(
 					 "%s: entry: %02" PRIu32 " last sector\t\t\t: %" PRIu32 "\n",
 					 function,
-					 entry_index,
+					 session_entry_index,
 					 session_last_sector );
 
 					libcnotify_printf(
@@ -7476,30 +7671,30 @@ ssize_t libewf_section_session_write(
 				 * This is either some EnCase specific behavior or the value is used for
 				 * other purposes.
 				 */
-				if( ( entry_index == 0 )
-				 && ( session_first_sector == 0 ) )
+				if( ( session_entry_index == 0 )
+				 && ( session_start_sector == 0 ) )
 				{
-					session_first_sector = 16;
+					session_start_sector = 16;
 				}
 				if( format_version == 1 )
 				{
 					byte_stream_copy_from_uint32_little_endian(
-					 ( (ewf_session_entry_v1_t *) session_entry_data )->first_sector,
-					 (uint32_t) session_first_sector );
+					 ( (ewf_session_entry_v1_t *) session_entry_data )->start_sector,
+					 (uint32_t) session_start_sector );
 				}
 				else if( format_version == 2 )
 				{
 					byte_stream_copy_from_uint64_little_endian(
-					 ( (ewf_session_entry_v2_t *) session_entry_data )->first_sector,
-					 session_first_sector );
+					 ( (ewf_session_entry_v2_t *) session_entry_data )->start_sector,
+					 session_start_sector );
 				}
 				session_entry_data += session_entry_data_size;
 
-				entry_index++;
+				session_entry_index++;
 			}
 			current_sector = session_last_sector;
 		}
-		if( entry_index >= (uint32_t) number_of_entries )
+		if( session_entry_index >= (uint32_t) number_of_session_entries )
 		{
 			break;
 		}
@@ -7624,6 +7819,7 @@ ssize_t libewf_section_table_read(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t **section_data,
          size_t *section_data_size,
          uint64_t *first_chunk_index,
@@ -7677,7 +7873,7 @@ ssize_t libewf_section_table_read(
 
 		/* The original EWF and SMART (EWF-S01) formats do not contain a table footer
 		 */
-		if( io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		{
 			table_footer_data_size = 4;
 		}
@@ -7811,7 +8007,7 @@ ssize_t libewf_section_table_read(
 	}
 	/* In original EWF, SMART (EWF-S01) and EnCase1 EWF-E01 the trailing data will be the chunk data
 	 */
-	if( ( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		*section_data_size = (size_t) table_header_data_size;
@@ -8028,6 +8224,7 @@ ssize_t libewf_section_table_read(
 	table_data      += table_header_data_size;
 	table_data_size -= table_header_data_size;
 
+/* TODO flag that header is corrupted and continue */
 	if( stored_checksum != calculated_checksum )
 	{
 		libcerror_error_set(
@@ -8085,7 +8282,7 @@ ssize_t libewf_section_table_read(
 
 			goto on_error;
 		}
-		if( ( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+		if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 		 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 		{
 			memory_free(
@@ -8128,6 +8325,7 @@ ssize_t libewf_section_table_read(
 			table_data      = *section_data;
 			table_data_size = *section_data_size;
 		}
+/* TODO flag that number of entries is corrupted and continue */
 		if( table_data_size < *table_entries_data_size )
 		{
 			libcerror_error_set(
@@ -8294,6 +8492,7 @@ ssize_t libewf_section_table_write(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
+         uint8_t segment_file_type,
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
@@ -8305,7 +8504,6 @@ ssize_t libewf_section_table_write(
          size_t table_entries_data_size,
          uint32_t number_of_entries,
          size64_t chunks_data_size,
-         uint8_t segment_file_type,
          libcerror_error_t **error )
 {
 	uint8_t *table_data                 = NULL;
@@ -8950,7 +9148,7 @@ ssize_t libewf_section_volume_e01_read(
 		 ( (ewf_volume_t *) section_data )->smart_logs_start_sector,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: SMART logs start sector\t\t: %" PRIu32 "\n",
+		 "%s: SMART logs start sector\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -10075,33 +10273,25 @@ ssize_t libewf_section_delta_chunk_read_header(
 	return( read_count );
 }
 
-/* Writes a delta chunk section
+/* Writes a delta chunk section header
  * Returns the number of bytes written or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write(
+ssize_t libewf_section_delta_chunk_write_header(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t section_offset,
          uint32_t chunk_index,
-         uint8_t *chunk_buffer,
          uint32_t chunk_data_size,
-         uint8_t *checksum_buffer,
-         int8_t chunk_io_flags,
          libcerror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
 
-	static char *function        = "libewf_section_delta_chunk_write";
+	static char *function        = "libewf_section_delta_chunk_write_header";
 	size64_t section_data_size   = 0;
 	ssize_t total_write_count    = 0;
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
-	uint32_t write_size          = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t chunk_checksum      = 0;
-#endif
 
 	if( section == NULL )
 	{
@@ -10125,17 +10315,6 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -10146,14 +10325,6 @@ ssize_t libewf_section_delta_chunk_write(
 		 function );
 
 		return( -1 );
-	}
-	write_size = chunk_data_size;
-
-/* TODO chunk data rewrite  */
-	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-	 && ( checksum_buffer != NULL ) )
-	{
-		chunk_data_size += 4;
 	}
 	if( chunk_data_size > (uint32_t) INT32_MAX )
 	{
@@ -10207,6 +10378,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
+	section_offset    += write_count;
 	total_write_count += write_count;
 
 	if( memory_set(
@@ -10277,119 +10449,9 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
+	section_offset    += write_count;
 	total_write_count += write_count;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " file IO pool entry\t: %d\n",
-		 function,
-		 chunk_index,
-		 file_io_pool_entry );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 chunk_index,
-		 section_offset + total_write_count,
-		 section_offset + total_write_count );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data size\t\t: %" PRIzd "\n",
-		 function,
-		 chunk_index,
-		 chunk_data_size );
-
-/* TODO chunk data rewrite  */
-		if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-		 && ( checksum_buffer != NULL ) )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 checksum_buffer,
-			 chunk_checksum );
-		}
-/* TODO chunk data rewrite */
-		else
-		{
-			if( chunk_data_size < 4 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk data size value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
-			byte_stream_copy_to_uint32_little_endian(
-			 &( chunk_buffer[ chunk_data_size - 4 ] ),
-			 chunk_checksum );
-		}
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " checksum\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 chunk_index,
-		 chunk_checksum );
-
-		libcnotify_printf(
-		 "%s: chunk: % 8" PRIu32 " data flags:\n",
-		 function,
-		 chunk_index );
-		libcnotify_printf(
-		 "Has checksum\n" );
-		libcnotify_printf(
-		 "Is delta\n" );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
-	write_count = libbfio_pool_write_buffer(
-	               file_io_pool,
-	               file_io_pool_entry,
-	               chunk_buffer,
-	               (size_t) write_size,
-	               error );
-
-	if( write_count != (ssize_t) write_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write chunk data.",
-		 function );
-
-		return( -1 );
-	}
-	total_write_count += write_count;
-
-/* TODO chunk data rewrite  */
-	if( ( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-	 && ( checksum_buffer != NULL ) )
-	{
-		write_count = libbfio_pool_write_buffer(
-		               file_io_pool,
-		               file_io_pool_entry,
-			       checksum_buffer,
-			       4,
-		               error );
-
-		if( write_count != (ssize_t) 4 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write checksum.",
-			 function );
-
-			return( -1 );
-		}
-		total_write_count += write_count;
-	}
 	return( total_write_count );
 }
 

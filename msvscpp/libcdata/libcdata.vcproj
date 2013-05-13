@@ -162,6 +162,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcdata\libcdata_error.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcdata\libcdata_list.c"
 				>
 			</File>
@@ -171,6 +175,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcdata\libcdata_range_list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcdata\libcdata_range_list_value.c"
 				>
 			</File>
 			<File
@@ -200,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcdata\libcdata_error.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcdata\libcdata_extern.h"
 				>
 			</File>
@@ -221,6 +233,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libcdata\libcdata_range_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcdata\libcdata_range_list_value.h"
 				>
 			</File>
 			<File

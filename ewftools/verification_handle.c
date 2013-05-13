@@ -1,4 +1,4 @@
-/* 
+/*
  * Verification handle
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
@@ -42,7 +42,8 @@
 #define VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE	32
 #define VERIFICATION_HANDLE_NOTIFY_STREAM		stdout
 
-/* Initializes the verification handle
+/* Creates a verification handle
+ * Make sure the value verification_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_initialize(
@@ -241,7 +242,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees the verification handle and its elements
+/* Frees a verification handle
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_free(
@@ -3746,7 +3747,7 @@ int verification_handle_checksum_errors_fprint(
 	}
 	if( number_of_errors > 0 )
 	{
-		fprintf( 
+		fprintf(
 		stream,
 		 "Sector validation errors:\n" );
 		fprintf(
@@ -3839,7 +3840,7 @@ int verification_handle_checksum_errors_fprint(
 				else if( result != 0 )
 				{
 					filename = libcstring_system_string_allocate(
-					            filename_size ); 
+					            filename_size );
 
 					if( filename == NULL )
 					{
