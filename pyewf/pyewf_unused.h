@@ -1,7 +1,7 @@
 /*
- * The libfdata header wrapper
+ * The internal unused definition
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,36 +19,25 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_LIBFDATA_H )
-#define _LIBEWF_LIBFDATA_H
+#if !defined( _PYEWF_INTERNAL_UNUSED_H )
+#define _PYEWF_INTERNAL_UNUSED_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFDATA for local use of libfdata
- */
-#if defined( HAVE_LOCAL_LIBFDATA )
-
-#include <libfdata_definitions.h>
-#include <libfdata_list.h>
-#include <libfdata_list_element.h>
-#include <libfdata_range_list.h>
-#include <libfdata_stream.h>
-#include <libfdata_tree.h>
-#include <libfdata_tree_node.h>
-#include <libfdata_types.h>
-#include <libfdata_vector.h>
-
+#if !defined( PYEWF_ATTRIBUTE_UNUSED )
+#if defined( __GNUC__ ) && __GNUC__ >= 3
+#define PYEWF_ATTRIBUTE_UNUSED	__attribute__ ((__unused__))
 #else
-
-/* If libtool DLL support is enabled set LIBFDATA_DLL_IMPORT
- * before including libfdata.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFDATA_DLL_IMPORT
+#define PYEWF_ATTRIBUTE_UNUSED
+#endif
 #endif
 
-#include <libfdata.h>
-
+#if defined( _MSC_VER )
+#define PYEWF_UNREFERENCED_PARAMETER( parameter ) \
+	UNREFERENCED_PARAMETER( parameter );
+#else
+#define PYEWF_UNREFERENCED_PARAMETER( parameter ) \
+	/* parameter */
 #endif
 
 #endif

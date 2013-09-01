@@ -35,7 +35,8 @@ extern "C" {
 #define PYEWF_ERROR_STRING_SIZE		512
 
 PyObject *pyewf_get_version(
-           PyObject *self );
+           PyObject *self,
+           PyObject *arguments );
 
 PyObject *pyewf_check_file_signature(
            PyObject *self,

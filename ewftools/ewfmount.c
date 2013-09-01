@@ -1591,11 +1591,11 @@ int ewfmount_dokan_ReadFile(
 		 "%s: invalid read count value exceeds maximum.",
 		 function );
 
-		result = -ERROR_BAD_ARGUMENTS;
+		result = -ERROR_READ_FAULT;
 
 		goto on_error;
 	}
-	*number_of_bytes_read = (DWOWD) read_count;
+	*number_of_bytes_read = (DWORD) read_count;
 
 	return( 0 );
 
@@ -1996,7 +1996,6 @@ int main( int argc, char * const argv[] )
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS ewfmount_dokan_operations;
 	DOKAN_OPTIONS ewfmount_dokan_options;
-
 #endif
 
 	libcnotify_stream_set(

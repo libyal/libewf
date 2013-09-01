@@ -80,43 +80,56 @@ PyObject *pyewf_file_entry_seek_offset(
            PyObject *keywords );
 
 PyObject *pyewf_file_entry_get_offset(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_size(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_creation_time(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_creation_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_modification_time(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_modification_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_access_time(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_access_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_entry_modification_time(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_name(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_hash_value_md5(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
-           pyewf_file_entry_t *pyewf_file_entry );
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_sub_file_entry_by_index(
            pyewf_file_entry_t *pyewf_file_entry,
@@ -126,6 +139,10 @@ PyObject *pyewf_file_entry_get_sub_file_entry(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments,
            PyObject *keywords );
+
+PyObject *pyewf_file_entry_get_sub_file_entries(
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments );
 
 #if defined( __cplusplus )
 }

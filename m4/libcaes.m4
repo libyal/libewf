@@ -1,6 +1,6 @@
 dnl Functions for libcaes
 dnl
-dnl Version: 20130331
+dnl Version: 20130716
 
 dnl Function to detect if libcaes is available
 dnl ac_libcaes_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBCAES_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libcaes],
-    [libcaes >= 20120425],
+    [libcaes >= 20130716],
     [ac_cv_libcaes=yes],
     [ac_cv_libcaes=no])
    ])
@@ -48,7 +48,7 @@ AC_DEFUN([AX_LIBCAES_CHECK_LIB],
      [ac_cv_libcaes_dummy=yes],
      [ac_cv_libcaes=no])
 
-    dnl AES functions
+    dnl Context functions
     AC_CHECK_LIB(
      caes,
      libcaes_context_initialize,
@@ -59,12 +59,30 @@ AC_DEFUN([AX_LIBCAES_CHECK_LIB],
      libcaes_context_free,
      [ac_cv_libcaes_dummy=yes],
      [ac_cv_libcaes=no])
-
     AC_CHECK_LIB(
      caes,
-     libcaes_crypt_set_key,
+     libcaes_context_set_key,
      [ac_cv_libcaes_dummy=yes],
      [ac_cv_libcaes=no])
+
+    dnl Tweaked context functions
+    AC_CHECK_LIB(
+     caes,
+     libcaes_tweaked_context_initialize,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_tweaked_context_free,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_tweaked_context_set_keys,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+
+    dnl Crypt functions
     AC_CHECK_LIB(
      caes,
      libcaes_crypt_cbc,
@@ -78,6 +96,11 @@ AC_DEFUN([AX_LIBCAES_CHECK_LIB],
     AC_CHECK_LIB(
      caes,
      libcaes_crypt_ecb,
+     [ac_cv_libcaes_dummy=yes],
+     [ac_cv_libcaes=no])
+    AC_CHECK_LIB(
+     caes,
+     libcaes_crypt_xts,
      [ac_cv_libcaes_dummy=yes],
      [ac_cv_libcaes=no])
 
@@ -120,7 +143,7 @@ AC_DEFUN([AX_LIBCAES_CHECK_LOCAL],
   [AX_WINCRYPT_CHECK_LIB
 
   ac_cv_libcaes_aes=libadvapi32])
- 
+
  dnl Check for libcrypto (openssl) support
  AS_IF(
   [test "x$ac_cv_libcaes_aes" = xno],
@@ -132,8 +155,8 @@ AC_DEFUN([AX_LIBCAES_CHECK_LOCAL],
 
    ac_cv_libcaes_aes=$ac_cv_libcrypto_aes])
   ])
-  
- dnl Fallback to local versions if necessary 
+
+ dnl Fallback to local versions if necessary
  AS_IF(
   [test "x$ac_cv_libcaes_aes" = xno],
   [ac_cv_libcaes_aes=local])

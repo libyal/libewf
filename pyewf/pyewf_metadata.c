@@ -32,12 +32,14 @@
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 /* Retrieves the size of the media data
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_media_size(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -45,6 +47,8 @@ PyObject *pyewf_handle_get_media_size(
 	static char *function    = "pyewf_handle_get_media_size";
 	size64_t media_size      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -116,11 +120,12 @@ PyObject *pyewf_handle_get_media_size(
 #endif
 }
 
-/* Retrieves the codepage used for header strings
- * Returns a Python object holding the offset if successful or NULL on error
+/* Retrieves the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_header_codepage(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -129,27 +134,22 @@ PyObject *pyewf_handle_get_header_codepage(
 	const char *codepage_string = NULL;
 	static char *function       = "pyewf_handle_get_header_codepage";
 	int header_codepage         = 0;
-	int result                  = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid handle.",
+		 "%s: invalid file.",
 		 function );
 
 		return( NULL );
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libewf_handle_get_header_codepage(
-	          pyewf_handle->handle,
-	          &header_codepage,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( libewf_handle_get_header_codepage(
+	     pyewf_handle->file,
+	     &header_codepage,
+	     &error ) != 1 )
 	{
 		if( libcerror_error_backtrace_sprint(
 		     error,
@@ -174,7 +174,7 @@ PyObject *pyewf_handle_get_header_codepage(
 
 		return( NULL );
 	}
-	codepage_string = pyewf_codepage_to_string(
+	codepage_string = pyevtx_codepage_to_string(
 	                   header_codepage );
 
 	if( codepage_string == NULL )
@@ -202,20 +202,17 @@ PyObject *pyewf_handle_get_header_codepage(
 	return( string_object );
 }
 
-/* Sets the codepage used for header strings
- * Returns a Python object holding the offset if successful or NULL on error
+/* Sets the codepage used for ASCII strings in the header
+ * Returns 1 if successful or -1 on error
  */
-PyObject *pyewf_handle_set_header_codepage(
-           pyewf_handle_t *pyewf_handle,
-           PyObject *arguments,
-           PyObject *keywords )
+int pyewf_handle_set_header_codepage_from_string(
+     pyewf_handle_t *pyewf_handle,
+     const char *codepage_string )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error      = NULL;
-	char *codepage_string         = NULL;
-	static char *keyword_list[]   = { "codepage", NULL };
-	static char *function         = "pyewf_handle_set_header_codepage";
+	static char *function         = "pyewf_handle_set_header_codepage_from_string";
 	size_t codepage_string_length = 0;
 	uint32_t feature_flags        = 0;
 	int header_codepage           = 0;
@@ -225,20 +222,11 @@ PyObject *pyewf_handle_set_header_codepage(
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid handle.",
+		 "%s: invalid file.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( PyArg_ParseTupleAndKeywords(
-	     arguments,
-	     keywords,
-	     "s",
-	     keyword_list,
-	     &codepage_string ) == 0 )
-        {
-                return( NULL );
-        }
 	if( codepage_string == NULL )
 	{
 		PyErr_Format(
@@ -246,7 +234,7 @@ PyObject *pyewf_handle_set_header_codepage(
 		 "%s: invalid codepage string.",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	codepage_string_length = libcstring_narrow_string_length(
 	                          codepage_string );
@@ -268,26 +256,26 @@ PyObject *pyewf_handle_set_header_codepage(
 		{
 			PyErr_Format(
 			 PyExc_RuntimeError,
-			 "%s: unable to determine ASCII codepage.",
+			 "%s: unable to determine header codepage.",
 			 function );
 		}
 		else
 		{
 			PyErr_Format(
 			 PyExc_RuntimeError,
-			 "%s: unable to determine ASCII codepage.\n%s",
+			 "%s: unable to determine header codepage.\n%s",
 			 function,
 			 error_string );
 		}
 		libcerror_error_free(
 		 &error );
 
-		return( NULL );
+		return( -1 );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libewf_handle_set_header_codepage(
-	          pyewf_handle->handle,
+	          pyewf_handle->file,
 	          header_codepage,
 	          &error );
 
@@ -302,26 +290,89 @@ PyObject *pyewf_handle_set_header_codepage(
 		{
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to set ASCII codepage.",
+			 "%s: unable to set header codepage.",
 			 function );
 		}
 		else
 		{
 			PyErr_Format(
 			 PyExc_IOError,
-			 "%s: unable to set ASCII codepage.\n%s",
+			 "%s: unable to set header codepage.\n%s",
 			 function,
 			 error_string );
 		}
 		libcerror_error_free(
 		 &error );
 
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_set_header_codepage(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	static char *keyword_list[] = { "codepage", NULL };
+	char *codepage_string       = NULL;
+	int result                  = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "s",
+	     keyword_list,
+	     &codepage_string ) == 0 )
+        {
+                return( NULL );
+        }
+	result = pyewf_handle_set_header_codepage_from_string(
+	          pyewf_handle,
+	          codepage_string );
+
+	if( result != 1 )
+	{
 		return( NULL );
 	}
 	Py_IncRef(
 	 Py_None );
 
 	return( Py_None );
+}
+
+/* Sets the codepage used for ASCII strings in the header
+ * Returns a Python object if successful or NULL on error
+ */
+int pyewf_handle_set_header_codepage_setter(
+     pyewf_handle_t *pyewf_handle,
+     PyObject *value_object,
+     void *closure PYEWF_ATTRIBUTE_UNUSED )
+{
+	char *codepage_string = NULL;
+	int result            = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( closure )
+
+	codepage_string = PyString_AsString(
+	                   value_object );
+
+	if( codepage_string == NULL )
+	{
+		return( -1 );
+	}
+	result = pyewf_handle_set_header_codepage_from_string(
+	          pyewf_handle,
+	          codepage_string );
+
+	if( result != 1 )
+	{
+		return( -1 );
+	}
+	return( 0 );
 }
 
 /* Retrieves a header value
@@ -513,7 +564,8 @@ on_error:
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_header_values(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -530,6 +582,8 @@ PyObject *pyewf_handle_get_header_values(
 	uint32_t number_of_header_values      = 0;
 	uint32_t header_value_index           = 0;
 	int result                            = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -1023,7 +1077,8 @@ on_error:
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_handle_get_hash_values(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1040,6 +1095,8 @@ PyObject *pyewf_handle_get_hash_values(
 	uint32_t number_of_hash_values      = 0;
 	uint32_t hash_value_index           = 0;
 	int result                          = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{

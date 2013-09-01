@@ -24,7 +24,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
+INPUT="input_old";
 TMP="tmp";
 
 AWK="awk";

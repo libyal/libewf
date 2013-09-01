@@ -67,7 +67,8 @@ void pyewf_handle_free(
       pyewf_handle_t *pyewf_handle );
 
 PyObject *pyewf_handle_signal_abort(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_open(
            pyewf_handle_t *pyewf_handle,
@@ -75,7 +76,8 @@ PyObject *pyewf_handle_open(
            PyObject *keywords );
 
 PyObject *pyewf_handle_close(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_read_buffer(
            pyewf_handle_t *pyewf_handle,
@@ -103,10 +105,12 @@ PyObject *pyewf_handle_seek_offset(
            PyObject *keywords );
 
 PyObject *pyewf_handle_get_offset(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 PyObject *pyewf_handle_get_root_file_entry(
-           pyewf_handle_t *pyewf_handle );
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
 
 #if defined( __cplusplus )
 }

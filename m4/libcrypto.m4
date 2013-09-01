@@ -1,7 +1,7 @@
 dnl Functions for libcrypto
 dnl
-dnl Version: 20120725
- 
+dnl Version: 20130831
+
 dnl Function to detect whether openssl/evp.h can be used in combination with zlib.h
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
  [AC_CACHE_CHECK(
@@ -21,13 +21,13 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE],
 dnl Function to detect if libcrypto (openssl) EVP functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP],
  [AC_CHECK_HEADERS([openssl/evp.h])
- 
+
  AS_IF(
   [test "x$ac_cv_header_openssl_evp_h" = xno],
   [ac_cv_libcrypto=no
   ac_cv_libcrypto_evp=no],
   [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_ZLIB_COMPATIBILE
- 
+
   AS_IF(
    [test "x$ac_cv_openssl_evp_zlib_compatible" = xyes],
    [ac_cv_libcrypto=yes
@@ -66,8 +66,13 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD],
   EVP_DigestFinal_ex,
   [ac_cv_libcrypto_dummy=yes],
   [ac_cv_libcrypto_evp_md=no])
+ AC_CHECK_LIB(
+  crypto,
+  ERR_remove_thread_state,
+  [ac_cv_libcrypto_dummy=yes],
+  [ac_cv_libcrypto_evp_md=no])
  ])
- 
+
 dnl Function to detect if openssl EVP MD5 functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD5],
  [AC_CHECK_LIB(
@@ -119,10 +124,27 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_SHA256],
   ])
  ])
 
+dnl Function to detect if openssl EVP SHA512 functions are available
+AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_SHA512],
+ [AC_CHECK_LIB(
+  crypto,
+  EVP_sha512,
+  [ac_cv_libcrypto_sha512=libcrypto_evp],
+  [ac_cv_libcrypto_sha512=no])
+
+ AS_IF(
+  [test "x$ac_cv_libcrypto_sha512" = xlibcrypto_evp],
+  [AC_DEFINE(
+   [HAVE_EVP_SHA512],
+   [1],
+   [Define to 1 if you have the `EVP_sha512' function".])
+  ])
+ ])
+
 dnl Function to detect if openssl MD5 functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_MD5],
  [AC_CHECK_HEADERS([openssl/md5.h])
- 
+
  AS_IF(
   [test "x$ac_cv_header_openssl_md5_h" = xno],
   [ac_cv_libcrypto_md5=no],
@@ -149,11 +171,11 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_MD5],
   [test "x$ac_cv_libcrypto" = xno && test "x$ac_cv_libcrypto_md5" = xlibcrypto],
   [ac_cv_libcrypto=yes])
  ])
- 
+
 dnl Function to detect if openssl SHA1 functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA1],
  [AC_CHECK_HEADERS([openssl/sha.h])
- 
+
  AS_IF(
   [test "x$ac_cv_header_openssl_sha_h" = xno],
   [ac_cv_libcrypto_sha1=no],
@@ -180,11 +202,11 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA1],
   [test "x$ac_cv_libcrypto" = xno && test "x$ac_cv_libcrypto_sha1" = xlibcrypto],
   [ac_cv_libcrypto=yes])
  ])
- 
+
 dnl Function to detect if openssl SHA256 functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA256],
  [AC_CHECK_HEADERS([openssl/sha.h])
- 
+
  AS_IF(
   [test "x$ac_cv_header_openssl_sha_h" = xno],
   [ac_cv_libcrypto_sha256=no],
@@ -209,6 +231,37 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA256],
 
  AS_IF(
   [test "x$ac_cv_libcrypto" = xno && test "x$ac_cv_libcrypto_sha256" = xlibcrypto],
+  [ac_cv_libcrypto=yes])
+ ])
+
+dnl Function to detect if openssl SHA512 functions are available
+AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_SHA512],
+ [AC_CHECK_HEADERS([openssl/sha.h])
+
+ AS_IF(
+  [test "x$ac_cv_header_openssl_sha_h" = xno],
+  [ac_cv_libcrypto_sha512=no],
+  [ac_cv_libcrypto_sha512=libcrypto
+
+  AC_CHECK_LIB(
+   crypto,
+   SHA512_Init,
+   [ac_cv_libcrypto_dummy=yes],
+   [ac_cv_libcrypto_sha512=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA512_Update,
+   [ac_cv_libcrypto_dummy=yes],
+   [ac_cv_libcrypto_sha512=no])
+  AC_CHECK_LIB(
+   crypto,
+   SHA512_Final,
+   [ac_cv_libcrypto_dummy=yes],
+   [ac_cv_libcrypto_sha512=no])
+  ])
+
+ AS_IF(
+  [test "x$ac_cv_libcrypto" = xno && test "x$ac_cv_libcrypto_sha512" = xlibcrypto],
   [ac_cv_libcrypto=yes])
  ])
 
@@ -248,12 +301,17 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_EVP_CIPHER],
   EVP_CipherFinal_ex,
   [ac_cv_libcrypto_dummy=yes],
   [ac_cv_libcrypto_evp_cipher=no])
+ AC_CHECK_LIB(
+  crypto,
+  ERR_remove_thread_state,
+  [ac_cv_libcrypto_dummy=yes],
+  [ac_cv_libcrypto_evp_cipher=no])
  ])
 
 dnl Function to detect if openssl AES functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_AES],
  [AC_CHECK_HEADERS([openssl/aes.h])
- 
+
  AS_IF(
   [test "x$ac_cv_header_openssl_aes_h" = xno],
   [ac_cv_libcrypto_aes=no],
@@ -279,10 +337,10 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_OPENSSL_AES],
   [test "x$ac_cv_libcrypto" = xno && test "x$ac_cv_libcrypto_aes" = xlibcrypto],
   [ac_cv_libcrypto=yes])
  ])
- 
+
 dnl Function to detect if libcrypto (openssl) dependencies are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
- [dnl Check if parameters were provided 
+ [dnl Check if parameters were provided
  AS_IF(
   [test "x$ac_cv_with_openssl" != x && test "x$ac_cv_with_openssl" != xno && test "x$ac_cv_with_openssl" != xauto-detect],
   [AS_IF(
@@ -336,14 +394,14 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
     [HAVE_OPENSSL_EVP_H],
     [0])
    ])
-  
+
   AS_IF(
    [test "x$ac_cv_libcrypto" != xno],
    [AC_DEFINE(
     [HAVE_LIBCRYPTO],
     [1],
     [Define to 1 if you have the 'crypto' library (-lcrypto).])
- 
+
    ac_cv_libcrypto_LIBADD="-lcrypto"
 
    dnl Enforce the dynamic loader library to be included if available
@@ -357,7 +415,7 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_LIB],
    ])
   ])
  ])
- 
+
 dnl Function to detect if libcrypto MD5 functions are available
 AC_DEFUN([AX_LIBCRYPTO_CHECK_MD5],
  [ac_cv_libcrypto_md5=no
@@ -416,6 +474,26 @@ AC_DEFUN([AX_LIBCRYPTO_CHECK_SHA256],
  AS_IF(
   [test "x$ac_cv_libcrypto_sha256" = xno],
   [AX_LIBCRYPTO_CHECK_OPENSSL_SHA256])
+ ])
+
+dnl Function to detect if libcrypto SHA512 functions are available
+AC_DEFUN([AX_LIBCRYPTO_CHECK_SHA512],
+ [ac_cv_libcrypto_sha512=no
+
+ dnl Check for libcrypto (openssl) EVP MD support
+ AS_IF(
+  [test "x$ac_cv_libcrypto_evp" = xyes && test "x$ac_cv_libcrypto_evp_md" != xyes],
+  [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_MD])
+
+ dnl Check for libcrypto (openssl) EVP SHA512 support
+ AS_IF(
+  [test "x$ac_cv_libcrypto_evp_md" = xyes],
+  [AX_LIBCRYPTO_CHECK_OPENSSL_EVP_SHA512])
+
+ dnl Check for libcrypto (openssl) SHA512 support
+ AS_IF(
+  [test "x$ac_cv_libcrypto_sha512" = xno],
+  [AX_LIBCRYPTO_CHECK_OPENSSL_SHA512])
  ])
 
 dnl Function to detect if libcrypto AES functions are available

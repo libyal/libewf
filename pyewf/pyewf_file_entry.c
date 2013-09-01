@@ -35,6 +35,7 @@
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 PyMethodDef pyewf_file_entry_object_methods[] = {
 
@@ -828,7 +829,8 @@ PyObject *pyewf_file_entry_seek_offset(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_offset(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -836,6 +838,8 @@ PyObject *pyewf_file_entry_get_offset(
 	static char *function    = "pyewf_file_entry_get_offset";
 	off64_t offset           = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -911,7 +915,8 @@ PyObject *pyewf_file_entry_get_offset(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_size(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -919,6 +924,8 @@ PyObject *pyewf_file_entry_get_size(
 	static char *function    = "pyewf_file_entry_get_size";
 	size64_t size            = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -994,7 +1001,8 @@ PyObject *pyewf_file_entry_get_size(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_creation_time(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1003,6 +1011,8 @@ PyObject *pyewf_file_entry_get_creation_time(
 	static char *function      = "pyewf_file_entry_get_creation_time";
 	uint32_t posix_time        = 0;
 	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1057,7 +1067,8 @@ PyObject *pyewf_file_entry_get_creation_time(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_creation_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1065,6 +1076,8 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
 	static char *function    = "pyewf_file_entry_get_creation_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1140,7 +1153,8 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_modification_time(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1149,6 +1163,8 @@ PyObject *pyewf_file_entry_get_modification_time(
 	static char *function      = "pyewf_file_entry_get_modification_time";
 	uint32_t posix_time        = 0;
 	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1203,7 +1219,8 @@ PyObject *pyewf_file_entry_get_modification_time(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_modification_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1211,6 +1228,8 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
 	static char *function    = "pyewf_file_entry_get_modification_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1286,7 +1305,8 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_access_time(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1295,6 +1315,8 @@ PyObject *pyewf_file_entry_get_access_time(
 	static char *function      = "pyewf_file_entry_get_access_time";
 	uint32_t posix_time        = 0;
 	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1349,7 +1371,8 @@ PyObject *pyewf_file_entry_get_access_time(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_access_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1357,6 +1380,8 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
 	static char *function    = "pyewf_file_entry_get_access_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1432,7 +1457,8 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_entry_modification_time(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1441,6 +1467,8 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 	static char *function      = "pyewf_file_entry_get_entry_modification_time";
 	uint32_t posix_time        = 0;
 	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1495,7 +1523,8 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1503,6 +1532,8 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
 	static char *function    = "pyewf_file_entry_get_entry_modification_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1578,7 +1609,8 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_name(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1589,6 +1621,8 @@ PyObject *pyewf_file_entry_get_name(
 	static char *function     = "pyewf_file_entry_get_name";
 	size_t name_size          = 0;
 	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1715,7 +1749,8 @@ on_error:
  * Returns a Python object holding the offset if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_hash_value_md5(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1726,6 +1761,8 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 	static char *function     = "pyewf_file_entry_get_hash_value_md5";
 	size_t hash_value_size    = 33;
 	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1810,7 +1847,8 @@ on_error:
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1818,6 +1856,8 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 	static char *function          = "pyewf_file_entry_get_number_of_sub_file_entries";
 	int number_of_sub_file_entries = 0;
 	int result                     = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{
@@ -1984,7 +2024,8 @@ PyObject *pyewf_file_entry_get_sub_file_entry(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entry_get_sub_file_entries(
-           pyewf_file_entry_t *pyewf_file_entry )
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1993,6 +2034,8 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
 	static char *function          = "pyewf_file_entry_get_sub_file_entries";
 	int number_of_sub_file_entries = 0;
 	int result                     = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_file_entry == NULL )
 	{

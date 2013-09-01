@@ -36,6 +36,7 @@
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 #if !defined( LIBEWF_HAVE_BFIO )
 LIBEWF_EXTERN \
@@ -97,11 +98,15 @@ PyMethodDef pyewf_module_methods[] = {
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_get_version(
-           PyObject *self )
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	const char *errors           = NULL;
 	const char *version_string   = NULL;
 	size_t version_string_length = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	Py_BEGIN_ALLOW_THREADS
 
@@ -126,7 +131,7 @@ PyObject *pyewf_get_version(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_check_file_signature(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
@@ -137,6 +142,8 @@ PyObject *pyewf_check_file_signature(
 	static char *keyword_list[] = { "filename", NULL };
 	const char *filename        = NULL;
 	int result                  = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -191,7 +198,7 @@ PyObject *pyewf_check_file_signature(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_check_file_signature_file_object(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
@@ -203,6 +210,8 @@ PyObject *pyewf_check_file_signature_file_object(
 	static char *function            = "pyewf_check_file_signature_file_object";
 	static char *keyword_list[]      = { "file_object", NULL };
 	int result                       = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
@@ -321,7 +330,7 @@ on_error:
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_glob(
-           PyObject *self,
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
            PyObject *arguments,
            PyObject *keywords )
 {
@@ -338,6 +347,8 @@ PyObject *pyewf_glob(
 	size_t filename_length      = 0;
 	int filename_index          = 0;
 	int number_of_filenames     = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,

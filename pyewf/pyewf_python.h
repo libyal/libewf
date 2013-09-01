@@ -32,6 +32,11 @@
  */
 #undef HAVE_FSTAT
 #undef HAVE_STAT
+#undef HAVE_SSIZE_T
+#undef HAVE_INT32_T
+#undef HAVE_UINT32_T
+#undef HAVE_INT64_T
+#undef HAVE_UINT64_T
 
 #include <Python.h>
 

@@ -1,5 +1,5 @@
 /*
- * Library seek testing program
+ * Expert Witness Compression Format (EWF) library seek offset testing program
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 
+#include "ewf_test_libcerror.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libewf.h"
 
@@ -34,24 +35,21 @@
 #define EWF_TEST_SEEK_VERBOSE
  */
 
-/* Tests libewf_handle_seek_offset
+/* Tests seeking an offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_seek_offset(
      libewf_handle_t *handle,
      off64_t input_offset,
      int input_whence,
-     off64_t output_offset )
+     off64_t expected_offset )
 {
-	libewf_error_t *error     = NULL;
+	libcerror_error_t *error  = NULL;
 	const char *whence_string = NULL;
+	static char *function     = "ewf_test_seek_offset";
 	off64_t result_offset     = 0;
 	int result                = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";
@@ -80,8 +78,28 @@ int ewf_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == output_offset )
+	if( result_offset != expected_offset )
 	{
+		if( result_offset == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset: %" PRIi64 ".",
+			 function,
+			 input_offset );
+
+			result = -1;
+		}
+	}
+	else
+	{
+		if( result_offset == -1 )
+		{
+			libcerror_error_free(
+			 &error );
+		}
 		result = 1;
 	}
 	if( result != 0 )
@@ -100,16 +118,22 @@ int ewf_test_seek_offset(
 	 stdout,
 	 "\n" );
 
-	if( error != NULL)
+	if( result == -1 )
 	{
-		if( result != 1 )
-		{
-			libewf_error_backtrace_fprint(
-			 error,
-			 stderr );
-		}
-		libewf_error_free(
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stdout );
+
+		libcerror_error_free(
 		 &error );
+	}
+	else if( result == 0 )
+	{
+		fprintf(
+		 stdout,
+		 "%s: unexpected result offset: %" PRIi64 "\n",
+		 function,
+		 result_offset );
 	}
 	return( result );
 }
@@ -122,15 +146,9 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	wchar_t **filenames     = NULL;
-#else
-	char **filenames        = NULL;
-#endif
-	libewf_error_t *error   = NULL;
-	libewf_handle_t *handle = NULL;
-	size64_t media_size     = 0;
-	int number_of_filenames = 0;
+	libcerror_error_t *error = NULL;
+	libewf_handle_t *handle  = NULL;
+	size64_t media_size      = 0;
 
 	if( argc < 2 )
 	{
@@ -147,48 +165,6 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libewf_glob_wide(
-	     argv[ 1 ],
-	     libcstring_wide_string_length(
-	      argv[ 1 ] ),
-	     LIBEWF_FORMAT_UNKNOWN,
-	     &filenames,
-	     &number_of_filenames,
-	     &error ) != 1 )
-#else
-	if( libewf_glob(
-	     argv[ 1 ],
-	     libcstring_narrow_string_length(
-	      argv[ 1 ] ),
-	     LIBEWF_FORMAT_UNKNOWN,
-	     &filenames,
-	     &number_of_filenames,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to glob filenames.\n" );
-
-		goto on_error;
-	}
-	if( number_of_filenames < 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Invalid number of filenames.\n" );
-
-		goto on_error;
-	}
-	else if( number_of_filenames == 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Missing filenames.\n" );
-
-		goto on_error;
-	}
 	/* Initialization
 	 */
 	if( libewf_handle_initialize(
@@ -204,15 +180,15 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,
-	     filenames,
-	     number_of_filenames,
+	     &( argv[ 1 ] ),
+	     argc - 1,
 	     LIBEWF_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     handle,
-	     filenames,
-	     number_of_filenames,
+	     &( argv[ 1 ] ),
+	     argc - 1,
 	     LIBEWF_OPEN_READ,
 	     &error ) != 1 )
 #endif
@@ -496,7 +472,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to close handle.\n" );
+		 "Unable to close file(s).\n" );
 
 		goto on_error;
 	}
@@ -507,24 +483,6 @@ int main( int argc, char * const argv[] )
 		fprintf(
 		 stderr,
 		 "Unable to free handle.\n" );
-
-		goto on_error;
-	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libewf_glob_wide_free(
-	     filenames,
-	     number_of_filenames,
-	     &error ) != 1 )
-#else
-	if( libewf_glob_free(
-	     filenames,
-	     number_of_filenames,
-	     &error ) != 1 )
-#endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free glob.\n" );
 
 		goto on_error;
 	}
@@ -547,20 +505,6 @@ on_error:
 		libewf_handle_free(
 		 &handle,
 		 NULL );
-	}
-	if( filenames != NULL )
-	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		libewf_glob_wide_free(
-		 filenames,
-		 number_of_filenames,
-		 NULL );
-#else
-		libewf_glob_free(
-		 filenames,
-		 number_of_filenames,
-		 NULL );
-#endif
 	}
 	return( EXIT_FAILURE );
 }

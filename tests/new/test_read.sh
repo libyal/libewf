@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ewfverify tool testing script
+# Library read testing script
 #
 # Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -40,53 +40,35 @@ list_contains()
 	return ${EXIT_FAILURE};
 }
 
-test_verify()
+test_read()
 { 
-	DIRNAME=$1;
-	INPUT_FILE=$2;
-	BASENAME=`basename ${INPUT_FILE}`;
+	echo "Testing read of input:" $*;
 
 	rm -rf tmp;
 	mkdir tmp;
 
-	${TEST_RUNNER} ${EWFVERIFY} -q ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
+	${TEST_RUNNER} ./${EWF_TEST_READ} $*;
 
 	RESULT=$?;
 
-	if test -f "input/.ewfverify/${DIRNAME}/${BASENAME}.log.gz";
-	then
-		zdiff "input/.ewfverify/${DIRNAME}/${BASENAME}.log.gz" "tmp/${BASENAME}.log";
-
-		RESULT=$?;
-	else
-		mv "tmp/${BASENAME}.log" "input/.ewfverify/${DIRNAME}";
-
-		gzip "input/.ewfverify/${DIRNAME}/${BASENAME}.log";
-	fi
-
 	rm -rf tmp;
 
-	echo -n "Testing ewfverify of input: ${INPUT_FILE} ";
+	echo "";
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
 	return ${RESULT};
 }
 
-EWFVERIFY="../ewftools/ewfverify";
+EWF_TEST_READ="ewf_test_read";
 
-if ! test -x ${EWFVERIFY};
+if ! test -x ${EWF_TEST_READ};
 then
-	EWFVERIFY="../ewftools/ewfverify.exe";
+	EWF_TEST_READ="ewf_test_read.exe";
+
 fi
 
-if ! test -x ${EWFVERIFY};
+if ! test -x ${EWF_TEST_READ};
 then
-	echo "Missing executable: ${EWFVERIFY}";
+	echo "Missing executable: ${EWF_TEST_READ}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -126,13 +108,9 @@ then
 else
 	IGNORELIST="";
 
-	if ! test -d "input/.ewfverify";
+	if test -f "input/.libewf/ignore";
 	then
-		mkdir "input/.ewfverify";
-	fi
-	if test -f "input/.ewfverify/ignore";
-	then
-		IGNORELIST=`cat input/.ewfverify/ignore | sed '/^#/d'`;
+		IGNORELIST=`cat input/.libewf/ignore | sed '/^#/d'`;
 	fi
 	for TESTDIR in input/*;
 	do
@@ -142,19 +120,15 @@ else
 
 			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
 			then
-				if ! test -d "input/.ewfverify/${DIRNAME}";
+				if test -f "input/.libewf/${DIRNAME}/files";
 				then
-					mkdir "input/.ewfverify/${DIRNAME}";
-				fi
-				if test -f "input/.ewfverify/${DIRNAME}/files";
-				then
-					TESTFILES=`cat input/.ewfverify/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
 					TESTFILES=`ls ${TESTDIR}/*`;
 				fi
 				for TESTFILE in ${TESTFILES};
 				do
-					if ! test_verify "${DIRNAME}" "${TESTFILE}";
+					if ! test_read "${TESTFILE}";
 					then
 						exit ${EXIT_FAILURE};
 					fi

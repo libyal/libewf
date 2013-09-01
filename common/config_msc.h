@@ -1,5 +1,5 @@
 /*
- * Configuration file for Microsoft Visual Studio C++ compiler
+ * Configuration for the Microsoft Visual Studio C++ compiler
  *
  * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -22,28 +22,6 @@
 #if !defined( _CONFIG_MSC_H )
 #define _CONFIG_MSC_H
 
-/* Define to the address where bug reports for this package should be sent.
- */
-#define PACKAGE_BUGREPORT "joachim.metz@gmail.com"
-
-/* Define the size of the wide character for WINAPI
- */
-#if !defined( SIZEOF_WCHAR_T )
-#define SIZEOF_WCHAR_T          2
-#endif
-
-/* Use the C Runtime (CRT) functions instead of the WINAPI functions
-#define USE_CRT_FUNCTIONS	1
- */
-
-/* Enable verbose output
-#define HAVE_VERBOSE_OUTPUT	1
- */
-
-/* Enable debug output
-#define HAVE_DEBUG_OUTPUT	1
- */
-
 /* Disable warning C4127: conditional expression is constant
  */
 #pragma warning( disable : 4127 )
@@ -51,10 +29,6 @@
 /* Disable warning C4201: nonstandard extension used : nameless struct/union
  */
 #pragma warning( disable : 4201 )
-
-/* Enable the v1 API
-#define HAVE_V1_API		1
- */
 
 #endif
 

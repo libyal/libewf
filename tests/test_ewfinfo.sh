@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ewfinfo testing script
+# ewfinfo tool testing script
 #
 # Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,21 +24,47 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
-INPUT_LOGICAL="input_logical";
-INPUT_OPTICAL="input_optical";
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-LS="ls";
-TR="tr";
-WC="wc";
+	for LINE in $LIST;
+	do
+		if test $LINE = $SEARCH;
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
 
 test_info()
 { 
-	INPUT_FILE=$1;
+	DIRNAME=$1;
+	INPUT_FILE=$2;
+	BASENAME=`basename ${INPUT_FILE}`;
 
-	${EWFINFO} ${INPUT_FILE};
+	rm -rf tmp;
+	mkdir tmp;
+
+	${TEST_RUNNER} ${EWFINFO} ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
 
 	RESULT=$?;
+
+	if test -f "input/.ewfinfo/${DIRNAME}/${BASENAME}.log.gz";
+	then
+		zdiff "input/.ewfinfo/${DIRNAME}/${BASENAME}.log.gz" "tmp/${BASENAME}.log";
+
+		RESULT=$?;
+	else
+		mv "tmp/${BASENAME}.log" "input/.ewfinfo/${DIRNAME}";
+
+		gzip "input/.ewfinfo/${DIRNAME}/${BASENAME}.log";
+	fi
+
+	rm -rf tmp;
 
 	echo -n "Testing ewfinfo of input: ${INPUT_FILE} ";
 
@@ -65,74 +91,82 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
 then
-	echo "No ${INPUT} directory found, to test ewfinfo create ${INPUT} directory and place EWF test files in directory.";
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test -d "input";
+then
+	echo "No input directory found.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-EXIT_RESULT=${EXIT_IGNORE};
+OLDIFS=${IFS};
+IFS="
+";
 
-if test -d ${INPUT};
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+if test ${RESULT} -eq 0;
 then
-	RESULT=`${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+	echo "No files or directories found in the input directory.";
 
-	if test ${RESULT} -eq 0;
+	EXIT_RESULT=${EXIT_IGNORE};
+else
+	IGNORELIST="";
+
+	if ! test -d "input/.ewfinfo";
 	then
-		echo "No files found in ${INPUT} directory, to test ewfinfo place EWF test files in directory.";
-	else
-		for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
-		do
-			if ! test_info "${FILENAME}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-
-		EXIT_RESULT=${EXIT_SUCCESS};
+		mkdir "input/.ewfinfo";
 	fi
+	if test -f "input/.ewfinfo/ignore";
+	then
+		IGNORELIST=`cat input/.ewfinfo/ignore | sed '/^#/d'`;
+	fi
+	for TESTDIR in input/*;
+	do
+		if test -d "${TESTDIR}";
+		then
+			DIRNAME=`basename ${TESTDIR}`;
+
+			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
+			then
+				if ! test -d "input/.ewfinfo/${DIRNAME}";
+				then
+					mkdir "input/.ewfinfo/${DIRNAME}";
+				fi
+				if test -f "input/.ewfinfo/${DIRNAME}/files";
+				then
+					TESTFILES=`cat input/.ewfinfo/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+				else
+					TESTFILES=`ls ${TESTDIR}/*`;
+				fi
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_info "${DIRNAME}" "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			fi
+		fi
+	done
+
+	EXIT_RESULT=${EXIT_SUCCESS};
 fi
 
-if test -d ${INPUT_LOGICAL};
-then
-	RESULT=`${LS} ${INPUT_LOGICAL}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
-
-	if test ${RESULT} -eq 0;
-	then
-		echo "No files found in ${INPUT_LOGICAL} directory, to test ewfinfo place EWF test files in directory.";
-	else
-		for FILENAME in `${LS} ${INPUT_LOGICAL}/*.[esE]01 | ${TR} ' ' '\n'`;
-		do
-			if ! test_info "${FILENAME}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-
-		EXIT_RESULT=${EXIT_SUCCESS};
-	fi
-fi
-
-if test -d ${INPUT_OPTICAL};
-then
-	RESULT=`${LS} ${INPUT_OPTICAL}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
-
-	if test ${RESULT} -eq 0;
-	then
-		echo "No files found in ${INPUT_OPTICAL} directory, to test ewfinfo place EWF test files in directory.";
-	else
-		for FILENAME in `${LS} ${INPUT_OPTICAL}/*.[esE]01 | ${TR} ' ' '\n'`;
-		do
-			if ! test_info "${FILENAME}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-
-		EXIT_RESULT=${EXIT_SUCCESS};
-	fi
-fi
+IFS=${OLDIFS};
 
 exit ${EXIT_RESULT};
 

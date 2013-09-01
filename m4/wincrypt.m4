@@ -1,6 +1,6 @@
 dnl Functions for wincrypt
 dnl
-dnl Version: 20111009
+dnl Version: 20130714
 
 dnl Function to detect whether a certain #define is present in a certain WINAPI header
 AC_DEFUN([AX_WINCRYPT_CHECK_WINAPI_DEFINE],
@@ -29,7 +29,7 @@ AC_DEFUN([AX_WINCRYPT_CHECK_LIB],
   [],
   [],
   [#include <windows.h>])
- 
+
  AS_IF(
   [test "x$ac_cv_header_wincrypt" = xno],
   [ac_cv_wincrypt=no],
@@ -39,40 +39,52 @@ AC_DEFUN([AX_WINCRYPT_CHECK_LIB],
 
   ac_cv_wincrypt=libadvapi32])
  ])
- 
+
 dnl Function to detect if wincrypt MD5 functions are available
 AC_DEFUN([AX_WINCRYPT_CHECK_MD5],
  [AX_WINCRYPT_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_MD5])
- 
+
  AS_IF(
   [test "x$ac_cv_winapi_define_CALG_MD5" = xyes],
   [ac_cv_wincrypt_md5=libadvapi32],
   [ac_cv_wincrypt_md5=local])
  ])
- 
+
 dnl Function to detect if wincrypt SHA1 functions are available
 AC_DEFUN([AX_WINCRYPT_CHECK_SHA1],
  [AX_WINCRYPT_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_SHA1])
- 
+
  AS_IF(
   [test "x$ac_cv_winapi_define_CALG_SHA1" = xyes],
   [ac_cv_wincrypt_sha1=libadvapi32],
   [ac_cv_wincrypt_sha1=local])
  ])
- 
+
 dnl Function to detect if wincrypt SHA256 functions are available
 AC_DEFUN([AX_WINCRYPT_CHECK_SHA256],
  [AX_WINCRYPT_CHECK_WINAPI_DEFINE(
   [wincrypt.h],
   [CALG_SHA_256])
- 
+
  AS_IF(
   [test "x$ac_cv_winapi_define_CALG_SHA_256" = xyes],
   [ac_cv_wincrypt_sha256=libadvapi32],
   [ac_cv_wincrypt_sha256=local])
  ])
- 
+
+dnl Function to detect if wincrypt SHA512 functions are available
+AC_DEFUN([AX_WINCRYPT_CHECK_SHA512],
+ [AX_WINCRYPT_CHECK_WINAPI_DEFINE(
+  [wincrypt.h],
+  [CALG_SHA_512])
+
+ AS_IF(
+  [test "x$ac_cv_winapi_define_CALG_SHA_512" = xyes],
+  [ac_cv_wincrypt_sha512=libadvapi32],
+  [ac_cv_wincrypt_sha512=local])
+ ])
+

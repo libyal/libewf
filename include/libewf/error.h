@@ -87,9 +87,6 @@ enum LIBEWF_ARGUMENT_ERROR
 	LIBEWF_ARGUMENT_ERROR_CONFLICTING_VALUE		= 9
 };
 
-/* TODO deprecated remove after a while */
-#define LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE	LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS
-
 /* The conversion error codes
  * to signify errors regarding conversions
  */
@@ -121,9 +118,6 @@ enum LIBEWF_COMPRESSION_ERROR
 	 */
 	LIBEWF_COMPRESSION_ERROR_DECOMPRESS_FAILED	= 2
 };
-
-/* TODO deprecated remove after a while */
-#define LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED	LIBERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED
 
 /* The input/output error codes
  * to signify errors regarding input/output
@@ -193,9 +187,6 @@ enum LIBEWF_INPUT_ERROR
 	 */
 	LIBEWF_INPUT_ERROR_VALUE_MISMATCH		= 4
 };
-
-/* TODO deprecated remove after a while */
-#define LIBEWF_INPUT_ERROR_CRC_MISMATCH			LIBEWF_INPUT_ERROR_CHECKSUM_MISMATCH
 
 /* The memory error codes
  * to signify errors regarding memory
@@ -284,9 +275,6 @@ enum LIBEWF_RUNTIME_ERROR
 	 */
 	LIBEWF_RUNTIME_ERROR_ABORT_REQUESTED		= 15
 };
-
-/* TODO deprecated remove after a while */
-#define LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS
 
 /* The output error codes
  */

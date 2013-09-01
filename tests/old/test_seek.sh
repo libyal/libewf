@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library read/write testing script
+# Expert Witness Compression Format (EWF) library seek offset testing script
 #
 # Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -27,6 +27,7 @@ EXIT_IGNORE=77;
 INPUT="input_old";
 TMP="tmp";
 
+CMP="cmp";
 LS="ls";
 TR="tr";
 SED="sed";
@@ -34,40 +35,36 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-test_read_write()
+test_seek()
 { 
-	echo "Testing read/write of input:" $*;
+	echo "Testing seek offset of input:" $*;
 
-	mkdir ${TMP};
-
-	./${EWF_TEST_READ_WRITE} -t ${TMP}/read_write $*;
+	./${EWF_TEST_SEEK} $*;
 
 	RESULT=$?;
-
-	rm -rf ${TMP};
 
 	echo "";
 
 	return ${RESULT};
 }
 
-EWF_TEST_READ_WRITE="ewf_test_read_write";
+EWF_TEST_SEEK="ewf_test_seek";
 
-if ! test -x ${EWF_TEST_READ_WRITE};
+if ! test -x ${EWF_TEST_SEEK};
 then
-	EWF_TEST_READ_WRITE="ewf_test_read_write.exe";
+	EWF_TEST_SEEK="ewf_test_seek.exe";
 fi
 
-if ! test -x ${EWF_TEST_READ_WRITE};
+if ! test -x ${EWF_TEST_SEEK};
 then
-	echo "Missing executable: ${EWF_TEST_READ_WRITE}";
+	echo "Missing executable: ${EWF_TEST_SEEK}";
 
 	exit ${EXIT_FAILURE};
 fi
 
 if ! test -d ${INPUT};
 then
-	echo "No ${INPUT} directory found, to test read/write create ${INPUT} directory and place EWF test files in directory.";
+	echo "No ${INPUT} directory found, to test seek create ${INPUT} directory and place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -77,7 +74,7 @@ RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${U
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in ${INPUT} directory, to test read/write place EWF test files in directory.";
+	echo "No files found in ${INPUT} directory, to test seek place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -88,9 +85,7 @@ BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SO
 
 for BASENAME in ${BASENAMES};
 do
-	FILENAMES=`${LS} ${BASENAME}.??? | ${TR} '\n' ' '`;
-
-	if ! test_read_write ${FILENAMES};
+	if ! test_seek `${LS} ${BASENAME}.???`;
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -101,9 +96,7 @@ BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${S
 
 for BASENAME in ${BASENAMES};
 do
-	FILENAMES=`${LS} ${BASENAME}.???? | ${TR} '\n' ' '`;
-
-	if ! test_read_write ${FILENAMES};
+	if ! test_seek `${LS} ${BASENAME}.????`;
 	then
 		exit ${EXIT_FAILURE};
 	fi

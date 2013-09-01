@@ -19,6 +19,7 @@ MSVSCPP_FILES = \
 	libcsplit/libcsplit.vcproj \
 	libcstring/libcstring.vcproj \
 	libcsystem/libcsystem.vcproj \
+	libcthreads/libcthreads.vcproj \
 	libewf_dll/libewf_dll.vcproj \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \

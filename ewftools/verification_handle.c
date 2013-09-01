@@ -213,11 +213,6 @@ on_error:
 			memory_free(
 			 ( *verification_handle )->stored_sha1_hash_string );
 		}
-		if( ( *verification_handle )->calculated_sha1_hash_string != NULL )
-		{
-			memory_free(
-			 ( *verification_handle )->calculated_sha1_hash_string );
-		}
 		if( ( *verification_handle )->stored_md5_hash_string != NULL )
 		{
 			memory_free(
@@ -2535,7 +2530,7 @@ int verification_handle_verify_sub_file_entries(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to verification sub file entry: %d.",
+			 "%s: unable to verify sub file entry: %d.",
 			 function,
 			 sub_file_entry_index );
 

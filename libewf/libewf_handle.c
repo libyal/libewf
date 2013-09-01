@@ -1726,6 +1726,9 @@ int libewf_handle_open_file_io_pool(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+/* TODO what about segment table and delta segment tables ?
+ * They should be created here or in initialize ?
+ */
 	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -4703,6 +4706,7 @@ int libewf_handle_close(
 
 		result = -1;
 	}
+/* TODO clear IO handle, segment tables */
 	return( result );
 }
 
@@ -5012,8 +5016,8 @@ ssize_t libewf_handle_read_chunk(
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to read chunk: %" PRIu64 " data.",
 		 function,
 		 chunk_index );
@@ -5273,8 +5277,8 @@ ssize_t libewf_handle_read_buffer(
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to read chunk: %" PRIu64 " data.",
 			 function,
 			 chunk_index );
@@ -6353,8 +6357,8 @@ ssize_t libewf_handle_write_buffer(
 				{
 					libcerror_error_set(
 					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 					 "%s: unable to read chunk: %" PRIu64 " data.",
 					 function,
 					 chunk_index );

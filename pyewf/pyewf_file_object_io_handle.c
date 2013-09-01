@@ -891,7 +891,11 @@ int pyewf_file_object_seek_offset(
 
 		return( -1 );
 	}
+#if defined( HAVE_LONG_LONG )
 	if( offset > (off64_t) INT64_MAX )
+#else
+	if( offset > (off64_t) LONG_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -918,9 +922,13 @@ int pyewf_file_object_seek_offset(
 	method_name = PyString_FromString(
 	               "seek" );
 
+#if defined( HAVE_LONG_LONG )
 	argument_offset = PyLong_FromLongLong(
 	                   (PY_LONG_LONG) offset );
-
+#else
+	argument_offset = PyLong_FromLongLong(
+	                   (long) offset );
+#endif
 	argument_whence = PyInt_FromLong(
 	                   (long) whence );
 
@@ -1025,7 +1033,11 @@ int pyewf_file_object_get_offset(
 	PyObject *method_result       = NULL;
 	char *error_string            = NULL;
 	static char *function         = "pyewf_file_object_get_offset";
+#if defined( HAVE_LONG_LONG )
 	PY_LONG_LONG safe_offset      = 0;
+#else
+	long safe_offset              = 0;
+#endif
 	int result                    = 0;
 
 	if( file_object == NULL )
@@ -1117,9 +1129,13 @@ int pyewf_file_object_get_offset(
 	}
 	PyErr_Clear();
 
+#if defined( HAVE_LONG_LONG )
+	safe_offset = PyLong_AsLongLong(
+	               method_result );
+#else
 	safe_offset = PyLong_AsLong(
 	               method_result );
-
+#endif
 	if( safe_offset == -1 )
 	{
 		PyErr_Fetch(
@@ -1157,7 +1173,11 @@ int pyewf_file_object_get_offset(
 
 		goto on_error;
 	}
+#if defined( HAVE_LONG_LONG )
 	if( safe_offset > (PY_LONG_LONG) INT64_MAX )
+#else
+	if( (off64_t) safe_offset > (off64_t) INT64_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1338,7 +1358,11 @@ int pyewf_file_object_get_size(
 	PyObject *method_result       = NULL;
 	char *error_string            = NULL;
 	static char *function         = "pyewf_file_object_get_size";
+#if defined( HAVE_LONG_LONG )
 	PY_LONG_LONG safe_size        = 0;
+#else
+	long safe_size                = 0;
+#endif
 
 	if( file_object == NULL )
 	{
@@ -1411,9 +1435,13 @@ int pyewf_file_object_get_size(
 	}
 	PyErr_Clear();
 
+#if defined( HAVE_LONG_LONG )
+	safe_size = PyLong_AsUnsignedLongLong(
+	             method_result );
+#else
 	safe_size = PyLong_AsUnsignedLong(
 	             method_result );
-
+#endif
 	if( safe_size == -1 )
 	{
 		PyErr_Fetch(
@@ -1451,7 +1479,11 @@ int pyewf_file_object_get_size(
 
 		goto on_error;
 	}
+#if defined( HAVE_LONG_LONG )
 	if( safe_size > (PY_LONG_LONG) INT64_MAX )
+#else
+	if( (size64_t) safe_size > (size64_t) INT64_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,

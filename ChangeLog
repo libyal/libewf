@@ -1,4 +1,8 @@
 TODO
+* Finish migrating tests to test_runner
+  - fix input/logical/encase7.04.01.L01
+  - fix input/test/empty.E01
+* fix allocation of segment tables
 * fix last_chunk_data_offset calculation for table2
   in combination with libewf_chunk_group_correct_v1
 * fix read of chunk groups in segment file on demand
@@ -380,6 +384,8 @@ Tools:
 * libsystem path implement GetVolumeInformation
 
 Tests
+* move to new set-up with test_runner
+  - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
 * ewfexport: export of split RAW
@@ -419,6 +425,15 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20130901
+* updated depencies
+* worked on pyewf
+* worked on tests
+
+20130831
+* updated depencies
+* replaced libcmulti by libcthreads
 
 20130411
 * changes for libmfdata and libfdata merge

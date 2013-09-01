@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Library glob testing script
+# Expert Witness Compression Format (EWF) library glob testing script
 #
 # Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -23,6 +23,11 @@
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
+
+TMP="tmp";
+
+CMP="cmp";
+EGREP="egrep";
 
 chr()
 {
@@ -58,28 +63,27 @@ test_glob()
 	SCHEMA=$2;
 	FILENAMES=$3;
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	mkdir ${TMP};
+	cd ${TMP};
 
-	rm -rf tmp;
-	mkdir tmp;
-
-	echo ${FILENAMES} > tmp/input;
+	echo ${FILENAMES} > input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	../${EWF_TEST_GLOB} ${BASENAME} > output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! ${CMP} -s input output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	cd ..;
+	rm -rf ${TMP};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -99,7 +103,7 @@ test_glob_sequence3()
 	FILENAME=$3;
 	LAST=$4;
 
-	RESULT=`echo ${SCHEMA} | egrep "^[.][esEL]01$"`;
+	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][esEL]01$"`;
 	IS_VALID=$?;
 
 	if [ ${IS_VALID} -ne 0 ];
@@ -109,7 +113,7 @@ test_glob_sequence3()
 		exit ${EXIT_FAILURE};
 	fi
 
-	RESULT=`echo ${LAST} | egrep "^[e-zE-Z][0-9a-zA-Z][0-9a-zA-Z]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^[e-zE-Z][0-9a-zA-Z][0-9a-zA-Z]$"`;
 	IS_VALID=$?;
 
 	if [ ${IS_VALID} -ne 0 ];
@@ -121,7 +125,7 @@ test_glob_sequence3()
 
 	FIRST_LETTER=`echo ${SCHEMA} | cut -c 2`;
 
-	RESULT=`echo ${LAST} | egrep "^${FIRST_LETTER}[0-9][0-9]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^${FIRST_LETTER}[0-9][0-9]$"`;
 	LAST_IS_NUMERIC=$?;
 
 	if [ ${LAST_IS_NUMERIC} -eq 0 ];
@@ -137,7 +141,7 @@ test_glob_sequence3()
 
 	if [ ${LAST_IS_NUMERIC} -ne 0 ];
 	then
-		RESULT=`echo ${LAST} | egrep "^[A-Z][A-Z][A-Z]$"`;
+		RESULT=`echo ${LAST} | ${EGREP} "^[A-Z][A-Z][A-Z]$"`;
 		IS_UPPER_CASE=$?;
 
 		SECOND_ITERATOR=0;
@@ -224,28 +228,27 @@ test_glob_sequence3()
 		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
 	fi
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	mkdir ${TMP};
+	cd ${TMP};
 
-	rm -rf tmp;
-	mkdir tmp;
-
-	echo ${FILENAMES} > tmp/input;
+	echo ${FILENAMES} > input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	../${EWF_TEST_GLOB} ${BASENAME} > output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! ${CMP} -s input output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	cd ..;
+	rm -rf ${TMP};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -265,7 +268,7 @@ test_glob_sequence4()
 	FILENAME=$3;
 	LAST=$4;
 
-	RESULT=`echo ${SCHEMA} | egrep "^[.][EL]x01$"`;
+	RESULT=`echo ${SCHEMA} | ${EGREP} "^[.][EL]x01$"`;
 	IS_VALID=$?;
 
 	if [ ${IS_VALID} -ne 0 ];
@@ -275,7 +278,7 @@ test_glob_sequence4()
 		exit ${EXIT_FAILURE};
 	fi
 
-	RESULT=`echo ${LAST} | egrep "^[EL][x-z][0-9A-Z][0-9A-Z]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^[EL][x-z][0-9A-Z][0-9A-Z]$"`;
 	IS_VALID=$?;
 
 	if [ ${IS_VALID} -ne 0 ];
@@ -288,7 +291,7 @@ test_glob_sequence4()
 	FIRST_LETTER=`echo ${SCHEMA} | cut -c 2`;
 	SECOND_LETTER=`echo ${SCHEMA} | cut -c 3`;
 
-	RESULT=`echo ${LAST} | egrep "^${FIRST_LETTER}${SECOND_LETTER}[0-9][0-9]$"`;
+	RESULT=`echo ${LAST} | ${EGREP} "^${FIRST_LETTER}${SECOND_LETTER}[0-9][0-9]$"`;
 	LAST_IS_NUMERIC=$?;
 
 	if [ ${LAST_IS_NUMERIC} -eq 0 ];
@@ -357,28 +360,27 @@ test_glob_sequence4()
 		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
 	fi
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	mkdir ${TMP};
+	cd ${TMP};
 
-	rm -rf tmp;
-	mkdir tmp;
-
-	echo ${FILENAMES} > tmp/input;
+	echo ${FILENAMES} > input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	../${EWF_TEST_GLOB} ${BASENAME} > output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! ${CMP} -s input output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	cd ..;
+	rm -rf ${TMP};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -395,24 +397,17 @@ EWF_TEST_GLOB="ewf_test_glob";
 
 if ! test -x ${EWF_TEST_GLOB};
 then
+	EWF_TEST_GLOB="ewf_test_glob.exe";
+fi
+
+if ! test -x ${EWF_TEST_GLOB};
+then
 	echo "Missing executable: ${EWF_TEST_GLOB}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-TEST_RUNNER="tests/test_runner.sh";
-
-if ! test -x ${TEST_RUNNER};
-then
-	TEST_RUNNER="./test_runner.sh";
-fi
-
-if ! test -x ${TEST_RUNNER};
-then
-	echo "Missing test runner: ${TEST_RUNNER}";
-
-	exit ${EXIT_FAILURE};
-fi
+rm -rf ${TMP};
 
 # .e01
 

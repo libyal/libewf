@@ -36,6 +36,7 @@
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
+#include "pyewf_unused.h"
 
 PyMethodDef pyewf_handle_object_methods[] = {
 
@@ -204,7 +205,7 @@ PyGetSetDef pyewf_handle_object_get_set_definitions[] = {
 
 	{ "header_codepage",
 	  (getter) pyewf_handle_get_header_codepage,
-	  (setter) pyewf_handle_set_header_codepage,
+	  (setter) pyewf_handle_set_header_codepage_setter,
 	  "The codepage used for header strings.",
 	  NULL },
 
@@ -520,13 +521,16 @@ void pyewf_handle_free(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_signal_abort(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyewf_handle_signal_abort";
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -830,13 +834,16 @@ on_error:
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_close(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyewf_handle_close";
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -1386,7 +1393,8 @@ PyObject *pyewf_handle_seek_offset(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_offset(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1394,6 +1402,8 @@ PyObject *pyewf_handle_get_offset(
 	static char *function    = "pyewf_handle_get_offset";
 	off64_t offset           = 0;
 	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{
@@ -1469,7 +1479,8 @@ PyObject *pyewf_handle_get_offset(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_root_file_entry(
-           pyewf_handle_t *pyewf_handle )
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
 	char error_string[ PYEWF_ERROR_STRING_SIZE ];
 
@@ -1478,6 +1489,8 @@ PyObject *pyewf_handle_get_root_file_entry(
 	PyObject *file_entry_object          = NULL;
 	static char *function                = "pyewf_handle_get_root_file_entry";
 	int result                           = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyewf_handle == NULL )
 	{

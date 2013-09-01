@@ -26,7 +26,7 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 
-/* Converts the EWF digest hash to a printable string
+/* Converts the digest hash to a printable string
  * Returns 1 if successful or -1 on error
  */
 int digest_hash_copy_to_string(

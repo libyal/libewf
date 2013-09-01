@@ -28,7 +28,8 @@ pyewf_la_SOURCES = \
 	pyewf_libcstring.h \
 	pyewf_libewf.h \
 	pyewf_metadata.c pyewf_metadata.h \
-	pyewf_python.h
+	pyewf_python.h \
+	pyewf_unused.h
 
 pyewf_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \

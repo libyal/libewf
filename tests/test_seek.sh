@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library seek offset testing script
+# Library seek testing script
 #
 # Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,24 +24,34 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input";
-TMP="tmp";
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-CMP="cmp";
-LS="ls";
-TR="tr";
-SED="sed";
-SORT="sort";
-UNIQ="uniq";
-WC="wc";
+	for LINE in $LIST;
+	do
+		if test $LINE = $SEARCH;
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
 
 test_seek()
 { 
 	echo "Testing seek offset of input:" $*;
 
-	./${EWF_TEST_SEEK} $*;
+	rm -rf tmp;
+	mkdir tmp;
+
+	${TEST_RUNNER} ./${EWF_TEST_SEEK} $*;
 
 	RESULT=$?;
+
+	rm -rf tmp;
 
 	echo "";
 
@@ -62,45 +72,74 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
 then
-	echo "No ${INPUT} directory found, to test seek create ${INPUT} directory and place EWF test files in directory.";
-	echo "Use unique filename bases per set of EWF image file(s)."
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test -d "input";
+then
+	echo "No input directory found.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ} | ${WC} -l`;
+OLDIFS=${IFS};
+IFS="
+";
+
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in ${INPUT} directory, to test seek place EWF test files in directory.";
-	echo "Use unique filename bases per set of EWF image file(s)."
+	echo "No files or directories found in the input directory.";
 
-	exit ${EXIT_IGNORE};
+	EXIT_RESULT=${EXIT_IGNORE};
+else
+	IGNORELIST="";
+
+	if test -f "input/.libewf/ignore";
+	then
+		IGNORELIST=`cat input/.libewf/ignore | sed '/^#/d'`;
+	fi
+	for TESTDIR in input/*;
+	do
+		if test -d "${TESTDIR}";
+		then
+			DIRNAME=`basename ${TESTDIR}`;
+
+			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
+			then
+				if test -f "input/.libewf/${DIRNAME}/files";
+				then
+					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+				else
+					TESTFILES=`ls ${TESTDIR}/*`;
+				fi
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_seek "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			fi
+		fi
+	done
+
+	EXIT_RESULT=${EXIT_SUCCESS};
 fi
 
-# Run tests for: E01, e01, s01
-BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
+IFS=${OLDIFS};
 
-for BASENAME in ${BASENAMES};
-do
-	if ! test_seek `${LS} ${BASENAME}.???`;
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
-
-# Run tests for: Ex01
-BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-
-for BASENAME in ${BASENAMES};
-do
-	if ! test_seek `${LS} ${BASENAME}.????`;
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
-
-exit ${EXIT_SUCCESS};
+exit ${EXIT_RESULT};
 
