@@ -1028,34 +1028,14 @@ int info_handle_section_value_size_fprint(
 
 		return( -1 );
 	}
-	result = byte_size_string_create(
-	          value_size_string,
-	          16,
-	          value_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-	          NULL );
-
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
-		if( result == 1 )
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)</%s>\n",
-			 identifier,
-			 value_size_string,
-			 value_size,
-			 identifier );
-		}
-		else
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\t\t\t<%s>%" PRIu64 " bytes</%s>\n",
-			 identifier,
-			 value_size,
-			 identifier );
-		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>%" PRIu64 "</%s>\n",
+		 identifier,
+		 value_size,
+		 identifier );
 	}
 	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 	{
@@ -1074,6 +1054,13 @@ int info_handle_section_value_size_fprint(
 
 			description_length += 8;
 		}
+		result = byte_size_string_create(
+		          value_size_string,
+		          16,
+		          value_size,
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          NULL );
+
 		if( result == 1 )
 		{
 			fprintf(

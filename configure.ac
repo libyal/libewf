@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20130831],
+ [20131210],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -355,7 +355,6 @@ AC_CONFIG_FILES([manuals/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([examples/Makefile])
 AC_CONFIG_FILES([macosx/Makefile])
-AC_CONFIG_FILES([borlandc/Makefile])
 AC_CONFIG_FILES([msvscpp/Makefile])
 dnl Have configure make the include files
 AC_CONFIG_FILES([include/libewf.h])

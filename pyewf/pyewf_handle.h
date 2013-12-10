@@ -58,7 +58,10 @@ PyObject *pyewf_handle_new_open(
            PyObject *arguments,
            PyObject *keywords );
 
-/* TODO new open file pool - list of file objects */
+PyObject *pyewf_file_new_open_file_objects(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
 
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle );
@@ -71,6 +74,11 @@ PyObject *pyewf_handle_signal_abort(
            PyObject *arguments );
 
 PyObject *pyewf_handle_open(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyewf_handle_open_file_objects(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );

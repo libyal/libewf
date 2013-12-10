@@ -1,5 +1,6 @@
 MSVSCPP_FILES = \
 	bzip2_dll/bzip2_dll.vcproj \
+	dokan_dll/dokan_dll.vcproj \
 	ewfacquire/ewfacquire.vcproj \
 	ewfacquirestream/ewfacquirestream.vcproj \
 	ewfexport/ewfexport.vcproj \

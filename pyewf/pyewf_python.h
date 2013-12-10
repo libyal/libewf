@@ -27,6 +27,7 @@
 /* Fix defines in pyconfig.h
  */
 #undef _POSIX_C_SOURCE
+#undef _XOPEN_SOURCE
 
 /* Fix defines in pyport.h
  */

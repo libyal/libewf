@@ -1,7 +1,6 @@
 /*
- * Python bindings for libewf (pyewf)
+ * Error functions
  *
- * Copyright (c) 2008, David Collett <david.collett@gmail.com>
  * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
@@ -20,39 +19,27 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYEWF_H )
-#define _PYEWF_H
+#if !defined( _PYEWF_ERROR_H )
+#define _PYEWF_ERROR_H
 
 #include <common.h>
 #include <types.h>
 
+#include "pyewf_libcerror.h"
 #include "pyewf_python.h"
+
+#define PYEWF_ERROR_FORMAT_STRING_SIZE		128
+#define PYEWF_ERROR_STRING_SIZE			512
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-PyObject *pyewf_get_version(
-           PyObject *self,
-           PyObject *arguments );
-
-PyObject *pyewf_check_file_signature(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyewf_check_file_signature_file_object(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyewf_glob(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyMODINIT_FUNC initpyewf(
-                void );
+void pyewf_error_raise(
+      PyObject *exception_object,
+      const char *format_string,
+      const char *function,
+      libcerror_error_t *error );
 
 #if defined( __cplusplus )
 }

@@ -114,7 +114,13 @@ int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
      const libcstring_system_character_t *path,
      size_t path_length,
+     libcstring_system_character_t path_separator,
      libewf_file_entry_t **file_entry,
+     libcerror_error_t **error );
+
+int mount_handle_get_number_of_input_handles(
+     mount_handle_t *mount_handle,
+     int *number_of_input_handles,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

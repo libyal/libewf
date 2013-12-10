@@ -1,4 +1,6 @@
 TODO
+* fix python bindings open file objects - segment table not being initialized
+* update msvscpp files
 * Finish migrating tests to test_runner
   - fix input/logical/encase7.04.01.L01
   - fix input/test/empty.E01
@@ -59,7 +61,6 @@ TODO
   - setup.py: non Windows support
 * ewftools: rename argv_filenames to source_filenames (see libvmdk)
 * add bzip2 compression support
-* complete work on ewfmount dokan support
 
 * add support for set identifier change ?
 * check alignment of:
@@ -389,6 +390,7 @@ Tests
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
 * ewfexport: export of split RAW
+* ewfinfo: DFXML output
 * implement pyewf tests
 * write resume from volume/disk section - basically re-image
 
@@ -426,13 +428,20 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20131210
+* updated dependencies
+* worked on Python bindings
+* fix in DFXML output for size values
+* removed codegear project files
+* worked on ewfmount
+
 20130901
-* updated depencies
-* worked on pyewf
+* updated dependencies
+* worked on Python bindings
 * worked on tests
 
 20130831
-* updated depencies
+* updated dependencies
 * replaced libcmulti by libcthreads
 
 20130411
@@ -510,7 +519,7 @@ Closed:
 
 20130119
 * 2013 update
-* updated pyewf
+* updated Python bindings
 * added pyewf/setup.py with thanks to Michael Cohen
 
 20130105

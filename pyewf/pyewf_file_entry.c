@@ -28,8 +28,10 @@
 
 #include "pyewf.h"
 #include "pyewf_datetime.h"
+#include "pyewf_error.h"
 #include "pyewf_file_entries.h"
 #include "pyewf_file_entry.h"
+#include "pyewf_integer.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
@@ -65,7 +67,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_offset",
 	  (PyCFunction) pyewf_file_entry_get_offset,
 	  METH_NOARGS,
-	  "get_offset() -> Long\n"
+	  "get_offset() -> Integer\n"
 	  "\n"
 	  "Returns the current offset within the file entry data." },
 
@@ -88,7 +90,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "tell",
 	  (PyCFunction) pyewf_file_entry_get_offset,
 	  METH_NOARGS,
-	  "tell() -> Long\n"
+	  "tell() -> Integer\n"
 	  "\n"
 	  "Returns the current offset within the file entry data." },
 
@@ -97,7 +99,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_size",
 	  (PyCFunction) pyewf_file_entry_get_size,
 	  METH_NOARGS,
-	  "get_size() -> Long\n"
+	  "get_size() -> Integer\n"
 	  "\n"
 	  "Returns the size of the file entry data." },
 
@@ -111,7 +113,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_creation_time_as_integer",
 	  (PyCFunction) pyewf_file_entry_get_creation_time_as_integer,
 	  METH_NOARGS,
-	  "get_creation_time_as_integer() -> Long\n"
+	  "get_creation_time_as_integer() -> Integer\n"
 	  "\n"
 	  "Returns the creation date and time as a 32-bit integer containing a POSIX timestamp value." },
 
@@ -125,7 +127,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_modification_time_as_integer",
 	  (PyCFunction) pyewf_file_entry_get_modification_time_as_integer,
 	  METH_NOARGS,
-	  "get_modification_time_as_integer() -> Long\n"
+	  "get_modification_time_as_integer() -> Integer\n"
 	  "\n"
 	  "Returns the modification date and time as a 32-bit integer containing a POSIX timestamp value." },
 
@@ -139,7 +141,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_access_time_as_integer",
 	  (PyCFunction) pyewf_file_entry_get_access_time_as_integer,
 	  METH_NOARGS,
-	  "get_access_time_as_integer() -> Long\n"
+	  "get_access_time_as_integer() -> Integer\n"
 	  "\n"
 	  "Returns the access date and time as a 32-bit integer containing a POSIX timestamp value." },
 
@@ -153,7 +155,7 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	{ "get_entry_modification_time_as_integer",
 	  (PyCFunction) pyewf_file_entry_get_entry_modification_time_as_integer,
 	  METH_NOARGS,
-	  "get_entry_modification_time_as_integer() -> Long\n"
+	  "get_entry_modification_time_as_integer() -> Integer\n"
 	  "\n"
 	  "Returns the entry modification date and time as a 32-bit integer containing a POSIX timestamp value." },
 
@@ -170,6 +172,13 @@ PyMethodDef pyewf_file_entry_object_methods[] = {
 	  "get_hash_value_md5() -> Unicode string or None\n"
 	  "\n"
 	  "Retrieves the MD5 hash of the file entry data." },
+
+	{ "get_hash_value_sha1",
+	  (PyCFunction) pyewf_file_entry_get_hash_value_sha1,
+	  METH_NOARGS,
+	  "get_hash_value_sha1() -> Unicode string or None\n"
+	  "\n"
+	  "Retrieves the SHA1 hash of the file entry data." },
 
 	/* Functions to access the sub file entries */
 
@@ -233,6 +242,12 @@ PyGetSetDef pyewf_file_entry_object_get_set_definitions[] = {
 	  (getter) pyewf_file_entry_get_hash_value_md5,
 	  (setter) 0,
 	  "The MD5 hash of the file entry data.",
+	  NULL },
+
+	{ "sha1_hash_value",
+	  (getter) pyewf_file_entry_get_hash_value_sha1,
+	  (setter) 0,
+	  "The SHA1 hash of the file entry data.",
 	  NULL },
 
 	{ "number_of_sub_file_entries",
@@ -430,8 +445,6 @@ int pyewf_file_entry_init(
 void pyewf_file_entry_free(
       pyewf_file_entry_t *pyewf_file_entry )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
 	static char *function    = "pyewf_file_entry_free";
 	int result               = 0;
@@ -482,24 +495,12 @@ void pyewf_file_entry_free(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free file_entry.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_MemoryError,
-			 "%s: unable to free file_entry.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_MemoryError,
+		 "%s: unable to free file_entry.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 	}
@@ -520,10 +521,8 @@ PyObject *pyewf_file_entry_read_buffer(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
-	PyObject *result_data       = NULL;
+	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_file_entry_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
 	ssize_t read_count          = 0;
@@ -576,47 +575,49 @@ PyObject *pyewf_file_entry_read_buffer(
 
 		return( NULL );
 	}
-	result_data = PyString_FromStringAndSize(
-	               NULL,
-	               read_size );
+	string_object = PyString_FromStringAndSize(
+	                 NULL,
+	                 read_size );
 
 	Py_BEGIN_ALLOW_THREADS
 
 	read_count = libewf_file_entry_read_buffer(
 	              pyewf_file_entry->file_entry,
 	              PyString_AsString(
-	               result_data ),
+	               string_object ),
 	              (size_t) read_size,
 	              &error );
 
 	Py_END_ALLOW_THREADS
 
-	if( read_count != (ssize_t) read_size )
+	if( read_count <= -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to read data.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
+		Py_DecRef(
+		 (PyObject *) string_object );
+
 		return( NULL );
 	}
-	return( result_data );
+	/* Need to resize the string here in case read_size was not fully read.
+	 */
+	if( _PyString_Resize(
+	     &string_object,
+	     (Py_ssize_t) read_count ) != 0 )
+	{
+		Py_DecRef(
+		 (PyObject *) string_object );
+
+		return( NULL );
+	}
+	return( string_object );
 }
 
 /* Reads a buffer of file entry data at a specific offset from EWF file(s)
@@ -627,10 +628,8 @@ PyObject *pyewf_file_entry_read_random(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
-	PyObject *result_data       = NULL;
+	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_file_entry_read_random";
 	static char *keyword_list[] = { "size", "offset", NULL };
 	off64_t read_offset         = 0;
@@ -696,48 +695,50 @@ PyObject *pyewf_file_entry_read_random(
 	}
 	/* Make sure the data fits into a memory buffer
 	 */
-	result_data = PyString_FromStringAndSize(
-	               NULL,
-	               read_size );
+	string_object = PyString_FromStringAndSize(
+	                 NULL,
+	                 read_size );
 
 	Py_BEGIN_ALLOW_THREADS
 
 	read_count = libewf_file_entry_read_random(
 	              pyewf_file_entry->file_entry,
 	              PyString_AsString(
-	               result_data ),
+	               string_object ),
 	              (size_t) read_size,
 	              (off64_t) read_offset,
 	              &error );
 
 	Py_END_ALLOW_THREADS
 
-	if( read_count != (ssize_t) read_size )
+	if( read_count <= -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to read data.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to read data.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
+		Py_DecRef(
+		 (PyObject *) string_object );
+
 		return( NULL );
 	}
-	return( result_data );
+	/* Need to resize the string here in case read_size was not fully read.
+	 */
+	if( _PyString_Resize(
+	     &string_object,
+	     (Py_ssize_t) read_count ) != 0 )
+	{
+		Py_DecRef(
+		 (PyObject *) string_object );
+
+		return( NULL );
+	}
+	return( string_object );
 }
 
 /* Seeks a certain offset in the file entry data
@@ -748,8 +749,6 @@ PyObject *pyewf_file_entry_seek_offset(
            PyObject *arguments,
            PyObject *keywords )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	static char *function       = "pyewf_file_entry_seek_offset";
 	static char *keyword_list[] = { "offset", "whence", NULL };
@@ -796,24 +795,12 @@ PyObject *pyewf_file_entry_seek_offset(
 
 	if( offset == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to seek offset.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to seek offset.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to seek offset.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -832,9 +819,8 @@ PyObject *pyewf_file_entry_get_offset(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_offset";
 	off64_t offset           = 0;
 	int result               = 0;
@@ -861,54 +847,21 @@ PyObject *pyewf_file_entry_get_offset(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve offset.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve offset.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve offset.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( offset > (off64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: offset value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_signed_new_from_64bit(
+	                  (int64_t) offset );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) offset ) );
-#else
-	if( offset > (off64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: offset value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) offset ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the size
@@ -918,9 +871,8 @@ PyObject *pyewf_file_entry_get_size(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_size";
 	size64_t size            = 0;
 	int result               = 0;
@@ -947,54 +899,21 @@ PyObject *pyewf_file_entry_get_size(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve size.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve size.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve size.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( size > (size64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: size value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) size );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) size ) );
-#else
-	if( size > (size64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) size ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the creation date and time
@@ -1004,8 +923,6 @@ PyObject *pyewf_file_entry_get_creation_time(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_creation_time";
@@ -1034,24 +951,12 @@ PyObject *pyewf_file_entry_get_creation_time(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve creation time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve creation time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve creation time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1070,9 +975,8 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_creation_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
@@ -1099,54 +1003,21 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve creation time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve creation time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve creation time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( (uint64_t) posix_time > (uint64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_signed_new_from_64bit(
+	                  (int64_t) posix_time );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) posix_time ) );
-#else
-	if( (uint64_t) posix_time > (uint64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) posix_time ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the modification date and time
@@ -1156,8 +1027,6 @@ PyObject *pyewf_file_entry_get_modification_time(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_modification_time";
@@ -1186,24 +1055,12 @@ PyObject *pyewf_file_entry_get_modification_time(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve modification time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve modification time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve modification time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1222,9 +1079,8 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_modification_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
@@ -1251,54 +1107,21 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve modification time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve modification time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve modification time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( (uint64_t) posix_time > (uint64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_signed_new_from_64bit(
+	                  (int64_t) posix_time );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) posix_time ) );
-#else
-	if( (uint64_t) posix_time > (uint64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) posix_time ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the access date and time
@@ -1308,8 +1131,6 @@ PyObject *pyewf_file_entry_get_access_time(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_access_time";
@@ -1338,24 +1159,12 @@ PyObject *pyewf_file_entry_get_access_time(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve access time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve access time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve access time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1374,9 +1183,8 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_access_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
@@ -1403,54 +1211,21 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve access time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve access time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve access time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( (uint64_t) posix_time > (uint64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_signed_new_from_64bit(
+	                  (int64_t) posix_time );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) posix_time ) );
-#else
-	if( (uint64_t) posix_time > (uint64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) posix_time ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the entry modification date and time
@@ -1460,8 +1235,6 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_entry_modification_time";
@@ -1490,24 +1263,12 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve entry modification time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve entry modification time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve entry modification time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1526,9 +1287,8 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_entry_modification_time_as_integer";
 	uint32_t posix_time      = 0;
 	int result               = 0;
@@ -1555,54 +1315,21 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve entry modification time.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve entry modification time.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve entry modification time.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( (uint64_t) posix_time > (uint64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_signed_new_from_64bit(
+	                  (int64_t) posix_time );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) posix_time ) );
-#else
-	if( (uint64_t) posix_time > (uint64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: POSIX time value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) posix_time ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the name
@@ -1612,8 +1339,6 @@ PyObject *pyewf_file_entry_get_name(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error  = NULL;
 	PyObject *string_object   = NULL;
 	const char *errors        = NULL;
@@ -1644,24 +1369,12 @@ PyObject *pyewf_file_entry_get_name(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve name size.",
-			 function );
-		}
-		else
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve name size.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve name size.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1699,24 +1412,12 @@ PyObject *pyewf_file_entry_get_name(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve name.",
-			 function );
-		}
-		else
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve name.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve name.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1752,8 +1453,6 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error  = NULL;
 	PyObject *string_object   = NULL;
 	const char *errors        = NULL;
@@ -1797,24 +1496,96 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve hash value MD5.",
-			 function );
-		}
-		else
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve hash value MD5.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve hash value MD5.",
+		 function,
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) hash_value,
+			 (Py_ssize_t) hash_value_size - 1,
+			 errors );
+
+	PyMem_Free(
+	 hash_value );
+
+	return( string_object );
+
+on_error:
+	if( hash_value != NULL )
+	{
+		PyMem_Free(
+		 hash_value );
+	}
+	return( NULL );
+}
+
+/* Retrieves the SHA1 hash
+ * Returns a Python object holding the offset if successful or NULL on error
+ */
+PyObject *pyewf_file_entry_get_hash_value_sha1(
+           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *string_object   = NULL;
+	const char *errors        = NULL;
+	uint8_t *hash_value       = NULL;
+	static char *function     = "pyewf_file_entry_get_hash_value_sha1";
+	size_t hash_value_size    = 41;
+	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	hash_value = (uint8_t *) PyMem_Malloc(
+	                          sizeof( uint8_t ) * hash_value_size );
+
+	if( hash_value == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create hash value.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_file_entry_get_utf8_hash_value_sha1(
+		  pyewf_file_entry->file_entry,
+		  hash_value,
+		  hash_value_size,
+		  &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve hash value SHA1.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1850,8 +1621,6 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error       = NULL;
 	static char *function          = "pyewf_file_entry_get_number_of_sub_file_entries";
 	int number_of_sub_file_entries = 0;
@@ -1879,24 +1648,12 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve number of sub file entries.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve number of sub file entries.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of sub file entries.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -2027,8 +1784,6 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error       = NULL;
 	PyObject *file_entries_object  = NULL;
 	static char *function          = "pyewf_file_entry_get_sub_file_entries";
@@ -2057,24 +1812,12 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve number of sub file entries.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve number of sub file entries.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of sub file entries.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 

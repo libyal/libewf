@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyewf\pyewf_error.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyewf\pyewf_file_entries.c"
 				>
 			</File>
@@ -209,7 +213,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyewf\pyewf_file_objects_io_pool.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyewf\pyewf_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyewf\pyewf_integer.c"
 				>
 			</File>
 			<File
@@ -235,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyewf\pyewf_error.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyewf\pyewf_file_entries.h"
 				>
 			</File>
@@ -247,7 +263,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyewf\pyewf_file_objects_io_pool.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyewf\pyewf_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyewf\pyewf_integer.h"
 				>
 			</File>
 			<File

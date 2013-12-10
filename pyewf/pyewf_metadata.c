@@ -25,7 +25,9 @@
 
 #include "pyewf.h"
 #include "pyewf_codepage.h"
+#include "pyewf_error.h"
 #include "pyewf_handle.h"
+#include "pyewf_integer.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libclocale.h"
 #include "pyewf_libcstring.h"
@@ -41,9 +43,8 @@ PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_handle_get_media_size";
 	size64_t media_size      = 0;
 	int result               = 0;
@@ -70,54 +71,21 @@ PyObject *pyewf_handle_get_media_size(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve media size.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve media size.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve media size.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-#if defined( HAVE_LONG_LONG )
-	if( media_size > (size64_t) LLONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_size );
 
-		return( NULL );
-	}
-	return( PyLong_FromLongLong(
-	         (long long) media_size ) );
-#else
-	if( media_size > (size64_t) LONG_MAX )
-	{
-		PyErr_Format(
-		 PyExc_OverflowError,
-		 "%s: media size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	return( PyLong_FromLong(
-	         (long) media_size ) );
-#endif
+	return( integer_object );
 }
 
 /* Retrieves the codepage used for ASCII strings in the header
@@ -127,8 +95,6 @@ PyObject *pyewf_handle_get_header_codepage(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
 	const char *codepage_string = NULL;
@@ -147,34 +113,22 @@ PyObject *pyewf_handle_get_header_codepage(
 		return( NULL );
 	}
 	if( libewf_handle_get_header_codepage(
-	     pyewf_handle->file,
+	     pyewf_handle->handle,
 	     &header_codepage,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve header codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to retrieve header codepage.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
 		return( NULL );
 	}
-	codepage_string = pyevtx_codepage_to_string(
+	codepage_string = pyewf_codepage_to_string(
 	                   header_codepage );
 
 	if( codepage_string == NULL )
@@ -209,8 +163,6 @@ int pyewf_handle_set_header_codepage_from_string(
      pyewf_handle_t *pyewf_handle,
      const char *codepage_string )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error      = NULL;
 	static char *function         = "pyewf_handle_set_header_codepage_from_string";
 	size_t codepage_string_length = 0;
@@ -249,24 +201,12 @@ int pyewf_handle_set_header_codepage_from_string(
 	     feature_flags,
 	     &error ) != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_RuntimeError,
-			 "%s: unable to determine header codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_RuntimeError,
-			 "%s: unable to determine header codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_RuntimeError,
+		 "%s: unable to determine header codepage.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -275,7 +215,7 @@ int pyewf_handle_set_header_codepage_from_string(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libewf_handle_set_header_codepage(
-	          pyewf_handle->file,
+	          pyewf_handle->handle,
 	          header_codepage,
 	          &error );
 
@@ -283,24 +223,12 @@ int pyewf_handle_set_header_codepage_from_string(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to set header codepage.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to set header codepage.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: unable to set header codepage.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -605,24 +533,12 @@ PyObject *pyewf_handle_get_header_values(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of header values.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of header values.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: failed to retrieve number of header values.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1118,24 +1034,12 @@ PyObject *pyewf_handle_get_hash_values(
 
 	if( result == -1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of hash values.",
-			 function );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: failed to retrieve number of hash values.\n%s",
-			 function,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 PyExc_IOError,
+		 "%s: failed to retrieve number of hash values.",
+		 function,
+		 error );
+
 		libcerror_error_free(
 		 &error );
 

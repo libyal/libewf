@@ -33,7 +33,6 @@ SUBDIRS = \
 	tests \
 	examples \
 	macosx \
-	borlandc \
 	msvscpp
 
 DPKG_FILES = \
