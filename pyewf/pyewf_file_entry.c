@@ -496,10 +496,10 @@ void pyewf_file_entry_free(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to free file_entry.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -593,10 +593,10 @@ PyObject *pyewf_file_entry_read_buffer(
 	if( read_count <= -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to read data.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -714,10 +714,10 @@ PyObject *pyewf_file_entry_read_random(
 	if( read_count <= -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to read data.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -796,10 +796,10 @@ PyObject *pyewf_file_entry_seek_offset(
 	if( offset == -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to seek offset.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -848,10 +848,10 @@ PyObject *pyewf_file_entry_get_offset(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve offset.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -900,10 +900,10 @@ PyObject *pyewf_file_entry_get_size(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve size.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -952,10 +952,10 @@ PyObject *pyewf_file_entry_get_creation_time(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve creation time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1004,10 +1004,10 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve creation time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1056,10 +1056,10 @@ PyObject *pyewf_file_entry_get_modification_time(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve modification time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1108,10 +1108,10 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve modification time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1160,10 +1160,10 @@ PyObject *pyewf_file_entry_get_access_time(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve access time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1212,10 +1212,10 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve access time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1264,10 +1264,10 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve entry modification time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1316,10 +1316,10 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve entry modification time.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1370,10 +1370,10 @@ PyObject *pyewf_file_entry_get_name(
 	if( result == -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve name size.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1413,10 +1413,10 @@ PyObject *pyewf_file_entry_get_name(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve name.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1497,10 +1497,10 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve hash value MD5.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1581,10 +1581,10 @@ PyObject *pyewf_file_entry_get_hash_value_sha1(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve hash value SHA1.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1649,10 +1649,10 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve number of sub file entries.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -1670,8 +1670,6 @@ PyObject *pyewf_file_entry_get_sub_file_entry_by_index(
            pyewf_file_entry_t *pyewf_file_entry,
            int sub_file_entry_index )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-
 	libcerror_error_t *error            = NULL;
 	libewf_file_entry_t *sub_file_entry = NULL;
 	PyObject *file_entry_object         = NULL;
@@ -1699,26 +1697,13 @@ PyObject *pyewf_file_entry_get_sub_file_entry_by_index(
 
 	if( result != 1 )
 	{
-		if( libcerror_error_backtrace_sprint(
-		     error,
-		     error_string,
-		     PYEWF_ERROR_STRING_SIZE ) == -1 )
-                {
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
-		}
-		else
-		{
-			PyErr_Format(
-			 PyExc_IOError,
-			 "%s: unable to retrieve sub file entry: %d.\n%s",
-			 function,
-			 sub_file_entry_index,
-			 error_string );
-		}
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve sub file entry: %d.",
+		 function,
+		 sub_file_entry_index );
+
 		libcerror_error_free(
 		 &error );
 
@@ -1813,10 +1798,10 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
 	if( result != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to retrieve number of sub file entries.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );

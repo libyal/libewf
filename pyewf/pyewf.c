@@ -164,10 +164,10 @@ PyObject *pyewf_check_file_signature(
 	if( result == -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to check file signature.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -213,10 +213,10 @@ PyObject *pyewf_check_file_signature_file_object(
 	     &error ) != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to initialize file IO handle.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -234,10 +234,10 @@ PyObject *pyewf_check_file_signature_file_object(
 	if( result == -1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to check file signature.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -249,10 +249,10 @@ PyObject *pyewf_check_file_signature_file_object(
 	     &error ) != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to free file IO handle.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -318,10 +318,10 @@ PyObject *pyewf_glob(
 	     &error ) != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_IOError,
 		 "%s: unable to glob filenames.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );
@@ -378,10 +378,10 @@ PyObject *pyewf_glob(
 	     &error ) != 1 )
 	{
 		pyewf_error_raise(
+		 error,
 		 PyExc_MemoryError,
 		 "%s: unable to free globbed filenames.",
-		 function,
-		 error );
+		 function );
 
 		libcerror_error_free(
 		 &error );

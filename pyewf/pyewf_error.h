@@ -28,18 +28,17 @@
 #include "pyewf_libcerror.h"
 #include "pyewf_python.h"
 
-#define PYEWF_ERROR_FORMAT_STRING_SIZE		128
-#define PYEWF_ERROR_STRING_SIZE			512
+#define PYEWF_ERROR_STRING_SIZE		768
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 void pyewf_error_raise(
+      libcerror_error_t *error,
       PyObject *exception_object,
       const char *format_string,
-      const char *function,
-      libcerror_error_t *error );
+      ... );
 
 #if defined( __cplusplus )
 }

@@ -20,31 +20,57 @@
  */
 
 #include <common.h>
+#include <memory.h>
 #include <types.h>
+
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
+#include <stdarg.h>
+#elif defined( HAVE_VARARGS_H )
+#include <varargs.h>
+#else
+#error Missing headers stdarg.h and varargs.h
+#endif
 
 #include "pyewf_error.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_python.h"
 
+#if defined( HAVE_STDARG_H ) || defined( WINAPI )
+#define VARARGS( function, error, exception_object, type, argument ) \
+	function( error, exception_object, type argument, ... )
+#define VASTART( argument_list, type, name ) \
+	va_start( argument_list, name )
+#define VAEND( argument_list ) \
+	va_end( argument_list )
+
+#elif defined( HAVE_VARARGS_H )
+#define VARARGS( function, error, exception_object, type, argument ) \
+	function( error, exception_object, va_alist ) va_dcl
+#define VASTART( argument_list, type, name ) \
+	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VAEND( argument_list ) \
+	va_end( argument_list ); }
+
+#endif
+
 /* Raises an error
  */
-void pyewf_error_raise(
+void VARARGS(
+      pyewf_error_raise,
+      libcerror_error_t *error,
       PyObject *exception_object,
-      const char *format_string,
-      const char *function,
-      libcerror_error_t *error )
+      const char *,
+      format_string )
 {
-	char error_string[ PYEWF_ERROR_STRING_SIZE ];
-	char extended_format_string[ PYEWF_ERROR_FORMAT_STRING_SIZE ];
+	va_list argument_list;
 
+	char error_string[ PYEWF_ERROR_STRING_SIZE ];
+
+	static char *function       = "pyewf_error_raise";
 	size_t error_string_index   = 0;
 	size_t format_string_length = 0;
 
-	if( function == NULL )
-	{
-		function = "pyewf_error_raise";
-	}
        	if( format_string == NULL )
 	{
 		PyErr_Format(
@@ -59,26 +85,23 @@ void pyewf_error_raise(
 		format_string_length = libcstring_narrow_string_length(
 		                        format_string );
 
-		if( format_string_length < ( PYEWF_ERROR_FORMAT_STRING_SIZE - 4 ) )
+		if( format_string_length < ( PYEWF_ERROR_STRING_SIZE - 2 ) )
 		{
-			if( libcerror_error_backtrace_sprint(
-			     error,
+			if( memory_copy(
 			     error_string,
-			     PYEWF_ERROR_STRING_SIZE ) != -1 )
+			     format_string,
+			     format_string_length ) != NULL )
 			{
-				if( memory_copy(
-				     extended_format_string,
-				     format_string,
-				     format_string_length ) != NULL )
-				{
-					extended_format_string[ format_string_length++ ] = ' ';
-					extended_format_string[ format_string_length++ ] = '%';
-					extended_format_string[ format_string_length++ ] = 's';
-					extended_format_string[ format_string_length ] = 0;
+				error_string_index = format_string_length;
 
-					for( error_string_index = 0;
-					     error_string_index < PYEWF_ERROR_STRING_SIZE;
-					     error_string_index++ )
+				error_string[ error_string_index++ ] = (char) ' ';
+
+				if( libcerror_error_backtrace_sprint(
+				     error,
+				     &( error_string[ error_string_index ] ),
+				     PYEWF_ERROR_STRING_SIZE - error_string_index ) != -1 )
+				{
+					while( error_string_index < PYEWF_ERROR_STRING_SIZE )
 					{
 						if( error_string[ error_string_index ] == 0 )
 						{
@@ -88,23 +111,48 @@ void pyewf_error_raise(
 						{
 							error_string[ error_string_index ] = ' ';
 						}
+						error_string_index++;
 					}
+					if( error_string_index >= PYEWF_ERROR_STRING_SIZE )
+					{
+						error_string[ PYEWF_ERROR_STRING_SIZE - 1 ] = 0;
+					}
+					VASTART(
+					 argument_list,
+					 const char *,
+					 format_string );
+
 					PyErr_Format(
 					 exception_object,
-					 extended_format_string,
+					 error_string,
 					 function,
-					 error_string );
+					 argument_list );
+
+					VAEND(
+					 argument_list );
 
 					return;
 				}
 			}
 		}
 	}
+	VASTART(
+	 argument_list,
+	 const char *,
+	 format_string );
+
 	PyErr_Format(
 	 exception_object,
 	 format_string,
 	 function );
 
+	VAEND(
+	 argument_list );
+
 	return;
 }
+
+#undef VARARGS
+#undef VASTART
+#undef VAEND
 
