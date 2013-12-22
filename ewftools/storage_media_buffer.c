@@ -31,6 +31,7 @@
  */
 int storage_media_buffer_initialize(
      storage_media_buffer_t **buffer,
+     uint8_t mode,
      size_t size,
      libcerror_error_t **error )
 {
@@ -55,6 +56,18 @@ int storage_media_buffer_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid buffer value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mode != STORAGE_MEDIA_BUFFER_MODE_BUFFERED )
+	 && ( mode != STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unusupported mode.",
 		 function );
 
 		return( -1 );
@@ -107,12 +120,12 @@ int storage_media_buffer_initialize(
 	{
 		raw_buffer_size = size;
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		/* Add 4 bytes to allow for write checksum buffer alignment
-		 */
-		raw_buffer_size += 4;
-#endif
-
+		if( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			/* Add 4 bytes to allow for write checksum buffer alignment
+			 */
+			raw_buffer_size += 4;
+		}
 /* TODO can low level functions and direct IO be combined ? */
 #if defined( memory_allocate_aligned )
 		if( memory_allocate_aligned(
@@ -148,26 +161,29 @@ int storage_media_buffer_initialize(
 
 		( *buffer )->raw_buffer_size = size;
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
-
-		( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
-		                                               sizeof( uint8_t ) * ( size * 2 ) );
-			
-		if( ( *buffer )->compression_buffer == NULL )
+		if( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create compression buffer.",
-			 function );
+			( *buffer )->checksum_buffer = &( ( ( *buffer )->raw_buffer )[ size ] );
 
-			goto on_error;
+			( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
+			                                               sizeof( uint8_t ) * ( size * 2 ) );
+			
+			if( ( *buffer )->compression_buffer == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create compression buffer.",
+				 function );
+
+				goto on_error;
+			}
+			( *buffer )->compression_buffer_size = size * 2;
 		}
-		( *buffer )->compression_buffer_size = size * 2;
-#endif
 	}
+	( *buffer )->mode = mode;
+
 	return( 1 );
 
 on_error:
@@ -213,13 +229,11 @@ int storage_media_buffer_free(
 			memory_free(
 			 ( *buffer )->raw_buffer );
 		}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		if( ( *buffer )->compression_buffer != NULL )
 		{
 			memory_free(
 			 ( *buffer )->compression_buffer );
 		}
-#endif
 		memory_free(
 		 *buffer );
 
@@ -271,7 +285,6 @@ int storage_media_buffer_resize(
 		buffer->raw_buffer_size      = size;
 		buffer->raw_buffer_data_size = 0;
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		/* The compression buffer is cleared
 		 */
 		if( buffer->compression_buffer != NULL )
@@ -283,7 +296,6 @@ int storage_media_buffer_resize(
 			buffer->compression_buffer_size      = 0;
 			buffer->compression_buffer_data_size = 0;
 		}
-#endif
 	}
 	return( 1 );
 }
@@ -332,8 +344,8 @@ int storage_media_buffer_get_data(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( buffer->data_in_compression_buffer == 0 )
+	if( ( buffer->mode != STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	 || ( buffer->data_in_compression_buffer == 0 ) )
 	{
 		*data      = buffer->raw_buffer;
 		*data_size = buffer->raw_buffer_data_size;
@@ -343,10 +355,6 @@ int storage_media_buffer_get_data(
 		*data      = buffer->compression_buffer;
 		*data_size = buffer->compression_buffer_data_size;
 	}
-#else
-	*data      = buffer->raw_buffer;
-	*data_size = buffer->raw_buffer_data_size;
-#endif
 	return( 1 );
 }
 

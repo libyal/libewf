@@ -389,9 +389,10 @@ Tests
   - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
+* ewftools: test with -x
 * ewfexport: export of split RAW
 * ewfinfo: DFXML output
-* implement pyewf tests
+* pyewf: add tests
 * write resume from volume/disk section - basically re-image
 
 Deployment:
@@ -427,6 +428,10 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20131222
+* moved low-level function support from compile time to run time
+* worked on experimental features
 
 20131211
 * worked on Python bindings

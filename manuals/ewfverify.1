@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd December 22, 2013
 .Dt ewfverify
 .Os libewf
 .Sh NAME
@@ -11,7 +11,7 @@
 .Op Fl f Ar format
 .Op Fl l Ar log_filename
 .Op Fl p Ar process_buffer_size
-.Op Fl hqvVw
+.Op Fl hqvVwx
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfverify
@@ -49,6 +49,8 @@ verbose output to stderr
 print version
 .It Fl w
 zero sectors on checksum error (mimic EnCase like behavior)
+.It Fl x
+use the chunk data instead of the buffered read and write functions.
 .El
 .Sh ENVIRONMENT
 None

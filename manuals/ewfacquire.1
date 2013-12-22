@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd December 22, 2013
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -29,7 +29,7 @@
 .Op Fl t Ar target
 .Op Fl T Ar toc_file
 .Op Fl 2 Ar secondary_target
-.Op Fl hqRsuvVw
+.Op Fl hqRsuvVwx
 .Ar source
 .Sh DESCRIPTION
 .Nm ewfacquire
@@ -117,6 +117,8 @@ verbose output to stderr
 print version
 .It Fl w
 zero sectors on read error (mimic EnCase like behavior)
+.It Fl x
+use the chunk data instead of the buffered read and write functions.
 .It Fl 2 Ar secondary_target
 the secondary target file (without extension) to write to
 .El

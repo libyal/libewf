@@ -61,7 +61,7 @@ void usage_fprint(
 
 	fprintf( stream, "Usage: ewfverify [ -A codepage ] [ -d digest_type ] [ -f format ]\n"
 	                 "                 [ -l log_filename ] [ -p process_buffer_size ]\n"
-	                 "                 [ -hqvVw ] ewf_files\n\n" );
+	                 "                 [ -hqvVwx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -82,6 +82,8 @@ void usage_fprint(
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
+	                 "\t           functions.\n" );
 }
 
 /* Signal handler for ewfverify
@@ -154,8 +156,9 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option                            = 0;
 	uint8_t calculate_md5                                         = 1;
 	uint8_t print_status_information                              = 1;
-	uint8_t zero_chunk_on_error                                   = 0;
+	uint8_t use_chunk_data_functions                              = 0;
 	uint8_t verbose                                               = 0;
+	uint8_t zero_chunk_on_error                                   = 0;
 	int number_of_filenames                                       = 0;
 	int result                                                    = 0;
 
@@ -192,7 +195,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:d:f:hl:p:qvVw" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:d:f:hl:p:qvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -259,6 +262,11 @@ int main( int argc, char * const argv[] )
 				zero_chunk_on_error = 1;
 
 				break;
+
+			case (libcstring_system_integer_t) 'x':
+				use_chunk_data_functions = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -286,6 +294,7 @@ int main( int argc, char * const argv[] )
 	if( verification_handle_initialize(
 	     &ewfverify_verification_handle,
 	     calculate_md5,
+	     use_chunk_data_functions,
 	     &error ) != 1 )
 	{
 		fprintf(

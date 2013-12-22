@@ -58,24 +58,6 @@ AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_V1_API],
   [test "x$ac_cv_enable_v1_api" != xno])
  ])
 
-dnl Function to detect whether low level function support should be enabled
-AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_LOW_LEVEL_FUNCTIONS],
- [AX_COMMON_ARG_ENABLE(
-  [low-level-functions],
-  [low_level_functions],
-  [use libewf's low level read and write functions in the ewftools],
-  [no])
-
- AS_IF(
-  [test "x$ac_cv_enable_low_level_functions" != xno],
-  [AC_DEFINE(
-   [HAVE_LOW_LEVEL_FUNCTIONS],
-   [1],
-   [Define to 1 if libewfs low level read and write functions should be used in the ewf tools.])
-
-  ac_cv_enable_low_level_functions=yes])
- ])
-
 dnl Function to determine the host operating system
 AC_DEFUN([AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM],
  [ac_libewf_determine_operating_system_target_string="$target";

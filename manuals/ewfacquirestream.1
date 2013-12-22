@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd December 22, 2013
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -26,7 +26,7 @@
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
 .Op Fl 2 Ar secondary_target
-.Op Fl hqsvV
+.Op Fl hqsvVx
 .Sh DESCRIPTION
 .Nm ewfacquirestream
 is a utility to acquire media data from stdin and store it in EWF format (Expert Witness Format).
@@ -94,6 +94,8 @@ the target file (without extension) to write to (default is image)
 verbose output to stderr
 .It Fl V
 print version
+.It Fl x
+use the chunk data instead of the buffered read and write functions.
 .It Fl 2 Ar secondary_target
 the secondary target file (without extension) to write to
 .El

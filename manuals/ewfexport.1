@@ -1,4 +1,4 @@
-.Dd March 30, 2013
+.Dd December 22, 2013
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -17,7 +17,7 @@
 .Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
-.Op Fl hqsuvVw
+.Op Fl hqsuvVwx
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfexport
@@ -71,6 +71,8 @@ verbose output to stderr
 print version
 .It Fl w
 zero sectors on checksum error (mimic EnCase like behavior)
+.It Fl x
+use the chunk data instead of the buffered read and write functions.
 .El
 .Sh ENVIRONMENT
 None

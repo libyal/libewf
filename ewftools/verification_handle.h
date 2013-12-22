@@ -131,6 +131,10 @@ struct verification_handle
 	 */
 	libcstring_system_character_t *stored_sha256_hash_string;
 
+	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
+	 */
+	uint8_t use_chunk_data_functions;
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -163,6 +167,7 @@ struct verification_handle
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int verification_handle_free(

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20131211],
+ [20131222],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -261,9 +261,6 @@ AS_IF(
 dnl Check if ewftools should be build as static executables
 AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 
-dnl Check if ewftools should be build with low level read and write functions
-AX_LIBEWF_CHECK_ENABLE_LOW_LEVEL_FUNCTIONS
-
 dnl Check if libewf should be build with verbose output
 AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
 
@@ -386,44 +383,43 @@ AC_OUTPUT
 dnl Print a summary
 AC_MSG_NOTICE([
 Building:
-   libcstring support:                              $ac_cv_libcstring
-   libcerror support:                               $ac_cv_libcerror
-   libcthreads support:                             $ac_cv_libcthreads
-   libcdata support:                                $ac_cv_libcdata
-   libclocale support:                              $ac_cv_libclocale
-   libcnotify support:                              $ac_cv_libcnotify
-   libcsplit support:                               $ac_cv_libcsplit
-   libuna support:                                  $ac_cv_libuna
-   libcfile support:                                $ac_cv_libcfile
-   libcpath support:                                $ac_cv_libcpath
-   libbfio support:                                 $ac_cv_libbfio
-   libfcache support:                               $ac_cv_libfcache
-   libfdata support:                                $ac_cv_libfdata
-   libfvalue support:                               $ac_cv_libfvalue
-   ADLER32 checksum support:                        $ac_cv_adler32
-   DEFLATE compression support:                     $ac_cv_zlib
-   BZIP2 compression support:                       $ac_cv_bzip2
-   libhmac support:                                 $ac_cv_libhmac
-   MD5 support:                                     $ac_cv_libhmac_md5
-   SHA1 support:                                    $ac_cv_libhmac_sha1
-   SHA256 support:                                  $ac_cv_libhmac_sha256
-   libcaes support:                                 $ac_cv_libcaes
-   AES support:                                     $ac_cv_libcaes_aes
-   libodraw support:                                $ac_cv_libodraw
-   libsmdev support:                                $ac_cv_libsmdev
-   libsmraw support:                                $ac_cv_libsmraw
-   libcsystem support:                              $ac_cv_libcsystem
-   GUID/UUID support:                               $ac_cv_libuuid
-   FUSE support:                                    $ac_cv_libfuse
+   libcstring support:                       $ac_cv_libcstring
+   libcerror support:                        $ac_cv_libcerror
+   libcthreads support:                      $ac_cv_libcthreads
+   libcdata support:                         $ac_cv_libcdata
+   libclocale support:                       $ac_cv_libclocale
+   libcnotify support:                       $ac_cv_libcnotify
+   libcsplit support:                        $ac_cv_libcsplit
+   libuna support:                           $ac_cv_libuna
+   libcfile support:                         $ac_cv_libcfile
+   libcpath support:                         $ac_cv_libcpath
+   libbfio support:                          $ac_cv_libbfio
+   libfcache support:                        $ac_cv_libfcache
+   libfdata support:                         $ac_cv_libfdata
+   libfvalue support:                        $ac_cv_libfvalue
+   ADLER32 checksum support:                 $ac_cv_adler32
+   DEFLATE compression support:              $ac_cv_zlib
+   BZIP2 compression support:                $ac_cv_bzip2
+   libhmac support:                          $ac_cv_libhmac
+   MD5 support:                              $ac_cv_libhmac_md5
+   SHA1 support:                             $ac_cv_libhmac_sha1
+   SHA256 support:                           $ac_cv_libhmac_sha256
+   libcaes support:                          $ac_cv_libcaes
+   AES support:                              $ac_cv_libcaes_aes
+   libodraw support:                         $ac_cv_libodraw
+   libsmdev support:                         $ac_cv_libsmdev
+   libsmraw support:                         $ac_cv_libsmraw
+   libcsystem support:                       $ac_cv_libcsystem
+   GUID/UUID support:                        $ac_cv_libuuid
+   FUSE support:                             $ac_cv_libfuse
 
 Features:
-   Multi-threading support:                         $ac_cv_libcthreads_multi_threading
-   Wide character type support:                     $ac_cv_enable_wide_character_type
-   ewftools are build as static executables:        $ac_cv_enable_static_executables
-   ewftools use low level read and write functions: $ac_cv_enable_low_level_functions
-   Python (pyewf) support:                          $ac_cv_enable_python
-   Verbose output:                                  $ac_cv_enable_verbose_output
-   Debug output:                                    $ac_cv_enable_debug_output
-   Version 1 API compatibility:                     $ac_cv_enable_v1_api
+   Multi-threading support:                  $ac_cv_libcthreads_multi_threading
+   Wide character type support:              $ac_cv_enable_wide_character_type
+   ewftools are build as static executables: $ac_cv_enable_static_executables
+   Python (pyewf) support:                   $ac_cv_enable_python
+   Verbose output:                           $ac_cv_enable_verbose_output
+   Debug output:                             $ac_cv_enable_debug_output
+   Version 1 API compatibility:              $ac_cv_enable_v1_api
 ]);
 

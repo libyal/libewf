@@ -49,6 +49,7 @@
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -197,11 +198,12 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-	( *verification_handle )->input_format        = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
-	( *verification_handle )->calculate_md5       = calculate_md5;
-	( *verification_handle )->header_codepage     = LIBEWF_CODEPAGE_ASCII;
-	( *verification_handle )->process_buffer_size = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *verification_handle )->notify_stream       = VERIFICATION_HANDLE_NOTIFY_STREAM;
+	( *verification_handle )->input_format             = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
+	( *verification_handle )->calculate_md5            = calculate_md5;
+	( *verification_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *verification_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+	( *verification_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *verification_handle )->notify_stream            = VERIFICATION_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -212,6 +214,11 @@ on_error:
 		{
 			memory_free(
 			 ( *verification_handle )->stored_sha1_hash_string );
+		}
+		if( ( *verification_handle )->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 ( *verification_handle )->calculated_sha1_hash_string );
 		}
 		if( ( *verification_handle )->stored_md5_hash_string != NULL )
 		{
@@ -704,90 +711,93 @@ ssize_t verification_handle_prepare_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
-
-	process_count = libewf_handle_prepare_read_chunk(
-	                 verification_handle->input_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_data_size,
-	                 storage_media_buffer->raw_buffer,
-	                 &( storage_media_buffer->raw_buffer_data_size ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->checksum,
-	                 storage_media_buffer->process_checksum,
-	                 error );
-
-	if( process_count == -1 )
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
-		libcerror_error_free(
-		 error );
+		storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
-		/* Wipe the chunk if nescessary
-		 */
-		if( verification_handle->zero_chunk_on_error != 0 )
+		process_count = libewf_handle_prepare_read_chunk(
+		                 verification_handle->input_handle,
+		                 storage_media_buffer->compression_buffer,
+		                 storage_media_buffer->compression_buffer_data_size,
+		                 storage_media_buffer->raw_buffer,
+		                 &( storage_media_buffer->raw_buffer_data_size ),
+		                 storage_media_buffer->is_compressed,
+		                 storage_media_buffer->checksum,
+		                 storage_media_buffer->process_checksum,
+		                 error );
+
+		if( process_count == -1 )
 		{
-			if( ( storage_media_buffer->is_compressed != 0 )
-			 && ( memory_set(
-			       storage_media_buffer->raw_buffer,
-			       0,
-			       storage_media_buffer->raw_buffer_size ) == NULL ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to zero raw buffer.",
-				 function );
+			libcerror_error_free(
+			 error );
 
-				return( -1 );
+			/* Wipe the chunk if nescessary
+			 */
+			if( verification_handle->zero_chunk_on_error != 0 )
+			{
+				if( ( storage_media_buffer->is_compressed != 0 )
+				 && ( memory_set(
+				       storage_media_buffer->raw_buffer,
+				       0,
+				       storage_media_buffer->raw_buffer_size ) == NULL ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero raw buffer.",
+					 function );
+
+					return( -1 );
+				}
+				if( memory_set(
+				     storage_media_buffer->compression_buffer,
+				     0,
+				     storage_media_buffer->compression_buffer_size ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero compression buffer.",
+					 function );
+
+					return( -1 );
+				}
 			}
-			if( memory_set(
-			     storage_media_buffer->compression_buffer,
-			     0,
-			     storage_media_buffer->compression_buffer_size ) == NULL )
+			process_count = verification_handle->chunk_size;
+
+			/* Append a read error
+			 */
+			if( verification_handle_append_read_error(
+			     verification_handle,
+			     verification_handle->last_offset_read,
+			     process_count,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to zero compression buffer.",
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append read error.",
 				 function );
 
 				return( -1 );
 			}
 		}
-		process_count = verification_handle->chunk_size;
-
-		/* Append a read error
-		 */
-		if( verification_handle_append_read_error(
-		     verification_handle,
-		     verification_handle->last_offset_read,
-		     process_count,
-		     error ) != 1 )
+		if( storage_media_buffer->is_compressed == 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append read error.",
-			 function );
-
-			return( -1 );
+			storage_media_buffer->data_in_compression_buffer = 1;
 		}
-	}
-	if( storage_media_buffer->is_compressed == 0 )
-	{
-		storage_media_buffer->data_in_compression_buffer = 1;
+		else
+		{
+			storage_media_buffer->data_in_compression_buffer = 0;
+		}
 	}
 	else
 	{
-		storage_media_buffer->data_in_compression_buffer = 0;
+		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 	}
-#else
-	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
-#endif
 	verification_handle->last_offset_read += process_count;
 
 	return( process_count );
@@ -827,24 +837,26 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	read_count = libewf_handle_read_chunk(
-                      verification_handle->input_handle,
-                      storage_media_buffer->compression_buffer,
-                      storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-	              &( storage_media_buffer->checksum ),
-	              &( storage_media_buffer->process_checksum ),
-	              error );
-#else
-	read_count = libewf_handle_read_buffer(
-                      verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size,
-	              error );
-#endif
-
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		read_count = libewf_handle_read_chunk(
+	                      verification_handle->input_handle,
+	                      storage_media_buffer->compression_buffer,
+	                      storage_media_buffer->compression_buffer_size,
+		              &( storage_media_buffer->is_compressed ),
+		              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
+		              &( storage_media_buffer->checksum ),
+		              &( storage_media_buffer->process_checksum ),
+		              error );
+	}
+	else
+	{
+		read_count = libewf_handle_read_buffer(
+	                      verification_handle->input_handle,
+	                      storage_media_buffer->raw_buffer,
+	                      read_size,
+		              error );
+	}
 	if( read_count == -1 )
 	{
 		libcerror_error_set(
@@ -856,12 +868,14 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
-#else
-	storage_media_buffer->raw_buffer_data_size         = (size_t) read_count;
-#endif
-
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
+	}
+	else
+	{
+		storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
+	}
 	return( read_count );
 }
 
@@ -1278,6 +1292,7 @@ int verification_handle_verify_input(
 	ssize_t process_count                        = 0;
 	ssize_t read_count                           = 0;
 	uint32_t number_of_checksum_errors           = 0;
+	uint8_t storage_media_buffer_mode            = 0;
 	int is_corrupted                             = 0;
 	int md5_hash_compare                         = 0;
 	int sha1_hash_compare                        = 0;
@@ -1317,7 +1332,6 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
-#if !defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( verification_handle->process_buffer_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
@@ -1329,7 +1343,6 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
-#endif
 	if( libewf_handle_get_media_size(
 	     verification_handle->input_handle,
 	     &media_size,
@@ -1344,20 +1357,26 @@ int verification_handle_verify_input(
 
 		goto on_error;
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	process_buffer_size = verification_handle->chunk_size;
-#else
-	if( verification_handle->process_buffer_size == 0 )
+	if( verification_handle->use_chunk_data_functions != 0 )
 	{
-		process_buffer_size = verification_handle->chunk_size;
+		process_buffer_size       = verification_handle->chunk_size;
+		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
 	}
 	else
 	{
-		process_buffer_size = verification_handle->process_buffer_size;
+		if( verification_handle->process_buffer_size == 0 )
+		{
+			process_buffer_size = verification_handle->chunk_size;
+		}
+		else
+		{
+			process_buffer_size = verification_handle->process_buffer_size;
+		}
+		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_BUFFERED;
 	}
-#endif
 	if( storage_media_buffer_initialize(
 	     &storage_media_buffer,
+	     storage_media_buffer_mode,
 	     process_buffer_size,
 	     error ) != 1 )
 	{
@@ -1477,14 +1496,15 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		/* Set the chunk data size in the compression buffer
-		 */
-		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 		{
-			storage_media_buffer->compression_buffer_data_size = (ssize_t) process_count;
+			/* Set the chunk data size in the compression buffer
+			 */
+			if( storage_media_buffer->data_in_compression_buffer == 1 )
+			{
+				storage_media_buffer->compression_buffer_data_size = (ssize_t) process_count;
+			}
 		}
-#endif
 		verify_count += (size64_t) process_count;
 
 		if( storage_media_buffer_get_data(
@@ -3328,8 +3348,6 @@ int verification_handle_set_zero_chunk_on_error(
 	return( 1 );
 }
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-
 /* Appends a read error to the output handle
  * Returns 1 if successful or -1 on error
  */
@@ -3389,7 +3407,6 @@ int verification_handle_append_read_error(
 	}
 	return( 1 );
 }
-#endif
 
 /* Print the hash values to a stream
  * Returns 1 if successful or -1 on error

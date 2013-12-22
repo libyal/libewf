@@ -108,7 +108,7 @@ void usage_fprint(
 	                 "                 [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
-	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
+	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVwx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -172,6 +172,8 @@ void usage_fprint(
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
+	                 "\t           functions.\n" );
 }
 
 /* Signal handler for ewfexport
@@ -255,6 +257,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                                         = 1;
 	uint8_t print_status_information                              = 1;
 	uint8_t swap_byte_pairs                                       = 0;
+	uint8_t use_chunk_data_functions                              = 0;
 	uint8_t verbose                                               = 0;
 	uint8_t zero_chunk_on_error                                   = 0;
 	int interactive_mode                                          = 1;
@@ -318,7 +321,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -437,6 +440,11 @@ int main( int argc, char * const argv[] )
 				zero_chunk_on_error = 1;
 
 				break;
+
+			case (libcstring_system_integer_t) 'x':
+				use_chunk_data_functions = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )
@@ -502,6 +510,7 @@ int main( int argc, char * const argv[] )
 	if( export_handle_initialize(
 	     &ewfexport_export_handle,
 	     calculate_md5,
+	     use_chunk_data_functions,
 	     &error ) != 1 )
 	{
 		fprintf(

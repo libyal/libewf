@@ -149,6 +149,10 @@ struct export_handle
 	 */
 	libcstring_system_character_t *calculated_sha256_hash_string;
 
+	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
+	 */
+	uint8_t use_chunk_data_functions;
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -177,11 +181,9 @@ struct export_handle
 	 */
 	size64_t input_media_size;
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* The last offset of the input data
 	 */
 	off64_t input_offset;
-#endif
 
 	/* Value to indicate if the write is compressed
 	 */
@@ -207,6 +209,7 @@ struct export_handle
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int export_handle_free(
@@ -404,13 +407,11 @@ int export_handle_set_hash_value(
      size_t hash_value_length,
      libcerror_error_t **error );
 
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 int export_handle_append_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,
       size_t number_of_bytes,
       libcerror_error_t **error );
-#endif
 
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,

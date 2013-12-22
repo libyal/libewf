@@ -57,6 +57,7 @@
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize";
@@ -175,6 +176,7 @@ int imaging_handle_initialize(
 		}
 	}
 	( *imaging_handle )->calculate_md5            = calculate_md5;
+	( *imaging_handle )->use_chunk_data_functions = use_chunk_data_functions;
 	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
 	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
@@ -858,42 +860,45 @@ ssize_t imaging_handle_prepare_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
-
-	process_count = libewf_handle_prepare_read_chunk(
-	                 imaging_handle->output_handle,
-	                 storage_media_buffer->compression_buffer,
-	                 storage_media_buffer->compression_buffer_data_size,
-	                 storage_media_buffer->raw_buffer,
-	                 &( storage_media_buffer->raw_buffer_data_size ),
-	                 storage_media_buffer->is_compressed,
-	                 storage_media_buffer->checksum,
-	                 storage_media_buffer->process_checksum,
-	                 error );
-
-	if( process_count == -1 )
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read storage media buffer.",
-		 function );
+		storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
 
-		return( -1 );
-	}
-	if( storage_media_buffer->is_compressed == 0 )
-	{
-		storage_media_buffer->data_in_compression_buffer = 1;
+		process_count = libewf_handle_prepare_read_chunk(
+		                 imaging_handle->output_handle,
+		                 storage_media_buffer->compression_buffer,
+		                 storage_media_buffer->compression_buffer_data_size,
+		                 storage_media_buffer->raw_buffer,
+		                 &( storage_media_buffer->raw_buffer_data_size ),
+		                 storage_media_buffer->is_compressed,
+		                 storage_media_buffer->checksum,
+		                 storage_media_buffer->process_checksum,
+		                 error );
+
+		if( process_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+		if( storage_media_buffer->is_compressed == 0 )
+		{
+			storage_media_buffer->data_in_compression_buffer = 1;
+		}
+		else
+		{
+			storage_media_buffer->data_in_compression_buffer = 0;
+		}
 	}
 	else
 	{
-		storage_media_buffer->data_in_compression_buffer = 0;
+		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 	}
-#else
-	process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
-#endif
 	return( process_count );
 }
 
@@ -932,24 +937,26 @@ ssize_t imaging_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	read_count = libewf_handle_read_chunk(
-                      imaging_handle->output_handle,
-                      storage_media_buffer->compression_buffer,
-                      storage_media_buffer->compression_buffer_size,
-	              &( storage_media_buffer->is_compressed ),
-	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-	              &( storage_media_buffer->checksum ),
-	              &( storage_media_buffer->process_checksum ),
-	              error );
-#else
-	read_count = libewf_handle_read_buffer(
-                      imaging_handle->output_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size,
-	              error );
-#endif
-
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		read_count = libewf_handle_read_chunk(
+	                      imaging_handle->output_handle,
+	                      storage_media_buffer->compression_buffer,
+	                      storage_media_buffer->compression_buffer_size,
+		              &( storage_media_buffer->is_compressed ),
+		              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
+		              &( storage_media_buffer->checksum ),
+		              &( storage_media_buffer->process_checksum ),
+		              error );
+	}
+	else
+	{
+		read_count = libewf_handle_read_buffer(
+	                      imaging_handle->output_handle,
+	                      storage_media_buffer->raw_buffer,
+	                      read_size,
+		              error );
+	}
 	if( read_count == -1 )
 	{
 		libcerror_error_set(
@@ -963,24 +970,26 @@ ssize_t imaging_handle_read_buffer(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		secondary_read_count = libewf_handle_read_chunk(
-			                imaging_handle->secondary_output_handle,
-			                storage_media_buffer->compression_buffer,
-			                storage_media_buffer->compression_buffer_size,
-			                &( storage_media_buffer->is_compressed ),
-			                &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
-			                &( storage_media_buffer->checksum ),
-			                &( storage_media_buffer->process_checksum ),
-			                error );
-#else
-		secondary_read_count = libewf_handle_read_buffer(
-		                        imaging_handle->secondary_output_handle,
-		                        storage_media_buffer->raw_buffer,
-		                        read_size,
-		                        error );
-#endif
-
+		if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			secondary_read_count = libewf_handle_read_chunk(
+				                imaging_handle->secondary_output_handle,
+				                storage_media_buffer->compression_buffer,
+				                storage_media_buffer->compression_buffer_size,
+				                &( storage_media_buffer->is_compressed ),
+				                &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
+				                &( storage_media_buffer->checksum ),
+				                &( storage_media_buffer->process_checksum ),
+				                error );
+		}
+		else
+		{
+			secondary_read_count = libewf_handle_read_buffer(
+			                        imaging_handle->secondary_output_handle,
+			                        storage_media_buffer->raw_buffer,
+			                        read_size,
+			                        error );
+		}
 		if( secondary_read_count == -1 )
 		{
 			libcerror_error_set(
@@ -993,12 +1002,14 @@ ssize_t imaging_handle_read_buffer(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_data_size = (ssize_t) read_count;
-#else
-	storage_media_buffer->raw_buffer_data_size         = (ssize_t) read_count;
-#endif
-
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		storage_media_buffer->compression_buffer_data_size = (ssize_t) read_count;
+	}
+	else
+	{
+		storage_media_buffer->raw_buffer_data_size = (ssize_t) read_count;
+	}
 	return( read_count );
 }
 
@@ -1035,35 +1046,37 @@ ssize_t imaging_handle_prepare_write_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	storage_media_buffer->compression_buffer_data_size = storage_media_buffer->compression_buffer_size;
-
-	process_count = libewf_handle_prepare_write_chunk(
-	                 imaging_handle->output_handle,
-	                 storage_media_buffer->raw_buffer,
-	                 storage_media_buffer->raw_buffer_data_size,
-	                 storage_media_buffer->compression_buffer,
-	                 &( storage_media_buffer->compression_buffer_data_size ),
-	                 &( storage_media_buffer->is_compressed ),
-	                 &( storage_media_buffer->checksum ),
-	                 &( storage_media_buffer->process_checksum ),
-	                 error );
-
-	if( process_count == -1 )
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to prepare storage media buffer before writing.",
-		 function );
+		storage_media_buffer->compression_buffer_data_size = storage_media_buffer->compression_buffer_size;
 
-		return( -1 );
+		process_count = libewf_handle_prepare_write_chunk(
+		                 imaging_handle->output_handle,
+		                 storage_media_buffer->raw_buffer,
+		                 storage_media_buffer->raw_buffer_data_size,
+		                 storage_media_buffer->compression_buffer,
+		                 &( storage_media_buffer->compression_buffer_data_size ),
+		                 &( storage_media_buffer->is_compressed ),
+		                 &( storage_media_buffer->checksum ),
+		                 &( storage_media_buffer->process_checksum ),
+		                 error );
+
+		if( process_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to prepare storage media buffer before writing.",
+			 function );
+
+			return( -1 );
+		}
 	}
-#else
-	process_count = storage_media_buffer->raw_buffer_data_size;
-#endif
-
+	else
+	{
+		process_count = storage_media_buffer->raw_buffer_data_size;
+	}
 	return( process_count );
 }
 
@@ -1076,14 +1089,11 @@ ssize_t imaging_handle_write_buffer(
          size_t write_size,
          libcerror_error_t **error )
 {
+	uint8_t *raw_write_buffer     = NULL;
 	static char *function         = "imaging_handle_write_buffer";
+	size_t raw_write_buffer_size  = 0;
 	ssize_t secondary_write_count = 0;
 	ssize_t write_count           = 0;
-
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	uint8_t *raw_write_buffer     = NULL;
-	size_t raw_write_buffer_size  = 0;
-#endif
 
 	if( imaging_handle == NULL )
 	{
@@ -1111,46 +1121,48 @@ ssize_t imaging_handle_write_buffer(
 	{
 		return( 0 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	if( storage_media_buffer->is_compressed == 0 )
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
-		raw_write_buffer      = storage_media_buffer->raw_buffer;
-		raw_write_buffer_size = storage_media_buffer->raw_buffer_data_size;
+		if( storage_media_buffer->is_compressed == 0 )
+		{
+			raw_write_buffer      = storage_media_buffer->raw_buffer;
+			raw_write_buffer_size = storage_media_buffer->raw_buffer_data_size;
+		}
+		else
+		{
+			raw_write_buffer      = storage_media_buffer->compression_buffer;
+			raw_write_buffer_size = storage_media_buffer->compression_buffer_data_size;
+		}
+		if( write_size != raw_write_buffer_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: mismatch in write size and number of bytes in storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+		write_count = libewf_handle_write_chunk(
+		               imaging_handle->output_handle,
+		               raw_write_buffer,
+		               raw_write_buffer_size,
+		               storage_media_buffer->raw_buffer_data_size,
+		               storage_media_buffer->is_compressed,
+		               storage_media_buffer->checksum_buffer,
+		               storage_media_buffer->checksum,
+		               storage_media_buffer->process_checksum,
+		               error );
 	}
 	else
 	{
-		raw_write_buffer      = storage_media_buffer->compression_buffer;
-		raw_write_buffer_size = storage_media_buffer->compression_buffer_data_size;
+		write_count = libewf_handle_write_buffer(
+		               imaging_handle->output_handle,
+		               storage_media_buffer->raw_buffer,
+		               write_size,
+		               error );
 	}
-	if( write_size != raw_write_buffer_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: mismatch in write size and number of bytes in storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	write_count = libewf_handle_write_chunk(
-	               imaging_handle->output_handle,
-	               raw_write_buffer,
-	               raw_write_buffer_size,
-	               storage_media_buffer->raw_buffer_data_size,
-	               storage_media_buffer->is_compressed,
-	               storage_media_buffer->checksum_buffer,
-	               storage_media_buffer->checksum,
-	               storage_media_buffer->process_checksum,
-	               error );
-#else
-	write_count = libewf_handle_write_buffer(
-	               imaging_handle->output_handle,
-	               storage_media_buffer->raw_buffer,
-	               write_size,
-	               error );
-#endif
-
 	if( write_count == -1 )
 	{
 		libcerror_error_set(
@@ -1173,25 +1185,27 @@ ssize_t imaging_handle_write_buffer(
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-		secondary_write_count = libewf_handle_write_chunk(
-		                         imaging_handle->secondary_output_handle,
-		                         raw_write_buffer,
-		                         raw_write_buffer_size,
-		                         storage_media_buffer->raw_buffer_data_size,
-		                         storage_media_buffer->is_compressed,
-		                         storage_media_buffer->checksum_buffer,
-		                         storage_media_buffer->checksum,
-		                         storage_media_buffer->process_checksum,
-		                         error );
-#else
-		secondary_write_count = libewf_handle_write_buffer(
-		                         imaging_handle->secondary_output_handle,
-		                         storage_media_buffer->raw_buffer,
-		                         write_size,
-		                         error );
-#endif
-
+		if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			secondary_write_count = libewf_handle_write_chunk(
+			                         imaging_handle->secondary_output_handle,
+			                         raw_write_buffer,
+			                         raw_write_buffer_size,
+			                         storage_media_buffer->raw_buffer_data_size,
+			                         storage_media_buffer->is_compressed,
+			                         storage_media_buffer->checksum_buffer,
+			                         storage_media_buffer->checksum,
+			                         storage_media_buffer->process_checksum,
+			                         error );
+		}
+		else
+		{
+			secondary_write_count = libewf_handle_write_buffer(
+			                         imaging_handle->secondary_output_handle,
+			                         storage_media_buffer->raw_buffer,
+			                         write_size,
+			                         error );
+		}
 		if( secondary_write_count == -1 )
 		{
 			libcerror_error_set(

@@ -196,6 +196,10 @@ struct imaging_handle
 	 */
 	uint8_t sha256_context_initialized;
 
+	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
+	 */
+	uint8_t use_chunk_data_functions;
+
 	/* The calculated SHA256 digest hash string
 	 */
 	libcstring_system_character_t *calculated_sha256_hash_string;
@@ -228,6 +232,7 @@ struct imaging_handle
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
+     uint8_t use_chunk_data_functions,
      libcerror_error_t **error );
 
 int imaging_handle_free(
