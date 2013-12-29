@@ -65,7 +65,6 @@
 #include <dokan.h>
 #endif
 
-#include "mount_handle.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
@@ -73,6 +72,7 @@
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
+#include "mount_handle.h"
 
 mount_handle_t *ewfmount_mount_handle = NULL;
 int ewfmount_abort                    = 0;
@@ -276,6 +276,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }
@@ -511,6 +517,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }
@@ -1498,6 +1510,12 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
 	return( result );
 }
 
@@ -1610,6 +1628,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }
@@ -1904,6 +1928,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }
@@ -2293,6 +2323,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 					goto on_error;
 				}
+/* TODO Check bounds MAX_PATH */
 				if( libcstring_wide_string_copy(
 				     find_data.cFileName,
 				     name,
@@ -2309,6 +2340,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 					goto on_error;
 				}
+/* TODO check max of 14
 				if( libcstring_wide_string_copy(
 				     find_data.cAlternateFileName,
 				     name,
@@ -2325,6 +2357,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 					goto on_error;
 				}
+*/
 				memory_free(
 				 name );
 
@@ -2921,6 +2954,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libewf_file_entry_free(
+		 &file_entry,
+		 NULL );
 	}
 	return( result );
 }

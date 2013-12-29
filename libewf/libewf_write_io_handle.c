@@ -2976,6 +2976,10 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN ) == 0 )
 		{
 			segment_file = NULL;
+
+			/* The segment file was closed so a new one needs to be created.
+			 */
+			segment_number++;
 		}
 	}
 	if( segment_file == NULL )

@@ -1,4 +1,7 @@
 TODO
+* ewftools:
+  - if one option available just print and continue
+  - if set by command lien just print and continue
 * fix python bindings open file objects - segment table not being initialized
 * update msvscpp files
 * Finish migrating tests to test_runner
@@ -14,6 +17,10 @@ TODO
   - change API to have chunk type
 * libmfdata/libfdata merge
   - fix reading delta chunks
+* libewf_chunk_data_check_for_empty_block
+  - use memcmp instead?
+  - write a test at configure time to determine which approach is faster
+  - same for adler32 ?
 
   - reimplement chunk table using layered approach (+/-)
 
