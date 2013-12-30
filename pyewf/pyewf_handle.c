@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf.h"
 #include "pyewf_error.h"
 #include "pyewf_file_entry.h"
 #include "pyewf_file_objects_io_pool.h"
@@ -594,6 +593,7 @@ PyObject *pyewf_handle_open(
 	PyObject *sequence_object   = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyewf_handle_open";
+	Py_ssize_t sequence_size    = 0;
 	size_t filename_length      = 0;
 	int access_flags            = 0;
 	int filename_index          = 0;
@@ -679,8 +679,19 @@ PyObject *pyewf_handle_open(
 
 		return( NULL );
 	}
-	number_of_filenames = PySequence_Size(
-	                       sequence_object );
+	sequence_size = PySequence_Size(
+	                 sequence_object );
+
+        if( sequence_size > (Py_ssize_t) INT_MAX )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid sequence size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	number_of_filenames = (int) sequence_size;
 
 	if( ( number_of_filenames <= 0 )
 	 || ( number_of_filenames > (int) UINT16_MAX ) )

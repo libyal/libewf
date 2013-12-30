@@ -434,7 +434,7 @@ ssize_t ewfacquirestream_read_chunk(
 #endif
 				/* There was a read error at a certain offset
 				 */
-				read_error_offset += read_count;
+				read_error_offset += (uint32_t) read_count;
 				bytes_to_read     -= read_count;
 			}
 			read_number_of_errors++;
@@ -643,7 +643,7 @@ int ewfacquirestream_read_input(
 		              input_file_descriptor,
 		              storage_media_buffer->raw_buffer,
 		              storage_media_buffer->raw_buffer_size,
-		              read_size,
+		              (size32_t) read_size,
 		              acquiry_count,
 		              read_error_retries,
 		              error );

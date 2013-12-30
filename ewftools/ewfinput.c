@@ -1168,7 +1168,11 @@ int ewfinput_get_string_variable(
 
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( string_variable_size > (size_t) INT_MAX )
+#else
 	if( string_variable_size > (size_t) SSIZE_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1193,7 +1197,7 @@ int ewfinput_get_string_variable(
 		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 string_variable,
-		                 string_variable_size - 1 );
+		                 (int) ( string_variable_size - 1 ) );
 
 		if( result_string != NULL )
 		{
@@ -1213,7 +1217,7 @@ int ewfinput_get_string_variable(
 					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 string_variable,
-					                 string_variable_size - 1 );
+					                 (int) ( string_variable_size - 1 ) );
 
 					end_of_input = libcstring_system_string_search_character(
 					                string_variable,
@@ -1290,7 +1294,11 @@ int ewfinput_get_size_variable(
 
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( input_buffer_size > (size_t) INT_MAX )
+#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1340,7 +1348,7 @@ int ewfinput_get_size_variable(
 		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1 );
+		                 (int)( input_buffer_size - 1 ) );
 
 		if( result_string != NULL )
 		{
@@ -1360,7 +1368,7 @@ int ewfinput_get_size_variable(
 					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1 );
+					                 (int) ( input_buffer_size - 1 ) );
 
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
@@ -1459,7 +1467,11 @@ int ewfinput_get_byte_size_variable(
 
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( input_buffer_size > (size_t) INT_MAX )
+#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1557,7 +1569,7 @@ int ewfinput_get_byte_size_variable(
 		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1 );
+		                 (int) ( input_buffer_size - 1 ) );
 
 		if( result_string != NULL )
 		{
@@ -1577,7 +1589,7 @@ int ewfinput_get_byte_size_variable(
 					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1 );
+					                 (int) ( input_buffer_size - 1 ) );
 
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,
@@ -1675,7 +1687,11 @@ int ewfinput_get_fixed_string_variable(
 
 		return( -1 );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( input_buffer_size > (size_t) INT_MAX )
+#else
 	if( input_buffer_size > (size_t) SSIZE_MAX )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -1749,7 +1765,7 @@ int ewfinput_get_fixed_string_variable(
 		result_string = libcsystem_file_stream_get_string(
 		                 stdin,
 		                 input_buffer,
-		                 input_buffer_size - 1 );
+		                 (int) ( input_buffer_size - 1 ) );
 
 		if( result_string != NULL )
 		{
@@ -1769,7 +1785,7 @@ int ewfinput_get_fixed_string_variable(
 					result_string = libcsystem_file_stream_get_string(
 					                 stdin,
 					                 input_buffer,
-					                 input_buffer_size - 1 );
+					                 (int) ( input_buffer_size - 1 ) );
 
 					end_of_input = libcstring_system_string_search_character(
 					                input_buffer,

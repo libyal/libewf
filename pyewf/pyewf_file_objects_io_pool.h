@@ -35,7 +35,7 @@ extern "C" {
 
 int pyewf_file_objects_pool_initialize(
      libbfio_pool_t **pool,
-     PyObject *file_objects,
+     PyObject *sequence_object,
      int access_flags,
      libcerror_error_t **error );
 

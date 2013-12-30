@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf.h"
 #include "pyewf_datetime.h"
 #include "pyewf_error.h"
 #include "pyewf_file_entries.h"

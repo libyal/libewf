@@ -2345,6 +2345,20 @@ System::String^ Handle::GetHeaderValueIdentifier( int index )
 		throw gcnew System::Exception(
 			     error_string );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( ewf_header_value_identifier_size > (size_t) INT_MAX )
+#else
+	if( ewf_header_value_identifier_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid header value identifier size value exceeds maximum." );
+	}
+	if( ewf_header_value_identifier_size == 0 )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid header value identifier size value out of bounds." );
+	}
 	ewf_header_value_identifier = (uint8_t *) memory_allocate(
 	                                           sizeof( uint8_t ) * ewf_header_value_identifier_size );
 
@@ -2393,7 +2407,7 @@ System::String^ Handle::GetHeaderValueIdentifier( int index )
 		header_value_identifier = gcnew System::String(
 		                                 (char *) ewf_header_value_identifier,
 		                                 0,
-		                                 ewf_header_value_identifier_size - 1,
+		                                 (int) ( ewf_header_value_identifier_size - 1 ),
 	        	                         encoding );
 	}
 	catch( System::Exception^ exception )
@@ -2701,6 +2715,20 @@ System::String^ Handle::GetHashValueIdentifier( int index )
 		throw gcnew System::Exception(
 			     error_string );
 	}
+#if SIZEOF_SIZE_T > SIZEOF_INT
+	if( ewf_hash_value_identifier_size > (size_t) INT_MAX )
+#else
+	if( ewf_hash_value_identifier_size > (size_t) SSIZE_MAX )
+#endif
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid hash value identifier size value exceeds maximum." );
+	}
+	if( ewf_hash_value_identifier_size == 0 )
+	{
+		throw gcnew System::Exception(
+		             "ewf.net " + function + ": invalid hash value identifier size value out of bounds." );
+	}
 	ewf_hash_value_identifier = (uint8_t *) memory_allocate(
 	                                         sizeof( uint8_t ) * ewf_hash_value_identifier_size );
 
@@ -2749,7 +2777,7 @@ System::String^ Handle::GetHashValueIdentifier( int index )
 		hash_value_identifier = gcnew System::String(
 		                               (char *) ewf_hash_value_identifier,
 		                               0,
-		                               ewf_hash_value_identifier_size - 1,
+		                               (int) ( ewf_hash_value_identifier_size - 1 ),
 	        	                       encoding );
 	}
 	catch( System::Exception^ exception )

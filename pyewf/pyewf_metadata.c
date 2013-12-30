@@ -23,7 +23,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyewf.h"
 #include "pyewf_codepage.h"
 #include "pyewf_error.h"
 #include "pyewf_handle.h"

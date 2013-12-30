@@ -35,13 +35,14 @@
  */
 int pyewf_file_objects_pool_initialize(
      libbfio_pool_t **pool,
-     PyObject *file_objects,
+     PyObject *sequence_object,
      int access_flags,
      libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
 	static char *function            = "pyewf_file_objects_pool_initialize";
+        Py_ssize_t sequence_size         = 0;
 	int element_index                = 0;
 	int file_io_pool_entry           = 0;
 	int number_of_elements           = 0;
@@ -68,8 +69,21 @@ int pyewf_file_objects_pool_initialize(
 
 		return( -1 );
 	}
-	number_of_elements = PySequence_Size(
-	                      file_objects );
+	sequence_size = PySequence_Size(
+	                 sequence_object );
+
+        if( sequence_size > (Py_ssize_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid sequence size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	number_of_elements = (int) sequence_size;
 
 	if( libbfio_pool_initialize(
 	     pool,
@@ -91,7 +105,7 @@ int pyewf_file_objects_pool_initialize(
 	     element_index++ )
 	{
 		file_object = PySequence_GetItem(
-		               file_objects,
+		               sequence_object,
 		               element_index );
 
 		if( file_object == NULL )

@@ -436,6 +436,9 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20131230
+* small updates
+
 20131222
 * moved low-level function support from compile time to run time
 * worked on experimental features

@@ -22,7 +22,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyewf.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_integer.h"
 #include "pyewf_python.h"
