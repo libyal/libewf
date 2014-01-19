@@ -1,7 +1,7 @@
 /*
  * The internal definitions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -123,7 +123,7 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for emtpy block compression
+ * bit 1	set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
  * bit 2	set to 1 for pattern fill compression

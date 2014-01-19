@@ -69,8 +69,8 @@ ewf_test_glob_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_glob_LDADD = \
-	@LIBCSTRING_LIBADD@ \
-	../libewf/libewf.la
+	../libewf/libewf.la \
+	@LIBCSTRING_LIBADD@
 
 ewf_test_read_SOURCES = \
 	ewf_test_definitions.h \
@@ -125,7 +125,7 @@ ewf_test_seek_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_seek_LDADD = \
-	../libewf/libewf.la
+	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@
 

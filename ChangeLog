@@ -1,4 +1,5 @@
 TODO
+* user header and header2 time difference to calculate the timezone
 * ewftools:
   - if one option available just print and continue
   - if set by command lien just print and continue
@@ -435,6 +436,10 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20140119
+* 2014 update
+* updated dependencies
 
 20131230
 * small updates

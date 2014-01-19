@@ -117,7 +117,7 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for emtpy block compression
+ * bit 1	set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
  * bit 2	set to 1 for pattern fill compression

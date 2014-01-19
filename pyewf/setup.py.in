@@ -11,7 +11,7 @@ from distutils.command.sdist import sdist
 from distutils.core import setup, Extension
 
 
-# Custom handler for the setup.py sdist command.
+# Custom handler for the setup.py bdist_rpm command.
 class custom_bdist_rpm(bdist):
 	def run(self):
 		print "'setup.py bdist_rpm' command not supported use 'rpmbuild' instead."

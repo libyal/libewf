@@ -2,7 +2,7 @@
  *  Metadata functions for the Python object definition of the libewf handle
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -608,7 +608,7 @@ PyObject *pyewf_handle_get_header_values(
 
 			goto on_error;
 		}
-		/* Ignore emtpy header values
+		/* Ignore empty header values
 		 */
 		if( ( result != 0 )
 		 && ( header_value_size > 0 ) )
@@ -1027,7 +1027,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 			goto on_error;
 		}
-		/* Ignore emtpy hash values
+		/* Ignore empty hash values
 		 */
 		if( ( result != 0 )
 		 && ( hash_value_size > 0 ) )

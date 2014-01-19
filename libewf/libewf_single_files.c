@@ -1,7 +1,7 @@
 /*
  * Single file entries functions
  *
- * Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -583,7 +583,7 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
-			/* The single files entries should be followed by an emtpy line
+			/* The single files entries should be followed by an empty line
 			 */
 			if( libfvalue_split_utf8_string_get_segment_by_index(
 			     lines,
@@ -1678,7 +1678,7 @@ int libewf_single_files_parse_file_entry(
 			if( type_string[ 0 ] == (uint8_t) 'p' )
 			{
 				/* p = 1 if directory
-				 * p = emtpy if file
+				 * p = empty if file
 				 */
 				if( value_string == NULL )
 				{
