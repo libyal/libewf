@@ -5570,6 +5570,26 @@ int imaging_handle_print_parameters(
 			 imaging_handle->notify_stream,
 			 ".e01" );
 		}
+		else if( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_ENCASE7 )
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 ".Ex01" );
+		}
+		else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+		      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE7 ) )
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 ".L01" );
+		}
+		else if( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 )
+		{
+			fprintf(
+			 imaging_handle->notify_stream,
+			 ".Lx01" );
+		}
 		else
 		{
 			fprintf(
@@ -5594,20 +5614,40 @@ int imaging_handle_print_parameters(
 			{
 				fprintf(
 				 imaging_handle->notify_stream,
-				 "s01" );
+				 ".s01" );
 			}
 			else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWF )
 			      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
 			{
 				fprintf(
 				 imaging_handle->notify_stream,
-				 "e01" );
+				 ".e01" );
+			}
+			else if( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_ENCASE7 )
+			{
+				fprintf(
+				 imaging_handle->notify_stream,
+				 ".Ex01" );
+			}
+			else if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE5 )
+			      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE6 )
+			      || ( imaging_handle->ewf_format == LIBEWF_FORMAT_LOGICAL_ENCASE7 ) )
+			{
+				fprintf(
+				 imaging_handle->notify_stream,
+				 ".L01" );
+			}
+			else if( imaging_handle->ewf_format == LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 )
+			{
+				fprintf(
+				 imaging_handle->notify_stream,
+				 ".Lx01" );
 			}
 			else
 			{
 				fprintf(
 				 imaging_handle->notify_stream,
-				 "E01" );
+				 ".E01" );
 			}
 		}
 		fprintf(

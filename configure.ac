@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20140119],
+ [20140126],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -69,6 +69,9 @@ AX_LIBCDATA_CHECK_ENABLE
 dnl Check for enabling libclocale for cross-platform C locale functions
 AX_LIBCLOCALE_CHECK_ENABLE
 
+dnl Check for enabling libcdatetime for cross-platform C datetime functions
+AX_LIBCDATETIME_CHECK_ENABLE
+
 dnl Check for enabling libcnotify for cross-platform C notification functions
 AX_LIBCNOTIFY_CHECK_ENABLE
 
@@ -131,133 +134,6 @@ AX_LIBFUSE_CHECK_ENABLE
 
 dnl Check for headers and functions used in tools
 
-dnl Function to detect if ctime_r or ctime is available
-dnl Also checks how to use ctime_r
-AC_DEFUN([AX_EWFTOOLS_CHECK_FUNC_CTIME],
- [AC_CHECK_FUNCS([ctime_r])
-
- AS_IF(
-  [test "x$ac_cv_func_ctime_r" = xyes],
-  [AC_MSG_CHECKING(
-   [how to use ctime_r])
-
-  AC_LANG_PUSH(C)
-
-  AC_LINK_IFELSE(
-   [AC_LANG_PROGRAM(
-    [[#include <time.h>]],
-    [[ctime_r( NULL, NULL, 0 )]] )],
-    [AC_MSG_RESULT(
-     [with additional size argument])
-    ac_cv_cv_ctime_r_size=yes],
-    [ac_cv_cv_ctime_r_size=no])
-
-  AS_IF(
-   [test "x$ac_cv_cv_ctime_r_size" = xno],
-   [AC_LINK_IFELSE(
-    [AC_LANG_PROGRAM(
-     [[#include <time.h>]],
-     [[ctime_r( NULL, NULL )]] )],
-    [AC_MSG_RESULT(
-     [with two arguments])
-    ac_cv_cv_ctime_r_posix=yes],
-    [ac_cv_cv_ctime_r_posix=no])
-   ])
-
-  AS_IF(
-   [test "x$ac_cv_cv_ctime_r_posix" = xno],
-   [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
-   AC_LINK_IFELSE(
-    [AC_LANG_PROGRAM(
-     [[#include <time.h>]],
-     [[ctime_r( NULL, NULL )]] )],
-    [AC_MSG_RESULT(
-     [with two arguments and definition _POSIX_PTHREAD_SEMANTICS])
-     ac_cv_cv_ctime_r_posix=yes],
-    [ac_cv_cv_ctime_r_posix=no])
-   ])
-
-  AC_LANG_POP(C)
-
-  AS_IF(
-   [test "x$ac_cv_cv_ctime_r_size" = xno && test "x$ac_cv_cv_ctime_r_posix" = xno],
-   [AC_MSG_WARN(
-    [unknown])
-   ac_cv_func_ctime_r=no])
-
-  AS_IF(
-   [test "x$ac_cv_func_ctime_r" = xyes],
-   [AC_DEFINE(
-    [HAVE_CTIME_R],
-    [1],
-    [Define to 1 if you have the ctime_r function.])
-   ])
-
-  AS_IF(
-   [test "x$ac_cv_cv_ctime_r_size" = xyes],
-   [AC_DEFINE(
-    [HAVE_CTIME_R_SIZE],
-    [1],
-    [Define to 1 if you have the ctime_r function with a third size argument.])
-   ])
-  ])
-
- AS_IF(
-  [test "x$ac_cv_func_ctime_r" = xno],
-  [AC_CHECK_FUNCS([ctime])
-
-  AS_IF(
-   [test "x$ac_cv_func_ctime" = xno],
-   [AC_MSG_FAILURE(
-    [Missing function: ctime_r and ctime],
-    [1])
-   ])
-  ])
- ])
-
-AS_IF(
- [test "x$ac_cv_enable_winapi" = xno],
- [AC_CHECK_HEADERS([sys/resource.h sys/utsname.h])
- AC_HEADER_TIME
- AC_CHECK_FUNCS([getegid geteuid getrlimit getuid time uname])
- ])
-
-dnl Date and time functions used in libcsystem/libcsystem_date_time.c
-AC_CHECK_FUNCS([localtime localtime_r mktime])
-
-AS_IF(
- [test "x$ac_cv_func_localtime" != xyes && test "x$ac_cv_func_localtime_r" != xyes],
- [AC_MSG_FAILURE(
-  [Missing functions: localtime and localtime_r],
-  [1])
- ])
- 
-AS_IF(
- [test "x$ac_cv_func_mktime" != xyes],
- [AC_MSG_FAILURE(
-  [Missing function: mktime],
-  [1])
- ])
- 
-dnl Date and time functions used in libcsystem/libcsystem_date_time.h
-AX_EWFTOOLS_CHECK_FUNC_CTIME
- 
-AC_CHECK_FUNCS([gmtime gmtime_r time])
-
-AS_IF(
- [test "x$ac_cv_func_gmtime" != xyes && test "x$ac_cv_func_gmtime_r" != xyes],
- [AC_MSG_FAILURE(
-  [Missing functions: gmtime_r and gmtime],
-  [1])
- ])
- 
-AS_IF(
- [test "x$ac_cv_func_time" != xyes],
- [AC_MSG_FAILURE(
-  [Missing function: time],
-  [1])
- ])
- 
 dnl Check if ewftools should be build as static executables
 AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 
@@ -326,6 +202,7 @@ AC_CONFIG_FILES([libcerror/Makefile])
 AC_CONFIG_FILES([libcthreads/Makefile])
 AC_CONFIG_FILES([libcdata/Makefile])
 AC_CONFIG_FILES([libclocale/Makefile])
+AC_CONFIG_FILES([libcdatetime/Makefile])
 AC_CONFIG_FILES([libcnotify/Makefile])
 AC_CONFIG_FILES([libcsplit/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
@@ -387,6 +264,7 @@ Building:
    libcerror support:                        $ac_cv_libcerror
    libcthreads support:                      $ac_cv_libcthreads
    libcdata support:                         $ac_cv_libcdata
+   libcdatetime support:                     $ac_cv_libcdatetime
    libclocale support:                       $ac_cv_libclocale
    libcnotify support:                       $ac_cv_libcnotify
    libcsplit support:                        $ac_cv_libcsplit

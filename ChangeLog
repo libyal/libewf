@@ -437,9 +437,14 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20140126
+* fixed multi file caching bug in libfdata
+
 20140119
 * 2014 update
 * updated dependencies
+* added libcdatetime
+* bug fix in writing original ewf format, due to EWF2 refactor
 
 20131230
 * small updates

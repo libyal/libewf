@@ -802,7 +802,7 @@ int libewf_chunk_group_fill_v2(
 			 chunk_data_size );
 
 			libcnotify_printf(
-			 "%s: table entry: %05" PRIu32 " chunk data flags\t: 0x%08" PRIx32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data flags\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 table_entry_index,
 			 chunk_data_flags );

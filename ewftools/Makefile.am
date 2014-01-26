@@ -4,6 +4,7 @@ AM_CPPFLAGS = \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
+	@LIBCDATETIME_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBCSPLIT_CPPFLAGS@ \
@@ -43,6 +44,7 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
@@ -73,6 +75,7 @@ ewfacquire_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -87,6 +90,7 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
@@ -114,6 +118,7 @@ ewfacquirestream_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -154,6 +159,7 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
 	ewftools_libclocale.h \
@@ -183,6 +189,7 @@ ewfexport_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -262,6 +269,7 @@ ewfrecover_SOURCES = \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
 	ewftools_libclocale.h \
@@ -290,6 +298,7 @@ ewfrecover_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -303,6 +312,7 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
@@ -327,6 +337,7 @@ ewfverify_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \

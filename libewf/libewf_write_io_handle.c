@@ -3250,21 +3250,22 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		write_io_handle->remaining_segment_file_size -= write_count;
 	}
+	chunk_offset = segment_file->current_offset;
+
 	/* Write the chunk data
 	 */
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	"%s: writing chunk: %" PRIu64 " data of size: %" PRIzd " to segment file: %" PRIu32 ".\n",
+	 	"%s: writing chunk: %" PRIu64 " data of size: %" PRIzd " to segment file: %" PRIu32 " at offset: 0x%08" PRIx64 ".\n",
 		 function,
 		 chunk_index,
 		 chunk_data->data_size,
-		 segment_number );
+		 segment_number,
+		 chunk_offset );
 	}
 #endif
-	chunk_offset = segment_file->current_offset;
-
 	write_count = libewf_segment_file_write_chunk_data(
 		       segment_file,
 		       file_io_pool,

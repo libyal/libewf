@@ -3250,27 +3250,33 @@ ssize_t libewf_segment_file_write_start(
 				goto on_error;
 			}
 		}
-		if( libfdata_list_append_element(
-		     segment_file->sections_list,
-		     &element_index,
-		     file_io_pool_entry,
-		     segment_file->current_offset,
-		     sizeof( ewf_section_descriptor_v1_t ),
-		     0,
-		     error ) != 1 )
+		else
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append section to sections list.",
-			 function );
-
-			goto on_error;
+			write_count = 0;
 		}
-		segment_file->current_offset += write_count;
-		total_write_count            += write_count;
+		if( write_count > 0 )
+		{
+			if( libfdata_list_append_element(
+			     segment_file->sections_list,
+			     &element_index,
+			     file_io_pool_entry,
+			     segment_file->current_offset,
+			     sizeof( ewf_section_descriptor_v1_t ),
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append section to sections list.",
+				 function );
 
+				goto on_error;
+			}
+			segment_file->current_offset += write_count;
+			total_write_count            += write_count;
+		}
 		if( libewf_section_free(
 		     &section,
 		     error ) != 1 )
@@ -4092,32 +4098,32 @@ ssize_t libewf_segment_file_write_chunk_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " file IO pool entry\t: %d\n",
+		 "%s: chunk: %05" PRIu64 " file IO pool entry\t: %d\n",
 		 function,
 		 chunk_index,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk: %05" PRIu64 " offset\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 chunk_index,
 		 segment_file->current_offset,
 		 segment_file->current_offset );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " write size\t\t: %" PRIzd "\n",
+		 "%s: chunk: %05" PRIu64 " write size\t\t: %" PRIzd "\n",
 		 function,
 		 chunk_index,
 		 chunk_write_size );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " data size\t\t: %" PRIzd "\n",
+		 "%s: chunk: %05" PRIu64 " data size\t\t: %" PRIzd "\n",
 		 function,
 		 chunk_index,
 		 chunk_data->data_size );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " padding size\t\t: %" PRIzd "\n",
+		 "%s: chunk: %05" PRIu64 " padding size\t\t: %" PRIzd "\n",
 		 function,
 		 chunk_index,
 		 chunk_data->padding_size );
@@ -4140,7 +4146,7 @@ ssize_t libewf_segment_file_write_chunk_data(
 			return( -1 );
 		}
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " checksum\t\t\t: ",
+		 "%s: chunk: %05" PRIu64 " checksum\t\t: ",
 		 function,
 		 chunk_index );
 
@@ -4159,7 +4165,7 @@ ssize_t libewf_segment_file_write_chunk_data(
 		 "\n" );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " flags:\n",
+		 "%s: chunk: %05" PRIu64 " flags:\n",
 		 function,
 		 chunk_index );
 
