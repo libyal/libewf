@@ -1,4 +1,7 @@
 TODO
+* ewfacquire print status info without confirmation in unattended mode
+* move multi threading into ewftools
+* check if empty block check or equiv is always done (except for no compression).
 * user header and header2 time difference to calculate the timezone
 * ewftools:
   - if one option available just print and continue
@@ -436,6 +439,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20140201
+* updated libcdatetime
 
 20140126
 * fixed multi file caching bug in libfdata

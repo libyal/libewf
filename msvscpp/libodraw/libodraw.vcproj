@@ -151,10 +151,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libodraw\libodraw_array_type.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_cue_parser.c"
 				>
 			</File>
@@ -213,10 +209,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libodraw\libodraw_array_type.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_codepage.h"
 				>
 			</File>
@@ -261,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libodraw\libodraw_libcdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libodraw\libodraw_libcerror.h"
 				>
 			</File>
@@ -270,6 +266,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libodraw\libodraw_libcnotify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libodraw\libodraw_libcpath.h"
 				>
 			</File>
 			<File
