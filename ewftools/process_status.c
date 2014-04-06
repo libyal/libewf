@@ -457,28 +457,30 @@ int process_status_update(
 			 process_status->output_stream,
 			 ".\n" );
 
-			total_number_of_seconds     = ( ( number_of_seconds * 100 ) / new_percentage );
-			remaining_number_of_seconds = total_number_of_seconds - number_of_seconds;
-
-			/* Negative time means nearly finished
-			 */
-			if( remaining_number_of_seconds < 0 )
+			if( new_percentage > 0 )
 			{
-				remaining_number_of_seconds = 0;
+				total_number_of_seconds     = ( ( number_of_seconds * 100 ) / new_percentage );
+				remaining_number_of_seconds = total_number_of_seconds - number_of_seconds;
+
+				/* Negative time means nearly finished
+				 */
+				if( remaining_number_of_seconds < 0 )
+				{
+					remaining_number_of_seconds = 0;
+				}
+				fprintf(
+				 process_status->output_stream,
+				 "        completion" );
+
+				process_status_timestamp_fprint(
+				 process_status->output_stream,
+				 remaining_number_of_seconds );
+
+				process_status_bytes_per_second_fprint(
+				 process_status->output_stream,
+				 bytes_total,
+				 total_number_of_seconds );
 			}
-			fprintf(
-			 process_status->output_stream,
-			 "        completion" );
-
-			process_status_timestamp_fprint(
-			 process_status->output_stream,
-			 remaining_number_of_seconds );
-
-			process_status_bytes_per_second_fprint(
-			 process_status->output_stream,
-			 bytes_total,
-			 total_number_of_seconds );
-
 			fprintf(
 			 process_status->output_stream,
 			 ".\n\n" );
@@ -857,6 +859,10 @@ void process_status_bytes_per_second_fprint(
 	int result                = 0;
 
 	if( stream == NULL )
+	{
+		return;
+	}
+	if( seconds == 0 )
 	{
 		return;
 	}

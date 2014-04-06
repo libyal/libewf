@@ -440,6 +440,13 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20140406
+* bug fixes in m4 files
+* worked on Python bindings
+
+20140216
+* bug fix in recent process status changes
+
 20140201
 * updated libcdatetime
 

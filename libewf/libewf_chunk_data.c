@@ -1876,7 +1876,7 @@ int libewf_chunk_data_get_checksum(
 	return( result );
 }
 
-/* Reads a chunk
+/* Reads chunk data
  * Callback function for the chunks list
  * Returns 1 if successful or -1 on error
  */
@@ -1932,7 +1932,7 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid element data size value out of bounds.",
+		 "%s: invalid chunk data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1943,7 +1943,7 @@ int libewf_chunk_data_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported element data flags.",
+		 "%s: unsupported chunk data flags.",
 		 function );
 
 		return( -1 );

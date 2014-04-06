@@ -31,7 +31,7 @@
 #include <libsmdev_support.h>
 #include <libsmdev_types.h>
 
-#elif defined( HAVE_LIBSMDEV_H )
+#else
 #include <libsmdev.h>
 
 #endif

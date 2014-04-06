@@ -33,7 +33,7 @@
 #include <libhmac_support.h>
 #include <libhmac_types.h>
 
-#elif defined( HAVE_LIBHMAC_H )
+#else
 #include <libhmac.h>
 
 #endif

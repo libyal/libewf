@@ -37,7 +37,7 @@ pyewf_la_SOURCES = \
 pyewf_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	../libewf/libewf.la
+	../libewf/libewf.la \
 	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \

@@ -32,7 +32,7 @@
 #include <libodraw_support.h>
 #include <libodraw_types.h>
 
-#elif defined( HAVE_LIBODRAW_H )
+#else
 #include <libodraw.h>
 
 #endif

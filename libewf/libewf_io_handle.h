@@ -100,6 +100,10 @@ int libewf_io_handle_free(
      libewf_io_handle_t **io_handle,
      libcerror_error_t **error );
 
+int libewf_io_handle_clear(
+     libewf_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
 int libewf_io_handle_clone(
      libewf_io_handle_t **destination_io_handle,
      libewf_io_handle_t *source_io_handle,

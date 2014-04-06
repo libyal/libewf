@@ -26,6 +26,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
@@ -45,6 +46,10 @@ struct pyewf_handle
 	/* The libewf handle
 	 */
 	libewf_handle_t *handle;
+
+	/* The file IO pool
+	 */
+	libbfio_pool_t *file_io_pool;
 };
 
 extern PyMethodDef pyewf_handle_object_methods[];
@@ -58,7 +63,7 @@ PyObject *pyewf_handle_new_open(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_file_new_open_file_objects(
+PyObject *pyewf_handle_new_open_file_objects(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );

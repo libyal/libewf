@@ -31,7 +31,7 @@
 #include <libsmraw_support.h>
 #include <libsmraw_types.h>
 
-#elif defined( HAVE_LIBSMRAW_H )
+#else
 #include <libsmraw.h>
 
 #endif

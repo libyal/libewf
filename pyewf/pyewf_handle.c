@@ -33,6 +33,7 @@
 #include "pyewf_file_objects_io_pool.h"
 #include "pyewf_handle.h"
 #include "pyewf_integer.h"
+#include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
@@ -427,7 +428,7 @@ PyObject *pyewf_handle_new_open_file_objects(
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle )
 {
-	static char *function   = "pyewf_handle_init";
+	static char *function    = "pyewf_handle_init";
 	libcerror_error_t *error = NULL;
 
 	if( pyewf_handle == NULL )
@@ -439,9 +440,8 @@ int pyewf_handle_init(
 
 		return( -1 );
 	}
-	/* Make sure libewf handle is set to NULL
-	 */
-	pyewf_handle->handle = NULL;
+	pyewf_handle->handle       = NULL;
+	pyewf_handle->file_io_pool = NULL;
 
 	if( libewf_handle_initialize(
 	     &( pyewf_handle->handle ),
@@ -578,7 +578,7 @@ PyObject *pyewf_handle_signal_abort(
 	return( Py_None );
 }
 
-/* Open EWF file(s)
+/* Open a handle
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_open(
@@ -586,19 +586,24 @@ PyObject *pyewf_handle_open(
            PyObject *arguments,
            PyObject *keywords )
 {
-	libcerror_error_t *error    = NULL;
-	char **filenames            = NULL;
-	char *mode                  = NULL;
-	static char *keyword_list[] = { "filenames", "mode", NULL };
-	PyObject *sequence_object   = NULL;
-	PyObject *string_object     = NULL;
-	static char *function       = "pyewf_handle_open";
-	Py_ssize_t sequence_size    = 0;
-	size_t filename_length      = 0;
-	int access_flags            = 0;
-	int filename_index          = 0;
-	int number_of_filenames     = 0;
-	int result                  = 0;
+	PyObject *exception_string    = NULL;
+	PyObject *exception_traceback = NULL;
+	PyObject *exception_type      = NULL;
+	PyObject *exception_value     = NULL;
+	PyObject *sequence_object     = NULL;
+	PyObject *string_object       = NULL;
+	libcerror_error_t *error      = NULL;
+	char **filenames              = NULL;
+	char *error_string            = NULL;
+	char *mode                    = NULL;
+	static char *keyword_list[]   = { "filenames", "mode", NULL };
+	static char *function         = "pyewf_handle_open";
+	Py_ssize_t sequence_size      = 0;
+	size_t filename_length        = 0;
+	int access_flags              = 0;
+	int filename_index            = 0;
+	int number_of_filenames       = 0;
+	int result                    = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -738,6 +743,57 @@ PyObject *pyewf_handle_open(
 		                 sequence_object,
 		                 filename_index );
 
+		PyErr_Clear();
+
+		result = PyObject_IsInstance(
+			  string_object,
+			  (PyObject *) &PyBaseString_Type );
+
+		if( result == -1 )
+		{
+			PyErr_Fetch(
+			 &exception_type,
+			 &exception_value,
+			 &exception_traceback );
+
+			exception_string = PyObject_Repr(
+					    exception_value );
+
+			error_string = PyString_AsString(
+					exception_string );
+
+			if( error_string != NULL )
+			{
+				PyErr_Format(
+				 PyExc_ValueError,
+				 "%s: unable to determine if the sequence object: %d is of type base string with error: %s.",
+				 function,
+				 filename_index,
+				 error_string );
+			}
+			else
+			{
+				PyErr_Format(
+				 PyExc_ValueError,
+				 "%s: unable to determine if the sequence object: %d is of type base string.",
+				 function,
+				 filename_index );
+			}
+			Py_DecRef(
+			 exception_string );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			PyErr_Format(
+			 PyExc_ValueError,
+			 "%s: sequence object: %d is not of type base string.",
+			 function,
+			 filename_index );
+
+			goto on_error;
+		}
 		filename_length = PyString_Size(
 		                   string_object );
 
@@ -834,13 +890,12 @@ PyObject *pyewf_handle_open_file_objects(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *file_objects       = NULL;
-	libbfio_pool_t *file_io_pool = NULL;
-	libcerror_error_t *error     = NULL;
-	char *mode                   = NULL;
-	static char *keyword_list[]  = { "file_object", "mode", NULL };
-	static char *function        = "pyewf_handle_open_file_objects";
-	int result                   = 0;
+	PyObject *file_objects      = NULL;
+	libcerror_error_t *error    = NULL;
+	char *mode                  = NULL;
+	static char *keyword_list[] = { "file_object", "mode", NULL };
+	static char *function       = "pyewf_handle_open_file_objects";
+	int result                  = 0;
 
 	if( pyewf_handle == NULL )
 	{
@@ -873,7 +928,7 @@ PyObject *pyewf_handle_open_file_objects(
 		return( NULL );
 	}
 	if( pyewf_file_objects_pool_initialize(
-	     &file_io_pool,
+	     &( pyewf_handle->file_io_pool ),
 	     file_objects,
 	     LIBBFIO_OPEN_READ,
 	     &error ) != 1 )
@@ -893,7 +948,7 @@ PyObject *pyewf_handle_open_file_objects(
 
 	result = libewf_handle_open_file_io_pool(
 	          pyewf_handle->handle,
-                  file_io_pool,
+                  pyewf_handle->file_io_pool,
                   LIBEWF_OPEN_READ,
 	          &error );
 
@@ -918,16 +973,16 @@ PyObject *pyewf_handle_open_file_objects(
 	return( Py_None );
 
 on_error:
-	if( file_io_pool != NULL )
+	if( pyewf_handle->file_io_pool != NULL )
 	{
 		libbfio_pool_free(
-		 &file_io_pool,
+		 &( pyewf_handle->file_io_pool ),
 		 NULL );
 	}
 	return( NULL );
 }
 
-/* Closes EWF file(s)
+/* Closes a handle
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_close(
@@ -970,13 +1025,37 @@ PyObject *pyewf_handle_close(
 
 		return( NULL );
 	}
+	if( pyewf_handle->file_io_pool != NULL )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libbfio_pool_free(
+		          &( pyewf_handle->file_io_pool ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to free libbfio file IO pool.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
 	Py_IncRef(
 	 Py_None );
 
 	return( Py_None );
 }
 
-/* Reads a buffer of media data from EWF file(s)
+/* Reads a buffer of media data
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyewf_handle_read_buffer(
@@ -1074,7 +1153,7 @@ PyObject *pyewf_handle_read_buffer(
 	return( string_object );
 }
 
-/* Reads a buffer of media data at a specific offset from EWF file(s)
+/* Reads a buffer of media data at a specific offset
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyewf_handle_read_random(
@@ -1184,7 +1263,7 @@ PyObject *pyewf_handle_read_random(
 	return( string_object );
 }
 
-/* Writes a buffer of media data to EWF file(s)
+/* Writes a buffer of media data
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyewf_handle_write_buffer(
@@ -1260,7 +1339,7 @@ PyObject *pyewf_handle_write_buffer(
 	return( Py_None );
 }
 
-/* Writes a buffer of media data at a specific offset to EWF file(s)
+/* Writes a buffer of media data at a specific offset
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyewf_handle_write_random(
@@ -1276,7 +1355,6 @@ PyObject *pyewf_handle_write_random(
 	Py_ssize_t buffer_size      = 0;
 	ssize_t write_count         = 0;
 
-/* TODO fix this needs a string containing the buffer */
 	if( pyewf_handle == NULL )
 	{
 		PyErr_Format(

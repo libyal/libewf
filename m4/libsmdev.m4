@@ -1,6 +1,6 @@
 dnl Functions for libsmdev
 dnl
-dnl Version: 20130329
+dnl Version: 20140406
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libsmdev],
-    [libsmdev >= 20120630],
+    [libsmdev >= 20140406],
     [ac_cv_libsmdev=yes],
     [ac_cv_libsmdev=no])
    ])
@@ -359,9 +359,9 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
 dnl Function to detect how to enable libsmdev
 AC_DEFUN([AX_LIBSMDEV_CHECK_ENABLE],
  [AX_COMMON_ARG_WITH(
-  [libmsdev],
-  [libmsdev],
-  [search for libmsdev in includedir and libdir or in the specified DIR, or no if to use local version],
+  [libsmdev],
+  [libsmdev],
+  [search for libsmdev in includedir and libdir or in the specified DIR, or no if to use local version],
   [auto-detect],
   [DIR])
 
