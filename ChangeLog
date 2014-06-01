@@ -1,6 +1,37 @@
 TODO
-* fix acquire resome
+Tests:
+  - finish migrating tests to test_runner
+  - move test_read_chunk to test runner
+  - move test_read_delta to test runner
+  - split test_read_delta in test_read_delta and test_read_delta_chunk
+  - move test_ewfexport to test runner
 
+Fix issues with input/logical/encase7.04.01.Lx01
+
+libcdata_range_list_insert_range: invalid range size value exceeds maximum.
+libewf_chunk_table_get_chunk_data_by_offset: unable to insert checksum error
+in range list.
+libewf_handle_read_buffer: unable to read chunk: 56 data.
+verification_handle_read_buffer: unable to read storage media buffer.
+verification_handle_verify_input: unable to read data.
+
+libcdata_range_list_insert_range: invalid range size value exceeds maximum.
+libewf_chunk_table_get_chunk_data_by_offset: unable to insert checksum error
+in range list.
+libewf_handle_read_buffer: unable to read chunk: 55 data.
+libewf_file_entry_read_buffer: unable to read buffer.
+verification_handle_verify_file_entry: unable to read file entry data.
+
+
+Fix missing segment name:
+Sector validation errors:
+	total number: 1
+		at sector(s): 3584 - 28236 (number: 24653) in segment file(s):
+
+ewfexport:
+* if EWF file is empty still write an emtpy file
+
+Clean up:
 * remove random and other deprecated functions
 
 * ewfacquire print status info without confirmation in unattended mode
@@ -12,9 +43,6 @@ TODO
   - if set by command lien just print and continue
 * fix python bindings open file objects - segment table not being initialized
 * update msvscpp files
-* Finish migrating tests to test_runner
-  - fix input/logical/encase7.04.01.L01
-  - fix input/test/empty.E01
 * fix allocation of segment tables
 * fix last_chunk_data_offset calculation for table2
   in combination with libewf_chunk_group_correct_v1
@@ -450,6 +478,8 @@ Closed:
 * updated dependencies
 * deprecated random functions
 * worked on Python bindings
+* worked on tests
+* worked on EWF2 refactor
 
 20140424
 * fixes to build static library with mingw and cygwin

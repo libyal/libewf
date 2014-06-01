@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Library read testing script
+# Library open close testing script
 #
-# Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -40,14 +40,16 @@ list_contains()
 	return ${EXIT_FAILURE};
 }
 
-test_read()
+test_open_close()
 { 
-	echo "Testing read of input:" $*;
+	INPUT_FILE=$1;
 
 	rm -rf tmp;
 	mkdir tmp;
 
-	${TEST_RUNNER} ./${EWF_TEST_READ} $*;
+	echo "Testing open close of input: ${INPUT_FILE}";
+
+	${TEST_RUNNER} ./${EWF_TEST_OPEN_CLOSE} ${INPUT_FILE};
 
 	RESULT=$?;
 
@@ -58,17 +60,16 @@ test_read()
 	return ${RESULT};
 }
 
-EWF_TEST_READ="ewf_test_read";
+EWF_TEST_OPEN_CLOSE="ewf_test_open_close";
 
-if ! test -x ${EWF_TEST_READ};
+if ! test -x ${EWF_TEST_OPEN_CLOSE};
 then
-	EWF_TEST_READ="ewf_test_read.exe";
-
+	EWF_TEST_OPEN_CLOSE="ewf_test_open_close.exe";
 fi
 
-if ! test -x ${EWF_TEST_READ};
+if ! test -x ${EWF_TEST_OPEN_CLOSE};
 then
-	echo "Missing executable: ${EWF_TEST_READ}";
+	echo "Missing executable: ${EWF_TEST_OPEN_CLOSE}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -124,11 +125,11 @@ else
 				then
 					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*`;
+					TESTFILES=`ls ${TESTDIR}/*.[ELes]01 ${TESTDIR}/*.[EL]x01 2> /dev/null`;
 				fi
 				for TESTFILE in ${TESTFILES};
 				do
-					if ! test_read "${TESTFILE}";
+					if ! test_open_close "${TESTFILE}";
 					then
 						exit ${EXIT_FAILURE};
 					fi

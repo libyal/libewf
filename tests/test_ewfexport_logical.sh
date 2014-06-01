@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ewfexport testing script for logical evidence files
+# ewfexport tool testing script for logical evidence files
 #
 # Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
 #
@@ -24,29 +24,57 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_logical";
-TMP="tmp";
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-LS="ls";
-TR="tr";
-WC="wc";
+	for LINE in $LIST;
+	do
+		if test $LINE = $SEARCH;
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
 
 test_export_logical()
 { 
-	INPUT_FILE=$1;
+	DIRNAME=$1;
+	INPUT_FILE=$2;
+	BASENAME=`basename ${INPUT_FILE}`;
 
-	mkdir ${TMP};
+	if test -d tmp;
+	then
+		rm -rf tmp;
+	fi
+	mkdir tmp;
 
-${EWFEXPORT} -q ${INPUT_FILE} <<EOI
+	${TEST_RUNNER} ${EWFEXPORT} -q ${INPUT_FILE} <<EOI
 files
-${TMP}/export
+tmp/${BASENAME}
 EOI
 
 	RESULT=$?;
 
-	rm -rf ${TMP};
+	find tmp/${BASENAME} -type f -exec md5sum {} \; | sort -k 2 > tmp/${BASENAME}.log
 
-	echo -n "Testing ewfexport to files of input: ${INPUT_FILE} ";
+	if test -f "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log.gz";
+	then
+		zdiff "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log.gz" "tmp/${BASENAME}.log";
+
+		RESULT=$?;
+	else
+		mv "tmp/${BASENAME}.log" "input/.ewfexport_logical/${DIRNAME}";
+
+		gzip "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log";
+	fi
+
+	rm -rf tmp;
+
+	echo -n "Testing ewfexport of input: ${INPUT_FILE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -59,21 +87,36 @@ EOI
 
 test_export_logical_unattended()
 { 
-	OUTPUT_FORMAT=$1;
+	DIRNAME=$1;
 	INPUT_FILE=$2;
+	BASENAME=`basename ${INPUT_FILE}`;
 
-	mkdir ${TMP};
+	if test -d tmp;
+	then
+		rm -rf tmp;
+	fi
+	mkdir tmp;
 
-	${EWFEXPORT} -q -u \
-	-t ${TMP}/unattended_export \
-	-f files \
-	${INPUT_FILE}
+	${TEST_RUNNER} ${EWFEXPORT} -q -u -t tmp/${BASENAME} -f files ${INPUT_FILE}
 
 	RESULT=$?;
 
-	rm -rf ${TMP};
+	find tmp/${BASENAME} -type f -exec md5sum {} \; | sort -k 2 > tmp/${BASENAME}.log
 
-	echo -n "Testing unattended ewfexport to files of input: ${INPUT_FILE} ";
+	if test -f "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log.gz";
+	then
+		zdiff "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log.gz" "tmp/${BASENAME}.log";
+
+		RESULT=$?;
+	else
+		mv "tmp/${BASENAME}.log" "input/.ewfexport_logical/${DIRNAME}";
+
+		gzip "input/.ewfexport_logical/${DIRNAME}/${BASENAME}.log";
+	fi
+
+	rm -rf tmp;
+
+	echo -n "Testing ewfexport of input: ${INPUT_FILE} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -88,7 +131,7 @@ EWFEXPORT="../ewftools/ewfexport";
 
 if ! test -x ${EWFEXPORT};
 then
-	EWFEXPORT="../ewftools/ewfexport.exe"
+	EWFEXPORT="../ewftools/ewfexport.exe";
 fi
 
 if ! test -x ${EWFEXPORT};
@@ -98,37 +141,89 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
 then
-	echo "No ${INPUT} directory found, to test ewfexport create ${INPUT} directory and place EWF test files in directory.";
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test -d "input";
+then
+	echo "No input directory found.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n' | ${WC} -l`;
+OLDIFS=${IFS};
+IFS="
+";
+
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in ${INPUT} directory, to test ewfexport place EWF test files in directory.";
+	echo "No files or directories found in the input directory.";
 
-	exit ${EXIT_IGNORE};
+	EXIT_RESULT=${EXIT_IGNORE};
+else
+	IGNORELIST="";
+
+	if ! test -d "input/.ewfexport_logical";
+	then
+		mkdir "input/.ewfexport_logical";
+	fi
+	if test -f "input/.ewfexport_logical/ignore";
+	then
+		IGNORELIST=`cat input/.ewfexport_logical/ignore | sed '/^#/d'`;
+	fi
+	for TESTDIR in input/*;
+	do
+		if test -d "${TESTDIR}";
+		then
+			DIRNAME=`basename ${TESTDIR}`;
+
+			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
+			then
+				if ! test -d "input/.ewfexport_logical/${DIRNAME}";
+				then
+					mkdir "input/.ewfexport_logical/${DIRNAME}";
+				fi
+				if test -f "input/.ewfexport_logical/${DIRNAME}/files";
+				then
+					TESTFILES=`cat input/.ewfexport_logical/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+				else
+					TESTFILES=`ls ${TESTDIR}/*.L01 ${TESTDIR}/*.Lx01 2> /dev/null`;
+				fi
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_export_logical "${DIRNAME}" "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_export_logical_unattended "${DIRNAME}" "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			fi
+		fi
+	done
+
+	EXIT_RESULT=${EXIT_SUCCESS};
 fi
 
-for FILENAME in `${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n'`;
-do
-	if ! test_export_logical "${FILENAME}";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+IFS=${OLDIFS};
 
-for FILENAME in `${LS} ${INPUT}/*.L01 | ${TR} ' ' '\n'`;
-do
-	if ! test_export_logical_unattended "${FORMAT}" "${FILENAME}";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
-
-exit ${EXIT_SUCCESS};
+exit ${EXIT_RESULT};
 

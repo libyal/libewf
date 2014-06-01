@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library seek offset testing script
+# Expert Witness Compression Format (EWF) library read testing script
 #
-# Copyright (c) 2006-2013, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -24,10 +24,8 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_old";
-TMP="tmp";
+INPUT="input_delta";
 
-CMP="cmp";
 LS="ls";
 TR="tr";
 SED="sed";
@@ -35,11 +33,11 @@ SORT="sort";
 UNIQ="uniq";
 WC="wc";
 
-test_seek()
+test_read_delta()
 { 
-	echo "Testing seek offset of input:" $*;
+	echo "Testing read of input:" $*;
 
-	./${EWF_TEST_SEEK} $*;
+	./${EWF_TEST_READ_DELTA} $*;
 
 	RESULT=$?;
 
@@ -48,23 +46,23 @@ test_seek()
 	return ${RESULT};
 }
 
-EWF_TEST_SEEK="ewf_test_seek";
+EWF_TEST_READ_DELTA="ewf_test_read_delta";
 
-if ! test -x ${EWF_TEST_SEEK};
+if ! test -x ${EWF_TEST_READ_DELTA};
 then
-	EWF_TEST_SEEK="ewf_test_seek.exe";
+	EWF_TEST_READ_DELTA="ewf_test_read_delta.exe";
 fi
 
-if ! test -x ${EWF_TEST_SEEK};
+if ! test -x ${EWF_TEST_READ_DELTA};
 then
-	echo "Missing executable: ${EWF_TEST_SEEK}";
+	echo "Missing executable: ${EWF_TEST_READ_DELTA}";
 
 	exit ${EXIT_FAILURE};
 fi
 
 if ! test -d ${INPUT};
 then
-	echo "No ${INPUT} directory found, to test seek create ${INPUT} directory and place EWF test files in directory.";
+	echo "No ${INPUT} directory found, to test read create ${INPUT} directory and place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
@@ -74,29 +72,20 @@ RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${U
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in ${INPUT} directory, to test seek place EWF test files in directory.";
+	echo "No files found in ${INPUT} directory, to test read place EWF test files in directory.";
 	echo "Use unique filename bases per set of EWF image file(s)."
 
 	exit ${EXIT_IGNORE};
 fi
 
-# Run tests for: E01, e01, s01
 BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
 
+# Run tests for: d01
 for BASENAME in ${BASENAMES};
 do
-	if ! test_seek `${LS} ${BASENAME}.???`;
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+	FILENAMES=`${LS} ${BASENAME}.??? | ${TR} '\n' ' '`;
 
-# Run tests for: Ex01
-BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-
-for BASENAME in ${BASENAMES};
-do
-	if ! test_seek `${LS} ${BASENAME}.????`;
+	if ! test_read_delta ${FILENAMES};
 	then
 		exit ${EXIT_FAILURE};
 	fi

@@ -2,7 +2,7 @@
 #
 # ewfinfo tool testing script
 #
-# Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -150,7 +150,7 @@ else
 				then
 					TESTFILES=`cat input/.ewfinfo/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*`;
+					TESTFILES=`ls ${TESTDIR}/*.[Ees]01 ${TESTDIR}/*.Ex01 2> /dev/null`;
 				fi
 				for TESTFILE in ${TESTFILES};
 				do

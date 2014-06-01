@@ -123,7 +123,7 @@ else
 				then
 					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*`;
+					TESTFILES=`ls ${TESTDIR}/*.[ELes]01 ${TESTDIR}/*.[EL]x01 2> /dev/null`;
 				fi
 				for TESTFILE in ${TESTFILES};
 				do

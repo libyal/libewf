@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Expert Witness Compression Format (EWF) library read testing script
+# Library read testing script
 #
-# Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -24,23 +24,34 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_old";
-INPUT_DELTA="input_delta";
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-LS="ls";
-TR="tr";
-SED="sed";
-SORT="sort";
-UNIQ="uniq";
-WC="wc";
+	for LINE in $LIST;
+	do
+		if test $LINE = $SEARCH;
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
 
 test_read()
 { 
 	echo "Testing read of input:" $*;
 
-	./${EWF_TEST_READ} $*;
+	rm -rf tmp;
+	mkdir tmp;
+
+	${TEST_RUNNER} ./${EWF_TEST_READ} $*;
 
 	RESULT=$?;
+
+	rm -rf tmp;
 
 	echo "";
 
@@ -61,75 +72,74 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
 then
-	echo "No ${INPUT} directory found, to test read create ${INPUT} directory and place EWF test files in directory.";
-	echo "Use unique filename bases per set of EWF image file(s)."
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+if ! test -d "input";
+then
+	echo "No input directory found.";
 
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ} | ${WC} -l`;
+OLDIFS=${IFS};
+IFS="
+";
+
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
 
 if test ${RESULT} -eq 0;
 then
-	echo "No files found in ${INPUT} directory, to test read place EWF test files in directory.";
-	echo "Use unique filename bases per set of EWF image file(s)."
+	echo "No files or directories found in the input directory.";
 
-	exit ${EXIT_IGNORE};
-fi
+	EXIT_RESULT=${EXIT_IGNORE};
+else
+	IGNORELIST="";
 
-# Run tests for: E01, e01, s01
-BASENAMES=`${LS} ${INPUT}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-
-for BASENAME in ${BASENAMES};
-do
-	FILENAMES=`${LS} ${BASENAME}.??? | ${TR} '\n' ' '`;
-
-	if ! test_read ${FILENAMES};
+	if test -f "input/.libewf/ignore";
 	then
-		exit ${EXIT_FAILURE};
+		IGNORELIST=`cat input/.libewf/ignore | sed '/^#/d'`;
 	fi
-done
-
-# Run tests for: Ex01
-BASENAMES=`${LS} ${INPUT}/*.???? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-
-for BASENAME in ${BASENAMES};
-do
-	FILENAMES=`${LS} ${BASENAME}.???? | ${TR} '\n' ' '`;
-
-	if ! test_read ${FILENAMES};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
-
-if test -d ${INPUT_DELTA};
-then
-	RESULT=`${LS} ${INPUT_DELTA} | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ} | ${WC} -l`;
-
-	if test ${RESULT} -eq 0;
-	then
-		echo "No files found in ${INPUT_DELTA} directory, to test read place EWF test files in directory.";
-		echo "Use unique filename bases per set of EWF image file(s)."
-
-		exit ${EXIT_IGNORE};
-	fi
-
-	BASENAMES=`${LS} ${INPUT_DELTA}/*.??? | ${TR} ' ' '\n' | ${SED} 's/[.][^.]*$//' | ${SORT} | ${UNIQ}`;
-
-	# Run tests for: d01
-	for BASENAME in ${BASENAMES};
+	for TESTDIR in input/*;
 	do
-		FILENAMES=`${LS} ${BASENAME}.??? | ${TR} '\n' ' '`;
-
-		if ! test_read ${FILENAMES};
+		if test -d "${TESTDIR}";
 		then
-			exit ${EXIT_FAILURE};
+			DIRNAME=`basename ${TESTDIR}`;
+
+			if ! list_contains "${IGNORELIST}" "${DIRNAME}";
+			then
+				if test -f "input/.libewf/${DIRNAME}/files";
+				then
+					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+				else
+					TESTFILES=`ls ${TESTDIR}/*.[ELes]01 ${TESTDIR}/*.[EL]x01 2> /dev/null`;
+				fi
+				for TESTFILE in ${TESTFILES};
+				do
+					if ! test_read "${TESTFILE}";
+					then
+						exit ${EXIT_FAILURE};
+					fi
+				done
+			fi
 		fi
 	done
+
+	EXIT_RESULT=${EXIT_SUCCESS};
 fi
 
-exit ${EXIT_SUCCESS};
+IFS=${OLDIFS};
+
+exit ${EXIT_RESULT};
 

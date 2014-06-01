@@ -160,12 +160,12 @@ void libewf_debug_print_section_data_flags(
 	if( ( section_data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
 	{
 		libcnotify_printf(
-		 "Has integrity hash (MD5HASHED)\n" );
+		 "\tHas integrity hash (MD5HASHED)\n" );
 	}
 	if( ( section_data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
 	{
 		libcnotify_printf(
-		 "Is encrypted (ENCRYPTED)\n" );
+		 "\tIs encrypted (ENCRYPTED)\n" );
 	}
 }
 

@@ -150,7 +150,7 @@ else
 				then
 					TESTFILES=`cat input/.ewfverify_logical/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*`;
+					TESTFILES=`ls ${TESTDIR}/*.L01 ${TESTDIR}/*.Lx01 2> /dev/null`;
 				fi
 				for TESTFILE in ${TESTFILES};
 				do

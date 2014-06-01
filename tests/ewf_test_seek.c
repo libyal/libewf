@@ -27,8 +27,9 @@
 
 #include <stdio.h>
 
-#include "ewf_test_libcstring.h"
+#include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libcstring.h"
 
 /* Define to make ewf_test_seek generate verbose output
 #define EWF_TEST_SEEK_VERBOSE
@@ -43,8 +44,8 @@ int ewf_test_seek_offset(
      int input_whence,
      off64_t output_offset )
 {
-	libewf_error_t *error     = NULL;
 	const char *whence_string = NULL;
+	libcerror_error_t *error  = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
@@ -80,6 +81,15 @@ int ewf_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
+	if( result_offset == -1 )
+	{
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+
+		libewf_error_free(
+		 &error );
+	}
 	if( result_offset == output_offset )
 	{
 		result = 1;
@@ -100,16 +110,277 @@ int ewf_test_seek_offset(
 	 stdout,
 	 "\n" );
 
-	if( error != NULL)
+	return( result );
+}
+
+/* Tests seeking in a handle
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int ewf_handle_test_seek(
+     libewf_handle_t *handle,
+     size64_t media_size )
+{
+	int result = 0;
+
+	if( handle == NULL )
 	{
-		if( result != 1 )
+		return( -1 );
+	}
+	if( media_size > (size64_t) INT64_MAX )
+	{
+		fprintf(
+		 stderr,
+		 "Media size exceeds maximum.\n" );
+
+		return( -1 );
+	}
+	/* Test: SEEK_SET offset: 0
+	 * Expected result: 0
+	 */
+	result = ewf_test_seek_offset(
+	          handle,
+	          0,
+	          SEEK_SET,
+	          0 );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <media_size>
+	 * Expected result: <media_size>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     (off64_t) media_size,
+	     SEEK_SET,
+	     (off64_t) media_size ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <media_size / 5>
+	 * Expected result: <media_size / 5>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     (off64_t) ( media_size / 5 ),
+	     SEEK_SET,
+	     (off64_t) ( media_size / 5 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: <media_size + 987>
+	 * Expected result: <media_size + 987>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     (off64_t) ( media_size + 987 ),
+	     SEEK_SET,
+	     (off64_t) ( media_size + 987 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_SET offset: -987
+	 * Expected result: -1
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     -987,
+	     SEEK_SET,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: 0
+	 * Expected result: <media_size + 987>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     0,
+	     SEEK_CUR,
+	     (off64_t) ( media_size + 987 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
+	 * Expected result: 0
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     -1 * (off64_t) ( media_size + 987 ),
+	     SEEK_CUR,
+	     0 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_CUR offset: <media_size / 3>
+	 * Expected result: <media_size / 3>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     (off64_t) ( media_size / 3 ),
+	     SEEK_CUR,
+	     (off64_t) ( media_size / 3 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	if( media_size == 0 )
+	{
+		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
+		 * Expected result: 0
+		 */
+		if( ewf_test_seek_offset(
+		     handle,
+		     -2 * (off64_t) ( media_size / 3 ),
+		     SEEK_CUR,
+		     0 ) != 1 )
 		{
-			libewf_error_backtrace_fprint(
-			 error,
-			 stderr );
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset.\n" );
+
+			return( result );
 		}
-		libewf_error_free(
-		 &error );
+	}
+	else
+	{
+		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
+		 * Expected result: -1
+		 */
+		if( ewf_test_seek_offset(
+		     handle,
+		     -2 * (off64_t) ( media_size / 3 ),
+		     SEEK_CUR,
+		     -1 ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test seek offset.\n" );
+
+			return( result );
+		}
+	}
+	/* Test: SEEK_END offset: 0
+	 * Expected result: <media_size>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     0,
+	     SEEK_END,
+	     (off64_t) media_size ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * media_size>
+	 * Expected result: 0
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     -1 * (off64_t) media_size,
+	     SEEK_END,
+	     0 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
+	 * Expected result: <media_size - (media_size / 4)>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     -1 * (off64_t) ( media_size / 4 ),
+	     SEEK_END,
+	     (off64_t) media_size - (off64_t) ( media_size / 4 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: 542
+	 * Expected result: <media_size + 542>
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     542,
+	     SEEK_END,
+	     (off64_t) ( media_size + 542 ) ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
+	 * Expected result: -1
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     -1 * (off64_t) ( media_size + 542 ),
+	     SEEK_END,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
+	}
+	/* Test: UNKNOWN (88) offset: 0
+	 * Expected result: -1
+	 */
+	if( ewf_test_seek_offset(
+	     handle,
+	     0,
+	     88,
+	     -1 ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test seek offset.\n" );
+
+		return( result );
 	}
 	return( result );
 }
@@ -122,15 +393,11 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	wchar_t **filenames     = NULL;
-#else
-	char **filenames        = NULL;
-#endif
-	libewf_error_t *error   = NULL;
-	libewf_handle_t *handle = NULL;
-	size64_t media_size     = 0;
-	int number_of_filenames = 0;
+	libcstring_system_character_t **filenames = NULL;
+	libewf_error_t *error                     = NULL;
+	libewf_handle_t *handle                   = NULL;
+	size64_t media_size                       = 0;
+	int number_of_filenames                   = 0;
 
 	if( argc < 2 )
 	{
@@ -219,7 +486,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open file(s).\n" );
+		 "Unable to open handle.\n" );
 
 		goto on_error;
 	}
@@ -234,257 +501,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( media_size > (size64_t) INT64_MAX )
-	{
-		fprintf(
-		 stderr,
-		 "Media size exceeds maximum.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: 0
-	 * Expected result: 0
-	 */
-	if( ewf_test_seek_offset(
+	if( ewf_handle_test_seek(
 	     handle,
-	     0,
-	     SEEK_SET,
-	     0 ) != 1 )
+	     media_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: <media_size>
-	 * Expected result: <media_size>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) media_size,
-	     SEEK_SET,
-	     (off64_t) media_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: <media_size / 5>
-	 * Expected result: <media_size / 5>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size / 5 ),
-	     SEEK_SET,
-	     (off64_t) ( media_size / 5 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: <media_size + 987>
-	 * Expected result: <media_size + 987>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size + 987 ),
-	     SEEK_SET,
-	     (off64_t) ( media_size + 987 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_SET offset: -987
-	 * Expected result: -1
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -987,
-	     SEEK_SET,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_CUR offset: 0
-	 * Expected result: <media_size + 987>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     SEEK_CUR,
-	     (off64_t) ( media_size + 987 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
-	 * Expected result: 0
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size + 987 ),
-	     SEEK_CUR,
-	     0 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_CUR offset: <media_size / 3>
-	 * Expected result: <media_size / 3>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size / 3 ),
-	     SEEK_CUR,
-	     (off64_t) ( media_size / 3 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	if( media_size == 0 )
-	{
-		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
-		 * Expected result: 0
-		 */
-		if( ewf_test_seek_offset(
-		     handle,
-		     -2 * (off64_t) ( media_size / 3 ),
-		     SEEK_CUR,
-		     0 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test seek offset.\n" );
-
-			goto on_error;
-		}
-	}
-	else
-	{
-		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
-		 * Expected result: -1
-		 */
-		if( ewf_test_seek_offset(
-		     handle,
-		     -2 * (off64_t) ( media_size / 3 ),
-		     SEEK_CUR,
-		     -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test seek offset.\n" );
-
-			goto on_error;
-		}
-	}
-	/* Test: SEEK_END offset: 0
-	 * Expected result: <media_size>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     SEEK_END,
-	     (off64_t) media_size ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * media_size>
-	 * Expected result: 0
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) media_size,
-	     SEEK_END,
-	     0 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
-	 * Expected result: <media_size - (media_size / 4)>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size / 4 ),
-	     SEEK_END,
-	     (off64_t) media_size - (off64_t) ( media_size / 4 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: 542
-	 * Expected result: <media_size + 542>
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     542,
-	     SEEK_END,
-	     (off64_t) ( media_size + 542 ) ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
-	 * Expected result: -1
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size + 542 ),
-	     SEEK_END,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
-
-		goto on_error;
-	}
-	/* Test: UNKNOWN (88) offset: 0
-	 * Expected result: -1
-	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     88,
-	     -1 ) != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test seek offset.\n" );
+		 "Unable to seek in handle.\n" );
 
 		goto on_error;
 	}
