@@ -68,6 +68,44 @@ uint8_t libewf_get_flags_write_resume(
 	return( (uint8_t) LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME );
 }
 
+/* Reads (media) data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_handle_read_random(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	return( libewf_handle_read_buffer_at_offset(
+	         handle,
+	         buffer,
+	         buffer_size,
+	         offset,
+	         error ) );
+}
+
+/* Writes (media) data at a specific offset,
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ */
+ssize_t libewf_handle_write_random(
+         libewf_handle_t *handle,
+         const void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	return( libewf_handle_write_buffer_at_offset(
+	         handle,
+	         buffer,
+	         buffer_size,
+	         offset,
+	         error ) );
+}
+
 /* Sets the maximum amount of (concurrent) open file handles
  * Returns 1 if successful or -1 on error
  */
@@ -510,6 +548,24 @@ int libewf_handle_set_hash_value(
 	         identifier_length,
 	         value,
 	         value_length,
+	         error ) );
+}
+
+/* Reads data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_file_entry_read_random(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error )
+{
+	return( libewf_file_entry_read_buffer_at_offset(
+	         file_entry,
+	         buffer,
+	         buffer_size,
+	         offset,
 	         error ) );
 }
 

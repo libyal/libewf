@@ -52,6 +52,22 @@ uint8_t libewf_get_flags_write_resume(
          void );
 
 LIBEWF_EXTERN \
+ssize_t libewf_handle_read_random(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+ssize_t libewf_handle_write_random(
+         libewf_handle_t *handle,
+         const void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_handle_set_maximum_amount_of_open_handles(
      libewf_handle_t *handle,
      int maximum_amount_of_open_handles,
@@ -221,6 +237,14 @@ int libewf_handle_set_hash_value(
      const uint8_t *value,
      size_t value_length,
      libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_random(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_file_entry_get_amount_of_sub_file_entries(

@@ -1450,14 +1450,14 @@ ssize_t libewf_file_entry_read_buffer(
 /* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_file_entry_read_random(
+ssize_t libewf_file_entry_read_buffer_at_offset(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_file_entry_read_random";
+	static char *function = "libewf_file_entry_read_buffer_at_offset";
 	ssize_t read_count    = 0;
 
 	if( libewf_file_entry_seek_offset(

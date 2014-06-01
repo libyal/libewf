@@ -190,7 +190,7 @@ ssize_t libewf_file_entry_read_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_file_entry_read_random(
+ssize_t libewf_file_entry_read_buffer_at_offset(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,

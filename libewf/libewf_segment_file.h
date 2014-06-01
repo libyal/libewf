@@ -352,6 +352,14 @@ ssize_t libewf_segment_file_write_close(
          ewf_data_t **data_section,
          libcerror_error_t **error );
 
+int libewf_segment_file_reopen(
+     libewf_segment_file_t *segment_file,
+     int last_section_index,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
+     libfcache_cache_t *sections_cache,
+     libcerror_error_t **error );
+
 int libewf_segment_file_write_sections_correction(
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,

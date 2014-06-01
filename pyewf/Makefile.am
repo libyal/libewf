@@ -17,6 +17,7 @@ pyexec_LTLIBRARIES = pyewf.la
 pyewf_la_SOURCES = \
 	pyewf.c pyewf.h \
 	pyewf_codepage.c pyewf_codepage.h \
+	pyewf_compression_methods.c pyewf_compression_methods.h \
 	pyewf_datetime.c pyewf_datetime.h \
 	pyewf_error.c pyewf_error.h \
 	pyewf_file_entries.c pyewf_file_entries.h \
@@ -30,6 +31,8 @@ pyewf_la_SOURCES = \
 	pyewf_libclocale.h \
 	pyewf_libcstring.h \
 	pyewf_libewf.h \
+	pyewf_media_flags.c pyewf_media_flags.h \
+	pyewf_media_types.c pyewf_media_types.h \
 	pyewf_metadata.c pyewf_metadata.h \
 	pyewf_python.h \
 	pyewf_unused.h

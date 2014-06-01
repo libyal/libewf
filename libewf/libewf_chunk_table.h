@@ -53,18 +53,6 @@ struct libewf_chunk_table
 	 */
 	uint8_t format_version;
 
-	/* The previous last chunk that was filled
-	 */
-	int previous_last_chunk_filled;
-
-	/* The last chunk that was filled
-	 */
-	int last_chunk_filled;
-
-	/* The last chunk that was compared
-	 */
-	int last_chunk_compared;
-
 	/* The sectors with checksum errors
 	 */
 	libcdata_range_list_t *checksum_errors;

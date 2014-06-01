@@ -292,7 +292,7 @@ int libewf_error_backtrace_sprint(
      size_t size );
 
 /* -------------------------------------------------------------------------
- * File/Handle functions
+ * Handle functions
  * ------------------------------------------------------------------------- */
 
 /* Creates a handle
@@ -429,7 +429,7 @@ ssize_t libewf_handle_read_buffer(
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN \
-ssize_t libewf_handle_read_random(
+ssize_t libewf_handle_read_buffer_at_offset(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
@@ -493,7 +493,7 @@ ssize_t libewf_handle_write_buffer(
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 LIBEWF_EXTERN \
-ssize_t libewf_handle_write_random(
+ssize_t libewf_handle_write_buffer_at_offset(
          libewf_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
@@ -776,8 +776,38 @@ int libewf_handle_get_file_io_handle(
 #endif
 
 /* -------------------------------------------------------------------------
- * File/Handle functions - deprecated
+ * Handle functions - deprecated
  * ------------------------------------------------------------------------- */
+
+/* Reads (media) data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ *
+ * This function deprecated use libewf_handle_read_buffer_at_offset instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+ssize_t libewf_handle_read_random(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libewf_error_t **error );
+
+/* Writes (media) data at a specific offset,
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ *
+ * This function deprecated use libewf_handle_write_buffer_at_offset instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+ssize_t libewf_handle_write_random(
+         libewf_handle_t *handle,
+         const void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libewf_error_t **error );
 
 /* Sets the maximum amount of (concurrent) open file handles
  * Returns 1 if successful or -1 on error
@@ -2377,7 +2407,7 @@ ssize_t libewf_file_entry_read_buffer(
  * Returns the number of bytes read or -1 on error
  */
 LIBEWF_EXTERN \
-ssize_t libewf_file_entry_read_random(
+ssize_t libewf_file_entry_read_buffer_at_offset(
          libewf_file_entry_t *file_entry,
          void *buffer,
          size_t buffer_size,
@@ -2471,6 +2501,20 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 /* -------------------------------------------------------------------------
  * Single file entry functions - deprecated
  * ------------------------------------------------------------------------- */
+
+/* Reads data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ *
+ * This function deprecated use libewf_file_entry_read_buffer_at_offset instead
+ */
+LIBEWF_DEPRECATED \
+LIBEWF_EXTERN \
+ssize_t libewf_file_entry_read_random(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libewf_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
@@ -2647,7 +2691,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer(
 /* Reads (media) data at a specific offset
  * Returns the amount of bytes read or -1 on error
  *
- * This function is deprecated use libewf_handle_read_random instead
+ * This function is deprecated use libewf_handle_read_buffer_at_offset instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN ssize_t libewf_read_random(
@@ -2712,7 +2756,7 @@ LIBEWF_EXTERN ssize_t libewf_write_buffer(
  * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  *
- * This function is deprecated use libewf_handle_write_random instead
+ * This function is deprecated use libewf_handle_write_buffer_at_offset instead
  */
 LIBEWF_DEPRECATED \
 LIBEWF_EXTERN ssize_t libewf_write_random(

@@ -146,6 +146,12 @@ int libewf_segment_table_get_segment_at_offset(
      size64_t *segment_file_size,
      libcerror_error_t **error );
 
+int libewf_segment_table_get_segment_storage_media_size_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     size64_t *storage_media_size,
+     libcerror_error_t **error );
+
 int libewf_segment_table_set_segment_storage_media_size_by_index(
      libewf_segment_table_t *segment_table,
      uint32_t segment_number,

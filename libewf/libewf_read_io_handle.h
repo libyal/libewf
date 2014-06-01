@@ -57,6 +57,14 @@ struct libewf_read_io_handle
 	/* Size of the cached version of the device information
 	 */
 	size_t device_information_size;
+
+	/* The storage media size read
+	 */
+	size64_t storage_media_size_read;
+
+        /* The (total) number of chunks read
+         */
+        uint64_t number_of_chunks_read;
 };
 
 int libewf_read_io_handle_initialize(

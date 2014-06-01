@@ -69,7 +69,7 @@ PyObject *pyewf_file_entry_read_buffer(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_file_entry_read_random(
+PyObject *pyewf_file_entry_read_buffer_at_offset(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments,
            PyObject *keywords );

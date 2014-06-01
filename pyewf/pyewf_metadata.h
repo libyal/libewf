@@ -37,6 +37,42 @@ PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments );
 
+PyObject *pyewf_handle_get_sectors_per_chunk(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_bytes_per_sector(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_number_of_sectors(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_chunk_size(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_error_granularity(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_compression_method(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_media_type(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_media_flags(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
+PyObject *pyewf_handle_get_format(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments );
+
 PyObject *pyewf_handle_get_header_codepage(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments );

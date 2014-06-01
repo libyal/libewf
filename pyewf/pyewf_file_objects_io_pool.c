@@ -42,7 +42,7 @@ int pyewf_file_objects_pool_initialize(
 	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
 	static char *function            = "pyewf_file_objects_pool_initialize";
-        Py_ssize_t sequence_size         = 0;
+	Py_ssize_t sequence_size         = 0;
 	int element_index                = 0;
 	int file_io_pool_entry           = 0;
 	int number_of_elements           = 0;
@@ -72,7 +72,7 @@ int pyewf_file_objects_pool_initialize(
 	sequence_size = PySequence_Size(
 	                 sequence_object );
 
-        if( sequence_size > (Py_ssize_t) INT_MAX )
+	if( sequence_size > (Py_ssize_t) INT_MAX )
 	{
 		libcerror_error_set(
 		 error,

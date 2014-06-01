@@ -891,6 +891,7 @@ int libewf_write_io_handle_initialize_resume(
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
      libewf_chunk_table_t *chunk_table,
+     libewf_read_io_handle_t *read_io_handle,
      libcerror_error_t **error )
 {
 	libewf_section_t *previous_section       = NULL;
@@ -899,14 +900,17 @@ int libewf_write_io_handle_initialize_resume(
 	libfcache_cache_t *sections_cache        = NULL;
 	static char *function                    = "libewf_write_io_handle_initialize_resume";
 	size64_t segment_file_size               = 0;
+	size64_t storage_media_size              = 0;
+	size64_t unusable_storage_media_size     = 0;
+	uint64_t unusable_number_of_chunks       = 0;
 	uint32_t number_of_segments              = 0;
 	uint32_t segment_number                  = 0;
 	uint8_t backtrack_to_last_chunks_section = 0;
 	uint8_t reopen_segment_file              = 0;
 	int file_io_pool_entry                   = 0;
 	int number_of_sections                   = 0;
-	int number_of_unusable_chunks            = 0;
 	int previous_section_index               = 0;
+	int result                               = 0;
 	int section_index                        = 0;
 	int supported_section                    = 0;
 
@@ -950,6 +954,17 @@ int libewf_write_io_handle_initialize_resume(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid media values - missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( read_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid read IO handle.",
 		 function );
 
 		return( -1 );
@@ -1321,28 +1336,10 @@ int libewf_write_io_handle_initialize_resume(
 
 				goto on_error;
 			}
-			if( chunk_table->previous_last_chunk_filled > chunk_table->last_chunk_filled )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: previous last chunk offset filled cannot be greater than current.",
-				 function );
-
-				goto on_error;
-			}
-			number_of_unusable_chunks = chunk_table->last_chunk_filled - chunk_table->previous_last_chunk_filled;
-
 			/* The sections containing the chunks and offsets were read partially
 			 */
 			section_index = previous_section_index;
 			section       = previous_section;
-
-/* TODO re-map the mapped range of the last segment file and chunk groups list ? */
-
-			chunk_table->last_chunk_filled   = chunk_table->previous_last_chunk_filled;
-			chunk_table->last_chunk_compared = chunk_table->previous_last_chunk_filled;
 
 			supported_section                           = 1;
 			reopen_segment_file                         = 1;
@@ -1455,28 +1452,10 @@ int libewf_write_io_handle_initialize_resume(
 
 				goto on_error;
 			}
-			if( chunk_table->previous_last_chunk_filled > chunk_table->last_chunk_filled )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: previous last chunk offset filled cannot be greater than current.",
-				 function );
-
-				goto on_error;
-			}
-			number_of_unusable_chunks = chunk_table->last_chunk_filled - chunk_table->previous_last_chunk_filled;
-
 			/* The sections containing the chunks and offsets were read partially
 			 */
 			section_index = previous_section_index;
 			section       = previous_section;
-
-/* TODO re-map the mapped range of the last segment file and chunk groups list ? */
-
-			chunk_table->last_chunk_filled   = chunk_table->previous_last_chunk_filled;
-			chunk_table->last_chunk_compared = chunk_table->previous_last_chunk_filled;
 
 			supported_section                           = 1;
 			reopen_segment_file                         = 1;
@@ -1514,33 +1493,16 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	/* Set offset into media data
 	 */
-	io_handle->current_offset = (off64_t) chunk_table->last_chunk_compared * media_values->chunk_size;
+	io_handle->current_offset = (off64_t) read_io_handle->storage_media_size_read;
 
 	/* Set write IO handle values
 	 */
-	write_io_handle->input_write_count        = (ssize64_t) io_handle->current_offset;
-	write_io_handle->number_of_chunks_written = (uint64_t) chunk_table->last_chunk_compared;
+	write_io_handle->input_write_count        = (ssize64_t) read_io_handle->storage_media_size_read;
+	write_io_handle->number_of_chunks_written = read_io_handle->number_of_chunks_read;
 	write_io_handle->write_finalized          = 0;
 
 	if( reopen_segment_file != 0 )
 	{
-		if( (size64_t) write_io_handle->resume_segment_file_offset > segment_table->maximum_segment_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: resume segment file offset cannot be greater than maximum segment file size.",
-			 function );
-
-			goto on_error;
-		}
-		write_io_handle->remaining_segment_file_size = segment_table->maximum_segment_size
-		                                             - write_io_handle->resume_segment_file_offset;
-
-		write_io_handle->number_of_chunks_written_to_segment_file = segment_file->number_of_chunks
-		                                                          - number_of_unusable_chunks;
-
 		if( libewf_segment_table_get_segment_by_index(
 		     segment_table,
 		     segment_number,
@@ -1558,24 +1520,106 @@ int libewf_write_io_handle_initialize_resume(
 
 			goto on_error;
 		}
-		if( libbfio_pool_reopen(
+		result = libewf_segment_table_get_segment_storage_media_size_by_index(
+		          segment_table,
+		          segment_number,
+		          &storage_media_size,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment: %" PRIu32 " storage media size from segment table.",
+			 function,
+			 segment_number );
+
+			goto on_error;
+		}
+		unusable_storage_media_size = segment_file->storage_media_size;
+		unusable_number_of_chunks   = segment_file->number_of_chunks;
+
+		if( libewf_segment_file_reopen(
+		     segment_file,
+		     section_index - 1,
 		     file_io_pool,
 		     file_io_pool_entry,
-		     LIBBFIO_OPEN_READ_WRITE,
+		     sections_cache,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to re-open segment file: %" PRIu32 ".",
+			 "%s: unable to reopen segment file: %" PRIu32 " for resume write.",
 			 function,
 			 segment_number );
 
 			goto on_error;
 		}
-		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
+		if( segment_file->storage_media_size > unusable_storage_media_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: segment file storage media size cannot be greater than unusable storage media size.",
+			 function );
+
+			goto on_error;
+		}
+		unusable_storage_media_size -= segment_file->storage_media_size;
+
+		if( segment_file->number_of_chunks > unusable_number_of_chunks )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: segment file number of chunks cannot be greater than unusable number of chunks.",
+			 function );
+
+			goto on_error;
+		}
+		unusable_number_of_chunks -= segment_file->number_of_chunks;
+
+		if( (size64_t) segment_file->current_offset > segment_table->maximum_segment_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: segment file current offset cannot be greater than maximum segment file size.",
+			 function );
+
+			goto on_error;
+		}
+		if( result != 0 )
+		{
+			/* The offset into media data need to be corrected if the read of the segment file was considered successful
+			 */
+			io_handle->current_offset -= unusable_storage_media_size;
+
+			/* The write IO handle values need to be corrected if the read of the segment file was considered successful
+			 */
+			write_io_handle->input_write_count                       -= unusable_storage_media_size;
+			write_io_handle->number_of_chunks_written                -= unusable_number_of_chunks;
+			write_io_handle->remaining_segment_file_size              = segment_table->maximum_segment_size - segment_file->current_offset;
+			write_io_handle->number_of_chunks_written_to_segment_file = segment_file->number_of_chunks;
+		}
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: resuming write at offset: 0x%08" PRIx64 " with chunk: %" PRIu64 ".\n",
+		 function,
+		 write_io_handle->input_write_count,
+		 write_io_handle->number_of_chunks_written );
+	}
+#endif
 	if( libfcache_cache_free(
 	     &sections_cache,
 	     error ) != 1 )

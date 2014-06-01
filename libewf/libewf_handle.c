@@ -2303,6 +2303,7 @@ int libewf_handle_open_file_io_pool(
 		     internal_handle->media_values,
 		     internal_handle->segment_table,
 		     internal_handle->chunk_table,
+		     internal_handle->read_io_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3678,6 +3679,17 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
+	if( internal_handle->read_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - missing read IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_segment_table_get_number_of_segments(
 	     internal_handle->segment_table,
 	     &number_of_segments,
@@ -3903,6 +3915,8 @@ int libewf_handle_open_read_segment_files(
 
 			return( -1 );
 		}
+		internal_handle->read_io_handle->storage_media_size_read += segment_file->storage_media_size;
+		internal_handle->read_io_handle->number_of_chunks_read   += segment_file->number_of_chunks;
 	}
 	if( last_segment_file == 0 )
 	{
@@ -5369,14 +5383,14 @@ ssize_t libewf_handle_read_buffer(
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_handle_read_random(
+ssize_t libewf_handle_read_buffer_at_offset(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_handle_read_random";
+	static char *function = "libewf_handle_read_buffer_at_offset";
 	ssize_t read_count    = 0;
 
 	if( libewf_handle_seek_offset(
@@ -6315,6 +6329,8 @@ ssize_t libewf_handle_write_buffer(
 
 			return( -1 );
 		}
+		/* Check if we are in read and write mode
+		 */
 		if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 		 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 		{
@@ -6756,14 +6772,14 @@ ssize_t libewf_handle_write_buffer(
  * Will initialize write if necessary
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libewf_handle_write_random(
+ssize_t libewf_handle_write_buffer_at_offset(
          libewf_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_handle_write_random";
+	static char *function = "libewf_handle_write_buffer_at_offset";
 	ssize_t write_count   = 0;
 
 	if( libewf_handle_seek_offset(

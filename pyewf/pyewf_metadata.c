@@ -36,7 +36,7 @@
 #include "pyewf_unused.h"
 
 /* Retrieves the size of the media data
- * Returns a Python object holding the offset if successful or NULL on error
+ * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_handle_get_media_size(
            pyewf_handle_t *pyewf_handle,
@@ -83,6 +83,474 @@ PyObject *pyewf_handle_get_media_size(
 	}
 	integer_object = pyewf_integer_unsigned_new_from_64bit(
 	                  (uint64_t) media_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of sectors per chunk
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_sectors_per_chunk(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments PYEWF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_sectors_per_chunk";
+	uint32_t sectors_per_chunk = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_sectors_per_chunk(
+	          pyewf_handle->handle,
+	          &sectors_per_chunk,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve sectors per chunk.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) sectors_per_chunk );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of bytes per sector
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_bytes_per_sector(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyewf_handle_get_bytes_per_sector";
+	uint32_t bytes_per_sector = 0;
+	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_bytes_per_sector(
+	          pyewf_handle->handle,
+	          &bytes_per_sector,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve bytes per sectors.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) bytes_per_sector );
+
+	return( integer_object );
+}
+
+/* Retrieves the number of sectors
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_number_of_sectors(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_number_of_sectors";
+	uint64_t number_of_sectors = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_number_of_sectors(
+	          pyewf_handle->handle,
+	          &number_of_sectors,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of sectors.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  number_of_sectors );
+
+	return( integer_object );
+}
+
+/* Retrieves the chunk size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_chunk_size(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyewf_handle_get_chunk_size";
+	size32_t chunk_size       = 0;
+	int result                = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_chunk_size(
+	          pyewf_handle->handle,
+	          &chunk_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve chunk size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) chunk_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the error granularity
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_error_granularity(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *integer_object   = NULL;
+	static char *function      = "pyewf_handle_get_error_granularity";
+	uint32_t error_granularity = 0;
+	int result                 = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_error_granularity(
+	          pyewf_handle->handle,
+	          &error_granularity,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve error granularity.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) error_granularity );
+
+	return( integer_object );
+}
+
+/* Retrieves the compression method
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_compression_method(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
+	static char *function       = "pyewf_handle_get_compression_method";
+	uint16_t compression_method = 0;
+	int result                  = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_compression_method(
+	          pyewf_handle->handle,
+	          &compression_method,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve compression method.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) compression_method );
+
+	return( integer_object );
+}
+
+/* Retrieves the media type
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_media_type(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_media_type";
+	uint8_t media_type       = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_media_type(
+	          pyewf_handle->handle,
+	          &media_type,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve media type.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_type );
+
+	return( integer_object );
+}
+
+/* Retrieves the media flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_media_flags(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_media_flags";
+	uint8_t media_flags      = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_media_flags(
+	          pyewf_handle->handle,
+	          &media_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve media flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) media_flags );
+
+	return( integer_object );
+}
+
+/* Retrieves the format
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_handle_get_format(
+           pyewf_handle_t *pyewf_handle,
+           PyObject *arguments )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyewf_handle_get_format";
+	uint8_t format           = 0;
+	int result               = 0;
+
+	PYEWF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid handle.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libewf_handle_get_format(
+	          pyewf_handle->handle,
+	          &format,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyewf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve format.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyewf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) format );
 
 	return( integer_object );
 }
@@ -254,9 +722,9 @@ PyObject *pyewf_handle_set_header_codepage(
 	     "s",
 	     keyword_list,
 	     &codepage_string ) == 0 )
-        {
-                return( NULL );
-        }
+	{
+		return( NULL );
+	}
 	result = pyewf_handle_set_header_codepage_from_string(
 	          pyewf_handle,
 	          codepage_string );

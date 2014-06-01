@@ -1549,6 +1549,63 @@ int libewf_segment_table_get_segment_at_offset(
 	return( result );
 }
 
+/* Retrieves the segment storage media size for a specific segment in the segment table
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_segment_table_get_segment_storage_media_size_by_index(
+     libewf_segment_table_t *segment_table,
+     uint32_t segment_number,
+     size64_t *storage_media_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_segment_storage_media_size_by_index";
+	int result            = 0;
+
+	if( segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+#if SIZEOF_INT <= 4
+	if( segment_number > (uint32_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid segment number value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libfdata_list_get_mapped_size_by_index(
+	          segment_table->segment_files_list,
+	          (int) segment_number,
+	          storage_media_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to get mapped size of element: %" PRIu32 " in segment files list.",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Sets the segment storage media size for a specific segment in the segment table
  * Returns 1 if successful or -1 on error
  */
@@ -1593,7 +1650,7 @@ int libewf_segment_table_set_segment_storage_media_size_by_index(
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set mapped size of element: %" PRIu32 " in segment files list.",
 		 function,
 		 segment_number );

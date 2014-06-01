@@ -110,13 +110,6 @@ stamp-h1
 /ewftools/ewfmount
 /ewftools/ewfrecover
 /ewftools/ewfverify
-/macosx/Introduction.rtf
-/macosx/libewf.pmdoc/01bin.xml
-/macosx/libewf.pmdoc/02include.xml
-/macosx/libewf.pmdoc/03lib.xml
-/macosx/libewf.pmdoc/04share.xml
-/macosx/libewf.pmdoc/05python.xml
-/macosx/libewf.pmdoc/index.xml
 /pyewf/setup.py
 /tests/input
 /tests/tmp

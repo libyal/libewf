@@ -1,4 +1,4 @@
-.Dd January 19, 2014
+.Dd June 1, 2014
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -65,7 +65,7 @@ Error functions
 .Ft int
 .Fn libewf_error_backtrace_sprint "libewf_error_t *error, char *string, size_t size"
 .Pp
-File/Handle functions
+Handle functions
 .Ft int
 .Fn libewf_handle_initialize "libewf_handle_t **handle, libewf_error_t **error"
 .Ft int
@@ -85,7 +85,7 @@ File/Handle functions
 .Ft ssize_t
 .Fn libewf_handle_read_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_read_random "libewf_handle_t *handle, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Fn libewf_handle_read_buffer_at_offset "libewf_handle_t *handle, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_chunk_buffer, size_t *compressed_chunk_buffer_size, int8_t *is_compressed, uint32_t *chunk_checksum, int8_t *chunk_io_flags, libewf_error_t **error"
 .Ft ssize_t
@@ -93,7 +93,7 @@ File/Handle functions
 .Ft ssize_t
 .Fn libewf_handle_write_buffer "libewf_handle_t *handle, const void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_random "libewf_handle_t *handle, const void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Fn libewf_handle_write_buffer_at_offset "libewf_handle_t *handle, const void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_finalize "libewf_handle_t *handle, libewf_error_t **error"
 .Ft off64_t
@@ -388,7 +388,7 @@ Single file entry functions
 .Ft ssize_t
 .Fn libewf_file_entry_read_buffer "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_file_entry_read_random "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Fn libewf_file_entry_read_buffer_at_offset "libewf_file_entry_t *file_entry, void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
 .Ft off64_t
 .Fn libewf_file_entry_seek_offset "libewf_file_entry_t *file_entry, off64_t offset, int whence, libewf_error_t **error"
 .Ft int
@@ -445,9 +445,9 @@ The
 .Fn libewf_handle_open_wide ,
 .Fn libewf_handle_close ,
 .Fn libewf_handle_read_buffer ,
-.Fn libewf_handle_read_random ,
+.Fn libewf_handle_read_buffer_at_offset ,
 .Fn libewf_handle_write_buffer ,
-.Fn libewf_handle_write_random ,
+.Fn libewf_handle_write_buffer_at_offset ,
 .Fn libewf_handle_seek_offset
 functions can be used to open, seek in, read from, write to and close a set of EWF files.
 .Pp

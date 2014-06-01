@@ -97,7 +97,7 @@ PyObject *pyewf_handle_read_buffer(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_handle_read_random(
+PyObject *pyewf_handle_read_buffer_at_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );
@@ -107,7 +107,7 @@ PyObject *pyewf_handle_write_buffer(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyewf_handle_write_random(
+PyObject *pyewf_handle_write_buffer_at_offset(
            pyewf_handle_t *pyewf_handle,
            PyObject *arguments,
            PyObject *keywords );

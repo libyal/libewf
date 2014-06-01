@@ -1,6 +1,6 @@
 dnl Functions for Python bindings
 dnl
-dnl Version: 20130303
+dnl Version: 20140529
 
 dnl Function to check if the python binary is available
 dnl "python python# python#.#"
@@ -63,12 +63,12 @@ AC_DEFUN([AX_PYTHON_CHECK],
    [$PYTHON_INCLUDES])
 
   dnl Check for Python libraries
-  PYTHON_LIBS=`$PYTHON_CONFIG --libs 2>/dev/null`;
+  PYTHON_LDFLAGS=`$PYTHON_CONFIG --ldflags 2>/dev/null`;
 
   AC_MSG_CHECKING(
    [for Python libraries])
   AC_MSG_RESULT(
-   [$PYTHON_LIBS])
+   [$PYTHON_LDFLAGS])
 
   dnl Check for the existence of Python.h
   BACKUP_CPPFLAGS="$CPPFLAGS"
@@ -92,7 +92,7 @@ AC_DEFUN([AX_PYTHON_CHECK],
 
   AC_SUBST(
    [PYTHON_LDFLAGS],
-   [$PYTHON_LIBS])
+   [$PYTHON_LDFLAGS])
 
   dnl Check for Python prefix
   AS_IF(
@@ -115,20 +115,23 @@ AC_DEFUN([AX_PYTHON_CHECK],
    [$ax_python_exec_prefix])
 
   dnl Check for Python library directory
-  ax_python_pythondir_suffix=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(0,0,prefix=''))" 2>/dev/null`;
+  ax_python_pythondir_suffix=`$PYTHON -c "import sys; import distutils.sysconfig; sys.stdout.write(distutils.sysconfig.get_python_lib(0, 0, prefix=''))" 2>/dev/null`;
 
   AS_IF(
-   [test "x$ac_cv_with_pyprefix" = x || test "x$ac_cv_with_pyprefix" = xno],
-   [ax_python_pythondir="$ax_python_prefix/$ax_python_pythondir_suffix"],
-   [ax_python_pythondir=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib() " 2>/dev/null`])
+   [test "x$ac_cv_with_pythondir" = x || test "x$ac_cv_with_pythondir" = xno],
+   [AS_IF(
+    [test "x$ac_cv_with_pyprefix" = x || test "x$ac_cv_with_pyprefix" = xno],
+    [ax_python_pythondir="$ax_python_prefix/$ax_python_pythondir_suffix"],
+    [ax_python_pythondir=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_python_lib() " 2>/dev/null`])],
+   [ax_python_pythondir=$ac_cv_with_pythondir])
 
   AC_SUBST(
    [pythondir],
    [$ax_python_pythondir])
 
   dnl Check for Python platform specific library directory
-  ax_python_pyexecdir_suffix=`$PYTHON -c "import sys; from distutils import sysconfig; sys.stdout.write(sysconfig.get_python_lib(1,0,prefix=''))" 2>/dev/null`;
-  ax_python_library_dir=`$PYTHON -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib(True) " 2>/dev/null`;
+  ax_python_pyexecdir_suffix=`$PYTHON -c "import sys; import distutils.sysconfig; sys.stdout.write(distutils.sysconfig.get_python_lib(1, 0, prefix=''))" 2>/dev/null`;
+  ax_python_library_dir=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_python_lib(True) " 2>/dev/null`;
 
   AS_IF(
    [test "x$ac_cv_with_pyprefix" = x || test "x$ac_cv_with_pyprefix" = xno],
@@ -142,6 +145,7 @@ AC_DEFUN([AX_PYTHON_CHECK],
   AC_SUBST(
    [PYTHON_LIBRARY_DIR],
    [$ax_python_pyexecdir_suffix])
+
   AC_SUBST(
    [PYTHON_PACKAGE_DIR],
    [$ax_python_library_dir])
@@ -157,9 +161,15 @@ AC_DEFUN([AX_PYTHON_CHECK_ENABLE],
   [build Python bindings],
   [no])
  AX_COMMON_ARG_WITH(
+  [pythondir],
+  [pythondir],
+  [use to specify the Python directory (pythondir)],
+  [no],
+  [no])
+ AX_COMMON_ARG_WITH(
   [pyprefix],
   [pyprefix],
-  [use `python-config --prefix' to determine the Python directories],
+  [use `python-config --prefix' to determine the prefix of pythondir instead of --prefix],
   [no],
   [no])
 

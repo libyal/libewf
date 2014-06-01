@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20140406],
+ [20140424],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -152,15 +152,36 @@ AX_LIBEWF_CHECK_ENABLE_V1_API
 dnl Check for the host operation system will be used as a fall back in the ewftools
 AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
 
-dnl Check if DLL support is needed in ewftools
+dnl Headers included in various places
+AC_CHECK_HEADERS([stdarg.h varargs.h])
+
 AS_IF(
- [test "x$enable_shared" = xyes && test "x$ac_cv_enable_static_executables" = xno],
+ [test "x$ac_cv_header_stdarg_h" != xyes && test "x$ac_cv_header_varargs_h" != xyes],
+ [AC_MSG_FAILURE(
+  [Missing headers: stdarg.h and varargs.h],
+  [1])
+ ])
+
+dnl Check if DLL support is needed
+AS_IF(
+ [test "x$enable_shared" = xyes],
  [AS_CASE(
   [$host],
   [*cygwin* | *mingw*],
-  [AC_SUBST(
-   [LIBEWF_DLL_IMPORT],
-   ["-DLIBEWF_DLL_IMPORT"])
+  [AC_DEFINE(
+   [HAVE_DLLMAIN],
+   [1],
+   [Define to 1 to enable the DllMain function.])
+  AC_SUBST(
+   [HAVE_DLLMAIN],
+   [1])
+
+  AS_IF(
+   [test "x$ac_cv_enable_static_executables" = xno],
+   [AC_SUBST(
+    [LIBEWF_DLL_IMPORT],
+    ["-DLIBEWF_DLL_IMPORT"])
+   ])
   ])
  ])
 
@@ -228,7 +249,6 @@ AC_CONFIG_FILES([documents/Makefile])
 AC_CONFIG_FILES([manuals/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([examples/Makefile])
-AC_CONFIG_FILES([macosx/Makefile])
 AC_CONFIG_FILES([msvscpp/Makefile])
 dnl Have configure make the include files
 AC_CONFIG_FILES([include/libewf.h])
@@ -242,13 +262,6 @@ AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([ewf.net/ewf.net.rc])
 AC_CONFIG_FILES([libewf/libewf.rc])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/01bin.xml])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/02include.xml])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/03lib.xml])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/04share.xml])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/05python.xml])
-AC_CONFIG_FILES([macosx/libewf.pmdoc/index.xml])
-AC_CONFIG_FILES([macosx/Introduction.rtf])
 AC_CONFIG_FILES([pyewf/setup.py])
 AC_CONFIG_FILES([libewf.pc])
 AC_CONFIG_FILES([libewf.spec])

@@ -5404,6 +5404,195 @@ on_error:
 	return( -1 );
 }
 
+/* Reopens the segment file for resume writing
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_file_reopen(
+     libewf_segment_file_t *segment_file,
+     int last_section_index,
+     libbfio_pool_t *file_io_pool,
+     int file_io_pool_entry,
+     libfcache_cache_t *sections_cache,
+     libcerror_error_t **error )
+{
+	libewf_section_t *last_section = NULL;
+	static char *function          = "libewf_segment_file_reopen";
+	size64_t storage_media_size    = 0;
+	uint64_t number_of_chunks      = 0;
+
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->io_handle->chunk_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file - invalid IO handle - missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_element_value_by_index(
+	     segment_file->sections_list,
+	     (intptr_t *) file_io_pool,
+	     sections_cache,
+	     last_section_index,
+	     (intptr_t **) &last_section,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve section: %d from sections list.",
+		 function,
+		 last_section_index );
+
+		return( -1 );
+	}
+	if( last_section == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing section: %d.",
+		 function,
+		 last_section_index );
+
+		return( -1 );
+	}
+        segment_file->current_offset      = last_section->end_offset;
+	segment_file->last_section_offset = last_section->end_offset;
+
+	if( libfdata_list_resize(
+	     segment_file->sections_list,
+	     last_section_index + 1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+		 "%s: unable to resize sections list.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->number_of_chunks > 0 )
+	{
+		if( libfdata_list_get_mapped_size_by_index(
+		     segment_file->chunk_groups_list,
+		     segment_file->chunk_groups_index,
+		     &storage_media_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunk group: %d mapped size.",
+			 function,
+			 segment_file->chunk_groups_index );
+
+			return( -1 );
+		}
+		if( libfdata_list_resize(
+		     segment_file->chunk_groups_list,
+		     segment_file->chunk_groups_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize chunk groups list.",
+			 function );
+
+			return( -1 );
+		}
+		segment_file->chunk_groups_index -= 1;
+
+		if( storage_media_size > segment_file->storage_media_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid storage media size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		segment_file->storage_media_size -= storage_media_size;
+
+		number_of_chunks = storage_media_size;
+
+		if( ( number_of_chunks % segment_file->io_handle->chunk_size ) != 0 )
+		{
+			number_of_chunks /= (uint64_t) segment_file->io_handle->chunk_size;
+			number_of_chunks += 1;
+		}
+		else
+		{
+			number_of_chunks /= (uint64_t) segment_file->io_handle->chunk_size;
+		}
+		if( number_of_chunks > segment_file->number_of_chunks )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid number of chunks value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		segment_file->number_of_chunks -= (uint64_t) number_of_chunks;
+	}
+	if( libbfio_pool_reopen(
+	     file_io_pool,
+	     file_io_pool_entry,
+	     LIBBFIO_OPEN_READ_WRITE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to re-open file IO pool entry: %d.",
+		 function,
+		 file_io_pool_entry );
+
+		return( -1 );
+	}
+	segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN;
+
+	return( 1 );
+}
+
 /* Corrects sections after streamed write
  * Returns 1 if successful or -1 on error
  */

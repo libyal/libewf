@@ -25,7 +25,6 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 INPUT="input_raw";
-TMP="tmp";
 
 AWK="awk";
 LS="ls";
@@ -37,10 +36,10 @@ test_write_resume()
 	INPUT_FILE=$1;
 	RESUME_OFFSET=$2;
 
-	mkdir ${TMP};
+	mkdir tmp/;
 
 	${EWFACQUIRE} -q -u \
-	-t ${TMP}/resume \
+	-t tmp/resume \
 	-C case_number \
 	-D description \
 	-E evidence_number \
@@ -58,22 +57,22 @@ test_write_resume()
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		${EWFVERIFY} -q ${TMP}/resume.E01
+		${EWFVERIFY} -q tmp/resume.E01
 
 		RESULT=$?;
 	fi
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		${EWFTRUNCATE} ${RESUME_OFFSET} ${TMP}/resume.E01
+		${EWFTRUNCATE} ${RESUME_OFFSET} tmp/resume.E01
 
 		RESULT=$?;
 	fi
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-${EWFACQUIRE} -q -R ${INPUT_FILE} <<EOI
-${TMP}/resume.E01
+		${EWFACQUIRE} -q -R ${INPUT_FILE} <<EOI
+tmp/resume.E01
 
 
 yes
@@ -84,12 +83,12 @@ EOI
 
 	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
 	then
-		${EWFVERIFY} -q ${TMP}/resume.E01
+		${EWFVERIFY} -q tmp/resume.E01
 
 		RESULT=$?;
 	fi
 
-	rm -rf ${TMP};
+	# rm -rf tmp;
 
 	if [ ${RESULT} -ne ${EXIT_IGNORE} ];
 	then

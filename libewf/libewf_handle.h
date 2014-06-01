@@ -263,7 +263,7 @@ ssize_t libewf_handle_read_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_handle_read_random(
+ssize_t libewf_handle_read_buffer_at_offset(
          libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
@@ -302,7 +302,7 @@ ssize_t libewf_handle_write_buffer(
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-ssize_t libewf_handle_write_random(
+ssize_t libewf_handle_write_buffer_at_offset(
          libewf_handle_t *handle,
          const void *buffer,
          size_t buffer_size,
