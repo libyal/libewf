@@ -113,23 +113,23 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
-	libcsystem_glob_t *glob                                = NULL;
+	libcsystem_glob_t *glob                                  = NULL;
 #endif
 
-	libcerror_error_t *error                               = NULL;
+	libcerror_error_t *error                                 = NULL;
 
-	libcstring_system_character_t * const *argv_filenames = NULL;
-	libcstring_system_character_t **ewf_filenames         = NULL;
+	libcstring_system_character_t * const *source_filenames = NULL;
+	libcstring_system_character_t **ewf_filenames           = NULL;
 
-	libcstring_system_character_t *option_header_codepage = NULL;
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
+	libcstring_system_character_t *option_header_codepage   = NULL;
+	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
 
-	libcstring_system_integer_t option                    = 0;
-	size_t first_filename_length                          = 0;
-	uint8_t verbose                                       = 0;
-	int number_of_filenames                               = 0;
-	int header_codepage                                   = LIBEWF_CODEPAGE_ASCII;
-	int result                                            = 0;
+	libcstring_system_integer_t option                      = 0;
+	size_t first_filename_length                            = 0;
+	uint8_t verbose                                         = 0;
+	int number_of_filenames                                 = 0;
+	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
+	int result                                              = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -303,21 +303,21 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
+	source_filenames    = glob->result;
 	number_of_filenames = glob->number_of_results;
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 #endif
 
 	if( number_of_filenames == 1 )
 	{
 		first_filename_length = libcstring_system_string_length(
-		                         argv_filenames[ 0 ] );
+		                         source_filenames[ 0 ] );
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
-		     argv_filenames[ 0 ],
+		     source_filenames[ 0 ],
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
@@ -325,7 +325,7 @@ int main( int argc, char * const argv[] )
 		     &error ) != 1 )
 #else
 		if( libewf_glob(
-		     argv_filenames[ 0 ],
+		     source_filenames[ 0 ],
 		     first_filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
 		     &ewf_filenames,
@@ -339,7 +339,7 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		argv_filenames = (libcstring_system_character_t * const *) ewf_filenames;
+		source_filenames = (libcstring_system_character_t * const *) ewf_filenames;
 	}
 	if( libewf_handle_initialize(
 	     &ewfdebug_input_handle,
@@ -353,7 +353,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = libewf_handle_open(
 	          ewfdebug_input_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          LIBEWF_OPEN_READ_WRITE,
 	          &error );

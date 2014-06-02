@@ -6,28 +6,6 @@ Tests:
   - split test_read_delta in test_read_delta and test_read_delta_chunk
   - move test_ewfexport to test runner
 
-Fix issues with input/logical/encase7.04.01.Lx01
-
-libcdata_range_list_insert_range: invalid range size value exceeds maximum.
-libewf_chunk_table_get_chunk_data_by_offset: unable to insert checksum error
-in range list.
-libewf_handle_read_buffer: unable to read chunk: 56 data.
-verification_handle_read_buffer: unable to read storage media buffer.
-verification_handle_verify_input: unable to read data.
-
-libcdata_range_list_insert_range: invalid range size value exceeds maximum.
-libewf_chunk_table_get_chunk_data_by_offset: unable to insert checksum error
-in range list.
-libewf_handle_read_buffer: unable to read chunk: 55 data.
-libewf_file_entry_read_buffer: unable to read buffer.
-verification_handle_verify_file_entry: unable to read file entry data.
-
-
-Fix missing segment name:
-Sector validation errors:
-	total number: 1
-		at sector(s): 3584 - 28236 (number: 24653) in segment file(s):
-
 ewfexport:
 * if EWF file is empty still write an emtpy file
 
@@ -41,24 +19,17 @@ Clean up:
 * ewftools:
   - if one option available just print and continue
   - if set by command lien just print and continue
-* fix python bindings open file objects - segment table not being initialized
-* update msvscpp files
-* fix allocation of segment tables
+
 * fix last_chunk_data_offset calculation for table2
   in combination with libewf_chunk_group_correct_v1
-* fix read of chunk groups in segment file on demand
 * ewftools: allow to set date and time
 * chunk data
   - related calculation into chunk data
   - change API to have chunk type
-* libmfdata/libfdata merge
-  - fix reading delta chunks
 * libewf_chunk_data_check_for_empty_block
   - use memcmp instead?
   - write a test at configure time to determine which approach is faster
   - same for adler32 ?
-
-  - reimplement chunk table using layered approach (+/-)
 
   - sections list on write: cache section descriptors instead of free-ing them?
 
@@ -101,8 +72,7 @@ Clean up:
 
 * pyewf
   - change header and hash values into sequence objects
-  - setup.py: non Windows support
-* ewftools: rename argv_filenames to source_filenames (see libvmdk)
+  - setup.py: non Windows support?
 * add bzip2 compression support
 * add function to retrieve:
   - compression values
@@ -113,9 +83,6 @@ Clean up:
 
 * check behavior of ewfacquire resume and specified offset
 * msvscpp
-  - add bzip2 support
-* codegear
-  - add checks to disable compiler warnings
   - add bzip2 support
 
 * complete ewfrecover
@@ -473,6 +440,11 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20140602
+* bug fix in ewfmount regarding logical files date and time values
+* fix for Lx01 files, device information section needs to be read before the
+  sector table section to determine the chunk size
 
 20140601
 * updated dependencies

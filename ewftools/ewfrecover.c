@@ -139,7 +139,7 @@ int main( int argc, char * const argv[] )
 #endif
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
-	libcstring_system_character_t * const *argv_filenames      = NULL;
+	libcstring_system_character_t * const *source_filenames    = NULL;
 
 	libcerror_error_t *error                                   = NULL;
 
@@ -353,10 +353,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
+	source_filenames    = glob->result;
 	number_of_filenames = glob->number_of_results;
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 #endif
 
@@ -416,7 +416,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = export_handle_open_input(
 	          ewfrecover_export_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          &error );
 

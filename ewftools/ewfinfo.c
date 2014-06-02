@@ -128,24 +128,24 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t * const *argv_filenames = NULL;
+	libcstring_system_character_t * const *source_filenames = NULL;
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
-	libcsystem_glob_t *glob                               = NULL;
+	libcsystem_glob_t *glob                                 = NULL;
 #endif
-	libcerror_error_t *error                              = NULL;
+	libcerror_error_t *error                                = NULL;
 
-	libcstring_system_character_t *option_date_format     = NULL;
-	libcstring_system_character_t *option_header_codepage = NULL;
-	libcstring_system_character_t *option_output_format   = NULL;
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
+	libcstring_system_character_t *option_date_format       = NULL;
+	libcstring_system_character_t *option_header_codepage   = NULL;
+	libcstring_system_character_t *option_output_format     = NULL;
+	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfinfo" );
 
-	libcstring_system_integer_t option                    = 0;
-	uint8_t verbose                                       = 0;
-	char info_option                                      = 'a';
-	int number_of_filenames                               = 0;
-	int print_header                                      = 1;
-	int result                                            = 0;
+	libcstring_system_integer_t option                      = 0;
+	uint8_t verbose                                         = 0;
+	char info_option                                        = 'a';
+	int number_of_filenames                                 = 0;
+	int print_header                                        = 1;
+	int result                                              = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -520,10 +520,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
+	source_filenames    = glob->result;
 	number_of_filenames = glob->number_of_results;
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 
 #endif
@@ -579,7 +579,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = info_handle_open_input(
 	          ewfinfo_info_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          &error );
 

@@ -2521,6 +2521,127 @@ int libewf_handle_open_read_segment_file_section_data(
 
 		goto on_error;
 	}
+	/* Make sure to read the device information section first so we
+	 * have the correct chunk size when reading Lx01 files.
+	 */
+	if( segment_file->device_information_section_index >= 0 )
+	{
+		if( libfdata_list_get_element_value_by_index(
+		     segment_file->sections_list,
+		     (intptr_t *) file_io_pool,
+		     sections_cache,
+		     segment_file->device_information_section_index,
+		     (intptr_t **) &section,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve section: %d from sections list.",
+			 function,
+			 segment_file->device_information_section_index );
+
+			goto on_error;
+		}
+		if( section == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing section: %d.",
+			 function,
+			 segment_file->device_information_section_index );
+
+			goto on_error;
+		}
+		if( libewf_segment_file_seek_offset(
+		     segment_file,
+		     file_io_pool,
+		     file_io_pool_entry,
+		     section->start_offset,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to seek section: %d data offset: %" PRIu64 ".",
+			 function,
+			 segment_file->device_information_section_index,
+			 section->start_offset );
+
+			goto on_error;
+		}
+		read_count = libewf_section_compressed_string_read(
+			      section,
+			      internal_handle->io_handle,
+			      file_io_pool,
+			      file_io_pool_entry,
+			      internal_handle->io_handle->compression_method,
+			      &string_data,
+			      &string_data_size,
+			      error );
+
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read device information file object string.",
+			 function );
+
+			goto on_error;
+		}
+		else if( read_count != 0 )
+		{
+			if( internal_handle->read_io_handle->device_information == NULL )
+			{
+				if( libewf_device_information_parse(
+				     string_data,
+				     string_data_size,
+				     internal_handle->media_values,
+				     internal_handle->header_values,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to parse device information.",
+					 function );
+
+					goto on_error;
+				}
+				internal_handle->read_io_handle->device_information      = string_data;
+				internal_handle->read_io_handle->device_information_size = string_data_size;
+			}
+			else
+			{
+				if( ( internal_handle->read_io_handle->device_information_size != string_data_size )
+				 || ( memory_compare(
+				       internal_handle->read_io_handle->device_information,
+				       string_data,
+				       16 ) != 0 ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_INPUT,
+					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
+					 "%s: device information value mismatch.",
+					 function );
+
+					goto on_error;
+				}
+				memory_free(
+				 string_data );
+			}
+			string_data = NULL;
+		}
+	}
 	for( section_index = 0;
 	     section_index < number_of_sections;
 	     section_index++ )
@@ -2613,77 +2734,8 @@ int libewf_handle_open_read_segment_file_section_data(
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-					read_count = libewf_section_compressed_string_read(
-						      section,
-						      internal_handle->io_handle,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->io_handle->compression_method,
-						      &string_data,
-						      &string_data_size,
-						      error );
-
-					if( read_count == -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read device information file object string.",
-						 function );
-
-						goto on_error;
-					}
-					else if( read_count != 0 )
-					{
-						if( internal_handle->read_io_handle->device_information == NULL )
-						{
-							if( libewf_device_information_parse(
-							     string_data,
-							     string_data_size,
-							     internal_handle->media_values,
-							     internal_handle->header_values,
-							     error ) != 1 )
-							{
-								libcerror_error_set(
-								 error,
-								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-								 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-								 "%s: unable to parse device information.",
-								 function );
-
-								goto on_error;
-							}
-							internal_handle->read_io_handle->device_information      = string_data;
-							internal_handle->read_io_handle->device_information_size = string_data_size;
-
-							if( internal_handle->read_io_handle->case_data != NULL )
-							{
-								initialize_chunk_values = 1;
-							}
-						}
-						else
-						{
-							if( ( internal_handle->read_io_handle->device_information_size != string_data_size )
-							 || ( memory_compare(
-							       internal_handle->read_io_handle->device_information,
-							       string_data,
-							       16 ) != 0 ) )
-							{
-								libcerror_error_set(
-								 error,
-								 LIBCERROR_ERROR_DOMAIN_INPUT,
-								 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-								 "%s: device information value mismatch.",
-								 function );
-
-								goto on_error;
-							}
-							memory_free(
-							 string_data );
-						}
-						string_data = NULL;
-					}
+					/* Since we already parsed it nothing to do for the device information section
+					 */
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -2735,10 +2787,7 @@ int libewf_handle_open_read_segment_file_section_data(
 							internal_handle->read_io_handle->case_data      = string_data;
 							internal_handle->read_io_handle->case_data_size = string_data_size;
 
-							if( internal_handle->read_io_handle->device_information != NULL )
-							{
-								initialize_chunk_values = 1;
-							}
+							initialize_chunk_values = 1;
 						}
 						else
 						{

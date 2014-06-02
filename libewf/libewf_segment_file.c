@@ -197,7 +197,8 @@ int libewf_segment_file_initialize(
 
 		goto on_error;
 	}
-	( *segment_file )->io_handle = io_handle;
+	( *segment_file )->io_handle                        = io_handle;
+	( *segment_file )->device_information_section_index = -1;
 
 	return( 1 );
 
@@ -6203,6 +6204,7 @@ int libewf_segment_file_read_element_data(
 	ssize_t read_count                  = 0;
 	int element_index                   = 0;
 	int last_section                    = 0;
+	int section_index                   = 0;
 
 	LIBEWF_UNREFERENCED_PARAMETER( element_flags )
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
@@ -6407,6 +6409,10 @@ int libewf_segment_file_read_element_data(
 		}
 		else if( segment_file->major_version == 2 )
 		{
+			if( section->type == LIBEWF_SECTION_TYPE_DEVICE_INFORMATION )
+			{
+				segment_file->device_information_section_index = section_index;
+			}
 			if( section->type == LIBEWF_SECTION_TYPE_ENCRYPTION_KEYS )
 			{
 				segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_IS_ENCRYPTED;
@@ -6451,6 +6457,7 @@ int libewf_segment_file_read_element_data(
 		{
 			break;
 		}
+		section_index++;
 	}
 	if( libewf_section_free(
 	     &section,

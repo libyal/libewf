@@ -105,6 +105,10 @@ struct libewf_segment_file
          */
         libfdata_list_t *sections_list;
 
+	/* The device information section index
+	 */
+	int device_information_section_index;
+
 	/* The chunk groups list
 	 */
 	libfdata_list_t *chunk_groups_list;

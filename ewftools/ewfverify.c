@@ -138,7 +138,7 @@ int main( int argc, char * const argv[] )
 #endif
 	libcerror_error_t *error                                      = NULL;
 
-	libcstring_system_character_t * const *argv_filenames         = NULL;
+	libcstring_system_character_t * const *source_filenames       = NULL;
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
 	libcsystem_glob_t *glob                                       = NULL;
@@ -411,10 +411,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
+	source_filenames    = glob->result;
 	number_of_filenames = glob->number_of_results;
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind;
 #endif
 
@@ -462,7 +462,7 @@ int main( int argc, char * const argv[] )
 	}
 	result = verification_handle_open_input(
 	          ewfverify_verification_handle,
-	          argv_filenames,
+	          source_filenames,
 	          number_of_filenames,
 	          &error );
 

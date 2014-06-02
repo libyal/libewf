@@ -1245,26 +1245,25 @@ int ewfmount_fuse_getattr(
 				}
 #endif
 				stat_info->st_size = (off_t) media_size;
-
+#if defined( HAVE_TIME )
+				if( time( &timestamp ) == (time_t) -1 )
+				{
+					timestamp = 0;
+				}
+				stat_info->st_atime = timestamp;
+				stat_info->st_mtime = timestamp;
+				stat_info->st_ctime = timestamp;
+#else
+				stat_info->st_atime = 0;
+				stat_info->st_mtime = 0;
+				stat_info->st_ctime = 0;
+#endif
 				result = 0;
 			}
 		}
 	}
 	if( result == 0 )
 	{
-#if defined( HAVE_TIME )
-		if( time( &timestamp ) == (time_t) -1 )
-		{
-			timestamp = 0;
-		}
-		stat_info->st_atime = timestamp;
-		stat_info->st_mtime = timestamp;
-		stat_info->st_ctime = timestamp;
-#else
-		stat_info->st_atime = 0;
-		stat_info->st_mtime = 0;
-		stat_info->st_ctime = 0;
-#endif
 #if defined( HAVE_GETEUID )
 		stat_info->st_uid = geteuid();
 #else
@@ -3083,28 +3082,28 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t * const *argv_filenames  = NULL;
+	libcstring_system_character_t * const *source_filenames = NULL;
 
-	libewf_error_t *error                                  = NULL;
-	libcstring_system_character_t *mount_point             = NULL;
-	libcstring_system_character_t *option_extended_options = NULL;
-	libcstring_system_character_t *option_format           = NULL;
-	libcstring_system_character_t *program                = _LIBCSTRING_SYSTEM_STRING( "ewfmount" );
-	libcstring_system_integer_t option                     = 0;
-	int number_of_filenames                                = 0;
-	int result                                             = 0;
-	int verbose                                            = 0;
+	libewf_error_t *error                                   = NULL;
+	libcstring_system_character_t *mount_point              = NULL;
+	libcstring_system_character_t *option_extended_options  = NULL;
+	libcstring_system_character_t *option_format            = NULL;
+	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfmount" );
+	libcstring_system_integer_t option                      = 0;
+	int number_of_filenames                                 = 0;
+	int result                                              = 0;
+	int verbose                                             = 0;
 
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
-	libcsystem_glob_t *glob                                = NULL;
+	libcsystem_glob_t *glob                                 = NULL;
 #endif
 
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
 
-	struct fuse_args ewfmount_fuse_arguments               = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *ewfmount_fuse_channel                = NULL;
-	struct fuse *ewfmount_fuse_handle                      = NULL;
+	struct fuse_args ewfmount_fuse_arguments                = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *ewfmount_fuse_channel                 = NULL;
+	struct fuse *ewfmount_fuse_handle                       = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS ewfmount_dokan_operations;
@@ -3244,10 +3243,10 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	argv_filenames      = glob->result;
+	source_filenames    = glob->result;
 	number_of_filenames = glob->number_of_results;
 #else
-	argv_filenames      = &( argv[ optind ] );
+	source_filenames    = &( argv[ optind ] );
 	number_of_filenames = argc - optind - 1;
 #endif
 
@@ -3314,7 +3313,7 @@ int main( int argc, char * const argv[] )
 #endif
 	if( mount_handle_open_input(
 	     ewfmount_mount_handle,
-	     argv_filenames,
+	     source_filenames,
 	     number_of_filenames,
 	     &error ) != 1 )
 	{
