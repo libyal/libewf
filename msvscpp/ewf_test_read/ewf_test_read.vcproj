@@ -2,11 +2,11 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="dokan_dll"
-	ProjectGUID="{91153D94-E20C-4739-A5D5-9A33A5670B81}"
-	RootNamespace="dokan_dll"
+	Name="ewf_test_read"
+	ProjectGUID="{B129B04A-DA44-4161-80AA-90134A069081}"
+	RootNamespace="ewf_test_read"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -20,7 +20,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -41,15 +41,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\dokan\sys\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;DOKAN_DLL"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcsystem"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCSYSTEM;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="0"
+				WarningLevel="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,16 +58,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\dokan.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="..\..\..\dokan\dokan\dokan.def"
-				GenerateDebugInformation="false"
-				SubSystem="0"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)dokan.lib"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -99,9 +93,8 @@
 			Name="VSDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -121,16 +114,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\dokan\sys\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;DOKAN_DLL"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcsystem"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCSYSTEM;LIBEWF_DLL_IMPORT"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -143,15 +134,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\dokan.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="0"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)dokan.lib"
+				DataExecutionPrevention="1"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -185,75 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\dokan\dokan\access.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\cleanup.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\close.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\create.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\directory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\dokan.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\fileinfo.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\flush.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\lock.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\mount.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\read.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\security.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\setfile.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\status.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\timeout.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\version.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\volume.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\dokan\dokan\write.c"
+				RelativePath="..\..\tests\ewf_test_read.c"
 				>
 			</File>
 		</Filter>
@@ -263,23 +186,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\dokan\dokan\dokan.h"
+				RelativePath="..\..\tests\ewf_test_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\dokan\dokan\dokanc.h"
+				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\dokan\dokan\dokani.h"
+				RelativePath="..\..\tests\ewf_test_libcstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\dokan\dokan\fileinfo.h"
+				RelativePath="..\..\tests\ewf_test_libewf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\dokan\dokan\list.h"
+				RelativePath="..\..\tests\ewf_test_unused.h"
 				>
 			</File>
 		</Filter>

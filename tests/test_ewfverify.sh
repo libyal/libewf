@@ -49,7 +49,7 @@ test_verify()
 	rm -rf tmp;
 	mkdir tmp;
 
-	${TEST_RUNNER} ${EWFVERIFY} -q ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
+	${TEST_RUNNER} ${EWFVERIFY} -q -d sha1 ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
 
 	RESULT=$?;
 

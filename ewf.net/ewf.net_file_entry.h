@@ -71,6 +71,10 @@ public ref class FileEntry sealed
 		int ReadBuffer( array<System::Byte>^ buffer,
 		                int size );
 
+		int ReadBufferAtOffset( array<System::Byte>^ buffer,
+		                        int size,
+		                        System::Int64 offset );
+
 		int ReadRandom( array<System::Byte>^ buffer,
 		                int size,
 		                System::Int64 offset );

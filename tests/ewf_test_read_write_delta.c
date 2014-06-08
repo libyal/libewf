@@ -42,7 +42,7 @@
  * Return 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_read_write_delta(
-     char * const filenames[],
+     libcstring_system_character_t * const filenames[],
      int number_of_filenames,
      const libcstring_system_character_t *delta_segment_filename,
      off64_t write_offset,

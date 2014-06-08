@@ -6,23 +6,31 @@ Tests:
   - split test_read_delta in test_read_delta and test_read_delta_chunk
   - move test_ewfexport to test runner
 
-ewfexport:
-* if EWF file is empty still write an emtpy file
-
 Clean up:
 * remove random and other deprecated functions
+  - libewf
+  - pyewf
+  - ewf.net
 
-* ewfacquire print status info without confirmation in unattended mode
-* move multi threading into ewftools
+* libewf:
+  - empty caches on close
+
 * check if empty block check or equiv is always done (except for no compression).
 * user header and header2 time difference to calculate the timezone
+
 * ewftools:
   - if one option available just print and continue
   - if set by command lien just print and continue
+  - port multi threaded ewfacquirestream
+  - add multi threading support
+  - allow to set date and time
+* ewfacquire:
+  - print status info without confirmation in unattended mode
+* ewfexport:
+  - if EWF file is empty still write an emtpy file
 
 * fix last_chunk_data_offset calculation for table2
   in combination with libewf_chunk_group_correct_v1
-* ewftools: allow to set date and time
 * chunk data
   - related calculation into chunk data
   - change API to have chunk type
@@ -82,8 +90,6 @@ Clean up:
   section_data_read CHS cylinders, SMART logs start sector
 
 * check behavior of ewfacquire resume and specified offset
-* msvscpp
-  - add bzip2 support
 
 * complete ewfrecover
   - max segment size
@@ -407,6 +413,11 @@ Tests
 * pyewf: add tests
 * write resume from volume/disk section - basically re-image
 
+Performance:
+* map full RAW storage media data into memory?
+  - libsigsegv?
+  - mmap?
+
 Deployment:
 * spec file
   - make flex, yacc include flexible ?
@@ -418,8 +429,6 @@ Deployment:
   - figure out a way to warn about the compiler used
   - add VC_EXTRALEAN to msvscpp config
 * integrating libewf.rc into mingw dll ?
-* macosx PackageMaker files
-  - add pyewf
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -440,6 +449,11 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20140608
+* worked on tests
+* updated msvscpp files
+* bug fix for utf16 header functions
 
 20140602
 * bug fix in ewfmount regarding logical files date and time values

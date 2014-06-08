@@ -351,13 +351,21 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_handle_open_wide(
+	          ewfdebug_input_handle,
+	          source_filenames,
+	          number_of_filenames,
+	          LIBEWF_OPEN_READ,
+	          &error );
+#else
 	result = libewf_handle_open(
 	          ewfdebug_input_handle,
 	          source_filenames,
 	          number_of_filenames,
-	          LIBEWF_OPEN_READ_WRITE,
+	          LIBEWF_OPEN_READ,
 	          &error );
-
+#endif
 #if !defined( LIBCSYSTEM_HAVE_GLOB )
 	if( libcsystem_glob_free(
 	     &glob,

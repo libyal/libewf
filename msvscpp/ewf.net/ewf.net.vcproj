@@ -2,11 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="bzip2_dll"
-	ProjectGUID="{A6479C8C-D36D-4507-9E5F-029A9D87D821}"
-	RootNamespace="bzip2_dll"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
+	Name="ewf.net"
+	ProjectGUID="{C50DB8AE-DF73-4F32-8F2C-E58E64426535}"
+	RootNamespace="ewf.net"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -22,7 +21,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,14 +40,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;BZ_DLL"
+				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="0"
+				WarningLevel="4"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -61,15 +57,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\bzip2.dll"
-				LinkIncremental="1"
-				GenerateDebugInformation="false"
-				SubSystem="0"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)bzip2.lib"
+				AdditionalDependencies="libewf.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
+				TargetMachine="1"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -99,7 +93,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
-			WholeProgramOptimization="1"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -119,15 +113,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;BZ_DLL"
-				BasicRuntimeChecks="3"
-				SmallerTypeCheck="true"
+				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -140,15 +131,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\bzip2.dll"
-				LinkIncremental="1"
+				AdditionalDependencies="libewf.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="0"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)bzip2.lib"
+				DataExecutionPrevention="1"
+				TargetMachine="1"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -182,31 +172,23 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\bzip2\blocksort.c"
+				RelativePath="..\..\ewf.net\ewf.net_datetime.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\bzip2\bzlib.c"
+				RelativePath="..\..\ewf.net\ewf.net_file_entry.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\bzip2\compress.c"
+				RelativePath="..\..\ewf.net\ewf.net_handle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\bzip2\crctable.c"
+				RelativePath="..\..\ewf.net\ewf.net_sector_range.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\bzip2\decompress.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\bzip2\huffman.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\bzip2\randtable.c"
+				RelativePath="..\..\ewf.net\ewf.net_support.cpp"
 				>
 			</File>
 		</Filter>
@@ -216,11 +198,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\bzip2\bzlib.h"
+				RelativePath="..\..\ewf.net\ewf.net_datetime.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\bzip2\bzlib_private.h"
+				RelativePath="..\..\ewf.net\ewf.net_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_file_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_sector_range.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net_support.h"
 				>
 			</File>
 		</Filter>
@@ -229,6 +227,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath="..\..\ewf.net\ewf.net.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

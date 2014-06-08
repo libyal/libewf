@@ -2,10 +2,11 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf.net_dll"
-	ProjectGUID="{C9D11A1A-EF3A-4411-B8EA-1437B7511E5A}"
-	RootNamespace="libewfnet_dll"
-	TargetFrameworkVersion="196613"
+	Name="ewf_test_write"
+	ProjectGUID="{497C0818-1B89-4FF5-847E-520A7A0C6825}"
+	RootNamespace="ewf_test_write"
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -19,10 +20,9 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
-			ManagedExtensions="1"
-			WholeProgramOptimization="0"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,15 +41,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="false"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;"
-				PreprocessorDefinitions="HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcsystem"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCSYSTEM;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="false"
 				WarningLevel="4"
-				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,16 +58,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libewf.lib"
-				OutputFile="$(OutDir)\ewf.net.dll"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="false"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				FixedBaseAddress="0"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)\dnewf.lib"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="2"
+				DataExecutionPrevention="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -99,10 +93,8 @@
 			Name="VSDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
-			ManagedExtensions="1"
-			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -122,16 +114,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				EnableIntrinsicFunctions="false"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;"
-				PreprocessorDefinitions="HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;LIBEWF_DLL_IMPORT"
-				BasicRuntimeChecks="0"
-				SmallerTypeCheck="false"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcstring;..\..\libcerror;..\..\libclocale;..\..\libcnotify;..\..\libuna;..\..\libcfile;..\..\libcsystem"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCSTRING;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCSYSTEM;LIBEWF_DLL_IMPORT"
+				BasicRuntimeChecks="3"
+				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="false"
 				WarningLevel="4"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -144,16 +134,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libewf.lib"
-				OutputFile="$(OutDir)\ewf.net.dll"
+				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
-				FixedBaseAddress="0"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)\dnewf.lib"
+				DataExecutionPrevention="1"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -187,23 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_datetime.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net_file_entry.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net_handle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net_sector_range.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net_support.cpp"
+				RelativePath="..\..\tests\ewf_test_write.c"
 				>
 			</File>
 		</Filter>
@@ -213,27 +186,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_datetime.h"
+				RelativePath="..\..\tests\ewf_test_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_definitions.h"
+				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_file_entry.h"
+				RelativePath="..\..\tests\ewf_test_libcstring.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_handle.h"
+				RelativePath="..\..\tests\ewf_test_libewf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewf.net\ewf.net_sector_range.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net_support.h"
+				RelativePath="..\..\tests\ewf_test_unused.h"
 				>
 			</File>
 		</Filter>
@@ -242,10 +211,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath="..\..\ewf.net\ewf.net.rc"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

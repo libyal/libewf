@@ -2,7 +2,7 @@
 #
 # Library read testing script
 #
-# Copyright (c) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -121,13 +121,13 @@ else
 			then
 				if test -f "input/.libewf/${DIRNAME}/files";
 				then
-					TESTFILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
+					TEST_FILES=`cat input/.libewf/${DIRNAME}/files | sed "s?^?${TESTDIR}/?"`;
 				else
-					TESTFILES=`ls ${TESTDIR}/*.[ELes]01 ${TESTDIR}/*.[EL]x01 2> /dev/null`;
+					TEST_FILES=`ls -1 ${TESTDIR}/*.[ELes]01 ${TESTDIR}/*.[EL]x01 2> /dev/null`;
 				fi
-				for TESTFILE in ${TESTFILES};
+				for TEST_FILE in ${TEST_FILES};
 				do
-					if ! test_read "${TESTFILE}";
+					if ! test_read "${TEST_FILE}";
 					then
 						exit ${EXIT_FAILURE};
 					fi

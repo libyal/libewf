@@ -86,11 +86,19 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libcfile_file_open_wide(
+	     file,
+	     argv[ 2 ],
+	     LIBCFILE_OPEN_WRITE,
+	     &error ) != 1 )
+#else
 	if( libcfile_file_open(
 	     file,
 	     argv[ 2 ],
 	     LIBCFILE_OPEN_WRITE,
 	     &error ) != 1 )
+#endif
 	{
 		fprintf(
 		 stderr,

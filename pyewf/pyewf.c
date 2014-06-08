@@ -154,7 +154,7 @@ PyObject *pyewf_check_file_signature(
 	char *error_string            = NULL;
 	int result                    = 0;
 
-	PYSMDEV_UNREFERENCED_PARAMETER( self )
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	/* Note that PyArg_ParseTupleAndKeywords with "s" will force Unicode strings to be converted to narrow character string.
 	 * On Windows the narrow character strings contains an extended ASCII string with a codepage. Hence we get a conversion
@@ -225,7 +225,7 @@ PyObject *pyewf_check_file_signature(
 
 		if( result == -1 )
 		{
-			pysmdev_error_raise(
+			pyewf_error_raise(
 			 error,
 			 PyExc_IOError,
 			 "%s: unable to check file signature.",
@@ -298,7 +298,7 @@ PyObject *pyewf_check_file_signature(
 
 		if( result == -1 )
 		{
-			pysmdev_error_raise(
+			pyewf_error_raise(
 			 error,
 			 PyExc_IOError,
 			 "%s: unable to check file signature.",
@@ -508,7 +508,7 @@ PyObject *pyewf_glob(
 	int number_of_filenames          = 0;
 	int result                       = 0;
 
-	PYSMDEV_UNREFERENCED_PARAMETER( self )
+	PYEWF_UNREFERENCED_PARAMETER( self )
 
 	/* Note that PyArg_ParseTupleAndKeywords with "s" will force Unicode strings to be converted to narrow character string.
 	 * On Windows the narrow character strings contains an extended ASCII string with a codepage. Hence we get a conversion
@@ -748,7 +748,7 @@ PyObject *pyewf_glob(
 			filename_string_object = PyUnicode_Decode(
 						  filenames_narrow[ filename_index ],
 						  filename_length,
-						  PyUnicode_GetDefaultEncoding()
+						  PyUnicode_GetDefaultEncoding(),
 						  errors );
 
 			if( filename_string_object == NULL )

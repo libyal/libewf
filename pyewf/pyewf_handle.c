@@ -720,6 +720,7 @@ PyObject *pyewf_handle_open(
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	wchar_t **filenames              = NULL;
 	wchar_t *filename                = NULL;
+	const char *errors               = NULL;
 	int is_unicode_string            = 0;
 #else
 	char **filenames                 = NULL;
@@ -1010,7 +1011,7 @@ PyObject *pyewf_handle_open(
 			                           string_object ),
 						  PyString_Size(
 			                           string_object ),
-						  PyUnicode_GetDefaultEncoding()
+						  PyUnicode_GetDefaultEncoding(),
 						  errors );
 
 			if( filename_string_object == NULL )
@@ -1027,7 +1028,7 @@ PyObject *pyewf_handle_open(
 			                        filename_string_object );
 		}
 		filename_length = libcstring_wide_string_length(
-		                   filename_wide );
+		                   filename );
 #else
 		/* A Unicode string object can be converted into UFT-8 formatted narrow string
 		 */
@@ -1039,8 +1040,8 @@ PyObject *pyewf_handle_open(
 #endif
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		filenames[ filename_index ] = (whcar_t *) PyMem_Malloc(
-		                                           sizeof( whcar_t ) * ( filename_length + 1 ) );
+		filenames[ filename_index ] = (wchar_t *) PyMem_Malloc(
+		                                           sizeof( wchar_t ) * ( filename_length + 1 ) );
 #else
 		filenames[ filename_index ] = (char *) PyMem_Malloc(
 		                                        sizeof( char ) * ( filename_length + 1 ) );

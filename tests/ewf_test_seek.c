@@ -28,8 +28,9 @@
 #include <stdio.h>
 
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libewf.h"
+#include "ewf_test_libcnotify.h"
 #include "ewf_test_libcstring.h"
+#include "ewf_test_libewf.h"
 
 /* Define to make ewf_test_seek generate verbose output
 #define EWF_TEST_SEEK_VERBOSE

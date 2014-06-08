@@ -64,7 +64,7 @@ check_PROGRAMS = \
 	ewf_test_read \
 	ewf_test_read_chunk \
 	ewf_test_read_delta \
-	ewf_test_read_write\
+	ewf_test_read_write \
 	ewf_test_read_write_delta \
 	ewf_test_seek \
 	ewf_test_truncate \

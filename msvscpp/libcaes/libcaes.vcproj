@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libcaes.lib"
+				OutputFile="$(OutDir)\$(ProjectName).lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\libcaes.lib"
+				OutputFile="$(OutDir)\$(ProjectName).lib"
 				ModuleDefinitionFile=""
 				IgnoreAllDefaultLibraries="false"
 			/>
@@ -170,6 +170,10 @@
 				RelativePath="..\..\libcaes\libcaes_support.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libcaes\libcaes_tweaked_context.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -201,7 +205,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcaes\libcaes_libcerror.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcaes\libcaes_libcstring.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcaes\libcaes_support.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcaes\libcaes_tweaked_context.h"
 				>
 			</File>
 			<File

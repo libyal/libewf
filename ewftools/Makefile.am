@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCDATETIME_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -22,6 +23,7 @@ AM_CPPFLAGS = \
 	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
@@ -52,6 +54,7 @@ ewfacquire_SOURCES = \
 	ewftools_libcsplit.h \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
+	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -79,9 +82,11 @@ ewfacquire_LDADD = \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \

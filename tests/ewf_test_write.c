@@ -42,7 +42,7 @@
  * Return 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_write(
-     const char *filename,
+     const libcstring_system_character_t *filename,
      size64_t media_size,
      size64_t maximum_segment_size,
      int8_t compression_level,

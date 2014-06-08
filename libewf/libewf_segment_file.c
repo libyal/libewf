@@ -6529,6 +6529,11 @@ int libewf_segment_file_read_element_data(
 
 			goto on_error;
 		}
+		if( segment_file->device_information_section_index != -1 )
+		{
+			segment_file->device_information_section_index = ( section_index - 1 )
+			                                               - segment_file->device_information_section_index;
+		}
 	}
 	if( libfdata_list_element_set_element_value(
 	     element,

@@ -554,7 +554,7 @@ int main( int argc, char * const argv[] )
 		          log_handle,
 		          &error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			fprintf(
 			 stderr,

@@ -3407,6 +3407,7 @@ int libewf_handle_get_utf8_header_value_size(
 	static char *function                     = "libewf_handle_get_utf8_header_value_size";
 	size_t date_time_string_size              = 64;
 	size_t header_value_data_size             = 0;
+	size_t string_index                       = 0;
 	int encoding                              = 0;
 	int result                                = 0;
 
@@ -3552,8 +3553,16 @@ int libewf_handle_get_utf8_header_value_size(
 
 			return( -1 );
 		}
-		*utf8_string_size = 1 + libcstring_narrow_string_length(
-		                         (char *) date_time_string );
+		for( string_index = 0;
+		     string_index < date_time_string_size;
+		     string_index++ )
+		{
+			if( date_time_string[ string_index ] == 0 )
+			{
+				break;
+			}
+		}
+		*utf8_string_size = 1 + string_index;
 	}
 	else
 	{
@@ -3934,6 +3943,7 @@ int libewf_handle_get_utf16_header_value_size(
 	static char *function                     = "libewf_handle_get_utf8_header_value_size";
 	size_t date_time_string_size              = 64;
 	size_t header_value_data_size             = 0;
+	size_t string_index                       = 0;
 	int encoding                              = 0;
 	int result                                = 0;
 
@@ -4079,8 +4089,16 @@ int libewf_handle_get_utf16_header_value_size(
 
 			return( -1 );
 		}
-		*utf16_string_size = 1 + libcstring_narrow_string_length(
-					  (char *) date_time_string );
+		for( string_index = 0;
+		     string_index < date_time_string_size;
+		     string_index++ )
+		{
+			if( date_time_string[ string_index ] == 0 )
+			{
+				break;
+			}
+		}
+		*utf16_string_size = 1 + string_index;
 	}
 	else
 	{

@@ -2262,7 +2262,7 @@ int libewf_utf16_string_time_copy_from_time_elements(
 
 		return( -1 );
 	}
-	if( ( *utf16_string_index + 16 ) >= utf16_string_size )
+	if( ( *utf16_string_index + 8 ) >= utf16_string_size )
 	{
 		libcerror_error_set(
 		 error,
