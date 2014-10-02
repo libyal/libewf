@@ -1,23 +1,50 @@
-Dependencies
-libewf requires:
-* zlib
-* bzip2
-  (optional for EWF2 support)
-* libcrypto (OpenSSL) or Windows Crypto API (from the Windows Platform SDK)
-  (optional but recommended)
+libewf is a library to access the Expert Witness Compression Format (EWF).
 
-ewftools require:
-* libcrypto (OpenSSL) or Windows Crypto API (from the Windows Platform SDK)
-  (optional but recommended)
-* libuuid or Windows RPC API
-  (optional but recommended)
+Read or write supported EWF formats:
+* SMART .s01 (EWF-S01)
+* EnCase .E01 (EWF-E01) and .Ex01 (EWF2-Ex01)
 
-ewfmount requires:
-* libfuse
-  (optional but recommended)
+**Note: at the moment EWF2 support is only available in the experimental version.**
 
+Not supported:
+* .Ex01 (EWF2-Ex01) bzip2 compression (work in progress)
+* .Ex01 (EWF2-Ex01) encryption
 
-Also see:
-* http://code.google.com/p/libewf/wiki/Building
-* README.macosx
+Read-only supported EWF formats:
+* Logical Evidence File (LEF) .L01 (EWF-L01) and .Lx01 (EWF2-Lx01)
+
+Other features:
+* empty-block compression
+* read/write access using delta (or shadow) files
+* write resume
+
+The libewf package contains the following tools:
+* ewfacquire; which writes storage media data from devices and files to EWF files.
+* ewfacquirestream; which writes data from stdin to EWF files.
+* ewfdebug; experimental tool does nothing at the moment.
+* ewfexport; which exports storage media data in EWF files to (split) RAW format or a specific version of EWF files.
+* ewfinfo; which shows the metadata in EWF files.
+* ewfmount; which FUSE mounts EWF files.
+* ewfrecover; special variant of ewfexport to create a new set of EWF files from a corrupt set.
+* ewfverify; which verifies the storage media data in EWF files.
+
+In 20140216 a multi-threaded version version of ewfacquirestream was added to the ewftools-mt directory note that this requires a C++ version 11 capable compiler.
+
+Work in progress:
+* Python bindings
+* Dokan library support (experimental)
+* write EWF2-Ex01 support
+
+Planned:
+* write EWF-L01 and EWF2-Lx01 (long-term)
+* Multi-threading support
+* Python 3 support
+
+For previous project contributions see:
+* libewf on Google Code: https://code.google.com/p/libewf/
+* libewf on SourceForge: https://sourceforge.net/projects/libewf/
+
+For more information see:
+* Project documentation: https://github.com/libyal/libewf/wiki/Home
+* How to build from source: https://github.com/libyal/libewf/wiki/Building
 

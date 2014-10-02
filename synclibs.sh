@@ -1,17 +1,17 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20130330
+# Version: 20141001
 
-GIT_URL_PREFIX="https://code.google.com/p"
-LOCAL_LIBS="libbfio libcaes libcdata libcerror libcfile libclocale libcnotify libcpath libcsplit libcstring libcsystem libcthreads libfcache libfdata libfvalue libhmac libodraw libsmdev libsmraw libuna";
+GIT_URL_PREFIX="https://github.com/libyal";
+LOCAL_LIBS="libbfio libcaes libcdata libcdatetime libcerror libcfile libclocale libcnotify libcpath libcsplit libcstring libcsystem libcthreads libfcache libfdata libfvalue libhmac libodraw libsmdev libsmraw libuna";
 
 OLDIFS=$IFS;
 IFS=" ";
 
 for LOCAL_LIB in ${LOCAL_LIBS};
 do
-	git clone ${GIT_URL_PREFIX}/${LOCAL_LIB}/ ${LOCAL_LIB}-$$;
+	git clone ${GIT_URL_PREFIX}/${LOCAL_LIB}.git ${LOCAL_LIB}-$$;
 
 	if [ -d ${LOCAL_LIB}-$$ ];
 	then
@@ -39,15 +39,21 @@ SED_SCRIPT="
 
 /${LOCAL_LIB}_la_LIBADD/ {
 :loop1
-        /${LOCAL_LIB}_la_LDFLAGS/ {
-                N
+	/${LOCAL_LIB}_la_LDFLAGS/ {
+		N
 		i endif
-                d
-        }
-        /${LOCAL_LIB}_la_LDFLAGS/ !{
-                N
-                b loop1
-        }
+		d
+	}
+	/${LOCAL_LIB}_la_LDFLAGS/ !{
+		N
+		b loop1
+	}
+}
+
+/${LOCAL_LIB}_la_LDFLAGS/ {
+	N
+	i endif
+	d
 }
 
 /EXTRA_DIST = / {
@@ -67,13 +73,13 @@ SED_SCRIPT="
 
 SED_SCRIPT="
 /^$/ {
-        x
-        N
-        /endif$/ {
-                a \
+	x
+	N
+	/endif$/ {
+		a \
 
-                D
-        }
+		D
+	}
 }";
 			sed "${SED_SCRIPT}" -i ${LOCAL_LIB}/Makefile.am;
 
