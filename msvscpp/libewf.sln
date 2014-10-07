@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewf.net", "ewf.net\ewf.net.vcproj", "{C50DB8AE-DF73-4F32-8F2C-E58E64426535}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41C2387C-9D7F-42B9-9998-3430FBC95AE7} = {41C2387C-9D7F-42B9-9998-3430FBC95AE7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfcache", "libfcache\libfcache.vcproj", "{3D19EAAD-9195-468B-BC5B-D147A89CA4F5}"
 	ProjectSection(ProjectDependencies) = postProject

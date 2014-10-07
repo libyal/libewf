@@ -2,9 +2,7 @@ libewf is a library to access the Expert Witness Compression Format (EWF).
 
 Read or write supported EWF formats:
 * SMART .s01 (EWF-S01)
-* EnCase .E01 (EWF-E01) and .Ex01 (EWF2-Ex01)
-
-**Note: at the moment EWF2 support is only available in the experimental version.**
+* EnCase .E01 (EWF-E01) and .Ex01 (EWF2-Ex01) (work in progress, experimental version only)
 
 Not supported:
 * .Ex01 (EWF2-Ex01) bzip2 compression (work in progress)

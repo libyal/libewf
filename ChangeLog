@@ -450,8 +450,13 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20141007
+* updated dependencies and corresponding changes
+* worked on autogen.sh and synclibs.sh scripts
+
 20141002
 * removed README.macosx
+* changes for project site move
 
 20140801
 * bug fix in Python-bindings
