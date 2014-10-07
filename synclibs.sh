@@ -65,14 +65,6 @@ endif
 	d
 }
 
-/EXTRA_DIST = / {
-	N
-	N
-	N
-	N
-	d
-}
-
 /distclean: clean/ {
 	n
 	N
