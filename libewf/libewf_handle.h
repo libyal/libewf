@@ -64,10 +64,6 @@ struct libewf_internal_handle
 	 */
 	libewf_io_handle_t *io_handle;
 
-	/* The current chunk data
-	 */
-	libewf_chunk_data_t *chunk_data;
-
 	/* The media values
 	 */
 	libewf_media_values_t *media_values;
@@ -119,6 +115,10 @@ struct libewf_internal_handle
 	/* The delta chunks range list
 	 */
 	libfdata_range_list_t *delta_chunks_range_list;
+
+	/* The current chunk data
+	 */
+	libewf_chunk_data_t *chunk_data;
 
 	/* The chunks cache
 	 */

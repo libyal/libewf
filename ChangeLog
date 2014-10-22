@@ -1,4 +1,8 @@
 TODO
+* fix libewf_chunk_table_set_chunk_data_by_offset
+  - need to enlarge segment file?
+  - cache chunk in cache directly?
+
 Tests:
   - finish migrating tests to test_runner
   - move test_read_chunk to test runner
@@ -449,6 +453,12 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20141021
+* changes for deployment
+
+20141012
+* bug fixes
 
 20141007
 * updated dependencies and corresponding changes

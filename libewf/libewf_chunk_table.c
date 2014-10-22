@@ -1086,7 +1086,7 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 			  &chunks_list,
 			  error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1098,45 +1098,42 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 
 			return( -1 );
 		}
-		if( result != 0 )
+		if( chunks_list == NULL )
 		{
-			if( chunks_list == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing chunks list: %d.",
-				 function,
-				 chunk_groups_list_index );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunks list: %d.",
+			 function,
+			 chunk_groups_list_index );
 
-				return( -1 );
-			}
-			result = libfdata_list_set_element_value_at_offset(
-				  chunks_list,
-				  (intptr_t *) file_io_pool,
-				  chunks_cache,
-				  chunk_group_data_offset,
-				  (intptr_t *) chunk_data,
-				  (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
-				  LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
-				  error );
+			return( -1 );
+		}
+		result = libfdata_list_set_element_value_at_offset(
+			  chunks_list,
+			  (intptr_t *) file_io_pool,
+			  chunks_cache,
+			  chunk_group_data_offset,
+			  (intptr_t *) chunk_data,
+			  (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
+			  LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+			  error );
 
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set chunk: %" PRIu64 " data in chunk group: %d in segment file: %" PRIu32 " at offset: %" PRIi64 ".",
-				 function,
-				 chunk_index,
-				 chunk_groups_list_index,
-				 segment_number,
-				 segment_file_data_offset );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set chunk: %" PRIu64 " data in chunk group: %d in segment file: %" PRIu32 " at offset: %" PRIi64 ".",
+			 function,
+			 chunk_index,
+			 chunk_groups_list_index,
+			 segment_number,
+			 segment_file_data_offset );
 
-				return( -1 );
-			}
+			return( -1 );
 		}
 	}
 	return( 1 );

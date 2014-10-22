@@ -1,6 +1,6 @@
 dnl Functions for libcdatetime
 dnl
-dnl Version: 20140105
+dnl Version: 20141018
 
 dnl Function to detect if libcdatetime is available
 dnl ac_libcdatetime_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBCDATETIME_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libcdatetime],
-    [libcdatetime >= 20120425],
+    [libcdatetime >= 20141018],
     [ac_cv_libcdatetime=yes],
     [ac_cv_libcdatetime=no])
    ])

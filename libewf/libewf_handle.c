@@ -4617,6 +4617,24 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
+	/* Free the chunk data if it could not be passed to libewf_chunk_table_set_chunk_data_by_offset
+	 */
+	if( internal_handle->chunk_data != NULL )
+	{
+		if( libewf_chunk_data_free(
+		     &( internal_handle->chunk_data ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk data.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_handle->chunk_table != NULL )
 	{
 		if( libewf_chunk_table_free(
@@ -5993,7 +6011,7 @@ ssize_t libewf_handle_write_chunk(
 	}
 	if( is_compressed != 0 )
 	{
-		chunk_data->range_flags = LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED;
+		chunk_data->range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
 	}
 	else if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
 	{
@@ -6362,7 +6380,6 @@ ssize_t libewf_handle_write_buffer(
 		return( -1 );
 	}
 /* TODO refactor */
-/* TODO refactor this function */
 	while( buffer_size > 0 )
 	{
 		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
@@ -6550,6 +6567,8 @@ ssize_t libewf_handle_write_buffer(
 
 					return( -1 );
 				}
+				/* chunks_cache takes over management of chunk_data
+				 */
 				chunk_data->data_size = internal_handle->media_values->chunk_size;
 
 				write_size = chunk_data->data_size;
@@ -6645,18 +6664,6 @@ ssize_t libewf_handle_write_buffer(
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 					 "%s: unable to create chunk: %" PRIu64 " data.",
-					 function,
-					 chunk_index );
-
-					return( -1 );
-				}
-				if( internal_handle->chunk_data == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: missing chunk: %" PRIu64 " data.",
 					 function,
 					 chunk_index );
 
@@ -6802,6 +6809,8 @@ ssize_t libewf_handle_write_buffer(
 
 					return( -1 );
 				}
+				/* chunks_cache takes over management of chunk_data
+				 */
 				internal_handle->chunk_data = NULL;
 			}
 		}
@@ -7096,6 +7105,8 @@ ssize_t libewf_handle_write_finalize(
 
 			return( -1 );
 		}
+		/* chunks_cache takes over management of chunk_data
+		 */
 		internal_handle->chunk_data = NULL;
 	}
 	/* Check if all media data has been written

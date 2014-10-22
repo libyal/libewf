@@ -2585,7 +2585,6 @@ on_error:
 		 filename );
 	}
 	return( -1 );
-
 }
 
 /* Writes the start of the chunks section
@@ -3587,7 +3586,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
-	if( ( chunk_data->range_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		libcerror_error_set(
 		 error,

@@ -1631,7 +1631,7 @@ ssize_t libewf_chunk_data_write(
 	}
 	total_write_count += write_count;
 
-	if( ( ( chunk_data->range_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) == 0 )
+	if( ( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
 	 && ( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 ) )
 	{
 		/* Check if the chunk and checksum buffers are aligned
@@ -1732,7 +1732,7 @@ int libewf_chunk_data_get_write_size(
 	}
 	safe_write_size = chunk_data->data_size + chunk_data->padding_size;
 
-	if( ( ( chunk_data->range_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) == 0 )
+	if( ( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) == 0 )
 	 && ( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 ) )
 	{
 		if( ( chunk_data->chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
@@ -1794,7 +1794,7 @@ int libewf_chunk_data_get_checksum(
 
 		return( -1 );
 	}
-	if( ( chunk_data->range_flags & LIBEWF_CHUNK_DATA_FLAG_IS_COMPRESSED ) != 0 )
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		if( chunk_data->data_size < 4 )
 		{

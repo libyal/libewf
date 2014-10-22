@@ -1,33 +1,28 @@
 libewf is a library to access the Expert Witness Compression Format (EWF).
 
+Project information:
+* Status: experimental
+* Licence: LGPLv3+
+
 Read or write supported EWF formats:
 * SMART .s01 (EWF-S01)
-* EnCase .E01 (EWF-E01)
-* EnCase .Ex01 (EWF2-Ex01) (experimental version only)
+* EnCase
+  * .E01 (EWF-E01)
+  * .Ex01 (EWF2-Ex01)
 
 Not supported:
 * .Ex01 (EWF2-Ex01) bzip2 compression (work in progress)
 * .Ex01 (EWF2-Ex01) encryption
 
 Read-only supported EWF formats:
-* Logical Evidence File (LEF) .L01 (EWF-L01) and .Lx01 (EWF2-Lx01)
+* Logical Evidence File (LEF)
+  * .L01 (EWF-L01)
+  * .Lx01 (EWF2-Lx01)
 
 Other features:
 * empty-block compression
 * read/write access using delta (or shadow) files
 * write resume
-
-The libewf package contains the following tools:
-* ewfacquire; which writes storage media data from devices and files to EWF files.
-* ewfacquirestream; which writes data from stdin to EWF files.
-* ewfdebug; experimental tool does nothing at the moment.
-* ewfexport; which exports storage media data in EWF files to (split) RAW format or a specific version of EWF files.
-* ewfinfo; which shows the metadata in EWF files.
-* ewfmount; which FUSE mounts EWF files.
-* ewfrecover; special variant of ewfexport to create a new set of EWF files from a corrupt set.
-* ewfverify; which verifies the storage media data in EWF files.
-
-In 20140216 a multi-threaded version version of ewfacquirestream was added to the ewftools-mt directory note that this requires a C++ version 11 capable compiler.
 
 Work in progress:
 * Python bindings
@@ -38,6 +33,16 @@ Planned:
 * write EWF-L01 and EWF2-Lx01 (long-term)
 * Multi-threading support
 * Python 3 support
+
+The libewf package contains the following tools:
+* ewfacquire; which writes storage media data from devices and files to EWF files.
+* ewfacquirestream; which writes data from stdin to EWF files.
+* ewfdebug; experimental tool does nothing at the moment.
+* ewfexport; which exports storage media data in EWF files to (split) RAW format or a specific version of EWF files.
+* ewfinfo; which shows the metadata in EWF files.
+* ewfmount; which FUSE mounts EWF files.
+* ewfrecover; special variant of ewfexport to create a new set of EWF files from a corrupt set.
+* ewfverify; which verifies the storage media data in EWF files.
 
 For previous project contributions see:
 * libewf on Google Code: https://code.google.com/p/libewf/
