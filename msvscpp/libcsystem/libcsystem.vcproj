@@ -197,10 +197,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcsystem\libcsystem_file_stream.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcsystem\libcsystem_find.h"
 				>
 			</File>

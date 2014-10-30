@@ -27,6 +27,10 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
@@ -112,7 +116,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                  = NULL;
 #endif
 
@@ -280,7 +284,7 @@ int main( int argc, char * const argv[] )
 		libcerror_error_free(
 		 &error );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -366,7 +370,7 @@ int main( int argc, char * const argv[] )
 	          LIBEWF_OPEN_READ,
 	          &error );
 #endif
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -465,7 +469,7 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

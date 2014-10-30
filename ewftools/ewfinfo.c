@@ -31,6 +31,10 @@
 #include <sys/resource.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
@@ -130,7 +134,7 @@ int main( int argc, char * const argv[] )
 #endif
 	libcstring_system_character_t * const *source_filenames = NULL;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                 = NULL;
 #endif
 	libcerror_error_t *error                                = NULL;
@@ -481,7 +485,7 @@ int main( int argc, char * const argv[] )
 			 "Unsupported header codepage defaulting to: ascii.\n" );
 		}
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -603,7 +607,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -893,7 +897,7 @@ on_error:
 		 &ewfinfo_info_handle,
 		 NULL );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

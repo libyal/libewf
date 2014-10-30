@@ -51,6 +51,10 @@
 #endif
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 #define FUSE_USE_VERSION	26
 
@@ -3094,7 +3098,7 @@ int main( int argc, char * const argv[] )
 	int result                                              = 0;
 	int verbose                                             = 0;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                 = NULL;
 #endif
 
@@ -3220,7 +3224,7 @@ int main( int argc, char * const argv[] )
 	libewf_notify_set_verbose(
 	 verbose );
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )

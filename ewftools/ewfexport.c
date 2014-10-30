@@ -31,6 +31,10 @@
 #include <sys/resource.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
@@ -232,7 +236,7 @@ int main( int argc, char * const argv[] )
 
 	libcerror_error_t *error                                       = NULL;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                        = NULL;
 #endif
 
@@ -477,7 +481,7 @@ int main( int argc, char * const argv[] )
 	 NULL );
 #endif
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -579,7 +583,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -1325,7 +1329,7 @@ on_error:
 		 &ewfexport_export_handle,
 		 NULL );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

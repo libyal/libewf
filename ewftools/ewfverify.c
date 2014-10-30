@@ -31,6 +31,10 @@
 #include <sys/resource.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfcommon.h"
@@ -140,7 +144,7 @@ int main( int argc, char * const argv[] )
 
 	libcstring_system_character_t * const *source_filenames       = NULL;
 
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                       = NULL;
 #endif
 
@@ -388,7 +392,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
@@ -478,7 +482,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( libcsystem_glob_free(
 	     &glob,
 	     &error ) != 1 )
@@ -674,7 +678,7 @@ on_error:
 		 &ewfverify_verification_handle,
 		 NULL );
 	}
-#if !defined( LIBCSYSTEM_HAVE_GLOB )
+#if !defined( HAVE_GLOB_H )
 	if( glob != NULL )
 	{
 		libcsystem_glob_free(

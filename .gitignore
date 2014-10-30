@@ -125,6 +125,7 @@ stamp-h1
 /tests/ewf_test_glob
 /tests/ewf_test_open_close
 /tests/ewf_test_read
+/tests/ewf_test_read_chunk
 /tests/ewf_test_read_delta
 /tests/ewf_test_read_write
 /tests/ewf_test_read_write_delta
