@@ -102,7 +102,7 @@ struct device_handle
 
 	/* libsmraw input handle
 	 */
-	libsmdev_handle_t *smraw_input_handle;
+	libsmraw_handle_t *smraw_input_handle;
 
 	/* The number of error retries
 	 */

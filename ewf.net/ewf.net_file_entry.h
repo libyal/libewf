@@ -38,6 +38,7 @@ public ref class FileEntry sealed
 		FileEntry( System::IntPtr ewf_file_entry );
 		~FileEntry( void );
 
+		System::Byte GetType( void );
 		System::UInt32 GetFlags( void );
 
 		System::Int64 GetMediaDataOffset( void );

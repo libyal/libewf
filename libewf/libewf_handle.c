@@ -4617,7 +4617,7 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
-	/* Free the chunk data if it could not be passed to libewf_chunk_table_set_chunk_data_by_offset
+	/* Free the chunk data if it could not be passed to libfcache_cache_set_value_by_index
 	 */
 	if( internal_handle->chunk_data != NULL )
 	{
@@ -6196,7 +6196,6 @@ ssize_t libewf_handle_write_buffer(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_write_buffer";
 	off64_t chunk_data_offset                 = 0;
-	off64_t chunk_offset                      = 0;
 	size_t buffer_offset                      = 0;
 	size_t input_data_size                    = 0;
 	size_t write_size                         = 0;
@@ -6352,7 +6351,6 @@ ssize_t libewf_handle_write_buffer(
 	}
 	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
 
-/* TODO refactor */
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
 		libcerror_error_set(
@@ -6364,9 +6362,8 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	chunk_offset = chunk_index * internal_handle->media_values->chunk_size;
-
-	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_offset;
+	chunk_data_offset = chunk_index * internal_handle->media_values->chunk_size;
+	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_data_offset;
 
 	if( chunk_data_offset >= (off64_t) SSIZE_MAX )
 	{
@@ -6379,7 +6376,6 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-/* TODO refactor */
 	while( buffer_size > 0 )
 	{
 		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
@@ -6644,12 +6640,10 @@ ssize_t libewf_handle_write_buffer(
 		}
 		else
 		{
-/* TODO refactor */
 			if( internal_handle->write_io_handle->write_finalized != 0 )
 			{
 				break;
 			}
-/* TODO refactor */
 			if( internal_handle->chunk_data == NULL )
 			{
 				/* Reserve 4 bytes for the chunk checksum
@@ -6788,15 +6782,15 @@ ssize_t libewf_handle_write_buffer(
 
 					return( -1 );
 				}
-				if( libewf_chunk_table_set_chunk_data_by_offset(
-				     internal_handle->chunk_table,
-				     chunk_index,
-				     internal_handle->file_io_pool,
-				     internal_handle->segment_table,
-				     internal_handle->delta_chunks_range_list,
+				if( libfcache_cache_set_value_by_index(
 				     internal_handle->chunks_cache,
+				     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
+				     0,
 				     internal_handle->io_handle->current_offset,
-				     internal_handle->chunk_data,
+				     0,
+				     (intptr_t *) internal_handle->chunk_data,
+				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
+				     LIBFCACHE_CACHE_VALUE_FLAG_MANAGED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -7084,15 +7078,15 @@ ssize_t libewf_handle_write_finalize(
 		}
 		write_finalize_count += write_count;
 
-		if( libewf_chunk_table_set_chunk_data_by_offset(
-		     internal_handle->chunk_table,
-		     chunk_index,
-		     internal_handle->file_io_pool,
-		     internal_handle->segment_table,
-		     internal_handle->delta_chunks_range_list,
+		if( libfcache_cache_set_value_by_index(
 		     internal_handle->chunks_cache,
+		     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
+		     0,
 		     internal_handle->io_handle->current_offset,
-		     internal_handle->chunk_data,
+		     0,
+		     (intptr_t *) internal_handle->chunk_data,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
+		     LIBFCACHE_CACHE_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
