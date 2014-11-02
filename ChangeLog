@@ -4,11 +4,21 @@ TODO
   - cache chunk in cache directly?
 
 Tests:
-  - finish migrating tests to test_runner
-  - move test_read_chunk to test runner
-  - move test_read_delta to test runner
-  - split test_read_delta in test_read_delta and test_read_delta_chunk
-  - move test_ewfexport to test runner
+* finish migrating tests to test_runner
+* move test_read_chunk to test runner
+* move test_read_delta to test runner
+* split test_read_delta in test_read_delta and test_read_delta_chunk
+* move test_ewfexport to test runner
+* add tests for Python-bindings
+* move to new set-up with test_runner
+  - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
+* implement read/write chunk test
+  - allow to set maximum delta file size default 4 GiB?
+* ewftools: test with -x
+* ewfexport: export of split RAW
+* ewfinfo: DFXML output
+* pyewf: add tests
+* write resume from volume/disk section - basically re-image
 
 Clean up:
 * remove random and other deprecated functions
@@ -405,17 +415,6 @@ Tools:
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
-
-Tests
-* move to new set-up with test_runner
-  - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
-* implement read/write chunk test
-  - allow to set maximum delta file size default 4 GiB?
-* ewftools: test with -x
-* ewfexport: export of split RAW
-* ewfinfo: DFXML output
-* pyewf: add tests
-* write resume from volume/disk section - basically re-image
 
 Performance:
 * map full RAW storage media data into memory?
