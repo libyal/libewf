@@ -89,7 +89,7 @@ Clean up:
 
 * pyewf
   - change header and hash values into sequence objects
-  - setup.py: non Windows support?
+
 * add bzip2 compression support
 * add function to retrieve:
   - compression values
