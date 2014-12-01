@@ -35,7 +35,7 @@ If you only have the first filename of the set use the 'libewf_glob' function to
 others.
 
 After the handle object has been opened the storage media data can be read from the EWF files
-using 'libewf_handle_read_buffer' or 'libewf_handle_read_random'.
+using 'libewf_handle_read_buffer' or 'libewf_handle_read_buffer_at_offset'.
 
 If done reading or writing close the handle object.
 

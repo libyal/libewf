@@ -892,6 +892,7 @@ int libewf_write_io_handle_initialize_resume(
      libewf_segment_table_t *segment_table,
      libewf_chunk_table_t *chunk_table,
      libewf_read_io_handle_t *read_io_handle,
+     off64_t *current_offset,
      libcerror_error_t **error )
 {
 	libewf_section_t *previous_section       = NULL;
@@ -965,6 +966,17 @@ int libewf_write_io_handle_initialize_resume(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( current_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid current offset.",
 		 function );
 
 		return( -1 );
@@ -1493,7 +1505,7 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	/* Set offset into media data
 	 */
-	io_handle->current_offset = (off64_t) read_io_handle->storage_media_size_read;
+	*current_offset = (off64_t) read_io_handle->storage_media_size_read;
 
 	/* Set write IO handle values
 	 */
@@ -1600,7 +1612,7 @@ int libewf_write_io_handle_initialize_resume(
 		{
 			/* The offset into media data need to be corrected if the read of the segment file was considered successful
 			 */
-			io_handle->current_offset -= unusable_storage_media_size;
+			*current_offset -= unusable_storage_media_size;
 
 			/* The write IO handle values need to be corrected if the read of the segment file was considered successful
 			 */

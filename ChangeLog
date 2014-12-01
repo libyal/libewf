@@ -448,6 +448,9 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20141129
+* code clean up
+
 20141102
 * bug fixes
 * ewf.net added FileEntry::GetType

@@ -46,6 +46,7 @@ ewfacquire_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
@@ -56,6 +57,7 @@ ewfacquire_SOURCES = \
 	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -95,6 +97,7 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
@@ -104,6 +107,7 @@ ewfacquirestream_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -142,6 +146,7 @@ ewfdebug_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -164,6 +169,7 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
@@ -174,6 +180,7 @@ ewfexport_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -215,6 +222,7 @@ ewfinfo_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -247,6 +255,7 @@ ewfmount_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -274,6 +283,7 @@ ewfrecover_SOURCES = \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
@@ -283,6 +293,7 @@ ewfrecover_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
@@ -317,6 +328,7 @@ ewfverify_SOURCES = \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
+	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
@@ -324,6 +336,7 @@ ewfverify_SOURCES = \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
 	ewftools_libewf.h \
+	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \

@@ -1693,7 +1693,8 @@ on_error:
 	}
 	return( -1 );
 }
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
  * Returns 1 if successful or -1 on error
@@ -2304,6 +2305,7 @@ int libewf_handle_open_file_io_pool(
 		     internal_handle->segment_table,
 		     internal_handle->chunk_table,
 		     internal_handle->read_io_handle,
+		     &( internal_handle->current_offset ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4478,17 +4480,6 @@ int libewf_handle_close(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( internal_handle->write_io_handle != NULL )
 	 && ( internal_handle->write_io_handle->write_finalized == 0 ) )
 	{
@@ -4549,6 +4540,19 @@ int libewf_handle_close(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to clear IO handle.",
+		 function );
+
+		result = -1;
+	}
+	if( libewf_media_values_clear(
+	     internal_handle->media_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to clear media values.",
 		 function );
 
 		result = -1;
@@ -4971,17 +4975,6 @@ ssize_t libewf_handle_read_chunk(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->chunk_data != NULL )
 	{
 		libcerror_error_set(
@@ -4993,7 +4986,7 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5093,11 +5086,11 @@ ssize_t libewf_handle_read_chunk(
 
 		return( -1 );
 	}
-	if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size )
+	if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
 	{
 		return( 0 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 	if( libewf_chunk_table_get_chunk_data_by_offset(
 	     internal_handle->chunk_table,
@@ -5108,7 +5101,7 @@ ssize_t libewf_handle_read_chunk(
 	     internal_handle->segment_table,
 	     internal_handle->delta_chunks_range_list,
 	     internal_handle->chunks_cache,
-	     internal_handle->io_handle->current_offset,
+	     internal_handle->current_offset,
 	     &chunk_data,
 	     &chunk_data_offset,
 	     error ) != 1 )
@@ -5231,11 +5224,11 @@ ssize_t libewf_handle_read_chunk(
 	{
 		data_size = chunk_data->data_size;
 	}
-	if( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size )
+	if( (size64_t) ( internal_handle->current_offset + data_size ) >= internal_handle->media_values->media_size )
 	{
-		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
+		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
 	}
-	internal_handle->io_handle->current_offset += (off64_t) data_size;
+	internal_handle->current_offset += (off64_t) data_size;
 
 	return( (ssize_t) read_size );
 }
@@ -5293,7 +5286,7 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5348,15 +5341,15 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size )
+	if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
 	{
 		return( 0 );
 	}
-	if( (size64_t) ( internal_handle->io_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size )
+	if( (size64_t) ( internal_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size )
 	{
-		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
+		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 	while( buffer_size > 0 )
 	{
@@ -5369,7 +5362,7 @@ ssize_t libewf_handle_read_buffer(
 		     internal_handle->segment_table,
 		     internal_handle->delta_chunks_range_list,
 		     internal_handle->chunks_cache,
-		     internal_handle->io_handle->current_offset,
+		     internal_handle->current_offset,
 		     &chunk_data,
 		     &chunk_data_offset,
 		     error ) != 1 )
@@ -5438,9 +5431,9 @@ ssize_t libewf_handle_read_buffer(
 		total_read_count += (ssize_t) read_size;
 		chunk_index      += 1;
 
-		internal_handle->io_handle->current_offset += (off64_t) read_size;
+		internal_handle->current_offset += (off64_t) read_size;
 
-		if( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size )
+		if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
 		{
 			break;
 		}
@@ -5560,7 +5553,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5656,14 +5649,14 @@ ssize_t libewf_handle_prepare_write_chunk(
 	}
 	if( internal_handle->read_io_handle != NULL )
 	{
-		chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+		chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
 		                internal_handle->chunk_table,
 		                chunk_index,
 		                internal_handle->file_io_pool,
 		                internal_handle->segment_table,
-		                internal_handle->io_handle->current_offset,
+		                internal_handle->current_offset,
 				error );
 
 		if( chunk_exists == -1 )
@@ -5869,7 +5862,7 @@ ssize_t libewf_handle_write_chunk(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5968,7 +5961,7 @@ ssize_t libewf_handle_write_chunk(
 		goto on_error;
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
+	 && ( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
 	}
@@ -5977,11 +5970,11 @@ ssize_t libewf_handle_write_chunk(
 		return( 0 );
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) ( internal_handle->io_handle->current_offset + data_size ) >= internal_handle->media_values->media_size ) )
+	 && ( (size64_t) ( internal_handle->current_offset + data_size ) >= internal_handle->media_values->media_size ) )
 	{
-		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
+		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -6057,7 +6050,7 @@ ssize_t libewf_handle_write_chunk(
 	                chunk_index,
 	                internal_handle->file_io_pool,
 	                internal_handle->segment_table,
-	                internal_handle->io_handle->current_offset,
+	                internal_handle->current_offset,
 			error );
 
 	if( chunk_exists == -1 )
@@ -6116,7 +6109,7 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->media_values,
 		               internal_handle->delta_segment_table,
 		               internal_handle->delta_chunks_range_list,
-			       internal_handle->io_handle->current_offset,
+			       internal_handle->current_offset,
 		               chunk_index,
 		               chunk_data,
 		               chunk_buffer_size,
@@ -6154,7 +6147,7 @@ ssize_t libewf_handle_write_chunk(
 
 		goto on_error;
 	}
-	internal_handle->io_handle->current_offset += (off64_t) data_size;
+	internal_handle->current_offset += (off64_t) data_size;
 
 	if( libewf_chunk_data_free(
 	     &chunk_data,
@@ -6228,7 +6221,7 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6328,7 +6321,7 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6340,16 +6333,16 @@ ssize_t libewf_handle_write_buffer(
 		return( -1 );
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
+	 && ( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
 	}
 	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) ( internal_handle->io_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size ) )
+	 && ( (size64_t) ( internal_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size ) )
 	{
-		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->io_handle->current_offset );
+		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 	if( chunk_index >= (uint64_t) INT_MAX )
 	{
@@ -6363,7 +6356,7 @@ ssize_t libewf_handle_write_buffer(
 		return( -1 );
 	}
 	chunk_data_offset = chunk_index * internal_handle->media_values->chunk_size;
-	chunk_data_offset = internal_handle->io_handle->current_offset - chunk_data_offset;
+	chunk_data_offset = internal_handle->current_offset - chunk_data_offset;
 
 	if( chunk_data_offset >= (off64_t) SSIZE_MAX )
 	{
@@ -6383,7 +6376,7 @@ ssize_t libewf_handle_write_buffer(
 		                chunk_index,
 		                internal_handle->file_io_pool,
 		                internal_handle->segment_table,
-		                internal_handle->io_handle->current_offset,
+		                internal_handle->current_offset,
 				error );
 
 		if( chunk_exists == -1 )
@@ -6446,7 +6439,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->segment_table,
 				     internal_handle->delta_chunks_range_list,
 				     internal_handle->chunks_cache,
-				     internal_handle->io_handle->current_offset,
+				     internal_handle->current_offset,
 				     &chunk_data,
 				     &chunk_data_offset,
 				     error ) != 1 )
@@ -6545,7 +6538,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->segment_table,
 				     internal_handle->delta_chunks_range_list,
 				     internal_handle->chunks_cache,
-				     internal_handle->io_handle->current_offset,
+				     internal_handle->current_offset,
 				     chunk_data,
 				     error ) != 1 )
 				{
@@ -6620,7 +6613,7 @@ ssize_t libewf_handle_write_buffer(
 				       internal_handle->media_values,
 				       internal_handle->delta_segment_table,
 				       internal_handle->delta_chunks_range_list,
-				       internal_handle->io_handle->current_offset,
+				       internal_handle->current_offset,
 				       chunk_index,
 				       chunk_data,
 				       input_data_size,
@@ -6721,7 +6714,7 @@ ssize_t libewf_handle_write_buffer(
 				write_chunk = 1;
 			}
 			else if( ( internal_handle->media_values->media_size != 0 )
-			      && ( ( (size64_t) internal_handle->io_handle->current_offset + write_size ) == internal_handle->media_values->media_size ) )
+			      && ( ( (size64_t) internal_handle->current_offset + write_size ) == internal_handle->media_values->media_size ) )
 			{
 				write_chunk = 1;
 			}
@@ -6786,7 +6779,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->chunks_cache,
 				     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
 				     0,
-				     internal_handle->io_handle->current_offset,
+				     internal_handle->current_offset,
 				     0,
 				     (intptr_t *) internal_handle->chunk_data,
 				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
@@ -6811,10 +6804,10 @@ ssize_t libewf_handle_write_buffer(
 		chunk_index      += 1;
 		chunk_data_offset = 0;
 
-		internal_handle->io_handle->current_offset += (off64_t) write_size;
+		internal_handle->current_offset += (off64_t) write_size;
 
 		if( ( internal_handle->media_values->media_size != 0 )
-		 && ( (size64_t) internal_handle->io_handle->current_offset >= internal_handle->media_values->media_size ) )
+		 && ( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size ) )
 		{
 			break;
 		}
@@ -6921,7 +6914,7 @@ ssize_t libewf_handle_write_finalize(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6991,14 +6984,14 @@ ssize_t libewf_handle_write_finalize(
 	}
 	if( internal_handle->chunk_data != NULL )
 	{
-		chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+		chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
 				internal_handle->chunk_table,
 				chunk_index,
 				internal_handle->file_io_pool,
 				internal_handle->segment_table,
-				internal_handle->io_handle->current_offset,
+				internal_handle->current_offset,
 				error );
 
 		if( chunk_exists == -1 )
@@ -7082,7 +7075,7 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->chunks_cache,
 		     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
 		     0,
-		     internal_handle->io_handle->current_offset,
+		     internal_handle->current_offset,
 		     0,
 		     (intptr_t *) internal_handle->chunk_data,
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
@@ -7416,17 +7409,6 @@ off64_t libewf_handle_seek_offset(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->chunk_data != NULL )
 	{
 		libcerror_error_set(
@@ -7475,7 +7457,7 @@ off64_t libewf_handle_seek_offset(
 	}
 	if( whence == SEEK_CUR )
 	{	
-		offset += internal_handle->io_handle->current_offset;
+		offset += internal_handle->current_offset;
 	}
 	else if( whence == SEEK_END )
 	{	
@@ -7501,7 +7483,7 @@ off64_t libewf_handle_seek_offset(
 
 		return( -1 );
 	}
-	internal_handle->io_handle->current_offset = offset;
+	internal_handle->current_offset = offset;
 
 	return( offset );
 }
@@ -7530,17 +7512,6 @@ int libewf_handle_get_offset(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( offset == NULL )
 	{
 		libcerror_error_set(
@@ -7552,7 +7523,7 @@ int libewf_handle_get_offset(
 
 		return( -1 );
 	}
-	*offset = internal_handle->io_handle->current_offset;
+	*offset = internal_handle->current_offset;
 
 	return( 1 );
 }
@@ -8957,7 +8928,7 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->current_offset < 0 )
+	if( internal_handle->current_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -8990,13 +8961,13 @@ int libewf_handle_get_file_io_handle(
 
 		return( -1 );
 	}
-	chunk_index = internal_handle->io_handle->current_offset / internal_handle->media_values->chunk_size;
+	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
 /* TODO check delta segment files list first add an overlay bitmap ? bit per chunk ?
  */
 	result = libewf_segment_table_get_segment_at_offset(
 	          internal_handle->segment_table,
-	          internal_handle->io_handle->current_offset,
+	          internal_handle->current_offset,
 	          &file_io_pool_entry,
 	          &segment_file_size,
 	          error );
@@ -9009,7 +8980,7 @@ int libewf_handle_get_file_io_handle(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment at offset: %" PRIi64 " from segment table.",
 		 function,
-		 internal_handle->io_handle->current_offset );
+		 internal_handle->current_offset );
 
 		return( -1 );
 	}
@@ -9107,7 +9078,7 @@ int libewf_internal_handle_get_media_values(
 			     internal_handle->segment_table,
 			     internal_handle->delta_chunks_range_list,
 			     internal_handle->chunks_cache,
-			     internal_handle->io_handle->current_offset,
+			     internal_handle->current_offset,
 			     &chunk_data,
 			     &chunk_data_offset,
 			     error ) != 1 )

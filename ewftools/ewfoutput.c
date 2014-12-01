@@ -24,26 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
-#include <stdlib.h>
-#endif
-
-#if defined( HAVE_STRING_H ) || defined( WINAPI )
-#include <string.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBBFIO )
-#include <libbfio_definitions.h>
-#elif defined( HAVE_LIBBFIO )
-#include <libbfio.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFVALUE )
-#include <libfvalue_definitions.h>
-#elif defined( HAVE_LIBFVALUE )
-#include <libfvalue.h>
-#endif
-
 #if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
 #include <zlib.h>
 #endif
@@ -57,12 +37,14 @@
 #endif
 
 #include "ewfoutput.h"
+#include "ewftools_libbfio.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
+#include "ewftools_libfvalue.h"
 #include "ewftools_libhmac.h"
 #include "ewftools_libodraw.h"
 #include "ewftools_libsmdev.h"
@@ -74,21 +56,30 @@
 void ewfoutput_copyright_fprint(
       FILE *stream )
 {
-	static char *function = "ewfoutput_copyright_fprint";
-
 	if( stream == NULL )
 	{
-		libcnotify_printf(
-		 "%s: invalid stream.\n",
-		 function );
-
 		return;
 	}
+	/* TRANSLATORS: This is a proper name.
+	 */
 	fprintf(
 	 stream,
-	 "Copyright (c) 2006-2014, Joachim Metz <%s>.\n"
-	 "This is free software; see the source for copying conditions. There is NO\n"
-	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	 _( "Copyright (c) 2006-2014, %s.\n" ),
+	 _( "Joachim Metz" ) );
+
+	fprintf(
+	 stream,
+	 _( "This is free software; see the source for copying conditions. There is NO\n"
+	    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" ) );
+
+	/* TRANSLATORS: The placeholder indicates the bug-reporting address
+	 * for this package.  Please add _another line_ saying
+	 * "Report translation bugs to <...>\n" with the address for translation
+	 * bugs (typically your translation team's web or email address).
+	 */
+	fprintf(
+	 stream,
+	 _( "Report bugs to <%s>.\n" ),
 	 PACKAGE_BUGREPORT );
 }
 

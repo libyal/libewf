@@ -100,6 +100,10 @@ struct libewf_internal_handle
 	 */
 	int maximum_number_of_open_handles;
 
+	/* The current (storage media) offset
+	 */
+	off64_t current_offset;
+
 	/* The segment file table
 	 */
 	libewf_segment_table_t *segment_table;

@@ -39,10 +39,6 @@ struct libewf_io_handle
 	 */
 	int access_flags;
 
-	/* The current (storage media) offset
-	 */
-	off64_t current_offset;
-
 	/* The segment file type
 	 */
 	uint8_t segment_file_type;

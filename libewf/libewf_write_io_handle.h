@@ -241,6 +241,7 @@ int libewf_write_io_handle_initialize_resume(
      libewf_segment_table_t *segment_table,
      libewf_chunk_table_t *chunk_table,
      libewf_read_io_handle_t *read_io_handle,
+     off64_t *current_offset,
      libcerror_error_t **error );
 
 int libewf_write_io_handle_resize_table_entries(

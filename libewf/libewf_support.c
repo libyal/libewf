@@ -132,7 +132,7 @@ int libewf_set_codepage(
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
-/* Determines if a file is an EWF file (check for the EWF file signature)
+/* Determines if a file contains an EWF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 int libewf_check_file_signature(
@@ -237,10 +237,11 @@ on_error:
 	return( -1 );
 }
 
-/* Determines if a file is an EWF file (check for the EWF file signature)
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Determines if a file contains an EWF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_check_file_signature_wide(
      const wchar_t *filename,
      libcerror_error_t **error )
@@ -342,9 +343,10 @@ on_error:
 	}
 	return( -1 );
 }
-#endif
 
-/* Determines if a file is an EWF file (check for the EWF file signature) using a Basic File IO (bfio) handle
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Determines if a file contains an EWF file signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
 int libewf_check_file_signature_file_io_handle(
@@ -1370,5 +1372,5 @@ int libewf_glob_wide_free(
 	return( 1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 

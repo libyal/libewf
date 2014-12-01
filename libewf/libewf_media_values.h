@@ -93,6 +93,10 @@ int libewf_media_values_clone(
      libewf_media_values_t *source_media_values,
      libcerror_error_t **error );
 
+int libewf_media_values_clear(
+     libewf_media_values_t *media_values,
+     libcerror_error_t **error );
+
 int libewf_media_values_calculate_chunk_size(
      libewf_media_values_t *media_values,
      libcerror_error_t **error );

@@ -241,6 +241,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libsmraw\libsmraw_libcthreads.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libsmraw\libsmraw_libfdata.h"
 				>
 			</File>

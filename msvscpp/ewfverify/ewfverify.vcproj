@@ -240,6 +240,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libbfio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_libcdatetime.h"
 				>
 			</File>
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewftools_libewf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_libfvalue.h"
 				>
 			</File>
 			<File

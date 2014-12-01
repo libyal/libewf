@@ -215,6 +215,48 @@ on_error:
 	return( -1 );
 }
 
+/* Clones the media values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_media_values_clear(
+     libewf_media_values_t *media_values,
+     libcerror_error_t **error )
+{
+        static char *function = "libewf_media_values_clear";
+
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     media_values,
+	     0,
+	     sizeof( libewf_media_values_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear media values.",
+		 function );
+
+		return( -1 );
+	}
+	media_values->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+	media_values->sectors_per_chunk = 64;
+	media_values->bytes_per_sector  = 512;
+	media_values->media_flags       = 0x01;
+
+	return( 1 );
+}
+
 /* Calculate the chunk size
  * Returns 1 if successful or -1 on error
  */

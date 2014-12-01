@@ -91,7 +91,7 @@ int libewf_set_codepage(
      int codepage,
      libewf_error_t **error );
 
-/* Determines if a file is an EWF file (check for the EWF file signature)
+/* Determines if a file contains an EWF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBEWF_EXTERN \
@@ -100,24 +100,28 @@ int libewf_check_file_signature(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
-/* Determines if a file is an EWF file (check for the EWF file signature)
+
+/* Determines if a file contains an EWF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_check_file_signature_wide(
      const wchar_t *filename,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBEWF_HAVE_BFIO )
-/* Determines if a file is an EWF file (check for the EWF file signature) using a Basic File IO (bfio) handle
+
+/* Determines if a file contains an EWF file signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_BFIO ) */
 
 /* Globs the segment files according to the EWF naming schema
  * Make sure the value filenames is referencing, is set to NULL
@@ -145,6 +149,7 @@ int libewf_glob_free(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Globs the segment files according to the EWF naming schema
  * Make sure the value filenames is referencing, is set to NULL
  *
@@ -169,7 +174,8 @@ int libewf_glob_wide_free(
      wchar_t *filenames[],
      int number_of_filenames,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* -------------------------------------------------------------------------
  * Support functions - deprecated
@@ -355,9 +361,11 @@ int libewf_handle_open_wide(
      int number_of_filenames,
      int access_flags,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBEWF_HAVE_BFIO )
+
 /* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
  * Returns 1 if successful or -1 on error
  */
@@ -367,7 +375,8 @@ int libewf_handle_open_file_io_pool(
      libbfio_pool_t *file_io_pool,
      int access_flags,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_BFIO ) */
 
 /* Closes the EWF handle
  * Returns 0 if successful or -1 on error
@@ -569,6 +578,7 @@ int libewf_handle_set_segment_filename(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the segment filename size
  * The filename size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -599,7 +609,8 @@ int libewf_handle_set_segment_filename_wide(
      const wchar_t *filename,
      size_t filename_length,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Retrieves the maximum segment file size
  * Returns 1 if successful or -1 on error
@@ -654,6 +665,7 @@ int libewf_handle_set_delta_segment_filename(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the delta segment filename size
  * The filename size includes the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -684,7 +696,8 @@ int libewf_handle_set_delta_segment_filename_wide(
      const wchar_t *filename,
      size_t filename_length,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Retrieves the maximum delta segment file size
  * Returns 1 if successful or -1 on error
@@ -742,6 +755,7 @@ int libewf_handle_get_filename(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
  * Returns 1 if successful, 0 if no such filename or -1 on error
@@ -762,9 +776,11 @@ int libewf_handle_get_filename_wide(
      wchar_t *filename,
      size_t filename_size,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBEWF_HAVE_BFIO )
+
 /* Retrieves the file IO handle of the (delta) segment file of the current chunk
  * Returns 1 if successful, 0 if no such file IO handle or -1 on error
  */
@@ -773,7 +789,8 @@ int libewf_handle_get_file_io_handle(
      libewf_handle_t *handle,
      libbfio_handle_t **file_io_handle,
      libewf_error_t **error );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_BFIO ) */
 
 /* -------------------------------------------------------------------------
  * Handle functions - deprecated
@@ -2601,6 +2618,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open(
                                 uint8_t flags );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
@@ -2613,7 +2631,8 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
                                 wchar_t * const filenames[],
                                 int amount_of_filenames,
                                 uint8_t flags );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful or -1 on error
@@ -2799,6 +2818,7 @@ LIBEWF_EXTERN int libewf_set_segment_filename(
                    size_t filename_length );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the segment filename
  * The filename size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2821,7 +2841,8 @@ LIBEWF_EXTERN int libewf_set_segment_filename_wide(
                    libewf_handle_t *handle,
                    const wchar_t *filename,
                    size_t filename_length );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Retrieves the segment file size
  * Returns 1 if successful or -1 on error
@@ -2867,6 +2888,7 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    size_t filename_length );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the delta segment filename
  * The filename size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2889,7 +2911,8 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
                    libewf_handle_t *handle,
                    const wchar_t *filename,
                    size_t filename_length );
-#endif
+
+#endif /* defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Retrieves the delta segment file size
  * Returns 1 if successful or -1 on error

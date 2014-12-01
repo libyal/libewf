@@ -256,6 +256,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libfvalue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_libhmac.h"
 				>
 			</File>
