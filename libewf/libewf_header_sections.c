@@ -31,8 +31,6 @@
 #include "libewf_libcnotify.h"
 #include "libewf_libfvalue.h"
 
-#include "ewf_definitions.h"
-
 /* Creates header sections
  * Make sure the value header_sections is referencing, is set to NULL
  * Returns 1 if successful or -1 on error

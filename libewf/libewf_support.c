@@ -34,8 +34,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_support.h"
 
-#include "ewf_definitions.h"
-
 #if !defined( HAVE_LOCAL_LIBEWF )
 
 /* Returns the library version as a string

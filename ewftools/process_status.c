@@ -480,10 +480,14 @@ int process_status_update(
 				 process_status->output_stream,
 				 bytes_total,
 				 total_number_of_seconds );
+
+				fprintf(
+				 process_status->output_stream,
+				 ".\n" );
 			}
 			fprintf(
 			 process_status->output_stream,
-			 ".\n\n" );
+			 "\n" );
 		}
 	}
 	return( 1 );

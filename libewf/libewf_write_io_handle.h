@@ -183,11 +183,6 @@ struct libewf_write_io_handle
 	 */
 	off64_t chunks_section_offset;
 
-	/* Value to indicate if the offset table should not be restricted
-	 * to the maximum number of offsets
-	 */
-	uint8_t unrestrict_offset_table;
-
 	/* Value to indicate the write values were initialized
 	 */
 	uint8_t values_initialized;

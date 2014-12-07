@@ -43,12 +43,6 @@ struct libewf_chunk_data
 	 */
 	size_t allocated_data_size;
 
-	/* The unpacked data size
-	 */
-/* TODO add ?
-	size_t unpacked_data_size;
-*/
-
 	/* The data
 	 */
 	uint8_t *data;

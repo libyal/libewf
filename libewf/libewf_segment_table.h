@@ -104,6 +104,7 @@ int libewf_segment_table_set_basename(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 int libewf_segment_table_get_basename_size_wide(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,
@@ -120,7 +121,8 @@ int libewf_segment_table_set_basename_wide(
      const wchar_t *basename,
      size_t basename_length,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 int libewf_segment_table_set_maximum_segment_size(
      libewf_segment_table_t *segment_table,

@@ -26,7 +26,6 @@ lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_data.h \
-	ewf_definitions.h \
 	ewf_digest.h \
 	ewf_error.h \
 	ewf_file_header.h \

@@ -31,8 +31,6 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 
-#include "ewf_definitions.h"
-
 /* Creates hash values
  * Make sure the value hash_values is referencing, is set to NULL
  * Returns 1 if successful or -1 on error

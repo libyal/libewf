@@ -28,8 +28,6 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcstring.h"
 
-#include "ewf_definitions.h"
-
 /* Sets the extension for a certain segment file
  * Using the format specific naming schema
  * Returns 1 on success or -1 on error

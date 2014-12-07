@@ -57,7 +57,6 @@
 #include "libewf_write_io_handle.h"
 
 #include "ewf_data.h"
-#include "ewf_definitions.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
 #include "ewfx_delta_chunk.h"
@@ -152,7 +151,7 @@ int libewf_write_io_handle_initialize(
 	( *write_io_handle )->table_entry_size            = sizeof( ewf_table_entry_v1_t );
 	( *write_io_handle )->maximum_segment_file_size   = INT64_MAX;
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	( *write_io_handle )->maximum_chunks_per_section  = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
+	( *write_io_handle )->maximum_chunks_per_section  = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
 	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) 14971;
 
 	return( 1 );
@@ -983,7 +982,7 @@ int libewf_write_io_handle_initialize_resume(
 	}
 	if( libfcache_cache_initialize(
 	     &sections_cache,
-	     4,
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1715,8 +1714,7 @@ int libewf_write_io_handle_resize_table_entries(
 		return( -1 );
 	}
 	write_io_handle->table_section_data      = (uint8_t *) reallocation;
-	write_io_handle->table_entries_data      = write_io_handle->table_section_data
-						 + write_io_handle->table_header_size;
+	write_io_handle->table_entries_data      = &( write_io_handle->table_section_data[ write_io_handle->table_header_size ] );
 	write_io_handle->number_of_table_entries = number_of_entries;
 
 	return( 1 );
@@ -1799,15 +1797,9 @@ int libewf_write_io_handle_calculate_chunks_per_segment_file(
 	}
 	/* Determine the number of required chunk sections
 	 */
-	if( write_io_handle->unrestrict_offset_table == 0 )
-	{
-		required_chunk_sections = maximum_chunks_per_segment_file
-		                        % write_io_handle->maximum_chunks_per_section;
-	}
-	else
-	{
-		required_chunk_sections = 1;
-	}
+	required_chunk_sections = maximum_chunks_per_segment_file
+	                        % write_io_handle->maximum_chunks_per_section;
+
 	calculated_chunks_per_segment_file = write_io_handle->remaining_segment_file_size;
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
@@ -1952,8 +1944,7 @@ int libewf_write_io_handle_calculate_chunks_per_section(
         remaining_number_of_chunks = (int64_t) write_io_handle->chunks_per_segment_file
 	                           - (int64_t) write_io_handle->number_of_chunks_written_to_segment_file;
 
-	if( ( write_io_handle->unrestrict_offset_table == 0 )
-	 && ( remaining_number_of_chunks > (int64_t) write_io_handle->maximum_chunks_per_section ) )
+	if( remaining_number_of_chunks > (int64_t) write_io_handle->maximum_chunks_per_section )
 	{
 		remaining_number_of_chunks = (int64_t) write_io_handle->maximum_chunks_per_section;
 	}
@@ -2169,7 +2160,6 @@ int libewf_write_io_handle_test_chunks_section_full(
 			 function );
 		}
 #endif
-
 		return( 0 );
 	}
 	/* Check if the maximum number of chunks has been reached
@@ -2185,7 +2175,6 @@ int libewf_write_io_handle_test_chunks_section_full(
 			 function );
 		}
 #endif
-
 		return( 1 );
 	}
 	/* Check if the end of the input has been reached
@@ -2203,10 +2192,7 @@ int libewf_write_io_handle_test_chunks_section_full(
 #endif
 		return( 1 );
 	}
-	/* Check if the maximum number of chunks restriction should apply
-	 */
-	if( ( write_io_handle->unrestrict_offset_table == 0 )
-	 && ( write_io_handle->number_of_chunks_written_to_section >= write_io_handle->maximum_chunks_per_section ) )
+	if( write_io_handle->number_of_chunks_written_to_section >= write_io_handle->maximum_chunks_per_section )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -2218,9 +2204,9 @@ int libewf_write_io_handle_test_chunks_section_full(
 #endif
 		return( 1 );
 	}
-	/* Fail safe no more than 2^31 chunks are allowed
+	/* No more than ( 2^31 / 4 ) chunks are allowed
 	 */
-	if( write_io_handle->number_of_chunks_written_to_section > (uint32_t) INT32_MAX )
+	if( write_io_handle->number_of_chunks_written_to_section > (uint32_t) ( INT32_MAX / 4 ) )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -2261,7 +2247,6 @@ int libewf_write_io_handle_test_chunks_section_full(
 				 function );
 			}
 #endif
-
 			return( 1 );
 		}
 	}
@@ -2277,7 +2262,6 @@ int libewf_write_io_handle_test_chunks_section_full(
 			 function );
 		}
 #endif
-
 		return( 1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )

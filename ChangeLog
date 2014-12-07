@@ -1,4 +1,10 @@
 TODO
+* throttle the size of the chunks list
+  - split if too large
+  - allow to set the maximum
+* throttle the size of the sections list?
+* read: hard limit the maximum number of table entries?
+* ewfacquire allow to set the the maximum number of table entries?
 
 Tests:
 * finish migrating tests to test_runner
@@ -22,6 +28,7 @@ Clean up:
   - ewf.net
 
 * libewf:
+  - add unpacked_data_size to chunk data?
   - empty caches on close
 
 * check if empty block check or equiv is always done (except for no compression).
@@ -447,6 +454,16 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20141204
+* small changes in progress status output
+* moved chunk groups cache into handle
+* moved libewf_chunk_table_chunk_exists_for_offset out of write-only code path
+
+20141201
+* code clean up
+* removed unrestrict_offset_table, added maximum of 128 M to size of offset table
+* removed ewf_definitions.h
 
 20141129
 * code clean up

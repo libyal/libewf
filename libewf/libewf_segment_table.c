@@ -897,6 +897,7 @@ int libewf_segment_table_set_basename(
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Retrieves the size of the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -1370,6 +1371,7 @@ int libewf_segment_table_set_basename_wide(
 #endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
 	return( 1 );
 }
+
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Sets the maximum segment size

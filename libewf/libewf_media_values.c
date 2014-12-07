@@ -22,11 +22,10 @@
 #include <common.h>
 #include <memory.h>
 
+#include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_media_values.h"
-
-#include "ewf_definitions.h"
 
 /* Creates media values
  * Make sure the value media_values is referencing, is set to NULL
@@ -88,7 +87,7 @@ int libewf_media_values_initialize(
 
 		goto on_error;
 	}
-	( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+	( *media_values )->chunk_size        = LIBEWF_MINIMUM_CHUNK_SIZE;
 	( *media_values )->sectors_per_chunk = 64;
 	( *media_values )->bytes_per_sector  = 512;
 	( *media_values )->media_flags       = 0x01;
@@ -249,7 +248,7 @@ int libewf_media_values_clear(
 
 		return( -1 );
 	}
-	media_values->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+	media_values->chunk_size        = LIBEWF_MINIMUM_CHUNK_SIZE;
 	media_values->sectors_per_chunk = 64;
 	media_values->bytes_per_sector  = 512;
 	media_values->media_flags       = 0x01;
@@ -322,10 +321,10 @@ int libewf_media_values_calculate_chunk_size(
 			libcnotify_printf(
 			 "%s: chunk size value exceeds maximum defaulting to: %d.\n",
 			 function,
-			 EWF_MINIMUM_CHUNK_SIZE );
+			 LIBEWF_MINIMUM_CHUNK_SIZE );
 		}
 #endif
-		bytes_per_chunk = (size64_t) EWF_MINIMUM_CHUNK_SIZE;
+		bytes_per_chunk = (size64_t) LIBEWF_MINIMUM_CHUNK_SIZE;
 	}
 	media_values->chunk_size = (uint32_t) bytes_per_chunk;
 

@@ -32,7 +32,6 @@
 #include "libewf_libfdata.h"
 #include "libewf_section.h"
 
-#include "ewf_definitions.h"
 #include "ewf_table.h"
 
 /* Creates a chunk group

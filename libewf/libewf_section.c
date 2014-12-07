@@ -45,7 +45,6 @@
 #include "libewf_unused.h"
 
 #include "ewf_data.h"
-#include "ewf_definitions.h"
 #include "ewf_digest.h"
 #include "ewf_error.h"
 #include "ewf_file_header.h"
@@ -8247,24 +8246,24 @@ ssize_t libewf_section_table_read(
 			if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 			 || ( io_handle->format == LIBEWF_FORMAT_ENCASE7 ) )
 			{
-				if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 )
+				if( *number_of_entries > LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 )
 				{
 					libcnotify_printf(
 					 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
 					 function,
 					 *number_of_entries,
-					 EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 );
+					 LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6 );
 				}
 			}
 			else
 			{
-				if( *number_of_entries > EWF_MAXIMUM_TABLE_ENTRIES )
+				if( *number_of_entries > LIBEWF_MAXIMUM_TABLE_ENTRIES )
 				{
 					libcnotify_printf(
 					 "%s: number of entries: %" PRIu32 " exceeds maximum: %" PRIu32 ".\n",
 					 function,
 					 *number_of_entries,
-					 EWF_MAXIMUM_TABLE_ENTRIES );
+					 LIBEWF_MAXIMUM_TABLE_ENTRIES );
 				}
 			}
 		}

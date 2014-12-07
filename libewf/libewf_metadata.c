@@ -38,8 +38,6 @@
 #include "libewf_sector_range.h"
 #include "libewf_types.h"
 
-#include "ewf_definitions.h"
-
 /* Retrieves the number of sectors per chunk
  * Returns 1 if successful or -1 on error
  */
@@ -1356,24 +1354,22 @@ int libewf_handle_set_format(
 	 || ( format == LIBEWF_FORMAT_ENCASE7 ) )
 	{
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
 	}
 	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
 	{
-		internal_handle->write_io_handle->unrestrict_offset_table    = 1;
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
 	}
 	else if( format == LIBEWF_FORMAT_EWFX )
 	{
-		internal_handle->write_io_handle->unrestrict_offset_table    = 1;
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
 	}
 	else
 	{
 		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-		internal_handle->write_io_handle->maximum_chunks_per_section = EWF_MAXIMUM_TABLE_ENTRIES;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF;
 	}
 	return( 1 );
 }

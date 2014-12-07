@@ -326,10 +326,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewf_definitions.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\ewf_digest.h"
 				>
 			</File>

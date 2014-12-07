@@ -120,9 +120,9 @@ struct libewf_internal_handle
 	 */
 	libfdata_range_list_t *delta_chunks_range_list;
 
-	/* The current chunk data
+	/* The chunk groups cache
 	 */
-	libewf_chunk_data_t *chunk_data;
+	libfcache_cache_t *chunk_groups_cache;
 
 	/* The chunks cache
 	 */
@@ -131,6 +131,10 @@ struct libewf_internal_handle
 	/* The chunk group
 	 */
 	libewf_chunk_group_t *chunk_group;
+
+	/* The current chunk data
+	 */
+	libewf_chunk_data_t *chunk_data;
 
 	/* The date format for certain header values
 	 */

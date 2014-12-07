@@ -639,6 +639,23 @@ int libewf_handle_clone(
 			goto on_error;
 		}
 	}
+	if( internal_source_handle->chunk_groups_cache != NULL )
+	{
+		if( libfcache_cache_clone(
+		     &( internal_destination_handle->chunk_groups_cache ),
+		     internal_source_handle->chunk_groups_cache,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create destination chunks groups cache.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	if( internal_source_handle->chunks_cache != NULL )
 	{
 		if( libfcache_cache_clone(
@@ -762,6 +779,12 @@ on_error:
 		{
 			libfcache_cache_free(
 			 &( internal_destination_handle->chunks_cache ),
+			 NULL );
+		}
+		if( internal_destination_handle->chunk_groups_cache != NULL )
+		{
+			libfcache_cache_free(
+			 &( internal_destination_handle->chunk_groups_cache ),
 			 NULL );
 		}
 		if( internal_destination_handle->delta_chunks_range_list != NULL )
@@ -1774,6 +1797,17 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
+	if( internal_handle->chunk_groups_cache != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunks group cache value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->chunks_cache != NULL )
 	{
 		libcerror_error_set(
@@ -1903,6 +1937,20 @@ int libewf_handle_open_file_io_pool(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create delta chunks range list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &( internal_handle->chunk_groups_cache ),
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk groups cache.",
 		 function );
 
 		goto on_error;
@@ -2360,6 +2408,12 @@ on_error:
 		 &( internal_handle->chunks_cache ),
 		 NULL );
 	}
+	if( internal_handle->chunk_groups_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &( internal_handle->chunk_groups_cache ),
+		 NULL );
+	}
 	if( internal_handle->delta_chunks_range_list != NULL )
 	{
 		libfdata_range_list_free(
@@ -2484,7 +2538,7 @@ int libewf_handle_open_read_segment_file_section_data(
 	}
 	if( libfcache_cache_initialize(
 	     &sections_cache,
-	     1,
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4075,7 +4129,7 @@ int libewf_handle_open_read_delta_segment_file_section_data(
 	}
 	if( libfcache_cache_initialize(
 	     &sections_cache,
-	     1,
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4671,6 +4725,22 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
+	if( internal_handle->chunk_groups_cache != NULL )
+	{
+		if( libfcache_cache_free(
+		     &( internal_handle->chunk_groups_cache ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk groups cache.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_handle->chunks_cache != NULL )
 	{
 		if( libfcache_cache_free(
@@ -5100,6 +5170,7 @@ ssize_t libewf_handle_read_chunk(
 	     internal_handle->media_values,
 	     internal_handle->segment_table,
 	     internal_handle->delta_chunks_range_list,
+	     internal_handle->chunk_groups_cache,
 	     internal_handle->chunks_cache,
 	     internal_handle->current_offset,
 	     &chunk_data,
@@ -5361,6 +5432,7 @@ ssize_t libewf_handle_read_buffer(
 		     internal_handle->media_values,
 		     internal_handle->segment_table,
 		     internal_handle->delta_chunks_range_list,
+		     internal_handle->chunk_groups_cache,
 		     internal_handle->chunks_cache,
 		     internal_handle->current_offset,
 		     &chunk_data,
@@ -5656,6 +5728,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 		                chunk_index,
 		                internal_handle->file_io_pool,
 		                internal_handle->segment_table,
+		                internal_handle->chunk_groups_cache,
 		                internal_handle->current_offset,
 				error );
 
@@ -6050,6 +6123,7 @@ ssize_t libewf_handle_write_chunk(
 	                chunk_index,
 	                internal_handle->file_io_pool,
 	                internal_handle->segment_table,
+	                internal_handle->chunk_groups_cache,
 	                internal_handle->current_offset,
 			error );
 
@@ -6371,32 +6445,33 @@ ssize_t libewf_handle_write_buffer(
 	}
 	while( buffer_size > 0 )
 	{
-		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
-		                internal_handle->chunk_table,
-		                chunk_index,
-		                internal_handle->file_io_pool,
-		                internal_handle->segment_table,
-		                internal_handle->current_offset,
-				error );
-
-		if( chunk_exists == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
-			 function,
-			 chunk_index );
-
-			return( -1 );
-		}
 		/* Check if we are in read and write mode
 		 */
 		if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 		 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 		{
-			if( chunk_exists == 0 )
+			chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
+			                internal_handle->chunk_table,
+			                chunk_index,
+			                internal_handle->file_io_pool,
+			                internal_handle->segment_table,
+			                internal_handle->chunk_groups_cache,
+			                internal_handle->current_offset,
+					error );
+
+			if( chunk_exists == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
+			else if( chunk_exists == 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -6408,24 +6483,6 @@ ssize_t libewf_handle_write_buffer(
 
 				return( -1 );
 			}
-		}
-		else
-		{
-			if( chunk_exists != 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-				 "%s: chunk: %" PRIu64 " already set.",
-				 function,
-				 chunk_index );
-
-				return( -1 );
-			}
-		}
-		if( chunk_exists != 0 )
-		{
 			if( ( chunk_data_offset != 0 )
 			 || ( buffer_size < internal_handle->media_values->chunk_size ) )
 			{
@@ -6438,6 +6495,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->media_values,
 				     internal_handle->segment_table,
 				     internal_handle->delta_chunks_range_list,
+				     internal_handle->chunk_groups_cache,
 				     internal_handle->chunks_cache,
 				     internal_handle->current_offset,
 				     &chunk_data,
@@ -6537,6 +6595,7 @@ ssize_t libewf_handle_write_buffer(
 				     internal_handle->file_io_pool,
 				     internal_handle->segment_table,
 				     internal_handle->delta_chunks_range_list,
+				     internal_handle->chunk_groups_cache,
 				     internal_handle->chunks_cache,
 				     internal_handle->current_offset,
 				     chunk_data,
@@ -6633,6 +6692,18 @@ ssize_t libewf_handle_write_buffer(
 		}
 		else
 		{
+			if( chunk_index < internal_handle->write_io_handle->number_of_chunks_written )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: chunk: %" PRIu64 " already set.",
+				 function,
+				 chunk_index );
+
+				return( -1 );
+			}
 			if( internal_handle->write_io_handle->write_finalized != 0 )
 			{
 				break;
@@ -6775,30 +6846,19 @@ ssize_t libewf_handle_write_buffer(
 
 					return( -1 );
 				}
-				if( libfcache_cache_set_value_by_index(
-				     internal_handle->chunks_cache,
-				     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
-				     0,
-				     internal_handle->current_offset,
-				     0,
-				     (intptr_t *) internal_handle->chunk_data,
-				     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
-				     LIBFCACHE_CACHE_VALUE_FLAG_MANAGED,
+				if( libewf_chunk_data_free(
+				     &( internal_handle->chunk_data ),
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set chunk: %" PRIu64 " data.",
-					 function,
-					 chunk_index );
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free chunk data.",
+					 function );
 
 					return( -1 );
 				}
-				/* chunks_cache takes over management of chunk_data
-				 */
-				internal_handle->chunk_data = NULL;
 			}
 		}
 		chunk_index      += 1;
@@ -6991,6 +7051,7 @@ ssize_t libewf_handle_write_finalize(
 				chunk_index,
 				internal_handle->file_io_pool,
 				internal_handle->segment_table,
+				internal_handle->chunk_groups_cache,
 				internal_handle->current_offset,
 				error );
 
@@ -9077,6 +9138,7 @@ int libewf_internal_handle_get_media_values(
 			     internal_handle->media_values,
 			     internal_handle->segment_table,
 			     internal_handle->delta_chunks_range_list,
+			     internal_handle->chunk_groups_cache,
 			     internal_handle->chunks_cache,
 			     internal_handle->current_offset,
 			     &chunk_data,

@@ -36,8 +36,6 @@
 #include "libewf_types.h"
 #include "libewf_unused.h"
 
-#include "ewf_definitions.h"
-
 /* Creates chunk data
  * Make sure the value chunk_data is referencing, is set to NULL
  * Returns 1 if successful or -1 on error

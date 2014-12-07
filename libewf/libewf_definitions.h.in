@@ -412,6 +412,24 @@ enum LIBEWF_PACK_FLAGS
 	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x10
 };
 
+/* The minimum chunk size is 32k or ( 64 sectors * 512 )
+ */
+#define LIBEWF_MINIMUM_CHUNK_SIZE				32768
+
+/* The maximum number of table entries for the EWF format
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF			16375
+
+/* The maximum number of table entries for the EWF format as of EnCase 6
+ * For a 32k chunk this would be approximately 32 KiB x 16 KiB = 2 GiB
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6			65534
+
+/* The maximum number of table entries allowed by the library (2 MiB / 4)
+ * For a 32k chunk this would be 32 KiB x (2 MiB / 4) = 16 GiB
+ */
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES				( ( 16 * 1024 * 1024 ) / 4 )
+
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define LIBEWF_2_TIB						0x20000000000UL
 #else
@@ -419,9 +437,10 @@ enum LIBEWF_PACK_FLAGS
 #endif
 
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_DELTA_SEGMENT_FILES	4
-#define LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES		128
-#define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS		32
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES		64
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS		16
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS			8
+#define LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS			4
 
 #endif
 
