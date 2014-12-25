@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script that runs the tests
 #
-# Version: 20141225
+# Version: 20141218
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -52,18 +52,6 @@ run_tests()
 	fi
 	return ${EXIT_SUCCESS};
 }
-
-./configure --help | grep -- '--with-openssl' > /dev/null;
-
-HAVE_WITH_OPENSSL=$?;
-
-if test ${HAVE_WITH_OPENSSL} -ne 0;
-then
-	if ! run_tests "--with-openssl=no";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-fi
 
 ./configure --help | grep -- '--enable-python' > /dev/null;
 
