@@ -574,7 +574,7 @@ PyObject *pyewf_handle_get_header_codepage(
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( NULL );
@@ -608,7 +608,7 @@ PyObject *pyewf_handle_get_header_codepage(
 
 		return( NULL );
 	}
-	string_object = PyString_FromString(
+	string_object = PyUnicode_FromString(
 	                 codepage_string );
 
 	if( string_object == NULL )
@@ -641,7 +641,7 @@ int pyewf_handle_set_header_codepage_from_string(
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file.",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -744,30 +744,117 @@ PyObject *pyewf_handle_set_header_codepage(
  */
 int pyewf_handle_set_header_codepage_setter(
      pyewf_handle_t *pyewf_handle,
-     PyObject *value_object,
+     PyObject *string_object,
      void *closure PYEWF_ATTRIBUTE_UNUSED )
 {
-	char *codepage_string = NULL;
-	int result            = 0;
+	PyObject *utf8_string_object = NULL;
+	static char *function        = "pyewf_handle_set_ascii_codepage_setter";
+	char *codepage_string        = NULL;
+	int result                   = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( closure )
 
-	codepage_string = PyString_AsString(
-	                   value_object );
+	PyErr_Clear();
 
-	if( codepage_string == NULL )
+	result = PyObject_IsInstance(
+	          string_object,
+	          (PyObject *) &PyUnicode_Type );
+
+	if( result == -1 )
 	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type unicode.",
+		 function );
+
 		return( -1 );
 	}
-	result = pyewf_handle_set_header_codepage_from_string(
-	          pyewf_handle,
-	          codepage_string );
-
-	if( result != 1 )
+	else if( result != 0 )
 	{
+		/* The codepage string should only contain ASCII characters.
+		 */
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
+		{
+			pyewf_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert unicode string to UTF-8.",
+			 function );
+
+			return( -1 );
+		}
+#if PY_MAJOR_VERSION >= 3
+		codepage_string = PyBytes_AsString(
+				   utf8_string_object );
+#else
+		codepage_string = PyString_AsString(
+				   utf8_string_object );
+#endif
+		if( codepage_string == NULL )
+		{
+			return( -1 );
+		}
+		result = pyewf_handle_set_header_codepage_from_string(
+		          pyewf_handle,
+		          codepage_string );
+
+		if( result != 1 )
+		{
+			return( -1 );
+		}
+		return( 0 );
+	}
+	PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyBytes_Type );
+#else
+	result = PyObject_IsInstance(
+		  string_object,
+		  (PyObject *) &PyString_Type );
+#endif
+	if( result == -1 )
+	{
+		pyewf_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type string.",
+		 function );
+
 		return( -1 );
 	}
-	return( 0 );
+	else if( result != 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		codepage_string = PyBytes_AsString(
+		                   string_object );
+#else
+		codepage_string = PyString_AsString(
+		                   string_object );
+#endif
+		if( codepage_string == NULL )
+		{
+			return( -1 );
+		}
+		result = pyewf_handle_set_header_codepage_from_string(
+			  pyewf_handle,
+			  codepage_string );
+
+		if( result != 1 )
+		{
+			return( -1 );
+		}
+		return( 0 );
+	}
+	PyErr_Format(
+	 PyExc_TypeError,
+	 "%s: unsupported string object type.",
+	 function );
+
+	return( -1 );
 }
 
 /* Retrieves a header value

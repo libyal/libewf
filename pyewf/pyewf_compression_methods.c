@@ -32,10 +32,8 @@
 #include "pyewf_unused.h"
 
 PyTypeObject pyewf_compression_methods_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyewf.compression_methods",
 	/* tp_basicsize */
@@ -134,6 +132,8 @@ PyTypeObject pyewf_compression_methods_type_object = {
 int pyewf_compression_methods_init_type(
      PyTypeObject *type_object )
 {
+	PyObject *value_object = NULL;
+
 	if( type_object == NULL )
 	{
 		return( -1 );
@@ -144,27 +144,45 @@ int pyewf_compression_methods_init_type(
 	{
 		return( -1 );
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_NONE );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_NONE );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "NONE",
-	     PyInt_FromLong(
-	      LIBEWF_COMPRESSION_METHOD_NONE ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_DEFLATE );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_DEFLATE );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "DEFLATE",
-	     PyInt_FromLong(
-	      LIBEWF_COMPRESSION_METHOD_DEFLATE ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_BZIP2 );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_COMPRESSION_METHOD_BZIP2 );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "BZIP2",
-	     PyInt_FromLong(
-	      LIBEWF_COMPRESSION_METHOD_BZIP2 ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
@@ -249,7 +267,8 @@ int pyewf_compression_methods_init(
 void pyewf_compression_methods_free(
       pyewf_compression_methods_t *pyewf_compression_methods )
 {
-	static char *function = "pyewf_compression_methods_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyewf_compression_methods_free";
 
 	if( pyewf_compression_methods == NULL )
 	{
@@ -260,25 +279,28 @@ void pyewf_compression_methods_free(
 
 		return;
 	}
-	if( pyewf_compression_methods->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyewf_compression_methods );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid compression methods - missing ob_type.",
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyewf_compression_methods->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid compression methods - invalid ob_type - missing tp_free.",
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
 	}
-	pyewf_compression_methods->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyewf_compression_methods );
 }
 

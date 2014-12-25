@@ -32,10 +32,8 @@
 #include "pyewf_unused.h"
 
 PyTypeObject pyewf_media_flags_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyewf.media_flags",
 	/* tp_basicsize */
@@ -134,6 +132,8 @@ PyTypeObject pyewf_media_flags_type_object = {
 int pyewf_media_flags_init_type(
      PyTypeObject *type_object )
 {
+	PyObject *value_object = NULL;
+
 	if( type_object == NULL )
 	{
 		return( -1 );
@@ -144,27 +144,45 @@ int pyewf_media_flags_init_type(
 	{
 		return( -1 );
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_FLAG_PHYSICAL );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_FLAG_PHYSICAL );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "PHYSICAL",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_FLAG_PHYSICAL ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_FLAG_FASTBLOC );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_FLAG_FASTBLOC );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "FASTBLOC",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_FLAG_FASTBLOC ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_FLAG_TABLEAU );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_FLAG_TABLEAU );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "TABLEAU",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_FLAG_TABLEAU ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
@@ -249,7 +267,8 @@ int pyewf_media_flags_init(
 void pyewf_media_flags_free(
       pyewf_media_flags_t *pyewf_media_flags )
 {
-	static char *function = "pyewf_media_flags_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyewf_media_flags_free";
 
 	if( pyewf_media_flags == NULL )
 	{
@@ -260,25 +279,28 @@ void pyewf_media_flags_free(
 
 		return;
 	}
-	if( pyewf_media_flags->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyewf_media_flags );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid media flags - missing ob_type.",
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyewf_media_flags->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid media flags - invalid ob_type - missing tp_free.",
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
 	}
-	pyewf_media_flags->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyewf_media_flags );
 }
 

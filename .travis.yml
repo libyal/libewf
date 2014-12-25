@@ -1,14 +1,14 @@
 language: c
 os:
   - linux
+  - osx
 compiler:
   - clang
   - gcc
 before_install:
   - if test `uname -s` = 'Darwin'; then brew update && brew install gettext && brew link --force gettext; fi
-  - if test `uname -s` = 'Linux'; then sudo apt-get update && sudo apt-get -o Dpkg::Options::="--force-confnew" -y upgrade && sudo apt-get install autopoint; fi
+  - if test `uname -s` = 'Linux'; then sudo apt-get update && sudo apt-mark hold postgresql-9.3 postgresql-client-9.3 postgresql-client-common postgresql-common postgresql-contrib-9.3 postgresql-doc-9.3 && sudo apt-get -o Dpkg::Options::="--force-confold" -y upgrade && sudo apt-get install autopoint; fi
 install:
   - ./synclibs.sh && ./autogen.sh
 script:
-  - ./configure --enable-python && make && make check
-  - if test -f tests/test-suite.log; then cat tests/test-suite.log; fi
+  - ./runtests.sh

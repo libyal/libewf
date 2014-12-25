@@ -1,9 +1,5 @@
 TODO
-* throttle the size of the chunks list
-  - split if too large
-  - allow to set the maximum
 * throttle the size of the sections list?
-* read: hard limit the maximum number of table entries?
 * ewfacquire allow to set the the maximum number of table entries?
 
 Tests:
@@ -454,6 +450,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20141225
+* worked on Python 3 support
 
 20141210
 * fix in spec file for zlib-static

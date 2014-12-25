@@ -25,14 +25,13 @@ Other features:
 * write resume
 
 Work in progress:
-* Python bindings
 * Dokan library support (experimental)
+* Python bindings (including Python 3 support)
 * write EWF2-Ex01 support
 
 Planned:
 * write EWF-L01 and EWF2-Lx01 (long-term)
 * Multi-threading support
-* Python 3 support
 
 The libewf package contains the following tools:
 * ewfacquire; which writes storage media data from devices and files to EWF files.
@@ -45,7 +44,6 @@ The libewf package contains the following tools:
 * ewfverify; which verifies the storage media data in EWF files.
 
 For previous project contributions see:
-* libewf on Google Code: https://code.google.com/p/libewf/
 * libewf on SourceForge: https://sourceforge.net/projects/libewf/
 
 For more information see:

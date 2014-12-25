@@ -32,10 +32,8 @@
 #include "pyewf_unused.h"
 
 PyTypeObject pyewf_media_types_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyewf.media_types",
 	/* tp_basicsize */
@@ -134,6 +132,8 @@ PyTypeObject pyewf_media_types_type_object = {
 int pyewf_media_types_init_type(
      PyTypeObject *type_object )
 {
+	PyObject *value_object = NULL;
+
 	if( type_object == NULL )
 	{
 		return( -1 );
@@ -144,43 +144,73 @@ int pyewf_media_types_init_type(
 	{
 		return( -1 );
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_TYPE_REMOVABLE );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_TYPE_REMOVABLE );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "REMOVABLE",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_TYPE_REMOVABLE ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_TYPE_FIXED );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_TYPE_FIXED );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "FIXED",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_TYPE_FIXED ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_TYPE_OPTICAL );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_TYPE_OPTICAL );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "OPTICAL",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_TYPE_OPTICAL ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_TYPE_SINGLE_FILES );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_TYPE_SINGLE_FILES );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "SINGLE_FILES",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_TYPE_SINGLE_FILES ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBEWF_MEDIA_TYPE_MEMORY );
+#else
+	value_object = PyInt_FromLong(
+	                LIBEWF_MEDIA_TYPE_MEMORY );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "MEMORY",
-	     PyInt_FromLong(
-	      LIBEWF_MEDIA_TYPE_MEMORY ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
@@ -265,7 +295,8 @@ int pyewf_media_types_init(
 void pyewf_media_types_free(
       pyewf_media_types_t *pyewf_media_types )
 {
-	static char *function = "pyewf_media_types_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyewf_media_types_free";
 
 	if( pyewf_media_types == NULL )
 	{
@@ -276,25 +307,28 @@ void pyewf_media_types_free(
 
 		return;
 	}
-	if( pyewf_media_types->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyewf_media_types );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid media types - missing ob_type.",
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyewf_media_types->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid media types - invalid ob_type - missing tp_free.",
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
 	}
-	pyewf_media_types->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyewf_media_types );
 }
 

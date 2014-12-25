@@ -88,7 +88,7 @@ PyObject *pyewf_handle_set_header_codepage(
 
 int pyewf_handle_set_header_codepage_setter(
      pyewf_handle_t *pyewf_handle,
-     PyObject *value_object,
+     PyObject *string_object,
      void *closure );
 
 PyObject *pyewf_handle_get_header_value(
