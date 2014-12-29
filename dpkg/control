@@ -1,13 +1,12 @@
 Source: libewf
-Section: unknown
+Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev, zlib1g-dev, libssl-dev, libfuse-dev, python-dev
-Standards-Version: 3.8.3
+Standards-Version: 3.9.5
 Homepage: https://github.com/libyal/libewf/
 
 Package: libewf
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Library to access the Expert Witness Compression Format (EWF)
@@ -19,21 +18,21 @@ Description: Library to access the Expert Witness Compression Format (EWF)
 Package: libewf-dev
 Section: libdevel
 Architecture: any
-Depends: libewf (= ${Source-Version})
+Depends: libewf (= ${binary:Version}), ${misc:Depends}
 Description: Header files and libraries for developing applications for libewf
  Header files and libraries for developing applications for libewf.
 
 Package: libewf-tools
 Section: utils
 Architecture: any
-Depends: libewf (= ${Source-Version}), ${shlibs:Depends}
+Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading and writing EWF files
  Several tools for reading and writing EWF files.
 
 Package: libewf-python
 Section: python
 Architecture: any
-Depends: libewf (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Python bindings for libewf
  Python bindings for libewf.
 
