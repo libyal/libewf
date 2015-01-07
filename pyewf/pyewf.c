@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (c) 2008-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -850,6 +850,14 @@ PyMODINIT_FUNC initpyewf(
 	PyTypeObject *media_flags_type_object         = NULL;
 	PyTypeObject *media_types_type_object         = NULL;
 	PyGILState_STATE gil_state                    = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+	libewf_notify_set_verbose(
+	 1 );
+#endif
 
 	/* Create the module
 	 * This function must be called before grabbing the GIL

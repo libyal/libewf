@@ -1,7 +1,7 @@
 /*
  * Verifies the integrity of the media data within the EWF file
  *
- * Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

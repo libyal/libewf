@@ -1,7 +1,7 @@
 /*
  * Single file tree functions
  *
- * Copyright (C) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

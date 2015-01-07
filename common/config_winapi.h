@@ -1,7 +1,7 @@
 /*
  * Configuration file for WINAPI
  *
- * Copyright (c) 2006-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -67,10 +67,6 @@
 #if !defined( HAVE_CONFIG_H ) && !defined( HAVE_MULTI_THREAD_SUPPORT )
 #define HAVE_MULTI_THREAD_SUPPORT	1
 #endif
-
-/* Enable the v1 API
-#define HAVE_V1_API			1
- */
 
 #endif /* defined( WINAPI ) */
 
