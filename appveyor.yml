@@ -1,0 +1,27 @@
+environment:
+  VisualStudioVersion: 11.0
+
+# TODO: add x64, fix issue: LNK1158: cannot run 'cvtres.exe'
+platform:
+  - Win32
+
+# TODO: add VSDebug
+configuration:
+  - Release
+
+install:
+  - cmd: git clone https://github.com/libyal/libyal.git && move libyal ..\
+  - cmd: git clone https://github.com/joachimmetz/dokan.git && move dokan ..\
+  - ps: .\synczlib.ps1
+  - ps: .\syncwinflexbison.ps1
+
+before_build:
+  - ps: .\synclibs.ps1
+  - ps: .\autogen.ps1
+  - cmd: ..\win_flex_bison\win_flex.exe -Cf libodraw\libodraw_cue_scanner.l && move lex.yy.c libodraw\libodraw_cue_scanner.c
+  - cmd: ..\win_flex_bison\win_bison.exe -d -v -l -p cue_scanner_ libodraw\libodraw_cue_parser.y && move libodraw_que_parser.tab.c libodraw\libodraw_que_parser.c && move libodraw_que_parser.tab.h libodraw\libodraw_que_parser.h
+  - cmd: C:\Python27\python.exe ..\libyal\msvscpp-convert.py --to 2010 msvscpp\libewf.sln
+
+build:
+  project: vs2010\libewf.sln
+
