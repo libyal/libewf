@@ -11,6 +11,7 @@ configuration:
 
 install:
   - cmd: git clone https://github.com/libyal/libyal.git && move libyal ..\
+  - cmd: git clone https://github.com/joachimmetz/bzip2.git && move bzip2 ..\
   - cmd: git clone https://github.com/joachimmetz/dokan.git && move dokan ..\
   - ps: .\synczlib.ps1
   - ps: .\syncwinflexbison.ps1
