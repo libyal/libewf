@@ -6,6 +6,7 @@ $Library = Get-Content -Path configure.ac | select -skip 3 -first 1 | % { $_ -Re
 $Version = Get-Content -Path configure.ac | select -skip 4 -first 1 | % { $_ -Replace " \[","" } | % { $_ -Replace "\],","" }
 
 Get-Content -Path include\${Library}.h.in > include\${Library}.h
+Get-Content -Path include\${Library}.h | % { $_ -Replace "@HAVE_V1_API@","0" } > include\${Library}.h
 Get-Content -Path include\${Library}\definitions.h.in | % { $_ -Replace "@VERSION@",${Version} } > include\${Library}\definitions.h
 Get-Content -Path include\${Library}\definitions.h.in | % { $_ -Replace "@HAVE_V1_API@","0" } > include\${Library}\definitions.h
 Get-Content -Path include\${Library}\features.h.in | % { $_ -Replace "@[A-Z0-9_]*@","0" } > include\${Library}\features.h
