@@ -97,7 +97,7 @@ System::Byte FileEntry::GetType( void )
 
 	Marshal::WriteIntPtr(
 	 (IntPtr) &handle,
-	 this->ewf_handle );
+	 this->ewf_file_entry );
 
 	if( libewf_file_entry_get_type(
 	     handle,
