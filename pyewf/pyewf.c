@@ -643,7 +643,7 @@ PyObject *pyewf_glob(
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
 		  string_object,
-		  (PyObject *) &Pybytes_Type );
+		  (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
 		  string_object,
