@@ -12,4 +12,5 @@ Get-Content -Path include\${Library}\types.h.in | % { $_ -Replace "@[A-Z0-9_]*@"
 Get-Content -Path common\types.h.in | % { $_ -Replace "@PACKAGE@",${Library} } > common\types.h
 Get-Content -Path ${Library}\${Library}_definitions.h.in | % { $_ -Replace "@VERSION@",${Version} } > ${Library}\${Library}_definitions.h
 Get-Content -Path ${Library}\${Library}.rc.in | % { $_ -Replace "@VERSION@",${Version} } > ${Library}\${Library}.rc
+Get-Content -Path ewf.net\ewf.net.rc.in | % { $_ -Replace "@VERSION@",${Version} } > ewf.net\ewf.net.rc
 
