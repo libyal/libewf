@@ -29,7 +29,7 @@ SUBDIRS = \
 	ewf.net \
 	pyewf \
 	po \
-	documents \
+	documentation \
 	manuals \
 	tests \
 	msvscpp

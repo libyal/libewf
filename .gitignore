@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20141227
+# Version: 20150725
 
 # Generic auto-generated build files
 *~
@@ -33,6 +33,7 @@ stamp-h[1-9]
 /ABOUT-NLS
 /aclocal.m4
 /autom4te.cache/
+/build
 /compile
 /config.guess
 /config.log
@@ -41,6 +42,7 @@ stamp-h[1-9]
 /config.sub
 /configure
 /depcomp
+/dist
 /install-sh
 /libtool
 /ltmain.sh
@@ -120,14 +122,6 @@ stamp-h[1-9]
 /ewftools/ewfrecover
 /ewftools/ewfverify
 /pyewf/setup.py
-/tests/input
-/tests/input_delta
-/tests/input_logical
-/tests/input_old
-/tests/input_raw
-/tests/input_raw_more
-/tests/input_raw_optical
-/tests/tmp
 /tests/ewf_test_glob
 /tests/ewf_test_open_close
 /tests/ewf_test_read
@@ -139,6 +133,14 @@ stamp-h[1-9]
 /tests/ewf_test_truncate
 /tests/ewf_test_write
 /tests/ewf_test_write_chunk
+/tests/input
+/tests/input_delta
+/tests/input_logical
+/tests/input_old
+/tests/input_raw
+/tests/input_raw_more
+/tests/input_raw_optical
+/tests/tmp*
 
 # Local library dependencies specific files
 /libbfio
