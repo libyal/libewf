@@ -53,7 +53,7 @@ toc::[]
 | 0.0.4 | J.B. Metz | July 2012 | Additional information about pattern fill and bzip2 compression.
 | 0.0.5 | J.B. Metz | August 2012 | Additional information some obtained from Guidance Software and findings.
 | 0.0.6 | J.B. Metz | August 2012 | Additional information some obtained from Guidance Software.
-| 0.0.7 | J.B. Metz | August 2012 | Updates based on \[ENCASE12] version 2, August 2012.
+| 0.0.7 | J.B. Metz | August 2012 | Updates based on [ENCASE12\] version 2, August 2012.
 | 0.0.8 | J.B. Metz | September 2012 | Updates regarding bzip2 compression.
 | 0.0.9 | J.B. Metz | August 2015 | Switched to asciidoc format.
 |===
@@ -65,7 +65,7 @@ Compression Format (EWF). Although at high-level both version 1 and 2 are quite
 similar in the details both versions differ significantly.
 
 This document will use EWF2 as the name of the format although Guidance named 
-the format EnCase Evidence File Format Version 2, see \[ENCASE12]. EWF1 is used 
+the format EnCase Evidence File Format Version 2, see [ENCASE12\]. EWF1 is used 
 to indicate version 1 of the format.
 
 There are 2 different versions of EWF2:
@@ -87,7 +87,7 @@ The following version of programs were used to test the information within this 
 EWF2 stores data in one or more segment files (or segments). Each segment file consists of:
 
 * A file header.
-* One or more sections; which \[ENCASE12] refers to as link records and data.
+* One or more sections; which [ENCASE12\] refers to as link records and data.
 
 EnCase allows for the segment file size to be set at 30 MB at minimum and about 8.8 TB at maximum. Libewf 1 MiB at minimum and about 8 EiB at maximum.
 
@@ -144,7 +144,7 @@ Contains a little-endian GUID (version 4)
 | 2 | COMPRESSION_BZIP2 | BZip2 compression
 |===
 
-\[ENCASE12] states that "COMPRESSION_NONE will be never used", even so EnCase 7 
+[ENCASE12\] states that "COMPRESSION_NONE will be never used", even so EnCase 7 
 does not even seem to supports this compression method and indicates the file 
 header is corrupt.
 
@@ -247,13 +247,13 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 | 0x00000010 | | Analytical data
 | | | 
 | 0x00000020 | | Single files data
-[yellow-background]*Not defined by \[ENCASE12]*
+[yellow-background]*Not defined by [ENCASE12\]*
 | 0x00000021 | | Single files unknown table
-[yellow-background]*Not defined by \[ENCASE12]*
+[yellow-background]*Not defined by [ENCASE12\]*
 | 0x00000022 | | Single files MD5 hash table
-[yellow-background]*Not defined by \[ENCASE12]*
+[yellow-background]*Not defined by [ENCASE12\]*
 | 0x00000023 | | [yellow-background]*Single files unknown table* +
-[yellow-background]*Not defined by \[ENCASE12]*
+[yellow-background]*Not defined by [ENCASE12\]*
 |===
 
 ==== [[data_flags]]Data flags
@@ -266,6 +266,236 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 |===
 
 === Device information
+The device information section can be found:
+
+* in every segment file after the file header in EWF2-Ex01
+* [yellow-background]*in every segment file* after section 0x00000020 in EWF2-Lx01 ([yellow-background]*TODO check multi Lx01*)
+
+When encryption is enabled the device information is encrypted.
+
+The device information section contains a serialized file object string that consist of:
+
+[cols="1,1,5",options="header"]
+|===
+| Line | Value | Description
+| 1 | 1 | Number of objects
+| 2 | "main" | Object name
+| 3 | | Attribute tags
+| 4 | | Attribute values
+| 5 | | Empty line
+|===
+
+==== Attribute tags
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier | Type | Description
+| sn | Text | Drive serial number +
+[yellow-background]*EnCase 7 generated strange values for this in the test*
+| md | Text | Drive model
+| lb | Text | Drive label
+| ts | Integer 64-bit | Number of sectors
+| hs | Integer 64-bit | Number of sectors of the HPA protected sectors
+| dc | Integer 64-bit | Number of sectors of the DCO protected sectors
+| dt | Enumeration | Drive type +
+See section: <<drive_type,Drive type>>
+| pid | Integer 32-bit | Process identifier +
+Set when the memory of an individual process is acquired
+| rs | Integer 32-bit | Number of sectors of a PALM RAM device
+| ls | Integer 32-bit | Number of sectors in the SMART or ATA general logs +
+[yellow-background]*The latter is returned by the ATA READ_LOG_EXT command*
+| bp | Integer 32-bit | Bytes per sector
+| ph | Boolean | Is physical
+|===
+
+==== [[drive_type]]Drive type
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| a | | RAM disk
+| c | | Optical disc (CD-ROM)
+| f | | Fixed
+| l | | Single files (Logical evidence)
+| m | | Memory
+| p | | PALM
+| r | | Removable
+|===
+
+=== Case data
+The case data section can be found:
+
+* in every segment file after the device information section in EWF2-Ex01
+* [yellow-background]*in every segment file* after the file header in EWF2-Lx01 ([yellow-background]*TODO check multi Lx01*)
+
+When encryption is enabled the case data is encrypted.
+
+The case data section contains a serialized file object string that consist of:
+
+[cols="1,1,5",options="header"]
+|===
+| Line | Value | Description
+| 1 | 1 | Number of objects
+| 2 | "main" | Object name
+| 3 | | Attribute tags
+| 4 | | Attribute values
+| 5 | | Empty line
+|===
+
+==== Attribute tags
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier | Type | Description
+| nm | Text | Name +
+Similar to Description in EWF version 1. +
+libewf treats them as equivalent.
+| cn | Text | Case number
+| en | Text | Evidence number
+| ex | Text | Examiner name
+| nt | Text | Notes
+| av | Text | Application version +
+The version of the application used for acquisition
+| os | Text | Operating system +
+The operating system used used for acquisition
+| tt | Timestamp | Target time +
+Date and time of the system used for acquisition in UTC +
+Similar to Acquired date in EWF version 1
+| at | Timestamp | Actual time +
+User provided date and time +
+Similar to System date in EWF version 1 +
+[yellow-background]*[ENCASE12\] defines this as in UTC, but if this is user provided can UTC still be guaranteed?*
+| tb | Integer 64-bit | Number of chunks (blocks)
+| cp | Integer 32-bit | Compression method +
+See section: <<compression_methods,Compression methods>> +
+The value is empty, not 0 when the compression method is no compression +
+[yellow-background]*Note that to match the compression method in the segment file header only be 16-bit of this value can be used*
+| sb | Integer 32-bit | Number of sectors per chunk (block)
+| gr | Integer 32-bit | Error granularity
+| wb | Integer 32-bit | Write-blocker type
+|===
+
+[NOTE]
+EnCase 7 only provides the following number of sectors per chunk: 64, 128, 256, 
+512, 1024 which is referred by the application as block size. The thorough 
+error granularity in EnCase 7 corresponds to 1 sector.
+
+==== Write-blocker type
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 1 | | FastBloc
+| 2 | | Tableau
+|===
+
+=== Sector data
+The first sector data section can be found in every segment file after the case 
+data section. Successive sector data sections are found after the sector table 
+section.
+
+When encryption is enabled the sector data is encrypted. 
+[yellow-background]*TODO verify this.*
+
+The sector data is stored in chunks. [ENCASE12\] states that each chunk must be 
+stored 16-byte aligned and padded with 0-byte values if necessary. Although it 
+can read non 16-byte aligned chunks.
+
+If the sector compression method defined in case data section is set the chunk 
+is compressed and the chunk data flag COMPRESSED is set. The checksum intrinsic 
+to the compression method is used to verify the integrity of the chunk data. 
+The chunk data flag CHECKSUMED is not set.
+
+If a chunk is not compressed an Adler32 checksum of the data is stored after 
+the chunk data and the chunk data flag CHECKSUMED is set.
+
+Pattern fill seems to be a special case of compression and the COMPRESSED flag 
+is set in combination with the PATTERNFILL flag. In EnCase pattern fill is not 
+used when writing files and the compression is set to none. Libewf, when 
+reading files, ignores the PATTERNFILL flag if the corresponding COMPRESSED 
+flag is not set.
+
+If the PATTERNFILL flag is set the chunk data size in the sector table entry is 
+set to 0 and the chunk data offset contains a 64-bit pattern to fill the chunk 
+data.
+
+See section: <<compression_methods,Compression methods>>
+
+=== Sector table
+The sector table is stored as an array of sector table entries (chunk 
+descriptor or block offset). It defines the location of the chunk data in the 
+segment file.
+
+The sector table section can be found in every segment file after the sector 
+data section. Every sector data section should be followed by a section table 
+section.
+
+When encryption is enabled the sector table is encrypted.
+
+The sector table consists of:
+
+* the sector table header
+* an array of sector table entries
+* the sector table footer
+
+==== Sector table header
+The sector table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | First chunk number +
+The first chunk number in the table +
+0 is the first chunk number for the entire image
+| 8 | 4 | | Number of entries
+| 12 | 4 | 0 | Padding +
+Reserved empty values
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the sector table header.
+|===
+
+The sector table header should be followed by 12 bytes of alignment padding.
+
+[yellow-background]*TODO does EnCase support non-contiguous images?*
+[yellow-background]*Does EnCase write about 1600 entries per section?*
+
+==== Sector table entry
+A sector table entry is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Chunk data offset or fill pattern if corresponding flag is set
+| 8 | 4 | | Chunk data size
+| 12 | 4 | | Chunk data flags
+|===
+
+==== Chunk data flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | COMPRESSED | The chunk is compressed
+| 0x00000002 | CHECKSUMED | The chunk is followed by an Adler32 checksum
+| 0x00000004 | PATTERNFILL | The chunk is sparse and the value in the chunk data offset is used to fill the chunk data at run-time.
+|===
+
+The PATTERNFILL flag should be ignored if the COMPRESSED flag is not set.
+
+==== Sector table footer
+The sector table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the sector table entries.
+|===
+
+The sector table footer should be followed by 12 bytes of alignment padding.
+
+=== Error table
+
 [yellow-background]*TODO migrate rest of documentation*
 
 == Serialized file object data
@@ -292,7 +522,7 @@ The file object serialization format uses the following special character values
 |===
 
 [NOTE]
-\[ENCASE12] states line feed (0x000d) as line delimiter this should be line feed (0x000a).
+[ENCASE12\] states line feed (0x000d) as line delimiter this should be line feed (0x000a).
 
 === Object
 An object consists of multiple lines:
