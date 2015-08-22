@@ -206,8 +206,8 @@ See section: <<data_flags,Data flags>>
 Contains an offset relative from the start of the segment file or 0 if there is no previous section
 | 16 | 8 | | Data size
 | 24 | 4 | | Section descriptor size
-| 28 | 4 | | Padding size
-| The size of the padding after the data to make the sections 16-byte aligned
+| 28 | 4 | | Padding size +
+The size of the padding after the data to make the sections 16-byte aligned
 | 32 | 16 | | Data integrity hash +
 Contains an MD5 of the data including padding, if the data is encrypted the integrity hash is calculated of the encrypted data.
 | 48 | 3 x 4 = 12 | 0 | Padding +
