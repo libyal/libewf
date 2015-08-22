@@ -246,11 +246,11 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 | 0x0000000f | | Done
 | 0x00000010 | | Analytical data
 | | | 
-| 0x00000020 | | Single files data
+| 0x00000020 | | Single files data +
 [yellow-background]*Not defined by `[ENCASE12]`*
-| 0x00000021 | | Single files unknown table
+| 0x00000021 | | Single files unknown table +
 [yellow-background]*Not defined by `[ENCASE12]`*
-| 0x00000022 | | Single files MD5 hash table
+| 0x00000022 | | Single files MD5 hash table +
 [yellow-background]*Not defined by `[ENCASE12]`*
 | 0x00000023 | | [yellow-background]*Single files unknown table* +
 [yellow-background]*Not defined by `[ENCASE12]`*
@@ -495,12 +495,133 @@ Adler-32 of all the previous data within the sector table entries.
 The sector table footer should be followed by 12 bytes of alignment padding.
 
 === Error table
+The error table is stored as an array of error table entries. It defines the 
+sector ranges that could not be read correctly during acquisition.
 
-[yellow-background]*TODO migrate rest of documentation*
+The error table section is optional, it does not need to be present. If it does 
+it resides in the last segment file before the MD5 hash section.
+
+When encryption is enabled the error table is encrypted. 
+[yellow-background]*TODO verify this.*
+
+The error table consists of:
+
+* the error table header
+* an array of error table entries
+* the error table footer
+
+==== Error table header
+The error table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of entries
+| 4 | 12 | | [yellow-background]*Unknown (Empty value)*
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the error table header.
+|===
+
+The error table header should be followed by 12 bytes of alignment padding.
+
+[yellow-background]*This differs from what `[ENCASE12]` specifies.*
+
+==== Error table entry
+An error table entry is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Start sector
+| 8 | 4 | | Number of sectors
+| 12 | 4 | 0 | Padding +
+Reserved empty values
+|===
+
+==== Error table footer
+The error table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the array of error table entries.
+|===
+
+The error table footer should be followed by 12 bytes of alignment padding.
 
 === Session table
+The session table is stored as an array of session table entries. It defines 
+the sessions of the optical disc stored in the set of segment files.
 
-[yellow-background]*TODO migrate rest of documentation*
+The session table section is optional, it does not need to be present. If it 
+does it resides in the last segment file before the error table section.
+
+When encryption is enabled the session table is encrypted. 
+[yellow-background]*TODO verify this.*
+
+The session table consists of:
+
+* the session table header
+* an array of session table entries
+* the session table footer
+
+==== Session table header
+The session table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of entries
+| 4 | 12 | | [yellow-background]*Unknown (Empty value)*
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the session table header.
+|===
+
+The session table header should be followed by 12 bytes of alignment padding.
+
+[yellow-background]*This differs from what `[ENCASE12]` specifies.*
+
+==== Session table entry
+A session table entry is 32 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | First sector
+| 8 | 4 | | Session flags
+| 12 | 5 x 4 | 20 | Padding +
+Reserved empty values
+|===
+
+[yellow-background]*For a CD the first session sector is stored as 16, although 
+the actual session starts at sector 0. Could this value be overloaded to 
+indicate the size of the reserved space between the start of the session and 
+the ISO 9660 volume descriptor.*
+
+==== Session flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | | If set the track is an audio track otherwise the track is a data track
+|===
+
+EnCase stores the data of audio tracks of an optical disc as 0-byte data with a 
+sector size of 2048. It is therefore assumed that the format is only to support 
+data tracks with a sector size of 2048.
+
+==== Session table footer
+The session table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the array of session table entries.
+|===
+
+The session table footer should be followed by 12 bytes of alignment padding.
 
 === Increment data
 The increment data section contains a serialized file object string that 
@@ -552,8 +673,112 @@ Adler-32 of the SHA1 hash.
 The MD5 hash data should be followed by 8 bytes of alignment padding.
 
 === Restart data
+The restart data section is optional, it does not need to be present. If it 
+does it resides in the last segment file before the done section.
 
-[yellow-background]*TODO migrate rest of documentation*
+[yellow-background]*TODO is the restart data stored after or before the 
+encryption keys?*
+
+[NOTE]
+The "main" and "rl" object tags are not explicitly defined in the string.
+
+The restart data section contains a serialized file object string that consist 
+of:
+
+[cols="1,1,5",options="header"]
+|===
+| Line | Value | Description
+| 1 | | Object tags
+| 2 | | Attribute tags
+| 3 | | Segments of the restart object
+|===
+
+The segments of the restart object likely represent the "tree view" in the 
+evidence view within EnCase. In the example below there are 3 segments, the 
+first segment having a sub object that has "expanded" properties and 
+containing another sub object that contains the actual restart data.
+
+....
+1	1
+p	d	sr	sp
+0	1
+			
+0	1
+5			
+0	0
+			1216
+....
+
+==== Object tags
+
+[cols="1,1,5",options="header"]
+|===
+| Column | Value | Description
+| 1 | 1 | Number of child objects +
+The restart data should contain a single restart object
+| 2 | 1 | [yellow-background]*Unknown (Constant value)*
+|===
+
+==== Attribute tags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| p | Integer 32-bit | Properties +
+Contains flags, see next paragraph, defaults to 0 if not set
+| d | Timestamp | Start date and time +
+Date and time the acquisition process was (re-)started
+| sr | Integer 64-bit | First sector +
+The first sector acquired in the acquisition process
+| sp | Integer 64-bit | Last sector +
+The last sector acquired in the acquisition process
+|===
+
+==== Properties
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x01 | STATEFOLDER | Item is a folder/container
+| 0x02 | STATESELECTED | Item is selected (highlighted in blue)
+| 0x04 | STATEEXPANDED | Item is expanded
+| 0x08 | STATEINCLUDE | Item is included (green-plated)
+|===
+
+[yellow-background]*According to Guidance Software this value is used to store 
+saved stated. In this context the value should always set to 0 but can contain 
+other values in different contexts. EnCase can choose to ignore these values.*
+
+=== Encryption keys
+In EWF2 the data and some of the metadata can be encrypted, the encrypted keys 
+section contains information necessary for decrypting the data.
+
+The encryption keys section is optional, it does not need to be present. If it 
+does it resides in the last segment file before the done section.
+
+[yellow-background]*TODO is the encryption keys stored after or before the 
+restart data?*
+
+The encryption keys is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Size +
+Including the padding size
+| 4 | 4 | | [yellow-background]*Unknown (Checksum?)*
+| 8 | 8 | 2 | [yellow-background]*Unknown (Algorithm ID?)* +
+[yellow-background]*2 => AES-256*
+| 16 | ...  | | [yellow-background]*Unknown (Encrypted data?)*
+|===
+
+The encryption keys should be followed by 12 bytes of alignment padding.
+
+[yellow-background]*`[ENCASE12]` "Please refer to the document outlining the 
+encryption support for Ex01 for further detail." Where is this document?*
+
+[yellow-background]*According to Guidance Software they are not disclosing 
+information about Ex01 encryption.*
 
 === Memory extents table
 The memory extents table is stored as an array of memory extents table entries. 
