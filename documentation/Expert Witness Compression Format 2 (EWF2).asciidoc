@@ -53,7 +53,7 @@ toc::[]
 | 0.0.4 | J.B. Metz | July 2012 | Additional information about pattern fill and bzip2 compression.
 | 0.0.5 | J.B. Metz | August 2012 | Additional information some obtained from Guidance Software and findings.
 | 0.0.6 | J.B. Metz | August 2012 | Additional information some obtained from Guidance Software.
-| 0.0.7 | J.B. Metz | August 2012 | Updates based on [ENCASE12\] version 2, August 2012.
+| 0.0.7 | J.B. Metz | August 2012 | Updates based on `[ENCASE12]` version 2, August 2012.
 | 0.0.8 | J.B. Metz | September 2012 | Updates regarding bzip2 compression.
 | 0.0.9 | J.B. Metz | August 2015 | Switched to asciidoc format.
 |===
@@ -65,7 +65,7 @@ Compression Format (EWF). Although at high-level both version 1 and 2 are quite
 similar in the details both versions differ significantly.
 
 This document will use EWF2 as the name of the format although Guidance named 
-the format EnCase Evidence File Format Version 2, see [ENCASE12\]. EWF1 is used 
+the format EnCase Evidence File Format Version 2, see `[ENCASE12]`. EWF1 is used 
 to indicate version 1 of the format.
 
 There are 2 different versions of EWF2:
@@ -87,7 +87,7 @@ The following version of programs were used to test the information within this 
 EWF2 stores data in one or more segment files (or segments). Each segment file consists of:
 
 * A file header.
-* One or more sections; which [ENCASE12\] refers to as link records and data.
+* One or more sections; which `[ENCASE12]` refers to as link records and data.
 
 EnCase allows for the segment file size to be set at 30 MB at minimum and about 8.8 TB at maximum. Libewf 1 MiB at minimum and about 8 EiB at maximum.
 
@@ -144,7 +144,7 @@ Contains a little-endian GUID (version 4)
 | 2 | COMPRESSION_BZIP2 | BZip2 compression
 |===
 
-[ENCASE12\] states that "COMPRESSION_NONE will be never used", even so EnCase 7 
+`[ENCASE12]` states that "COMPRESSION_NONE will be never used", even so EnCase 7 
 does not even seem to supports this compression method and indicates the file 
 header is corrupt.
 
@@ -247,13 +247,13 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 | 0x00000010 | | Analytical data
 | | | 
 | 0x00000020 | | Single files data
-[yellow-background]*Not defined by [ENCASE12\]*
+[yellow-background]*Not defined by `[ENCASE12]`*
 | 0x00000021 | | Single files unknown table
-[yellow-background]*Not defined by [ENCASE12\]*
+[yellow-background]*Not defined by `[ENCASE12]`*
 | 0x00000022 | | Single files MD5 hash table
-[yellow-background]*Not defined by [ENCASE12\]*
+[yellow-background]*Not defined by `[ENCASE12]`*
 | 0x00000023 | | [yellow-background]*Single files unknown table* +
-[yellow-background]*Not defined by [ENCASE12\]*
+[yellow-background]*Not defined by `[ENCASE12]`*
 |===
 
 ==== [[data_flags]]Data flags
@@ -364,7 +364,7 @@ Similar to Acquired date in EWF version 1
 | at | Timestamp | Actual time +
 User provided date and time +
 Similar to System date in EWF version 1 +
-[yellow-background]*[ENCASE12\] defines this as in UTC, but if this is user provided can UTC still be guaranteed?*
+[yellow-background]*`[ENCASE12]` defines this as in UTC, but if this is user provided can UTC still be guaranteed?*
 | tb | Integer 64-bit | Number of chunks (blocks)
 | cp | Integer 32-bit | Compression method +
 See section: <<compression_methods,Compression methods>> +
@@ -397,7 +397,7 @@ section.
 When encryption is enabled the sector data is encrypted. 
 [yellow-background]*TODO verify this.*
 
-The sector data is stored in chunks. [ENCASE12\] states that each chunk must be 
+The sector data is stored in chunks. `[ENCASE12]` states that each chunk must be 
 stored 16-byte aligned and padded with 0-byte values if necessary. Although it 
 can read non 16-byte aligned chunks.
 
@@ -498,6 +498,274 @@ The sector table footer should be followed by 12 bytes of alignment padding.
 
 [yellow-background]*TODO migrate rest of documentation*
 
+=== Session table
+
+[yellow-background]*TODO migrate rest of documentation*
+
+=== Increment data
+The increment data section contains a serialized file object string that 
+consist of:
+
+[yellow-background]*TODO location in segment files, affected by encryption? 
+Need example.*
+
+=== MD5 hash
+The MD5 hash section contains the MD5 hash of the data stored in the set of 
+segment files.
+
+The MD5 hash section is optional, it does not need to be present. If it does it 
+resides in the last segment file before the SHA1 hash section.
+
+When encryption is enabled the MD5 hash is encrypted.
+
+The MD5 hash data is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | MD5 hash
+| 16 | 4 | | Checksum +
+Adler-32 of the MD5 hash.
+|===
+
+The MD5 hash data should be followed by 12 bytes of alignment padding.
+
+=== SHA1 hash
+The SHA1 hash section contains the SHA1 hash of the data stored in the set of 
+segment files.
+
+The SHA1 hash section is optional, it does not need to be present. If it does 
+it resides in the last segment file before the analytical data section.
+
+When encryption is enabled the SHA1 hash is encrypted.
+
+The SHA1 hash data is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 20 | | SHA1 hash
+| 20 | 4 | | Checksum +
+Adler-32 of the SHA1 hash.
+|===
+
+The MD5 hash data should be followed by 8 bytes of alignment padding.
+
+=== Restart data
+
+[yellow-background]*TODO migrate rest of documentation*
+
+=== Memory extents table
+The memory extents table is stored as an array of memory extents table entries. 
+It defines the extents of memory stored in the set of segment files.
+
+[yellow-background]*TODO location in segment files, affected by encryption?*
+[yellow-background]*TODO does this table also come with a table header and footer?*
+
+==== Memory extents table entry
+A memory extents table entry is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Start page
+| 8 | 8 | | Number of pages
+|===
+
+=== Next
+The next section is without data and marks the end of the segment file 
+indicating more segment files are in the set. It should be the last section in 
+a segment file, other than the last segment file.
+
+=== Final information
+[yellow-background]*`[ENCASE12]` defines this section as currently unused.*
+
+[yellow-background]*TODO location in segment files, affected by encryption?*
+
+=== Done
+The done section is without data and marks the end of the segment file 
+indicating this is the last segment file in the set. It should be the last 
+section in the last segment file.
+
+=== Analytical data
+The analytical data section is optional, it does not need to be present. If it 
+does it resides in the last segment file before the restart data section.
+
+When encryption is enabled the analytical data is encrypted.
+
+The analytical data section contains a serialized file object string that 
+consist of:
+
+[cols="1,1,5",options="header"]
+|===
+| Line | Value | Description
+| 1 | 1 | Number of objects
+| 2 | "main" | Object name
+| 3 | | Attribute tags
+| 4 | | Attribute values
+| 5 | | Empty line
+|===
+
+[yellow-background]*`[ENCASE12]` does not define the format of this section in detail.*
+
+==== Attribute tags
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier | Type | Description
+| tps | Integer 64-bit | [yellow-background]*The (total) number of bytes not written for use of pattern fill*
+|===
+
+=== Single files data
+The single files data section is only present in EWF2-Lx01.
+
+[yellow-background]*The single files data section can be found in the last 
+segment file after the last sector table section. TODO what about non-closed 
+LEF files.*
+
+This section has the section integrity hash set.
+
+The single files data section contains a non-compressed serialized file object 
+data which is similar to the EnCase 7 ltree data in EWF-L01.
+
+=== 0x00000021 table
+[yellow-background]*TODO add descriptive text*
+
+The 0x00000021 table consists of:
+
+* the 0x00000021 table header
+* an array of 0x00000021 table entries
+* the 0x00000021 table footer
+
+==== 0x00000021 table header
+The 0x00000021 table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of entries
+| 4 | 12 | | [yellow-background]*Unknown (Empty value)*
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the 0x00000021 table header.
+|===
+
+The 0x00000021 table header should be followed by 12 bytes of alignment padding.
+
+==== 0x00000021 table entry
+An 0x00000021 table entry is 8 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | [yellow-background]*Unknown* +
+[yellow-background]*Start offset in the data?*
+|===
+
+==== 0x00000021 table footer
+The 0x00000021 table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the array of 0x00000021 table entries.
+|===
+
+The 0x00000021 table footer should be followed by 12 bytes of alignment padding.
+
+=== Single files MD5 hash table
+[yellow-background]*TODO add descriptive text*
+
+The single files MD5 hash table consists of:
+
+* the single files MD5 hash table header
+* an array of single files MD5 hash table entries
+* the single files MD5 hash table footer
+
+==== single files MD5 hash table header
+The 0x00000021 table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of entries
+| 4 | 12 | | [yellow-background]*Unknown (Empty value)*
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the single files MD5 hash table header.
+|===
+
+The single files MD5 hash table header should be followed by 12 bytes of 
+alignment padding.
+
+==== single files MD5 hash table entry
+A single files MD5 hash table entry is 8 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | MD5 hash
+|===
+
+==== single files MD5 hash table footer
+The single files MD5 hash table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the array of single files MD5 hash table entries.
+|===
+
+The single files MD5 hash table footer should be followed by 12 bytes of alignment padding.
+
+=== 0x00000023 table
+[yellow-background]*TODO add descriptive text*
+
+The 0x00000023 table consists of:
+
+* the 0x00000023 table header
+* an array of 0x00000023 table entries
+* the 0x00000023 table footer
+
+==== 0x00000023 table header
+The 0x00000023 table header is 20 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of entries
+| 4 | 12 | | [yellow-background]*Unknown (Empty value)*
+| 16 | 4 | | Checksum +
+Adler-32 of all the previous data within the 0x00000023 table header.
+|===
+
+The 0x00000023 table header should be followed by 12 bytes of alignment padding.
+
+==== 0x00000023 table entry
+An 0x00000023 table entry is 8 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | [yellow-background]*Unknown* +
+[yellow-background]*Start offset in the data?*
+|===
+
+==== 0x00000023 table footer
+The 0x00000023 table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the previous data within the array of 0x00000023 table entries.
+|===
+
+The 0x00000023 table footer should be followed by 12 bytes of alignment padding.
+
+[yellow-background]*Note if the number of table entries is odd the alignment 
+padding is only 4 bytes.*
+
 == Serialized file object data
 The serialized file object data is stored as a compressed UTF-16 string with 
 byte-order-mark. Commonly the string is encoded in little-endian. The 
@@ -508,7 +776,8 @@ The serialized file object data consists of:
 * the first line containing the number of objects in the string
 * the object data
 
-The file object serialization format uses the following special character values:
+The file object serialization format uses the following special character 
+values:
 
 [cols="1,1,5",options="header"]
 |===
@@ -522,7 +791,8 @@ The file object serialization format uses the following special character values
 |===
 
 [NOTE]
-[ENCASE12\] states line feed (0x000d) as line delimiter this should be line feed (0x000a).
+`[ENCASE12]` states line feed (0x000d) as line delimiter this should be line 
+feed (0x000a).
 
 === Object
 An object consists of multiple lines:
