@@ -647,10 +647,136 @@ disk image?
 [yellow-background]*TODO migrate remaining documentation*
 
 === Sectors section
+The sectors section is identified in the section data type field as "sectors". 
+Some aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* Not defined in the EWF format `[ASR02]`.
+* Found in EWF-E01 in EnCase 2 to 7, or linen 5 to 7 or FTK Imager, EWF-L01 in EnCase 5 to 7. Not found in EnCase 1 (EWF-E01) or SMART (EWF-S01).
+* The first sectors section can be found after the volume section in the first segment file or at the after the data section in other segment files. Successive sector data sections are found after the sector table2 section.
+
+The sectors section contains the actual chunks of media data.
+
+* The sectors section can contain multiple chunks.
+* The default size of a chunk is 32768 bytes of data (64 standard sectors, with a size of 512 bytes per sector). It is possible in EnCase 5 and 6 and linen 5 and 6 to change the number of sectors per block to 64, 128, 256, 1024, 2048, 4096, 8192, 16384 or 32768. In EnCase 7 and linen 7 this has been reduced to 64, 128, 256, 1024.
+
+==== Data chunk
+The first chunk is often located directly after the section descriptor, 
+although the format does not require this.
+
+When the data is compressed and the compressed data (with checksum) is larger 
+than the uncompressed data (without the checksum) the data chunk is stored 
+uncompressed. The default size of a chunk is 32768 bytes of data (64 standard 
+sectors).
+
+An uncompressed data chunk is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ... | | Uncompressed chunk data
+| ... | 4 | | Checksum +
+Adler-32 of the chunk data
+|===
+
+The compressed data chunk consist of zlib compressed data. The checksum of the 
+compressed data chunk is part the zlib compressed data format. See section:
+<<compression,Compression>>.
+
+==== Optical disc images
+For a MODE‑1 CD-ROM optical disc image EnCase only seems to support 2048 bytes 
+per sector (the data).
+
+The raw sector size of a MODE-1 CD-ROM is 2352 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | Synchronization bytes
+| 16 | 2048 | | Data
+| 2054 | 4 | | Error detection
+| 2058 | 8 | | [yellow-background]*Unknown (Empty values)*
+| 2066 | 276 | | Error correction
+|===
+
+[yellow-background]*TODO add information about Mode-2 and Mode-XA*
 
 === Table section
+The table section is identified in the section data type field as "table". Some 
+aspects of this section are:
+
+* Defined in the EWF format `[ASR02]`.
+* Found in EWF-E01 in EnCase 1 to 7 or linen 5 to 7 or FTK Imager, EWF-L01 in EnCase 5 to 7, and SMART (EWF-S01)
+
+[NOTE]
+The offsets within the section descriptor are 8 bytes (64 bits) of size while 
+the offsets in the table entry array are 4 bytes (32 bits) of size.
+
+In the next paragraphs the various versions of the table section are described.
+
+==== EWF specification
+Some aspects of the table section according to the EWF specification are:
+
+* The first table section resides after the volume section in the first segment file or after the file header in other segment files.
+* It can be found in every segment file.
+
+The table section consists of:
+
+* the table header
+* an array of table entries
+* the data chunks
+
+===== Table header
+The table header is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | The number of entries +
+[yellow-background]*Note that according to `[ASR02]` it contains 0x01*
+| 4 | 16 | 0x00 | Padding
+| 20 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+According to `[ASR02]` the table can hold 16375 entries if more entries are 
+required an additional table section should be created.
+
+===== Table entry
+The table entry is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Chunk data offset
+|===
+
+The most significant bit (MSB) in the chunk data offset indicates if the chunk 
+is compressed (1) or uncompressed (0).
+
+A chunk data offset points to the start of the chunk of media data, which 
+resides in the same table section within the segment file. The offset contains 
+a value relative to the start of the file.
+
+===== Data chunk
+The first chunk is often located directly after the last table entry, although 
+the format does not require this.
+
+A data chunk is always compressed even when no compression is required. This 
+approach provides a checksum for each chunk. The default size of a chunk is 
+32768 bytes of data (64 standard sectors). The resulting size of the 
+"compressed" chunk can therefore be larger than the default chunk size. 
+[yellow-background]*This however was deducted from the behavior of FTK Imager 
+for EWF-S01.*
+
+The compressed data chunk consist of zlib compressed data. The checksum of the 
+compressed data chunk is part the zlib compressed data format. See section: 
+<<compression,Compression>>.
+
+==== SMART (EWF-S01)
+The table section in the SMART (EWF-S01) format is equivalent to that of the 
+EWF specification.
+
+==== EnCase 1 (EWF-E01)
 
 [yellow-background]*TODO migrate remaining documentation*
 
@@ -712,16 +838,148 @@ The additional ltypes section data is 6 bytes of size and consists of:
 |===
 
 === Ltree section
+The ltree section is identifier in the section data type field as "ltree". Some 
+aspects of this section are:
+
+* Found in EWF-L01 in of EnCase 5 to 7
+* Found in the last segment file after ltypes section and before data section.
+
+The ltree section consists of:
+
+* ltree header
+* ltree data
+
+==== Ltree header
+The ltree header is 6 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | Integrity hash +
+Contains the MD5 of the ltree data
+| 16 | 4 | | Data size
+| 20 | 4 | | [yellow-background]*Unknown (empty values)*
+| 24 | 4 | | Checksum +
+Adler-32 of all the data within the ltree header where the checksum value itself is zeroed out.
+| 28 | 20 | | [yellow-background]*Unknown (empty values)*
+|====
+
+==== Ltree data
 
 [yellow-background]*TODO migrate remaining documentation*
 
 === Map section
+Some aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* Found in EWF-L01 in of EnCase 7 (First seen in EnCase 7.4.1.10)
+* Found in the last segment file after data section before done section.
+
+The map consists of:
+
+* map string
+* map entries array
+
+==== Map string
+The map string consists of an UTF-16 little-endian encoded string without the 
+UTF-16 endian byte order mark.
+
+The map string contains the following information:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | 1 | The number of sections provided
+| 2 | r | Probably the type of information provided
+| 3 | c | Identifier for the values in the 4th line
+| 4 | | The data for the different identifiers in the 3rd line
+| 5 | | (an empty line)
+|===
+
+===== Map string values
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 29th line | Meaning
+| 1 | C | Number of map entries (count)
+|===
+
+The number of map entries should match the number of single file entries in the 
+ltree.
+
+==== Map entry
+A map entry is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown*
+| 4 | 4 | | [yellow-background]*Unknown (empty values or part of previous value)*
+| 8 | 16 | | [yellow-background]*Unknown*
+|===
 
 === Session section
+The session section is identifier in the section data type field as "session". Some aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* It is not defined in the EWF format `[ASR02]`.
+* It is not found in SMART (EWF-S01) and FTK Imager (EWF-E01).
+* It is found in EnCase 5 and 6 (EWF-E01) files.
+* It is only added to the last segment file for images of optical disc (CD/DVD/BD) media.
+* It is found after the data section and before the error2 section.
+
+The session section data consists of:
+
+* The session header
+* The session entries array
+* The session footer
+
+==== Session header
+The session header is 36 byte of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Number of sessions
+| 4 | 28 | | [yellow-background]*Unknown (empty values)*
+| 32 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional session section data.
+|===
+
+==== Session entry
+A session entry is 32 byte of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Flags
+| 4 | 4 | | Start sector
+| 8 | 24 | | [yellow-background]*Unknown (empty values)*
+|===
+
+EnCase stores audio tracks as 0 byte data with a sector size of 2048.
+
+[NOTE]
+For a CD the first session sector is stored as 16, although the actual session 
+starts at sector 0. Could this value be overloaded to indicate the size of the 
+reserved space between the start of the session and the ISO 9660 volume 
+descriptor.
+
+==== Session flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | | If set the track is an audio track otherwise the track is a data track
+|===
+
+==== Session footer
+The session footer is 4 byte of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of all the data within the session entries array
+|===
 
 === Error2 section
 The error2 section is identifier in the section data type field as "error2". 
