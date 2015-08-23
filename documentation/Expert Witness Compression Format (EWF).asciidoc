@@ -578,7 +578,7 @@ These symbols are merged in a single "alphabet" where:
 | 0x11a | | Size of [163, 194]
 | 0x11b | | Size of [195, 226]
 | 0x11c | | Size of [227, 257]
-+3| _0 additional bits_
+3+| _0 additional bits_
 | 0x11d | | Size of 258
 |===
 
@@ -787,8 +787,11 @@ libewf_section_start_read: checksum                  : 0x1ad00464
 
 === Corrupt table section
 [yellow-background]*TODO add description*
+
 [yellow-background]*with and with out table 2*
-[yellow-background]*number of entries *
+
+[yellow-background]*number of entries*
+
 [yellow-background]*entry data*
 
 === Corrupted segment file header
