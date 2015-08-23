@@ -862,7 +862,7 @@ Contains the MD5 of the ltree data
 | 24 | 4 | | Checksum +
 Adler-32 of all the data within the ltree header where the checksum value itself is zeroed out.
 | 28 | 20 | | [yellow-background]*Unknown (empty values)*
-|====
+|===
 
 ==== Ltree data
 
