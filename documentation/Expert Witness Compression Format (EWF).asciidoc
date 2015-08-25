@@ -619,8 +619,277 @@ The restrictions were tested with EnCase 7.02.01, older versions could have a
 restriction of 40 characters instead of 3000 characters.
 
 === Header section
+The header section is identified in the section data type field as "header". 
+Some aspects of this section are:
+
+* It is defined in the EWF format `[ASR02]`.
+* Found in EWF-E01 in EnCase 1 to 7 or linen 5 to 7 or FTK Imager, EWF-L01 in EnCase 5 to 7, and SMART (EWF-S01)
+* Found at the start of the first segment file or in EnCase 4 to 7 after the header2 section in the first segment file. Not found in other segment files.
+
+The additional data this section contains is the following
+
+[cols="1,1,5",options="header"]
+|===
+| Offset | Number of bytes | Description
+| 76 (0x4c) | (variable) | Information about the acquired media.
+|===
+
+The information about the acquired media consists of zlib compressed data (see 
+section: <<compression,Compression>>). It contains text in ASCII format 
+specifying information about the acquired media. The text multiple lines 
+separated by an end of line character(s).
+
+In the next paragraphs the various variants of the header section are 
+described. In all cases the information consists of at least 4 lines:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | 1 | The number of categories provided
+| 2 | main | The name/type of the category provided
+| 3 | | Identifiers for the values in the 4th line
+| 4 | | The data for the different identifiers in the 3rd line
+|===
+
+An additional 5th line is found in FTK Imager, EnCase 1 to 7 (EWF-E01).
+
+[cols="1,1,5",options="header"]
+|===
+| 5 | | (an empty line)
+|===
+
+==== EWF format
+Some aspects of this section are:
+
+* `[ASR02]` specifies the end of line character(s) is a newline (0x0a).
+
+According to `[ASR02]` the 3rd and the 4th line consist of the following tab 
+(0x09) separated values:
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | c | Case number
+| 2 | n | Evidence number
+| 3 | a | Unique description
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | m | Acquired date
+| 7 | u | System date
+| 8 | p | Password hash
+| 9 | r | Compression level
+|===
+
+For more information see section: <<header_values,Header values>>
+
+`[ASR02]` states that the Expert Witness Compression uses 'f', fastest compression.
+
+==== EnCase 1 (EWF-E01)
+Some aspects of this section are:
+
+* The header section is defined only once.
+* It is the first section of the first segment file. It is not found in other segment files.
+* The header data itself is compressed using zlib.
+* The end of line character(s) is a carriage return (0x0d) followed by a newline (0x0a).
+
+The 3rd and the 4th line consist of the following tab (0x09) separated values"
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | c | Case number
+| 2 | n | Evidence number
+| 3 | a | Unique description
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | m | Acquired date
+| 7 | u | System date
+| 8 | p | Password hash
+| 9 | r | Compression level
+|===
+
+For more information see section: <<header_values,Header values>>
+
+==== SMART (EWF-S01)
+Some aspects of this section are:
+
+* The header section is defined once.
+* It is the first section of the first segment file. It is not found in other segment files.
+* The header data is always processed by zlib, however the same compression level is used as for the chunks. This could mean compression level 0 which is no compression.
+
+The SMART format uses the FTK Imager (EWF-E01) specification for this section. 
+[yellow-background]*Note that this could be something FTK Imager specific.*
+
+==== EnCase 2 and 3 (EWF-E01)
+Some aspects of this section are:
+
+* The same header section defined twice.
+* It is the first and second section of the first segment file. It is not found in other segment files.
+* The header data itself is compressed using zlib.
+* The end of line character(s) is a carriage return (0x0d) followed by a newline (0x0a).
+
+The 3rd and the 4th line consist of the following tab (0x09) separated values:
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | c | Case number
+| 2 | n | Evidence number
+| 3 | a | Unique description
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | av | Version
+| 7 | ov | Platform +
+The platform/operating system used to acquire the media
+| 8 | m | Acquired date
+| 9 | u | System date
+| 10 | p | Password hash
+| 11 | r | Compression level
+|===
+
+For more information see section: <<header_values,Header values>>
+
+==== EnCase 4 to 7 (EWF-E01)
+Some aspects of this section are:
+
+* The header is defined only once.
+* It resides after the header2 sections of the first segment file. It is not found in other segment files.
+* The header data itself is compressed using zlib.
+* The end of line character(s) is a carriage return (0x0d) followed by a newline (0x0a).
+
+The 3rd and the 4th line consist of the following tab (0x09) separated values:
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | c | Case number
+| 2 | n | Evidence number
+| 3 | a | Unique description
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | av | Version
+| 7 | ov | Platform +
+The platform/operating system used to acquire the media
+| 8 | m | Acquired date
+| 9 | u | System date
+| 10 | p | Password hash
+|===
+
+For more information see section: <<header_values,Header values>>
+
+==== linen 5 to 7 (EWF-E01)
 
 [yellow-background]*TODO migrate remaining documentation*
+
+==== FTK Imager (EWF-E01)
+Some aspects of this section are:
+
+* In FTK Imager (EWF-E01) the same header section defined twice.
+* It is the first and second section of the first segment file. It is not found in other segment files.
+* The header data itself is compressed using zlib. Note that the compression level can be none and therefore the header looks uncompressed.
+* In FTK Imager the end of line character(s) is a newline (0x0a).
+
+The 3rd and the 4th line consist of the following tab (0x09) separated values:
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | c | Case number
+| 2 | n | Evidence number
+| 3 | a | Unique description
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | av | Version +
+The FTK Imager version used to acquire the media
+| 7 | ov | Platform +
+The platform/operating system used to acquire the media
+| 8 | m | Acquired date
+| 9 | u | System date
+| 10 | p | Password hash
+| 11 | r | char
+|===
+
+For more information see section: <<header_values,Header values>>
+
+==== EnCase 5 to 7 (EWF-L01)
+The EnCase 4 to 7 (EWF-E01) header section specification is also used for the 
+EnCase 5 to 7 (EWF-L01) format, with the following aspects:
+
+* In EnCase 5 both the acquired date and system date are set to 0.
+* In EnCase 6 and 7 both the acquired date and system date are set to Jan 1, 1970 00:00:00 (the time is dependent on the local timezone and daylight savings)
+
+==== [[header_values]]Header values
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier | Description | Notes
+| a | Unique description | Free form string +
+Note that EnCase might not respond when this value is  large e.g. >= 1 MiB
+| c | Case number | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| n | Evidence number | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| e | Examiner name | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| t | Notes | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| md | Model | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| sn | Serial Number | Free form string +
+EnCase limits this string to 3000 - 1 characters
+| l | Device label | Free form string
+| av | Version | Free form string +
+EnCase limits this string to 12 - 1 characters
+| ov | Platform | Free form string +
+EnCase limits this string to 24 -1 characters
+| m | Acquired date | In EnCase: +
+String containing a date and time value +
+E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
+ +
+In linen: +
+String containing Unix 32-bit epoch timestamp +
+E.g. "1142163845"> which represents the date: March 12 2006, 11:44:05
+| u | System date | In EnCase: +
+String containing a date and time value +
+E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
+ +
+In linen: +
+String containing Unix 32-bit epoch timestamp +
+E.g. "1142163845"> which represents the date: March 12 2006, 11:44:05
+| p | Password hash | String containing the password hash. +
+If no password is set it should be simply the character '0'. 
+| pid | Process identifier | String containing the process identifier (pid) number
+| dc | [yellow-background]*Unknown* | 
+| ext | Extents | extents contains: +
+number of entries +
+entries that consist of: S <1> <2> <3>
+| r | Compression | Single character that represent the compression level
+|===
+
+[NOTE]
+The restrictions were tested with Encase 7.02.01, older versions could have a 
+restriction of 40 characters instead of 3000 characters.
+
+[cols="1,1,5",options="header"]
+|===
+| Value of char | Meaning
+| b | Best compression is used
+| f | Fastest compression is used
+| n | No compression is used
+|===
+
+===== Notes
+There should not be a tab, carriage return and newline characters within the 
+text in the 4th line. Or is there a method to escape these characters? 
+`[ASR02]` states that these characters should not be used in the free form 
+text. Need to confirm this, the specification only speaks of a newline 
+character.
+
+Currently the password has no a additional value than allow an application 
+check it. The data itself is not protected using the password. The password 
+hashing algorithm is unknown. Need to find out. And does the algorithm differ 
+per EnCase version? probably not. The algorithm does not differ in EnCase
+1 to 7. FTK Imager does not bother with a password.
 
 === [[volume_section]]Volume section
 
