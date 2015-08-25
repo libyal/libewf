@@ -848,14 +848,14 @@ E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
 In linen: +
 String containing Unix 32-bit epoch timestamp +
-E.g. "1142163845"> which represents the date: March 12 2006, 11:44:05
+E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | u | System date | In EnCase: +
 String containing a date and time value +
 E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
 In linen: +
 String containing Unix 32-bit epoch timestamp +
-E.g. "1142163845"> which represents the date: March 12 2006, 11:44:05
+E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | p | Password hash | String containing the password hash. +
 If no password is set it should be simply the character '0'. 
 | pid | Process identifier | String containing the process identifier (pid) number
