@@ -467,9 +467,10 @@ contains:
 The end of line character(s) is a newline (0x0a).
 
 ===== Main category
-The 3rd and the 4th line consist of the following tab (0x09) separated values. 
-Note that the actual values in this category are dependent on the version of 
-EnCase.
+The 3rd and the 4th line consist of the following tab (0x09) separated values.
+
+[NOTE]
+The actual values in this category are dependent on the version of EnCase.
 
 [cols="1,1,5",options="header"]
 |===
@@ -778,8 +779,143 @@ The platform/operating system used to acquire the media
 For more information see section: <<header_values,Header values>>
 
 ==== linen 5 to 7 (EWF-E01)
+Some aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* The same header section defined twice.
+* It is the first and second section of the first segment file. It is not found in other segment files.
+* The header data itself is compressed using zlib.
+* The end of line character(s) is a newline (0x0a).
+
+The header information consist of 18 lines
+
+The remainder of the string contains the following information:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | 3 | The number of categories provided
+| 2 | main | The name/type of the category provided
+| 3 | | Identifier for the values in the 4th line
+| 4 | | The data for the different identifiers in the 3rd line
+| 5 | | (an empty line)
+| 6 | srce | The name/type of the section provided
+| 7 | | 
+| 8 | | Identifier for the values in the section
+| 9 | | 
+| 10 | | 
+| 11 | | (an empty line)
+| 12 | sub | The name/type of the section provided
+| 13 | | 
+| 14 | | Identifier for the values in the section
+| 15 | | 
+| 16 | | 
+| 17 | | (an empty line)
+|===
+
+The end of line character(s) is a newline (0x0a).
+
+===== Main category
+The 3rd and the 4th line consist of the following tab (0x09) separated values. 
+
+[NOTE]
+The actual values in this category are dependent on the version of linen.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | a | Unique description
+| 2 | c | Case number
+| 3 | n | Evidence number
+| 4 | e | Examiner name
+| 5 | t | Notes
+| 6 | md | The model of the media, i.e. hard disk model +
+(Introduced in linen 6)
+| 7 | sn | The serial number of media +
+(Introduced in linen 6)
+| 8 | l | The device label +
+(Introduced in linen 6.19)
+| 9 | av | Version
+| 10 | ov | Platform +
+The platform/operating system used to acquire the media
+| 11 | m | Acquired date
+| 12 | u | System date
+| 13 | p | Password hash
+| 14 | pid | Process identifier +
+The identifier of the process memory acquired +
+(Introduced in linen 6.19 or earlier)
+| 15 | dc | [yellow-background]*Unknown* +
+(Introduced in linen 6)
+| 16 | ext | Extents +
+The extents of the process memory acquired +
+(Introduced in linen 6.19 or earlier)
+|===
+
+[NOTE]
+As of linen 6.19 the acquire date (and time) is in UTC and the system date is 
+in local time. Where as before both date values were in local time.
+
+For more information see section: <<header_values,Header values>>
+
+===== Sources category
+Line 6 the srce category contains information about sources
+
+[yellow-background]*TODO describe what a source is in the context of EnCase.*
+
+Line 7 consists of 2 values, namely the values are "0 1".
+
+The 8th line consist of the following tab (0x09) separated values.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 8rd line | Meaning
+| 1 | p | 
+| 2 | n | 
+| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 4 | ev | [yellow-background]*Unknown (Evidence number)*
+| 5 | tb | [yellow-background]*Unknown (Total bytes)*
+| 6 | lo | [yellow-background]*Unknown (Logical offset)*
+| 7 | po | [yellow-background]*Unknown (Physical offset)*
+| 8 | ah | [yellow-background]*Unknown (Acquire hash)*
+| 9 | sh | [yellow-background]*Unknown* +
+(Introduced in linen 6.19 or earlier)
+| 10 | gu | [yellow-background]*Unknown (GUID)*
+| 11 | aq | [yellow-background]*Unknown (Acquire date)*
+|===
+
+Line 9 consists of 2 values, namely the values are "0 0".
+
+Line 10 contains the values defined by line 8.
+
+[NOTE]
+The default values of some of these values has changed around linen 6.19 or 
+earlier.
+
+===== Subjects category
+Line 12 the sub category contains information about subjects.
+
+[yellow-background]*TODO describe what a subject is in the context of EnCase.*
+
+Line 13 consists of 2 values, namely the values are "0 1".
+
+The 14th line consist of the following tab (0x09) separated values.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 14rd line | Meaning
+| 1 | p | 
+| 2 | n | 
+| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 4 | nu | [yellow-background]*Unknown (Number)*
+| 5 | co | [yellow-background]*Unknown (Comment)*
+| 6 | gu | [yellow-background]*Unknown (GUID)*
+|===
+
+Line 15 consists of 2 values, namely the values are "0 0".
+
+Line 16 contains the values defined by line 14.
+
+[NOTE] The default values of some of these values has changed around linen 6.19 
+or earlier.
 
 ==== FTK Imager (EWF-E01)
 Some aspects of this section are:
