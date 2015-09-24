@@ -892,8 +892,112 @@ per EnCase version? probably not. The algorithm does not differ in EnCase
 1 to 7. FTK Imager does not bother with a password.
 
 === [[volume_section]]Volume section
+The volume section is identified in the section data type field as "volume". 
+Some aspects of this section are:
+
+* Defined in the EWF format `[ASR02]`.
+* Found in EWF-E01 in EnCase 1 to 7 or linen 5 to 7 or FTK Imager, EWF-L01 in EnCase 5 to 7, and SMART (EWF-S01)
+* Found after the header section of the first segment file. Not found in other segment files.
+
+In the next paragraphs the various versions of the volume section are described.
+
+==== EWF specification
+The specification according to `[ASR02]`.
+
+The additional volume section data is 94 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Reserved according to `[ASR02]` +
+Contains 0x01 +
+[yellow-background]*Reserved for what?*
+| 4 | 4 | | The chunk count +
+Contains the number of chunks within the all segment files.
+| 8 | 4 | | The number of sectors per chunk +
+Contains 64 per default.
+| 12 | 4 | | The number of bytes per sectors +
+Contains 512 per default
+| 16 | 4 | | The sectors count, the number of sectors within all segment files
+| 20 | 20 | 0x00 | Reserved +
+[yellow-background]*Reserved for what?*
+| 40 | 45 | 0x00 | Padding
+| 85 | 5 | | Signature (Reserved) +
+Contains the EWF file header signature
+| 90 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+The chunk count is a 32-bit value this means it maximum of addressable chunks 
+would be: 4294967295 (= 2^32 - 1). For a chunk size of 32768 x 4294967295 = 
+about 127 TiB. The maximum segment file amount is 2^16 - 1 = 65535. This allows 
+for an equal number of storage if a segment file is filled to its maximum 
+number of chunks.
+
+However libewf is restricted at 14295 segment files, due to the extension 
+naming schema of the segment files.
+
+==== SMART (EWF-S01)
+The SMART format uses the EWF specification for this section.
+
+In SMART the signature (reverse) value is the string "SMART" (0x53 0x4d 0x41 
+0x52 0x54) instead of the file header signature.
+
+==== FTK Imager, EnCase 1 to 7 and linen 5 to 7 (EWF-E01)
 
 [yellow-background]*TODO migrate remaining documentation*
+
+==== EnCase 5 to 7 (EWF-L01)
+
+[yellow-background]*TODO migrate remaining documentation*
+
+==== [[media_type]]Media type
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00 | | A removable storage media device
+| 0x01 | | A fixed storage media device
+| | | 
+| 0x03 | | An optical disc (CD/DVD/BD)
+| | | 
+| 0x0e | | Logical Evidence File (LEV or L01)
+| | | 
+| 0x10 | | Physical Memory (RAM)
+|===
+
+[NOTE]
+FTK imager versions, before version 2.9, set the storage media to fixed (0x01).
+The exact version of FTK imager where this behavior changed is unknown.
+
+==== [[media_flags]]Media flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x01 | | Is an image file +
+in FTK Imager, EnCase 1 to 7 this bit is always set, when not set EnCase seems to see the image file as a device
+| 0x02 | | Is physical device or device type +
+0 => a non physical device (logical) +
+1 => a physical device
+| 0x04 | | Fastbloc write blocker used
+| 0x08 | | Tableau write blocker used +
+This was added in EnCase 6.13
+|===
+
+[NOTE]
+If both the the Fastbloc and Tableau write blocker media flags are set EnCase 
+only shows the Fastbloc.
+
+==== [[compression_level]]Compression level
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00 | | no compression
+| 0x01 | | good compression
+| 0x02 | | best compression
+|===
 
 === Disk section
 The disk section is identified in the section data type field as "disk". Some 
