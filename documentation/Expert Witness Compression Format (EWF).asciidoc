@@ -1080,12 +1080,72 @@ In SMART the signature (reverse) value is the string "SMART" (0x53 0x4d 0x41
 0x52 0x54) instead of the file header signature.
 
 ==== FTK Imager, EnCase 1 to 7 and linen 5 to 7 (EWF-E01)
+The specification for FTK Imager, EnCase 1 to 7 and linen 5 to 7.
 
-[yellow-background]*TODO migrate remaining documentation*
+The additional volume section data is 1052 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 1 | | Media type +
+See section: <<media_type,Media type>>
+| 1 | 3 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 4 | 4 | | The chunk count +
+Contains the number of chunks within the all segment files.
+| 8 | 4 | | The number of sectors per chunk (or block size) +
+Contains 64 per default. +
+EnCase 5 is the first version which allows this value to be different than 64.
+| 12 | 4 | | The number of bytes per sector
+| 16 | 8 | | The sectors count +
+Contains the number of sectors within all segment files +
+This value probably has been changed in EnCase 6 from a 32-bit value to a 64-bit value to support media >2TiB
+| 24 | 4 | | The number of cylinders of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 28 | 4 | | The number of heads of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 32 | 4 | | The number of sectors of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 36 | 1 | | Media flags +
+See section: Media flags
+| 37 | 3 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 40 | 4 | | PALM volume start sector
+| 44 | 4 | 0x00 | [yellow-background]*Unknown (padding/empty values)*
+| 48 | 4 | | SMART logs start sector +
+Contains an offset relative from the end of media +
+E.g. a value of 10 would refer to sector = number of sectors - 10
+| 52 | 1 | | Compression level +
+(Introduced in EnCase 5) +
+See section: <<compression_level,Compression level>>
+| 53 | 3 | 0x00 | [yellow-background]*Unknown (empty values)* +
+these values seem to be part of the compression type
+| 56 | 4 | | The sector error granularity +
+Contains the error block size +
+(Introduced in EnCase 5)
+| 60 | 4 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 64 | 16 | | Segment file set identifier +
+Contains a GUID/UUID generated on the acquiry system probably used to uniquely identify a set of segment files +
+(Introduced in EnCase 5)
+| 80 | 963 | | [yellow-background]*Unknown (padding/empty values)*
+| 1043 | 5 | | Signature (Reserved) +
+Contains 0x00
+| 1048 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+[yellow-background]*TODO a value that could be in the volume is the raid stripe size*
+
+[NOTE]
+EnCase requires for media that contains no partition table that the is physical 
+media flag is not set and vice versa. Other tools like FTK check the actual
+storagee media data.
 
 ==== EnCase 5 to 7 (EWF-L01)
+The EWF-L01 format uses the EnCase 5 (EWF-E01) volume section specification. However:
 
-[yellow-background]*TODO migrate remaining documentation*
+* the volume type contains 0x0e
+* the number of chunks is 0
+* The number of bytes per sectors is some kind of block size value (4096), perhaps the source file system block size
+* [yellow-background]*The sectors count, represents some other value because ( sector_size * sector_amount != total_size ) the total size is in the ltree section*
 
 ==== [[media_type]]Media type
 
