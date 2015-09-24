@@ -1150,8 +1150,205 @@ The table section in the SMART (EWF-S01) format is equivalent to that of the
 EWF specification.
 
 ==== EnCase 1 (EWF-E01)
+Some aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* The table section resides after the volume section in the first segment file or after the file header in other segment files.
+* It can be found in every segment file.
+
+The table section consists of:
+
+* the table header
+* an array of table entries
+* the table footer
+* the data chunks
+
+===== Table header
+The table header is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | The number of entries
+| 4 | 16 | 0x00 | Padding
+| 20 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+The table can hold 16375 entries if more entries are required an additional table section should be created.
+
+===== Table entry
+The table entry is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Chunk data offset
+|===
+
+The most significant bit (MSB) in the chunk data offset indicates if the chunk 
+is compressed (1) or uncompressed (0).
+
+A chunk data offset points to the start of the chunk of media data, which 
+resides in the same table section within the segment file. The offset contains 
+a value relative to the start of the file.
+
+===== Table footer
+The table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of the offset array
+|===
+
+===== Data chunk
+The first chunk is often located directly after the table footer, although the 
+format does not require this.
+
+When the data is compressed and the compressed data (with checksum) is larger 
+than the uncompressed data (without the checksum) the data chunk is stored 
+uncompressed. The default size of a chunk is 32768 bytes of data (64 standard 
+sectors).
+
+An uncompressed data chunk is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ...  | | Uncompressed chunk data
+| ...  | 4 | | Checksum +
+Adler-32 of the chunk data
+|===
+
+The compressed data chunk consist of zlib compressed data. The checksum of the 
+compressed data chunk is part the zlib compressed data format. See section: 
+<<compression,Compression>>
+
+==== FTK Imager and EnCase 2 to 5 and linen 5 (EWF-E01)
+Some aspects of this section are:
+
+* The table section resides after the sectors section.
+* It can be found in every segment file.
+* The data chunks are no longer stored in this section but in the sectors section instead.
+* The table2 section contains a mirror copy of the table section. In EWF-E01 it is always present.
+
+The table section consists of:
+
+* the table header
+* an array of table entries
+* the table footer
+
+===== Table header
+The sector table header is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | The number of entries
+| 4 | 16 | 0x00 | Padding
+| 20 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+The table section can hold 16375 entries. A new table section should be created 
+to hold more entries. Both FTK Imager and EnCase 5 can handle more than 16375, 
+FTK 1 cannot. To contain more than 16375 chunks new sectors, table and table2 
+sections need to be created after the table2 section.
+
+===== Table entry
+The table entry is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Chunk data offset
+|===
+
+The most significant bit (MSB) in the chunk data offset indicates if the chunk 
+is compressed (1) or uncompressed (0).
+
+A chunk data offset points to the start of the chunk of media data, which 
+resides in the preceding sectors section within the segment file. The offset 
+contains a value relative to the start of the file.
+
+===== Table footer
+The table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of the offset array
+|===
+
+==== EnCase 6 to 7 and linen 6 to 7 (EWF-E01)
+Some aspects of this section are:
+
+* Every segment file contains its own table section.
+* It resides after the sectors section.
+* The data chunks are no longer stored in this section but in the sectors section instead.
+* The table2 section contains a mirror copy of the table section. In EWF-E01 it is always present.
+
+The table section consists of:
+
+* the table header
+* an array of table entries
+* the table footer
+
+===== Table header
+The sector table header is 24 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | The number of entries
+| 4 | 4 | 0x00 | Padding
+| 8 | 8 | | The table base offset
+| 16 | 4 | 0x00 | Padding
+| 20 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional volume section data.
+|===
+
+As of EnCase 6 the number of entries is no longer restricted to 16375 entries. 
+The new limit seems to be 65534.
+
+===== Table entry
+The table entry is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Chunk data offset
+|===
+
+The most significant bit (MSB) in the chunk data offset indicates if the chunk 
+is compressed (1) or uncompressed (0).
+
+A chunk data offset points to the start of the chunk of media data, which 
+resides in the preceding sectors section within the segment file. The offset 
+contains a value relative to the start of the file.
+
+In EnCase 6.7.1 the sectors section can be larger than 2048Mb. The table 
+entries offsets are 31 bit values in EnCase6 the offset in a table entry value 
+will actually use *the full 32 bit* if the 2048Mb has been exceeded. This 
+behavior is no longer present in EnCase 6.8 so it is assumed to be a bug. 
+Libewf currently assumes that the if the 31 bit value overflows the following 
+chunks are uncompressed. This allows EnCase 6.7.1 faulty EWF files to be 
+converted by libewf.
+
+===== Table footer
+The table footer is 4 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Checksum +
+Adler-32 of the offset array
+|===
+
+==== EnCase 6 to 7 (EWF-L01)
+The EWF-L01 format uses the EnCase 6 to 7 (EWF-E01) table section specification.
 
 === Table2 section
 The table2 section is identified in the section data type field as "table2". 
