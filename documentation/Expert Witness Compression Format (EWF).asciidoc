@@ -86,7 +86,7 @@ toc::[]
 | 0.0.31 | J.B. Metz | November 2006 | Additional information about the EnCase linen 5 (EWF-E01) format.
 | 0.0.32 | J.B. Metz | December 2006 | Additional information about GUID.
 | 0.0.33 | J.B. Metz | December 2006 | Corrected error regarding header sections in EnCase 1 format.
-| 0.0.34 | J.B. Metz | December 2006 | Added new information regarding the table section after encountering a bug in FTK for EWF files with more than 16 * 1024 offset table entries.
+| 0.0.34 | J.B. Metz | December 2006 | Added new information regarding the table section after encountering a bug in FTK for EWF files with more than 16 x 1024 offset table entries.
 | 0.0.35 | J.B. Metz | December 2006 | Corrected misinterpretation of original specifications, regarding additional table sections.
 | 0.0.36 | J.B. Metz | January 2007 | Added information about EnCase 6.
 | 0.0.37 | J.B. Metz | January 2007 | Added information about linen 6.
@@ -1145,7 +1145,7 @@ The EWF-L01 format uses the EnCase 5 (EWF-E01) volume section specification. How
 * the volume type contains 0x0e
 * the number of chunks is 0
 * The number of bytes per sectors is some kind of block size value (4096), perhaps the source file system block size
-* [yellow-background]*The sectors count, represents some other value because ( sector_size * sector_amount != total_size ) the total size is in the ltree section*
+* [yellow-background]*The sectors count, represents some other value because ( sector_size x sector_amount != total_size ) the total size is in the ltree section*
 
 ==== [[media_type]]Media type
 
@@ -1212,8 +1212,77 @@ old method to differentiate between a partition (volume) image or a physical
 disk image?
 
 === Data section
+The data section is identified in the section data type field as "data". Some 
+aspects of this section are:
 
-[yellow-background]*TODO migrate remaining documentation*
+* It is not defined in the EWF format `[ASR02]`.
+* Found in EWF-E01 in EnCase 1 to 7 or linen 5 to 7 or FTK Imager, and EWF-L01 in EnCase 5 to 7. Not found in SMART (EWF-S01).
+* For multiple segment files it does not reside in the first segment file. For a single segment file it does.
+* Found after the last table2 section in a single segment file or for multiple segment files at the start of the segment files, except for the first.
+* The data section has data it should should contain the same information as the volume section.
+
+==== FTK Imager, EnCase 1 to 7 and linen 5 to 7 (EWF-E01)
+The additional data section data is 1052 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 1 | | Media type +
+See section: <<media_type,Media type>>
+| 1 | 3 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 4 | 4 | | The chunk count +
+Contains the number of chunks within the all segment files.
+| 8 | 4 | | The block size (number of sectors per chunk) +
+Contains 64 per default. +
+EnCase 5 is the first version which allows this value to be different than 64.
+| 12 | 4 | | The number of bytes per sector
+| 16 | 8 | | The sectors count +
+Contains  the number of sectors within all segment files +
+This value probably has been changed in EnCase 6 from a 32-bit value to a 64-bit value to support media >2TiB
+| 24 | 4 | | The number of cylinders of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 28 | 4 | | The number of heads of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 32 | 4 | | The number of sectors of the C:H:S value +
+Most of the time this value is empty (0x00)
+| 36 | 1 | | Media flags +
+See section: <<media_flags,Media flags>>
+| 37 | 3 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 40 | 4 | | PALM volume start sector
+| 44 | 4 | 0x00 | [yellow-background]*Unknown (padding/empty values)*
+| 48 | 4 | | SMART logs start sector +
+Contains an offset relative from the end of media +
+E.g. a value of 10 would refer to sector = number of sectors - 10
+| 52 | 1 | | Compression level +
+(Introduced in EnCase 5) +
+See section: <<compression_level,Compression level>>
+| 53 | 3 | 0x00 | [yellow-background]*Unknown (empty values)* +
+[yellow-background]*These values seem to be part of the compression type*
+| 56 | 4 | | The sector error granularity +
+Contains the error block size +
+(Introduced in EnCase 5)
+| 60 | 4 | 0x00 | [yellow-background]*Unknown (empty values)*
+| 64 | 16 | | Segment file set identifier +
+Contains a GUID/UUID generated on the acquiry system probably used to uniquely identify a set of segment files +
+(Introduced in EnCase 5)
+| 80 | 963 | | [yellow-background]*Unknown (padding/empty values)*
+| 1043 | 5 | | Signature (Reserved) +
+Contains 0x00
+| 1048 | 4 | | Checksum +
+Adler-32 of all the previous data within the additional data section data.
+|===
+
+[NOTE]
+In Logicube products (Talon (firmware predating April 2013) and Forensic 
+dossier (before version 3.3.3RC16)) the checksum is not calculated and set to 0.
+
+==== EnCase 5 to 7 (EWF-L01)
+The EWF-L01 format uses the EnCase 5 (EWF-E01) data section specification. However:
+
+* the data type contains 0x0e
+* the number of chunks is 0
+* The number of bytes per sectors is some kind of block size value (4096), perhaps the source file system block size
+* [yellow-background]*The sectors count, represents some other value because ( sector_size x sector_amount != total_size ) the total size is in the ltree section*
 
 === Sectors section
 The sectors section is identified in the section data type field as "sectors". 
