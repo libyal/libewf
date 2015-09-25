@@ -543,8 +543,10 @@ the actual values in this category are dependent on the version of EnCase.
 
 Line 9 consists of 2 values, namely the values are "0 0".
 
-Line 10 contains the values defined by line 8. Note that the default values of 
-some of these values has changed around EnCase 6.12.
+Line 10 contains the values defined by line 8.
+
+[NOTE]
+The default values of some of these values has changed around EnCase 6.12.
 
 ===== Subjects category
 Line 12 the sub category contains information about subjects.
@@ -1713,7 +1715,7 @@ The ltree data string contains the following information:
 | 3 | | Identifier for the values in the 4th line
 | 4 | | The data for the different identifiers in the 3rd line
 | 5 | | (an empty line)
-| 6 | perm | Information about single file permissions
+| 6 | perm | Information about file permissions
 | 7 | | 
 | 8 | | Identifier for the values in the section
 | 9 | | 
@@ -1734,7 +1736,7 @@ The ltree data string contains the following information:
 | 24 | | Identifier for the values in the section
 | 25 | | 
 | 26 | | (an empty line)
-| 27 | entry | Information about single file entries
+| 27 | entry | Information about file entries
 | 28 | | 
 | 29 | | Identifier for the values in the section
 | 30 | | The ltree entries of files and directories
@@ -1770,7 +1772,7 @@ The size of the logical file data (media data)
 |===
 
 ==== Permissions category
-The perm category contains information about single file permissions.
+The perm category contains information about file permissions.
 
 Line 6 consist of perm
 
@@ -1794,16 +1796,92 @@ The 8th line consist of the following tab (0x09) separated values.
 [yellow-background]*Notes: Property: (2 => allow, empty => owner, 1 => group)*
 
 ==== Sources category
+Line 12 the srce category contains information about sources
 
-*TODO: migrate rest of documentation*
+[yellow-background]*TODO describe what a source is in the context of EnCase.*
+
+Line 13 consists of 2 values, namely the values are "0 1".
+
+The 14th line consist of the following tab (0x09) separated values.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 9th line | Meaning
+| 1 | p |
+| 2 | n |
+| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 4 | ev | [yellow-background]*Unknown (Evidence number)*
+| 5 | tb | [yellow-background]*Unknown (Total bytes)*
+| 6 | lo | [yellow-background]*Unknown (Logical offset)* +
+-1 when not set
+| 7 | po | [yellow-background]*Unknown (Physical offset)* +
+-1 when not set
+| 8 | ah | [yellow-background]*Unknown (Acquire hash)*
+| 9 | sh | [yellow-background]*Unknown* +
+(introduced in EnCase 6.19)
+| 10 | gu | [yellow-background]*Unknown (GUID)*
+| 11 | pgu | [yellow-background]*Unknown* +
+(introduced in EnCase 7)
+| 12 | aq | [yellow-background]*Unknown (Acquire date)*
+|===
+
+"Acquire date" is in the form of: "1142163845", which is a Unix epoch time 
+stamp and represents the date: March 12 2006, 11:44:05.
 
 ==== Subjects category
+The 21th line consist of the following tab (0x09) separated values.
 
-*TODO: migrate rest of documentation*
+[yellow-background]*TODO describe what a subject is in the context of EnCase.*
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 15th line | Meaning
+| 1 | p | 
+| 2 | n | 
+| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 4 | nu | [yellow-background]*Unknown (Number)*
+| 5 | co | [yellow-background]*Unknown (Comment)*
+| 6 | gu | [yellow-background]*Unknown (GUID)*
+|===
 
 ==== Ltree entries
+===== EnCase 5 and 6 (EWF-L01)
 
 *TODO: migrate rest of documentation*
+
+===== EnCase 7 (EWF-L01)
+
+*TODO: migrate rest of documentation*
+
+===== [[file_entry_flags]]File entry flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| | | 
+| 0x00000008 | | Archive
+| | | 
+| 0x00400000 | | [yellow-background]*Unknown (is file?)*
+| | | 
+| 0x01000000 | | [yellow-background]*Unknown*
+| 0x02000000 | | [yellow-background]*Unknown*
+| 0x04000000 | | Data is sparse +
+See remarks below.
+|===
+
+If the sparse data flag is set:
+
+* the data size should be 1 and data should consist of a single byte value.
+* the data size should be equal to the file size and data should be the same.
+
+If the duplicate data offset value is not set the single byte value in the data 
+should be used to reconstruct the file data. E.g. if the file size is 4096 and 
+the data contains the byte value 0x00 the resulting file should consists of 
+4096 x 0x00 byte values.
+
+If the duplicate data offset value is set the single byte in the data is 
+ignored and the duplicate data offset refers to the location where the data 
+stored.
 
 === Map section
 Some aspects of this section are:
@@ -1840,8 +1918,7 @@ The map string contains the following information:
 | 1 | C | Number of map entries (count)
 |===
 
-The number of map entries should match the number of single file entries in the 
-ltree.
+The number of map entries should match the number of file entries in the ltree.
 
 ==== Map entry
 A map entry is 24 bytes of size and consists of:
