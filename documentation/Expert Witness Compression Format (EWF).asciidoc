@@ -1481,8 +1481,8 @@ An uncompressed data chunk is variable of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0 | ...  | | Uncompressed chunk data
-| ...  | 4 | | Checksum +
+| 0 | ... | | Uncompressed chunk data
+| ... | 4 | | Checksum +
 Adler-32 of the chunk data
 |===
 
@@ -1700,8 +1700,110 @@ Adler-32 of all the data within the ltree header where the checksum value itself
 |===
 
 ==== Ltree data
+The ltree data string consists of an UTF-16 little-endian encoded string 
+without the UTF-16 endian byte order mark.
 
-[yellow-background]*TODO migrate remaining documentation*
+The ltree data string contains the following information:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | 5 | The number of categories provided
+| 2 | rec | Probably the type of information provided
+| 3 | | Identifier for the values in the 4th line
+| 4 | | The data for the different identifiers in the 3rd line
+| 5 | | (an empty line)
+| 6 | perm | Information about single file permissions
+| 7 | | 
+| 8 | | Identifier for the values in the section
+| 9 | | 
+| 10 | | 
+| 11 | | 
+| 12 | | 
+| 13 | | (an empty line)
+| 14 | srce | Probably the type of information provided (the data source)
+| 15 | | 
+| 16 | | Identifier for the values in the section
+| 17 | | 
+| 18 | | 
+| 19 | | 
+| 20 | | 
+| 21 | | (an empty line)
+| 22 | sub | Probably the type of information provided
+| 23 | | 
+| 24 | | Identifier for the values in the section
+| 25 | | 
+| 26 | | (an empty line)
+| 27 | entry | Information about single file entries
+| 28 | | 
+| 29 | | Identifier for the values in the section
+| 30 | | The ltree entries of files and directories
+| ... | | (an empty line)
+|===
+
+[NOTE]
+The actual line numbering can vary.
+
+The end of line character(s) is a newline (0x0a).
+
+==== Records category
+The rec category contains information about records.
+
+The 3rd and the 4th line consist of the following tab (0x09) separated values.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 3rd line | Value in 4th line
+| 1 | tb | Total bytes +
+The size of the logical file data (media data)
+| 2 | cl | [yellow-background]*Unknown (Clusters?)*
+| 3 | n | [yellow-background]*Unknown* +
+(introduced in EnCase 6.19)
+| 4 | fp | [yellow-background]*Unknown* +
+(introduced in EnCase 7)
+| 5 | pg | [yellow-background]*Unknown* +
+(introduced in EnCase 7)
+| 6 | lg | [yellow-background]*Unknown* +
+(introduced in EnCase 7)
+| 7 | ig | [yellow-background]*Unknown* +
+(introduced in EnCase 7)
+|===
+
+==== Permissions category
+The perm category contains information about single file permissions.
+
+Line 6 consist of perm
+
+Line 7 consists of 2 values.
+
+The 8th line consist of the following tab (0x09) separated values.
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 8th line | Meaning
+| 1 | p | 
+| 2 | n | Name
+| 3 | s | NT security identifier (SID)
+| 4 | pr | Property
+| 5 | nta | [yellow-background]*Unknown (NT permission (ACE)?)*
+| 6 | nti | [yellow-background]*Unknown (Permission?)*
+| 7 | nts | [yellow-background]*Unknown (Permission?)* +
+(Removed in EnCase 6)
+|===
+
+[yellow-background]*Notes: Property: (2 => allow, empty => owner, 1 => group)*
+
+==== Sources category
+
+*TODO: migrate rest of documentation*
+
+==== Subjects category
+
+*TODO: migrate rest of documentation*
+
+==== Ltree entries
+
+*TODO: migrate rest of documentation*
 
 === Map section
 Some aspects of this section are:
@@ -1723,7 +1825,7 @@ The map string contains the following information:
 [cols="1,1,5",options="header"]
 |===
 | Line number | Value | Description
-| 1 | 1 | The number of sections provided
+| 1 | 1 | The number of categories provided
 | 2 | r | Probably the type of information provided
 | 3 | c | Identifier for the values in the 4th line
 | 4 | | The data for the different identifiers in the 3rd line
