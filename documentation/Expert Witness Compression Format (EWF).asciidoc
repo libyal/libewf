@@ -1846,8 +1846,56 @@ The 21th line consist of the following tab (0x09) separated values.
 
 ==== Ltree entries
 ===== EnCase 5 and 6 (EWF-L01)
+The 29th line consist of the following tab (0x09) separated values.
 
-*TODO: migrate rest of documentation*
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 29th line | Meaning
+| 1 | p | Is parent +
+1 => if the single file entry is a directory +
+(null) => if single file entry is a file
+| 2 | n | Name
+| 3 | id | [yellow-background]*Unknown*
+| 4 | opr | Flags +
+See section: <<file_entry_flags,File entry flags>>
+| 5 | src | Possible the source identifier
+| 6 | sub | Possible the subject identifier
+| 7 | cid | [yellow-background]*Unknown*
+| 8 | jq | [yellow-background]*Unknown*
+| 9 | cr | Creation date
+| 10 | ac | Access date +
+[yellow-background]*(precision is date only)*
+| 11 | wr | (File) modification (last written) date
+| 12 | mo | (File system) entry modification date
+| 13 | dl | [yellow-background]*Unknown*
+| 14 | aq | [yellow-background]*Unknown*
+| 15 | ha | Hash +
+The MD5 hash of the file data
+| 16 | ls | File size +
+The file size specified in bytes +
+If the file size is 0 the data size should be 1
+| 17 | du | Duplicate data offset +
+Relative from the start of the media data
+| 18 | lo | [yellow-background]*Unknown*
+| 19 | po | [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
+| 20 | mid | [yellow-background]*Unknown (identifier?)* +
+(introduced in EnCase 6.19)
+| 21 | cfi | [yellow-background]*Unknown* +
+(introduced in EnCase 6.14)
+| 22 | be | Binary extents +
+See section: <<binary_extents_value,Binary extents value>>
+| 23 | pm | [yellow-background]*permissions index? -1 has a special meaning?*
+| 24 | lpt | [yellow-background]*Unknown* +
+(introduced in EnCase 6.19)
+|===
+
+"Creation date", "Access date" and " Last written date" are in the form of: 
+"1142163845", which is a Unix epoch time stamp and represents the date: March 
+12 2006, 11:44:05.
+
+The "ha" value (Hash) consist of a MD5 hash string when file entries are 
+hashed. If the "ha" value contains "00000000000000000000000000000000" this 
+means the MD5 hash is not set. 
 
 ===== EnCase 7 (EWF-L01)
 
@@ -1882,6 +1930,22 @@ the data contains the byte value 0x00 the resulting file should consists of
 If the duplicate data offset value is set the single byte in the data is 
 ignored and the duplicate data offset refers to the location where the data 
 stored.
+
+===== [[binary_extents_value]]Binary extents value
+The binary extents value contains 3 values separated by a space:
+....
+Unknown Offset Size
+....
+
+Where:
+
+* unknown always is 1 ([yellow-background]*could this be the number of extents?*)
+* extent data offset, relative from the start of the media data
+* extent data size
+
+The offset and size are specified in hexadecimal values.
+
+[yellow-background]*Note: Contains 1 value for the first single file entry.*
 
 === Map section
 Some aspects of this section are:
