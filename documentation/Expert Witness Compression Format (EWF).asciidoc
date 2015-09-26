@@ -1,10 +1,10 @@
 = EWF specification
+Expert Witness Compression Format specification
+
 :toc:
 :toc-placement: manual
 :toc-title: 
 :toclevels: 4
-
-Expert Witness Compression Format specification
 
 :numbered!:
 [abstract]
