@@ -1,7 +1,7 @@
 = EWF specification
 Expert Witness Compression Format specification
 
-:toc:
+:toc: macro
 :toc-placement: manual
 :toc-title: 
 :toclevels: 4
