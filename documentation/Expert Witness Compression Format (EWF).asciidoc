@@ -46,6 +46,7 @@ in the section entitled "GNU Free Documentation License".
 
 [preface]
 == Table of contents
+
 toc::[]
 
 [preface]
