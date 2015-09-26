@@ -1,10 +1,10 @@
 = EWF specification
-Expert Witness Compression Format specification
-
 :toc:
 :toc-placement: manual
 :toc-title: 
 :toclevels: 4
+
+Expert Witness Compression Format specification
 
 :numbered!:
 [abstract]
@@ -1876,15 +1876,17 @@ The file size specified in bytes +
 If the file size is 0 the data size should be 1
 | 17 | du | Duplicate data offset +
 Relative from the start of the media data
-| 18 | lo | [yellow-background]*Unknown*
-| 19 | po | [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
+| 18 | lo | [yellow-background]*Unknown (Logical Offset?)*
+| 19 | po | [yellow-background]*Unknown (Physical Offset?)* +
+[yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
 | 20 | mid | [yellow-background]*Unknown (identifier?)* +
 (introduced in EnCase 6.19)
 | 21 | cfi | [yellow-background]*Unknown* +
 (introduced in EnCase 6.14)
 | 22 | be | Binary extents +
 See section: <<binary_extents_value,Binary extents value>>
-| 23 | pm | [yellow-background]*permissions index? -1 has a special meaning?*
+| 23 | pm | [yellow-background]*Unknown (permissions index?)* +
+[yellow-background]*-1 has a special meaning?*
 | 24 | lpt | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
 |===
@@ -1894,12 +1896,95 @@ See section: <<binary_extents_value,Binary extents value>>
 12 2006, 11:44:05.
 
 The "ha" value (Hash) consist of a MD5 hash string when file entries are 
-hashed. If the "ha" value contains "00000000000000000000000000000000" this 
-means the MD5 hash is not set. 
+hashed. If the "ha" value contains "00000000000000000000000000000000." this
+means the MD5 hash is not set.
+
+====== Ltree file entries
+The ltree entries of files and directories consist of entries starting with: 0 
+followed by the number of sub file entries.
+
+The entries of files and directories:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | (empty) | The root directory
+| 2 | | The target drive/mount point
+| 3 | | The actual single file entries
+|===
 
 ===== EnCase 7 (EWF-L01)
+The 29th line consist of the following tab (0x09) separated values.
 
-*TODO: migrate rest of documentation*
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Character in 29th line | Meaning
+| 1 | mid | [yellow-background]*Unknown (identifier?)*
+| 2 | ls | File size +
+The file size specified in bytes +
+If the file size is 0 the data size should be 1
+| 3 | be | Binary extents +
+See section: <<binary_extents_value,Binary extents value>>
+| 4 | id | [yellow-background]*Unknown*
+| 5 | cr | Creation date
+| 6 | ac | Access date
+| 7 | wr | (File) modification (last written) date
+| 8 | mo | (File system) entry modification date
+| 9 | dl | [yellow-background]*Unknown*
+| 10 | sig | [yellow-background]*Unknown* +
+(Introduced in EnCase 7)
+| 11 | ha | Hash +
+The MD5 hash of the file data
+| 12 | sha | SHA1 hash +
+Judging by the size this value is assumed to be the SHA1 hash of the file data, does not seem to be currently set by EnCase +
+(Introduced in EnCase 7)
+| 13 | p | Is parent +
+1 => if the single file entry is a directory +
+(null) => if single file entry is a file
+| 14 | n | Name
+| 15 | du | Duplicate data offset +
+Relative from the start of the media data
+| 16 | lo | [yellow-background]*Unknown (Logical Offset?)*
+| 17 | po | [yellow-background]*Unknown (Physical Offset?)*
+[yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
+| 18 | pm | [yellow-background]*Unknown (permissions index?)* +
+[yellow-background]*-1 has a special meaning?*
+| 19 | oes | [yellow-background]*Unknown* +
+(Introduced in EnCase 7)
+| 20 | opr | Flags +
+See section: <<file_entry_flags,File entry flags>>
+| 21 | src | [yellow-background]*Unknown (Possible the source identifier)*
+| 22 | sub | [yellow-background]*Unknown (Possible the subject identifier)*
+| 23 | cid | [yellow-background]*Unknown*
+| 24 | jq | [yellow-background]*Unknown*
+| 25 | alt | [yellow-background]*Unknown* +
+(Introduced in EnCase 7)
+| 26 | ep | [yellow-background]*Unknown* +
+(Introduced in EnCase 7)
+| 27 | aq | [yellow-background]*Unknown*
+| 28 | cfi | [yellow-background]*Unknown*
+| 29 | sg | [yellow-background]*Unknown* +
+(Introduced in EnCase 7)
+| 30 | lpt | [yellow-background]*Unknown*
+|===
+
+If the "ha" value contains "00000000000000000000000000000000." this means the 
+MD5 hash is not set. The same applies for the "sha" value when it contains 
+"0000000000000000000000000000000000000000" the SHA1 has is not set.
+
+====== Ltree file entries
+The ltree entries of files and directories consist of entries starting with: 26 
+followed by the number of sub file entries.
+
+The entries of files and directories:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | LogicalEntries | The root directory
+| 2 | | The target drive/mount point
+| 3 | | The actual single file entries
+|===
 
 ===== [[file_entry_flags]]File entry flags
 
