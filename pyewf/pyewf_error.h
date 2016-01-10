@@ -1,7 +1,7 @@
 /*
  * Error functions
  *
- * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -28,7 +28,7 @@
 #include "pyewf_libcerror.h"
 #include "pyewf_python.h"
 
-#define PYEWF_ERROR_STRING_SIZE		768
+#define PYEWF_ERROR_STRING_SIZE		2048
 
 #if defined( __cplusplus )
 extern "C" {

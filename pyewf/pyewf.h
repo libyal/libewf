@@ -2,7 +2,7 @@
  * Python bindings for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -51,8 +51,13 @@ PyObject *pyewf_glob(
            PyObject *arguments,
            PyObject *keywords );
 
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_pyewf(
+                void );
+#else
 PyMODINIT_FUNC initpyewf(
                 void );
+#endif
 
 #if defined( __cplusplus )
 }

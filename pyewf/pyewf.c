@@ -2,7 +2,7 @@
  * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
- * Copyright (C) 2008-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -325,7 +325,7 @@ PyObject *pyewf_check_file_signature(
 	return( NULL );
 }
 
-/* Checks if the file has a Windows Event Log (EWF) file signature using a file-like object
+/* Checks if the file has an Expert Witness Compression Format (EWF) signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_check_file_signature_file_object(

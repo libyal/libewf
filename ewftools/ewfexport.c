@@ -1,7 +1,7 @@
 /*
  * Export media data from EWF files to a file
  *
- * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -234,10 +234,10 @@ int main( int argc, char * const argv[] )
 
 	libcstring_system_character_t * const *source_filenames       = NULL;
 
-	libcerror_error_t *error                                       = NULL;
+	libcerror_error_t *error                                      = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                        = NULL;
+	libcsystem_glob_t *glob                                       = NULL;
 #endif
 
 	libcstring_system_character_t *acquiry_software_version       = NULL;

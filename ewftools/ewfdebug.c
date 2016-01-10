@@ -1,7 +1,7 @@
 /*
  * Debugs EWF files
  *
- * Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -117,10 +117,10 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                  = NULL;
+	libcsystem_glob_t *glob                                 = NULL;
 #endif
 
-	libcerror_error_t *error                                 = NULL;
+	libcerror_error_t *error                                = NULL;
 
 	libcstring_system_character_t * const *source_filenames = NULL;
 	libcstring_system_character_t **ewf_filenames           = NULL;
