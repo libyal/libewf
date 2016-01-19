@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20160110],
+ [20160119],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -144,7 +144,10 @@ dnl Check if libewf should be build with debug output
 AX_COMMON_CHECK_ENABLE_DEBUG_OUTPUT
 
 dnl Check if libewf python bindings (pyewf) should be build
+AX_PYTHON_CHECK_PYPREFIX
 AX_PYTHON_CHECK_ENABLE
+AX_PYTHON2_CHECK_ENABLE
+AX_PYTHON3_CHECK_ENABLE
 
 dnl Check if libewf should be build with version 1 API
 AX_LIBEWF_CHECK_ENABLE_V1_API
@@ -243,6 +246,8 @@ AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([ewf.net/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
+AC_CONFIG_FILES([pyewf-python2/Makefile])
+AC_CONFIG_FILES([pyewf-python3/Makefile])
 AC_CONFIG_FILES([po/Makefile.in])
 AC_CONFIG_FILES([po/Makevars])
 AC_CONFIG_FILES([manuals/Makefile])
@@ -260,7 +265,6 @@ AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([ewf.net/ewf.net.rc])
 AC_CONFIG_FILES([libewf/libewf.rc])
-AC_CONFIG_FILES([pyewf/setup.py])
 AC_CONFIG_FILES([libewf.pc])
 AC_CONFIG_FILES([libewf.spec])
 dnl Have configure write its configuration
@@ -307,6 +311,8 @@ Features:
    Wide character type support:              $ac_cv_enable_wide_character_type
    ewftools are build as static executables: $ac_cv_enable_static_executables
    Python (pyewf) support:                   $ac_cv_enable_python
+   Python version 2 (pyewf) support:         $ac_cv_enable_python2
+   Python version 3 (pyewf) support:         $ac_cv_enable_python3
    Verbose output:                           $ac_cv_enable_verbose_output
    Debug output:                             $ac_cv_enable_debug_output
    Version 1 API compatibility:              $ac_cv_enable_v1_api

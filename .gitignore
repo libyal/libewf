@@ -112,6 +112,7 @@ stamp-h[1-9]
 /include/libewf/types.h
 /libewf/libewf.rc
 /libewf/libewf_definitions.h
+/pyewf-python[23]/*.[ch]
 /ewf.net/ewf.net.rc
 /ewftools/ewfacquire
 /ewftools/ewfacquirestream
@@ -121,7 +122,6 @@ stamp-h[1-9]
 /ewftools/ewfmount
 /ewftools/ewfrecover
 /ewftools/ewfverify
-/pyewf/setup.py
 /tests/ewf_test_glob
 /tests/ewf_test_open_close
 /tests/ewf_test_read

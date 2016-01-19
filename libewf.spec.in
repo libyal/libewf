@@ -44,27 +44,36 @@ Several tools for reading and writing EWF files.
 It contains tools to acquire, export, query and verify EWF files.
 
 %package python
-Summary: Python bindings for libewf
+Summary: Python 2 bindings for libewf
 Group: System Environment/Libraries
 Requires: libewf = %{version}-%{release} python
 BuildRequires: python-devel
 
 %description python
-Python bindings for libewf
+Python 2 bindings for libewf
+
+%package python3
+Summary: Python 3 bindings for libewf
+Group: System Environment/Libraries
+Requires: libewf = %{version}-%{release} python3
+BuildRequires: python3-devel
+
+%description python3
+Python 3 bindings for libewf
 
 %prep
 %setup -q
 
 %build
-%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python
+%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python2 --enable-python3
 make %{?_smp_mflags}
 
 %install
-rm -rf ${RPM_BUILD_ROOT}
-make DESTDIR=${RPM_BUILD_ROOT} install
+rm -rf %{buildroot}
+%make_install
 
 %clean
-rm -rf ${RPM_BUILD_ROOT}
+rm -rf %{buildroot}
 
 %post -p /sbin/ldconfig
 
@@ -104,9 +113,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %files python
 %defattr(644,root,root,755)
 %doc AUTHORS COPYING NEWS README
-%{_libdir}/python*/site-packages/*.a
-%{_libdir}/python*/site-packages/*.la
-%{_libdir}/python*/site-packages/*.so
+%{_libdir}/python2*/site-packages/*.a
+%{_libdir}/python2*/site-packages/*.la
+%{_libdir}/python2*/site-packages/*.so
+
+%files python3
+%defattr(644,root,root,755)
+%doc AUTHORS COPYING NEWS README
+%{_libdir}/python3*/site-packages/*.a
+%{_libdir}/python3*/site-packages/*.la
+%{_libdir}/python3*/site-packages/*.so
 
 ### Exclude expirimental files ###
 %exclude %{_bindir}/ewfdebug

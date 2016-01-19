@@ -28,6 +28,8 @@ SUBDIRS = \
 	ewftools \
 	ewf.net \
 	pyewf \
+	pyewf-python2 \
+	pyewf-python3 \
 	po \
 	manuals \
 	tests \
@@ -41,8 +43,10 @@ DPKG_FILES = \
 	dpkg/copyright \
 	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libewf-dev.docs \
 	dpkg/libewf.docs \
+	dpkg/libewf-dev.docs \
+	dpkg/libewf-python.docs \
+	dpkg/libewf-python2.docs \
 	dpkg/libewf-tools.docs \
 	dpkg/source/format
 
@@ -53,6 +57,9 @@ GETTEXT_FILES = \
 PKGCONFIG_FILES = \
 	libewf.pc.in
 
+SETUP_PY_FILES = \
+	setup.py
+
 SPEC_FILES = \
 	libewf.spec \
 	libewf.spec.in
@@ -61,6 +68,7 @@ EXTRA_DIST = \
 	$(DPKG_FILES) \
 	$(GETTEXT_FILES) \
 	$(PKGCONFIG_FILES) \
+	$(SETUP_PY_FILES) \
 	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \
