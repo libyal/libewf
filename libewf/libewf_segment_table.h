@@ -86,6 +86,10 @@ int libewf_segment_table_clone(
      libewf_segment_table_t *source_segment_table,
      libcerror_error_t **error );
 
+int libewf_segment_table_empty(
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error );
+
 int libewf_segment_table_get_basename_size(
      libewf_segment_table_t *segment_table,
      size_t *basename_size,

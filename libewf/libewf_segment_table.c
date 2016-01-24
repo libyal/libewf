@@ -416,6 +416,63 @@ on_error:
 	return( -1 );
 }
 
+/* Empties the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_empty(
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_segment_table_empty";
+	int result            = 1;
+
+	if( segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename = NULL;
+	}
+	if( libfdata_list_empty(
+	     segment_table->segment_files_list,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty segment files list.",
+		 function );
+
+		result = -1;
+	}
+	if( libfcache_cache_empty(
+	     segment_table->segment_files_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty segment files cache.",
+		 function );
+
+		result = -1;
+	}
+	return( result );
+}
+
 /* Retrieves the size of the basename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */

@@ -191,6 +191,38 @@ int libewf_handle_initialize(
 
 		goto on_error;
 	}
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->segment_table ),
+	     internal_handle->io_handle,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_segment_table_initialize(
+	     &( internal_handle->delta_segment_table ),
+	     internal_handle->io_handle,
+	     INT64_MAX,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create delta segment table.",
+		 function );
+
+		goto on_error;
+	}
 	internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
 	internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
 
@@ -201,6 +233,19 @@ int libewf_handle_initialize(
 on_error:
 	if( internal_handle != NULL )
 	{
+		if( internal_handle->segment_table != NULL )
+		{
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ),
+			 NULL );
+		}
+		if( internal_handle->acquiry_errors != NULL )
+		{
+			libcdata_range_list_free(
+			 &( internal_handle->acquiry_errors ),
+			 NULL,
+			 NULL );
+		}
 		if( internal_handle->tracks != NULL )
 		{
 			libcdata_array_free(
@@ -341,6 +386,32 @@ int libewf_handle_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free acquiry errors range list.",
+			 function );
+
+			result = -1;
+		}
+		if( libewf_segment_table_free(
+		     &( internal_handle->segment_table ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment table.",
+			 function );
+
+			result = -1;
+		}
+		if( libewf_segment_table_free(
+		     &( internal_handle->delta_segment_table ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free delta segment table.",
 			 function );
 
 			result = -1;
@@ -571,39 +642,33 @@ int libewf_handle_clone(
 			goto on_error;
 		}
 	}
-	if( internal_source_handle->segment_table != NULL )
+	if( libewf_segment_table_clone(
+	     &( internal_destination_handle->segment_table ),
+	     internal_source_handle->segment_table,
+	     error ) != 1 )
 	{
-		if( libewf_segment_table_clone(
-		     &( internal_destination_handle->segment_table ),
-		     internal_source_handle->segment_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination segment table.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination segment table.",
+		 function );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-	if( internal_source_handle->delta_segment_table != NULL )
+	if( libewf_segment_table_clone(
+	     &( internal_destination_handle->delta_segment_table ),
+	     internal_source_handle->delta_segment_table,
+	     error ) != 1 )
 	{
-		if( libewf_segment_table_clone(
-		     &( internal_destination_handle->delta_segment_table ),
-		     internal_source_handle->delta_segment_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination delta segment table.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination delta segment table.",
+		 function );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
 	if( internal_source_handle->chunk_table != NULL )
 	{
@@ -942,28 +1007,6 @@ int libewf_handle_open(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - segment table already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - delta segment table already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( filenames == NULL )
 	{
 		libcerror_error_set(
@@ -1126,38 +1169,6 @@ int libewf_handle_open(
 			}
 		}
 	}
-	if( libewf_segment_table_initialize(
-	     &( internal_handle->segment_table ),
-	     internal_handle->io_handle,
-	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment table.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_segment_table_initialize(
-	     &( internal_handle->delta_segment_table ),
-	     internal_handle->io_handle,
-	     INT64_MAX,
-	     1,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create delta segment table.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
 		/* Get the basename of the first segment file
@@ -1284,18 +1295,6 @@ int libewf_handle_open(
 	return( 1 );
 
 on_error:
-	if( internal_handle->delta_segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 &( internal_handle->delta_segment_table ),
-		 NULL );
-	}
-	if( internal_handle->segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-	}
 	if( file_io_handle != NULL )
 	{
 		libbfio_handle_free(
@@ -1308,6 +1307,14 @@ on_error:
 		 &file_io_pool,
 		 NULL );
 	}
+	libewf_segment_table_empty(
+	 internal_handle->delta_segment_table,
+	 NULL );
+
+	libewf_segment_table_empty(
+	 internal_handle->segment_table,
+	 NULL );
+
 	return( -1 );
 }
 
@@ -1348,28 +1355,6 @@ int libewf_handle_open_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - segment table already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - delta segment table already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( filenames == NULL )
 	{
 		libcerror_error_set(
@@ -1532,38 +1517,6 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
-	if( libewf_segment_table_initialize(
-	     &( internal_handle->segment_table ),
-	     internal_handle->io_handle,
-	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment table.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_segment_table_initialize(
-	     &( internal_handle->delta_segment_table ),
-	     internal_handle->io_handle,
-	     INT64_MAX,
-	     1,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create delta segment table.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	{
 		/* Get the basename of the first segment file
@@ -1690,18 +1643,6 @@ int libewf_handle_open_wide(
 	return( 1 );
 
 on_error:
-	if( internal_handle->delta_segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 &( internal_handle->delta_segment_table ),
-		 NULL );
-	}
-	if( internal_handle->segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 &( internal_handle->segment_table ),
-		 NULL );
-	}
 	if( file_io_handle != NULL )
 	{
 		libbfio_handle_free(
@@ -1714,6 +1655,14 @@ on_error:
 		 &file_io_pool,
 		 NULL );
 	}
+	libewf_segment_table_empty(
+	 internal_handle->delta_segment_table,
+	 NULL );
+
+	libewf_segment_table_empty(
+	 internal_handle->segment_table,
+	 NULL );
+
 	return( -1 );
 }
 
@@ -3791,6 +3740,17 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
+	if( internal_handle->segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->read_io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -4643,37 +4603,31 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
-	if( internal_handle->segment_table != NULL )
+	if( libewf_segment_table_empty(
+	     internal_handle->segment_table,
+	     error ) != 1 )
 	{
-		if( libewf_segment_table_free(
-		     &( internal_handle->segment_table ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment table.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to emtpy segment table.",
+		 function );
 
-			result = -1;
-		}
+		result = -1;
 	}
-	if( internal_handle->delta_segment_table != NULL )
+	if( libewf_segment_table_empty(
+	     internal_handle->delta_segment_table,
+	     error ) != 1 )
 	{
-		if( libewf_segment_table_free(
-		     &( internal_handle->delta_segment_table ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free delta segment table.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to emtpy delta segment table.",
+		 function );
 
-			result = -1;
-		}
+		result = -1;
 	}
 	/* Free the chunk data if it could not be passed to libfcache_cache_set_value_by_index
 	 */
@@ -7428,7 +7382,6 @@ ssize_t libewf_handle_write_finalize(
 		     internal_handle->tracks,
 		     internal_handle->acquiry_errors,
 		     error ) != 1 )
-
 		{
 			libcerror_error_set(
 			 error,
@@ -7739,17 +7692,6 @@ int libewf_handle_get_segment_filename_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_size(
 	          internal_handle->segment_table,
 	          filename_size,
@@ -7796,17 +7738,6 @@ int libewf_handle_get_segment_filename(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename(
 	          internal_handle->segment_table,
 	          filename,
@@ -7863,17 +7794,6 @@ int libewf_handle_set_segment_filename(
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->segment_table,
 	     filename,
@@ -7920,17 +7840,6 @@ int libewf_handle_get_segment_filename_size_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_size_wide(
 	          internal_handle->segment_table,
 	          filename_size,
@@ -7977,17 +7886,6 @@ int libewf_handle_get_segment_filename_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_wide(
 	          internal_handle->segment_table,
 	          filename,
@@ -8040,17 +7938,6 @@ int libewf_handle_set_segment_filename_wide(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: segment filename cannot be changed.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
 		 function );
 
 		return( -1 );
@@ -8241,17 +8128,6 @@ int libewf_handle_get_delta_segment_filename_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_size(
 	          internal_handle->delta_segment_table,
 	          filename_size,
@@ -8298,17 +8174,6 @@ int libewf_handle_get_delta_segment_filename(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename(
 	          internal_handle->delta_segment_table,
 	          filename,
@@ -8365,17 +8230,6 @@ int libewf_handle_set_delta_segment_filename(
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->delta_segment_table,
 	     filename,
@@ -8422,17 +8276,6 @@ int libewf_handle_get_delta_segment_filename_size_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_size_wide(
 	          internal_handle->delta_segment_table,
 	          filename_size,
@@ -8479,17 +8322,6 @@ int libewf_handle_get_delta_segment_filename_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
-		 function );
-
-		return( -1 );
-	}
 	result = libewf_segment_table_get_basename_wide(
 	          internal_handle->delta_segment_table,
 	          filename,
@@ -8542,17 +8374,6 @@ int libewf_handle_set_delta_segment_filename_wide(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: delta segment filename cannot be changed.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
 		return( -1 );
