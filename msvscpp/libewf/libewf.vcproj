@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_deflate.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_device_information.c"
 				>
 			</File>
@@ -411,6 +415,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_deflate.h"
 				>
 			</File>
 			<File

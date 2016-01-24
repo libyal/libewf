@@ -36,6 +36,7 @@
 
 #include "libewf_compression.h"
 #include "libewf_definitions.h"
+#include "libewf_deflate.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 
@@ -58,7 +59,7 @@ int libewf_compress_data(
 	unsigned int bzip2_compressed_data_size = 0;
 	int bzip2_compression_level             = 0;
 #endif
-#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL )
 	uLongf zlib_compressed_data_size        = 0;
 	int zlib_compression_level              = 0;
 #endif
@@ -109,7 +110,7 @@ int libewf_compress_data(
 	}
 	if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
 	{
-#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL )
 		if( compression_level == LIBEWF_COMPRESSION_DEFAULT )
 		{
 			zlib_compression_level = Z_DEFAULT_COMPRESSION;
@@ -232,7 +233,7 @@ int libewf_compress_data(
 		 function );
 
 		return( -1 );
-#endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
+#endif /* ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL ) */
 	}
 	else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 	{
@@ -381,7 +382,7 @@ int libewf_decompress_data(
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
 	unsigned int bzip2_uncompressed_data_size = 0;
 #endif
-#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL )
 	uLongf zlib_uncompressed_data_size        = 0;
 #endif
 
@@ -431,7 +432,7 @@ int libewf_decompress_data(
 	}
 	if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
 	{
-#if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL )
 		if( compressed_data_size > (size_t) ULONG_MAX )
 		{
 			libcerror_error_set(
@@ -526,15 +527,25 @@ int libewf_decompress_data(
 			result = -1;
 		}
 #else
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: missing support for deflate compression.",
-		 function );
+		result = libewf_deflate_decompress(
+		          compressed_data,
+		          compressed_data_size,
+		          uncompressed_data,
+		          uncompressed_data_size,
+		          error );
 
-		return( -1 );
-#endif /* defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) */
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ENCRYPTION,
+			 LIBCERROR_ENCRYPTION_ERROR_GENERIC,
+			 "%s: unable to decompress deflate compressed data.",
+			 function );
+
+			return( -1 );
+		}
+#endif /* ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL ) */
 	}
 	else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 	{

@@ -49,6 +49,7 @@ libewf_la_SOURCES = \
 	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_definitions.h \
+	libewf_deflate.c libewf_deflate.h \
 	libewf_device_information.c libewf_device_information.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \

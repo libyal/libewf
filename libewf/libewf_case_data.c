@@ -28,6 +28,7 @@
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
+#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_media_values.h"

@@ -25,11 +25,14 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_deflate.h"
 #include "libewf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+#if defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
 
 int libewf_checksum_calculate_adler32(
      uint32_t *checksum_value,
@@ -37,6 +40,12 @@ int libewf_checksum_calculate_adler32(
      size_t size,
      uint32_t initial_value,
      libcerror_error_t **error );
+
+#else
+#define libewf_checksum_calculate_adler32( checksum_value, buffer, size, initial_value, error ) \
+	libewf_deflate_calculate_adler32( checksum_value, buffer, size, initial_value, error )
+
+#endif /* defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
 
 #if defined( __cplusplus )
 }
