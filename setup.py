@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Script to build and install Python-bindings.
-# Version: 20160119
+# Version: 20160121
 
 from __future__ import print_function
 import glob
@@ -151,11 +151,6 @@ class ProjectInformation(object):
 
     self._ReadConfigureAc()
     self._ReadMakefileAm()
-
-  @property
-  def dll_filename(self):
-    """The DLL filename."""
-    return "{0:s}.dll".format(self.library_name)
 
   @property
   def module_name(self):

@@ -172,7 +172,8 @@ do
 
 	for FORMAT in encase7-v2;
 	do
-		for COMPRESSION_METHOD in deflate bzip2;
+		# for COMPRESSION_METHOD in deflate bzip2;
+		for COMPRESSION_METHOD in deflate;
 		do
 			if ! test_export_ewf "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
 			then
@@ -194,7 +195,8 @@ do
 
 	for FORMAT in encase7-v2;
 	do
-		for COMPRESSION_METHOD in deflate bzip2;
+		# for COMPRESSION_METHOD in deflate bzip2;
+		for COMPRESSION_METHOD in deflate;
 		do
 			if ! test_export_unattended "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
 			then

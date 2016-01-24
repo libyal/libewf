@@ -205,7 +205,8 @@ do
 
 	for FORMAT in encase7-v2;
 	do
-		for COMPRESSION_METHOD in deflate bzip2;
+		# for COMPRESSION_METHOD in deflate bzip2;
+		for COMPRESSION_METHOD in deflate;
 		do
 			for COMPRESSION_LEVEL in none empty-block fast best;
 			do
@@ -233,7 +234,8 @@ do
 
 	for FORMAT in encase7-v2;
 	do
-		for COMPRESSION_METHOD in deflate bzip2;
+		# for COMPRESSION_METHOD in deflate bzip2;
+		for COMPRESSION_METHOD in deflate;
 		do
 			for COMPRESSION_LEVEL in none empty-block fast best;
 			do

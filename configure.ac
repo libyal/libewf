@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20160119],
+ [20160124],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -101,6 +101,10 @@ AX_LIBFVALUE_CHECK_ENABLE
 
 dnl Check for zlib compression support
 AX_ZLIB_CHECK_ENABLE
+AX_ZLIB_CHECK_ADLER32
+AX_ZLIB_CHECK_COMPRESS2
+AX_ZLIB_CHECK_COMPRESSBOUND
+AX_ZLIB_CHECK_UNCOMPRESS
 
 dnl Check for bz2lib compression support
 AX_BZIP2_CHECK_ENABLE
