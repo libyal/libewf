@@ -41,7 +41,7 @@ typedef struct libewf_file_entry {}	libewf_file_entry_t;
 typedef intptr_t libewf_handle_t;
 typedef intptr_t libewf_file_entry_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
 #endif /* defined( HAVE_LOCAL_LIBEWF ) */
 
@@ -50,5 +50,5 @@ typedef intptr_t libewf_file_entry_t;
  */
 typedef unsigned long int libewf_aligned_t;
 
-#endif
+#endif /* !defined( _LIBEWF_INTERNAL_TYPES_H ) */
 

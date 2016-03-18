@@ -39,5 +39,5 @@
 
 #include <config_winapi.h>
 
-#endif
+#endif /* !defined( _COMMON_H ) */
 

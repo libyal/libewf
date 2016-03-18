@@ -52,5 +52,5 @@ int pyewf_integer_unsigned_copy_to_64bit(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_INTEGER_H ) */
 

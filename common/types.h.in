@@ -304,5 +304,5 @@
 
 #endif /* SSIZE_MAX */
 
-#endif
+#endif /* !defined( _TYPES_H ) */
 

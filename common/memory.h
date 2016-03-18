@@ -120,5 +120,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* !defined( _MEMORY_H ) */
 

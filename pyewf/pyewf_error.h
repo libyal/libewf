@@ -28,7 +28,7 @@
 #include "pyewf_libcerror.h"
 #include "pyewf_python.h"
 
-#define PYEWF_ERROR_STRING_SIZE		2048
+#define PYEWF_ERROR_STRING_SIZE	2048
 
 #if defined( __cplusplus )
 extern "C" {
@@ -56,5 +56,5 @@ void pyewf_error_raise(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_ERROR_H ) */
 

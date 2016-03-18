@@ -253,5 +253,5 @@ typedef union byte_stream_float64
 }
 #endif
 
-#endif
+#endif /* !defined( _BYTE_STREAM_H ) */
 

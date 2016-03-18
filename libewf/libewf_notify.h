@@ -53,11 +53,11 @@ LIBEWF_EXTERN \
 int libewf_notify_stream_close(
      libcerror_error_t **error );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_NOTIFY_H ) */
 

@@ -30,5 +30,5 @@
  */
 #pragma warning( disable : 4201 )
 
-#endif
+#endif /* !defined( _CONFIG_MSC_H ) */
 

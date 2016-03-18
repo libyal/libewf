@@ -40,5 +40,5 @@
 	/* parameter */
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_INTERNAL_UNUSED_H ) */
 

@@ -22,5 +22,5 @@
 #if !defined( _CONFIG_BORLANDC_H )
 #define _CONFIG_BORLANDC_H
 
-#endif
+#endif /* !defined( _CONFIG_BORLANDC_H ) */
 

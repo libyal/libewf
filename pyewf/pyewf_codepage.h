@@ -38,5 +38,5 @@ const char *pyewf_codepage_to_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_CODEPAGE_H */
 

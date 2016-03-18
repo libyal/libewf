@@ -147,5 +147,5 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* !defined( _FILE_STREAM_H ) */
 
