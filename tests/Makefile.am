@@ -31,6 +31,7 @@ TESTS = \
 	test_read_chunk.sh \
 	test_read_delta.sh \
 	test_write.sh \
+	test_write_chunk.sh \
 	test_read_write.sh \
 	test_read_write_delta.sh \
 	test_ewfverify.sh \
@@ -70,7 +71,8 @@ check_SCRIPTS = \
 	test_read_write_delta.sh \
 	test_runner.sh \
 	test_seek.sh \
-	test_write.sh
+	test_write.sh \
+	test_write_chunk.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)

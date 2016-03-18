@@ -430,9 +430,9 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'n' )
+		if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'b' )
 		{
-			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_level = LIBEWF_COMPRESSION_BEST;
 			compression_flags = 0;
 		}
 		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'e' )
@@ -445,9 +445,9 @@ int main( int argc, char * const argv[] )
 			compression_level = LIBEWF_COMPRESSION_FAST;
 			compression_flags = 0;
 		}
-		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'b' )
+		else if( option_compression_level[ 0 ] == (libcstring_system_character_t) 'n' )
 		{
-			compression_level = LIBEWF_COMPRESSION_BEST;
+			compression_level = LIBEWF_COMPRESSION_NONE;
 			compression_flags = 0;
 		}
 		else

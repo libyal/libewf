@@ -1,5 +1,5 @@
 #!/bin/bash
-# Library write testing script
+# Library write chunk testing script
 #
 # Version: 20160125
 
@@ -11,7 +11,7 @@ TEST_PREFIX=`pwd`;
 TEST_PREFIX=`dirname ${TEST_PREFIX}`;
 TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-TEST_EXECUTABLE="${TEST_PREFIX}_test_write";
+TEST_EXECUTABLE="${TEST_PREFIX}_test_write_chunk";
 
 test_write()
 { 
@@ -30,7 +30,7 @@ test_write()
 
 	rm -rf ${TMPDIR};
 
-	echo -n "Testing write with media size: ${MEDIA_SIZE}, maximum segment size: ${MAXIMUM_SEGMENT_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
+	echo -n "Testing write chunk with media size: ${MEDIA_SIZE}, maximum segment size: ${MAXIMUM_SEGMENT_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
