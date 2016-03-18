@@ -45,6 +45,7 @@ TESTS = \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
+	create_ewfexport_option_sets.sh \
 	pyewf_test_open_close.py \
 	pyewf_test_read.py \
 	pyewf_test_seek.py \

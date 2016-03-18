@@ -3001,6 +3001,10 @@ int export_handle_set_output_format(
 
 			return( -1 );
 		}
+		else if( result != 0 )
+		{
+			export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
+		}
 	}
 	return( result );
 }
@@ -5558,9 +5562,6 @@ int export_handle_export_file_entry(
 					 "FAILED\n" );
 				}
 			}
-			fprintf(
-			 export_handle->notify_stream,
-			 "\n" );
 		}
 		else if( file_entry_type == LIBEWF_FILE_ENTRY_TYPE_DIRECTORY )
 		{

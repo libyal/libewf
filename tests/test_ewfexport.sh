@@ -1,55 +1,101 @@
 #!/bin/bash
+# Export tool testing script
 #
-# ewfexport testing script
-#
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160318
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_old";
-TMP="tmp";
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-LS="ls";
-TR="tr";
-WC="wc";
+OPTION_SETS="raw ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx encase7-v2";
+INPUT_GLOB="*.[Ees]*01";
 
-test_export_raw()
-{ 
-	INPUT_FILE=$1;
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-	mkdir ${TMP};
+	for LINE in ${LIST};
+	do
+		if test ${LINE} = ${SEARCH};
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
 
-${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
-raw
-${TMP}/export.raw
+	return ${EXIT_FAILURE};
+}
 
+run_test()
+{
+	TEST_SET_DIR=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
+	INPUT_FILE=$4;
+	OPTION_SET=$5;
 
+	TEST_RUNNER="tests/test_runner.sh";
 
-EOI
+	if ! test -x "${TEST_RUNNER}";
+	then
+		TEST_RUNNER="./test_runner.sh";
+	fi
+
+	if ! test -x "${TEST_RUNNER}";
+	then
+		echo "Missing test runner: ${TEST_RUNNER}";
+
+		return ${EXIT_FAILURE};
+	fi
+
+	INPUT_NAME=`basename ${INPUT_FILE}`;
+
+	if test -z "${OPTION_SET}";
+	then
+		OPTIONS="";
+		TEST_OUTPUT="${INPUT_NAME}";
+	else
+		OPTIONS=`cat "${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}" | head -n 1 | sed 's/[\r\n]*$//'`;
+		TEST_OUTPUT="${INPUT_NAME}-${OPTION_SET}";
+	fi
+	TMPDIR="tmp$$";
+
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
+	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
+
+	# Note that options should not contain spaces otherwise the test_runner
+	# will fail parsing the arguments.
+	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -q -t ${TMPDIR}/${INPUT_NAME}.export -u ${OPTIONS} ${INPUT_FILE} > /dev/null;
 
 	RESULT=$?;
 
-	rm -rf ${TMP};
+	(cd ${TMPDIR} && md5sum ${INPUT_NAME}.export.* | sort -k 2 > ${TEST_OUTPUT}.log);
 
-	echo -n "Testing ewfexport to raw of input: ${INPUT_FILE} ";
+	if test -f "${STORED_TEST_RESULTS}";
+	then
+		zdiff ${STORED_TEST_RESULTS} ${TEST_RESULTS};
+
+		RESULT=$?;
+	else
+		gzip ${TEST_RESULTS};
+
+		mv "${TEST_RESULTS}.gz" ${TEST_SET_DIR};
+	fi
+	rm -rf ${TMPDIR};
+
+	if test -z "${OPTION_SET}";
+	then
+		echo -n "Testing ${TEST_DESCRIPTION} with input: ${INPUT_FILE}";
+	else
+		echo -n "Testing ${TEST_DESCRIPTION} with option: ${OPTION_SET} and input: ${INPUT_FILE}";
+	fi
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -60,151 +106,128 @@ EOI
 	return ${RESULT};
 }
 
-test_export_ewf()
-{ 
-	INPUT_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
+run_tests()
+{
+	TEST_PROFILE=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
 
-	mkdir ${TMP};
-
-${EWFEXPORT} -q -d sha1 ${INPUT_FILE} <<EOI
-${OUTPUT_FORMAT}
-${TMP}/export
-${COMPRESSION_METHOD}
-${COMPRESSION_LEVEL}
-
-
-
-
-EOI
-
-	RESULT=$?;
-
-	rm -rf ${TMP};
-
-	echo -n "Testing ewfexport of input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	if ! test -d "input";
 	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
+		echo "No input directory found.";
+
+		return ${EXIT_IGNORE};
 	fi
-	return ${RESULT};
+	RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files or directories found in the input directory.";
+
+		return ${EXIT_IGNORE};
+	fi
+	TEST_PROFILE_DIR="input/.${TEST_PROFILE}";
+
+	if ! test -d "${TEST_PROFILE_DIR}";
+	then
+		mkdir ${TEST_PROFILE_DIR};
+	fi
+	IGNORE_FILE="${TEST_PROFILE_DIR}/ignore";
+	IGNORE_LIST="";
+
+	if test -f "${IGNORE_FILE}";
+	then
+		IGNORE_LIST=`cat ${IGNORE_FILE} | sed '/^#/d'`;
+	fi
+
+	for INPUT_DIR in input/*;
+	do
+		if ! test -d "${INPUT_DIR}";
+		then
+			continue
+		fi
+		INPUT_NAME=`basename ${INPUT_DIR}`;
+
+		if list_contains "${IGNORE_LIST}" "${INPUT_NAME}";
+		then
+			continue
+		fi
+		TEST_SET_DIR="${TEST_PROFILE_DIR}/${INPUT_NAME}";
+
+		if ! test -d "${TEST_SET_DIR}";
+		then
+			mkdir "${TEST_SET_DIR}";
+		fi
+
+		if test -f "${TEST_SET_DIR}/files";
+		then
+			INPUT_FILES=`cat ${TEST_SET_DIR}/files | sed "s?^?${INPUT_DIR}/?"`;
+		else
+			INPUT_FILES=`ls ${INPUT_DIR}/${INPUT_GLOB}`;
+		fi
+
+		for INPUT_FILE in ${INPUT_FILES};
+		do
+			TESTED_WITH_OPTIONS=0;
+			INPUT_NAME=`basename ${INPUT_FILE}`;
+
+			for OPTION_SET in `echo ${OPTION_SETS} | tr ' ' '\n'`;
+			do
+				OPTION_FILE="${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}";
+
+				if ! test -f "${OPTION_FILE}";
+				then
+					continue
+				fi
+
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTION_SET}";
+				then
+					return ${EXIT_FAILURE};
+				fi
+				TESTED_WITH_OPTIONS=1;
+			done
+
+			if test ${TESTED_WITH_OPTIONS} -eq 0;
+			then
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "";
+				then
+					return ${EXIT_FAILURE};
+				fi
+			fi
+		done
+	done
+
+	return ${EXIT_SUCCESS};
 }
 
-test_export_unattended()
-{ 
-	INPUT_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
-
-	mkdir ${TMP};
-
-	${EWFEXPORT} -q -u -d sha1 \
-	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
-	-f ${OUTPUT_FORMAT} \
-	-t ${TMP}/unattended_export \
-	${INPUT_FILE}
-
-	RESULT=$?;
-
-	rm -rf ${TMP};
-
-	echo -n "Testing ewfexport of input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
-}
-
-EWFEXPORT="../ewftools/ewfexport";
-
-if ! test -x ${EWFEXPORT};
+if ! test -z ${SKIP_TOOLS_TESTS};
 then
-	EWFEXPORT="../ewftools/ewfexport.exe"
+	exit ${EXIT_IGNORE};
 fi
 
-if ! test -x ${EWFEXPORT};
+EXPORT_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}export";
+
+if ! test -x "${EXPORT_TOOL}";
 then
-	echo "Missing executable: ${EWFEXPORT}";
+	EXPORT_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}export";
+fi
+
+if ! test -x "${EXPORT_TOOL}";
+then
+	echo "Missing executable: ${EXPORT_TOOL}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
-then
-	echo "No ${INPUT} directory found, to test ewfexport create ${INPUT} directory and place EWF test files in directory.";
+OLDIFS=${IFS};
+IFS="
+";
 
-	exit ${EXIT_IGNORE};
-fi
+run_tests "${TEST_PREFIX}export" "${TEST_PREFIX}export" "${EXPORT_TOOL}";
 
-RESULT=`${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n' | ${WC} -l`;
+RESULT=$?;
 
-if test ${RESULT} -eq 0;
-then
-	echo "No files found in ${INPUT} directory, to test ewfexport place EWF test files in directory.";
+IFS=${OLDIFS};
 
-	exit ${EXIT_IGNORE};
-fi
-
-for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
-do
-	if ! test_export_raw "${FILENAME}";
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
-	do
-		if ! test_export_ewf "${FILENAME}" "${FORMAT}" deflate none;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-	done
-
-	for FORMAT in encase7-v2;
-	do
-		# for COMPRESSION_METHOD in deflate bzip2;
-		for COMPRESSION_METHOD in deflate;
-		do
-			if ! test_export_ewf "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-	done
-done
-
-for FILENAME in `${LS} ${INPUT}/*.[esE]01 | ${TR} ' ' '\n'`;
-do
-	for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
-	do
-		if ! test_export_unattended "${FILENAME}" "${FORMAT}" deflate none;
-		then
-			exit ${EXIT_FAILURE};
-		fi
-	done
-
-	for FORMAT in encase7-v2;
-	do
-		# for COMPRESSION_METHOD in deflate bzip2;
-		for COMPRESSION_METHOD in deflate;
-		do
-			if ! test_export_unattended "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" none;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-	done
-done
-
-exit ${EXIT_SUCCESS};
+exit ${RESULT};
 
