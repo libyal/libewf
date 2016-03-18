@@ -153,6 +153,10 @@ AX_PYTHON_CHECK_ENABLE
 AX_PYTHON2_CHECK_ENABLE
 AX_PYTHON3_CHECK_ENABLE
 
+AM_CONDITIONAL(
+ HAVE_PYTHON_TESTS,
+ [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno])
+
 dnl Check if libewf should be build with version 1 API
 AX_LIBEWF_CHECK_ENABLE_V1_API
 

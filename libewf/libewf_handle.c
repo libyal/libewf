@@ -7423,6 +7423,17 @@ off64_t libewf_handle_seek_offset(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->chunk_data != NULL )
 	{
 		libcerror_error_set(

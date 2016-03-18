@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to run an executable for testing.
 #
-# Version: 20160312
+# Version: 20160318
 #
 # When CHECK_WITH_VALGRIND is set to a non-empty value the executable
 # is run with valgrind, otherwise it is run without.
@@ -74,7 +74,19 @@ then
 
 		file -bi ${EXECUTABLE} | sed 's/;.*$//' | grep "application/x-executable" > /dev/null 2>&1;
 
-		if test $? -ne 0;
+		RESULT=$?;
+
+		if test ${RESULT} -ne 0;
+		then
+			EXECUTABLE_DIRNAME=`dirname ${EXECUTABLE}`;
+			EXECUTABLE_BASENAME=`basename ${EXECUTABLE}`;
+			EXECUTABLE="${EXECUTABLE_DIRNAME}/.libs/${EXECUTABLE_BASENAME}";
+
+			file -bi ${EXECUTABLE} | sed 's/;.*$//' | grep "application/x-executable" > /dev/null 2>&1;
+
+			RESULT=$?;
+		fi
+		if test ${RESULT} -ne 0;
 		then
 			echo "Invalid executable: ${EXECUTABLE}";
 

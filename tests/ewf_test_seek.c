@@ -20,17 +20,17 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcnotify.h"
 #include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_unused.h"
 
 /* Define to make ewf_test_seek generate verbose output
 #define EWF_TEST_SEEK_VERBOSE
@@ -45,8 +45,8 @@ int ewf_test_seek_offset(
      int input_whence,
      off64_t output_offset )
 {
-	const char *whence_string = NULL;
 	libcerror_error_t *error  = NULL;
+	const char *whence_string = NULL;
 	off64_t result_offset     = 0;
 	int result                = 0;
 
@@ -82,15 +82,6 @@ int ewf_test_seek_offset(
 	                 input_whence,
 	                 &error );
 
-	if( result_offset == -1 )
-	{
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
-
-		libewf_error_free(
-		 &error );
-	}
 	if( result_offset == output_offset )
 	{
 		result = 1;
@@ -111,13 +102,24 @@ int ewf_test_seek_offset(
 	 stdout,
 	 "\n" );
 
+	if( error != NULL )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 &error );
+	}
 	return( result );
 }
 
 /* Tests seeking in a handle
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int ewf_handle_test_seek(
+int ewf_test_seek(
      libewf_handle_t *handle,
      size64_t media_size )
 {
@@ -155,11 +157,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_SET offset: <media_size>
 	 * Expected result: <media_size>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) media_size,
-	     SEEK_SET,
-	     (off64_t) media_size ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          (off64_t) media_size,
+	          SEEK_SET,
+	          (off64_t) media_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -170,11 +174,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_SET offset: <media_size / 5>
 	 * Expected result: <media_size / 5>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size / 5 ),
-	     SEEK_SET,
-	     (off64_t) ( media_size / 5 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          (off64_t) ( media_size / 5 ),
+	          SEEK_SET,
+	          (off64_t) ( media_size / 5 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -185,11 +191,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_SET offset: <media_size + 987>
 	 * Expected result: <media_size + 987>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size + 987 ),
-	     SEEK_SET,
-	     (off64_t) ( media_size + 987 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          (off64_t) ( media_size + 987 ),
+	          SEEK_SET,
+	          (off64_t) ( media_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -200,11 +208,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_SET offset: -987
 	 * Expected result: -1
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -987,
-	     SEEK_SET,
-	     -1 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          -987,
+	          SEEK_SET,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -215,11 +225,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_CUR offset: 0
 	 * Expected result: <media_size + 987>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     SEEK_CUR,
-	     (off64_t) ( media_size + 987 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          0,
+	          SEEK_CUR,
+	          (off64_t) ( media_size + 987 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -230,11 +242,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_CUR offset: <-1 * (media_size + 987)>
 	 * Expected result: 0
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size + 987 ),
-	     SEEK_CUR,
-	     0 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          -1 * (off64_t) ( media_size + 987 ),
+	          SEEK_CUR,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -245,11 +259,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_CUR offset: <media_size / 3>
 	 * Expected result: <media_size / 3>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     (off64_t) ( media_size / 3 ),
-	     SEEK_CUR,
-	     (off64_t) ( media_size / 3 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          (off64_t) ( media_size / 3 ),
+	          SEEK_CUR,
+	          (off64_t) ( media_size / 3 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -262,11 +278,13 @@ int ewf_handle_test_seek(
 		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
 		 * Expected result: 0
 		 */
-		if( ewf_test_seek_offset(
-		     handle,
-		     -2 * (off64_t) ( media_size / 3 ),
-		     SEEK_CUR,
-		     0 ) != 1 )
+		result = ewf_test_seek_offset(
+		          handle,
+		          -2 * (off64_t) ( media_size / 3 ),
+		          SEEK_CUR,
+		          0 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -280,11 +298,13 @@ int ewf_handle_test_seek(
 		/* Test: SEEK_CUR offset: <-2 * (media_size / 3)>
 		 * Expected result: -1
 		 */
-		if( ewf_test_seek_offset(
-		     handle,
-		     -2 * (off64_t) ( media_size / 3 ),
-		     SEEK_CUR,
-		     -1 ) != 1 )
+		result = ewf_test_seek_offset(
+		          handle,
+		          -2 * (off64_t) ( media_size / 3 ),
+		          SEEK_CUR,
+		          -1 );
+
+		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
@@ -296,11 +316,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_END offset: 0
 	 * Expected result: <media_size>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     SEEK_END,
-	     (off64_t) media_size ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          0,
+	          SEEK_END,
+	          (off64_t) media_size );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -311,11 +333,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_END offset: <-1 * media_size>
 	 * Expected result: 0
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) media_size,
-	     SEEK_END,
-	     0 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          -1 * (off64_t) media_size,
+	          SEEK_END,
+	          0 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -326,11 +350,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_END offset: <-1 * (media_size / 4)>
 	 * Expected result: <media_size - (media_size / 4)>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size / 4 ),
-	     SEEK_END,
-	     (off64_t) media_size - (off64_t) ( media_size / 4 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          -1 * (off64_t) ( media_size / 4 ),
+	          SEEK_END,
+	          (off64_t) media_size - (off64_t) ( media_size / 4 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -341,11 +367,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_END offset: 542
 	 * Expected result: <media_size + 542>
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     542,
-	     SEEK_END,
-	     (off64_t) ( media_size + 542 ) ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          542,
+	          SEEK_END,
+	          (off64_t) ( media_size + 542 ) );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -356,11 +384,13 @@ int ewf_handle_test_seek(
 	/* Test: SEEK_END offset: <-1 * (media_size + 542)>
 	 * Expected result: -1
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     -1 * (off64_t) ( media_size + 542 ),
-	     SEEK_END,
-	     -1 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          -1 * (off64_t) ( media_size + 542 ),
+	          SEEK_END,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -371,11 +401,13 @@ int ewf_handle_test_seek(
 	/* Test: UNKNOWN (88) offset: 0
 	 * Expected result: -1
 	 */
-	if( ewf_test_seek_offset(
-	     handle,
-	     0,
-	     88,
-	     -1 ) != 1 )
+	result = ewf_test_seek_offset(
+	          handle,
+	          0,
+	          88,
+	          -1 );
+
+	if( result != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -386,53 +418,42 @@ int ewf_handle_test_seek(
 	return( result );
 }
 
-/* The main program
+/* Tests seeking in a handle
+ * Returns 1 if successful, 0 if not or -1 on error
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] )
-#else
-int main( int argc, char * const argv[] )
-#endif
+int ewf_test_seek_handle(
+     libcstring_system_character_t *source,
+     libcerror_error_t **error )
 {
 	libcstring_system_character_t **filenames = NULL;
-	libewf_error_t *error                     = NULL;
 	libewf_handle_t *handle                   = NULL;
 	size64_t media_size                       = 0;
+	size_t string_length                      = 0;
 	int number_of_filenames                   = 0;
+	int result                                = 0;
 
-	if( argc < 2 )
-	{
-		fprintf(
-		 stderr,
-		 "Missing filename(s).\n" );
-
-		return( EXIT_FAILURE );
-	}
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_SEEK_VERBOSE )
-	libewf_notify_set_verbose(
-	 1 );
-	libewf_notify_set_stream(
-	 stderr,
-	 NULL );
-#endif
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	string_length = libcstring_wide_string_length(
+	                 source );
+
 	if( libewf_glob_wide(
-	     argv[ 1 ],
-	     libcstring_wide_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,
-	     &error ) != 1 )
+	     error ) != 1 )
 #else
+	string_length = libcstring_narrow_string_length(
+	                 source );
+
 	if( libewf_glob(
-	     argv[ 1 ],
-	     libcstring_narrow_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,
-	     &error ) != 1 )
+	     error ) != 1 )
 #endif
 	{
 		fprintf(
@@ -457,11 +478,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	/* Initialization
-	 */
 	if( libewf_handle_initialize(
 	     &handle,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -472,17 +491,17 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,
-	     filenames,
+	     (wchar_t * const *) filenames,
 	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
-	     &error ) != 1 )
+	     error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     handle,
-	     filenames,
+	     (char * const *) filenames,
 	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
-	     &error ) != 1 )
+	     error ) != 1 )
 #endif
 	{
 		fprintf(
@@ -494,7 +513,7 @@ int main( int argc, char * const argv[] )
 	if( libewf_handle_get_media_size(
 	     handle,
 	     &media_size,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -502,9 +521,11 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( ewf_handle_test_seek(
-	     handle,
-	     media_size ) != 1 )
+	result = ewf_test_seek(
+	          handle,
+	          media_size );
+
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -512,11 +533,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	/* Clean up
-	 */
 	if( libewf_handle_close(
 	     handle,
-	     &error ) != 0 )
+	     error ) != 0 )
 	{
 		fprintf(
 		 stderr,
@@ -526,7 +545,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libewf_handle_free(
 	     &handle,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
 		fprintf(
 		 stderr,
@@ -538,12 +557,12 @@ int main( int argc, char * const argv[] )
 	if( libewf_glob_wide_free(
 	     filenames,
 	     number_of_filenames,
-	     &error ) != 1 )
+	     error ) != 1 )
 #else
 	if( libewf_glob_free(
 	     filenames,
 	     number_of_filenames,
-	     &error ) != 1 )
+	     error ) != 1 )
 #endif
 	{
 		fprintf(
@@ -552,17 +571,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	return( EXIT_SUCCESS );
+	return( result );
 
 on_error:
-	if( error != NULL )
-	{
-		libewf_error_backtrace_fprint(
-		 error,
-		 stderr );
-		libewf_error_free(
-		 &error );
-	}
 	if( handle != NULL )
 	{
 		libewf_handle_close(
@@ -585,6 +596,178 @@ on_error:
 		 number_of_filenames,
 		 NULL );
 #endif
+	}
+	return( -1 );
+}
+
+/* Tests seeking in a handle without opening it
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int ewf_test_seek_handle_no_open(
+     libcstring_system_character_t *source EWF_TEST_ATTRIBUTE_UNUSED,
+     libcerror_error_t **error )
+{
+	libewf_handle_t *handle = NULL;
+	off64_t result_offset   = 0;
+	int result              = 0;
+
+	EWF_TEST_UNREFERENCED_PARAMETER( source );
+
+	if( libewf_handle_initialize(
+	     &handle,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create handle.\n" );
+
+		goto on_error;
+	}
+	fprintf(
+	 stdout,
+	 "Testing seek without open: \t" );
+
+	result_offset = libewf_handle_seek_offset(
+	                 handle,
+	                 0,
+	                 SEEK_SET,
+	                 error );
+
+	if( result_offset == -1 )
+	{
+		result = 1;
+	}
+	if( result != 0 )
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(FAIL)" );
+	}
+	fprintf(
+	 stdout,
+	 "\n" );
+
+	if( ( error != NULL )
+	 && ( *error != NULL ) )
+	{
+		if( result != 1 )
+		{
+			libcerror_error_backtrace_fprint(
+			 *error,
+			 stderr );
+		}
+		libcerror_error_free(
+		 error );
+	}
+	if( libewf_handle_free(
+	     &handle,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free handle.\n" );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( handle != NULL )
+	{
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* The main program
+ */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+int wmain( int argc, wchar_t * const argv[] )
+#else
+int main( int argc, char * const argv[] )
+#endif
+{
+	libcerror_error_t *error              = NULL;
+	libcstring_system_character_t *source = NULL;
+	libcstring_system_integer_t option    = 0;
+	int result                            = 0;
+
+	while( ( option = libcsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind == argc )
+	{
+		fprintf(
+		 stderr,
+		 "Missing source file or device.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	source = argv[ optind ];
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_SEEK_VERBOSE )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+	result = ewf_test_seek_handle(
+	          source,
+	          &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in handle.\n" );
+
+		goto on_error;
+	}
+	result = ewf_test_seek_handle_no_open(
+	          source,
+	          &error );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to seek in handle without open.\n" );
+
+		goto on_error;
+	}
+	return( EXIT_SUCCESS );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libcerror_error_free(
+		 &error );
 	}
 	return( EXIT_FAILURE );
 }

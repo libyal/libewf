@@ -3,15 +3,24 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
+	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
+	@LIBCSPLIT_CPPFLAGS@ \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
+	@LIBCPATH_CPPFLAGS@ \
+	@LIBBFIO_CPPFLAGS@ \
 	@LIBCSYSTEM_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
-if HAVE_PYTHON
-TESTS_PYEWF =
+if HAVE_PYTHON_TESTS
+TESTS_PYEWF = \
+	test_pyewf_open_close.sh \
+	test_pyewf_seek.sh \
+	test_pyewf_read.sh
 endif
 
 TESTS = \
@@ -36,6 +45,9 @@ TESTS = \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
+	pyewf_test_open_close.py \
+	pyewf_test_read.py \
+	pyewf_test_seek.py \
 	test_ewfacquire.sh \
 	test_ewfacquire_optical.sh \
 	test_ewfacquire_resume.sh \
@@ -47,6 +59,9 @@ check_SCRIPTS = \
 	test_ewfverify_logical.sh \
 	test_glob.sh \
 	test_open_close.sh \
+	test_pyewf_open_close.sh \
+	test_pyewf_read.sh \
+	test_pyewf_seek.sh \
 	test_read.sh \
 	test_read_chunk.sh \
 	test_read_delta.sh \
@@ -80,7 +95,8 @@ ewf_test_glob_SOURCES = \
 
 ewf_test_glob_LDADD = \
 	../libewf/libewf.la \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_open_close_SOURCES = \
 	ewf_test_libewf.h \
@@ -103,27 +119,34 @@ ewf_test_read_SOURCES = \
 	ewf_test_definitions.h \
 	ewf_test_libcerror.h \
 	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
+	ewf_test_libcthreads.h \
 	ewf_test_libewf.h \
 	ewf_test_read.c \
 	ewf_test_unused.h
 
 ewf_test_read_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_read_chunk_SOURCES = \
 	ewf_test_definitions.h \
 	ewf_test_libcerror.h \
 	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_read_chunk.c \
 	ewf_test_unused.h
 
 ewf_test_read_chunk_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_read_delta_SOURCES = \
 	ewf_test_definitions.h \
@@ -136,7 +159,8 @@ ewf_test_read_delta_SOURCES = \
 ewf_test_read_delta_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_read_write_SOURCES = \
 	ewf_test_definitions.h \
@@ -153,7 +177,8 @@ ewf_test_read_write_LDADD = \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_read_write_delta_SOURCES = \
 	ewf_test_definitions.h \
@@ -168,19 +193,23 @@ ewf_test_read_write_delta_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_seek_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_seek.c \
 	ewf_test_unused.h
 
 ewf_test_seek_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_truncate_SOURCES = \
 	ewf_test_libcerror.h \
@@ -198,7 +227,8 @@ ewf_test_truncate_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_write_SOURCES = \
 	ewf_test_definitions.h \
@@ -212,7 +242,8 @@ ewf_test_write_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_definitions.h \
@@ -227,7 +258,8 @@ ewf_test_write_chunk_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

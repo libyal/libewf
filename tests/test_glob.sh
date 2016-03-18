@@ -1,28 +1,17 @@
 #!/bin/bash
-#
 # Library glob testing script
 #
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160131
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
+
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
+
+TEST_EXECUTABLE="${TEST_PREFIX}_test_glob";
 
 chr()
 {
@@ -58,28 +47,30 @@ test_glob()
 	SCHEMA=$2;
 	FILENAMES=$3;
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	TMPDIR="tmp$$";
 
-	rm -rf tmp;
-	mkdir tmp;
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
 
-	echo ${FILENAMES} > tmp/input;
+	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
+
+	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	${TEST_RUNNER} ${TMPDIR} ${TEST_GLOB} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	rm -rf ${TMPDIR};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -224,28 +215,30 @@ test_glob_sequence3()
 		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
 	fi
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	TMPDIR="tmp$$";
 
-	rm -rf tmp;
-	mkdir tmp;
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
 
-	echo ${FILENAMES} > tmp/input;
+	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
+
+	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	${TEST_RUNNER} ${TMPDIR} ${TEST_GLOB} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	rm -rf ${TMPDIR};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -357,28 +350,30 @@ test_glob_sequence4()
 		FILENAMES="${FILENAMES} ${FILENAME}.${EXTENSION}";
 	fi
 
-	FILENAMES=`echo ${FILENAMES} | sed 's?^?tmp/?' | sed 's? ? tmp/?g'`;
+	TMPDIR="tmp$$";
 
-	rm -rf tmp;
-	mkdir tmp;
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
 
-	echo ${FILENAMES} > tmp/input;
+	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
+
+	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
 
-	${TEST_RUNNER} ./${EWF_TEST_GLOB} tmp/${BASENAME} > tmp/output;
+	${TEST_RUNNER} ${TMPDIR} ${TEST_GLOB} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		if ! cmp -s tmp/input tmp/output;
+		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
 		fi
 	fi
 
-	rm -rf tmp;
+	rm -rf ${TMPDIR};
 
 	echo -n "Testing glob: for basename: ${BASENAME} and schema: ${SCHEMA} ";
 
@@ -391,13 +386,16 @@ test_glob_sequence4()
 	return ${RESULT};
 }
 
-EWF_TEST_GLOB="ewf_test_glob";
-
-if ! test -x ${EWF_TEST_GLOB};
+if ! test -z ${SKIP_LIBRARY_TESTS};
 then
-	echo "Missing executable: ${EWF_TEST_GLOB}";
+	exit ${EXIT_IGNORE};
+fi
 
-	exit ${EXIT_FAILURE};
+TEST_GLOB="./${TEST_EXECUTABLE}";
+
+if ! test -x "${TEST_GLOB}";
+then
+	TEST_GLOB="${TEST_EXECUTABLE}.exe";
 fi
 
 TEST_RUNNER="tests/test_runner.sh";

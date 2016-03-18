@@ -20,15 +20,15 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
 /* Tests single open and close of a handle
@@ -40,10 +40,10 @@ int ewf_test_single_open_close_handle(
      int access_flags,
      int expected_result )
 {
-	libcerror_error_t *error  = NULL;
-	libewf_handle_t *handle = NULL;
-	static char *function     = "ewf_test_single_open_close_handle";
-	int result                = 0;
+	libcerror_error_t *error = NULL;
+	libewf_handle_t *handle  = NULL;
+	static char *function    = "ewf_test_single_open_close_handle";
+	int result               = 0;
 
 	if( libewf_handle_initialize(
 	     &handle,
@@ -56,7 +56,7 @@ int ewf_test_single_open_close_handle(
 		 "%s: unable to create handle.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
@@ -86,7 +86,7 @@ int ewf_test_single_open_close_handle(
 			 "%s: unable to close handle.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 	}
 	if( libewf_handle_free(
@@ -100,7 +100,7 @@ int ewf_test_single_open_close_handle(
 		 "%s: unable to free handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	result = ( expected_result == result );
 
@@ -122,16 +122,30 @@ int ewf_test_single_open_close_handle(
 
 	if( error != NULL )
 	{
-		if( result != 1 )
-		{
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stderr );
-		}
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
 		libcerror_error_free(
 		 &error );
 	}
 	return( result );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libcerror_error_free(
+		 &error );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_free(
+		 &handle,
+		 NULL);
+	}
+	return( -1 );
 }
 
 /* Tests multiple open and close of a handle
@@ -143,10 +157,10 @@ int ewf_test_multi_open_close_handle(
      int access_flags,
      int expected_result )
 {
-	libcerror_error_t *error  = NULL;
-	libewf_handle_t *handle = NULL;
-	static char *function     = "ewf_test_multi_open_close_handle";
-	int result                = 0;
+	libcerror_error_t *error = NULL;
+	libewf_handle_t *handle  = NULL;
+	static char *function    = "ewf_test_multi_open_close_handle";
+	int result               = 0;
 
 	if( libewf_handle_initialize(
 	     &handle,
@@ -159,7 +173,7 @@ int ewf_test_multi_open_close_handle(
 		 "%s: unable to create handle.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
@@ -189,7 +203,7 @@ int ewf_test_multi_open_close_handle(
 			 "%s: unable to close handle.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_handle_open_wide(
@@ -219,7 +233,7 @@ int ewf_test_multi_open_close_handle(
 				 "%s: unable to close handle.",
 				 function );
 
-				result = -1;
+				goto on_error;
 			}
 		}
 	}
@@ -234,7 +248,7 @@ int ewf_test_multi_open_close_handle(
 		 "%s: unable to free handle.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 	result = ( expected_result == result );
 
@@ -256,16 +270,30 @@ int ewf_test_multi_open_close_handle(
 
 	if( error != NULL )
 	{
-		if( result != 1 )
-		{
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stderr );
-		}
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
 		libcerror_error_free(
 		 &error );
 	}
 	return( result );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libcerror_error_free(
+		 &error );
+	}
+	if( handle != NULL )
+	{
+		libewf_handle_free(
+		 &handle,
+		 NULL);
+	}
+	return( -1 );
 }
 
 /* The main program
@@ -277,17 +305,43 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcstring_system_character_t **filenames = NULL;
-	libewf_error_t *error                     = NULL;
+	libcerror_error_t *error                  = NULL;
+	libcstring_system_integer_t option        = 0;
 	int number_of_filenames                   = 0;
 
-	if( argc != 2 )
+	while( ( option = libcsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
-		 "Unsupported number of arguments.\n" );
+		 "Missing source file or device.\n" );
 
 		return( EXIT_FAILURE );
 	}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_OPEN_CLOSE_VERBOSE )
+	libewf_notify_set_verbose(
+	 1 );
+	libewf_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
+
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_glob_wide(
 	     argv[ 1 ],

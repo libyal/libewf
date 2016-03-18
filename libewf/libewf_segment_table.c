@@ -470,6 +470,8 @@ int libewf_segment_table_empty(
 
 		result = -1;
 	}
+	segment_table->number_of_segments = 0;
+
 	return( result );
 }
 
