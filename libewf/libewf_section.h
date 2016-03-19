@@ -397,23 +397,6 @@ ssize_t libewf_section_volume_s01_write(
          libewf_media_values_t *media_values,
          libcerror_error_t **error );
 
-ssize_t libewf_section_delta_chunk_read_header(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint32_t *chunk_index,
-         uint32_t *chunk_data_size,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_delta_chunk_write_header(
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         uint32_t chunk_index,
-         uint32_t chunk_data_size,
-         libcerror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

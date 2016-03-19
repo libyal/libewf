@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 
-#include "ewf_test_definitions.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"

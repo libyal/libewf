@@ -129,11 +129,6 @@ int libewf_filename_set_extension(
 		first_character       = 's';
 		additional_characters = 'a';
 	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-	{
-		first_character       = 'd';
-		additional_characters = 'a';
-	}
 	else
 	{
 		libcerror_error_set(
@@ -342,11 +337,6 @@ int libewf_filename_set_extension_wide(
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	{
 		first_character       = (wchar_t) 's';
-		additional_characters = (wchar_t) 'a';
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_DELTA )
-	{
-		first_character       = (wchar_t) 'd';
 		additional_characters = (wchar_t) 'a';
 	}
 	else

@@ -1892,10 +1892,10 @@ int libewf_chunk_data_read_element_data(
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_chunk_data_read_element_data";
-	off64_t storage_media_offset    = 0;
 	ssize_t read_count              = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	off64_t storage_media_offset    = 0;
 	uint64_t chunk_index            = -1;
 #endif
 
@@ -2080,11 +2080,6 @@ int libewf_chunk_data_read_element_data(
 		{
 			libcnotify_printf(
 			 "\tHas checksum\n" );
-		}
-		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_IS_DELTA ) != 0 )
-		{
-			libcnotify_printf(
-			 "\tIs delta\n" );
 		}
 		libcnotify_printf(
 		 "\n" );

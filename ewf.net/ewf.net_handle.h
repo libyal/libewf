@@ -69,20 +69,12 @@ public ref class Handle sealed
 		                        int size,
 		                        System::Int64 offset );
 
-		int ReadRandom( array<System::Byte>^ buffer,
-		                int size,
-		                System::Int64 offset );
-
 		int WriteBuffer( array<System::Byte>^ buffer,
 		                 int size );
 
 		int WriteBufferAtOffset( array<System::Byte>^ buffer,
 		                         int size,
 		                         System::Int64 offset );
-
-		int WriteRandom( array<System::Byte>^ buffer,
-		                 int size,
-		                 System::Int64 offset );
 
 		System::Int64 SeekOffset( System::Int64 offset,
 		                          System::IO::SeekOrigin origin );

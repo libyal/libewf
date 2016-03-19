@@ -97,13 +97,6 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  "\n"
 	  "Reads a buffer of media data at a specific offset." },
 
-	{ "read_random",
-	  (PyCFunction) pyewf_handle_read_buffer_at_offset,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "read_random(size, offset) -> String\n"
-	  "\n"
-	  "Reads a buffer of media data at a specific offset." },
-
 	{ "write_buffer",
 	  (PyCFunction) pyewf_handle_write_buffer,
 	  METH_VARARGS | METH_KEYWORDS,
@@ -115,13 +108,6 @@ PyMethodDef pyewf_handle_object_methods[] = {
 	  (PyCFunction) pyewf_handle_write_buffer_at_offset,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "write_buffer_at_offset(buffer, offset) -> None\n"
-	  "\n"
-	  "Writes a buffer of media data at a specific offset." },
-
-	{ "write_random",
-	  (PyCFunction) pyewf_handle_write_buffer_at_offset,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "write_random(buffer, offset) -> None\n"
 	  "\n"
 	  "Writes a buffer of media data at a specific offset." },
 
@@ -779,18 +765,9 @@ PyObject *pyewf_handle_open(
 	}
 	else if( mode[ 0 ] == 'r' )
 	{
-		if( mode[ 1 ] == '+' )
-		{
-			if( ( mode[ 2 ] == 0 )
-			 || ( ( mode[ 2 ] == 'b' )
-			  &&  ( mode[ 3 ] == 0 ) ) )
-			{
-				access_flags = LIBEWF_OPEN_READ_WRITE;
-			}
-		}
-		else if( ( mode[ 1 ] == 0 )
-		      || ( ( mode[ 1 ] == 'b' )
-		       &&  ( mode[ 2 ] == 0 ) ) )
+		if( ( mode[ 1 ] == 0 )
+		  || ( ( mode[ 1 ] == 'b' )
+		   &&  ( mode[ 2 ] == 0 ) ) )
 		{
 			access_flags = LIBEWF_OPEN_READ;
 		}

@@ -42,11 +42,9 @@ int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      libewf_io_handle_t *io_handle,
      size64_t maximum_segment_size,
-     uint8_t is_delta,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_segment_table_initialize";
-	int result            = 0;
 
 	if( segment_table == NULL )
 	{
@@ -114,33 +112,16 @@ int libewf_segment_table_initialize(
 
 		return( -1 );
 	}
-	if( is_delta == 0 )
-	{
 /* TODO add write support ? */
-		result = libfdata_list_initialize(
-			  &( ( *segment_table )->segment_files_list ),
-			  (intptr_t *) io_handle,
-			  NULL,
-			  NULL,
-			  (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
-			  NULL,
-			  LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-			  error );
-	}
-	else
-	{
-/* TODO add write support ? */
-		result = libfdata_list_initialize(
-			  &( ( *segment_table )->segment_files_list ),
-			  (intptr_t *) io_handle,
-			  NULL,
-			  NULL,
-		          (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_delta_segment_file_read_element_data,
-			  NULL,
-			  LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-			  error );
-	}
-	if( result != 1 )
+	if( libfdata_list_initialize(
+	     &( ( *segment_table )->segment_files_list ),
+	     (intptr_t *) io_handle,
+	     NULL,
+	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
+	     NULL,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -151,21 +132,10 @@ int libewf_segment_table_initialize(
 
 		goto on_error;
 	}
-	if( is_delta == 0 )
-	{
-		result = libfcache_cache_initialize(
-		          &( ( *segment_table )->segment_files_cache ),
-		          LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES,
-		          error );
-	}
-	else
-	{
-		result = libfcache_cache_initialize(
-		          &( ( *segment_table )->segment_files_cache ),
-		          LIBEWF_MAXIMUM_CACHE_ENTRIES_DELTA_SEGMENT_FILES,
-		          error );
-	}
-	if( result != 1 )
+	if( libfcache_cache_initialize(
+	     &( ( *segment_table )->segment_files_cache ),
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SEGMENT_FILES,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

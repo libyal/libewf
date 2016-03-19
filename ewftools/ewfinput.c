@@ -148,7 +148,7 @@ int ewfinput_determine_ewf_format(
 		          _LIBCSTRING_SYSTEM_STRING( "ftk" ),
 		          3 ) == 0 )
 		{
-			*ewf_format = LIBEWF_FORMAT_FTK;
+			*ewf_format = LIBEWF_FORMAT_FTK_IMAGER;
 			result      = 1;
 		}
 	}

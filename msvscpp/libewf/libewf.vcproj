@@ -260,10 +260,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_legacy.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_media_values.c"
 				>
 			</File>
@@ -366,10 +362,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewfx_delta_chunk.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_analytical_data.h"
 				>
 			</File>
@@ -463,10 +455,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_io_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_legacy.h"
 				>
 			</File>
 			<File

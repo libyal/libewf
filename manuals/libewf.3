@@ -1,4 +1,4 @@
-.Dd January  7, 2015
+.Dd March 19, 2016
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -113,16 +113,6 @@ Handle functions
 .Ft int
 .Fn libewf_handle_set_maximum_segment_size "libewf_handle_t *handle, size64_t maximum_segment_size, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_delta_segment_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t filename_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_get_maximum_delta_segment_size "libewf_handle_t *handle, size64_t *maximum_delta_segment_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_set_maximum_delta_segment_size "libewf_handle_t *handle, size64_t maximum_delta_segment_size, libewf_error_t **error"
-.Ft int
 .Fn libewf_handle_segment_files_corrupted "libewf_handle_t *handle, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_segment_files_encrypted "libewf_handle_t *handle, libewf_error_t **error"
@@ -140,12 +130,6 @@ Available when compiled with wide character string support:
 .Fn libewf_handle_get_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t filename_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t filename_length, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_get_delta_segment_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_get_delta_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t filename_size, libewf_error_t **error"
-.Ft int
-.Fn libewf_handle_set_delta_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t filename_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
 .Ft int

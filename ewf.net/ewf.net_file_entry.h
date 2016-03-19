@@ -76,10 +76,6 @@ public ref class FileEntry sealed
 		                        int size,
 		                        System::Int64 offset );
 
-		int ReadRandom( array<System::Byte>^ buffer,
-		                int size,
-		                System::Int64 offset );
-
 		System::Int64 SeekOffset( System::Int64 offset,
 		                          System::IO::SeekOrigin origin );
 

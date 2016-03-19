@@ -28,9 +28,9 @@
 
 #include <stdio.h>
 
-#include "ewf_test_definitions.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libcstring.h"
+#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
 /* Define to make ewf_test_read generate verbose output
@@ -353,6 +353,248 @@ int ewf_test_read_chunk_at_offset(
 	return( result );
 }
 
+/* Tests reading chunks from a handle
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int ewf_test_read_chunk_from_handle(
+     libewf_handle_t *handle,
+     size64_t media_size,
+     size32_t chunk_size )
+{
+	off64_t read_offset = 0;
+	size64_t read_size  = 0;
+	int result          = 0;
+
+	if( handle == NULL )
+	{
+		return( -1 );
+	}
+	if( media_size > (size64_t) INT64_MAX )
+	{
+		fprintf(
+		 stderr,
+		 "Media size exceeds maximum.\n" );
+
+		return( -1 );
+	}
+	/* Case 0: test full read
+	 */
+
+	/* Test: offset: 0 size: <media_size>
+	 * Expected result: offset: 0 size: <media_size>
+	 */
+	read_offset = 0;
+	read_size   = media_size;
+
+	result = ewf_test_read_chunk_at_offset(
+	          handle,
+	          chunk_size,
+	          read_offset,
+	          SEEK_SET,
+	          read_size,
+	          read_offset,
+	          read_size );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test read chunk.\n" );
+
+		return( -1 );
+	}
+	result = ewf_test_read_chunk_at_offset(
+	          handle,
+	          chunk_size,
+	          read_offset,
+	          SEEK_SET,
+	          read_size,
+	          read_offset,
+	          read_size );
+
+	if( result != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to test read chunk.\n" );
+
+		return( -1 );
+	}
+
+	/* Case 1: test random read
+	 */
+
+	/* Test: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
+	 * Expected result: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
+	 */
+	read_offset = (off64_t) ( ( media_size / 7 ) / chunk_size ) * chunk_size;
+	read_size   = ( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size;
+
+	if( media_size == 0 )
+	{
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          read_offset,
+		          0 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          read_offset,
+		          0 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          read_offset,
+		          read_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          read_offset,
+		          read_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	/* Case 2: test read chunk beyond media size
+	 */
+	if( media_size < 1024 )
+	{
+		/* Test: offset: <media_size - 1024> size: chunk_size
+		 * Expected result: offset: -1 size: <undetermined>
+		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = chunk_size;
+
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		/* Test: offset: <media_size - 1024> size: chunk_size
+		 * Expected result: offset: <media_size - 1024> size: chunk size or media_size % chunk_size
+		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = chunk_size;
+
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          (off64_t) ( media_size - 1024 ),
+		          ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          (off64_t) ( media_size - 1024 ),
+		          ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
@@ -361,21 +603,43 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error = NULL;
-	libewf_handle_t *handle = NULL;
-	off64_t read_offset     = 0;
-	size64_t media_size     = 0;
-	size64_t read_size      = 0;
-	size32_t chunk_size     = 0;
+	libcstring_system_character_t **filenames = NULL;
+	libcstring_system_character_t *source     = NULL;
+	libcerror_error_t *error                  = NULL;
+	libewf_handle_t *handle                   = NULL;
+	libcstring_system_integer_t option        = 0;
+	size64_t media_size                       = 0;
+	size32_t chunk_size                       = 0;
+	size_t string_length                      = 0;
+	int number_of_filenames                   = 0;
 
-	if( argc < 2 )
+	while( ( option = libcsystem_getopt(
+	                   argc,
+	                   argv,
+	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	{
+		switch( option )
+		{
+			case (libcstring_system_integer_t) '?':
+			default:
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 argv[ optind - 1 ] );
+
+				return( EXIT_FAILURE );
+		}
+	}
+	if( optind == argc )
 	{
 		fprintf(
 		 stderr,
-		 "Missing filename(s).\n" );
+		 "Missing source file or device.\n" );
 
 		return( EXIT_FAILURE );
 	}
+	source = argv[ optind ];
+
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
@@ -383,6 +647,53 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	string_length = libcstring_wide_string_length(
+	                 source );
+
+	if( libewf_glob_wide(
+	     source,
+	     string_length,
+	     LIBEWF_FORMAT_UNKNOWN,
+	     &filenames,
+	     &number_of_filenames,
+	     &error ) != 1 )
+#else
+	string_length = libcstring_narrow_string_length(
+	                 source );
+
+	if( libewf_glob(
+	     source,
+	     string_length,
+	     LIBEWF_FORMAT_UNKNOWN,
+	     &filenames,
+	     &number_of_filenames,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to glob filenames.\n" );
+
+		goto on_error;
+	}
+	if( number_of_filenames < 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Invalid number of filenames.\n" );
+
+		goto on_error;
+	}
+	else if( number_of_filenames == 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Missing filenames.\n" );
+
+		goto on_error;
+	}
 	/* Initialization
 	 */
 	if( libewf_handle_initialize(
@@ -398,15 +709,15 @@ int main( int argc, char * const argv[] )
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,
-	     &( argv[ 1 ] ),
-	     argc - 1,
+	     filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     &error ) != 1 )
 #else
 	if( libewf_handle_open(
 	     handle,
-	     &( argv[ 1 ] ),
-	     argc - 1,
+	     filenames,
+	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     &error ) != 1 )
 #endif
@@ -465,201 +776,32 @@ int main( int argc, char * const argv[] )
 	 "\nChunk size: %" PRIu32 " bytes\n",
 	 chunk_size );
 
-	/* Case 0: test full read
-	 */
-
-	/* Test: offset: 0 size: <media_size>
-	 * Expected result: offset: 0 size: <media_size>
-	 */
-	read_offset = 0;
-	read_size   = media_size;
-
-	if( ewf_test_read_chunk_at_offset(
+	if( ewf_test_read_chunk_from_handle(
 	     handle,
-	     chunk_size,
-	     read_offset,
-	     SEEK_SET,
-	     read_size,
-	     read_offset,
-	     read_size ) != 1 )
+	     media_size,
+	     chunk_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read chunk.\n" );
+		 "Unable to read chunk from handle.\n" );
 
 		goto on_error;
 	}
-	if( ewf_test_read_chunk_at_offset(
+/* TODO implement thread support
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( ewf_test_read_chunk_from_handle_multi_thread(
 	     handle,
-	     chunk_size,
-	     read_offset,
-	     SEEK_SET,
-	     read_size,
-	     read_offset,
-	     read_size ) != 1 )
+	     media_size,
+	     EWF_TEST_READ_NUMBER_OF_THREADS ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read chunk.\n" );
+		 "Unable to read chunk from handle in multiple threads.\n" );
 
 		goto on_error;
 	}
-
-	/* Case 1: test random read
-	 */
-
-	/* Test: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
-	 * Expected result: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
-	 */
-	read_offset = (off64_t) ( ( media_size / 7 ) / chunk_size ) * chunk_size;
-	read_size   = ( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size;
-
-	if( media_size == 0 )
-	{
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     read_offset,
-		     0 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     read_offset,
-		     0 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-	}
-	else
-	{
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     read_offset,
-		     read_size ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     read_offset,
-		     read_size ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-	}
-	/* Case 2: test read chunk beyond media size
-	 */
-	if( media_size < 1024 )
-	{
-		/* Test: offset: <media_size - 1024> size: chunk_size
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = chunk_size;
-
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     -1,
-		     (size64_t) -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     -1,
-		     (size64_t) -1 ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-	}
-	else
-	{
-		/* Test: offset: <media_size - 1024> size: chunk_size
-		 * Expected result: offset: <media_size - 1024> size: chunk size or media_size % chunk_size
-		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = chunk_size;
-
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     (off64_t) ( media_size - 1024 ),
-		     ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-		if( ewf_test_read_chunk_at_offset(
-		     handle,
-		     chunk_size,
-		     read_offset,
-		     SEEK_SET,
-		     read_size,
-		     (off64_t) ( media_size - 1024 ),
-		     ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to test read chunk.\n" );
-
-			goto on_error;
-		}
-	}
+#endif
+*/
 	/* Clean up
 	 */
 	if( libewf_handle_close(
@@ -682,6 +824,24 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	if( libewf_glob_wide_free(
+	     filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
+#else
+	if( libewf_glob_free(
+	     filenames,
+	     number_of_filenames,
+	     &error ) != 1 )
+#endif
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free glob.\n" );
+
+		goto on_error;
+	}
 	return( EXIT_SUCCESS );
 
 on_error:
@@ -701,6 +861,20 @@ on_error:
 		libewf_handle_free(
 		 &handle,
 		 NULL );
+	}
+	if( filenames != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
 	}
 	return( EXIT_FAILURE );
 }

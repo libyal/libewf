@@ -5841,7 +5841,7 @@ int imaging_handle_print_parameters(
 			 "SMART (.s01)" );
 			break;
 
-		case LIBEWF_FORMAT_FTK:
+		case LIBEWF_FORMAT_FTK_IMAGER:
 			fprintf(
 			 imaging_handle->notify_stream,
 			 "FTK Imager (.E01)" );

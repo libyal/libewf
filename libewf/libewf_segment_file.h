@@ -201,15 +201,6 @@ ssize_t libewf_segment_file_read_volume_section(
          libewf_media_values_t *media_values,
          libcerror_error_t **error );
 
-ssize_t libewf_segment_file_read_delta_chunk_section(
-         libewf_segment_file_t *segment_file,
-         libewf_section_t *section,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint32_t *chunk_index,
-         uint32_t *chunk_size,
-         libcerror_error_t **error );
-
 ssize_t libewf_segment_file_write_device_information_section(
          libewf_segment_file_t *segment_file,
          libbfio_pool_t *file_io_pool,
@@ -318,17 +309,6 @@ ssize_t libewf_segment_file_write_chunk_data(
          libewf_chunk_data_t *chunk_data,
          libcerror_error_t **error );
 
-ssize_t libewf_segment_file_write_delta_chunk(
-         libewf_segment_file_t *segment_file,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint64_t chunk_index,
-         libewf_chunk_data_t *chunk_data,
-         off64_t *chunk_data_offset,
-         uint32_t *chunk_write_size,
-	 uint8_t no_section_append,
-         libcerror_error_t **error );
-
 ssize_t libewf_segment_file_write_hash_sections(
          libewf_segment_file_t *segment_file,
          libbfio_pool_t *file_io_pool,
@@ -382,18 +362,6 @@ int libewf_segment_file_write_sections_correction(
      libcerror_error_t **error );
 
 int libewf_segment_file_read_element_data(
-     libewf_io_handle_t *io_handle,
-     libbfio_pool_t *file_io_pool,
-     libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
-     int file_io_pool_entry,
-     off64_t element_offset,
-     size64_t segment_file_size,
-     uint32_t element_flags,
-     uint8_t read_flags,
-     libcerror_error_t **error );
-
-int libewf_delta_segment_file_read_element_data(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,

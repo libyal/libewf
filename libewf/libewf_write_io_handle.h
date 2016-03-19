@@ -315,19 +315,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t input_data_size,
          libcerror_error_t **error );
 
-ssize_t libewf_write_io_handle_write_existing_chunk(
-         libewf_write_io_handle_t *write_io_handle,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         libewf_media_values_t *media_values,
-         libewf_segment_table_t *delta_segment_table,
-         libfdata_range_list_t *delta_chunks_range_list,
-         off64_t storage_media_offset,
-         uint64_t chunk_index,
-         libewf_chunk_data_t *chunk_data,
-         size_t input_data_size,
-         libcerror_error_t **error );
-
 int libewf_write_io_handle_finalize_write_sections_corrections(
      libewf_write_io_handle_t *write_io_handle,
      libbfio_pool_t *file_io_pool,

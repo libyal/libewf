@@ -35,7 +35,6 @@ libewf_la_SOURCES = \
 	ewf_session.h \
 	ewf_table.h \
 	ewf_volume.h \
-	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_analytical_data.c libewf_analytical_data.h \
 	libewf_case_data.c libewf_case_data.h \
@@ -61,7 +60,6 @@ libewf_la_SOURCES = \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_io_handle.c libewf_io_handle.h \
-	libewf_legacy.c libewf_legacy.h \
 	libewf_libbfio.h \
 	libewf_libcaes.h \
 	libewf_libcdata.h \
@@ -114,7 +112,7 @@ libewf_la_LIBADD = \
 	@LIBDL_LIBADD@ \
 	@PTHREAD_LIBADD@
 
-libewf_la_LDFLAGS = -no-undefined -version-info 3:0:1
+libewf_la_LDFLAGS = -no-undefined -version-info 3:0:0
 
 EXTRA_DIST = \
 	libewf_definitions.h.in \

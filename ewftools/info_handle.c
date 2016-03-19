@@ -2224,7 +2224,7 @@ int info_handle_media_information_fprint(
 			value_string = _LIBCSTRING_SYSTEM_STRING( "SMART" );
 			break;
 
-		case LIBEWF_FORMAT_FTK:
+		case LIBEWF_FORMAT_FTK_IMAGER:
 			value_string = _LIBCSTRING_SYSTEM_STRING( "FTK Imager" );
 			break;
 
@@ -2842,7 +2842,7 @@ int info_handle_media_information_fprint(
 			}
 		}
 	}
-	if( format != LIBEWF_FORMAT_LVF )
+	if( format != LIBEWF_FORMAT_LOGICAL_ENCASE5 )
 	{
 		if( libewf_handle_get_bytes_per_sector(
 		     info_handle->input_handle,

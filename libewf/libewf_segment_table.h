@@ -74,7 +74,6 @@ int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      libewf_io_handle_t *io_handle,
      size64_t maximum_segment_size,
-     uint8_t is_delta,
      libcerror_error_t **error );
 
 int libewf_segment_table_free(

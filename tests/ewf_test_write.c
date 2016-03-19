@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 
-#include "ewf_test_definitions.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
@@ -37,6 +36,8 @@
 /* Define to make ewf_test_write generate verbose output
 #define EWF_TEST_WRITE_VERBOSE
  */
+
+#define EWF_TEST_WRITE_BUFFER_SIZE		4096
 
 /* Tests writing data of media size to EWF file(s) with a maximum segment size
  * Return 1 if successful, 0 if not or -1 on error
@@ -144,7 +145,7 @@ int ewf_test_write(
 		goto on_error;
 	}
 	buffer = (uint8_t *) memory_allocate(
-	                      EWF_TEST_BUFFER_SIZE );
+	                      EWF_TEST_WRITE_BUFFER_SIZE );
 
 	if( buffer == NULL )
 	{

@@ -360,7 +360,9 @@ int ewf_test_read_from_handle(
      libewf_handle_t *handle,
      size64_t media_size )
 {
-	int result = 0;
+	off64_t read_offset = 0;
+	size64_t read_size  = 0;
+	int result          = 0;
 
 	if( handle == NULL )
 	{
@@ -380,13 +382,16 @@ int ewf_test_read_from_handle(
 	/* Test: offset: 0 size: <media_size>
 	 * Expected result: offset: 0 size: <media_size>
 	 */
+	read_offset = 0;
+	read_size   = media_size;
+
 	result = ewf_test_seek_offset_and_read_buffer(
 	          handle,
-	          0,
+	          read_offset,
 	          SEEK_SET,
-	          media_size,
-	          0,
-	          media_size );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -396,16 +401,13 @@ int ewf_test_read_from_handle(
 
 		return( result );
 	}
-	/* Test: offset: 0 size: <media_size>
-	 * Expected result: offset: 0 size: <media_size>
-	 */
 	result = ewf_test_seek_offset_and_read_buffer(
 	          handle,
-	          0,
+	          read_offset,
 	          SEEK_SET,
-	          media_size,
-	          0,
-	          media_size );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -415,20 +417,22 @@ int ewf_test_read_from_handle(
 
 		return( result );
 	}
-
 	/* Case 1: test buffer at offset read
 	 */
 
 	/* Test: offset: <media_size / 7> size: <media_size / 2>
 	 * Expected result: offset: <media_size / 7> size: <media_size / 2>
 	 */
+	read_offset = (off64_t) ( media_size / 7 );
+	read_size   = media_size / 2;
+
 	result = ewf_test_seek_offset_and_read_buffer(
 	          handle,
-	          (off64_t) ( media_size / 7 ),
+	          read_offset,
 	          SEEK_SET,
-	          media_size / 2,
-	          (off64_t) ( media_size / 7 ),
-	          media_size / 2 );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -438,16 +442,13 @@ int ewf_test_read_from_handle(
 
 		return( result );
 	}
-	/* Test: offset: <media_size / 7> size: <media_size / 2>
-	 * Expected result: offset: <media_size / 7> size: <media_size / 2>
-	 */
 	result = ewf_test_seek_offset_and_read_buffer(
 	          handle,
-	          (off64_t) ( media_size / 7 ),
+	          read_offset,
 	          SEEK_SET,
-	          media_size / 2,
-	          (off64_t) ( media_size / 7 ),
-	          media_size / 2 );
+	          read_size,
+	          read_offset,
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -460,17 +461,19 @@ int ewf_test_read_from_handle(
 
 	/* Case 2: test read beyond media size
 	 */
-
 	if( media_size < 1024 )
 	{
 		/* Test: offset: <media_size - 1024> size: 4096
 		 * Expected result: offset: -1 size: <undetermined>
 		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = 4096;
+
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
-		          (off64_t) ( media_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
+		          read_size,
 		          -1,
 		          (size64_t) -1 );
 
@@ -482,14 +485,11 @@ int ewf_test_read_from_handle(
 
 			return( result );
 		}
-		/* Test: offset: <media_size - 1024> size: 4096
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
-		          (off64_t) ( media_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
+		          read_size,
 		          -1,
 		          (size64_t) -1 );
 
@@ -507,12 +507,15 @@ int ewf_test_read_from_handle(
 		/* Test: offset: <media_size - 1024> size: 4096
 		 * Expected result: offset: <media_size - 1024> size: 1024
 		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = 4096;
+
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
-		          (off64_t) ( media_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
-		          (off64_t) ( media_size - 1024 ),
+		          read_size,
+		          read_offset,
 		          1024 );
 
 		if( result != 1 )
@@ -523,15 +526,12 @@ int ewf_test_read_from_handle(
 
 			return( result );
 		}
-		/* Test: offset: <media_size - 1024> size: 4096
-		 * Expected result: offset: <media_size - 1024> size: 1024
-		 */
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
-		          (off64_t) ( media_size - 1024 ),
+		          read_offset,
 		          SEEK_SET,
-		          4096,
-		          (off64_t) ( media_size - 1024 ),
+		          read_size,
+		          read_offset,
 		          1024 );
 
 		if( result != 1 )
@@ -549,12 +549,15 @@ int ewf_test_read_from_handle(
 	/* Test: offset: <media_size / 7> size: <media_size / 2>
 	 * Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
 	 */
+	read_offset = (off64_t) ( media_size / 7 );
+	read_size   = media_size / 2;
+
 	result = ewf_test_read_buffer_at_offset(
 	          handle,
-	          (off64_t) ( media_size / 7 ),
-	          media_size / 2,
-	          (off64_t) ( media_size / 7 ) + ( media_size / 2 ),
-	          media_size / 2 );
+	          read_offset,
+	          read_size,
+	          (off64_t) ( read_offset + read_size ),
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -564,15 +567,12 @@ int ewf_test_read_from_handle(
 
 		return( result );
 	}
-	/* Test: offset: <media_size / 7> size: <media_size / 2>
-	 * Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
-	 */
 	result = ewf_test_read_buffer_at_offset(
 	          handle,
-	          (off64_t) ( media_size / 7 ),
-	          media_size / 2,
-	          (off64_t) ( media_size / 7 ) + ( media_size / 2 ),
-	          media_size / 2 );
+	          read_offset,
+	          read_size,
+	          (off64_t) ( read_offset + read_size ),
+	          read_size );
 
 	if( result != 1 )
 	{
@@ -859,11 +859,13 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcstring_system_character_t **filenames = NULL;
+	libcstring_system_character_t *source     = NULL;
 	libcerror_error_t *error                  = NULL;
-	libewf_handle_t *handle                 = NULL;
+	libewf_handle_t *handle                   = NULL;
 	libcstring_system_integer_t option        = 0;
-	int number_of_filenames                   = 0;
 	size64_t media_size                       = 0;
+	size_t string_length                      = 0;
+	int number_of_filenames                   = 0;
 
 	while( ( option = libcsystem_getopt(
 	                   argc,
@@ -890,6 +892,8 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	source = argv[ optind ];
+
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
@@ -899,19 +903,23 @@ int main( int argc, char * const argv[] )
 #endif
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	string_length = libcstring_wide_string_length(
+	                 source );
+
 	if( libewf_glob_wide(
-	     argv[ 1 ],
-	     libcstring_wide_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,
 	     &error ) != 1 )
 #else
+	string_length = libcstring_narrow_string_length(
+	                 source );
+
 	if( libewf_glob(
-	     argv[ 1 ],
-	     libcstring_narrow_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,

@@ -108,17 +108,9 @@ struct libewf_internal_handle
 	 */
 	libewf_segment_table_t *segment_table;
 
-	/* The delta segment file table
-	 */
-	libewf_segment_table_t *delta_segment_table;
-
 	/* The chunk table
 	 */
 	libewf_chunk_table_t *chunk_table;
-
-	/* The delta chunks range list
-	 */
-	libfdata_range_list_t *delta_chunks_range_list;
 
 	/* The chunk groups cache
 	 */
@@ -219,18 +211,6 @@ int libewf_handle_open_read_segment_file_section_data(
      libcerror_error_t **error );
 
 int libewf_handle_open_read_segment_files(
-     libewf_internal_handle_t *internal_handle,
-     libbfio_pool_t *file_io_pool,
-     libcerror_error_t **error );
-
-int libewf_handle_open_read_delta_segment_file_section_data(
-     libewf_internal_handle_t *internal_handle,
-     libewf_segment_file_t *segment_file,
-     libbfio_pool_t *file_io_pool,
-     int file_io_pool_entry,
-     libcerror_error_t **error );
-
-int libewf_handle_open_read_delta_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
      libcerror_error_t **error );
@@ -403,60 +383,6 @@ LIBEWF_EXTERN \
 int libewf_handle_set_maximum_segment_size(
      libewf_handle_t *handle,
      size64_t maximum_segment_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_get_delta_segment_filename_size(
-     libewf_handle_t *handle,
-     size_t *filename_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_get_delta_segment_filename(
-     libewf_handle_t *handle,
-     char *filename,
-     size_t filename_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_set_delta_segment_filename(
-     libewf_handle_t *handle,
-     const char *filename,
-     size_t filename_length,
-     libcerror_error_t **error );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN \
-int libewf_handle_get_delta_segment_filename_size_wide(
-     libewf_handle_t *handle,
-     size_t *filename_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_get_delta_segment_filename_wide(
-     libewf_handle_t *handle,
-     wchar_t *filename,
-     size_t filename_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_set_delta_segment_filename_wide(
-     libewf_handle_t *handle,
-     const wchar_t *filename,
-     size_t filename_length,
-     libcerror_error_t **error );
-#endif
-
-LIBEWF_EXTERN \
-int libewf_handle_get_maximum_delta_segment_size(
-     libewf_handle_t *handle,
-     size64_t *maximum_delta_segment_size,
-     libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-int libewf_handle_set_maximum_delta_segment_size(
-     libewf_handle_t *handle,
-     size64_t maximum_delta_segment_size,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \

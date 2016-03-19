@@ -13,7 +13,7 @@ TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
 TEST_EXECUTABLE="${TEST_PREFIX}_test_seek";
 OPTION_SETS="";
-INPUT_GLOB="*.*01";
+INPUT_GLOB="*.[ELels]*01";
 
 list_contains()
 {

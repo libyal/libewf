@@ -31,33 +31,6 @@ AC_DEFUN([AX_LIBEWF_CHECK_LOCAL],
  AC_CHECK_FUNCS([bindtextdomain])
  ])
 
-dnl Function to detect whether version 1 API support should be enabled
-AC_DEFUN([AX_LIBEWF_CHECK_ENABLE_V1_API],
- [AX_COMMON_ARG_ENABLE(
-  [v1-api],
-  [v1_api],
-  [enable version 1 API],
-  [no])
-
- AS_IF(
-  [test "x$ac_cv_enable_v1_api" != xno],
-  [AC_DEFINE(
-   [HAVE_V1_API],
-   [1],
-   [Define to 1 if the version 1 API should be available.])
-  AC_SUBST(
-   [HAVE_V1_API],
-   [1])
-  ac_cv_enable_v1_api=yes],
-  [AC_SUBST(
-   [HAVE_V1_API],
-   [0]) ])
-
- AM_CONDITIONAL(
-  HAVE_V1_API,
-  [test "x$ac_cv_enable_v1_api" != xno])
- ])
-
 dnl Function to determine the host operating system
 AC_DEFUN([AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM],
  [ac_libewf_determine_operating_system_target_string="$target";
