@@ -33,12 +33,12 @@
 #include "ewf_test_libewf.h"
 #include "ewf_test_unused.h"
 
-/* Define to make ewf_test_read_write generate verbose output
-#define EWF_TEST_READ_WRITE_VERBOSE
+/* Define to make ewf_test_read_write_chunk generate verbose output
+#define EWF_TEST_READ_WRITE_CHUNK_VERBOSE
  */
 
-#define EWF_TEST_READ_WRITE_BUFFER_SIZE		4096
-#define EWF_TEST_READ_WRITE_NUMBER_OF_THREADS	4
+#define EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE		4096
+#define EWF_TEST_READ_WRITE_CHUNK_NUMBER_OF_THREADS	4
 
 /* Tests libewf_handle_seek_offset
  * Returns 1 if successful, 0 if not or -1 on error
@@ -88,46 +88,49 @@ int ewf_test_seek_offset(
 	return( result );
 }
 
-/* Tests libewf_handle_read_buffer and libewf_handle_write_buffer
+/* Tests libewf_handle_read_chunk, libewf_handle_write_chunk, libewf_handle_prepare_read_chunk and libewf_handle_prepare_write_chunk
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int ewf_test_read_write_buffer(
+int ewf_test_read_write_chunk(
      libewf_handle_t *handle,
+     uint8_t *data_buffer,
+     size_t data_buffer_size,
+     uint8_t *chunk_buffer,
+     size_t chunk_buffer_size,
      size64_t input_size,
-     size64_t expected_size )
+     size64_t expected_size,
+     libcerror_error_t **error )
 {
-	uint8_t buffer[ EWF_TEST_READ_WRITE_BUFFER_SIZE ];
+	uint8_t checksum_buffer[ 4 ];
 
-	libcerror_error_t *error = NULL;
-	static char *function    = "ewf_test_read_write_buffer";
-	size64_t remaining_size  = 0;
-	size64_t result_size     = 0;
-	size_t read_size         = 0;
-	ssize_t read_count       = 0;
-	ssize_t write_count      = 0;
-	int result               = 0;
+	static char *function   = "ewf_test_read_write_chunk";
+	size64_t remaining_size = 0;
+	size64_t result_size    = 0;
+	size_t chunk_data_size  = 0;
+	size_t data_size        = 0;
+	size_t write_size       = 0;
+	ssize_t process_count   = 0;
+	ssize_t read_count      = 0;
+	ssize_t write_count     = 0;
+	uint32_t chunk_checksum = 0;
+	int8_t is_compressed    = 0;
+	int8_t process_checksum = 0;
 
-	if( handle == NULL )
-	{
-		return( -1 );
-	}
 	remaining_size = input_size;
 
 	while( remaining_size > 0 )
 	{
-		read_size = EWF_TEST_READ_WRITE_BUFFER_SIZE;
-
-		if( remaining_size < (size64_t) read_size )
-		{
-			read_size = (size_t) remaining_size;
-		}
-		read_count = libewf_handle_read_buffer(
+		read_count = libewf_handle_read_chunk(
 			      handle,
-			      buffer,
-			      read_size,
-			      &error );
+			      chunk_buffer,
+			      chunk_buffer_size,
+			      &is_compressed,
+			      (void *) checksum_buffer,
+			      &chunk_checksum,
+			      &process_checksum,
+			      error );
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_CHUNK_VERBOSE )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
@@ -136,25 +139,69 @@ int ewf_test_read_write_buffer(
 			 read_count );
 		}
 #endif
-		if( read_count <= 0 )
+		if( read_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read chunk of size: %" PRIzd ".",
+			 function,
+			 chunk_buffer_size );
+
+			return( -1 );
+		}
+		else if( read_count == 0 )
 		{
 			break;
+		}
+		data_size = data_buffer_size;
+
+		process_count = libewf_handle_prepare_read_chunk(
+		                 handle,
+		                 chunk_buffer,
+		                 (size_t) read_count,
+		                 data_buffer,
+		                 &data_size,
+		                 is_compressed,
+		                 chunk_checksum,
+		                 process_checksum,
+		                 error );
+
+		if( process_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to prepare chunk of size: %" PRIzd " after read.",
+			 function,
+			 read_count );
+
+			return( -1 );
 		}
 		if( libewf_handle_seek_offset(
 		     handle,
-	             -1 * (off64_t) read_count,
+	             -1 * (off64_t) process_count,
 	             SEEK_CUR,
-	             &error ) == -1 )
-		{
-			break;
-		}
-		if( memory_set(
-		     buffer,
-		     (int) 'B',
-		     (size_t) read_count ) == NULL )
+	             error ) == -1 )
 		{
 			libcerror_error_set(
-			 &error,
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to seek previous offset.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     data_buffer,
+		     (int) 'C',
+		     data_buffer_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable set value in buffer.",
@@ -162,13 +209,67 @@ int ewf_test_read_write_buffer(
 
 			return( -1 );
 		}
-		write_count = libewf_handle_write_buffer(
-			       handle,
-			       buffer,
-			       (size_t) read_count,
-			       &error );
+		write_size      = process_count;
+		chunk_data_size = chunk_buffer_size;
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+		process_count = libewf_handle_prepare_write_chunk(
+				 handle,
+				 data_buffer,
+				 write_size,
+				 chunk_buffer,
+				 &chunk_data_size,
+				 &is_compressed,
+				 &chunk_checksum,
+				 &process_checksum,
+				 error );
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_CHUNK_VERBOSE )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: process count: %" PRIzd ".\n",
+			 function,
+			 process_count );
+		}
+#endif
+		if( process_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to prepare chunk buffer before writing.",
+			 function );
+
+			return( -1 );
+		}
+		if( is_compressed == 0 )
+		{
+			write_count = libewf_handle_write_chunk(
+				       handle,
+				       data_buffer,
+				       process_count,
+				       write_size,
+				       is_compressed,
+				       checksum_buffer,
+				       chunk_checksum,
+				       process_checksum,
+				       error );
+		}
+		else
+		{
+			write_count = libewf_handle_write_chunk(
+				       handle,
+				       chunk_buffer,
+				       chunk_data_size,
+				       write_size,
+				       is_compressed,
+				       checksum_buffer,
+				       chunk_checksum,
+				       process_checksum,
+				       error );
+		}
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_CHUNK_VERBOSE )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
@@ -177,17 +278,20 @@ int ewf_test_read_write_buffer(
 			 write_count );
 		}
 #endif
-		if( write_count <= 0 )
+		if( write_count < 0 )
 		{
-			break;
-		}
-		remaining_size -= (size64_t) write_count;
-		result_size    += (size64_t) write_count;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable write chunk of size: %" PRIzd ".",
+			 function,
+			 chunk_data_size );
 
-		if( write_count != read_count )
-		{
-			break;
+			return( -1 );
 		}
+		remaining_size -= (size64_t) write_size;
+		result_size    += (size64_t) write_size;
 	}
 	if( expected_size != result_size )
 	{
@@ -196,30 +300,18 @@ int ewf_test_read_write_buffer(
 		 "%s: unexpected read/write count: %" PRIu64 "\n",
 		 function,
 		 result_size );
+
+		return( 0 );
 	}
-	else
-	{
-		result = 1;
-	}
-	if( error != NULL )
-	{
-		if( result != 1 )
-		{
-			libcerror_error_backtrace_fprint(
-			 error,
-			 stderr );
-		}
-		libcerror_error_free(
-		 &error );
-	}
-	return( result );
+	return( 1 );
 }
 
-/* Tests reading and writing a buffers at a specific offset
+/* Tests reading and writing chunks at a specific offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int ewf_test_read_write_buffer_at_offset(
+int ewf_test_read_write_chunk_at_offset(
      libewf_handle_t *handle,
+     size32_t chunk_size,
      off64_t input_offset,
      int input_whence,
      size64_t input_size,
@@ -227,9 +319,23 @@ int ewf_test_read_write_buffer_at_offset(
      size64_t expected_size )
 {
 	libcerror_error_t *error  = NULL;
+	uint8_t *chunk_buffer     = NULL;
+	uint8_t *data_buffer      = NULL;
 	const char *whence_string = NULL;
+	size_t chunk_buffer_size  = 0;
+	size_t data_buffer_size   = 0;
 	int result                = 0;
 
+	if( chunk_size == 0 )
+	{
+		return( -1 );
+	}
+#if SIZEOF_SIZE_T < 8
+	if( (size_t) chunk_size > (size_t) SSIZE_MAX )
+	{
+		return( -1 );
+	}
+#endif
 	if( input_whence == SEEK_CUR )
 	{
 		whence_string = "SEEK_CUR";
@@ -248,7 +354,7 @@ int ewf_test_read_write_buffer_at_offset(
 	}
 	fprintf(
 	 stdout,
-	 "Testing reading and writing range with offset: %" PRIi64 ", whence: %s and size: %" PRIu64 "\t",
+	 "Testing reading range and writing with offset: %" PRIi64 ", whence: %s and size: %" PRIu64 "\t",
 	 input_offset,
 	 whence_string,
 	 input_size );
@@ -259,16 +365,38 @@ int ewf_test_read_write_buffer_at_offset(
 	          input_whence,
 	          expected_offset );
 
+	data_buffer_size = chunk_size;
+
+	data_buffer = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * data_buffer_size );
+
+	/* The compressed data can become larger than the uncompressed data
+	 */
+	chunk_buffer_size = chunk_size * 2;
+
+	chunk_buffer = (uint8_t *) memory_allocate(
+	                            sizeof( uint8_t ) * chunk_buffer_size );
+
 	if( result == 1 )
 	{
 		if( input_offset >= 0 )
 		{
-			result = ewf_test_read_write_buffer(
+			result = ewf_test_read_write_chunk(
 				  handle,
+				  data_buffer,
+				  data_buffer_size,
+				  chunk_buffer,
+				  chunk_buffer_size,
 				  input_size,
-				  expected_size );
+				  expected_size,
+			          &error );
 		}
 	}
+	memory_free(
+	 chunk_buffer );
+	memory_free(
+	 data_buffer );
+
 	if( result != 0 )
 	{
 		fprintf(
@@ -297,12 +425,13 @@ int ewf_test_read_write_buffer_at_offset(
 	return( result );
 }
 
-/* Tests reading data from and writing to a handle
+/* Tests reading chunk from and writing to a handle
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int ewf_test_read_write_from_handle(
+int ewf_test_read_write_chunk_from_handle(
      libewf_handle_t *handle,
-     size64_t media_size )
+     size64_t media_size,
+     size32_t chunk_size )
 {
 	off64_t read_offset = 0;
 	size64_t read_size  = 0;
@@ -320,6 +449,7 @@ int ewf_test_read_write_from_handle(
 
 		return( -1 );
 	}
+
 	/* Case 0: test full read
 	 */
 
@@ -329,8 +459,9 @@ int ewf_test_read_write_from_handle(
 	read_offset = 0;
 	read_size   = media_size;
 
-	result = ewf_test_read_write_buffer_at_offset(
+	result = ewf_test_read_write_chunk_at_offset(
 	          handle,
+	          chunk_size,
 	          read_offset,
 	          SEEK_SET,
 	          read_size,
@@ -341,12 +472,13 @@ int ewf_test_read_write_from_handle(
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read/write buffer.\n" );
+		 "Unable to test read/write chunk.\n" );
 
 		return( -1 );
 	}
-	result = ewf_test_read_write_buffer_at_offset(
+	result = ewf_test_read_write_chunk_at_offset(
 	          handle,
+	          chunk_size,
 	          read_offset,
 	          SEEK_SET,
 	          read_size,
@@ -357,7 +489,7 @@ int ewf_test_read_write_from_handle(
 	{
 		fprintf(
 		 stderr,
-		 "Unable to test read/write buffer.\n" );
+		 "Unable to test read/write chunk.\n" );
 
 		return( -1 );
 	}
@@ -365,125 +497,170 @@ int ewf_test_read_write_from_handle(
 	/* Case 1: test random read
 	 */
 
-	/* Test: offset: <media_size / 7> size: <media_size / 2>
-	 * Expected result: offset: <media_size / 7> size: <media_size / 2>
+	/* Test: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
+	 * Expected result: offset: <( ( media_size / 7 ) / chunk_size ) * chunk_size> size: <( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size>
 	 */
-	read_offset = (off64_t) ( media_size / 7 );
-	read_size   = media_size / 2;
+	read_offset = (off64_t) ( ( media_size / 7 ) / chunk_size ) * chunk_size;
+	read_size   = ( ( ( media_size / 2 ) / chunk_size ) + 1 ) * chunk_size;
 
-	result = ewf_test_read_write_buffer_at_offset(
-	          handle,
-	          read_offset,
-	          SEEK_SET,
-	          read_size,
-	          read_offset,
-	          read_size );
-
-	if( result != 1 )
+	if( media_size == 0 )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to test read/write buffer.\n" );
-
-		return( -1 );
-	}
-	result = ewf_test_read_write_buffer_at_offset(
-	          handle,
-	          read_offset,
-	          SEEK_SET,
-	          read_size,
-	          read_offset,
-	          read_size );
-
-	if( result != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unable to test read/write buffer.\n" );
-
-		return( -1 );
-	}
-
-	/* Case 2: test read buffer beyond media size
-	 */
-	if( media_size < 1024 )
-	{
-		/* Test: offset: <media_size - 1024> size: 4096
-		 * Expected result: offset: -1 size: <undetermined>
-		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = 4096;
-
-		result = ewf_test_read_write_buffer_at_offset(
+		result = ewf_test_read_write_chunk_at_offset(
 		          handle,
+		          chunk_size,
 		          read_offset,
 		          SEEK_SET,
 		          read_size,
-		          -1,
-		          (size64_t) -1 );
+		          read_offset,
+		          0 );
 
 		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to test read/write buffer.\n" );
+			 "Unable to test read/write chunk.\n" );
 
 			return( -1 );
 		}
-		result = ewf_test_read_write_buffer_at_offset(
+		result = ewf_test_read_write_chunk_at_offset(
 		          handle,
+		          chunk_size,
 		          read_offset,
 		          SEEK_SET,
 		          read_size,
-		          -1,
-		          (size64_t) -1 );
+		          read_offset,
+		          0 );
 
 		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to test read/write buffer.\n" );
+			 "Unable to test read/write chunk.\n" );
 
 			return( -1 );
 		}
 	}
 	else
 	{
-		/* Test: offset: <media_size - 1024> size: 4096
-		 * Expected result: offset: <media_size - 1024> size: 1024
-		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = 4096;
-
-		result = ewf_test_read_write_buffer_at_offset(
+		result = ewf_test_read_write_chunk_at_offset(
 		          handle,
+		          chunk_size,
 		          read_offset,
 		          SEEK_SET,
 		          read_size,
 		          read_offset,
-		          1024 );
+		          read_size );
 
 		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to test read/write buffer.\n" );
+			 "Unable to test read/write chunk.\n" );
 
 			return( -1 );
 		}
-		result = ewf_test_read_write_buffer_at_offset(
+		result = ewf_test_read_write_chunk_at_offset(
 		          handle,
+		          chunk_size,
 		          read_offset,
 		          SEEK_SET,
 		          read_size,
 		          read_offset,
-		          1024 );
+		          read_size );
 
 		if( result != 1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to test read/write buffer.\n" );
+			 "Unable to test read/write chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	/* Case 2: test read chunk beyond media size
+	 */
+	if( media_size < 1024 )
+	{
+		/* Test: offset: <media_size - 1024> size: chunk_size
+		 * Expected result: offset: -1 size: <undetermined>
+		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = chunk_size;
+
+		result = ewf_test_read_write_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read/write chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_write_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          -1,
+		          (size64_t) -1 );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read/write chunk.\n" );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		/* Test: offset: <media_size - 1024> size: chunk_size
+		 * Expected result: offset: <media_size - 1024> size: chunk size or media_size % chunk_size
+		 */
+		read_offset = (off64_t) ( media_size - 1024 );
+		read_size   = chunk_size;
+
+		result = ewf_test_read_write_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          (off64_t) ( media_size - 1024 ),
+		          ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read/write chunk.\n" );
+
+			return( -1 );
+		}
+		result = ewf_test_read_write_chunk_at_offset(
+		          handle,
+		          chunk_size,
+		          read_offset,
+		          SEEK_SET,
+		          read_size,
+		          (off64_t) ( media_size - 1024 ),
+		          ( ( media_size % chunk_size ) == 0 ) ? chunk_size : media_size % chunk_size );
+
+		if( result != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to test read/write chunk.\n" );
 
 			return( -1 );
 		}
@@ -496,15 +673,15 @@ int ewf_test_read_write_from_handle(
 /* The thread pool callback function
  * Returns 1 if successful or -1 on error
  */
-int ewf_test_read_write_callback_function(
+int ewf_test_read_write_chunk_callback_function(
      libewf_handle_t *handle,
      void *arguments EWF_TEST_ATTRIBUTE_UNUSED )
 {
-	uint8_t buffer[ EWF_TEST_READ_WRITE_BUFFER_SIZE ];
+	uint8_t buffer[ EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE ];
 
 	libcerror_error_t *error = NULL;
-	static char *function    = "ewf_test_read_write_callback_function";
-	size_t read_size         = EWF_TEST_READ_WRITE_BUFFER_SIZE;
+	static char *function    = "ewf_test_read_write_chunk_callback_function";
+	size_t read_size         = EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE;
 	ssize_t read_count       = 0;
 	int number_of_iterations = 3;
 
@@ -523,6 +700,7 @@ int ewf_test_read_write_callback_function(
 	}
 	while( number_of_iterations > 0 )
 	{
+/* TODO replace by read chunk */
 		read_count = libewf_handle_read_buffer(
 		              handle,
 		              buffer,
@@ -576,18 +754,18 @@ on_error:
 	return( -1 );
 }
 
-/* Tests reading data from and writing to a handle in multiple threads
+/* Tests reading chunks from and writing to a handle in multiple threads
  * This test requires multi-threading support
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int ewf_test_read_write_from_handle_multi_thread(
+int ewf_test_read_write_chunks_from_handle_multi_thread(
      libewf_handle_t *handle,
      size64_t media_size,
      int number_of_threads )
 {
 	libcerror_error_t *error               = NULL;
 	libcthreads_thread_pool_t *thread_pool = NULL;
-	static char *function                  = "ewf_test_read_write_from_handle_multi_thread";
+	static char *function                  = "ewf_test_read_write_chunks_from_handle_multi_thread";
 	off64_t expected_offset                = 0;
 	off64_t result_offset                  = 0;
 	int iteration                          = 0;
@@ -624,15 +802,15 @@ int ewf_test_read_write_from_handle_multi_thread(
 	{
 		number_of_iterations = number_of_threads * 32;
 
-		expected_offset = (off64_t) number_of_iterations * EWF_TEST_READ_WRITE_BUFFER_SIZE;
+		expected_offset = (off64_t) number_of_iterations * EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE;
 
 		if( (size64_t) expected_offset > media_size )
 		{
 			expected_offset = media_size;
 
-			number_of_iterations = media_size / EWF_TEST_READ_WRITE_BUFFER_SIZE;
+			number_of_iterations = media_size / EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE;
 
-			if( ( media_size % EWF_TEST_READ_WRITE_BUFFER_SIZE ) != 0 )
+			if( ( media_size % EWF_TEST_READ_WRITE_CHUNK_BUFFER_SIZE ) != 0 )
 			{
 				number_of_iterations += 1;
 			}
@@ -642,7 +820,7 @@ int ewf_test_read_write_from_handle_multi_thread(
 		     NULL,
 		     number_of_threads,
 		     number_of_iterations,
-		     (int (*)(intptr_t *, void *)) &ewf_test_read_write_callback_function,
+		     (int (*)(intptr_t *, void *)) &ewf_test_read_write_chunk_callback_function,
 		     NULL,
 		     &error ) != 1 )
 		{
@@ -772,6 +950,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_integer_t option             = 0;
 	int number_of_filenames                        = 0;
 	size64_t media_size                            = 0;
+	size32_t chunk_size                            = 0;
 	size_t delta_segment_filename_length           = 0;
 	size_t string_length                           = 0;
 
@@ -807,7 +986,7 @@ int main( int argc, char * const argv[] )
 	}
 	source = argv[ optind ];
 
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_VERBOSE )
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_READ_WRITE_CHUNK_VERBOSE )
 	libewf_notify_set_verbose(
 	 1 );
 	libewf_notify_set_stream(
@@ -940,31 +1119,56 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	if( libewf_handle_get_chunk_size(
+	     handle,
+	     &chunk_size,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to retrieve chunk size.\n" );
+
+		goto on_error;
+	}
+	if( chunk_size == 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Invalid chunk size.\n" );
+
+		goto on_error;
+	}
 	fprintf(
 	 stdout,
 	 "Media size: %" PRIu64 " bytes\n",
 	 media_size );
 
-	if( ewf_test_read_write_from_handle(
+	fprintf(
+	 stdout,
+	 "\nChunk size: %" PRIu32 " bytes\n",
+	 chunk_size );
+
+	if( ewf_test_read_write_chunk_from_handle(
 	     handle,
-	     media_size ) != 1 )
+	     media_size,
+	     chunk_size ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to read from and write to handle.\n" );
+		 "Unable to read chunks from and write to handle.\n" );
 
 		goto on_error;
 	}
 /* TODO implement thread support
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( ewf_test_read_write_from_handle_multi_thread(
+	if( ewf_test_read_write_chunk_from_handle_multi_thread(
 	     handle,
 	     media_size,
 	     EWF_TEST_READ_NUMBER_OF_THREADS ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to read from and write to handle in multiple threads.\n" );
+		 "Unable to read chunks from and write to handle in multiple threads.\n" );
 
 		goto on_error;
 	}

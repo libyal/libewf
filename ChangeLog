@@ -10,7 +10,6 @@ Tests:
   - move test_ewfexport to test runner
   - done ewfverify, ewfverify_logical, ewfinfo, glob, seek
 * split test_read_delta in test_read_delta and test_read_delta_chunk
-* add tests for Python-bindings (pyewf)
 * implement read/write chunk test
   - allow to set maximum delta file size default 4 GiB?
 * ewftools: test with -x

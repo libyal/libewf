@@ -33,6 +33,7 @@ TESTS = \
 	test_write.sh \
 	test_write_chunk.sh \
 	test_read_write.sh \
+	test_read_write_chunk.sh \
 	test_read_write_delta.sh \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
@@ -68,6 +69,7 @@ check_SCRIPTS = \
 	test_read_chunk.sh \
 	test_read_delta.sh \
 	test_read_write.sh \
+	test_read_write_chunk.sh \
 	test_read_write_delta.sh \
 	test_runner.sh \
 	test_seek.sh \
@@ -84,6 +86,7 @@ check_PROGRAMS = \
 	ewf_test_read_chunk \
 	ewf_test_read_delta \
 	ewf_test_read_write \
+	ewf_test_read_write_chunk \
 	ewf_test_read_write_delta \
 	ewf_test_seek \
 	ewf_test_truncate \
@@ -176,6 +179,24 @@ ewf_test_read_write_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_read_write_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
+
+ewf_test_read_write_chunk_SOURCES = \
+	ewf_test_definitions.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcnotify.h \
+	ewf_test_libcstring.h \
+	ewf_test_libcsystem.h \
+	ewf_test_libewf.h \
+	ewf_test_read_write_chunk.c \
+	ewf_test_unused.h
+
+ewf_test_read_write_chunk_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Library read write testing script
+# Library chunk read write testing script
 #
 # Version: 20160126
 
@@ -11,7 +11,7 @@ TEST_PREFIX=`pwd`;
 TEST_PREFIX=`dirname ${TEST_PREFIX}`;
 TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-TEST_EXECUTABLE="${TEST_PREFIX}_test_read_write";
+TEST_EXECUTABLE="${TEST_PREFIX}_test_read_write_chunk";
 OPTION_SETS="";
 INPUT_GLOB="*.*01";
 
@@ -201,7 +201,7 @@ OLDIFS=${IFS};
 IFS="
 ";
 
-run_tests "lib${TEST_PREFIX}" "read_write" "${TEST_READ_WRITE}";
+run_tests "lib${TEST_PREFIX}" "read_write_chunk" "${TEST_READ_WRITE}";
 
 RESULT=$?;
 

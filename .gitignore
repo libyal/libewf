@@ -132,6 +132,7 @@ stamp-h[1-9]
 /tests/ewf_test_read_chunk
 /tests/ewf_test_read_delta
 /tests/ewf_test_read_write
+/tests/ewf_test_read_write_chunk
 /tests/ewf_test_read_write_delta
 /tests/ewf_test_seek
 /tests/ewf_test_truncate

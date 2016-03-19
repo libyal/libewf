@@ -8,6 +8,7 @@ MSVSCPP_FILES = \
 	ewf_test_read_chunk/ewf_test_read_chunk.vcproj \
 	ewf_test_read_delta/ewf_test_read_delta.vcproj \
 	ewf_test_read_write/ewf_test_read_write.vcproj \
+	ewf_test_read_write_chunk/ewf_test_read_write_chunk.vcproj \
 	ewf_test_read_write_delta/ewf_test_read_write_delta.vcproj \
 	ewf_test_seek/ewf_test_seek.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \

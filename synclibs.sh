@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20160228
+# Version: 20160318
 
 GIT_URL_PREFIX="https://github.com/libyal";
 LOCAL_LIBS="libbfio libcaes libcdata libcdatetime libcerror libcfile libclocale libcnotify libcpath libcsplit libcstring libcsystem libcthreads libfcache libfdata libfvalue libhmac libodraw libsmdev libsmraw libuna";
@@ -30,7 +30,7 @@ do
 	LOCAL_LIB_VERSION=`grep -A 2 AC_INIT ${LOCAL_LIB}-$$/configure.ac | tail -n 1 | sed 's/^\s*\[\([0-9]*\)\],\s*$/\1/'`;
 	LOCAL_LIB_MAKEFILE_AM="${LOCAL_LIB}/Makefile.am";
 
-	cp ${LOCAL_LIB}-$$/${LOCAL_LIB}/*.[ch] ${LOCAL_LIB};
+	cp ${LOCAL_LIB}-$$/${LOCAL_LIB}/*.[chly] ${LOCAL_LIB};
 	cp ${LOCAL_LIB}-$$/${LOCAL_LIB_MAKEFILE_AM} ${LOCAL_LIB_MAKEFILE_AM};
 
 	# Make the necessary changes to libyal/Makefile.am
