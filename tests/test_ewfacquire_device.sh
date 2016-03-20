@@ -47,11 +47,13 @@ run_test()
 	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
 
 	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_DEVICE} | sed '1,2d' > ${TEST_RESULTS};
+	# /usr/bin/time -v 
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
+		# /usr/bin/time -v 
                 ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.* > /dev/null;
 
                 RESULT=$?;

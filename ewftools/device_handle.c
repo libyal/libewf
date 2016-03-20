@@ -2884,31 +2884,6 @@ int device_handle_read_errors_fprint(
 
 		return( -1 );
 	}
-	if( device_handle_get_bytes_per_sector(
-	     device_handle,
-	     &bytes_per_sector,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sector.",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid bytes per sector returned.",
-		 function );
-
-		return( -1 );
-	}
 	if( device_handle_get_number_of_read_errors(
 	     device_handle,
 	     &number_of_read_errors,
@@ -2925,6 +2900,31 @@ int device_handle_read_errors_fprint(
 	}
 	if( number_of_read_errors > 0 )
 	{
+		if( device_handle_get_bytes_per_sector(
+		     device_handle,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
+
+			return( -1 );
+		}
+		if( bytes_per_sector == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid bytes per sector returned.",
+			 function );
+
+			return( -1 );
+		}
 		fprintf(
 		 stream,
 		 "Errors reading device:\n" );
