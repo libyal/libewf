@@ -1,78 +1,48 @@
 #!/bin/bash
+# Acquire tool testing script
 #
-# ewfacquire resume testing script
-#
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160320
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_raw";
-
-AWK="awk";
-LS="ls";
-TR="tr";
-WC="wc";
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
 test_write_resume()
 { 
 	INPUT_FILE=$1;
 	RESUME_OFFSET=$2;
 
-	mkdir tmp/;
+	TMPDIR="tmp$$";
 
-	${EWFACQUIRE} -q -u \
-	-t tmp/resume \
-	-C case_number \
-	-D description \
-	-E evidence_number \
-	-e examiner \
-	-N notes \
-	-m removable \
-	-M logical \
-	-c none \
-	-f encase5 \
-	-S 650MB \
-	-b 64 \
-	${INPUT_FILE}
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	${ACQUIRE_TOOL} -b 64 -c deflate:none -C Case -D Description -E Evidence -e Examiner -f encase5 -m removable -M logical -N Notes -q -S 650MB -t ${TMPDIR}/resume -u ${INPUT_FILE} > /dev/null;
 
 	RESULT=$?;
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${EWFVERIFY} -q tmp/resume.E01
+		${VERIFY_TOOL} -q ${TMPDIR}/resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${EWFTRUNCATE} ${RESUME_OFFSET} tmp/resume.E01
+		${TRUNCATE_TOOL} ${RESUME_OFFSET} ${TMPDIR}/resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${EWFACQUIRE} -q -R ${INPUT_FILE} <<EOI
-tmp/resume.E01
+		${TEST_RUNNER} ${TMPDIR} ${ACQUIRE_TOOL} -q -R ${INPUT_FILE}  > ${TMPDIR}/output <<EOI
+${TMPDIR}/resume.E01
 
 
 yes
@@ -81,16 +51,15 @@ EOI
 		RESULT=$?;
 	fi
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${EWFVERIFY} -q tmp/resume.E01
+		${VERIFY_TOOL} -q ${TMPDIR}/resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi
+	rm -rf ${TMPDIR};
 
-	# rm -rf tmp;
-
-	if [ ${RESULT} -ne ${EXIT_IGNORE} ];
+	if test ${RESULT} -ne ${EXIT_IGNORE};
 	then
 		echo -n "Testing ewfacquire resume of at offset: ${RESUME_OFFSET}";
 
@@ -104,105 +73,115 @@ EOI
 	return ${RESULT};
 }
 
-EWFTRUNCATE="./ewf_test_truncate";
-
-if ! test -x ${EWFTRUNCATE};
+if ! test -z ${SKIP_TOOLS_TESTS};
 then
-	echo "Missing executable: ${EWFTRUNCATE}";
-
-	exit ${EXIT_FAILURE};
-fi
-
-EWFACQUIRE="../ewftools/ewfacquire";
-
-if ! test -x ${EWFACQUIRE};
-then
-	EWFACQUIRE="../ewftools/ewfacquire.exe"
-fi
-
-if ! test -x ${EWFACQUIRE};
-then
-	echo "Missing executable: ${EWFACQUIRE}";
-
-	exit ${EXIT_FAILURE};
-fi
-
-EWFVERIFY="../ewftools/ewfverify";
-
-if ! test -x ${EWFVERIFY};
-then
-	EWFVERIFY="../ewftools/ewfverify.exe";
-fi
-
-if ! test -x ${EWFVERIFY};
-then
-	echo "Missing executable: ${EWFVERIFY}";
-
-	exit ${EXIT_FAILURE};
-fi
-
-if ! test -d ${INPUT};
-then
-	echo "No ${INPUT} directory found, to test ewfacquire resume create ${INPUT} directory and place RAW image test files in directory.";
-
 	exit ${EXIT_IGNORE};
 fi
 
-RESULT=`${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n' | ${WC} -l`;
+ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
 
-if test ${RESULT} -eq 0;
+if ! test -x "${ACQUIRE_TOOL}";
 then
-	echo "No files found in ${INPUT} directory, to test ewfacquire resume place RAW image test files in directory.";
+	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire.exe";
+fi
 
+if ! test -x "${ACQUIRE_TOOL}";
+then
+	echo "Missing executable: ${ACQUIRE_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+TRUNCATE_TOOL="./ewf_test_truncate";
+
+if ! test -x "${TRUNCATE_TOOL}";
+then
+	ACQUIRE_TOOL="ewf_test_truncate.exe";
+fi
+
+if ! test -x ${TRUNCATE_TOOL};
+then
+	echo "Missing executable: ${TRUNCATE_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify.exe";
+fi
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	echo "Missing executable: ${VERIFY_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+TEST_RUNNER="tests/test_runner.sh";
+
+if ! test -x ${TEST_RUNNER};
+then
+	TEST_RUNNER="./test_runner.sh";
+fi
+
+if ! test -x ${TEST_RUNNER};
+then
+	echo "Missing test runner: ${TEST_RUNNER}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+FILENAME="input/raw/floppy.raw";
+
+if ! test -f ${FILENAME};
+then
 	exit ${EXIT_IGNORE};
 fi
 
-for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
-do
-	FILESIZE=`${LS} -l ${FILENAME} | ${AWK} '{ print $5 }'`;
+FILESIZE=`ls -l ${FILENAME} | awk '{ print $5 }'`;
 
-	if [ ${FILESIZE} -ne 1474560 ];
-	then
-		echo "ewfacquire resume test currently only supports RAW image of: 1474560 bytes.";
+if test ${FILESIZE} -ne 1474560;
+then
+	exit ${EXIT_IGNORE};
+fi
 
-		exit ${EXIT_IGNORE};
-	fi
+if ! test_write_resume "${FILENAME}" 1478560
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1478560
-	then
-		exit ${EXIT_FAILURE};
-	fi
+if ! test_write_resume "${FILENAME}" 1477351
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1477351
-	then
-		exit ${EXIT_FAILURE};
-	fi
+if ! test_write_resume "${FILENAME}" 1478432
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1478432
-	then
-		exit ${EXIT_FAILURE};
-	fi
+if ! test_write_resume "${FILENAME}" 1477296
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1477296
-	then
-		exit ${EXIT_FAILURE};
-	fi
+if ! test_write_resume "${FILENAME}" 1477008
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1477008
-	then
-		exit ${EXIT_FAILURE};
-	fi
+if ! test_write_resume "${FILENAME}" 1476736
+then
+	exit ${EXIT_FAILURE};
+fi
 
-	if ! test_write_resume "${FILENAME}" 1476736
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	if ! test_write_resume "${FILENAME}" 3584
-	then
-		exit ${EXIT_FAILURE};
-	fi
-done
+if ! test_write_resume "${FILENAME}" 3584
+then
+	exit ${EXIT_FAILURE};
+fi
 
 exit ${EXIT_SUCCESS};
 

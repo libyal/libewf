@@ -218,7 +218,7 @@ EXPORT_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}export";
 
 if ! test -x "${EXPORT_TOOL}";
 then
-	EXPORT_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}export";
+	EXPORT_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}export.exe";
 fi
 
 if ! test -x "${EXPORT_TOOL}";
@@ -232,7 +232,7 @@ VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
 
 if ! test -x "${VERIFY_TOOL}";
 then
-	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify.exe";
 fi
 
 if ! test -x "${VERIFY_TOOL}";

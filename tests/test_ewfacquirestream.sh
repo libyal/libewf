@@ -212,7 +212,7 @@ ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquirestream";
 
 if ! test -x "${ACQUIRE_TOOL}";
 then
-	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquirestream";
+	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquirestream.exe";
 fi
 
 if ! test -x "${ACQUIRE_TOOL}";
@@ -226,7 +226,7 @@ VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
 
 if ! test -x "${VERIFY_TOOL}";
 then
-	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify.exe";
 fi
 
 if ! test -x "${VERIFY_TOOL}";
