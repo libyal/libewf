@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20160319
+# Version: 20160320
 
 GIT_URL_PREFIX="https://github.com/libyal";
 LOCAL_LIBS="libbfio libcaes libcdata libcdatetime libcerror libcfile libclocale libcnotify libcpath libcsplit libcstring libcsystem libcthreads libfcache libfdata libfvalue libhmac libodraw libsmdev libsmraw libuna";
@@ -81,8 +81,10 @@ endif
 	sed -i'~' "/${LOCAL_LIB}_definitions.h.in/d" ${LOCAL_LIB_MAKEFILE_AM};
 	sed -i'~' "/${LOCAL_LIB}.rc/d" ${LOCAL_LIB_MAKEFILE_AM};
 
-	if test ${LOCAL_LIB} != "libodraw";
+	if test ${LOCAL_LIB} = "libodraw";
 	then
+		sed -i'~' 's/libodraw_cue_scanner.c \\/libodraw_cue_scanner.c/' ${LOCAL_LIB_MAKEFILE_AM};
+	else
 		sed -i'~' '/EXTRA_DIST = /,+1d' ${LOCAL_LIB_MAKEFILE_AM};
 	fi
 

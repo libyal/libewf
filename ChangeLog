@@ -7,16 +7,21 @@ Tests:
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
 * finish migrating tests to test_runner
 * ewftools: test with -x
-* ewfinfo: DFXML output
 * write resume from volume/disk section - basically re-image
 * ewfacquire:
-  - add non-unattended test
-  - add large file tests
+  - add non-unattended tests
+* add large file tests
+  - Add 2 TiB image size test
+  - Add 8 TiB image size test
+* ewfacquire_optical:
+  - add non-unattended tests
 * ewfexport:
-  - add non-unattended test
+  - add non-unattended tests
   - export of split RAW
 * ewfexport_logical:
-  - add non-unattended test
+  - add non-unattended tests
+* ewfinfo:
+  - add DFXML output tests
 
 * libewf:
   - add unpacked_data_size to chunk data?
@@ -120,9 +125,6 @@ Tests:
 
 * check if compression level none is passed for EWF-S01
   - validate SMART forced compression of uncompressed chunks
-
-* Add 2 TiB image size test
-* Add 8 TiB image size test
 
 * Ex01/Lx01 format
   - encryption support (read/write)

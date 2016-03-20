@@ -1,88 +1,106 @@
 #!/bin/bash
+# Acquire tool testing script
 #
-# ewfacquire testing script for optical disc (split) RAW image input
-#
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160320
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_raw_optical";
-TMP="tmp";
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-LS="ls";
-SED="sed";
-TR="tr";
-WC="wc";
+OPTION_SETS="format:encase5 format:encase6 format:encase7 format:encase7-v2";
+INPUT_GLOB="*.[Cc][Uu][Ee]";
 
-test_acquire_optical_file()
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
+
+	for LINE in ${LIST};
+	do
+		if test ${LINE} = ${SEARCH};
+		then
+			return ${EXIT_SUCCESS};
+		fi
+	done
+
+	return ${EXIT_FAILURE};
+}
+
+run_test()
 { 
-	TOC_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
-	MAXIMUM_SEGMENT_SIZE=$5;
-	CHUNK_SIZE=$6;
+	TEST_SET_DIR=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
+	INPUT_FILE=$4;
+	OPTION_SET=$5;
 
-	INPUT_FILES=`echo ${TOC_FILE} | ${SED} 's/_*[0-9]*[.][cC][uU][eE]$//'`;
+	TEST_RUNNER="tests/test_runner.sh";
 
-	mkdir ${TMP};
+	if ! test -x "${TEST_RUNNER}";
+	then
+		TEST_RUNNER="./test_runner.sh";
+	fi
 
-${EWFACQUIRE} -q -d sha1 -T ${TOC_FILE} ${INPUT_FILES}*.[iI][sS][oO] <<EOI
-${TMP}/acquire
-case_number
-description
-evidence_number
-examiner
-notes
-optical
-logical
-${OUTPUT_FORMAT}
-${COMPRESSION_METHOD}
-${COMPRESSION_LEVEL}
+	if ! test -x "${TEST_RUNNER}";
+	then
+		echo "Missing test runner: ${TEST_RUNNER}";
 
+		return ${EXIT_FAILURE};
+	fi
 
-${MAXIMUM_SEGMENT_SIZE}
+	INPUT_NAME=`basename ${INPUT_FILE}`;
 
-${CHUNK_SIZE}
+	if test -z "${OPTION_SET}";
+	then
+		OPTIONS=();
+		TEST_OUTPUT="${INPUT_NAME}";
+	else
+		OPTIONS_STRING=`cat "${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}" | head -n 1 | sed 's/[\r\n]*$//'`;
+		IFS=" " read -a OPTIONS <<< ${OPTIONS_STRING};
+		TEST_OUTPUT="${INPUT_NAME}-${OPTION_SET}";
+	fi
+	INPUT_BASENAME=`echo ${INPUT_FILE} | sed 's/_*[0-9]*[.][cC][uU][eE]$//'`;
 
+	TMPDIR="tmp$$";
 
-2
-no
-yes
-EOI
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
+	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
+
+	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -C Case -D Description -E Evidence -e Examiner -m optical -M logical -N Notes -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > ${TEST_RESULTS};
 
 	RESULT=$?;
 
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if test -f "${STORED_TEST_RESULTS}";
 	then
-		${EWFVERIFY} -q -d sha1 ${TMP}/acquire.*
+		zdiff ${STORED_TEST_RESULTS} ${TEST_RESULTS};
 
 		RESULT=$?;
+	else
+		gzip ${TEST_RESULTS};
+
+		mv "${TEST_RESULTS}.gz" ${TEST_SET_DIR};
 	fi
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
+        then
+                ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.* > /dev/null;
 
-	echo "";
+                RESULT=$?;
+        fi
+	rm -rf ${TMPDIR};
 
-	rm -rf ${TMP};
-
-	echo -n "Testing ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+	if test -z "${OPTION_SET}";
+	then
+		echo -n "Testing ${TEST_DESCRIPTION} with input: ${INPUT_BASENAME}*.[Ii][Ss][Oo]";
+	else
+		echo -n "Testing ${TEST_DESCRIPTION} with option: ${OPTION_SET} and input: ${INPUT_BASENAME}*.[Ii][Ss][Oo]";
+	fi
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -93,160 +111,142 @@ EOI
 	return ${RESULT};
 }
 
-test_acquire_unattended_optical_file()
-{ 
-	TOC_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
-	MAXIMUM_SEGMENT_SIZE=$5;
-	CHUNK_SIZE=$6;
+run_tests()
+{
+	TEST_PROFILE=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
 
-	INPUT_FILES=`echo ${TOC_FILE} | ${SED} 's/_*[0-9]*[.][cC][uU][eE]$//'`;
-
-	mkdir ${TMP};
-
-	${EWFACQUIRE} -q -u -d sha1 \
-	-T ${TOC_FILE} \
-	-t ${TMP}/unattended_acquire \
-	-C case_number \
-	-D description \
-	-E evidence_number \
-	-e examiner \
-	-N notes \
-	-m optical \
-	-M logical \
-	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
-	-f ${OUTPUT_FORMAT} \
-	-S ${MAXIMUM_SEGMENT_SIZE} \
-	-b ${CHUNK_SIZE} \
-	${INPUT_FILES}*.[iI][sS][oO]
-
-	RESULT=$?;
-
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
+	if ! test -d "input";
 	then
-		${EWFVERIFY} -q -d sha1 ${TMP}/unattended_acquire.*
+		echo "No input directory found.";
 
-		RESULT=$?;
+		return ${EXIT_IGNORE};
+	fi
+	RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files or directories found in the input directory.";
+
+		return ${EXIT_IGNORE};
+	fi
+	TEST_PROFILE_DIR="input/.${TEST_PROFILE}";
+
+	if ! test -d "${TEST_PROFILE_DIR}";
+	then
+		mkdir ${TEST_PROFILE_DIR};
+	fi
+	IGNORE_FILE="${TEST_PROFILE_DIR}/ignore";
+	IGNORE_LIST="";
+
+	if test -f "${IGNORE_FILE}";
+	then
+		IGNORE_LIST=`cat ${IGNORE_FILE} | sed '/^#/d'`;
 	fi
 
-	rm -rf ${TMP};
+	for INPUT_DIR in input/*;
+	do
+		if ! test -d "${INPUT_DIR}";
+		then
+			continue
+		fi
+		INPUT_NAME=`basename ${INPUT_DIR}`;
 
-	echo -n "Testing unattended ewfacquire of optical disc raw input: ${TOC_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
+		if list_contains "${IGNORE_LIST}" "${INPUT_NAME}";
+		then
+			continue
+		fi
+		TEST_SET_DIR="${TEST_PROFILE_DIR}/${INPUT_NAME}";
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
+		if ! test -d "${TEST_SET_DIR}";
+		then
+			mkdir "${TEST_SET_DIR}";
+		fi
+
+		if test -f "${TEST_SET_DIR}/files";
+		then
+			INPUT_FILES=`cat ${TEST_SET_DIR}/files | sed "s?^?${INPUT_DIR}/?"`;
+		else
+			INPUT_FILES=`ls ${INPUT_DIR}/${INPUT_GLOB}`;
+		fi
+
+		for INPUT_FILE in ${INPUT_FILES};
+		do
+			TESTED_WITH_OPTIONS=0;
+			INPUT_NAME=`basename ${INPUT_FILE}`;
+
+			for OPTION_SET in `echo ${OPTION_SETS} | tr ' ' '\n'`;
+			do
+				OPTION_FILE="${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}";
+
+				if ! test -f "${OPTION_FILE}";
+				then
+					continue
+				fi
+
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTION_SET}";
+				then
+					return ${EXIT_FAILURE};
+				fi
+				TESTED_WITH_OPTIONS=1;
+			done
+
+			if test ${TESTED_WITH_OPTIONS} -eq 0;
+			then
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "";
+				then
+					return ${EXIT_FAILURE};
+				fi
+			fi
+		done
+	done
+
+	return ${EXIT_SUCCESS};
 }
 
-EWFACQUIRE="../ewftools/ewfacquire";
-
-if ! test -x ${EWFACQUIRE};
+if ! test -z ${SKIP_TOOLS_TESTS};
 then
-	EWFACQUIRE="../ewftools/ewfacquire.exe"
+	exit ${EXIT_IGNORE};
 fi
 
-if ! test -x ${EWFACQUIRE};
+ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
+
+if ! test -x "${ACQUIRE_TOOL}";
 then
-	echo "Missing executable: ${EWFACQUIRE}";
+	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
+fi
+
+if ! test -x "${ACQUIRE_TOOL}";
+then
+	echo "Missing executable: ${ACQUIRE_TOOL}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-EWFVERIFY="../ewftools/ewfverify";
+VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
 
-if ! test -x ${EWFVERIFY};
+if ! test -x "${VERIFY_TOOL}";
 then
-	EWFVERIFY="../ewftools/ewfverify.exe";
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
 fi
 
-if ! test -x ${EWFVERIFY};
+if ! test -x "${VERIFY_TOOL}";
 then
-	echo "Missing executable: ${EWFVERIFY}";
+	echo "Missing executable: ${VERIFY_TOOL}";
 
 	exit ${EXIT_FAILURE};
 fi
 
-if ! test -d ${INPUT};
-then
-	echo "No ${INPUT} directory found, to test ewfacquire create ${INPUT} directory and place optical disc RAW image test files in directory.";
-	echo "Make sure the table of contents file has the same basename as the data files.";
+OLDIFS=${IFS};
+IFS="
+";
 
-	exit ${EXIT_IGNORE};
-fi
+run_tests "${TEST_PREFIX}acquire_optical" "${TEST_PREFIX}acquire_optical" "${ACQUIRE_TOOL}";
 
-RESULT=`${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n' | ${WC} -l`;
+RESULT=$?;
 
-if test ${RESULT} -eq 0;
-then
-	echo "No files found in ${INPUT} directory, to test ewfacquire place optical disc RAW image test files in directory.";
-	echo "Make sure the table of contents file has the same basename as the data files.";
+IFS=${OLDIFS};
 
-	exit ${EXIT_IGNORE};
-fi
-
-for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
-do
-	for FORMAT in encase5 encase6;
-	do
-		for COMPRESSION_LEVEL in none empty-block fast best;
-		do
-			if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" 650MB 16;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-	done
-
-	for FORMAT in encase7-v2;
-	do
-		# for COMPRESSION_METHOD in deflate bzip2;
-		for COMPRESSION_METHOD in deflate;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_optical_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB 16;
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-		done
-	done
-done
-
-for FILENAME in `${LS} ${INPUT}/*.[cC][uU][eE] | ${TR} ' ' '\n'`;
-do
-	for FORMAT in encase5 encase6;
-	do
-		for COMPRESSION_LEVEL in not_acquire_optical_filee empty-block fast best;
-		do
-			if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" 650MB 16;
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-	done
-
-	for FORMAT in encase7-v2;
-	do
-		# for COMPRESSION_METHOD in deflate bzip2;
-		for COMPRESSION_METHOD in deflate;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_unattended_optical_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB 16;
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-		done
-	done
-done
-
-exit ${EXIT_SUCCESS};
+exit ${RESULT};
 

@@ -71,9 +71,7 @@ run_test()
 	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
 	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
 
-	# Note that options should not contain spaces otherwise the test_runner
-	# will fail parsing the arguments.
-	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -q -t ${TMPDIR}/${INPUT_NAME}.export -u ${OPTIONS[*]} ${INPUT_FILE} > /dev/null;
+	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -q -t ${TMPDIR}/${INPUT_NAME}.export -u ${OPTIONS[*]} ${INPUT_FILE} &> /dev/null;
 
 	RESULT=$?;
 
@@ -91,9 +89,14 @@ run_test()
 
 			mv "${TEST_RESULTS}.gz" ${TEST_SET_DIR};
 		fi
-	fi
-	# TODO: use ewfverify to verify non-raw exported files.
+	else
+		if test ${RESULT} -eq ${EXIT_SUCCESS};
+        	then
+	                ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.export.* > /dev/null;
 
+        	        RESULT=$?;
+	        fi
+	fi
 	rm -rf ${TMPDIR};
 
 	if test -z "${OPTION_SET}";
@@ -221,6 +224,20 @@ fi
 if ! test -x "${EXPORT_TOOL}";
 then
 	echo "Missing executable: ${EXPORT_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+fi
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	echo "Missing executable: ${VERIFY_TOOL}";
 
 	exit ${EXIT_FAILURE};
 fi

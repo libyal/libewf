@@ -71,9 +71,7 @@ run_test()
 	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
 	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
 
-	# Note that options should not contain spaces otherwise the test_runner
-	# will fail parsing the arguments.
-	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -C Case -D Description -E Evidence -e Examiner -N Notes -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_FILE} | sed '1,2d' > ${TEST_RESULTS};
+	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_FILE} | sed '1,2d' > ${TEST_RESULTS};
 
 	RESULT=$?;
 
@@ -87,6 +85,12 @@ run_test()
 
 		mv "${TEST_RESULTS}.gz" ${TEST_SET_DIR};
 	fi
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
+        then
+                ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.* > /dev/null;
+
+                RESULT=$?;
+        fi
 	rm -rf ${TMPDIR};
 
 	if test -z "${OPTION_SET}";
@@ -214,6 +218,20 @@ fi
 if ! test -x "${ACQUIRE_TOOL}";
 then
 	echo "Missing executable: ${ACQUIRE_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+fi
+
+if ! test -x "${VERIFY_TOOL}";
+then
+	echo "Missing executable: ${VERIFY_TOOL}";
 
 	exit ${EXIT_FAILURE};
 fi
