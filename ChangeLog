@@ -7,9 +7,16 @@ Tests:
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
 * finish migrating tests to test_runner
 * ewftools: test with -x
-* ewfexport: export of split RAW
 * ewfinfo: DFXML output
 * write resume from volume/disk section - basically re-image
+* ewfacquire:
+  - add non-unattended test
+  - add large file tests
+* ewfexport:
+  - add non-unattended test
+  - export of split RAW
+* ewfexport_logical:
+  - add non-unattended test
 
 * libewf:
   - add unpacked_data_size to chunk data?
@@ -428,6 +435,10 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160320
+* worked on tests
+* fix for printing sha256 in ewfexport
 
 20160319
 * worked on tests

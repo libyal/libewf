@@ -1,339 +1,232 @@
 #!/bin/bash
+# Acquire tool testing script
 #
-# ewfacquire testing script for (split) RAW image input
-#
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
+# Version: 20160320
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-INPUT="input_raw";
-INPUT_MORE="input_raw_more";
-TMP="tmp";
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-LS="ls";
-TR="tr";
-WC="wc";
+OPTION_SETS="format:encase1 format:encase2 format:encase3 format:encase4 format:encase5 format:encase6 format:encase7 format:encase7-v2 format:ewf format:ewfx format:ftk format:linen5 format:linen6 format:linen7 format:raw format:smart deflate:none:encase7 deflate:empty-block:encase7 deflate:fast:encase7 deflate:best:encase7 deflate:none:encase7-v2 deflate:empty-block:encase7-v2 deflate:fast:encase7-v2 deflate:best:encase7-v2 deflate:none:smart deflate:empty-block:smart deflate:fast:smart deflate:best:smart segmentsize:1mib:encase7 segmentsize:1mib:encase7-v2 segmentsize:1mib:smart blocksize:16 blocksize:32 blocksize:128 blocksize:256 blocksize:512 blocksize:1024 blocksize:2048 blocksize:4096 blocksize:8192 blocksize:16384 blocksize:32768 hash:sha1 hash:sha256 hash:all";
+INPUT_GLOB="*.[Rr][Aa][Ww]";
 
-test_acquire_file()
-{ 
-	INPUT_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
-	MAXIMUM_SEGMENT_SIZE=$5;
-	CHUNK_SIZE=$6;
+list_contains()
+{
+	LIST=$1;
+	SEARCH=$2;
 
-	mkdir ${TMP};
-
-${EWFACQUIRE} -q -d sha1 ${INPUT_FILE} <<EOI
-${TMP}/acquire
-case_number
-description
-evidence_number
-examiner
-notes
-removable
-logical
-${OUTPUT_FORMAT}
-${COMPRESSION_METHOD}
-${COMPRESSION_LEVEL}
-
-
-${MAXIMUM_SEGMENT_SIZE}
-
-${CHUNK_SIZE}
-
-
-2
-no
-yes
-EOI
-
-	RESULT=$?;
-
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
-	then
-		${EWFVERIFY} -q -d sha1 ${TMP}/acquire.*
-
-		RESULT=$?;
-	fi
-
-	echo "";
-
-	rm -rf ${TMP};
-
-	echo -n "Testing ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
-}
-
-test_acquire_unattended_file()
-{ 
-	INPUT_FILE=$1;
-	OUTPUT_FORMAT=$2;
-	COMPRESSION_METHOD=$3;
-	COMPRESSION_LEVEL=$4;
-	MAXIMUM_SEGMENT_SIZE=$5;
-	CHUNK_SIZE=$6;
-
-	mkdir ${TMP};
-
-	${EWFACQUIRE} -q -u -d sha1 \
-	-t ${TMP}/unattended_acquire \
-	-C case_number \
-	-D description \
-	-E evidence_number \
-	-e examiner \
-	-N notes \
-	-m removable \
-	-M logical \
-	-c ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} \
-	-f ${OUTPUT_FORMAT} \
-	-S ${MAXIMUM_SEGMENT_SIZE} \
-	-b ${CHUNK_SIZE} \
-	${INPUT_FILE}
-
-	RESULT=$?;
-
-	if [ ${RESULT} -eq ${EXIT_SUCCESS} ];
-	then
-		${EWFVERIFY} -q -d sha1 ${TMP}/unattended_acquire.*
-
-		RESULT=$?;
-	fi
-
-	rm -rf ${TMP};
-
-	echo -n "Testing unattended ewfacquire of raw input: ${INPUT_FILE} to ewf format: ${OUTPUT_FORMAT} with compression: ${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} and chunk size: ${CHUNK_SIZE} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
-}
-
-EWFACQUIRE="../ewftools/ewfacquire";
-
-if ! test -x ${EWFACQUIRE};
-then
-	EWFACQUIRE="../ewftools/ewfacquire.exe"
-fi
-
-if ! test -x ${EWFACQUIRE};
-then
-	echo "Missing executable: ${EWFACQUIRE}";
-
-	exit ${EXIT_FAILURE};
-fi
-
-EWFVERIFY="../ewftools/ewfverify";
-
-if ! test -x ${EWFVERIFY};
-then
-	EWFVERIFY="../ewftools/ewfverify.exe";
-fi
-
-if ! test -x ${EWFVERIFY};
-then
-	echo "Missing executable: ${EWFVERIFY}";
-
-	exit ${EXIT_FAILURE};
-fi
-
-if ! test -d ${INPUT};
-then
-	echo "No ${INPUT} directory found, to test ewfacquire create ${INPUT} directory and place RAW image test files in directory.";
-
-	exit ${EXIT_IGNORE};
-fi
-
-RESULT=`${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n' | ${WC} -l`;
-
-if test ${RESULT} -eq 0;
-then
-	echo "No files found in ${INPUT} directory, to test ewfacquire place RAW image test files in directory.";
-
-	exit ${EXIT_IGNORE};
-fi
-
-for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
-do
-	for SEGMENT_SIZE in 650MB 1MiB;
+	for LINE in ${LIST};
 	do
-		for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-		done
-
-		for FORMAT in encase7-v2;
-		do
-			# for COMPRESSION_METHOD in deflate bzip2;
-			for COMPRESSION_METHOD in deflate;
-			do
-				for COMPRESSION_LEVEL in none empty-block fast best;
-				do
-					if ! test_acquire_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
-					then
-						exit ${EXIT_FAILURE};
-					fi
-				done
-			done
-		done
-	done
-
-	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
-	do
-		for SEGMENT_SIZE in 650MB 1MiB;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_file "${FILENAME}" smart deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-
-			# for COMPRESSION_METHOD in deflate bzip2;
-			for COMPRESSION_METHOD in deflate;
-			do
-				for COMPRESSION_LEVEL in none empty-block fast best;
-				do
-					if ! test_acquire_file "${FILENAME}" encase7-v2 deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" "${CHUNK_SIZE}";
-					then
-						exit ${EXIT_FAILURE};
-					fi
-				done
-			done
-		done
-	done
-done
-
-for FILENAME in `${LS} ${INPUT}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
-do
-	for SEGMENT_SIZE in 650MB 1MiB;
-	do
-		for FORMAT in ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" deflate "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-		done
-
-		for FORMAT in encase7-v2;
-		do
-			# for COMPRESSION_METHOD in deflate bzip2;
-			for COMPRESSION_METHOD in deflate;
-			do
-				for COMPRESSION_LEVEL in none empty-block fast best;
-				do
-					if ! test_acquire_unattended_file "${FILENAME}" "${FORMAT}" "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" "${SEGMENT_SIZE}" 64;
-					then
-						exit ${EXIT_FAILURE};
-					fi
-				done
-			done
-		done
-	done
-
-	for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
-	do
-		for COMPRESSION_LEVEL in none empty-block fast best;
-		do
-			if ! test_acquire_unattended_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-
-		for COMPRESSION_LEVEL in none empty-block fast best;
-		do
-			if ! test_acquire_unattended_file "${FILENAME}" smart deflate "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
-			then
-				exit ${EXIT_FAILURE};
-			fi
-		done
-
-		# for COMPRESSION_METHOD in deflate bzip2;
-		for COMPRESSION_METHOD in deflate;
-		do
-			for COMPRESSION_LEVEL in none empty-block fast best;
-			do
-				if ! test_acquire_unattended_file "${FILENAME}" encase7-v2 "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 650MB "${CHUNK_SIZE}";
-				then
-					exit ${EXIT_FAILURE};
-				fi
-			done
-		done
-	done
-done
-
-for FILENAME in `${LS} ${INPUT_MORE}/*.[rR][aA][wW] | ${TR} ' ' '\n'`;
-do
-	for COMPRESSION_LEVEL in none empty-block fast best;
-	do
-		if ! test_acquire_file "${FILENAME}" encase6 deflate "${COMPRESSION_LEVEL}" 100GB 64;
+		if test ${LINE} = ${SEARCH};
 		then
-			exit ${EXIT_FAILURE};
+			return ${EXIT_SUCCESS};
 		fi
 	done
 
-	# for COMPRESSION_METHOD in deflate bzip2;
-	for COMPRESSION_METHOD in deflate;
+	return ${EXIT_FAILURE};
+}
+
+run_test()
+{ 
+	TEST_SET_DIR=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
+	INPUT_FILE=$4;
+	OPTION_SET=$5;
+
+	TEST_RUNNER="tests/test_runner.sh";
+
+	if ! test -x "${TEST_RUNNER}";
+	then
+		TEST_RUNNER="./test_runner.sh";
+	fi
+
+	if ! test -x "${TEST_RUNNER}";
+	then
+		echo "Missing test runner: ${TEST_RUNNER}";
+
+		return ${EXIT_FAILURE};
+	fi
+
+	INPUT_NAME=`basename ${INPUT_FILE}`;
+
+	if test -z "${OPTION_SET}";
+	then
+		OPTIONS=();
+		TEST_OUTPUT="${INPUT_NAME}";
+	else
+		OPTIONS_STRING=`cat "${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}" | head -n 1 | sed 's/[\r\n]*$//'`;
+		IFS=" " read -a OPTIONS <<< ${OPTIONS_STRING};
+		TEST_OUTPUT="${INPUT_NAME}-${OPTION_SET}";
+	fi
+	TMPDIR="tmp$$";
+
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
+	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
+
+	# Note that options should not contain spaces otherwise the test_runner
+	# will fail parsing the arguments.
+	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -C Case -D Description -E Evidence -e Examiner -N Notes -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_FILE} | sed '1,2d' > ${TEST_RESULTS};
+
+	RESULT=$?;
+
+	if test -f "${STORED_TEST_RESULTS}";
+	then
+		zdiff ${STORED_TEST_RESULTS} ${TEST_RESULTS};
+
+		RESULT=$?;
+	else
+		gzip ${TEST_RESULTS};
+
+		mv "${TEST_RESULTS}.gz" ${TEST_SET_DIR};
+	fi
+	rm -rf ${TMPDIR};
+
+	if test -z "${OPTION_SET}";
+	then
+		echo -n "Testing ${TEST_DESCRIPTION} with input: ${INPUT_FILE}";
+	else
+		echo -n "Testing ${TEST_DESCRIPTION} with option: ${OPTION_SET} and input: ${INPUT_FILE}";
+	fi
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
+	return ${RESULT};
+}
+
+run_tests()
+{
+	TEST_PROFILE=$1;
+	TEST_DESCRIPTION=$2;
+	TEST_EXECUTABLE=$3;
+
+	if ! test -d "input";
+	then
+		echo "No input directory found.";
+
+		return ${EXIT_IGNORE};
+	fi
+	RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+	if test ${RESULT} -eq 0;
+	then
+		echo "No files or directories found in the input directory.";
+
+		return ${EXIT_IGNORE};
+	fi
+	TEST_PROFILE_DIR="input/.${TEST_PROFILE}";
+
+	if ! test -d "${TEST_PROFILE_DIR}";
+	then
+		mkdir ${TEST_PROFILE_DIR};
+	fi
+	IGNORE_FILE="${TEST_PROFILE_DIR}/ignore";
+	IGNORE_LIST="";
+
+	if test -f "${IGNORE_FILE}";
+	then
+		IGNORE_LIST=`cat ${IGNORE_FILE} | sed '/^#/d'`;
+	fi
+
+	for INPUT_DIR in input/*;
 	do
-		for COMPRESSION_LEVEL in none empty-block fast best;
+		if ! test -d "${INPUT_DIR}";
+		then
+			continue
+		fi
+		INPUT_NAME=`basename ${INPUT_DIR}`;
+
+		if list_contains "${IGNORE_LIST}" "${INPUT_NAME}";
+		then
+			continue
+		fi
+		TEST_SET_DIR="${TEST_PROFILE_DIR}/${INPUT_NAME}";
+
+		if ! test -d "${TEST_SET_DIR}";
+		then
+			mkdir "${TEST_SET_DIR}";
+		fi
+
+		if test -f "${TEST_SET_DIR}/files";
+		then
+			INPUT_FILES=`cat ${TEST_SET_DIR}/files | sed "s?^?${INPUT_DIR}/?"`;
+		else
+			INPUT_FILES=`ls ${INPUT_DIR}/${INPUT_GLOB}`;
+		fi
+
+		for INPUT_FILE in ${INPUT_FILES};
 		do
-			if ! test_acquire_file "${FILENAME}" encase7-v2 "${COMPRESSION_METHOD}" "${COMPRESSION_LEVEL}" 100GB 64;
+			TESTED_WITH_OPTIONS=0;
+			INPUT_NAME=`basename ${INPUT_FILE}`;
+
+			for OPTION_SET in `echo ${OPTION_SETS} | tr ' ' '\n'`;
+			do
+				OPTION_FILE="${TEST_SET_DIR}/${INPUT_NAME}.${OPTION_SET}";
+
+				if ! test -f "${OPTION_FILE}";
+				then
+					continue
+				fi
+
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTION_SET}";
+				then
+					return ${EXIT_FAILURE};
+				fi
+				TESTED_WITH_OPTIONS=1;
+			done
+
+			if test ${TESTED_WITH_OPTIONS} -eq 0;
 			then
-				exit ${EXIT_FAILURE};
+				if ! run_test "${TEST_SET_DIR}" "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "";
+				then
+					return ${EXIT_FAILURE};
+				fi
 			fi
 		done
 	done
-done
 
-exit ${EXIT_SUCCESS};
+	return ${EXIT_SUCCESS};
+}
+
+if ! test -z ${SKIP_TOOLS_TESTS};
+then
+	exit ${EXIT_IGNORE};
+fi
+
+ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
+
+if ! test -x "${ACQUIRE_TOOL}";
+then
+	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
+fi
+
+if ! test -x "${ACQUIRE_TOOL}";
+then
+	echo "Missing executable: ${ACQUIRE_TOOL}";
+
+	exit ${EXIT_FAILURE};
+fi
+
+OLDIFS=${IFS};
+IFS="
+";
+
+run_tests "${TEST_PREFIX}acquire" "${TEST_PREFIX}acquire" "${ACQUIRE_TOOL}";
+
+RESULT=$?;
+
+IFS=${OLDIFS};
+
+exit ${RESULT};
 

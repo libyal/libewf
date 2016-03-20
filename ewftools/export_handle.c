@@ -1814,7 +1814,7 @@ int export_handle_finalize_integrity_hash(
 		     calculated_sha256_hash,
 		     LIBHMAC_SHA256_HASH_SIZE,
 		     export_handle->calculated_sha256_hash_string,
-		     41,
+		     65,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

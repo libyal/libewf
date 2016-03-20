@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to create the ewfexport option sets
 #
-# Version: 20160318
+# Version: 20160320
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -58,27 +58,60 @@ do
 	do
 		INPUT_NAME=`basename ${INPUT_FILE}`;
 
-		for FORMAT in raw ewf encase1 encase2 encase3 encase4 encase5 encase6 encase7 linen5 linen6 linen7 ftk smart ewfx encase7-v2;
+		# Test the different supported formats. 
+		for FORMAT in encase1 encase2 encase3 encase4 encase5 encase6 encase7 encase7-v2 ewf ewfx ftk linen5 linen6 linen7 raw smart;
 		do
-			OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.${FORMAT}";
+			OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.format:${FORMAT}";
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
 			echo "-f${FORMAT}" > ${OUTPUT_FILE};
 		done
 
-		# TODO: add bzip2 support
+		# Test the different supported compression methods and levels.
 		for COMPRESSION_METHOD in deflate;
 		do
+			# TODO: add bzip2 support for encase7-v2
+			if test COMPRESSION_METHOD = "bzip2";
+			then
+				continue;
+			fi
+
 			for COMPRESSION_LEVEL in none empty-block fast best;
 			do
 				OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.${COMPRESSION_METHOD}:${COMPRESSION_LEVEL}";
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -f${FORMAT}" > ${OUTPUT_FILE};
+				echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -fencase7" > ${OUTPUT_FILE};
 			done
 		done
+
+		# Test the different supported chunk sizes.
+		for CHUNK_SIZE in 16 32 128 256 512 1024 2048 4096 8192 16384 32768;
+		do
+			OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.blocksize:${CHUNK_SIZE}";
+
+			echo "Creating option set file: ${OUTPUT_FILE}";
+
+			echo "-b${CHUNK_SIZE} -fencase7" > ${OUTPUT_FILE};
+		done
+
+		# Test the different supported formats. 
+		for HASHING_METHOD in sha1 sha256;
+		do
+			OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.hash:${HASHING_METHOD}";
+
+			echo "Creating option set file: ${OUTPUT_FILE}";
+
+			echo "-d${HASHING_METHOD} -fencase7" > ${OUTPUT_FILE};
+		done
+
+		OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.hash:all";
+
+		echo "Creating option set file: ${OUTPUT_FILE}";
+
+		echo "-dsha1,sha256 -fencase7" > ${OUTPUT_FILE};
 	done
 done
 

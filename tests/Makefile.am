@@ -43,6 +43,7 @@ TESTS = \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
+	create_ewfacquire_option_sets.sh \
 	create_ewfexport_option_sets.sh \
 	pyewf_test_open_close.py \
 	pyewf_test_read.py \

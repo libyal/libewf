@@ -157,9 +157,6 @@ AM_CONDITIONAL(
  HAVE_PYTHON_TESTS,
  [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno])
 
-dnl Check if libewf should be build with version 1 API
-AX_LIBEWF_CHECK_ENABLE_V1_API
-
 dnl Check for the host operation system will be used as a fall back in the ewftools
 AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
 
