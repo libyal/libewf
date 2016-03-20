@@ -2730,32 +2730,51 @@ int device_handle_media_information_fprint(
 
 		return( -1 );
 	}
-	result = byte_size_string_create(
-		  byte_size_string,
-		  16,
-		  media_size,
-		  BYTE_SIZE_STRING_UNIT_MEGABYTE,
-		  NULL );
+	fprintf(
+	 stream,
+	 "Media size:\t\t\t\t" );
 
-	if( result == 1 )
+	if( media_size == 0 )
 	{
 		fprintf(
 		 stream,
-		 "Media size:\t\t\t\t%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)\n",
-		 byte_size_string,
-		 media_size );
+		 "N/A" );
 	}
 	else
 	{
-		fprintf(
-		 stream,
-		 "Media size:\t\t\t\t%" PRIu64 " bytes\n",
-		 media_size );
+		result = byte_size_string_create(
+			  byte_size_string,
+			  16,
+			  media_size,
+			  BYTE_SIZE_STRING_UNIT_MEGABYTE,
+			  NULL );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 "%" PRIs_LIBCSTRING_SYSTEM " (%" PRIu64 " bytes)",
+			 byte_size_string,
+			 media_size );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 "%" PRIu64 " bytes",
+			 media_size );
+		}
 	}
-	if( device_handle_get_bytes_per_sector(
-	     device_handle,
-	     &bytes_per_sector,
-	     error ) != 1 )
+	fprintf(
+	 stream,
+	 "\n" );
+
+	result = device_handle_get_bytes_per_sector(
+	          device_handle,
+	          &bytes_per_sector,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2768,8 +2787,24 @@ int device_handle_media_information_fprint(
 	}
 	fprintf(
 	 stream,
-	 "Bytes per sector:\t\t\t%" PRIu32 "\n",
-	 bytes_per_sector );
+	 "Bytes per sector:\t\t\t" );
+
+	if( result == 0 )
+	{
+		fprintf(
+		 stream,
+		 "N/A" );
+	}
+	else
+	{
+		fprintf(
+		 stream,
+		 "%" PRIu32 "",
+		 bytes_per_sector );
+	}
+	fprintf(
+	 stream,
+	 "\n" );
 
 	if( media_type == DEVICE_HANDLE_MEDIA_TYPE_OPTICAL )
 	{
