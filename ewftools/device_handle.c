@@ -1587,7 +1587,7 @@ int device_handle_get_media_type(
 }
 
 /* Retrieves the number of bytes per sector
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
@@ -1595,6 +1595,7 @@ int device_handle_get_bytes_per_sector(
      libcerror_error_t **error )
 {
 	static char *function = "device_handle_get_bytes_per_sector";
+	int result            = 0;
 
 	if( device_handle == NULL )
 	{
@@ -1609,10 +1610,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	if( device_handle->type == DEVICE_HANDLE_TYPE_DEVICE )
 	{
-		if( libsmdev_handle_get_bytes_per_sector(
-		     device_handle->smdev_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libsmdev_handle_get_bytes_per_sector(
+		          device_handle->smdev_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1626,10 +1629,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE )
 	{
-		if( libodraw_handle_get_bytes_per_sector(
-		     device_handle->odraw_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libodraw_handle_get_bytes_per_sector(
+		          device_handle->odraw_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1643,10 +1648,12 @@ int device_handle_get_bytes_per_sector(
 	}
 	else if( device_handle->type == DEVICE_HANDLE_TYPE_FILE )
 	{
-		if( libsmraw_handle_get_bytes_per_sector(
-		     device_handle->smraw_input_handle,
-		     bytes_per_sector,
-		     error ) != 1 )
+		result = libsmraw_handle_get_bytes_per_sector(
+		          device_handle->smraw_input_handle,
+		          bytes_per_sector,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1662,7 +1669,7 @@ int device_handle_get_bytes_per_sector(
 			*bytes_per_sector = 512;
 		}
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the information value by identifier

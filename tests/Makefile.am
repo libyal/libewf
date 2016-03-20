@@ -51,6 +51,7 @@ check_SCRIPTS = \
 	pyewf_test_read.py \
 	pyewf_test_seek.py \
 	test_ewfacquire.sh \
+	test_ewfacquire_device.sh \
 	test_ewfacquire_optical.sh \
 	test_ewfacquire_resume.sh \
 	test_ewfacquirestream.sh \

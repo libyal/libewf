@@ -666,8 +666,9 @@ int ewfacquire_read_input(
 		return( -1 );
 	}
 #endif
-	if( ( imaging_handle->acquiry_size > imaging_handle->input_media_size )
-	 || ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX ) )
+	if( ( imaging_handle->acquiry_size > (ssize64_t) INT64_MAX )
+	 || ( ( imaging_handle->input_media_size != 0 )
+	  && ( imaging_handle->acquiry_size > imaging_handle->input_media_size ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -681,13 +682,13 @@ int ewfacquire_read_input(
 	if( imaging_handle->acquiry_offset > 0 )
 	{
 		if( ( imaging_handle->acquiry_offset > (uint64_t) imaging_handle->input_media_size )
-		 || ( ( imaging_handle->acquiry_size + imaging_handle->acquiry_offset ) > (uint64_t) imaging_handle->input_media_size ) )
+		 || ( imaging_handle->acquiry_size > (uint64_t) ( imaging_handle->input_media_size - imaging_handle->acquiry_offset ) ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: unable to acquire beyond media size.",
+			 "%s: invalid acquire offset value out of bound.",
 			 function );
 
 			goto on_error;
@@ -710,13 +711,13 @@ int ewfacquire_read_input(
 	}
 	if( resume_acquiry_offset > 0 )
 	{
-		if( ( imaging_handle->acquiry_offset + (uint64_t) resume_acquiry_offset ) > (uint64_t) imaging_handle->input_media_size )
+		if( (uint64_t) resume_acquiry_offset > (uint64_t) ( imaging_handle->input_media_size - imaging_handle->acquiry_offset ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: unable to resume acquire beyond media size.",
+			 "%s: invalid resume acquire offset value out of bound.",
 			 function );
 
 			goto on_error;
@@ -2072,16 +2073,25 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		if( device_handle_get_bytes_per_sector(
-		     ewfacquire_device_handle,
-		     &( ewfacquire_imaging_handle->bytes_per_sector ),
-		     &error ) != 1 )
+		result = device_handle_get_bytes_per_sector(
+		          ewfacquire_device_handle,
+		          &( ewfacquire_imaging_handle->bytes_per_sector ),
+		          &error );
+
+		if( result == -1 )
 		{
 			fprintf(
 			 stderr,
 			 "Unable to retrieve bytes per sector from device.\n" );
 
 			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
+			 ewfacquire_imaging_handle->bytes_per_sector );
 		}
 	}
 	if( option_sectors_per_chunk != NULL )
@@ -2169,7 +2179,8 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 		else if( ( result == 0 )
-		      || ( ewfacquire_imaging_handle->acquiry_offset >= ewfacquire_imaging_handle->input_media_size ) )
+		      || ( ( ewfacquire_imaging_handle->input_media_size != 0 )
+		       &&  ( ewfacquire_imaging_handle->acquiry_offset >= ewfacquire_imaging_handle->input_media_size ) ) )
 		{
 			ewfacquire_imaging_handle->acquiry_offset = 0;
 
@@ -2194,7 +2205,8 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 		else if( ( result == 0 )
-		      || ( ewfacquire_imaging_handle->acquiry_size > ( ewfacquire_imaging_handle->input_media_size - ewfacquire_imaging_handle->acquiry_offset ) ) )
+		      || ( ( ewfacquire_imaging_handle->input_media_size != 0 )
+		       &&  ( ewfacquire_imaging_handle->acquiry_size > ( ewfacquire_imaging_handle->input_media_size - ewfacquire_imaging_handle->acquiry_offset ) ) ) )
 		{
 			ewfacquire_imaging_handle->acquiry_size = 0;
 
@@ -2243,7 +2255,8 @@ int main( int argc, char * const argv[] )
 	}
 	/* Initialize values
 	 */
-	if( ewfacquire_imaging_handle->acquiry_size == 0 )
+	if( ( ewfacquire_imaging_handle->acquiry_size == 0 )
+	 && ( ewfacquire_imaging_handle->input_media_size != 0 ) )
 	{
 		ewfacquire_imaging_handle->acquiry_size = ewfacquire_imaging_handle->input_media_size
 		                                        - ewfacquire_imaging_handle->acquiry_offset;
