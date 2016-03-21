@@ -43,18 +43,14 @@ run_test()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	STORED_TEST_RESULTS="${TEST_SET_DIR}/${TEST_OUTPUT}.log.gz";
-	TEST_RESULTS="${TMPDIR}/${TEST_OUTPUT}.log";
-
-	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_DEVICE} | sed '1,2d' > ${TEST_RESULTS};
-	# /usr/bin/time -v 
+	# ${TEST_RUNNER} ${TMPDIR} ...
+	/usr/bin/time -v ${TEST_EXECUTABLE} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_DEVICE}
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
-		# /usr/bin/time -v 
-                ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.* > /dev/null;
+                /usr/bin/time -v ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.*
 
                 RESULT=$?;
         fi
@@ -124,59 +120,62 @@ TEST_SET_DIR="input/.${TEST_PROFILE}";
 # Set upper virtual memory limit to 1 GiB
 ulimit -Sv 1048576;
 
-# > 2 GiB test
-INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 ) + 512 ));
+for FORMAT in encase7 encase7-v2;
+do
+	# > 2 GiB test
+	INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 ) + 512 ));
 
-OPTIONS="-cdeflate:none -fencase7";
+	OPTIONS="-cdeflate:none -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-OPTIONS="-cdeflate:empty-block -fencase7";
+	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-# > 4 GiB test
-INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
+	# > 4 GiB test
+	INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
 
-OPTIONS="-cdeflate:none -fencase7";
+	OPTIONS="-cdeflate:none -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-OPTIONS="-cdeflate:empty-block -fencase7";
+	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-# > 2 TiB test
-INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
+	# > 2 TiB test
+	INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
 
-OPTIONS="-cdeflate:empty-block -fencase7";
+	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
 
-# > 8 TiB test
-INPUT_SIZE=$(( ( 8 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
+	# > 8 TiB test
+	INPUT_SIZE=$(( ( 8 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
 
-OPTIONS="-cdeflate:empty-block -fencase7";
+	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
-then
-	exit ${EXIT_FAILURE};
-fi
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+done
 
 exit ${EXIT_SUCCESS};
 
