@@ -139,6 +139,8 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 
+	# TODO: create a large number of segment files.
+
 	# > 4 GiB test
 	INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
 
