@@ -132,6 +132,14 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 
+	# Test +64 segment files.
+	OPTIONS="-cdeflate:none -f${FORMAT} -S16MiB";
+
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
 	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
 	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
