@@ -53,6 +53,10 @@ struct libewf_chunk_table
 	 */
 	uint8_t format_version;
 
+	/* The corrupted chunks list
+	 */
+	libfdata_list_t *corrupted_chunks_list;
+
 	/* The sectors with checksum errors
 	 */
 	libcdata_range_list_t *checksum_errors;

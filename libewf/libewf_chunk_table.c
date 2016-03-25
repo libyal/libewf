@@ -112,6 +112,25 @@ int libewf_chunk_table_initialize(
 
 		return( -1 );
 	}
+	if( libfdata_list_initialize(
+	     &( ( *chunk_table )->corrupted_chunks_list ),
+	     NULL,
+	     NULL,
+	     NULL,
+	     NULL,
+	     NULL,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create corrupted chunks list.",
+		 function );
+
+		goto on_error;
+	}
 	if( libcdata_range_list_initialize(
 	     &( ( *chunk_table )->checksum_errors ),
 	     error ) != 1 )
@@ -132,6 +151,12 @@ int libewf_chunk_table_initialize(
 on_error:
 	if( *chunk_table != NULL )
 	{
+		if( ( *chunk_table )->corrupted_chunks_list != NULL )
+		{
+			libfdata_list_free(
+			 &( ( *chunk_table )->corrupted_chunks_list ),
+			 NULL );
+		}
 		memory_free(
 		 *chunk_table );
 
@@ -163,6 +188,19 @@ int libewf_chunk_table_free(
 	}
 	if( *chunk_table != NULL )
 	{
+		if( libfdata_list_free(
+		     &( ( *chunk_table )->corrupted_chunks_list ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free corrupted chunks list.",
+			 function );
+
+			result = -1;
+		}
 		if( libcdata_range_list_free(
 		     &( ( *chunk_table )->checksum_errors ),
 		     NULL,
@@ -908,6 +946,8 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 	}
 	else
 	{
+/* TODO get chunk from chunk_table->corrupted_chunks_list */
+
 		chunk_offset    = (off64_t) chunk_index * media_values->chunk_size;
 		chunk_data_size = media_values->chunk_size;
 
@@ -946,7 +986,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		corrupted_chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 
 		if( libfdata_list_cache_element_value(
-		     chunks_list,
+		     chunk_table->corrupted_chunks_list,
 		     chunks_cache,
 		     (int) chunk_index,
 		     (int) segment_number,
@@ -956,7 +996,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		     0,
 		     (intptr_t *) corrupted_chunk_data,
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
-		     0,
+		     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

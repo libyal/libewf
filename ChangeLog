@@ -1,4 +1,5 @@
 TODO
+* chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
