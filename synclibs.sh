@@ -83,6 +83,7 @@ endif
 
 	if test ${LOCAL_LIB} = "libodraw";
 	then
+		# TODO: make this more generic to strip the last \\
 		sed -i'~' 's/libodraw_cue_scanner.c \\/libodraw_cue_scanner.c/' ${LOCAL_LIB_MAKEFILE_AM};
 	else
 		sed -i'~' '/EXTRA_DIST = /,/^$/d' ${LOCAL_LIB_MAKEFILE_AM};

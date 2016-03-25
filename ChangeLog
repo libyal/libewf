@@ -438,6 +438,9 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20160325
+* fixed leaks libewf_chunk_table_get_chunk_data_by_offset
+
 20160320
 * worked on tests
 * fix for printing sha256 in ewfexport
