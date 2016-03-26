@@ -125,6 +125,13 @@ do
 	# > 2 GiB test
 	INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 ) + 512 ));
 
+	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
+
+	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+
 	OPTIONS="-cdeflate:none -f${FORMAT}";
 
 	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
@@ -140,28 +147,19 @@ do
 		exit ${EXIT_FAILURE};
 	fi
 
+	# > 4 GiB test
+	INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
+
 	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
 	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
 	then
 		exit ${EXIT_FAILURE};
 	fi
-
-	# TODO: create a large number of segment files.
-
-	# > 4 GiB test
-	INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
 
 	OPTIONS="-cdeflate:none -f${FORMAT}";
 
 	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-
-	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
-
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
 	then
 		exit ${EXIT_FAILURE};
 	fi

@@ -677,23 +677,6 @@ int libewf_handle_clone(
 			goto on_error;
 		}
 	}
-	if( internal_source_handle->chunk_group != NULL )
-	{
-		if( libewf_chunk_group_clone(
-		     &( internal_destination_handle->chunk_group ),
-		     internal_source_handle->chunk_group,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination chunk group.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( internal_source_handle->hash_sections != NULL )
 	{
 		if( libewf_hash_sections_clone(
@@ -771,12 +754,6 @@ on_error:
 		{
 			libewf_hash_sections_free(
 			 &( internal_destination_handle->hash_sections ),
-			 NULL );
-		}
-		if( internal_destination_handle->chunk_group != NULL )
-		{
-			libewf_chunk_group_free(
-			 &( internal_destination_handle->chunk_group ),
 			 NULL );
 		}
 		if( internal_destination_handle->chunks_cache != NULL )
@@ -1596,17 +1573,6 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( internal_handle->chunk_group != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunk group value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->hash_sections != NULL )
 	{
 		libcerror_error_set(
@@ -1722,19 +1688,6 @@ int libewf_handle_open_file_io_pool(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunks cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_chunk_group_initialize(
-	     &( internal_handle->chunk_group ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk group.",
 		 function );
 
 		goto on_error;
@@ -2089,12 +2042,6 @@ on_error:
 		 &( internal_handle->header_values ),
 		 NULL );
 	}
-	if( internal_handle->chunk_group != NULL )
-	{
-		libewf_chunk_group_free(
-		 &( internal_handle->chunk_group ),
-		 NULL );
-	}
 	if( internal_handle->chunks_cache != NULL )
 	{
 		libfcache_cache_free(
@@ -2138,6 +2085,7 @@ int libewf_handle_open_read_segment_file_section_data(
      int file_io_pool_entry,
      libcerror_error_t **error )
 {
+	libewf_chunk_group_t *chunk_group         = NULL;
 	libewf_header_sections_t *header_sections = NULL;
 	libewf_section_t *section                 = NULL;
 	libfcache_cache_t *sections_cache         = NULL;
@@ -2246,6 +2194,19 @@ int libewf_handle_open_read_segment_file_section_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header sections.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_chunk_group_initialize(
+	     &chunk_group,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk group.",
 		 function );
 
 		goto on_error;
@@ -2579,15 +2540,20 @@ int libewf_handle_open_read_segment_file_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
-					read_count = libewf_segment_file_read_table_section(
-						      segment_file,
-						      section,
-						      file_io_pool,
-						      file_io_pool_entry,
-						      internal_handle->media_values,
-						      internal_handle->chunk_group,
-						      error );
-
+					/* If the chunk_size is unknown read the sector table section
+					 * otherwise it will be read by libewf_segment_file_read_element_data
+					 */
+					if( internal_handle->io_handle->chunk_size == 0 )
+					{
+						read_count = libewf_segment_file_read_table_section(
+							      segment_file,
+							      section,
+							      file_io_pool,
+							      file_io_pool_entry,
+							      internal_handle->media_values->chunk_size,
+							      chunk_group,
+							      error );
+					}
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -2882,9 +2848,9 @@ int libewf_handle_open_read_segment_file_section_data(
 					goto on_error;
 
 /* TODO part of error tolerability changes
-					internal_handle->chunk_group->previous_last_chunk_filled = 0;
-					internal_handle->chunk_group->last_chunk_filled          = 0;
-					internal_handle->chunk_group->last_chunk_compared        = 0;
+					chunk_group->previous_last_chunk_filled = 0;
+					chunk_group->last_chunk_filled          = 0;
+					chunk_group->last_chunk_compared        = 0;
 */
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -3087,14 +3053,19 @@ int libewf_handle_open_read_segment_file_section_data(
 				  (void *) "table2",
 				  6 ) == 0 )
 			{
-				read_count = libewf_segment_file_read_table2_section(
-					      segment_file,
-					      section,
-					      file_io_pool,
-					      file_io_pool_entry,
-					      internal_handle->chunk_group,
-					      error );
-
+				/* If the chunk_size is unknown read the table2 section
+				 * otherwise it will be read by libewf_segment_file_read_element_data
+				 */
+				if( internal_handle->io_handle->chunk_size == 0 )
+				{
+					read_count = libewf_segment_file_read_table2_section(
+						      segment_file,
+						      section,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->chunk_group,
+						      error );
+				}
 #if defined( HAVE_VERBOSE_OUTPUT )
 				known_section = 1;
 #endif
@@ -3390,6 +3361,19 @@ int libewf_handle_open_read_segment_file_section_data(
 			internal_handle->media_values->number_of_sectors += 1;
 		}
 	}
+	if( libewf_chunk_group_free(
+	     &chunk_group,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free chunk group.",
+		 function );
+
+		goto on_error;
+	}
 	if( libewf_header_sections_free(
 	     &header_sections,
 	     error ) != 1 )
@@ -3423,6 +3407,12 @@ on_error:
 	{
 		memory_free(
 		 string_data );
+	}
+	if( chunk_group != NULL )
+	{
+		libewf_chunk_group_free(
+		 &chunk_group,
+		 NULL );
 	}
 	if( header_sections != NULL )
 	{

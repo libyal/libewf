@@ -181,7 +181,7 @@ ssize_t libewf_segment_file_read_table_section(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         libewf_media_values_t *media_values,
+         size32_t chunk_size,
          libewf_chunk_group_t *chunk_group,
          libcerror_error_t **error );
 

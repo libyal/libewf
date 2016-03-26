@@ -1,4 +1,5 @@
 TODO
+* handle table2 fallback in libewf_chunk_group_fill_v1
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?
@@ -439,8 +440,12 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
+20160326
+* changes for segment files read issue
+
 20160325
 * fixed leaks libewf_chunk_table_get_chunk_data_by_offset
+* worked on v2 support
 
 20160320
 * worked on tests

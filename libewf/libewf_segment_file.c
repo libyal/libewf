@@ -1118,7 +1118,7 @@ ssize_t libewf_segment_file_read_table_section(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         libewf_media_values_t *media_values,
+         size32_t chunk_size,
          libewf_chunk_group_t *chunk_group,
          libcerror_error_t **error )
 {
@@ -1249,7 +1249,7 @@ ssize_t libewf_segment_file_read_table_section(
 	}
 	if( number_of_entries > 0 )
 	{
-		storage_media_size = (size64_t) media_values->chunk_size * number_of_entries;
+		storage_media_size = (size64_t) chunk_size * number_of_entries;
 
 		if( libfdata_list_append_element_with_mapped_size(
 		     segment_file->chunk_groups_list,
@@ -5833,6 +5833,7 @@ int libewf_segment_file_read_element_data(
      uint8_t read_flags LIBEWF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
+	libewf_chunk_group_t *chunk_group   = NULL;
 	libewf_section_t *section           = NULL;
 	libewf_segment_file_t *segment_file = NULL;
 	static char *function               = "libewf_segment_file_read_element_data";
@@ -5961,6 +5962,22 @@ int libewf_segment_file_read_element_data(
 
 		goto on_error;
 	}
+	if( io_handle->chunk_size != 0 )
+	{
+		if( libewf_chunk_group_initialize(
+		     &chunk_group,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create chunk group.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	while( ( segment_file_offset > 0 )
 	    && ( (size64_t) segment_file_offset < segment_file_size ) )
 	{
@@ -6087,6 +6104,61 @@ int libewf_segment_file_read_element_data(
 			}
 			segment_file_offset -= section->size;
 		}
+		if( io_handle->chunk_size != 0 )
+		{
+			if( section->type == LIBEWF_SECTION_TYPE_SECTOR_TABLE )
+			{
+				read_count = libewf_segment_file_read_table_section(
+					      segment_file,
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      io_handle->chunk_size,
+					      chunk_group,
+					      error );
+
+				if( read_count == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read section: 0x%08" PRIx32 ".",
+					 function,
+					 section->type );
+
+					goto on_error;
+				}
+			}
+			else if( ( segment_file->major_version == 1 )
+			      && ( ( section->type_string_length == 6 )
+			      && ( memory_compare(
+			            (void *) section->type_string,
+			            (void *) "table2",
+			            6 ) == 0 ) ) )
+			{
+				read_count = libewf_segment_file_read_table2_section(
+					      segment_file,
+					      section,
+					      file_io_pool,
+					      file_io_pool_entry,
+					      chunk_group,
+					      error );
+
+				if( read_count == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read section: %s.",
+					 function,
+					 section->type_string );
+
+					goto on_error;
+				}
+			}
+		}
 		if( ( segment_file->major_version == 1 )
 		 && ( last_section != 0 ) )
 		{
@@ -6106,6 +6178,22 @@ int libewf_segment_file_read_element_data(
 		 function );
 
 		goto on_error;
+	}
+	if( chunk_group != NULL )
+	{
+		if( libewf_chunk_group_free(
+		     &chunk_group,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk group.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED ) == 0 )
 	{
@@ -6191,6 +6279,12 @@ int libewf_segment_file_read_element_data(
 	return( 1 );
 
 on_error:
+	if( chunk_group != NULL )
+	{
+		libewf_chunk_group_free(
+		 &chunk_group,
+		 NULL );
+	}
 	if( section != NULL )
 	{
 		libewf_section_free(
