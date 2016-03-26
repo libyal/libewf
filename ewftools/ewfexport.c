@@ -150,7 +150,7 @@ void usage_fprint(
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
 		                 "\t           (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for raw, encase6\n"
-		                 "\t           and encase7 format and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
+		                 "\t           and later formats and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n"
 		                 "\t           (not used for files format)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
@@ -160,8 +160,8 @@ void usage_fprint(
 	else
 	{
 		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIu32 ")\n"
-		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for raw, encase6 and\n"
-		                 "\t           enccase7 format and %" PRIu32 " for other formats)\n"
+		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for raw, encase6\n"
+		                 "\t           and later formats and %" PRIu32 " for other formats)\n"
 		                 "\t           (not used for files format)\n",
 		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,

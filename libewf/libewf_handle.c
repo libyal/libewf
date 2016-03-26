@@ -2100,6 +2100,7 @@ int libewf_handle_open_read_segment_file_section_data(
 	int section_index                         = 0;
 	int set_identifier_change                 = 0;
 	int single_files_section_found            = 0;
+	int read_table_sections                   = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	int known_section                         = 0;
@@ -2194,19 +2195,6 @@ int libewf_handle_open_read_segment_file_section_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header sections.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_chunk_group_initialize(
-	     &chunk_group,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk group.",
 		 function );
 
 		goto on_error;
@@ -2540,10 +2528,27 @@ int libewf_handle_open_read_segment_file_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SECTOR_TABLE:
-					/* If the chunk_size is unknown read the sector table section
-					 * otherwise it will be read by libewf_segment_file_read_element_data
+					/* If the chunk_size was unknown when the segment file was opened we
+					 * have to read the chunk groups here
 					 */
-					if( internal_handle->io_handle->chunk_size == 0 )
+					if( segment_file->number_of_chunks == 0 )
+					{
+						if( libewf_chunk_group_initialize(
+						     &chunk_group,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+							 "%s: unable to create chunk group.",
+							 function );
+
+							goto on_error;
+						}
+						read_table_sections = 1;
+					}
+					if( read_table_sections != 0 )
 					{
 						read_count = libewf_segment_file_read_table_section(
 							      segment_file,
@@ -3053,17 +3058,14 @@ int libewf_handle_open_read_segment_file_section_data(
 				  (void *) "table2",
 				  6 ) == 0 )
 			{
-				/* If the chunk_size is unknown read the table2 section
-				 * otherwise it will be read by libewf_segment_file_read_element_data
-				 */
-				if( internal_handle->io_handle->chunk_size == 0 )
+				if( read_table_sections != 0 )
 				{
 					read_count = libewf_segment_file_read_table2_section(
 						      segment_file,
 						      section,
 						      file_io_pool,
 						      file_io_pool_entry,
-						      internal_handle->chunk_group,
+						      chunk_group,
 						      error );
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -3361,18 +3363,21 @@ int libewf_handle_open_read_segment_file_section_data(
 			internal_handle->media_values->number_of_sectors += 1;
 		}
 	}
-	if( libewf_chunk_group_free(
-	     &chunk_group,
-	     error ) != 1 )
+	if( chunk_group != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free chunk group.",
-		 function );
+		if( libewf_chunk_group_free(
+		     &chunk_group,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk group.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	if( libewf_header_sections_free(
 	     &header_sections,
@@ -3954,22 +3959,6 @@ int libewf_handle_close(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunks cache.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_handle->chunk_group != NULL )
-	{
-		if( libewf_chunk_group_free(
-		     &( internal_handle->chunk_group ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunk group.",
 			 function );
 
 			result = -1;

@@ -34,6 +34,7 @@ MSVSCPP_FILES = \
 	libewf/libewf.vcproj \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \
+	libfguid/libfguid.vcproj \
 	libfvalue/libfvalue.vcproj \
 	libhmac/libhmac.vcproj \
 	libodraw/libodraw.vcproj \

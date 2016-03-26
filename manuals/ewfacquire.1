@@ -1,4 +1,4 @@
-.Dd June 7, 2014
+.Dd March 26, 2016
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -76,7 +76,7 @@ the examiner name (default is examiner_name)
 .It Fl E Ar evidence_number
 the evidence number (default is evidence_number)
 .It Fl f Ar format
-the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), encase7, linen5, linen6, linen7, ewfx.
+the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), encase7, encase7-v2, linen5, linen6, linen7, ewfx.
 .It Fl g Ar number_of_sectors
 the number of sectors to be used as error granularity
 .It Fl h
@@ -104,7 +104,7 @@ resume acquiry at a safe point
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 and encase7 format and 1.9 GiB for other formats)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 and later formats and 1.9 GiB for other formats)
 .It Fl t Ar target
 the target file (without extension) to write to (default is image)
 .It Fl T Ar toc_file
@@ -132,7 +132,7 @@ should mimic EnCase it will zero all of sectors specified as error granularity.
 .Pp
 Empty block compression detects blocks of sectors with entirely the same byte data and compresses them using the default compression level.
 .Pp
-The encase6 and encase7 format allows for segment files greater than 2 GiB (2147483648 bytes).
+The encase6 and later formats allow for segment files greater than 2 GiB (2147483648 bytes).
 .Sh ENVIRONMENT
 None
 .Sh FILES
@@ -148,7 +148,7 @@ will ask for the information it requires.
 .Ss To image a floppy:
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20120805
+ewfacquire 20160325
 
 Device information:
 Bus type:
@@ -170,7 +170,7 @@ Examiner name: John D.
 Notes: Just a floppy in my system
 Media type (fixed, removable, optical, memory) [fixed]: removable
 Media characteristics (logical, physical) [logical]:
-Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, linen5, linen6, linen7, ewfx) [encase6]: encase5
+Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, encase7-v2, linen5, linen6, linen7, ewfx) [encase6]: encase5
 Compression method (deflate) [deflate]:
 Compression level (none, empty-block, fast, best) [none]:
 Start to acquire at offset (0 <= value <= 1474560) [0]:

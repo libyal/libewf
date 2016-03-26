@@ -233,6 +233,7 @@ int libewf_chunk_group_fill_v1(
      libcerror_error_t **error )
 {
 	static char *function          = "libewf_chunk_group_fill_v1";
+	off64_t chunk_data_end_offset  = 0;
 	off64_t last_chunk_data_offset = 0;
 	off64_t last_chunk_data_size   = 0;
 	uint32_t chunk_data_size       = 0;
@@ -538,24 +539,45 @@ int libewf_chunk_group_fill_v1(
 
 		return( -1 );
 	}
-/* TODO fix for table2 */
-	if( last_chunk_data_offset < table_section->start_offset )
+	/* A table2 section where the chunk data is stored 2 sections before
+	 */
+	if( ( table_section->type_string_length == 6 )
+	 && ( memory_compare(
+	       (void *) table_section->type_string,
+	       (void *) "table2",
+	       6 ) == 0 ) )
 	{
-		last_chunk_data_size = table_section->start_offset - last_chunk_data_offset;
+		chunk_data_end_offset = table_section->start_offset - table_section->size;
 	}
+	/* A table2 section where the chunk data is stored 1 section before
+	 */
+	else if( last_chunk_data_offset < table_section->start_offset )
+	{
+		chunk_data_end_offset = table_section->start_offset;
+	}
+	/* A table section that contains the chunk data
+	 */
 	else if( last_chunk_data_offset < table_section->end_offset )
 	{
-		last_chunk_data_size = table_section->end_offset - last_chunk_data_offset;
+		chunk_data_end_offset = table_section->end_offset;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	else if( libcnotify_verbose != 0 )
+	if( last_chunk_data_offset < chunk_data_end_offset )
 	{
-		libcnotify_printf(
-		 "%s: invalid last chunk: %" PRIu64 " offset value exceeds table section end offset.\n",
-		 function,
-		 chunk_index );
+		last_chunk_data_size = chunk_data_end_offset - last_chunk_data_offset;
 	}
+	else
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: invalid last chunk: %" PRIu64 " offset value exceeds table section end offset.\n",
+			 function,
+			 chunk_index );
+		}
 #endif
+		corrupted = 1;
+	}
 	if( last_chunk_data_size <= 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )

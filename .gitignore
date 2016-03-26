@@ -156,6 +156,7 @@ stamp-h[1-9]
 /libcthreads
 /libfcache
 /libfdata
+/libfguid
 /libfvalue
 /libhmac
 /libodraw

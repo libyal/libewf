@@ -112,10 +112,6 @@ struct libewf_internal_handle
 	 */
 	libfcache_cache_t *chunks_cache;
 
-	/* The chunk group
-	 */
-	libewf_chunk_group_t *chunk_group;
-
 	/* The current chunk data
 	 */
 	libewf_chunk_data_t *chunk_data;

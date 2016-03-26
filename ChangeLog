@@ -1,5 +1,4 @@
 TODO
-* handle table2 fallback in libewf_chunk_group_fill_v1
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?
@@ -442,6 +441,7 @@ Closed:
 
 20160326
 * changes for segment files read issue
+* implement table2 fallback support in libewf_chunk_group_fill_v1
 
 20160325
 * fixed leaks libewf_chunk_table_get_chunk_data_by_offset
