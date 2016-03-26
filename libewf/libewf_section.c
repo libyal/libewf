@@ -281,6 +281,54 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the section data offset
+ * Returns 1 if successful, 0 if the section contains no data or -1 on error
+ */
+int libewf_section_get_data_offset(
+     libewf_section_t *section,
+     uint8_t format_version,
+     off64_t *data_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_section_get_data_offset";
+
+	if( section == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( section->data_size == 0 )
+	{
+		return( 0 );
+	}
+	if( format_version == 1 )
+	{
+		*data_offset = section->start_offset + sizeof( ewf_section_descriptor_v1_t );
+	}
+	else
+	{
+		*data_offset = section->start_offset;
+	}
+	return( 1 );
+}
+
 /* Sets the section values
  * Returns 1 if successful or -1 on error
  */
@@ -823,6 +871,8 @@ ssize_t libewf_section_descriptor_read(
 	}
 	if( format_version == 1 )
 	{
+		section->type = 0;
+
 		if( section->type_string_length == 4 )
 		{
 			if( memory_compare(

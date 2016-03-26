@@ -106,8 +106,14 @@ int libewf_section_clone(
      libewf_section_t *source_section,
      libcerror_error_t **error );
 
+int libewf_section_get_data_offset(
+     libewf_section_t *section,
+     uint8_t format_version,
+     off64_t *data_offset,
+     libcerror_error_t **error );
+
 int libewf_section_set_values(
-     libewf_section_t *sections,
+     libewf_section_t *section,
      uint32_t type,
      const uint8_t *type_string,
      size_t type_string_length,

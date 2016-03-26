@@ -365,7 +365,7 @@ int libewf_segment_file_read_element_data(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfcache_cache_t *segment_file_cache,
      int file_io_pool_entry,
      off64_t element_offset,
      size64_t segment_file_size,

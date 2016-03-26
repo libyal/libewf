@@ -2101,6 +2101,7 @@ int libewf_handle_open_read_segment_file_section_data(
 	int set_identifier_change                 = 0;
 	int single_files_section_found            = 0;
 	int read_table_sections                   = 0;
+	int result                                = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	int known_section                         = 0;
@@ -2357,26 +2358,26 @@ int libewf_handle_open_read_segment_file_section_data(
 
 			goto on_error;
 		}
-		if( section == NULL )
+		result = libewf_section_get_data_offset(
+		          section,
+		          segment_file->major_version,
+		          &section_data_offset,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing section: %d.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve section: %d data offset.",
 			 function,
 			 section_index );
 
 			goto on_error;
 		}
-		if( section->data_size != 0 )
+		else if( result != 0 )
 		{
-			section_data_offset = section->start_offset;
-
-			if( segment_file->major_version == 1 )
-			{
-				section_data_offset += sizeof( ewf_section_descriptor_v1_t );
-			}
 			if( libewf_segment_file_seek_offset(
 			     segment_file,
 			     file_io_pool,

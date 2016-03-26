@@ -94,6 +94,10 @@ int libewf_chunk_group_initialize(
 
 		goto on_error;
 	}
+	( *chunk_group )->previous_last_chunk_filled = -1;
+	( *chunk_group )->last_chunk_filled          = -1;
+	( *chunk_group )->last_chunk_compared        = -1;
+
 	return( 1 );
 
 on_error:
