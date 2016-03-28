@@ -3156,7 +3156,7 @@ int main( int argc, char * const argv[] )
 				fprintf(
 				 stderr,
 				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 argv[ optind - 1 ] );
+				 argv[ optind ] );
 
 				usage_fprint(
 				 stdout );

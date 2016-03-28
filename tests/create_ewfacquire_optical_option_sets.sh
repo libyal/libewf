@@ -65,7 +65,7 @@ do
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-f${FORMAT} -T${INPUT_FILE}" > ${OUTPUT_FILE};
+			echo "-f${FORMAT}" > ${OUTPUT_FILE};
 		done
 	done
 done

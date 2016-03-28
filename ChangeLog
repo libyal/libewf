@@ -1,4 +1,5 @@
 TODO
+* add multi threaded tool support
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?

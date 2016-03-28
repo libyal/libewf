@@ -1,15 +1,14 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160320
+# Version: 20160328
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX=`pwd`;
-TEST_PREFIX=`dirname ${TEST_PREFIX}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
+TEST_PREFIX=`dirname ${PWD}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
 
 test_write_resume()
 { 
@@ -41,7 +40,7 @@ test_write_resume()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${TEST_RUNNER} ${TMPDIR} ${ACQUIRE_TOOL} -q -R ${INPUT_FILE}  > ${TMPDIR}/output <<EOI
+		run_test_with_arguments ${ACQUIRE_TOOL} -q -R ${INPUT_FILE} > ${TMPDIR}/output <<EOI
 ${TMPDIR}/resume.E01
 
 
@@ -122,17 +121,19 @@ fi
 
 TEST_RUNNER="tests/test_runner.sh";
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
 	TEST_RUNNER="./test_runner.sh";
 fi
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
 	echo "Missing test runner: ${TEST_RUNNER}";
 
 	exit ${EXIT_FAILURE};
 fi
+
+source ${TEST_RUNNER};
 
 FILENAME="input/raw/floppy.raw";
 
@@ -148,40 +149,61 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-if ! test_write_resume "${FILENAME}" 1478560
+test_write_resume "${FILENAME}" 1478560
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 1477351
+test_write_resume "${FILENAME}" 1477351
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 1478432
+test_write_resume "${FILENAME}" 1478432
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 1477296
+test_write_resume "${FILENAME}" 1477296
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 1477008
+test_write_resume "${FILENAME}" 1477008
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 1476736
+test_write_resume "${FILENAME}" 1476736
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-if ! test_write_resume "${FILENAME}" 3584
+test_write_resume "${FILENAME}" 3584
+RESULT=$?;
+
+if test ${RESULT} -ne ${EXIT_SUCCESS};
 then
-	exit ${EXIT_FAILURE};
+	exit ${RESULT};
 fi
 
-exit ${EXIT_SUCCESS};
+exit ${RESULT};
 

@@ -126,6 +126,7 @@ stamp-h[1-9]
 /ewftools/ewfmount
 /ewftools/ewfrecover
 /ewftools/ewfverify
+/tests/ewf_test_get_version
 /tests/ewf_test_glob
 /tests/ewf_test_open_close
 /tests/ewf_test_read

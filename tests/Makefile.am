@@ -24,13 +24,9 @@ TESTS_PYEWF = \
 endif
 
 TESTS = \
+	test_api_functions.sh \
 	test_glob.sh \
-	test_open_close.sh \
-	test_seek.sh \
-	test_read.sh \
-	test_read_chunk.sh \
-	test_write.sh \
-	test_write_chunk.sh \
+	test_write_functions.sh \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	test_ewfacquire.sh \
@@ -50,6 +46,7 @@ check_SCRIPTS = \
 	pyewf_test_open_close.py \
 	pyewf_test_read.py \
 	pyewf_test_seek.py \
+	test_api_functions.sh \
 	test_ewfacquire.sh \
 	test_ewfacquire_device.sh \
 	test_ewfacquire_optical.sh \
@@ -61,21 +58,17 @@ check_SCRIPTS = \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	test_glob.sh \
-	test_open_close.sh \
 	test_pyewf_open_close.sh \
 	test_pyewf_read.sh \
 	test_pyewf_seek.sh \
-	test_read.sh \
-	test_read_chunk.sh \
 	test_runner.sh \
-	test_seek.sh \
-	test_write.sh \
-	test_write_chunk.sh
+	test_write_functions.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	ewf_test_get_version \
 	ewf_test_glob \
 	ewf_test_open_close \
 	ewf_test_read \
@@ -84,6 +77,15 @@ check_PROGRAMS = \
 	ewf_test_truncate \
 	ewf_test_write \
 	ewf_test_write_chunk
+
+ewf_test_get_version_SOURCES = \
+	ewf_test_libcstring.h \
+	ewf_test_libewf.h \
+	ewf_test_get_version.c
+
+ewf_test_get_version_LDADD = \
+	../libewf/libewf.la \
+	@LIBCSTRING_LIBADD@
 
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c \

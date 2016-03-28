@@ -48,7 +48,7 @@
 
 #include <libcsystem.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCSYSTEM ) */
 
-#endif
+#endif /* !defined( _EWF_TEST_LIBCSYSTEM_H ) */
 

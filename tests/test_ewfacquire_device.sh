@@ -1,52 +1,39 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160320
+# Version: 20160328
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX=`pwd`;
-TEST_PREFIX=`dirname ${TEST_PREFIX}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
+TEST_PREFIX=`dirname ${PWD}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
 
-run_test()
+TEST_PROFILE="${TEST_PREFIX}acquire_device";
+
+TEST_SET_DIR="input/.${TEST_PROFILE}";
+
+run_ewfacquire_device()
 { 
-	TEST_SET_DIR=$1;
-	TEST_DESCRIPTION=$2;
-	TEST_EXECUTABLE=$3;
-	IFS=" " read -a OPTIONS <<< $4;
-	INPUT_DEVICE=$5;
-	INPUT_SIZE=$6;
+	local TEST_SET_DIR=$1;
+	local TEST_DESCRIPTION=$2;
+	local INPUT_DEVICE=$3;
+	local INPUT_SIZE=$4;
+	IFS=" " read -a ACQUIRE_OPTIONS <<< $5;
 
-	TEST_RUNNER="tests/test_runner.sh";
+	local INPUT_NAME=`basename ${INPUT_DEVICE}`;
 
-	if ! test -x "${TEST_RUNNER}";
-	then
-		TEST_RUNNER="./test_runner.sh";
-	fi
+	local TEST_OUTPUT="${INPUT_NAME}";
 
-	if ! test -x "${TEST_RUNNER}";
-	then
-		echo "Missing test runner: ${TEST_RUNNER}";
-
-		return ${EXIT_FAILURE};
-	fi
-
-	INPUT_NAME=`basename ${INPUT_DEVICE}`;
-
-	TEST_OUTPUT="${INPUT_NAME}";
-
-	TMPDIR="tmp$$";
+	local TMPDIR="tmp$$";
 
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	# ${TEST_RUNNER} ${TMPDIR} ...
-	/usr/bin/time -v ${TEST_EXECUTABLE} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${OPTIONS[*]} ${INPUT_DEVICE}
+	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE}
 
-	RESULT=$?;
+	local RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
@@ -114,8 +101,7 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-TEST_PROFILE="${TEST_PREFIX}acquire_device";
-TEST_SET_DIR="input/.${TEST_PROFILE}";
+source ${TEST_RUNNER};
 
 # Set upper virtual memory limit to 1 GiB
 ulimit -Sv 1048576;
@@ -125,24 +111,24 @@ do
 	# > 2 GiB test
 	INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 ) + 512 ));
 
-	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
 
-	OPTIONS="-cdeflate:none -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
 
 	# Test +64 segment files.
-	OPTIONS="-cdeflate:none -f${FORMAT} -S16MiB";
+	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT} -S16MiB";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -150,16 +136,16 @@ do
 	# > 4 GiB test
 	INPUT_SIZE=$(( ( 4 * 1024 * 1024 * 1024 ) + 512 ));
 
-	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
 
-	OPTIONS="-cdeflate:none -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/urandom" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -167,9 +153,9 @@ do
 	# > 2 TiB test
 	INPUT_SIZE=$(( ( 2 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
 
-	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -177,9 +163,9 @@ do
 	# > 8 TiB test
 	INPUT_SIZE=$(( ( 8 * 1024 * 1024 * 1024 * 1024 ) + 512 ));
 
-	OPTIONS="-cdeflate:empty-block -f${FORMAT}";
+	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_test "${TEST_SET_DIR}" "${TEST_PROFILE}" "${ACQUIRE_TOOL}" "${OPTIONS}" "/dev/zero" ${INPUT_SIZE};
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
