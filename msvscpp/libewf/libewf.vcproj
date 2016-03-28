@@ -486,6 +486,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_libcthreads.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_libfcache.h"
 				>
 			</File>

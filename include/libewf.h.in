@@ -309,6 +309,7 @@ int libewf_handle_open(
      libewf_error_t **error );
 
 #if defined( LIBEWF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added

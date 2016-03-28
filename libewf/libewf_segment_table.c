@@ -1571,7 +1571,7 @@ int libewf_segment_table_get_segment_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element at offset: %" PRIi64 " from segment files list.",
+		 "%s: unable to retrieve element at offset: 0x%08" PRIx64 " from segment files list.",
 		 function,
 		 offset );
 
@@ -1804,7 +1804,7 @@ int libewf_segment_table_get_segment_file_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element at offset: %" PRIi64 " from segment files list.",
+		 "%s: unable to retrieve element at offset: 0x%08" PRIx64 " from segment files list.",
 		 function,
 		 offset );
 

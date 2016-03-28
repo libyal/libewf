@@ -43,6 +43,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
+#include "libewf_libcthreads.h"
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
@@ -191,21 +192,21 @@ int libewf_handle_initialize(
 
 		goto on_error;
 	}
-	if( libewf_segment_table_initialize(
-	     &( internal_handle->segment_table ),
-	     internal_handle->io_handle,
-	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_handle->read_write_lock ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment table.",
+		 "%s: unable to intialize read/write lock.",
 		 function );
 
 		goto on_error;
 	}
+#endif
 	internal_handle->date_format                    = LIBEWF_DATE_FORMAT_CTIME;
 	internal_handle->maximum_number_of_open_handles = LIBBFIO_POOL_UNLIMITED_NUMBER_OF_OPEN_HANDLES;
 
@@ -216,12 +217,6 @@ int libewf_handle_initialize(
 on_error:
 	if( internal_handle != NULL )
 	{
-		if( internal_handle->segment_table != NULL )
-		{
-			libewf_segment_table_free(
-			 &( internal_handle->segment_table ),
-			 NULL );
-		}
 		if( internal_handle->acquiry_errors != NULL )
 		{
 			libcdata_range_list_free(
@@ -305,6 +300,21 @@ int libewf_handle_free(
 		}
 		*handle = NULL;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_handle->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		if( libewf_io_handle_free(
 		     &( internal_handle->io_handle ),
 		     error ) != 1 )
@@ -369,19 +379,6 @@ int libewf_handle_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free acquiry errors range list.",
-			 function );
-
-			result = -1;
-		}
-		if( libewf_segment_table_free(
-		     &( internal_handle->segment_table ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment table.",
 			 function );
 
 			result = -1;
@@ -891,11 +888,14 @@ int libewf_handle_open(
 	libbfio_handle_t *file_io_handle          = NULL;
 	libbfio_pool_t *file_io_pool              = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_segment_table_t *segment_table     = NULL;
 	char *first_segment_filename              = NULL;
 	static char *function                     = "libewf_handle_open";
 	size_t filename_length                    = 0;
 	int file_io_pool_entry                    = 0;
 	int filename_index                        = 0;
+	int maximum_number_of_open_handles        = 0;
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -932,10 +932,42 @@ int libewf_handle_open(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	maximum_number_of_open_handles = internal_handle->maximum_number_of_open_handles;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libbfio_pool_initialize(
 	     &file_io_pool,
 	     0,
-	     internal_handle->maximum_number_of_open_handles,
+	     maximum_number_of_open_handles,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1058,35 +1090,23 @@ int libewf_handle_open(
 			}
 		}
 	}
-	if( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	if( libewf_segment_table_initialize(
+	     &segment_table,
+	     internal_handle->io_handle,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     error ) != 1 )
 	{
-		/* Get the basename of the first segment file
-		 */
-		if( first_segment_filename != NULL )
-		{
-			filename_length = libcstring_narrow_string_length(
-					   first_segment_filename );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
 
-			/* Set segment table basename
-			 */
-			if( libewf_segment_table_set_basename(
-			     internal_handle->segment_table,
-			     first_segment_filename,
-			     filename_length - 4,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set basename in segment table.",
-				 function );
-
-				goto on_error;
-			}
-		}
+		goto on_error;
 	}
-	else if( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
+	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -1098,7 +1118,7 @@ int libewf_handle_open(
 			/* Set segment table basename
 			 */
 			if( libewf_segment_table_set_basename(
-			     internal_handle->segment_table,
+			     segment_table,
 			     first_segment_filename,
 			     filename_length - 4,
 			     error ) != 1 )
@@ -1124,7 +1144,7 @@ int libewf_handle_open(
 		/* Set segment table basename
 		 */
 		if( libewf_segment_table_set_basename(
-		     internal_handle->segment_table,
+		     segment_table,
 		     filenames[ 0 ],
 		     filename_length,
 		     error ) != 1 )
@@ -1139,11 +1159,29 @@ int libewf_handle_open(
 			goto on_error;
 		}
 	}
-	if( libewf_handle_open_file_io_pool(
-	     handle,
-	     file_io_pool,
-	     access_flags,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+	result = libewf_internal_handle_open_file_io_pool(
+	          internal_handle,
+	          file_io_pool,
+	          access_flags,
+	          segment_table,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1151,14 +1189,41 @@ int libewf_handle_open(
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
+	}
+	else
+	{
+		internal_handle->file_io_pool_created_in_library = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	result = libcthreads_read_write_lock_release_for_write(
+	          internal_handle->read_write_lock,
+	          error );
 
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		result = -1;
+	}
+#endif
+	if( result != 1 )
+	{
 		goto on_error;
 	}
-	internal_handle->file_io_pool_created_in_library = 1;
-
 	return( 1 );
 
 on_error:
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
 	if( file_io_handle != NULL )
 	{
 		libbfio_handle_free(
@@ -1171,10 +1236,6 @@ on_error:
 		 &file_io_pool,
 		 NULL );
 	}
-	libewf_segment_table_empty(
-	 internal_handle->segment_table,
-	 NULL );
-
 	return( -1 );
 }
 
@@ -1195,11 +1256,14 @@ int libewf_handle_open_wide(
 	libbfio_handle_t *file_io_handle          = NULL;
 	libbfio_pool_t *file_io_pool              = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_segment_table_t *segment_table     = NULL;
 	wchar_t *first_segment_filename           = NULL;
 	static char *function                     = "libewf_handle_open_wide";
 	size_t filename_length                    = 0;
 	int file_io_pool_entry                    = 0;
 	int filename_index                        = 0;
+	int maximum_number_of_open_handles        = 0;
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1236,10 +1300,42 @@ int libewf_handle_open_wide(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	maximum_number_of_open_handles = internal_handle->maximum_number_of_open_handles;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libbfio_pool_initialize(
 	     &file_io_pool,
 	     0,
-	     internal_handle->maximum_number_of_open_handles,
+	     maximum_number_of_open_handles,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1362,35 +1458,23 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
-	if( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	if( libewf_segment_table_initialize(
+	     &segment_table,
+	     internal_handle->io_handle,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     error ) != 1 )
 	{
-		/* Get the basename of the first segment file
-		 */
-		if( first_segment_filename != NULL )
-		{
-			filename_length = libcstring_wide_string_length(
-					   first_segment_filename );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
 
-			/* Set segment table basename
-			 */
-			if( libewf_segment_table_set_basename_wide(
-			     internal_handle->segment_table,
-			     first_segment_filename,
-			     filename_length - 4,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set basename in segment table.",
-				 function );
-
-				goto on_error;
-			}
-		}
+		goto on_error;
 	}
-	else if( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 )
+	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
 		/* Get the basename of the first segment file
 		 */
@@ -1402,7 +1486,7 @@ int libewf_handle_open_wide(
 			/* Set segment table basename
 			 */
 			if( libewf_segment_table_set_basename_wide(
-			     internal_handle->segment_table,
+			     segment_table,
 			     first_segment_filename,
 			     filename_length - 4,
 			     error ) != 1 )
@@ -1428,7 +1512,7 @@ int libewf_handle_open_wide(
 		/* Set segment table basename
 		 */
 		if( libewf_segment_table_set_basename_wide(
-		     internal_handle->segment_table,
+		     segment_table,
 		     filenames[ 0 ],
 		     filename_length,
 		     error ) != 1 )
@@ -1443,11 +1527,29 @@ int libewf_handle_open_wide(
 			goto on_error;
 		}
 	}
-	if( libewf_handle_open_file_io_pool(
-	     handle,
-	     file_io_pool,
-	     access_flags,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
+	result = libewf_internal_handle_open_file_io_pool(
+	          internal_handle,
+	          file_io_pool,
+	          access_flags,
+	          segment_table,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1455,14 +1557,39 @@ int libewf_handle_open_wide(
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
+	}
+	else
+	{
+		internal_handle->file_io_pool_created_in_library = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	result = libcthreads_read_write_lock_release_for_write(
+	          internal_handle->read_write_lock,
+	          error );
 
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+	}
+#endif
+	if( result != 1 )
+	{
 		goto on_error;
 	}
-	internal_handle->file_io_pool_created_in_library = 1;
-
 	return( 1 );
 
 on_error:
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
 	if( file_io_handle != NULL )
 	{
 		libbfio_handle_free(
@@ -1475,610 +1602,15 @@ on_error:
 		 &file_io_pool,
 		 NULL );
 	}
-	libewf_segment_table_empty(
-	 internal_handle->segment_table,
-	 NULL );
-
 	return( -1 );
 }
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-/* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_open_file_io_pool(
-     libewf_handle_t *handle,
-     libbfio_pool_t *file_io_pool,
-     int access_flags,
-     libcerror_error_t **error )
-{
-	libbfio_handle_t *file_io_handle          = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_segment_file_t *segment_file       = NULL;
-	static char *function                     = "libewf_handle_open_file_io_pool";
-	size64_t segment_file_size                = 0;
-	ssize_t read_count                        = 0;
-	int file_io_pool_entry                    = 0;
-	int number_of_file_io_handles             = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO what about segment table ?
- * They should be created here or in initialize ?
- */
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->file_io_pool != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - file IO pool value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_table != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunk table value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_groups_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunks group cache value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunks_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunks cache value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->hash_sections != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - hash sections value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->single_files != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - single files value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( file_io_pool == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file IO pool.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( access_flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported access flags.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
-	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
-	{
-		if( libewf_read_io_handle_initialize(
-		     &( internal_handle->read_io_handle ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create read IO handle.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
-	{
-		if( libewf_write_io_handle_initialize(
-		     &( internal_handle->write_io_handle ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create write IO handle.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( libewf_chunk_table_initialize(
-	     &( internal_handle->chunk_table ),
-	     internal_handle->io_handle,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk table.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_handle->chunk_groups_cache ),
-	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk groups cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_handle->chunks_cache ),
-	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunks cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_header_values_initialize(
-	     &( internal_handle->header_values ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header values.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_hash_sections_initialize(
-	     &( internal_handle->hash_sections ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hash sections.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_single_files_initialize(
-	     &( internal_handle->single_files ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create single files.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_empty(
-	     internal_handle->sessions,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty sessions array.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_empty(
-	     internal_handle->tracks,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty tracks array.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_range_list_empty(
-	     internal_handle->acquiry_errors,
-	     NULL,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty acquiry errors range list.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
-	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
-	{
-		if( libbfio_pool_get_number_of_handles(
-		     file_io_pool,
-		     &number_of_file_io_handles,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the number of handles in the pool.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_segment_file_initialize(
-		     &segment_file,
-		     internal_handle->io_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment file.",
-			 function );
-
-			goto on_error;
-		}
-		for( file_io_pool_entry = 0;
-		     file_io_pool_entry < number_of_file_io_handles;
-		     file_io_pool_entry++ )
-		{
-			if( libbfio_pool_get_size(
-			     file_io_pool,
-			     file_io_pool_entry,
-			     &segment_file_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve size of file IO pool entry: %d.",
-				 function,
-				 file_io_pool_entry );
-
-				goto on_error;
-			}
-			if( libbfio_pool_get_handle(
-			     file_io_pool,
-			     file_io_pool_entry,
-			     &file_io_handle,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to retrieve file IO handle: %d from pool.",
-				 function,
-				 file_io_pool_entry );
-
-				goto on_error;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: processing file IO pool entry: %d.\n",
-				 function,
-				 file_io_pool_entry );
-			}
-#endif
-			read_count = libewf_segment_file_read_file_header(
-				      segment_file,
-				      file_io_pool,
-				      file_io_pool_entry,
-				      error );
-
-			if( read_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read segment file header.",
-				 function );
-
-				goto on_error;
-			}
-			if( segment_file->segment_number == 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_INPUT,
-				 LIBCERROR_INPUT_ERROR_INVALID_DATA,
-				 "%s: invalid segment number: 0 in file IO pool entry: %d.",
-				 function,
-				 file_io_pool_entry );
-
-				goto on_error;
-			}
-			if( libewf_segment_table_append_segment_by_segment_file(
-			     internal_handle->segment_table,
-			     segment_file,
-			     file_io_pool_entry,
-			     segment_file_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append segment: %" PRIu32 " to segment table.",
-				 function,
-				 segment_file->segment_number );
-
-				goto on_error;
-			}
-		}
-		if( libewf_segment_file_free(
-		     &segment_file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment file.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_handle_open_read_segment_files(
-		     internal_handle,
-		     file_io_pool,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read segment files.",
-			 function );
-
-			if( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
-			{
-				goto on_error;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( error != NULL )
-				 && ( *error != NULL ) )
-				{
-					libcnotify_print_error_backtrace(
-					 *error );
-				}
-			}
-#endif
-			libcerror_error_free(
-			 error );
-		}
-		if( internal_handle->media_values == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid handle - missing media values.",
-			 function );
-
-			goto on_error;
-		}
-/* TODO refactor */
-		if( internal_handle->single_files->ltree_data == NULL )
-		{
-			if( libewf_internal_handle_get_media_values(
-			     internal_handle,
-			     &( internal_handle->media_values->media_size ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine media values.",
-				 function );
-
-				goto on_error;
-			}
-		}
-	}
-	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
-	 && ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
-	{
-		if( internal_handle->write_io_handle->values_initialized == 0 )
-		{
-			if( libewf_write_io_handle_initialize_values(
-			     internal_handle->write_io_handle,
-			     internal_handle->io_handle,
-			     internal_handle->media_values,
-			     internal_handle->segment_table,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize write IO handle values.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		if( libewf_write_io_handle_initialize_resume(
-		     internal_handle->write_io_handle,
-		     internal_handle->io_handle,
-		     file_io_pool,
-		     internal_handle->media_values,
-		     internal_handle->segment_table,
-		     internal_handle->chunk_table,
-		     internal_handle->read_io_handle,
-		     &( internal_handle->current_offset ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write IO handle to resume.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	internal_handle->io_handle->access_flags = access_flags;
-	internal_handle->file_io_pool            = file_io_pool;
-
-	return( 1 );
-
-on_error:
-	if( segment_file != NULL )
-	{
-		libewf_segment_file_free(
-		 &segment_file,
-		 NULL );
-	}
-	if( internal_handle->single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &( internal_handle->single_files ),
-		 NULL );
-	}
-	if( internal_handle->hash_sections != NULL )
-	{
-		libewf_hash_sections_free(
-		 &( internal_handle->hash_sections ),
-		 NULL );
-	}
-	if( internal_handle->header_values != NULL )
-	{
-		libfvalue_table_free(
-		 &( internal_handle->header_values ),
-		 NULL );
-	}
-	if( internal_handle->chunks_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( internal_handle->chunks_cache ),
-		 NULL );
-	}
-	if( internal_handle->chunk_groups_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( internal_handle->chunk_groups_cache ),
-		 NULL );
-	}
-	if( internal_handle->chunk_table != NULL )
-	{
-		libewf_chunk_table_free(
-		 &( internal_handle->chunk_table ),
-		 NULL );
-	}
-	if( internal_handle->write_io_handle != NULL )
-	{
-		libewf_write_io_handle_free(
-		 &( internal_handle->write_io_handle ),
-		 error );
-	}
-	if( internal_handle->read_io_handle != NULL )
-	{
-		libewf_read_io_handle_free(
-		 &( internal_handle->read_io_handle ),
-		 error );
-	}
-	return( -1 );
-}
-
 /* Reads the section data from a segment file
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_open_read_segment_file_section_data(
+int libewf_internal_handle_open_read_segment_file_section_data(
      libewf_internal_handle_t *internal_handle,
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
@@ -2090,7 +1622,7 @@ int libewf_handle_open_read_segment_file_section_data(
 	libewf_section_t *section                 = NULL;
 	libfcache_cache_t *sections_cache         = NULL;
 	uint8_t *string_data                      = NULL;
-	static char *function                     = "libewf_handle_open_read_segment_file_section_data";
+	static char *function                     = "libewf_internal_handle_open_read_segment_file_section_data";
 	off64_t section_data_offset               = 0;
 	size_t string_data_size                   = 0;
 	ssize_t read_count                        = 0;
@@ -3438,13 +2970,14 @@ on_error:
 /* Opens the segment files for reading
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_open_read_segment_files(
+int libewf_internal_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
+     libewf_segment_table_t *segment_table,
      libcerror_error_t **error )
 {
 	libewf_segment_file_t *segment_file = NULL;
-	static char *function               = "libewf_handle_open_read_segment_files";
+	static char *function               = "libewf_internal_handle_open_read_segment_files";
 	size64_t maximum_segment_size       = 0;
 	size64_t segment_file_size          = 0;
 	uint32_t number_of_segments         = 0;
@@ -3474,17 +3007,6 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->read_io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3496,8 +3018,19 @@ int libewf_handle_open_read_segment_files(
 
 		return( -1 );
 	}
+	if( segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_segment_table_get_number_of_segments(
-	     internal_handle->segment_table,
+	     segment_table,
 	     &number_of_segments,
 	     error ) != 1 )
 	{
@@ -3526,7 +3059,7 @@ int libewf_handle_open_read_segment_files(
 	     segment_number++ )
 	{
 		if( libewf_segment_table_get_segment_by_index(
-		     internal_handle->segment_table,
+		     segment_table,
 		     segment_number,
 		     &file_io_pool_entry,
 		     &segment_file_size,
@@ -3550,7 +3083,7 @@ int libewf_handle_open_read_segment_files(
 			maximum_segment_size = ( segment_file_size >> 10 ) << 10;
 
 			if( libewf_segment_table_set_maximum_segment_size(
-			     internal_handle->segment_table,
+			     segment_table,
 			     maximum_segment_size,
 			     error ) != 1 )
 			{
@@ -3565,7 +3098,7 @@ int libewf_handle_open_read_segment_files(
 			}
 		}
 		if( libewf_segment_table_get_segment_file_by_index(
-		     internal_handle->segment_table,
+		     segment_table,
 		     segment_number,
 		     file_io_pool,
 		     &segment_file,
@@ -3686,9 +3219,9 @@ int libewf_handle_open_read_segment_files(
 		}
 		if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED ) != 0 )
 		{
-			internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
+			segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
 		}
-		if( libewf_handle_open_read_segment_file_section_data(
+		if( libewf_internal_handle_open_read_segment_file_section_data(
 		     internal_handle,
 		     segment_file,
 		     file_io_pool,
@@ -3706,7 +3239,7 @@ int libewf_handle_open_read_segment_files(
 			return( -1 );
 		}
 		if( libewf_segment_table_set_segment_storage_media_size_by_index(
-		     internal_handle->segment_table,
+		     segment_table,
 		     segment_number,
 		     segment_file->storage_media_size,
 		     error ) != 1 )
@@ -3747,9 +3280,715 @@ int libewf_handle_open_read_segment_files(
 		libcerror_error_free(
 		 error );
 
-		internal_handle->segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
+		segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
 	}
 	return( 1 );
+}
+
+/* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_internal_handle_open_file_io_pool(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     int access_flags,
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle    = NULL;
+	libewf_segment_file_t *segment_file = NULL;
+	static char *function               = "libewf_internal_handle_open_file_io_pool";
+	size64_t segment_file_size          = 0;
+	ssize_t read_count                  = 0;
+	int file_io_pool_entry              = 0;
+	int number_of_file_io_handles       = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->file_io_pool != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - file IO pool value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_table != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunk table value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_groups_cache != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunks group cache value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunks_cache != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunks cache value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_sections != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - hash sections value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->single_files != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - single files value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( access_flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported access flags.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
+	{
+		if( libewf_read_io_handle_initialize(
+		     &( internal_handle->read_io_handle ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create read IO handle.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		if( libewf_write_io_handle_initialize(
+		     &( internal_handle->write_io_handle ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create write IO handle.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libewf_chunk_table_initialize(
+	     &( internal_handle->chunk_table ),
+	     internal_handle->io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk table.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &( internal_handle->chunk_groups_cache ),
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk groups cache.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &( internal_handle->chunks_cache ),
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunks cache.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_header_values_initialize(
+	     &( internal_handle->header_values ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create header values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_hash_sections_initialize(
+	     &( internal_handle->hash_sections ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create hash sections.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_single_files_initialize(
+	     &( internal_handle->single_files ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create single files.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_empty(
+	     internal_handle->sessions,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty sessions array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_empty(
+	     internal_handle->tracks,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty tracks array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_range_list_empty(
+	     internal_handle->acquiry_errors,
+	     NULL,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty acquiry errors range list.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 || ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
+	{
+		if( libbfio_pool_get_number_of_handles(
+		     file_io_pool,
+		     &number_of_file_io_handles,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve the number of handles in the pool.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_segment_file_initialize(
+		     &segment_file,
+		     internal_handle->io_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create segment file.",
+			 function );
+
+			goto on_error;
+		}
+		for( file_io_pool_entry = 0;
+		     file_io_pool_entry < number_of_file_io_handles;
+		     file_io_pool_entry++ )
+		{
+			if( libbfio_pool_get_size(
+			     file_io_pool,
+			     file_io_pool_entry,
+			     &segment_file_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of file IO pool entry: %d.",
+				 function,
+				 file_io_pool_entry );
+
+				goto on_error;
+			}
+			if( libbfio_pool_get_handle(
+			     file_io_pool,
+			     file_io_pool_entry,
+			     &file_io_handle,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to retrieve file IO handle: %d from pool.",
+				 function,
+				 file_io_pool_entry );
+
+				goto on_error;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: processing file IO pool entry: %d.\n",
+				 function,
+				 file_io_pool_entry );
+			}
+#endif
+			read_count = libewf_segment_file_read_file_header(
+				      segment_file,
+				      file_io_pool,
+				      file_io_pool_entry,
+				      error );
+
+			if( read_count < 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read segment file header.",
+				 function );
+
+				goto on_error;
+			}
+			if( segment_file->segment_number == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_INPUT,
+				 LIBCERROR_INPUT_ERROR_INVALID_DATA,
+				 "%s: invalid segment number: 0 in file IO pool entry: %d.",
+				 function,
+				 file_io_pool_entry );
+
+				goto on_error;
+			}
+			if( libewf_segment_table_append_segment_by_segment_file(
+			     segment_table,
+			     segment_file,
+			     file_io_pool_entry,
+			     segment_file_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append segment: %" PRIu32 " to segment table.",
+				 function,
+				 segment_file->segment_number );
+
+				goto on_error;
+			}
+		}
+		if( libewf_segment_file_free(
+		     &segment_file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment file.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_internal_handle_open_read_segment_files(
+		     internal_handle,
+		     file_io_pool,
+		     segment_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read segment files.",
+			 function );
+
+			if( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 )
+			{
+				goto on_error;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( error != NULL )
+				 && ( *error != NULL ) )
+				{
+					libcnotify_print_error_backtrace(
+					 *error );
+				}
+			}
+#endif
+			libcerror_error_free(
+			 error );
+		}
+		if( internal_handle->media_values == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid handle - missing media values.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO refactor */
+		if( internal_handle->single_files->ltree_data == NULL )
+		{
+			if( libewf_internal_handle_get_media_values(
+			     internal_handle,
+			     &( internal_handle->media_values->media_size ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine media values.",
+				 function );
+
+				goto on_error;
+			}
+		}
+	}
+	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	 && ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
+	{
+		if( internal_handle->write_io_handle->values_initialized == 0 )
+		{
+			if( libewf_write_io_handle_initialize_values(
+			     internal_handle->write_io_handle,
+			     internal_handle->io_handle,
+			     internal_handle->media_values,
+			     segment_table,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to initialize write IO handle values.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( libewf_write_io_handle_initialize_resume(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     file_io_pool,
+		     internal_handle->media_values,
+		     segment_table,
+		     internal_handle->chunk_table,
+		     internal_handle->read_io_handle,
+		     &( internal_handle->current_offset ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write IO handle to resume.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	internal_handle->io_handle->access_flags = access_flags;
+	internal_handle->file_io_pool            = file_io_pool;
+	internal_handle->segment_table           = segment_table;
+
+	return( 1 );
+
+on_error:
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
+	if( internal_handle->single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &( internal_handle->single_files ),
+		 NULL );
+	}
+	if( internal_handle->hash_sections != NULL )
+	{
+		libewf_hash_sections_free(
+		 &( internal_handle->hash_sections ),
+		 NULL );
+	}
+	if( internal_handle->header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &( internal_handle->header_values ),
+		 NULL );
+	}
+	if( internal_handle->chunks_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &( internal_handle->chunks_cache ),
+		 NULL );
+	}
+	if( internal_handle->chunk_groups_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &( internal_handle->chunk_groups_cache ),
+		 NULL );
+	}
+	if( internal_handle->chunk_table != NULL )
+	{
+		libewf_chunk_table_free(
+		 &( internal_handle->chunk_table ),
+		 NULL );
+	}
+	if( internal_handle->write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &( internal_handle->write_io_handle ),
+		 error );
+	}
+	if( internal_handle->read_io_handle != NULL )
+	{
+		libewf_read_io_handle_free(
+		 &( internal_handle->read_io_handle ),
+		 error );
+	}
+	return( -1 );
+}
+
+/* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_open_file_io_pool(
+     libewf_handle_t *handle,
+     libbfio_pool_t *file_io_pool,
+     int access_flags,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	libewf_segment_table_t *segment_table     = NULL;
+	static char *function                     = "libewf_handle_open_file_io_pool";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - file IO pool value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_segment_table_initialize(
+	     &segment_table,
+	     internal_handle->io_handle,
+	     LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create segment table.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_internal_handle_open_file_io_pool(
+	          internal_handle,
+	          file_io_pool,
+	          access_flags,
+	          segment_table,
+	          error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open handle using a file IO pool.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	result = libcthreads_read_write_lock_release_for_write(
+	          internal_handle->read_write_lock,
+	          error );
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+	}
+#endif
+	if( result != 1 )
+	{
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Closes the EWF handle
@@ -3796,6 +4035,21 @@ int libewf_handle_close(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->file_io_pool_created_in_library != 0 )
 	{
 		if( libbfio_pool_close_all(
@@ -3886,19 +4140,6 @@ int libewf_handle_close(
 			result = -1;
 		}
 	}
-	if( libewf_segment_table_empty(
-	     internal_handle->segment_table,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to emtpy segment table.",
-		 function );
-
-		result = -1;
-	}
 	/* Free the chunk data if it could not be passed to libfcache_cache_set_value_by_index
 	 */
 	if( internal_handle->chunk_data != NULL )
@@ -3912,6 +4153,22 @@ int libewf_handle_close(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk data.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_handle->segment_table != NULL )
+	{
+		if( libewf_segment_table_free(
+		     &( internal_handle->segment_table ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment table.",
 			 function );
 
 			result = -1;
@@ -4072,6 +4329,21 @@ int libewf_handle_close(
 		result = -1;
 	}
 /* TODO clear IO handle, segment tables */
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -4495,25 +4767,26 @@ ssize_t libewf_handle_read_chunk(
 	return( (ssize_t) read_size );
 }
 
-/* Reads (media) data at the current offset into a buffer
+/* Reads (media) data from the last current into a buffer using a Basic File IO (bfio) pool
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_handle_read_buffer(
-         libewf_handle_t *handle,
+ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
          void *buffer,
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	libewf_chunk_data_t *chunk_data           = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_read_buffer";
-	off64_t chunk_data_offset                 = 0;
-	uint64_t chunk_index                      = 0;
-	size_t buffer_offset                      = 0;
-	size_t read_size                          = 0;
-	ssize_t total_read_count                  = 0;
+	libewf_chunk_data_t *chunk_data = NULL;
+	static char *function           = "libewf_internal_handle_read_buffer_from_file_io_pool";
+	off64_t chunk_data_offset       = 0;
+	uint64_t chunk_index            = 0;
+	size_t buffer_offset            = 0;
+	size_t read_size                = 0;
+	ssize_t total_read_count        = 0;
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -4524,8 +4797,6 @@ ssize_t libewf_handle_read_buffer(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -4709,6 +4980,94 @@ ssize_t libewf_handle_read_buffer(
 	return( total_read_count );
 }
 
+/* Reads (media) data at the current offset into a buffer
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_handle_read_buffer(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_read_buffer";
+	ssize_t read_count                        = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	read_count = libewf_internal_handle_read_buffer_from_file_io_pool(
+		      internal_handle,
+		      internal_handle->file_io_pool,
+		      buffer,
+		      buffer_size,
+		      error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		read_count = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( read_count );
+}
+
 /* Reads (media) data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
@@ -4719,11 +5078,51 @@ ssize_t libewf_handle_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_handle_read_buffer_at_offset";
-	ssize_t read_count    = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_read_buffer_at_offset";
+	ssize_t read_count                        = 0;
 
-	if( libewf_handle_seek_offset(
-	     handle,
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_internal_handle_seek_offset(
+	     internal_handle,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -4735,15 +5134,16 @@ ssize_t libewf_handle_read_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	read_count = libewf_handle_read_buffer(
-	              handle,
+	read_count = libewf_internal_handle_read_buffer_from_file_io_pool(
+	              internal_handle,
+	              internal_handle->file_io_pool,
 	              buffer,
 	              buffer_size,
 	              error );
 
-	if( read_count < 0 )
+	if( read_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -4752,9 +5152,32 @@ ssize_t libewf_handle_read_buffer_at_offset(
 		 "%s: unable to read buffer.",
 		 function );
 
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( read_count );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Prepares a chunk of (media) data before writing according to the handle settings
@@ -5398,28 +5821,29 @@ on_error:
 	return( -1 );
 }
 
-/* Writes (media) data at the current offset
+/* Writes (media) data at the current offset from a buffer using a Basic File IO (bfio) pool
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libewf_handle_write_buffer(
-         libewf_handle_t *handle,
+ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
          const void *buffer,
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_write_buffer";
-	off64_t chunk_data_offset                 = 0;
-	size_t buffer_offset                      = 0;
-	size_t input_data_size                    = 0;
-	size_t write_size                         = 0;
-	ssize_t write_count                       = 0;
-	uint64_t chunk_index                      = 0;
-	int write_chunk                           = 0;
+	static char *function     = "libewf_internal_handle_write_buffer_to_file_io_pool";
+	off64_t chunk_data_offset = 0;
+	size_t buffer_offset      = 0;
+	size_t input_data_size    = 0;
+	size_t write_size         = 0;
+	ssize_t write_count       = 0;
+	uint64_t chunk_index      = 0;
+	int write_chunk           = 0;
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -5430,8 +5854,6 @@ ssize_t libewf_handle_write_buffer(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	if( internal_handle->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -5779,6 +6201,96 @@ ssize_t libewf_handle_write_buffer(
 	return( (ssize_t) buffer_offset );
 }
 
+/* Writes (media) data at the current offset
+ * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
+ * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ */
+ssize_t libewf_handle_write_buffer(
+         libewf_handle_t *handle,
+         const void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_write_buffer";
+	ssize_t write_count                       = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
+	               internal_handle,
+	               internal_handle->file_io_pool,
+	               buffer,
+	               buffer_size,
+	               error );
+
+	if( write_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to write buffer.",
+		 function );
+
+		write_count = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( write_count );
+}
+
 /* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
@@ -5791,11 +6303,51 @@ ssize_t libewf_handle_write_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_handle_write_buffer_at_offset";
-	ssize_t write_count   = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_write_buffer_at_offset";
+	ssize_t write_count                       = 0;
 
-	if( libewf_handle_seek_offset(
-	     handle,
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_internal_handle_seek_offset(
+	     internal_handle,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -5807,26 +6359,50 @@ ssize_t libewf_handle_write_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	write_count = libewf_handle_write_buffer(
-	               handle,
+	write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
+	               internal_handle,
+	               internal_handle->file_io_pool,
 	               buffer,
 	               buffer_size,
 	               error );
 
-	if( write_count < 0 )
+	if( write_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to write buffer.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( write_count );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Finalizes the write by correcting the EWF the meta data in the segment files
@@ -6345,37 +6921,24 @@ ssize_t libewf_handle_write_finalize(
 }
 
 /* Seeks a certain offset of the (media) data
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the offset if seek is successful or -1 on error
  */
-off64_t libewf_handle_seek_offset(
-         libewf_handle_t *handle,
+off64_t libewf_internal_handle_seek_offset(
+         libewf_internal_handle_t *internal_handle,
          off64_t offset,
          int whence,
          libcerror_error_t **error )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_seek_offset";
+	static char *function = "libewf_internal_handle_seek_offset";
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->file_io_pool == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing file IO pool.",
 		 function );
 
 		return( -1 );
@@ -6459,6 +7022,92 @@ off64_t libewf_handle_seek_offset(
 	return( offset );
 }
 
+/* Seeks a certain offset of the (media) data
+ * Returns the offset if seek is successful or -1 on error
+ */
+off64_t libewf_handle_seek_offset(
+         libewf_handle_t *handle,
+         off64_t offset,
+         int whence,
+         libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_seek_offset";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	offset = libewf_internal_handle_seek_offset(
+	          internal_handle,
+	          offset,
+	          whence,
+	          error );
+
+	if( offset == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		offset = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( offset );
+}
+
 /* Retrieves the current offset of the (media) data
  * Returns 1 if successful or -1 on error
  */
@@ -6494,8 +7143,38 @@ int libewf_handle_get_offset(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*offset = internal_handle->current_offset;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -6649,6 +7328,21 @@ int libewf_handle_get_segment_filename_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_segment_table_get_basename_size(
 	          internal_handle->segment_table,
 	          filename_size,
@@ -6662,9 +7356,22 @@ int libewf_handle_get_segment_filename_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -6695,6 +7402,21 @@ int libewf_handle_get_segment_filename(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_segment_table_get_basename(
 	          internal_handle->segment_table,
 	          filename,
@@ -6709,9 +7431,22 @@ int libewf_handle_get_segment_filename(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -6797,6 +7532,21 @@ int libewf_handle_get_segment_filename_size_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_segment_table_get_basename_size_wide(
 	          internal_handle->segment_table,
 	          filename_size,
@@ -6810,9 +7560,22 @@ int libewf_handle_get_segment_filename_size_wide(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename size.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -6843,6 +7606,21 @@ int libewf_handle_get_segment_filename_wide(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_segment_table_get_basename_wide(
 	          internal_handle->segment_table,
 	          filename,
@@ -6857,9 +7635,22 @@ int libewf_handle_get_segment_filename_wide(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve segment table basename.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -6965,8 +7756,38 @@ int libewf_handle_get_maximum_segment_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*maximum_segment_size = internal_handle->segment_table->maximum_segment_size;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -7068,9 +7889,10 @@ int libewf_handle_get_filename_size(
      size_t *filename_size,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libewf_handle_get_filename_size";
-	int result                       = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	libbfio_handle_t *file_io_handle          = NULL;
+	static char *function                     = "libewf_handle_get_filename_size";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -7083,6 +7905,23 @@ int libewf_handle_get_filename_size(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_handle_get_file_io_handle(
 	          handle,
 	          &file_io_handle,
@@ -7096,15 +7935,15 @@ int libewf_handle_get_filename_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
-
-		return( -1 );
 	}
 	else if( result != 0 )
 	{
-		if( libbfio_file_get_name_size(
-		     file_io_handle,
-		     filename_size,
-		     error ) != 1 )
+		result = libbfio_file_get_name_size(
+		          file_io_handle,
+		          filename_size,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -7112,10 +7951,23 @@ int libewf_handle_get_filename_size(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename size.",
 			 function );
-
-			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -7129,9 +7981,10 @@ int libewf_handle_get_filename(
      size_t filename_size,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libewf_handle_get_filename";
-	int result                       = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	libbfio_handle_t *file_io_handle          = NULL;
+	static char *function                     = "libewf_handle_get_filename";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -7144,6 +7997,23 @@ int libewf_handle_get_filename(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_handle_get_file_io_handle(
 	          handle,
 	          &file_io_handle,
@@ -7157,16 +8027,16 @@ int libewf_handle_get_filename(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
-
-		return( -1 );
 	}
 	else if( result != 0 )
 	{
-		if( libbfio_file_get_name(
-		     file_io_handle,
-		     filename,
-		     filename_size,
-		     error ) != 1 )
+		result = libbfio_file_get_name(
+		          file_io_handle,
+		          filename,
+		          filename_size,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -7174,10 +8044,23 @@ int libewf_handle_get_filename(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename.",
 			 function );
-
-			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -7192,9 +8075,10 @@ int libewf_handle_get_filename_size_wide(
      size_t *filename_size,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libewf_handle_get_filename_size_wide";
-	int result                       = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	libbfio_handle_t *file_io_handle          = NULL;
+	static char *function                     = "libewf_handle_get_filename_size_wide";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -7207,6 +8091,23 @@ int libewf_handle_get_filename_size_wide(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_handle_get_file_io_handle(
 	          handle,
 	          &file_io_handle,
@@ -7220,15 +8121,15 @@ int libewf_handle_get_filename_size_wide(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
-
-		return( -1 );
 	}
 	else if( result != 0 )
 	{
-		if( libbfio_file_get_name_size_wide(
-		     file_io_handle,
-		     filename_size,
-		     error ) != 1 )
+		result = libbfio_file_get_name_size_wide(
+		          file_io_handle,
+		          filename_size,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -7236,10 +8137,23 @@ int libewf_handle_get_filename_size_wide(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename size.",
 			 function );
-
-			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -7253,9 +8167,10 @@ int libewf_handle_get_filename_wide(
      size_t filename_size,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libewf_handle_get_filename_wide";
-	int result                       = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	libbfio_handle_t *file_io_handle          = NULL;
+	static char *function                     = "libewf_handle_get_filename_wide";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -7268,6 +8183,23 @@ int libewf_handle_get_filename_wide(
 
 		return( -1 );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_handle_get_file_io_handle(
 	          handle,
 	          &file_io_handle,
@@ -7281,16 +8213,16 @@ int libewf_handle_get_filename_wide(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file IO handle for current chunk.",
 		 function );
-
-		return( -1 );
 	}
 	else if( result != 0 )
 	{
-		if( libbfio_file_get_name_wide(
-		     file_io_handle,
-		     filename,
-		     filename_size,
-		     error ) != 1 )
+		result = libbfio_file_get_name_wide(
+		          file_io_handle,
+		          filename,
+		          filename_size,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -7298,10 +8230,23 @@ int libewf_handle_get_filename_wide(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve filename.",
 			 function );
-
-			return( -1 );
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -7394,7 +8339,7 @@ int libewf_handle_get_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment at offset: %" PRIi64 " from segment table.",
+		 "%s: unable to retrieve segment at offset: 0x%08" PRIx64 " from segment table.",
 		 function,
 		 internal_handle->current_offset );
 
@@ -7739,6 +8684,7 @@ int libewf_handle_get_root_file_entry(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_root_file_entry";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -7786,26 +8732,55 @@ int libewf_handle_get_root_file_entry(
 
 		return( -1 );
 	}
-	if( internal_handle->single_files->root_file_entry_node == NULL )
-	{
-		return( 0 );
-	}
-	if( libewf_file_entry_initialize(
-	     root_file_entry,
-	     internal_handle,
-	     internal_handle->single_files->root_file_entry_node,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create root file entry.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( internal_handle->single_files->root_file_entry_node != NULL )
+	{
+		result = libewf_file_entry_initialize(
+		          root_file_entry,
+		          internal_handle,
+		          internal_handle->single_files->root_file_entry_node,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create root file entry.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the (single) file entry for the specific UTF-8 encoded path

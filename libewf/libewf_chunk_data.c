@@ -1982,7 +1982,7 @@ int libewf_chunk_data_read_element_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading chunk: %" PRIu64 " at offset: %" PRIi64 " with size: %" PRIu64 " in file IO pool entry: %d.\n",
+		 "%s: reading chunk: %" PRIu64 " at offset: 0x%08" PRIx64 " with size: %" PRIu64 " in file IO pool entry: %d.\n",
 		 function,
 		 chunk_index,
 		 chunk_data_offset,

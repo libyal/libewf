@@ -33,6 +33,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcthreads.h"
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
@@ -143,6 +144,12 @@ struct libewf_internal_handle
 	/* The single files
 	 */
 	libewf_single_files_t *single_files;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBEWF_EXTERN \
@@ -175,6 +182,7 @@ int libewf_handle_open(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBEWF_EXTERN \
 int libewf_handle_open_wide(
      libewf_handle_t *handle,
@@ -182,25 +190,34 @@ int libewf_handle_open_wide(
      int number_of_filenames,
      int access_flags,
      libcerror_error_t **error );
-#endif
 
-LIBEWF_EXTERN \
-int libewf_handle_open_file_io_pool(
-     libewf_handle_t *handle,
-     libbfio_pool_t *file_io_pool,
-     int access_flags,
-     libcerror_error_t **error );
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-int libewf_handle_open_read_segment_file_section_data(
+int libewf_internal_handle_open_read_segment_file_section_data(
      libewf_internal_handle_t *internal_handle,
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
      int file_io_pool_entry,
      libcerror_error_t **error );
 
-int libewf_handle_open_read_segment_files(
+int libewf_internal_handle_open_read_segment_files(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error );
+
+int libewf_internal_handle_open_file_io_pool(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     int access_flags,
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_open_file_io_pool(
+     libewf_handle_t *handle,
+     libbfio_pool_t *file_io_pool,
+     int access_flags,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -229,6 +246,13 @@ ssize_t libewf_handle_read_chunk(
          void *checksum_buffer,
          uint32_t *chunk_checksum,
          int8_t *chunk_io_flags,
+         libcerror_error_t **error );
+
+ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         void *buffer,
+         size_t buffer_size,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -270,6 +294,13 @@ ssize_t libewf_handle_write_chunk(
          int8_t chunk_io_flags,
          libcerror_error_t **error );
 
+ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         const void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_buffer(
          libewf_handle_t *handle,
@@ -288,6 +319,12 @@ ssize_t libewf_handle_write_buffer_at_offset(
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_finalize(
          libewf_handle_t *handle,
+         libcerror_error_t **error );
+
+off64_t libewf_internal_handle_seek_offset(
+         libewf_internal_handle_t *internal_handle,
+         off64_t offset,
+         int whence,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \

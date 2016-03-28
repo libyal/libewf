@@ -3718,7 +3718,7 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: setting file descriptor back to end of data at offset: %" PRIi64 ".\n",
+			 "%s: setting file descriptor back to end of data at offset: 0x%08" PRIx64 ".\n",
 			 function,
 			 segment_file->current_offset );
 		}
@@ -7039,7 +7039,7 @@ int libewf_segment_file_get_chunk_group_by_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunks list at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve chunks list at offset: 0x%08" PRIx64 ".",
 		 function,
 		 offset );
 

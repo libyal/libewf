@@ -5,6 +5,17 @@ TODO
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
 
+Threat safety
+* libewf_handle_signal_abort
+* libewf_handle_get_file_io_handle (need libewf_internal_handle_get_file_io_handle)
+* libewf_file_get_file_entry_by_utf8_path
+* libewf_file_get_file_entry_by_utf16_path
+* libewf_handle_set_*
+* libewf_metadata
+ - libewf_handle_get_segment_file_set_identifier and beyond
+ - libewf_handle_set_*
+* libewf_file_entry
+
 Tests:
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
 * finish migrating tests to test_runner

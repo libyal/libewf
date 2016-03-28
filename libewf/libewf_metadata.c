@@ -30,6 +30,7 @@
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcthreads.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
@@ -48,6 +49,7 @@ int libewf_handle_get_sectors_per_chunk(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_sectors_per_chunk";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -84,6 +86,21 @@ int libewf_handle_get_sectors_per_chunk(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -93,11 +110,28 @@ int libewf_handle_get_sectors_per_chunk(
 		 "%s: invalid sectors per chunk value exceeds maximum.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*sectors_per_chunk = internal_handle->media_values->sectors_per_chunk;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	*sectors_per_chunk = internal_handle->media_values->sectors_per_chunk;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Sets the number of sectors per chunk
@@ -177,6 +211,7 @@ int libewf_handle_get_bytes_per_sector(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_bytes_per_sector";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -213,6 +248,21 @@ int libewf_handle_get_bytes_per_sector(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->media_values->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -222,11 +272,28 @@ int libewf_handle_get_bytes_per_sector(
 		 "%s: invalid bytes per sector value exceeds maximum.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*bytes_per_sector = internal_handle->media_values->bytes_per_sector;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	*bytes_per_sector = internal_handle->media_values->bytes_per_sector;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Sets the number of bytes per sector
@@ -306,6 +373,7 @@ int libewf_handle_get_number_of_sectors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_sectors";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -342,6 +410,21 @@ int libewf_handle_get_number_of_sectors(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->media_values->number_of_sectors > (uint64_t) INT64_MAX )
 	{
 		libcerror_error_set(
@@ -351,11 +434,28 @@ int libewf_handle_get_number_of_sectors(
 		 "%s: invalid number of sectors value exceeds maximum.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*number_of_sectors = internal_handle->media_values->number_of_sectors;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	*number_of_sectors = internal_handle->media_values->number_of_sectors;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the chunk size
@@ -368,6 +468,7 @@ int libewf_handle_get_chunk_size(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_chunk_size";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -404,6 +505,21 @@ int libewf_handle_get_chunk_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->media_values->chunk_size > (size32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -413,11 +529,28 @@ int libewf_handle_get_chunk_size(
 		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*chunk_size = internal_handle->media_values->chunk_size;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	*chunk_size = internal_handle->media_values->chunk_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the error granularity
@@ -430,6 +563,7 @@ int libewf_handle_get_error_granularity(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_error_granularity";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -466,6 +600,21 @@ int libewf_handle_get_error_granularity(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->media_values->error_granularity > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(
@@ -475,11 +624,28 @@ int libewf_handle_get_error_granularity(
 		 "%s: invalid error granularity value exceeds maximum.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*error_granularity = internal_handle->media_values->error_granularity;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	*error_granularity = internal_handle->media_values->error_granularity;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Sets the error granularity
@@ -580,8 +746,38 @@ int libewf_handle_get_compression_method(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*compression_method = internal_handle->io_handle->compression_method;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -720,9 +916,39 @@ int libewf_handle_get_compression_values(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*compression_level = internal_handle->io_handle->compression_level;
 	*compression_flags = internal_handle->io_handle->compression_flags;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -852,8 +1078,38 @@ int libewf_handle_get_media_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*media_size = internal_handle->media_values->media_size;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -981,8 +1237,38 @@ int libewf_handle_get_media_type(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*media_type = internal_handle->media_values->media_type;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1049,6 +1335,7 @@ int libewf_handle_get_media_flags(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_media_flags";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1074,17 +1361,6 @@ int libewf_handle_get_media_flags(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->media_flags > (uint8_t) INT8_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid media flags value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( media_flags == NULL )
 	{
 		libcerror_error_set(
@@ -1096,9 +1372,52 @@ int libewf_handle_get_media_flags(
 
 		return( -1 );
 	}
-	*media_flags = internal_handle->media_values->media_flags;
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
-	return( 1 );
+		return( -1 );
+	}
+#endif
+	if( internal_handle->media_values->media_flags > (uint8_t) INT8_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid media flags value exceeds maximum.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		*media_flags = internal_handle->media_values->media_flags;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Sets the media flags
@@ -1168,6 +1487,7 @@ int libewf_handle_get_format(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_format";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1204,17 +1524,6 @@ int libewf_handle_get_format(
 
 		return( -1 );
 	}
-	if( internal_handle->io_handle->format > (uint8_t) INT8_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid format value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( format == NULL )
 	{
 		libcerror_error_set(
@@ -1226,9 +1535,52 @@ int libewf_handle_get_format(
 
 		return( -1 );
 	}
-	*format = internal_handle->io_handle->format;
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
-	return( 1 );
+		return( -1 );
+	}
+#endif
+	if( internal_handle->io_handle->format > (uint8_t) INT8_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid format value exceeds maximum.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		*format = internal_handle->io_handle->format;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Sets the output format
@@ -1432,9 +1784,39 @@ int libewf_handle_get_segment_file_version(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*major_version = internal_handle->io_handle->major_version;
 	*minor_version = internal_handle->io_handle->minor_version;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 

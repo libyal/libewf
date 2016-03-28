@@ -68,6 +68,7 @@ libewf_la_SOURCES = \
 	libewf_libclocale.h \
 	libewf_libcnotify.h \
 	libewf_libcstring.h \
+	libewf_libcthreads.h \
 	libewf_libhmac.h \
 	libewf_libfcache.h \
 	libewf_libfdata.h \

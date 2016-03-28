@@ -89,12 +89,12 @@ fi
 
 TEST_RUNNER="tests/test_runner.sh";
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
 	TEST_RUNNER="./test_runner.sh";
 fi
 
-if ! test -x ${TEST_RUNNER};
+if ! test -f "${TEST_RUNNER}";
 then
 	echo "Missing test runner: ${TEST_RUNNER}";
 
