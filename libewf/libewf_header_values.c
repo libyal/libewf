@@ -7027,6 +7027,17 @@ int libewf_header_values_get_identifier(
 
 		return( -1 );
 	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfvalue_table_get_value_by_index(
 	     header_values,
 	     (int) index,
@@ -7053,8 +7064,9 @@ int libewf_header_values_get_identifier(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value identifier size.",
-		 function );
+		 "%s: unable to retrieve header value: %" PRIu32 " identifier size.",
+		 function,
+		 index );
 
 		return( -1 );
 	}
@@ -7064,8 +7076,9 @@ int libewf_header_values_get_identifier(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: identifier size too small.",
-		 function );
+		 "%s: header value: %" PRIu32 " identifier size too small.",
+		 function,
+		 index );
 
 		return( -1 );
 	}
@@ -7078,8 +7091,9 @@ int libewf_header_values_get_identifier(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy identifier.",
-		 function );
+		 "%s: unable to copy header value: %" PRIu32 " identifier.",
+		 function,
+		 index );
 
 		return( -1 );
 	}

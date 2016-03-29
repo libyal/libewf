@@ -1176,3 +1176,825 @@ int libewf_hash_values_generate_sha1_hash(
 	return( 1 );
 }
 
+/* Retrieves the size of the hash value identifier of a specific index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if if no hash values are present or -1 on error
+ */
+int libewf_hash_values_get_identifier_size(
+     libfvalue_table_t *hash_values,
+     uint32_t index,
+     size_t *identifier_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value  = NULL;
+	uint8_t *hash_value_identifier = NULL;
+	static char *function          = "libewf_hash_values_get_identifier_size";
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_table_get_value_by_index(
+	     hash_values,
+	     (int) index,
+	     &hash_value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %" PRIu32 ".",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( libfvalue_value_get_identifier(
+	     hash_value,
+	     &hash_value_identifier,
+	     identifier_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %" PRIu32 " identifier size.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the hash value identifier of a specific index
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ */
+int libewf_hash_values_get_identifier(
+     libfvalue_table_t *hash_values,
+     uint32_t index,
+     uint8_t *identifier,
+     size_t identifier_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value     = NULL;
+	uint8_t *hash_value_identifier    = NULL;
+	static char *function             = "libewf_hash_values_get_identifier";
+	size_t hash_value_identifier_size = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_table_get_value_by_index(
+	     hash_values,
+	     (int) index,
+	     &hash_value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %" PRIu32 ".",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( libfvalue_value_get_identifier(
+	     hash_value,
+	     &hash_value_identifier,
+	     &hash_value_identifier_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %" PRIu32 " identifier size.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( identifier_size < hash_value_identifier_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: hash value: %" PRIu32 " identifier size too small.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     identifier,
+	     hash_value_identifier,
+	     hash_value_identifier_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value: %" PRIu32 " identifier.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded hash value of an identifier
+ * The string size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_hash_values_get_utf8_value_size(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_get_utf8_value_size";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	result = libfvalue_value_has_data(
+		  hash_value,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if hash value has data.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( libfvalue_value_get_utf8_string_size(
+	     hash_value,
+	     0,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string size of hash value.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded hash value of an identifier
+ * The string size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_hash_values_get_utf8_value(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_get_utf8_value";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	result = libfvalue_value_has_data(
+		  hash_value,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if hash value has data.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( libfvalue_value_copy_to_utf8_string(
+	     hash_value,
+	     0,
+	     utf8_string,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the UTF-8 encoded hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_set_utf8_value(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_set_utf8_value";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		if( libfvalue_value_type_initialize(
+		     &hash_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_identifier(
+		     hash_value,
+		     identifier,
+		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s identifier.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 &hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_table_set_value(
+		     hash_values,
+		     hash_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s in table.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 &hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+	}
+	if( libfvalue_value_copy_from_utf8_string(
+	     hash_value,
+	     0,
+	     utf8_string,
+	     utf8_string_length,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value from UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded hash value of an identifier
+ * The string size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_hash_values_get_utf16_value_size(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_get_utf16_value_size";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	result = libfvalue_value_has_data(
+		  hash_value,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if hash value has data.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( libfvalue_value_get_utf16_string_size(
+	     hash_value,
+	     0,
+	     utf16_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string size of hash value.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded hash value of an identifier
+ * The string size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_hash_values_get_utf16_value(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_get_utf16_value";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	result = libfvalue_value_has_data(
+		  hash_value,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if hash value has data.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( libfvalue_value_copy_to_utf16_string(
+	     hash_value,
+	     0,
+	     utf16_string,
+	     utf16_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value to UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the UTF-16 encoded hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_set_utf16_value(
+     libfvalue_table_t *hash_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *hash_value = NULL;
+	static char *function         = "libewf_hash_values_set_utf16_value";
+	int result                    = 0;
+
+	if( hash_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfvalue_table_get_value_by_identifier(
+	          hash_values,
+	          identifier,
+	          identifier_length + 1,
+	          &hash_value,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		if( libfvalue_value_type_initialize(
+		     &hash_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libfvalue_value_set_identifier(
+		     hash_value,
+		     identifier,
+		     identifier_length + 1,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s identifier.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 &hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfvalue_table_set_value(
+		     hash_values,
+		     hash_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value: %s in table.",
+			 function,
+			 (char *) identifier );
+
+			libfvalue_value_free(
+			 &hash_value,
+			 NULL );
+
+			return( -1 );
+		}
+	}
+	if( libfvalue_value_copy_from_utf16_string(
+	     hash_value,
+	     0,
+	     utf16_string,
+	     utf16_string_length,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy hash value from UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+

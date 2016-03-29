@@ -17,6 +17,8 @@ Threat safety
  - libewf_handle_set_*
  - libewf_handle_copy_header_values
 * libewf_file_entry
+* write lock
+  - libewf_handle_get_ ... _hash_values
 
 Tests:
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
