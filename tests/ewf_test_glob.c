@@ -1,5 +1,5 @@
 /*
- * Expert Witness Compression Format (EWF) library glob testing program
+ * library glob testing program
  *
  * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *

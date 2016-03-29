@@ -252,3 +252,107 @@ on_error:
 	return( -1 );
 }
 
+/* Sets the digest specified by the identifier from the hash values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_sections_set_digest_from_hash_values(
+     libewf_hash_sections_t *hash_sections,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     libfvalue_table_t *hash_values,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_hash_sections_set_digest_from_hash_values";
+
+	if( hash_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( identifier_length == 3 )
+	 && ( libcstring_narrow_string_compare(
+	       (char *) identifier,
+	       "MD5",
+	       identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_generate_md5_hash(
+		     hash_values,
+		     hash_sections->md5_hash,
+		     16,
+		     &( hash_sections->md5_hash_set ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_generate_md5_hash(
+		     hash_values,
+		     hash_sections->md5_digest,
+		     16,
+		     &( hash_sections->md5_digest_set ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( ( identifier_length == 4 )
+	      && ( libcstring_narrow_string_compare(
+		    (char *) identifier,
+		    "SHA1",
+		    identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_generate_sha1_hash(
+		     hash_values,
+		     hash_sections->sha1_hash,
+		     20,
+		     &( hash_sections->sha1_hash_set ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse SHA1 hash value for its value.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_generate_sha1_hash(
+		     hash_values,
+		     hash_sections->sha1_digest,
+		     20,
+		     &( hash_sections->sha1_digest_set ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse SHA1 hash value for its value.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+

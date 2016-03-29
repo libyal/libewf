@@ -4890,7 +4890,7 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 		     internal_handle->chunk_table,
 		     chunk_index,
 		     internal_handle->io_handle,
-		     internal_handle->file_io_pool,
+		     file_io_pool,
 		     internal_handle->media_values,
 		     internal_handle->segment_table,
 		     internal_handle->chunk_groups_cache,
@@ -6144,7 +6144,7 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 			write_count = libewf_write_io_handle_write_new_chunk(
 			               internal_handle->write_io_handle,
 			               internal_handle->io_handle,
-			               internal_handle->file_io_pool,
+			               file_io_pool,
 			               internal_handle->media_values,
 			               internal_handle->segment_table,
 			               internal_handle->header_values,

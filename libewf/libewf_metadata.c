@@ -4726,983 +4726,14 @@ int libewf_handle_set_utf16_header_value(
 	return( 1 );
 }
 
-/* Copies the header values from the source to the destination handle
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_copy_header_values(
-     libewf_handle_t *destination_handle,
-     libewf_handle_t *source_handle,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_destination_handle = NULL;
-	libewf_internal_handle_t *internal_source_handle      = NULL;
-	static char *function                                 = "libewf_handle_copy_header_values";
-
-	if( destination_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid destination handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( source_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
-	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
-
-	if( internal_source_handle->header_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid source handle - missing header values.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_destination_handle->header_values == NULL )
-	{
-		if( libewf_header_values_initialize(
-		     &( internal_destination_handle->header_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header values.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( libewf_header_values_copy(
-	     internal_destination_handle->header_values,
-	     internal_source_handle->header_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy header values.",
-		 function );
-
-		return( -1 );
-	}
-	internal_destination_handle->header_values_parsed = 1;
-
-	return( 1 );
-}
-
-/* Retrieves the number of hash values
- * Returns 1 if successful, 0 if no hash values are present or -1 on error
- */
-int libewf_handle_get_number_of_hash_values(
-     libewf_handle_t *handle,
-     uint32_t *number_of_values,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_number_of_hash_values";
-	int number_of_hash_values                 = 0;
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( number_of_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of values.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libfvalue_table_get_number_of_values(
-		          internal_handle->hash_values,
-		          &number_of_hash_values,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of hash values.",
-			 function );
-
-			return( -1 );
-		}
-		else if( number_of_hash_values < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid number of hash values value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		else
-		{
-			*number_of_values = (uint32_t) number_of_hash_values;
-		}
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the size of the hash value identifier of a specific index
- * The identifier size includes the end of string character
- * Returns 1 if successful, 0 if if no hash values are present or -1 on error
- */
-int libewf_handle_get_hash_value_identifier_size(
-     libewf_handle_t *handle,
-     uint32_t index,
-     size_t *identifier_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value_identifier_size";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_identifier_size(
-		          internal_handle->hash_values,
-		          index,
-		          identifier_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: %" PRIu32 " identifier size.",
-			 function,
-			 index );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the hash value identifier of a specific index
- * The identifier size should include the end of string character
- * Returns 1 if successful, 0 if no hash values are present or -1 on error
- */
-int libewf_handle_get_hash_value_identifier(
-     libewf_handle_t *handle,
-     uint32_t index,
-     uint8_t *identifier,
-     size_t identifier_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_hash_value_identifier";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_identifier(
-		          internal_handle->hash_values,
-		          index,
-		          identifier,
-		          identifier_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: %" PRIu32 " identifier.",
-			 function,
-			 index );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the size of the UTF-8 encoded hash value of an identifier
- * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_utf8_hash_value_size(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     size_t *utf8_string_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_utf8_hash_value_size";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_utf8_value_size(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf8_string_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value size.",
-			 function );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the UTF-8 encoded hash value of an identifier
- * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_utf8_hash_value(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_utf8_hash_value";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_utf8_value(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf8_string,
-		          utf8_string_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value.",
-			 function );
-		}
-	}
-	return( result );
-}
-
-/* Sets the UTF-8 encoded hash value specified by the identifier
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_set_utf8_hash_value(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_utf8_hash_value";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
-	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: hash value cannot be changed.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_hash_values_initialize(
-		     &( internal_handle->hash_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_set_utf8_value(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf8_string,
-		          utf8_string_length,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-/* TODO refactor into hash sections */
-	if( internal_handle->hash_sections != NULL )
-	{
-		if( ( identifier_length == 3 )
-		 && ( libcstring_narrow_string_compare(
-		       (char *) identifier,
-		       "MD5",
-		       identifier_length ) == 0 ) )
-		{
-			if( libewf_hash_values_generate_md5_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->md5_hash,
-			     16,
-			     &( internal_handle->hash_sections->md5_hash_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse MD5 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_hash_values_generate_md5_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->md5_digest,
-			     16,
-			     &( internal_handle->hash_sections->md5_digest_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse MD5 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		else if( ( identifier_length == 4 )
-		      && ( libcstring_narrow_string_compare(
-		            (char *) identifier,
-		            "SHA1",
-		            identifier_length ) == 0 ) )
-		{
-			if( libewf_hash_values_generate_sha1_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->sha1_hash,
-			     20,
-			     &( internal_handle->hash_sections->sha1_hash_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse SHA1 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_hash_values_generate_sha1_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->sha1_digest,
-			     20,
-			     &( internal_handle->hash_sections->sha1_digest_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse SHA1 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-		}
-	}
-	return( 1 );
-}
-
-/* Retrieves the size of the UTF-16 encoded hash value of an identifier
- * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_utf16_hash_value_size(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     size_t *utf16_string_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_utf16_hash_value_size";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_utf16_value_size(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf16_string_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value size.",
-			 function );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the UTF-16 encoded hash value of an identifier
- * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_handle_get_utf16_hash_value(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     uint16_t *utf16_string,
-     size_t utf16_string_size,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_get_utf16_hash_value";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_handle_parse_hash_values(
-		     internal_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_get_utf16_value(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf16_string,
-		          utf16_string_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value.",
-			 function );
-		}
-	}
-	return( result );
-}
-
-/* Sets the UTF-16 encoded hash value specified by the identifier
- * Returns 1 if successful or -1 on error
- */
-int libewf_handle_set_utf16_hash_value(
-     libewf_handle_t *handle,
-     const uint8_t *identifier,
-     size_t identifier_length,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_set_utf16_hash_value";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
-	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: hash value cannot be changed.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO add write lock */
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_hash_values_initialize(
-		     &( internal_handle->hash_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		result = libewf_hash_values_set_utf16_value(
-		          internal_handle->hash_values,
-		          identifier,
-		          identifier_length,
-		          utf16_string,
-		          utf16_string_length,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value.",
-			 function );
-
-			return( -1 );
-		}
-	}
-/* TODO refactor into hash sections */
-	if( internal_handle->hash_sections != NULL )
-	{
-		if( ( identifier_length == 3 )
-		 && ( libcstring_narrow_string_compare(
-		       (char *) identifier,
-		       "MD5",
-		       identifier_length ) == 0 ) )
-		{
-			if( libewf_hash_values_generate_md5_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->md5_hash,
-			     16,
-			     &( internal_handle->hash_sections->md5_hash_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse MD5 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_hash_values_generate_md5_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->md5_digest,
-			     16,
-			     &( internal_handle->hash_sections->md5_digest_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse MD5 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		else if( ( identifier_length == 4 )
-		      && ( libcstring_narrow_string_compare(
-		            (char *) identifier,
-		            "SHA1",
-		            identifier_length ) == 0 ) )
-		{
-			if( libewf_hash_values_generate_sha1_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->sha1_hash,
-			     20,
-			     &( internal_handle->hash_sections->sha1_hash_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse SHA1 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_hash_values_generate_sha1_hash(
-			     internal_handle->hash_values,
-			     internal_handle->hash_sections->sha1_digest,
-			     20,
-			     &( internal_handle->hash_sections->sha1_digest_set ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to parse SHA1 hash value for its value.",
-				 function );
-
-				return( -1 );
-			}
-		}
-	}
-	return( 1 );
-}
-
 /* Parses the hash values from the hash, digest and/or xhash section
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_parse_hash_values(
+int libewf_internal_handle_parse_hash_values(
      libewf_internal_handle_t *internal_handle,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_handle_parse_hash_values";
+	static char *function = "libewf_internal_handle_parse_hash_values";
 	int result            = 1;
 
 	if( internal_handle == NULL )
@@ -5840,5 +4871,1084 @@ int libewf_handle_parse_hash_values(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Copies the header values from the source to the destination handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_copy_header_values(
+     libewf_handle_t *destination_handle,
+     libewf_handle_t *source_handle,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_destination_handle = NULL;
+	libewf_internal_handle_t *internal_source_handle      = NULL;
+	static char *function                                 = "libewf_handle_copy_header_values";
+
+	if( destination_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
+	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
+
+	if( internal_source_handle->header_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid source handle - missing header values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_destination_handle->header_values == NULL )
+	{
+		if( libewf_header_values_initialize(
+		     &( internal_destination_handle->header_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header values.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( libewf_header_values_copy(
+	     internal_destination_handle->header_values,
+	     internal_source_handle->header_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy header values.",
+		 function );
+
+		return( -1 );
+	}
+	internal_destination_handle->header_values_parsed = 1;
+
+	return( 1 );
+}
+
+/* Retrieves the number of hash values
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ */
+int libewf_handle_get_number_of_hash_values(
+     libewf_handle_t *handle,
+     uint32_t *number_of_values,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_number_of_hash_values";
+	int number_of_hash_values                 = 0;
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( number_of_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of values.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libfvalue_table_get_number_of_values(
+		          internal_handle->hash_values,
+		          &number_of_hash_values,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of hash values.",
+			 function );
+
+			return( -1 );
+		}
+		else if( number_of_hash_values < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid number of hash values value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		else
+		{
+			*number_of_values = (uint32_t) number_of_hash_values;
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the hash value identifier of a specific index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if if no hash values are present or -1 on error
+ */
+int libewf_handle_get_hash_value_identifier_size(
+     libewf_handle_t *handle,
+     uint32_t index,
+     size_t *identifier_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_hash_value_identifier_size";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_identifier_size(
+		          internal_handle->hash_values,
+		          index,
+		          identifier_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: %" PRIu32 " identifier size.",
+			 function,
+			 index );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the hash value identifier of a specific index
+ * The identifier size should include the end of string character
+ * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ */
+int libewf_handle_get_hash_value_identifier(
+     libewf_handle_t *handle,
+     uint32_t index,
+     uint8_t *identifier,
+     size_t identifier_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_hash_value_identifier";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_identifier(
+		          internal_handle->hash_values,
+		          index,
+		          identifier,
+		          identifier_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: %" PRIu32 " identifier.",
+			 function,
+			 index );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-8 encoded hash value of an identifier
+ * The string size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_utf8_hash_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_utf8_hash_value_size";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_utf8_value_size(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf8_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-8 encoded hash value of an identifier
+ * The string size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_utf8_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_utf8_hash_value";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_utf8_value(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf8_string,
+		          utf8_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Sets the UTF-8 encoded hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_utf8_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_set_utf8_hash_value";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: hash value cannot be changed.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_hash_values_initialize(
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_set_utf8_value(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf8_string,
+		          utf8_string_length,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value.",
+			 function );
+		}
+		else if( internal_handle->hash_sections != NULL )
+		{
+			result = libewf_hash_sections_set_digest_from_hash_values(
+				  internal_handle->hash_sections,
+				  identifier,
+				  identifier_length,
+				  internal_handle->hash_values,
+				  error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set digest in hash sections.",
+				 function );
+			}
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-16 encoded hash value of an identifier
+ * The string size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_utf16_hash_value_size(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_utf16_hash_value_size";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_utf16_value_size(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf16_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded hash value of an identifier
+ * The string size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_handle_get_utf16_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_utf16_hash_value";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_internal_handle_parse_hash_values(
+		     internal_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_get_utf16_value(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf16_string,
+		          utf16_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Sets the UTF-16 encoded hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_set_utf16_hash_value(
+     libewf_handle_t *handle,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_set_utf16_hash_value";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: hash value cannot be changed.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO add write lock */
+	if( internal_handle->hash_values_parsed == 0 )
+	{
+		if( libewf_hash_values_initialize(
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->hash_values_parsed = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_handle->hash_values != NULL )
+	{
+		result = libewf_hash_values_set_utf16_value(
+		          internal_handle->hash_values,
+		          identifier,
+		          identifier_length,
+		          utf16_string,
+		          utf16_string_length,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set hash value.",
+			 function );
+		}
+		else if( internal_handle->hash_sections != NULL )
+		{
+			result = libewf_hash_sections_set_digest_from_hash_values(
+				  internal_handle->hash_sections,
+				  identifier,
+				  identifier_length,
+				  internal_handle->hash_values,
+				  error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set digest in hash sections.",
+				 function );
+			}
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 

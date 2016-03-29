@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API functions testing script
 #
-# Version: 20160328
+# Version: 20160329
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -12,7 +12,7 @@ TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
 
 TEST_PROFILE="lib${TEST_PREFIX}";
 TEST_FUNCTIONS="get_version";
-TEST_FUNCTIONS_WITH_INPUT="open_close seek read read_chunk";
+TEST_FUNCTIONS_WITH_INPUT="open_close seek read read_chunk handle_get_values";
 OPTION_SETS="";
 
 TEST_TOOL_DIRECTORY=".";
@@ -46,7 +46,7 @@ test_api_function()
 	run_test_with_arguments ${TEST_EXECUTABLE};
 	local RESULT=$?;
 
-	if test ${RESULT} -ne 0;
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
 		echo "(FAIL)";
 	else
@@ -120,7 +120,7 @@ then
 	exit ${RESULT};
 fi
 
-for TEST_FUNCTION in ${TEST_FUNCTIONS_WITH_INTPUT};
+for TEST_FUNCTION in ${TEST_FUNCTIONS_WITH_INPUT};
 do
 	test_api_function_with_input "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
 	RESULT=$?;

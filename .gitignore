@@ -128,6 +128,7 @@ stamp-h[1-9]
 /ewftools/ewfverify
 /tests/ewf_test_get_version
 /tests/ewf_test_glob
+/tests/ewf_test_handle_get_values
 /tests/ewf_test_open_close
 /tests/ewf_test_read
 /tests/ewf_test_read_chunk

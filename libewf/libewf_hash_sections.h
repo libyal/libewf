@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_libcerror.h"
+#include "libewf_libfvalue.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -99,6 +100,13 @@ int libewf_hash_sections_free(
 int libewf_hash_sections_clone(
      libewf_hash_sections_t **destination_hash_sections,
      libewf_hash_sections_t *source_hash_sections,
+     libcerror_error_t **error );
+
+int libewf_hash_sections_set_digest_from_hash_values(
+     libewf_hash_sections_t *hash_sections,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     libfvalue_table_t *hash_values,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

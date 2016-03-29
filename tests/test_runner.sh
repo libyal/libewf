@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160329
+# Version: 20160330
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -542,7 +542,7 @@ run_test_on_input_directory()
 
 	local IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	local RESULT=${EXIT_SUCCESS};
+	RESULT=${EXIT_SUCCESS};
 
 	for TEST_SET_INPUT_DIRECTORY in ${TEST_INPUT_DIRECTORY}/*;
 	do
@@ -565,7 +565,7 @@ run_test_on_input_directory()
 			INPUT_FILES="${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}";
 		fi
 
-		ls -1 ${INPUT_FILES} | while read -r INPUT_FILE;
+		while read -r INPUT_FILE;
 		do
 			local TESTED_WITH_OPTIONS=0;
 
@@ -583,7 +583,7 @@ run_test_on_input_directory()
 
 				if test ${RESULT} -ne ${EXIT_SUCCESS};
 				then
-					break;
+					return ${RESULT};
 				fi
 				TESTED_WITH_OPTIONS=1;
 			done
@@ -592,16 +592,13 @@ run_test_on_input_directory()
 			then
 				run_test_on_input_file "${TEST_SET_DIRECTORY}" "${TEST_DESCRIPTION}" "${TEST_MODE}" "" "${TEST_EXECUTABLE}" "${INPUT_FILE}" ${ARGUMENTS[*]};
 				RESULT=$?;
+
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					return ${RESULT};
+				fi
 			fi
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-		if test ${RESULT} -ne ${EXIT_SUCCESS};
-		then
-			break;
-		fi
+		done < <(ls -1 ${INPUT_FILES});
 	done
 
 	return ${RESULT};

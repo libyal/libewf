@@ -403,6 +403,10 @@ int libewf_handle_copy_header_values(
      libewf_handle_t *source_handle,
      libcerror_error_t **error );
 
+int libewf_internal_handle_parse_hash_values(
+     libewf_internal_handle_t *internal_handle,
+     libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 int libewf_handle_get_number_of_hash_values(
      libewf_handle_t *handle,
@@ -474,10 +478,6 @@ int libewf_handle_set_utf16_hash_value(
      size_t identifier_length,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libcerror_error_t **error );
-
-int libewf_handle_parse_hash_values(
-     libewf_internal_handle_t *internal_handle,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

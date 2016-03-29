@@ -1,5 +1,6 @@
 TODO
-* libewf_handle_get_header_value_identifier add refactor into header_values same for other metadata types
+* fix failing test ewf_test_handle_get_values
+
 * add multi threaded tool support
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
@@ -13,7 +14,7 @@ Threat safety
 * libewf_file_get_file_entry_by_utf16_path
 * libewf_handle_set_*
 * libewf_metadata
- - libewf_handle_get_number_of_hash_values and beyond
+ - libewf_handle_parse_hash_values and beyond
  - libewf_handle_set_*
  - libewf_handle_copy_header_values
 * libewf_file_entry
@@ -21,8 +22,15 @@ Threat safety
   - libewf_handle_get_ ... _hash_values
 
 Tests:
+* extend ewf_test_handle_get_values with
+  - session informatation
+  - tracks
+  - acquiry_errors
+  - checksum_errors? (needs read)
+  - libewf_handle_set_md5_hash
+  - libewf_handle_set_sha1_hash
+  - header value date and time formats?
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
-* finish migrating tests to test_runner
 * ewftools: test with -x
 * write resume from volume/disk section - basically re-image
 * ewfacquire:
