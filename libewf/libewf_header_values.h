@@ -292,6 +292,69 @@ int libewf_header_values_generate_header_ewfx(
      int codepage,
      libcerror_error_t **error );
 
+int libewf_header_values_get_identifier_size(
+     libfvalue_table_t *header_values,
+     uint32_t index,
+     size_t *identifier_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_get_identifier(
+     libfvalue_table_t *header_values,
+     uint32_t index,
+     uint8_t *identifier,
+     size_t identifier_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_get_utf8_value_size(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     int date_format,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_get_utf8_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     int date_format,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_set_utf8_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
+int libewf_header_values_get_utf16_value_size(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     int date_format,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_get_utf16_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     int date_format,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_header_values_set_utf16_value(
+     libfvalue_table_t *header_values,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

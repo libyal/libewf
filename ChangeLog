@@ -1,4 +1,5 @@
 TODO
+* libewf_handle_get_header_value_identifier add refactor into header_values same for other metadata types
 * add multi threaded tool support
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
@@ -12,8 +13,9 @@ Threat safety
 * libewf_file_get_file_entry_by_utf16_path
 * libewf_handle_set_*
 * libewf_metadata
- - libewf_handle_get_segment_file_set_identifier and beyond
+ - libewf_handle_get_number_of_hash_values and beyond
  - libewf_handle_set_*
+ - libewf_handle_copy_header_values
 * libewf_file_entry
 
 Tests:
@@ -23,9 +25,6 @@ Tests:
 * write resume from volume/disk section - basically re-image
 * ewfacquire:
   - add non-unattended tests
-* add large file tests
-  - Add 2 TiB image size test
-  - Add 8 TiB image size test
 * ewfacquire_optical:
   - add non-unattended tests
 * ewfexport:
@@ -450,6 +449,13 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160329
+* worked on thread locking support
+
+20160328
+* worked on tests
+* worked on thread locking support
 
 20160326
 * changes for segment files read issue
