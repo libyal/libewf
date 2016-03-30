@@ -764,7 +764,7 @@ PyObject *pyewf_glob(
 	}
 	PyErr_Format(
 	 PyExc_TypeError,
-	 "%s: unsupported string object type",
+	 "%s: unsupported string object type.",
 	 function );
 
 on_error:

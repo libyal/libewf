@@ -150,30 +150,34 @@ def pyewf_test_read(ewf_handle):
 
   # Test: offset: 0 size: <media_size>
   # Expected result: offset: 0 size: <media_size>
+  read_offset = 0
+  read_size = media_size
+
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_handle, 0, os.SEEK_SET, media_size, 0, media_size):
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
-  # Test: offset: 0 size: <media_size>
-  # Expected result: offset: 0 size: <media_size>
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_handle, 0, os.SEEK_SET, media_size, 0, media_size):
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
   # Case 1: test buffer at offset read
 
   # Test: offset: <media_size / 7> size: <media_size / 2>
   # Expected result: offset: <media_size / 7> size: <media_size / 2>
+  read_offset, _ = divmod(media_size, 7)
+  read_size, _ = divmod(media_size, 2)
+
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_handle, media_size / 7, os.SEEK_SET, media_size / 2,
-      media_size / 7, media_size / 2):
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
-  # Test: offset: <media_size / 7> size: <media_size / 2>
-  # Expected result: offset: <media_size / 7> size: <media_size / 2>
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_handle, media_size / 7, os.SEEK_SET, media_size / 2,
-      media_size / 7, media_size / 2):
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
   # Case 2: test read beyond media size
@@ -181,45 +185,50 @@ def pyewf_test_read(ewf_handle):
   if media_size < 1024:
     # Test: offset: <media_size - 1024> size: 4096
     # Expected result: offset: -1 size: <undetermined>
+    read_offset = 0
+    read_size = media_size
+
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_handle, media_size - 1024, os.SEEK_SET, 4096, -1, -1):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
-    # Test: offset: <media_size - 1024> size: 4096
-    # Expected result: offset: -1 size: <undetermined>
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_handle, media_size - 1024, os.SEEK_SET, 4096, -1, -1):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
   else:
     # Test: offset: <media_size - 1024> size: 4096
     # Expected result: offset: <media_size - 1024> size: 1024
+    read_offset = 0
+    read_size = media_size
+
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_handle, media_size - 1024, os.SEEK_SET, 4096,
-        media_size - 1024, 1024):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        read_offset, 1024):
       return False
 
-    # Test: offset: <media_size - 1024> size: 4096
-    # Expected result: offset: <media_size - 1024> size: 1024
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_handle, media_size - 1024, os.SEEK_SET, 4096,
-        media_size - 1024, 1024):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        read_offset, 1024):
       return False
 
   # Case 3: test buffer at offset read
 
   # Test: offset: <media_size / 7> size: <media_size / 2>
   # Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
+  read_offset, _ = divmod(media_size, 7)
+  read_size, _ = divmod(media_size, 2)
+
   if not pyewf_test_read_buffer_at_offset(
-      ewf_handle, media_size / 7, media_size / 2,
-      (media_size / 7) + (media_size / 2), media_size / 2):
+      ewf_handle, read_offset, read_size,
+      read_offset + read_size, read_size):
     return False
 
-  # Test: offset: <media_size / 7> size: <media_size / 2>
-  # Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
   if not pyewf_test_read_buffer_at_offset(
-      ewf_handle, media_size / 7, media_size / 2,
-      (media_size / 7) + (media_size / 2), media_size / 2):
+      ewf_handle, read_offset, read_size,
+      read_offset + read_size, read_size):
     return False
 
   return True
@@ -229,7 +238,7 @@ def pyewf_test_read_file(filename):
   filenames = pyewf.glob(filename)
   ewf_handle = pyewf.handle()
 
-  ewf_handle.open(filenameis, "r")
+  ewf_handle.open([filename], "r")
   result = pyewf_test_read(ewf_handle)
   ewf_handle.close()
 
@@ -240,7 +249,7 @@ def pyewf_test_read_file_object(filename):
   filenames = pyewf.glob(filename)
   file_objects = []
   for filename in filenames:
-    file_object = open(filename, "rb")
+    file_object = open([filename], "rb")
     file_objects.append(file_object)
 
   ewf_handle.open_file_object(file_objects, "r")

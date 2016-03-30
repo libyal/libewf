@@ -24,6 +24,7 @@
 
 #include "libewf_libcerror.h"
 #include "libewf_hash_sections.h"
+#include "libewf_hash_values.h"
 
 /* Creates hash sections
  * Make sure the value hash_sections is referencing, is set to NULL

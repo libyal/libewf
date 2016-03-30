@@ -18,9 +18,7 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON_TESTS
 TESTS_PYEWF = \
-	test_pyewf_open_close.sh \
-	test_pyewf_seek.sh \
-	test_pyewf_read.sh
+	test_python_functions.sh
 endif
 
 TESTS = \
@@ -43,6 +41,7 @@ check_SCRIPTS = \
 	create_ewfacquire_option_sets.sh \
 	create_ewfacquirestream_option_sets.sh \
 	create_ewfexport_option_sets.sh \
+	pyewf_test_get_version.py \
 	pyewf_test_open_close.py \
 	pyewf_test_read.py \
 	pyewf_test_seek.py \
@@ -58,9 +57,7 @@ check_SCRIPTS = \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	test_glob.sh \
-	test_pyewf_open_close.sh \
-	test_pyewf_read.sh \
-	test_pyewf_seek.sh \
+	test_python_functions.sh \
 	test_runner.sh \
 	test_write_functions.sh
 

@@ -1,5 +1,6 @@
 TODO
 * fix failing test ewf_test_handle_get_values
+* fix failing test pyewf_test_read.py
 
 * add multi threaded tool support
 * chunk table get chunk from chunk_table->corrupted_chunks_list
@@ -14,12 +15,16 @@ Threat safety
 * libewf_file_get_file_entry_by_utf16_path
 * libewf_handle_set_*
 * libewf_metadata
- - libewf_handle_parse_hash_values and beyond
- - libewf_handle_set_*
+ - refactor libewf_handle_set_format
+ - refactor and add lock libewf_handle_set_md5_hash
+ - refactor and add lock libewf_handle_set_sha1_hash
+ - add lock libewf_handle_append_acquiry_error
+ - add lock libewf_handle_append_checksum_error
+ - add lock libewf_handle_append_session
+ - add lock libewf_handle_append_track
  - libewf_handle_copy_header_values
+  - write lock libewf_handle_get_ ... _hash_values
 * libewf_file_entry
-* write lock
-  - libewf_handle_get_ ... _hash_values
 
 Tests:
 * extend ewf_test_handle_get_values with

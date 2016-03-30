@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160330
+# Version: 20160331
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -74,29 +74,32 @@ find_binary_executable()
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 
-	file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//' | grep "application/x-executable" > /dev/null 2>&1;
+	local EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
 
-	if test $? -ne ${EXIT_SUCCESS};
+	# Check if the test executable is a libtool shell script.
+	echo "${EXECUTABLE_TYPE}" | grep "text/x-shellscript" > /dev/null 2>&1;
+	RESULT=$?;
+
+	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
 		local TEST_EXECUTABLE_BASENAME=`basename ${TEST_EXECUTABLE}`;
 		local TEST_EXECUTABLE_DIRNAME=`dirname ${TEST_EXECUTABLE}`;
 
 		TEST_EXECUTABLE="${TEST_EXECUTABLE_DIRNAME}/.libs/${TEST_EXECUTABLE_BASENAME}";
 
-		if ! test -x ${TEST_EXECUTABLE};
+		if test -x ${TEST_EXECUTABLE};
 		then
-			echo "Unable to find test executable: ${TEST_EXECUTABLE}";
+			EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
 
-			exit ${EXIT_FAILURE};
-		fi
+			echo "${EXECUTABLE_TYPE}" | grep "application/x-executable" > /dev/null 2>&1;
+			RESULT=$?;
 
-		file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//' | grep "application/x-executable" > /dev/null 2>&1;
+			if test ${RESULT} -ne ${EXIT_SUCCESS};
+			then
+				echo "Invalid test executable: ${TEST_EXECUTABLE}";
 
-		if test $? -ne ${EXIT_SUCCESS};
-		then
-			echo "Invalid test executable: ${TEST_EXECUTABLE}";
-
-			exit ${EXIT_FAILURE};
+				exit ${EXIT_FAILURE};
+			fi
 		fi
 	fi
 	echo ${TEST_EXECUTABLE};
@@ -267,6 +270,13 @@ run_test_with_arguments()
 	shift 1;
 	local ARGUMENTS=$@;
 
+	if ! test -f ${TEST_EXECUTABLE};
+	then
+		echo "Missing test executable: ${TEST_EXECUTABLE}";
+		echo "";
+
+		return ${EXIT_FAILURE};
+	fi
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
@@ -274,9 +284,14 @@ run_test_with_arguments()
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 
-		# TODO: add Mac OS X support.
-		LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-		RESULT=$?;
+		if test `uname -s` = 'Darwin';
+		then
+			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+			RESULT=$?;
+		else
+			LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+			RESULT=$?;
+		fi
 
 	elif ! test -z ${CHECK_WITH_VALGRIND};
 	then
@@ -284,10 +299,14 @@ run_test_with_arguments()
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 		local VALGRIND_LOG="valgrind.log-$$";
 
-		# TODO: add Mac OS X support.
-		LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-		RESULT=$?;
-
+		if test `uname -s` = 'Darwin';
+		then
+			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+			RESULT=$?;
+		else
+			LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+			RESULT=$?;
+		fi
 		if test ${RESULT} -eq ${EXIT_SUCCESS};
 		then
 			grep "All heap blocks were freed -- no leaks are possible" ${VALGRIND_LOG} > /dev/null 2>&1;
@@ -304,6 +323,13 @@ run_test_with_arguments()
 		rm -f ${VALGRIND_LOG};
 
 	else
+		if ! test -x ${TEST_EXECUTABLE};
+		then
+			echo "Invalid test executable: ${TEST_EXECUTABLE}";
+			echo "";
+
+			return ${EXIT_FAILURE};
+		fi
 		${TEST_EXECUTABLE} ${ARGUMENTS[*]} 2> /dev/null;
 		RESULT=$?;
 	fi
@@ -365,9 +391,14 @@ run_test_on_input_file()
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 
-		# TODO: add Mac OS X support.
-		LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-		RESULT=$?;
+		if test `uname -s` = 'Darwin';
+		then
+			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
+			RESULT=$?;
+		else
+			LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
+			RESULT=$?;
+		fi
 
 	elif ! test -z ${CHECK_WITH_VALGRIND};
 	then
@@ -375,10 +406,14 @@ run_test_on_input_file()
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 		local VALGRIND_LOG="${TMPDIR}/valgrind.log";
 
-		# TODO: add Mac OS X support.
-		LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-		RESULT=$?;
-
+		if test `uname -s` = 'Darwin';
+		then
+			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
+			RESULT=$?;
+		else
+			LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
+			RESULT=$?;
+		fi
 		if test ${RESULT} -eq ${EXIT_SUCCESS};
 		then
 			grep "All heap blocks were freed -- no leaks are possible" ${VALGRIND_LOG} > /dev/null 2>&1;
@@ -403,6 +438,13 @@ run_test_on_input_file()
 	then
 		TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 
+		if ! test -x ${TEST_EXECUTABLE};
+		then
+			echo "Invalid test executable: ${TEST_EXECUTABLE}";
+			echo "";
+
+			return ${EXIT_FAILURE};
+		fi
 		local INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 		local TEST_LOG="${TEST_OUTPUT}.log";
 
@@ -425,6 +467,13 @@ run_test_on_input_file()
 		fi
 
 	else
+		if ! test -x ${TEST_EXECUTABLE};
+		then
+			echo "Invalid test executable: ${TEST_EXECUTABLE}";
+			echo "";
+
+			return ${EXIT_FAILURE};
+		fi
 		${TEST_EXECUTABLE} ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}" 2> /dev/null;
 		RESULT=$?;
 	fi
@@ -495,6 +544,7 @@ run_test_on_input_directory()
 	assert_availability_binary readlink;
 	assert_availability_binary sed;
 	assert_availability_binary tr;
+	assert_availability_binary uname;
 	assert_availability_binary wc;
 	assert_availability_binary zcat;
 
@@ -515,9 +565,9 @@ run_test_on_input_directory()
 		return ${EXIT_FAILURE};
 	fi
 
-	if ! test -x ${TEST_EXECUTABLE};
+	if ! test -f ${TEST_EXECUTABLE};
 	then
-		echo "Invalid test executable: ${TEST_EXECUTABLE}";
+		echo "Missing test executable: ${TEST_EXECUTABLE}";
 		echo "";
 
 		return ${EXIT_FAILURE};

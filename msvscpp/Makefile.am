@@ -4,6 +4,7 @@ MSVSCPP_FILES = \
 	ewf.net/ewf.net.vcproj \
 	ewf_test_get_version/ewf_test_get_version.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
+	ewf_test_handle_get_values/ewf_test_handle_get_values.vcproj \
 	ewf_test_open_close/ewf_test_open_close.vcproj \
 	ewf_test_read/ewf_test_read.vcproj \
 	ewf_test_read_chunk/ewf_test_read_chunk.vcproj \

@@ -49,6 +49,7 @@ def pyewf_test_single_open_close_file(filename, mode):
           filename_string, get_mode_string(mode)), end="")
 
   result = True
+  error_string = None
   try:
     filenames = pyewf.glob(filename)
     ewf_handle = pyewf.handle()
@@ -59,7 +60,7 @@ def pyewf_test_single_open_close_file(filename, mode):
   except TypeError as exception:
     expected_message = (
         "{0:s}: unsupported string object type.").format(
-            "pyewf_handle_open")
+            "pyewf_glob")
 
     if not filename and str(exception) == expected_message:
       pass
@@ -97,6 +98,7 @@ def pyewf_test_multi_open_close_file(filename, mode):
           filename, get_mode_string(mode)), end="")
 
   result = True
+  error_string = None
   try:
     filenames = pyewf.glob(filename)
     ewf_handle = pyewf.handle()
@@ -120,12 +122,13 @@ def pyewf_test_multi_open_close_file(filename, mode):
   return result
 
 
-def pyewf_test_single_open_close_file_object(filename, mode):
+def pyewf_test_single_open_close_file_objects(filename, mode):
   print(
       ("Testing single open close of file-like object of: {0:s} "
        "with access: {1:s}\t").format(filename, get_mode_string(mode)), end="")
 
   result = True
+  error_string = None
   try:
     filenames = pyewf.glob(filename)
     file_objects = []
@@ -135,7 +138,7 @@ def pyewf_test_single_open_close_file_object(filename, mode):
 
     ewf_handle = pyewf.handle()
 
-    ewf_handle.open_file_object(file_objects, mode)
+    ewf_handle.open_file_objects(file_objects, mode)
     ewf_handle.close()
 
   except Exception as exception:
@@ -160,6 +163,7 @@ def pyewf_test_single_open_close_file_object_with_dereference(
           filename, get_mode_string(mode)), end="")
 
   result = True
+  error_string = None
   try:
     filenames = pyewf.glob(filename)
     file_objects = []
@@ -169,7 +173,7 @@ def pyewf_test_single_open_close_file_object_with_dereference(
 
     ewf_handle = pyewf.handle()
 
-    ewf_handle.open_file_object(file_objects, mode)
+    ewf_handle.open_file_objects(file_objects, mode)
 
     for file_object in file_objects:
       del file_object
@@ -191,12 +195,13 @@ def pyewf_test_single_open_close_file_object_with_dereference(
   return result
 
 
-def pyewf_test_multi_open_close_file_object(filename, mode):
+def pyewf_test_multi_open_close_file_objects(filename, mode):
   print(
       ("Testing multi open close of file-like object of: {0:s} "
        "with access: {1:s}\t").format(filename, get_mode_string(mode)), end="")
 
   result = True
+  error_string = None
   try:
     filenames = pyewf.glob(filename)
     file_objects = []
@@ -206,9 +211,9 @@ def pyewf_test_multi_open_close_file_object(filename, mode):
 
     ewf_handle = pyewf.handle()
 
-    ewf_handle.open_file_object(file_objects, mode)
+    ewf_handle.open_file_objects(file_objects, mode)
     ewf_handle.close()
-    ewf_handle.open_file_object(file_objects, mode)
+    ewf_handle.open_file_objects(file_objects, mode)
     ewf_handle.close()
 
   except Exception as exception:
@@ -226,8 +231,8 @@ def pyewf_test_multi_open_close_file_object(filename, mode):
 
 
 def main():
-  args_parser = argparse.ArgumentParser(description=(
-      "Tests open and close."))
+  args_parser = argparse.ArgumentParser(
+      description="Tests open and close.")
 
   args_parser.add_argument(
       "source", nargs="?", action="store", metavar="FILENAME",
@@ -251,15 +256,14 @@ def main():
   if not pyewf_test_multi_open_close_file(options.source, "r"):
     return False
 
-  if not pyewf_test_single_open_close_file_object(options.source, "r"):
+  if not pyewf_test_single_open_close_file_objects(options.source, "r"):
     return False
 
   if not pyewf_test_single_open_close_file_object_with_dereference(
       options.source, "r"):
     return False
 
-  if not pyewf_test_multi_open_close_file_object(
-      options.source, "r"):
+  if not pyewf_test_multi_open_close_file_objects(options.source, "r"):
     return False
 
   return True
