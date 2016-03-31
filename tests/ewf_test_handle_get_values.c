@@ -96,31 +96,31 @@ int ewf_test_handle_get_header_values(
 
 	result = libewf_handle_get_header_value_identifier_size(
 	          handle,
-	          1,
+	          0,
 	          &identifier_size,
 	          error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve header value: 1 identifier size.\n" );
+		 "Unable to retrieve header value: 0 identifier size.\n" );
 
 		return( -1 );
 	}
@@ -135,32 +135,32 @@ int ewf_test_handle_get_header_values(
 
 	result = libewf_handle_get_header_value_identifier(
 	          handle,
-	          1,
+	          0,
 	          identifier,
 	          128,
 	          error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve header value: 1 identifier.\n" );
+		 "Unable to retrieve header value: 0 identifier.\n" );
 
 		return( -1 );
 	}
@@ -175,23 +175,23 @@ int ewf_test_handle_get_header_values(
 		  &utf8_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -216,23 +216,23 @@ int ewf_test_handle_get_header_values(
 		  utf8_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -251,23 +251,23 @@ int ewf_test_handle_get_header_values(
 		  &utf16_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -292,23 +292,23 @@ int ewf_test_handle_get_header_values(
 		  utf16_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -379,31 +379,31 @@ int ewf_test_handle_get_hash_values(
 
 	result = libewf_handle_get_hash_value_identifier_size(
 	          handle,
-	          1,
+	          0,
 	          &identifier_size,
 	          error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve hash value: 1 identifier size.\n" );
+		 "Unable to retrieve hash value: 0 identifier size.\n" );
 
 		return( -1 );
 	}
@@ -418,32 +418,32 @@ int ewf_test_handle_get_hash_values(
 
 	result = libewf_handle_get_hash_value_identifier(
 	          handle,
-	          1,
+	          0,
 	          identifier,
 	          128,
 	          error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to retrieve hash value: 1 identifier.\n" );
+		 "Unable to retrieve hash value: 0 identifier.\n" );
 
 		return( -1 );
 	}
@@ -458,23 +458,23 @@ int ewf_test_handle_get_hash_values(
 		  &utf8_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -499,23 +499,23 @@ int ewf_test_handle_get_hash_values(
 		  utf8_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -534,23 +534,23 @@ int ewf_test_handle_get_hash_values(
 		  &utf16_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,
@@ -575,23 +575,23 @@ int ewf_test_handle_get_hash_values(
 		  utf16_value_size,
 		  error );
 
-	if( result == 1 )
-	{
-		fprintf(
-		 stdout,
-		 "(PASS)" );
-	}
-	else
+	if( result == -1 )
 	{
 		fprintf(
 		 stdout,
 		 "(FAIL)" );
 	}
+	else
+	{
+		fprintf(
+		 stdout,
+		 "(PASS)" );
+	}
 	fprintf(
 	 stdout,
 	 "\n" );
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		fprintf(
 		 stderr,

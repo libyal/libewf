@@ -3547,7 +3547,7 @@ int verification_handle_additional_hash_values_fprint(
 	if( libewf_handle_get_number_of_hash_values(
 	     verification_handle->input_handle,
 	     &number_of_values,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

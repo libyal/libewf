@@ -1584,7 +1584,7 @@ int Handle::GetNumberOfAcquiryErrors( void )
 	          &ewf_number_of_acquiry_errors,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of acquiry errors from ewf handle." );
@@ -1755,7 +1755,7 @@ int Handle::GetNumberOfChecksumErrors( void )
 	          &ewf_number_of_checksum_errors,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of checksum errors from ewf handle." );
@@ -1926,7 +1926,7 @@ int Handle::GetNumberOfSessions( void )
 	          &number_of_sessions,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of sessions from ewf handle." );
@@ -2097,7 +2097,7 @@ int Handle::GetNumberOfTracks( void )
 	          &number_of_tracks,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of tracks from ewf handle." );
@@ -2270,7 +2270,7 @@ int Handle::GetNumberOfHeaderValues( void )
 	          &number_of_header_values,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of header values from ewf handle." );
@@ -2640,7 +2640,7 @@ int Handle::GetNumberOfHashValues( void )
 	          &number_of_hash_values,
 	          &error );
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		error_string = gcnew System::String(
 		                      "ewf.net " + function + ": unable to retrieve number of hash values from ewf handle." );

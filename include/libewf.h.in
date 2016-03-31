@@ -1114,7 +1114,7 @@ int libewf_handle_set_header_values_date_format(
      libewf_error_t **error );
 
 /* Retrieves the number of header values
- * Returns 1 if successful, 0 if no header values are present or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_number_of_header_values(
@@ -1387,7 +1387,7 @@ int libewf_handle_copy_header_values(
      libewf_error_t **error );
 
 /* Retrieves the number of hash values
- * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_handle_get_number_of_hash_values(

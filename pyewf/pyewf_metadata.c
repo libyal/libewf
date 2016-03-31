@@ -1055,7 +1055,7 @@ PyObject *pyewf_handle_get_header_values(
 
 	Py_END_ALLOW_THREADS
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		pyewf_error_raise(
 		 error,
@@ -1474,7 +1474,7 @@ PyObject *pyewf_handle_get_hash_values(
 
 	Py_END_ALLOW_THREADS
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		pyewf_error_raise(
 		 error,

@@ -221,7 +221,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parses an SHA1 hash for its value
+/* Parses a SHA1 hash for its value
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_sha1_hash(
@@ -997,7 +997,7 @@ int libewf_hash_values_generate_md5_hash(
 	return( 1 );
 }
 
-/* Generate an SHA1 hash
+/* Generate a SHA1 hash
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_generate_sha1_hash(

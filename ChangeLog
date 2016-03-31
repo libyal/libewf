@@ -1,6 +1,6 @@
 TODO
 * clean up TODO refactor notes
-* fix failing test ewf_test_handle_get_values
+* refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 * fix failing test pyewf_test_read.py
 
 * add multi threaded tool support

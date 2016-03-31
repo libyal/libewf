@@ -4393,7 +4393,7 @@ int libewf_handle_set_header_values_date_format(
 }
 
 /* Retrieves the number of header values
- * Returns 1 if successful, 0 if no header values are present or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_number_of_header_values(
      libewf_handle_t *handle,
@@ -4403,7 +4403,7 @@ int libewf_handle_get_number_of_header_values(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_header_values";
 	int number_of_header_values               = 0;
-	int result                                = 0;
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -4544,7 +4544,7 @@ int libewf_handle_get_header_value_identifier_size(
 		          identifier_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4625,7 +4625,7 @@ int libewf_handle_get_header_value_identifier(
 		          identifier_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4707,7 +4707,7 @@ int libewf_handle_get_utf8_header_value_size(
 		          utf8_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4790,7 +4790,7 @@ int libewf_handle_get_utf8_header_value(
 		          utf8_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4981,7 +4981,7 @@ int libewf_handle_get_utf16_header_value_size(
 		          utf16_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5064,7 +5064,7 @@ int libewf_handle_get_utf16_header_value(
 		          utf16_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5228,9 +5228,14 @@ int libewf_handle_copy_header_values(
 	}
 	if( source_handle == NULL )
 	{
-		 *destination_handle = NULL;
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source handle.",
+		 function );
 
-		return( 1 );
+		return( -1 );
 	}
 	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
 	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
@@ -5392,6 +5397,22 @@ int libewf_internal_handle_parse_hash_values(
 
 		result = -1;
 	}
+	else if( ( internal_handle->hash_sections->md5_digest_set != 0 )
+	      && ( libewf_hash_values_parse_md5_hash(
+	            internal_handle->hash_values,
+	            internal_handle->hash_sections->md5_digest,
+	            16,
+	            error ) != 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse MD5 digest for its value.",
+		 function );
+
+		result = -1;
+	}
 	if( ( internal_handle->hash_sections->sha1_hash_set != 0 )
 	 && ( libewf_hash_values_parse_sha1_hash(
 	       internal_handle->hash_values,
@@ -5408,41 +5429,21 @@ int libewf_internal_handle_parse_hash_values(
 
 		result = -1;
 	}
-	if( ( internal_handle->hash_sections->md5_digest_set != 0 )
-	 || ( internal_handle->hash_sections->sha1_digest_set != 0 ) )
+	else if( ( internal_handle->hash_sections->sha1_digest_set != 0 )
+	      && ( libewf_hash_values_parse_sha1_hash(
+	            internal_handle->hash_values,
+	            internal_handle->hash_sections->sha1_digest,
+	            20,
+	            error ) != 1 ) )
 	{
-		if( ( internal_handle->hash_sections->md5_digest_set != 0 )
-		 && ( libewf_hash_values_parse_md5_hash(
-		       internal_handle->hash_values,
-		       internal_handle->hash_sections->md5_digest,
-		       16,
-		       error ) != 1 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse MD5 hash for its value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse SHA1 digest for its value.",
+		 function );
 
-			result = -1;
-		}
-		if( ( internal_handle->hash_sections->sha1_digest_set != 0 )
-		 && ( libewf_hash_values_parse_sha1_hash(
-		       internal_handle->hash_values,
-		       internal_handle->hash_sections->sha1_digest,
-		       20,
-		       error ) != 1 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse SHA1 hash for its value.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 	if( ( internal_handle->hash_sections->xhash != NULL )
 	 && ( libewf_hash_values_parse_xhash(
@@ -5460,15 +5461,11 @@ int libewf_internal_handle_parse_hash_values(
 
 		result = -1;
 	}
-	if( result != 1 )
-	{
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the number of hash values
- * Returns 1 if successful, 0 if no hash values are present or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_handle_get_number_of_hash_values(
      libewf_handle_t *handle,
@@ -5657,7 +5654,7 @@ int libewf_handle_get_hash_value_identifier_size(
 		          identifier_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5756,7 +5753,7 @@ int libewf_handle_get_hash_value_identifier(
 		          identifier_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5855,7 +5852,7 @@ int libewf_handle_get_utf8_hash_value_size(
 		          utf8_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5955,7 +5952,7 @@ int libewf_handle_get_utf8_hash_value(
 		          utf8_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -6196,7 +6193,7 @@ int libewf_handle_get_utf16_hash_value_size(
 		          utf16_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -6296,7 +6293,7 @@ int libewf_handle_get_utf16_hash_value(
 		          utf16_string_size,
 		          error );
 
-		if( result != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
