@@ -1530,7 +1530,7 @@ int libewf_handle_get_root_file_entry(
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBEWF_EXTERN \
-int libewf_file_get_file_entry_by_utf8_path(
+int libewf_handle_get_file_entry_by_utf8_path(
      libewf_handle_t *handle,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
@@ -1542,7 +1542,7 @@ int libewf_file_get_file_entry_by_utf8_path(
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBEWF_EXTERN \
-int libewf_file_get_file_entry_by_utf16_path(
+int libewf_handle_get_file_entry_by_utf16_path(
      libewf_handle_t *handle,
      const uint16_t *utf16_string,
      size_t utf16_string_length,

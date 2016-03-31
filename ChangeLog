@@ -1,4 +1,5 @@
 TODO
+* clean up TODO refactor notes
 * fix failing test ewf_test_handle_get_values
 * fix failing test pyewf_test_read.py
 
@@ -9,11 +10,9 @@ TODO
 * ewfacquire allow to set the the maximum number of table entries?
 
 Threat safety
-* libewf_handle_signal_abort
-* libewf_handle_get_file_io_handle (need libewf_internal_handle_get_file_io_handle)
-* libewf_file_get_file_entry_by_utf8_path
-* libewf_file_get_file_entry_by_utf16_path
-* libewf_handle_set_*
+* libewf_handle
+  - libewf_handle_prepare_write_chunk
+  - libewf_handle_write_chunk
 * libewf_metadata
  - refactor libewf_handle_set_format
  - refactor and add lock libewf_handle_set_md5_hash
@@ -22,9 +21,10 @@ Threat safety
  - add lock libewf_handle_append_checksum_error
  - add lock libewf_handle_append_session
  - add lock libewf_handle_append_track
- - libewf_handle_copy_header_values
-  - write lock libewf_handle_get_ ... _hash_values
+ - libewf_handle_copy_header_values (write lock)
+ - write lock libewf_handle_get_ ... _hash_values
 * libewf_file_entry
+  - TODO
 
 Tests:
 * extend ewf_test_handle_get_values with

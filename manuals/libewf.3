@@ -1,4 +1,4 @@
-.Dd March 19, 2016
+.Dd March 31, 2016
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -275,9 +275,9 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_root_file_entry "libewf_handle_t *handle, libewf_file_entry_t **root_file_entry, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_get_file_entry_by_utf8_path "libewf_handle_t *handle, const uint8_t *utf8_string, size_t utf8_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
+.Fn libewf_handle_get_file_entry_by_utf8_path "libewf_handle_t *handle, const uint8_t *utf8_string, size_t utf8_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_get_file_entry_by_utf16_path "libewf_handle_t *handle, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
+.Fn libewf_handle_get_file_entry_by_utf16_path "libewf_handle_t *handle, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Pp
 Single file entry functions
 .Ft int

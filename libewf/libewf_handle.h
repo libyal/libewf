@@ -237,6 +237,17 @@ ssize_t libewf_handle_prepare_read_chunk(
          int8_t chunk_io_flags,
          libcerror_error_t **error );
 
+ssize_t libewf_internal_handle_read_chunk_from_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         void *chunk_buffer,
+         size_t chunk_buffer_size,
+         int8_t *is_compressed,
+         void *checksum_buffer,
+         uint32_t *chunk_checksum,
+         int8_t *chunk_io_flags,
+         libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 ssize_t libewf_handle_read_chunk(
          libewf_handle_t *handle,
@@ -314,6 +325,11 @@ ssize_t libewf_handle_write_buffer_at_offset(
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
+         libcerror_error_t **error );
+
+ssize_t libewf_internal_handle_write_finalize_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
@@ -438,6 +454,11 @@ int libewf_handle_get_filename_wide(
      libcerror_error_t **error );
 #endif
 
+int libewf_internal_handle_get_file_io_handle(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_handle_t **file_io_handle,
+     libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 int libewf_handle_get_file_io_handle(
      libewf_handle_t *handle,
@@ -462,16 +483,30 @@ int libewf_handle_get_root_file_entry(
      libewf_file_entry_t **root_file_entry,
      libcerror_error_t **error );
 
-LIBEWF_EXTERN \
-int libewf_file_get_file_entry_by_utf8_path(
-     libewf_handle_t *handle,
+int libewf_internal_handle_get_file_entry_by_utf8_path(
+     libewf_internal_handle_t *internal_handle,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-int libewf_file_get_file_entry_by_utf16_path(
+int libewf_handle_get_file_entry_by_utf8_path(
+     libewf_handle_t *handle,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libewf_file_entry_t **file_entry,
+     libcerror_error_t **error );
+
+int libewf_internal_handle_get_file_entry_by_utf16_path(
+     libewf_internal_handle_t *internal_handle,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libewf_file_entry_t **file_entry,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_get_file_entry_by_utf16_path(
      libewf_handle_t *handle,
      const uint16_t *utf16_string,
      size_t utf16_string_length,

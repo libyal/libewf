@@ -5213,6 +5213,7 @@ int libewf_handle_copy_header_values(
 	libewf_internal_handle_t *internal_destination_handle = NULL;
 	libewf_internal_handle_t *internal_source_handle      = NULL;
 	static char *function                                 = "libewf_handle_copy_header_values";
+	int result                                            = 1;
 
 	if( destination_handle == NULL )
 	{
@@ -5227,18 +5228,28 @@ int libewf_handle_copy_header_values(
 	}
 	if( source_handle == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source handle.",
-		 function );
+		 *destination_handle = NULL;
 
-		return( -1 );
+		return( 1 );
 	}
 	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
 	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_source_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_source_handle->header_values == NULL )
 	{
 		libcerror_error_set(
@@ -5248,41 +5259,65 @@ int libewf_handle_copy_header_values(
 		 "%s: invalid source handle - missing header values.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( internal_destination_handle->header_values == NULL )
+	else
 	{
-		if( libewf_header_values_initialize(
-		     &( internal_destination_handle->header_values ),
-		     error ) != 1 )
+/* TODO add destination handle write lock */
+		if( internal_destination_handle->header_values == NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header values.",
-			 function );
+			if( libewf_header_values_initialize(
+			     &( internal_destination_handle->header_values ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create header values.",
+				 function );
 
-			return( -1 );
+				result = -1;
+			}
+		}
+		if( result == 1 )
+		{
+			result = libewf_header_values_copy(
+			          internal_destination_handle->header_values,
+			          internal_source_handle->header_values,
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy header values.",
+				 function );
+			}
+			else
+			{
+				internal_destination_handle->header_values_parsed = 1;
+			}
 		}
 	}
-	if( libewf_header_values_copy(
-	     internal_destination_handle->header_values,
-	     internal_source_handle->header_values,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_source_handle->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy header values.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	internal_destination_handle->header_values_parsed = 1;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Parses the hash values from the hash, digest and/or xhash section

@@ -733,14 +733,14 @@ int mount_handle_get_file_entry_by_path(
 		}
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libewf_file_get_file_entry_by_utf16_path(
+	result = libewf_handle_get_file_entry_by_utf16_path(
 		  mount_handle->input_handle,
 		  (uint16_t *) ewf_path,
 		  path_length,
 		  file_entry,
 		  error );
 #else
-	result = libewf_file_get_file_entry_by_utf8_path(
+	result = libewf_handle_get_file_entry_by_utf8_path(
 		  mount_handle->input_handle,
 		  (uint8_t *) ewf_path,
 		  path_length,
