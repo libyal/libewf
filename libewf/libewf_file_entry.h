@@ -29,6 +29,7 @@
 #include "libewf_handle.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcthreads.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_types.h"
 
@@ -55,6 +56,12 @@ struct libewf_internal_file_entry
 	/* The offset
 	 */
 	off64_t offset;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libewf_file_entry_initialize(

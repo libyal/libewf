@@ -31,6 +31,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libcstring.h"
+#include "libewf_libcthreads.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
 #include "libewf_types.h"
@@ -96,8 +97,26 @@ int libewf_file_entry_initialize(
 		 "%s: unable to clear file entry.",
 		 function );
 
+		memory_free(
+		 internal_file_entry );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_file_entry->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to intialize read/write lock.",
+		 function );
+
 		goto on_error;
 	}
+#endif
 	internal_file_entry->internal_handle      = internal_handle;
 	internal_file_entry->file_entry_tree_node = file_entry_tree_node;
 
@@ -123,6 +142,7 @@ int libewf_file_entry_free(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_free";
+	int result                                        = 1;
 
 	if( file_entry == NULL )
 	{
@@ -140,12 +160,27 @@ int libewf_file_entry_free(
 		internal_file_entry = (libewf_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_file_entry->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		/* The internal_handle and file_entry_tree_node references are freed elsewhere
 		 */
 		memory_free(
 		 internal_file_entry );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the type
@@ -159,6 +194,7 @@ int libewf_file_entry_get_type(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_type";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -173,10 +209,12 @@ int libewf_file_entry_get_type(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -215,6 +253,7 @@ int libewf_file_entry_get_flags(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_flags";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -229,10 +268,12 @@ int libewf_file_entry_get_flags(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -271,6 +312,7 @@ int libewf_file_entry_get_media_data_offset(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -285,10 +327,12 @@ int libewf_file_entry_get_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -327,6 +371,7 @@ int libewf_file_entry_get_media_data_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_size";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -341,10 +386,12 @@ int libewf_file_entry_get_media_data_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -383,6 +430,7 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -397,10 +445,12 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -440,6 +490,7 @@ int libewf_file_entry_get_utf8_name_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_name_size";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -454,10 +505,12 @@ int libewf_file_entry_get_utf8_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -497,7 +550,8 @@ int libewf_file_entry_get_utf8_name(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_get_utf8_name_size";
+	static char *function                             = "libewf_file_entry_get_utf8_name";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -512,10 +566,12 @@ int libewf_file_entry_get_utf8_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -556,6 +612,7 @@ int libewf_file_entry_get_utf16_name_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_name_size";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -570,10 +627,12 @@ int libewf_file_entry_get_utf16_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -613,7 +672,8 @@ int libewf_file_entry_get_utf16_name(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_get_utf16_name_size";
+	static char *function                             = "libewf_file_entry_get_utf16_name";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -628,10 +688,12 @@ int libewf_file_entry_get_utf16_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -671,6 +733,7 @@ int libewf_file_entry_get_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_size";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -685,10 +748,12 @@ int libewf_file_entry_get_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -727,6 +792,7 @@ int libewf_file_entry_get_creation_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_creation_time";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -741,10 +807,12 @@ int libewf_file_entry_get_creation_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -783,6 +851,7 @@ int libewf_file_entry_get_modification_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_modification_time";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -797,10 +866,12 @@ int libewf_file_entry_get_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -839,6 +910,7 @@ int libewf_file_entry_get_access_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_access_time";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -853,10 +925,12 @@ int libewf_file_entry_get_access_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -895,6 +969,7 @@ int libewf_file_entry_get_entry_modification_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_entry_modification_time";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -909,10 +984,12 @@ int libewf_file_entry_get_entry_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -967,10 +1044,12 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1028,10 +1107,12 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1089,10 +1170,12 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1150,10 +1233,12 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1203,6 +1288,7 @@ ssize_t libewf_file_entry_read_buffer(
 	size_t read_size                                  = 0;
 	ssize_t read_count                                = 0;
 	uint32_t flags                                    = 0;
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1250,10 +1336,12 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1508,6 +1596,7 @@ off64_t libewf_file_entry_seek_offset(
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_seek_offset";
 	size64_t size                                     = 0;
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1522,10 +1611,12 @@ off64_t libewf_file_entry_seek_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1972,10 +2063,12 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2269,10 +2362,12 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-	if( libcdata_tree_node_get_value(
-	     internal_file_entry->file_entry_tree_node,
-	     (intptr_t **) &single_file_entry,
-	     error ) != 1 )
+	result = libcdata_tree_node_get_value(
+	          internal_file_entry->file_entry_tree_node,
+	          (intptr_t **) &single_file_entry,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
