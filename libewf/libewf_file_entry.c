@@ -209,6 +209,21 @@ int libewf_file_entry_get_type(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -222,24 +237,40 @@ int libewf_file_entry_get_type(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_type(
-	     single_file_entry,
-	     type,
+	else
+	{
+		result = libewf_single_file_entry_get_type(
+		          single_file_entry,
+		          type,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve type.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve type.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the flags
@@ -268,6 +299,21 @@ int libewf_file_entry_get_flags(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -281,24 +327,40 @@ int libewf_file_entry_get_flags(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_flags(
-	     single_file_entry,
-	     flags,
+	else
+	{
+		result = libewf_single_file_entry_get_flags(
+		          single_file_entry,
+		          flags,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve flags.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve flags.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the media data offset
@@ -327,6 +389,21 @@ int libewf_file_entry_get_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -340,24 +417,40 @@ int libewf_file_entry_get_media_data_offset(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_data_offset(
-	     single_file_entry,
-	     media_data_offset,
+	else
+	{
+		result = libewf_single_file_entry_get_data_offset(
+		          single_file_entry,
+		          media_data_offset,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data offset.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data offset.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the media data size
@@ -386,6 +479,21 @@ int libewf_file_entry_get_media_data_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -399,24 +507,40 @@ int libewf_file_entry_get_media_data_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_data_size(
-	     single_file_entry,
-	     media_data_size,
+	else
+	{
+		result = libewf_single_file_entry_get_data_size(
+		          single_file_entry,
+		          media_data_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the duplicate media data offset
@@ -445,6 +569,21 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -458,24 +597,40 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_duplicate_data_offset(
-	     single_file_entry,
-	     duplicate_media_data_offset,
+	else
+	{
+		result = libewf_single_file_entry_get_duplicate_data_offset(
+		          single_file_entry,
+		          duplicate_media_data_offset,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve duplicate data offset.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve duplicate data offset.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-8 encoded name
@@ -505,6 +660,21 @@ int libewf_file_entry_get_utf8_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -518,24 +688,40 @@ int libewf_file_entry_get_utf8_name_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_utf8_name_size(
-	     single_file_entry,
-	     utf8_name_size,
+	else
+	{
+		result = libewf_single_file_entry_get_utf8_name_size(
+		          single_file_entry,
+		          utf8_name_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 name size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded name value
@@ -566,6 +752,21 @@ int libewf_file_entry_get_utf8_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -579,25 +780,41 @@ int libewf_file_entry_get_utf8_name(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_utf8_name(
-	     single_file_entry,
-	     utf8_name,
-	     utf8_name_size,
+	else
+	{
+		result = libewf_single_file_entry_get_utf8_name(
+		          single_file_entry,
+		          utf8_name,
+		          utf8_name_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 name.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -627,6 +844,21 @@ int libewf_file_entry_get_utf16_name_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -640,24 +872,40 @@ int libewf_file_entry_get_utf16_name_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_utf16_name_size(
-	     single_file_entry,
-	     utf16_name_size,
+	else
+	{
+		result = libewf_single_file_entry_get_utf16_name_size(
+		          single_file_entry,
+		          utf16_name_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 name size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 name size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded name value
@@ -688,6 +936,21 @@ int libewf_file_entry_get_utf16_name(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -701,25 +964,41 @@ int libewf_file_entry_get_utf16_name(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_utf16_name(
-	     single_file_entry,
-	     utf16_name,
-	     utf16_name_size,
+	else
+	{
+		result = libewf_single_file_entry_get_utf16_name(
+		          single_file_entry,
+		          utf16_name,
+		          utf16_name_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 name.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size
@@ -748,6 +1027,21 @@ int libewf_file_entry_get_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -761,24 +1055,40 @@ int libewf_file_entry_get_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_size(
-	     single_file_entry,
-	     size,
+	else
+	{
+		result = libewf_single_file_entry_get_size(
+		          single_file_entry,
+		          size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the creation date and time
@@ -807,6 +1117,21 @@ int libewf_file_entry_get_creation_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -820,24 +1145,40 @@ int libewf_file_entry_get_creation_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_creation_time(
-	     single_file_entry,
-	     creation_time,
+	else
+	{
+		result = libewf_single_file_entry_get_creation_time(
+		          single_file_entry,
+		          creation_time,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve creation time.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve creation time.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the (file) modification (last written) date and time
@@ -866,6 +1207,21 @@ int libewf_file_entry_get_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -879,24 +1235,40 @@ int libewf_file_entry_get_modification_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_modification_time(
-	     single_file_entry,
-	     modification_time,
+	else
+	{
+		result = libewf_single_file_entry_get_modification_time(
+		          single_file_entry,
+		          modification_time,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve modification time.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve modification time.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the access date and time
@@ -925,6 +1297,21 @@ int libewf_file_entry_get_access_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -938,24 +1325,40 @@ int libewf_file_entry_get_access_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_access_time(
-	     single_file_entry,
-	     access_time,
+	else
+	{
+		result = libewf_single_file_entry_get_access_time(
+		          single_file_entry,
+		          access_time,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve access time.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve access time.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the (file system entry) modification date and time
@@ -984,6 +1387,21 @@ int libewf_file_entry_get_entry_modification_time(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -997,24 +1415,40 @@ int libewf_file_entry_get_entry_modification_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	if( libewf_single_file_entry_get_entry_modification_time(
-	     single_file_entry,
-	     entry_modification_time,
+	else
+	{
+		result = libewf_single_file_entry_get_entry_modification_time(
+		          single_file_entry,
+		          entry_modification_time,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry modification time.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry modification time.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded MD5 hash value
@@ -1044,6 +1478,21 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -1057,26 +1506,40 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	result = libewf_single_file_entry_get_utf8_hash_value_md5(
-	          single_file_entry,
-	          utf8_string,
-	          utf8_string_size,
-	          error );
+	else
+	{
+		result = libewf_single_file_entry_get_utf8_hash_value_md5(
+			  single_file_entry,
+			  utf8_string,
+			  utf8_string_size,
+			  error );
 
-	if( result == -1 )
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: MD5.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: MD5.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -1107,6 +1570,21 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -1120,26 +1598,40 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	result = libewf_single_file_entry_get_utf16_hash_value_md5(
-	          single_file_entry,
-	          utf16_string,
-	          utf16_string_size,
-	          error );
+	else
+	{
+		result = libewf_single_file_entry_get_utf16_hash_value_md5(
+			  single_file_entry,
+			  utf16_string,
+			  utf16_string_size,
+			  error );
 
-	if( result == -1 )
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: MD5.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: MD5.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -1170,6 +1662,21 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -1183,26 +1690,40 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	result = libewf_single_file_entry_get_utf8_hash_value_sha1(
-	          single_file_entry,
-	          utf8_string,
-	          utf8_string_size,
-	          error );
+	else
+	{
+		result = libewf_single_file_entry_get_utf8_hash_value_sha1(
+			  single_file_entry,
+			  utf8_string,
+			  utf8_string_size,
+			  error );
 
-	if( result == -1 )
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: SHA1.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: SHA1.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -1233,6 +1754,21 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -1246,26 +1782,40 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-
-		return( -1 );
 	}
-	result = libewf_single_file_entry_get_utf16_hash_value_sha1(
-	          single_file_entry,
-	          utf16_string,
-	          utf16_string_size,
-	          error );
+	else
+	{
+		result = libewf_single_file_entry_get_utf16_hash_value_sha1(
+			  single_file_entry,
+			  utf16_string,
+			  utf16_string_size,
+			  error );
 
-	if( result == -1 )
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve hash value: SHA1.",
+			 function );
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value: SHA1.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 

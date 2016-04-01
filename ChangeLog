@@ -24,6 +24,7 @@ Threat safety
  - libewf_handle_copy_header_values (write lock)
  - write lock libewf_handle_get_ ... _hash_values
 * libewf_file_entry
+  - libewf_file_entry_read_buffer and beyond
   - TODO
 
 Tests:
@@ -464,6 +465,16 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160041
+* worked on thread locking support
+
+20160331
+* worked on tests
+* worked on thread locking support
+
+20160330
+* worked on thread locking support
 
 20160329
 * worked on thread locking support
