@@ -467,6 +467,7 @@ Closed:
     for now not adding support for this, unless there is a good reason to do so
 
 20160041
+* worked on tests
 * worked on thread locking support
 
 20160331

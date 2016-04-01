@@ -1,10 +1,13 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160331
+# Version: 20160401
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
+#
+# When CHECK_WITH_STDERR is set to a non-empty value the test executable
+# is run with error output to stderr.
 #
 # When CHECK_WITH_VALGRIND is set to a non-empty value the test executable
 # is run with valgrind, otherwise it is run without.
@@ -135,6 +138,36 @@ find_binary_library_path()
 	echo "${TEST_EXECUTABLE}/${LIBRARY_NAME}/.libs";
 }
 
+# Searches for the path to the binary variant of the Python module
+#
+# Arguments:
+#   a string containing the path of the test executable
+#
+# Returns:
+#   a string containing the path of the binary variant of the Python module
+#
+find_binary_python_module_path()
+{
+	local TEST_EXECUTABLE=$1;
+	local PYTHON_MODULE_NAME="${TEST_EXECUTABLE}";
+
+	echo ${PYTHON_MODULE_NAME} | grep 'tools' > /dev/null 2>&1;
+
+	if test $? -eq ${EXIT_SUCCESS};
+	then
+		PYTHON_MODULE_NAME=`dirname ${PYTHON_MODULE_NAME}`;
+		PYTHON_MODULE_NAME=`dirname ${PYTHON_MODULE_NAME}`;
+		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/\(.*\)tools$/py\1/'`;
+	else
+		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/^\(.*\)_test_.*$/py\1/'`;
+	fi
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+
+	echo "${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}/.libs";
+}
+
 # Determines the test option file.
 #
 # Arguments:
@@ -255,7 +288,9 @@ read_option_file()
 #
 # Globals:
 #   CHECK_WITH_GDB
+#   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
+#   PYTHON
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -277,35 +312,69 @@ run_test_with_arguments()
 
 		return ${EXIT_FAILURE};
 	fi
+	local EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
+
+	local PLATFORM=`uname -s`;
+
+	# Check if the test executable is a Python script.
+	echo "${EXECUTABLE_TYPE}" | grep "text/x-python" > /dev/null 2>&1;
+	local IS_PYTHON_SCRIPT=$?;
+
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
 	then
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
+		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
 
-		if test `uname -s` = 'Darwin';
+		if test "${PLATFORM}" = "Darwin";
 		then
-			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-			RESULT=$?;
+			if test ${IS_PYTHON_SCRIPT} -eq 0;
+			then
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			else
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			fi
 		else
-			LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-			RESULT=$?;
+			if test ${IS_PYTHON_SCRIPT} -eq 0;
+			then
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			else
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			fi
 		fi
 
 	elif ! test -z ${CHECK_WITH_VALGRIND};
 	then
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
+		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
 		local VALGRIND_LOG="valgrind.log-$$";
 
-		if test `uname -s` = 'Darwin';
+		if test "${PLATFORM}" = "Darwin";
 		then
-			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-			RESULT=$?;
+			if test ${IS_PYTHON_SCRIPT} -eq 0;
+			then
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			else
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			fi
 		else
-			LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
-			RESULT=$?;
+			if test ${IS_PYTHON_SCRIPT} -eq 0;
+			then
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			else
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				RESULT=$?;
+			fi
 		fi
 		if test ${RESULT} -eq ${EXIT_SUCCESS};
 		then
@@ -322,16 +391,42 @@ run_test_with_arguments()
 		fi
 		rm -f ${VALGRIND_LOG};
 
+	elif test ${IS_PYTHON_SCRIPT} -eq 0;
+	then
+		if ! test -f "${TEST_EXECUTABLE}";
+		then
+			echo "Invalid test Python script: ${TEST_EXECUTABLE}";
+			echo "";
+
+			return ${EXIT_FAILURE};
+		fi
+		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
+
+		if ! test -z ${CHECK_WITH_STDERR};
+		then
+			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+			RESULT=$?;
+		else
+			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} 2> /dev/null;
+			RESULT=$?;
+		fi
 	else
-		if ! test -x ${TEST_EXECUTABLE};
+		if ! test -x "${TEST_EXECUTABLE}";
 		then
 			echo "Invalid test executable: ${TEST_EXECUTABLE}";
 			echo "";
 
 			return ${EXIT_FAILURE};
 		fi
-		${TEST_EXECUTABLE} ${ARGUMENTS[*]} 2> /dev/null;
-		RESULT=$?;
+
+		if ! test -z ${CHECK_WITH_STDERR};
+		then
+			${TEST_EXECUTABLE} ${ARGUMENTS[*]};
+			RESULT=$?;
+		else
+			${TEST_EXECUTABLE} ${ARGUMENTS[*]} 2> /dev/null;
+			RESULT=$?;
+		fi
 	fi
 	return ${RESULT};
 }
@@ -386,48 +481,10 @@ run_test_on_input_file()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if ! test -z ${CHECK_WITH_GDB};
+	if ! test -z ${CHECK_WITH_GDB} || ! test -z ${CHECK_WITH_VALGRIND};
 	then
-		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
-		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
-
-		if test `uname -s` = 'Darwin';
-		then
-			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-			RESULT=$?;
-		else
-			LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex r --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-			RESULT=$?;
-		fi
-
-	elif ! test -z ${CHECK_WITH_VALGRIND};
-	then
-		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
-		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
-		local VALGRIND_LOG="${TMPDIR}/valgrind.log";
-
-		if test `uname -s` = 'Darwin';
-		then
-			DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-			RESULT=$?;
-		else
-			LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
-			RESULT=$?;
-		fi
-		if test ${RESULT} -eq ${EXIT_SUCCESS};
-		then
-			grep "All heap blocks were freed -- no leaks are possible" ${VALGRIND_LOG} > /dev/null 2>&1;
-
-			if test $? -ne ${EXIT_SUCCESS};
-			then
-				echo "Memory leakage detected.";
-
-				cat ${VALGRIND_LOG};
-
-				RESULT=${EXIT_FAILURE};
-			fi
-		fi
-		rm -f ${VALGRIND_LOG};
+		run_test_with_arguments "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
+		RESULT=$?;
 
 	elif test "${TEST_MODE}" = "with_callback";
 	then
@@ -448,7 +505,7 @@ run_test_on_input_file()
 		local INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 		local TEST_LOG="${TEST_OUTPUT}.log";
 
-		(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE_FULL_PATH}" | sed '1,2d' > "${TEST_LOG}");
+		(cd ${TMPDIR} && run_test_with_arguments "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE_FULL_PATH}" | sed '1,2d' > "${TEST_LOG}");
 		RESULT=$?;
 
 		local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
@@ -467,14 +524,7 @@ run_test_on_input_file()
 		fi
 
 	else
-		if ! test -x ${TEST_EXECUTABLE};
-		then
-			echo "Invalid test executable: ${TEST_EXECUTABLE}";
-			echo "";
-
-			return ${EXIT_FAILURE};
-		fi
-		${TEST_EXECUTABLE} ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}" 2> /dev/null;
+		run_test_with_arguments "${TEST_EXECUTABLE}" ${ARGUMENTS[*]} ${OPTIONS[*]} "${INPUT_FILE}";
 		RESULT=$?;
 	fi
 

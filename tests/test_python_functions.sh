@@ -1,7 +1,7 @@
 #!/bin/bash
 # Python module functions testing script
 #
-# Version: 20160330
+# Version: 20160401
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -19,30 +19,6 @@ TEST_TOOL_DIRECTORY=".";
 INPUT_DIRECTORY="input";
 INPUT_GLOB="*";
 
-test_callback()
-{
-	local TMPDIR=$1;
-	local TEST_SET_DIRECTORY=$2;
-	local TEST_OUTPUT=$3;
-	local TEST_SCRIPT=$4;
-	local TEST_INPUT=$5;
-	shift 5;
-	local ARGUMENTS=$@;
-
-	local RESULT=0;
-
-	if test `uname -s` = 'Darwin';
-	then
-		DYLD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} ${ARGUMENTS[*]} "${INPUT_FILE}" > /dev/null 2>&1;
-		RESULT=$?;
-	else
-		# LD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} ${ARGUMENTS[*]} "${INPUT_FILE}" > /dev/null 2>&1;
-		LD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} ${ARGUMENTS[*]} "${INPUT_FILE}";
-		RESULT=$?;
-	fi
-	return ${RESULT};
-}
-
 test_python_function()
 {
 	local TEST_PROFILE=$1;
@@ -51,25 +27,10 @@ test_python_function()
 
 	local TEST_SCRIPT="${TEST_TOOL_DIRECTORY}/py${TEST_PREFIX}_test_${TEST_FUNCTION}.py";
 
-	if ! test -f ${TEST_SCRIPT};
-	then
-		echo "Missing test Python script: ${TEST_SCRIPT}";
-
-		exit ${EXIT_FAILURE};
-	fi
 	echo -n -e "Testing Python-bindings function: py${TEST_PREFIX}.${TEST_FUNCTION}\t";
 
-	local RESULT=0;
-
-	# TODO: add support for TEST_PROFILE and OPTION_SETS?
-	if test `uname -s` = 'Darwin';
-	then
-		DYLD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} > /dev/null 2>&1;
-		RESULT=$?;
-	else
-		LD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} > /dev/null 2>&1;
-		RESULT=$?;
-	fi
+	run_test_with_arguments "${TEST_SCRIPT}";
+	local RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
 	then
@@ -90,14 +51,7 @@ test_python_function_with_input()
 
 	local TEST_SCRIPT="${TEST_TOOL_DIRECTORY}/py${TEST_PREFIX}_test_${TEST_FUNCTION}.py";
 
-	if ! test -f ${TEST_SCRIPT};
-	then
-		echo "Missing test Python script: ${TEST_SCRIPT}";
-
-		exit ${EXIT_FAILURE};
-	fi
-
-	run_test_on_input_directory "${TEST_PROFILE}" "${TEST_FUNCTION}" "with_callback" "${OPTION_SETS}" "${TEST_SCRIPT}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
+	run_test_on_input_directory "${TEST_PROFILE}" "${TEST_FUNCTION}" "default" "${OPTION_SETS}" "${TEST_SCRIPT}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
 	local RESULT=$?;
 
 	return ${RESULT};

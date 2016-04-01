@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API functions testing script
 #
-# Version: 20160329
+# Version: 20160401
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -34,12 +34,6 @@ test_api_function()
 		TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
 	fi
 
-	if ! test -x "${TEST_EXECUTABLE}";
-	then
-		echo "Missing test executable: ${TEST_EXECUTABLE}";
-
-		return ${EXIT_FAILURE};
-	fi
 	echo -n -e "Testing API function: lib${TEST_PREFIX}_${TEST_FUNCTION}\t";
 
 	# TODO: add support for TEST_PROFILE and OPTION_SETS?
@@ -71,12 +65,6 @@ test_api_function_with_input()
 		TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
 	fi
 
-	if ! test -x "${TEST_EXECUTABLE}";
-	then
-		echo "Missing test executable: ${TEST_EXECUTABLE}";
-
-		return ${EXIT_FAILURE};
-	fi
 	run_test_on_input_directory "${TEST_PROFILE}" "${TEST_FUNCTION}" "default" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
 	local RESULT=$?;
 
