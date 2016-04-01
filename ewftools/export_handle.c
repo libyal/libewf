@@ -3341,6 +3341,67 @@ int export_handle_set_process_buffer_size(
 	return( result );
 }
 
+/* Sets the number of threads
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int export_handle_set_number_of_threads(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error )
+{
+	static char *function      = "export_handle_set_number_of_threads";
+	size_t string_length       = 0;
+	uint64_t number_of_threads = 0;
+	int result                 = 0;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string[ 0 ] != (libcstring_system_character_t) '-' )
+	{
+		string_length = libcstring_system_string_length(
+				 string );
+
+		if( libcsystem_string_decimal_copy_to_64_bit(
+		     string,
+		     string_length + 1,
+		     &number_of_threads,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine number of threads.",
+			 function );
+
+			return( -1 );
+		}
+		result = 1;
+
+		if( number_of_threads > 32 )
+		{
+			result = 0;
+		}
+		else
+		{
+			export_handle->number_of_threads = (int) number_of_threads;
+		}
+	}
+	return( result );
+}
+
 /* Sets the additional digest types
  * Returns 1 if successful or -1 on error
  */

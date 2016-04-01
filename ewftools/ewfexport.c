@@ -44,6 +44,7 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "export_handle.h"
 #include "log_handle.h"
@@ -110,7 +111,7 @@ void usage_fprint(
 
 	fprintf( stream, "Usage: ewfexport [ -A codepage ] [ -b number_of_sectors ]\n"
 	                 "                 [ -B number_of_bytes ] [ -c compression_values ]\n"
-	                 "                 [ -d digest_type ] [ -f format ] [ -l log_filename ]\n"
+	                 "                 [ -d digest_type ] [ -f format ] [ -j jobs ] [ -l log_filename ]\n"
 	                 "                 [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVwx ] ewf_files\n\n" );
 
@@ -138,6 +139,9 @@ void usage_fprint(
 	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6,\n"
 	                 "\t           encase7, encase7-v2, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
+	fprintf( stream, "\t-j:        the number of concurrent processing jobs (threads), where\n"
+	                 "\t           a number of 0 represents single-threaded mode (default is 4\n"
+	                 "\t           if multi-threaded mode is supported)\n" );
 	fprintf( stream, "\t-l:        logs export errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
@@ -247,6 +251,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_format                  = NULL;
 	libcstring_system_character_t *option_header_codepage         = NULL;
 	libcstring_system_character_t *option_maximum_segment_size    = NULL;
+	libcstring_system_character_t *option_number_of_jobs          = NULL;
 	libcstring_system_character_t *option_offset                  = NULL;
 	libcstring_system_character_t *option_process_buffer_size     = NULL;
 	libcstring_system_character_t *option_sectors_per_chunk       = NULL;
@@ -325,7 +330,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hl:o:p:qsS:t:uvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:d:f:hj:l:o:p:qsS:t:uvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -384,6 +389,11 @@ int main( int argc, char * const argv[] )
 				 stderr );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'j':
+				option_number_of_jobs = optarg;
+
+				break;
 
 			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
@@ -821,6 +831,36 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_number_of_jobs != NULL )
+	{
+		result = export_handle_set_number_of_threads(
+			  ewfexport_export_handle,
+			  option_number_of_jobs,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of jobs (threads).\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfexport_export_handle->number_of_threads > (int) 32 ) )
+		{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+			ewfexport_export_handle->number_of_threads = 4;
+#else
+			ewfexport_export_handle->number_of_threads = 0;
+#endif
+
+			fprintf(
+			 stderr,
+			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+			 ewfexport_export_handle->number_of_threads );
 		}
 	}
 	if( option_additional_digest_types != NULL )

@@ -65,7 +65,7 @@ void usage_fprint(
 	                 "Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfverify [ -A codepage ] [ -d digest_type ] [ -f format ]\n"
-	                 "                 [ -l log_filename ] [ -p process_buffer_size ]\n"
+	                 "                 [ -j jobs ] [ -l log_filename ] [ -p process_buffer_size ]\n"
 	                 "                 [ -hqvVwx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
@@ -80,6 +80,9 @@ void usage_fprint(
 	fprintf( stream, "\t-f:        specify the input format, options: raw (default),\n"
 	                 "\t           files (restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
+	fprintf( stream, "\t-j:        the number of concurrent processing jobs (threads), where\n"
+	                 "\t           a number of 0 represents single-threaded mode (default is 4\n"
+	                 "\t           if multi-threaded mode is supported)\n" );
 	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the\n"
 	                 "\t           log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
@@ -154,6 +157,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_additional_digest_types = NULL;
 	libcstring_system_character_t *option_format                  = NULL;
 	libcstring_system_character_t *option_header_codepage         = NULL;
+	libcstring_system_character_t *option_number_of_jobs          = NULL;
 	libcstring_system_character_t *option_process_buffer_size     = NULL;
 
 	log_handle_t *log_handle                                      = NULL;
@@ -166,12 +170,6 @@ int main( int argc, char * const argv[] )
 	uint8_t zero_chunk_on_error                                   = 0;
 	int number_of_filenames                                       = 0;
 	int result                                                    = 0;
-
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
-	uint8_t use_multi_threading                                   = 1;
-#else
-	uint8_t use_multi_threading                                   = 0;
-#endif
 
 	libcnotify_stream_set(
 	 stderr,
@@ -206,7 +204,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:d:f:hl:p:qvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:d:f:j:hl:p:qvVwx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -242,6 +240,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'j':
+				option_number_of_jobs = optarg;
+
+				break;
 
 			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
@@ -305,7 +308,6 @@ int main( int argc, char * const argv[] )
 	     &ewfverify_verification_handle,
 	     calculate_md5,
 	     use_chunk_data_functions,
-	     use_multi_threading,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -381,6 +383,36 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_number_of_jobs != NULL )
+	{
+		result = verification_handle_set_number_of_threads(
+			  ewfverify_verification_handle,
+			  option_number_of_jobs,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of jobs (threads).\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfverify_verification_handle->number_of_threads > (int) 32 ) )
+		{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+			ewfverify_verification_handle->number_of_threads = 4;
+#else
+			ewfverify_verification_handle->number_of_threads = 0;
+#endif
+
+			fprintf(
+			 stderr,
+			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+			 ewfverify_verification_handle->number_of_threads );
 		}
 	}
 	if( option_additional_digest_types != NULL )

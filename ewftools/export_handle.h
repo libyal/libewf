@@ -28,6 +28,7 @@
 #include "digest_hash.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "ewftools_libsmraw.h"
@@ -153,6 +154,30 @@ struct export_handle
 	 */
 	uint8_t use_chunk_data_functions;
 
+	/* The process buffer size
+	 */
+	size_t process_buffer_size;
+
+	/* The number of threads in the process thread pool
+	 */
+	int number_of_threads;
+
+	/* The maximum number of items queued in the process thread pool
+	 */
+	int maximum_number_of_queued_items;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+	/* The process thread pool
+	 */
+	libcthreads_thread_pool_t *process_thread_pool;
+
+	/* The output thread pool
+	 */
+	libcthreads_thread_pool_t *output_thread_pool;
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -192,10 +217,6 @@ struct export_handle
 	/* Value to indicate if the chunk should be zeroed on error
 	 */
 	int zero_chunk_on_error;
-
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
 
 	/* The notification output stream
 	 */
@@ -382,6 +403,11 @@ int export_handle_set_header_codepage(
 
 int export_handle_set_process_buffer_size(
      export_handle_t *export_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error );
+
+int export_handle_set_number_of_threads(
+     export_handle_t *verification_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );
 

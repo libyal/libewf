@@ -106,6 +106,7 @@ ewfacquirestream_SOURCES = \
 	ewftools_libcsplit.h \
 	ewftools_libcstring.h \
 	ewftools_libcsystem.h \
+	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
@@ -131,9 +132,11 @@ ewfacquirestream_LDADD = \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
-	@LIBINTL@
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
 
 ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \

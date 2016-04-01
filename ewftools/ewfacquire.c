@@ -113,7 +113,7 @@ void ewfacquire_usage_fprint(
 	                 "                  [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                  [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
 	                 "                  [ -e examiner_name ] [ -E evidence_number ] [ -f format ]\n"
-	                 "                  [ -g number_of_sectors ] [ -l log_filename ]\n"
+	                 "                  [ -g number_of_sectors ] [ -j jobs ] [ -l log_filename ]\n"
 	                 "                  [ -m media_type ] [ -M media_flags ] [ -N notes ]\n"
 	                 "                  [ -o offset ] [ -p process_buffer_size ]\n"
 	                 "                  [ -P bytes_per_sector ] [ -r read_error_retries ]\n"
@@ -147,6 +147,9 @@ void ewfacquire_usage_fprint(
 	                 "\t        encase7, encase7-v2, linen5, linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-g      specify the number of sectors to be used as error granularity\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
+	fprintf( stream, "\t-j:     the number of concurrent processing jobs (threads), where\n"
+	                 "\t        a number of 0 represents single-threaded mode (default is 4\n"
+	                 "\t        if multi-threaded mode is supported)\n" );
 	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable,\n"
 	                 "\t        optical, memory\n" );
@@ -191,8 +194,8 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     zero sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-x:     in single-threaded mode use the chunk data instead of\n"
-	                 "\t        the buffered read and write functions.\n");
+	fprintf( stream, "\t-x:     use the chunk data instead of the buffered read and write\n"
+	                 "\t        functions.\n" );
 	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write\n"
 	                 "\t        to\n" );
 }
@@ -1378,6 +1381,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
 	libcstring_system_character_t *option_number_of_error_retries   = NULL;
+	libcstring_system_character_t *option_number_of_jobs            = NULL;
 	libcstring_system_character_t *option_offset                    = NULL;
 	libcstring_system_character_t *option_process_buffer_size       = NULL;
 	libcstring_system_character_t *option_secondary_target_filename = NULL;
@@ -1439,7 +1443,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:P:qr:RsS:t:T:uvVwx2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hj:l:m:M:N:o:p:P:qr:RsS:t:T:uvVwx2:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1523,6 +1527,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'j':
+				option_number_of_jobs = optarg;
+
+				break;
 
 			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
@@ -2242,6 +2251,36 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_number_of_jobs != NULL )
+	{
+		result = imaging_handle_set_number_of_threads(
+			  ewfacquire_imaging_handle,
+			  option_number_of_jobs,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of jobs (threads).\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquire_imaging_handle->number_of_threads > (int) 32 ) )
+		{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+			ewfacquire_imaging_handle->number_of_threads = 4;
+#else
+			ewfacquire_imaging_handle->number_of_threads = 0;
+#endif
+
+			fprintf(
+			 stderr,
+			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+			 ewfacquire_imaging_handle->number_of_threads );
 		}
 	}
 	if( option_additional_digest_types != NULL )

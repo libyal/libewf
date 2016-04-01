@@ -28,6 +28,7 @@
 
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "storage_media_buffer.h"
@@ -196,13 +197,37 @@ struct imaging_handle
 	 */
 	uint8_t sha256_context_initialized;
 
+	/* The calculated SHA256 digest hash string
+	 */
+	libcstring_system_character_t *calculated_sha256_hash_string;
+
 	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
 	 */
 	uint8_t use_chunk_data_functions;
 
-	/* The calculated SHA256 digest hash string
+	/* The process buffer size
 	 */
-	libcstring_system_character_t *calculated_sha256_hash_string;
+	size_t process_buffer_size;
+
+	/* The number of threads in the process thread pool
+	 */
+	int number_of_threads;
+
+	/* The maximum number of items queued in the process thread pool
+	 */
+	int maximum_number_of_queued_items;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+	/* The process thread pool
+	 */
+	libcthreads_thread_pool_t *process_thread_pool;
+
+	/* The output thread pool
+	 */
+	libcthreads_thread_pool_t *output_thread_pool;
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 	/* The libewf output handle
 	 */
@@ -215,10 +240,6 @@ struct imaging_handle
 	/* The input media size
 	 */
 	size64_t input_media_size;
-
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
 
 	/* The notification output stream
 	 */
@@ -445,6 +466,11 @@ int imaging_handle_set_header_codepage(
      libcerror_error_t **error );
 
 int imaging_handle_set_process_buffer_size(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error );
+
+int imaging_handle_set_number_of_threads(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );

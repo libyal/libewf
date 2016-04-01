@@ -1,4 +1,4 @@
-.Dd January 19, 2014
+.Dd April  1, 2016
 .Dt ewfverify
 .Os libewf
 .Sh NAME
@@ -9,6 +9,7 @@
 .Op Fl A Ar codepage
 .Op Fl d Ar digest_type
 .Op Fl f Ar format
+.Op Fl j Ar jobs
 .Op Fl l Ar log_filename
 .Op Fl p Ar process_buffer_size
 .Op Fl hqvVwx
@@ -37,6 +38,8 @@ calculate additional digest (hash) types besides md5, options: sha1, sha256
 specify the input format, options: raw (default), files (restricted to logical volume files)
 .It Fl h
 shows this help
+.It Fl j Ar jobs
+the number of concurrent processing jobs (threads), where a number of 0 represents single-threaded mode (default is 4 if multi-threaded mode is supported).
 .It Fl l Ar log_filename
 logs verification errors and the digest (hash) to the log filename
 .It Fl p Ar process_buffer_size

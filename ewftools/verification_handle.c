@@ -52,7 +52,6 @@ int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
      uint8_t use_chunk_data_functions,
-     uint8_t use_multi_threading,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -204,8 +203,7 @@ int verification_handle_initialize(
 	( *verification_handle )->input_format                   = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
 	( *verification_handle )->calculate_md5                  = calculate_md5;
 	( *verification_handle )->use_chunk_data_functions       = use_chunk_data_functions;
-	( *verification_handle )->use_multi_threading            = use_multi_threading;
-	( *verification_handle )->number_of_threads              = 1;
+	( *verification_handle )->number_of_threads              = 4;
 	( *verification_handle )->maximum_number_of_queued_items = 256;
 	( *verification_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
 	( *verification_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
@@ -1601,7 +1599,7 @@ int verification_handle_verify_input(
 		return( -1 );
 	}
 #if !defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( verification_handle->use_multi_threading != 0 )
+	if( verification_handle->number_of_threads != 0 )
 	{
 		libcerror_error_set(
 		 &error,
@@ -1645,7 +1643,7 @@ int verification_handle_verify_input(
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_BUFFERED;
 	}
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( verification_handle->use_multi_threading != 0 )
+	if( verification_handle->number_of_threads != 0 )
 	{
 		if( libcthreads_thread_pool_create(
 		     &( verification_handle->process_thread_pool ),
@@ -1794,7 +1792,7 @@ int verification_handle_verify_input(
 		remaining_media_size -= (size64_t) read_size;
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
-		if( verification_handle->use_multi_threading != 0 )
+		if( verification_handle->number_of_threads != 0 )
 		{
 			if( libcthreads_thread_pool_push(
 			     verification_handle->process_thread_pool,
@@ -1896,7 +1894,7 @@ int verification_handle_verify_input(
 		}
 	}
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
-	if( verification_handle->use_multi_threading != 0 )
+	if( verification_handle->process_thread_pool != NULL )
 	{
 		if( libcthreads_thread_pool_join(
 		     &( verification_handle->process_thread_pool ),
@@ -1911,6 +1909,9 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
+	}
+	if( verification_handle->output_thread_pool != NULL )
+	{
 		if( libcthreads_thread_pool_join(
 		     &( verification_handle->output_thread_pool ),
 		     error ) != 1 )
@@ -3374,6 +3375,67 @@ int verification_handle_set_process_buffer_size(
 		else
 		{
 			verification_handle->process_buffer_size = (size_t) size_variable;
+		}
+	}
+	return( result );
+}
+
+/* Sets the number of threads
+ * Returns 1 if successful, 0 if unsupported value or -1 on error
+ */
+int verification_handle_set_number_of_threads(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error )
+{
+	static char *function      = "verification_handle_set_number_of_threads";
+	size_t string_length       = 0;
+	uint64_t number_of_threads = 0;
+	int result                 = 0;
+
+	if( verification_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	string_length = libcstring_system_string_length(
+	                 string );
+
+	if( string[ 0 ] != (libcstring_system_character_t) '-' )
+	{
+		string_length = libcstring_system_string_length(
+				 string );
+
+		if( libcsystem_string_decimal_copy_to_64_bit(
+		     string,
+		     string_length + 1,
+		     &number_of_threads,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine number of threads.",
+			 function );
+
+			return( -1 );
+		}
+		result = 1;
+
+		if( number_of_threads > 32 )
+		{
+			result = 0;
+		}
+		else
+		{
+			verification_handle->number_of_threads = (int) number_of_threads;
 		}
 	}
 	return( result );

@@ -137,9 +137,9 @@ struct verification_handle
 	 */
 	uint8_t use_chunk_data_functions;
 
-	/* Value to indicate if multi threading should be used
+	/* The process buffer size
 	 */
-	uint8_t use_multi_threading;
+	size_t process_buffer_size;
 
 	/* The number of threads in the process thread pool
 	 */
@@ -181,10 +181,6 @@ struct verification_handle
 	 */
 	off64_t last_offset_hashed;
 
-	/* The process buffer size
-	 */
-	size_t process_buffer_size;
-
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
@@ -202,7 +198,6 @@ int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
      uint8_t use_chunk_data_functions,
-     uint8_t use_multi_threading,
      libcerror_error_t **error );
 
 int verification_handle_free(
@@ -319,6 +314,11 @@ int verification_handle_set_format(
      libcerror_error_t **error );
 
 int verification_handle_set_process_buffer_size(
+     verification_handle_t *verification_handle,
+     const libcstring_system_character_t *string,
+     libcerror_error_t **error );
+
+int verification_handle_set_number_of_threads(
      verification_handle_t *verification_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );

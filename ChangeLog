@@ -402,9 +402,11 @@ Tools:
   - improve output when encountering a read error
   - add support to set device label header value
   - allow for multi stage imaging, where user suspends and resumes
-    imaging process
+    imaging process?
+  - add multi threading support
 * ewfacquirestream
   - implement stream handle
+  - add multi threading support
 * ewfexport
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
@@ -414,6 +416,8 @@ Tools:
   - limit output formats for input types (lvf vs ewf)
   - add information and media values to raw output
   - improve -f files error tollerability
+  - add multi threading support
+  - add multi threading support for logical images
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -421,9 +425,13 @@ Tools:
   - Windows finish Dokan implementation
   - Windows add ImDisk implementation ?
   - MacOS native API support ?
+  - add multi threading support
+  - add multi threading support for logical images
 * ewfverify
   - allow for multi stage verification, where user suspends and resumes?
-  - for multi threading measure: number of items queued, number of items requeued
+  - for multi threading measure: number of items queued, number of items
+  requeued, number of threads
+  - add multi threading support for logical images
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation

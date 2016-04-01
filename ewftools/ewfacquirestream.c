@@ -40,6 +40,7 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
@@ -106,7 +107,7 @@ void usage_fprint(
 	                 "                        [ -B number_of_bytes ] [ -c compression_values ]\n"
 	                 "                        [ -C case_number ] [ -d digest_type ]\n"
 	                 "                        [ -D description ] [ -e examiner_name ]\n"
-	                 "                        [ -E evidence_number ] [ -f format ]\n"
+	                 "                        [ -E evidence_number ] [ -f format ] [ -j jobs ]\n"
 	                 "                        [ -l log_filename ] [ -m media_type ]\n"
 	                 "                        [ -M media_flags ] [ -N notes ]\n"
 	                 "                        [ -o offset ] [ -p process_buffer_size ]\n"
@@ -140,6 +141,9 @@ void usage_fprint(
 	                 "\t    encase3, encase4, encase5, encase6 (default), encase7, linen5,\n"
 	                 "\t    linen6, linen7, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
+	fprintf( stream, "\t-j: the number of concurrent processing jobs (threads), where\n"
+	                 "\t    a number of 0 represents single-threaded mode (default is 4\n"
+	                 "\t    if multi-threaded mode is supported)\n" );
 	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable,\n"
 	                 "\t    optical, memory\n" );
@@ -939,6 +943,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t *option_media_flags               = NULL;
 	libcstring_system_character_t *option_media_type                = NULL;
 	libcstring_system_character_t *option_notes                     = NULL;
+	libcstring_system_character_t *option_number_of_jobs            = NULL;
 	libcstring_system_character_t *option_offset                    = NULL;
 	libcstring_system_character_t *option_process_buffer_size       = NULL;
         libcstring_system_character_t *option_secondary_target_filename = NULL;
@@ -1020,7 +1025,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hl:m:M:N:o:p:P:qsS:t:vVx2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hj:l:m:M:N:o:p:P:qsS:t:vVx2:" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1099,6 +1104,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (libcstring_system_integer_t) 'j':
+				option_number_of_jobs = optarg;
+
+				break;
 
 			case (libcstring_system_integer_t) 'l':
 				log_filename = optarg;
@@ -1619,6 +1629,36 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported process buffer size defaulting to: chunk size.\n" );
+		}
+	}
+	if( option_number_of_jobs != NULL )
+	{
+		result = imaging_handle_set_number_of_threads(
+			  ewfacquirestream_imaging_handle,
+			  option_number_of_jobs,
+			  &error );
+
+		if( result == -1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set number of jobs (threads).\n" );
+
+			goto on_error;
+		}
+		else if( ( result == 0 )
+		      || ( ewfacquirestream_imaging_handle->number_of_threads > (int) 32 ) )
+		{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+			ewfacquirestream_imaging_handle->number_of_threads = 4;
+#else
+			ewfacquirestream_imaging_handle->number_of_threads = 0;
+#endif
+
+			fprintf(
+			 stderr,
+			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+			 ewfacquirestream_imaging_handle->number_of_threads );
 		}
 	}
 	if( option_additional_digest_types != NULL )

@@ -1,4 +1,4 @@
-.Dd March 26, 2016
+.Dd April  1, 2016
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -17,6 +17,7 @@
 .Op Fl E Ar evidence_number
 .Op Fl f Ar format
 .Op Fl g Ar number_of_sectors
+.Op Fl j Ar jobs
 .Op Fl l Ar log_filename
 .Op Fl m Ar media_type
 .Op Fl M Ar media_flags
@@ -77,6 +78,8 @@ the examiner name (default is examiner_name)
 the evidence number (default is evidence_number)
 .It Fl f Ar format
 the EWF file format to write to, options: ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6 (default), encase7, encase7-v2, linen5, linen6, linen7, ewfx.
+.It Fl j Ar jobs
+the number of concurrent processing jobs (threads), where a number of 0 represents single-threaded mode (default is 4 if multi-threaded mode is supported).
 .It Fl g Ar number_of_sectors
 the number of sectors to be used as error granularity
 .It Fl h
@@ -118,7 +121,7 @@ print version
 .It Fl w
 zero sectors on read error (mimic EnCase like behavior)
 .It Fl x
-in single-threaded mode use the chunk data instead of the buffered read and write functions.
+use the chunk data instead of the buffered read and write functions.
 .It Fl 2 Ar secondary_target
 the secondary target file (without extension) to write to
 .El

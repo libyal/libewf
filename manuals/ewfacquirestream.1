@@ -1,4 +1,4 @@
-.Dd March 26, 2016
+.Dd April  1, 2016
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -16,6 +16,7 @@
 .Op Fl e Ar examiner_name
 .Op Fl E Ar evidence_number
 .Op Fl f Ar format
+.Op Fl j Ar jobs
 .Op Fl l Ar log_filename
 .Op Fl m Ar media_type
 .Op Fl M Ar media_flags
@@ -64,10 +65,12 @@ the examiner name (default is examiner_name)
 the evidence number (default is evidence_number)
 .It Fl f Ar format
 the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5, encase6 (default), encase7, encase7-v2, linen5, linen6, linen7, ewfx.
-.Nm libewf
-does not support streamed writes for other EWF formats.
 .It Fl h
 shows this help
+.It Fl j Ar jobs
+the number of concurrent processing jobs (threads), where a number of 0 represents single-threaded mode (default is 4 if multi-threaded mode is supported).
+.Nm libewf
+does not support streamed writes for other EWF formats.
 .It Fl l Ar log_filename
 logs acquiry errors and the digest (hash) to the log filename
 .It Fl m Ar media_type

@@ -1,4 +1,4 @@
-.Dd March 26, 2016
+.Dd April  1, 2016
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -12,6 +12,7 @@
 .Op Fl c Ar compression_values
 .Op Fl d Ar digest_type
 .Op Fl f Ar format
+.Op Fl j Ar jobs
 .Op Fl l Ar log_filename
 .Op Fl o Ar offset
 .Op Fl p Ar process_buffer_size
@@ -51,6 +52,8 @@ calculate additional digest (hash) types besides md5, options: sha1 (not used fo
 the output format to write to, options: raw (default), files (restricted to logical volume files), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, encase7, encase7-v2, linen5, linen6, linen7, ewfx.
 .It Fl h
 shows this help
+.It Fl j Ar jobs
+the number of concurrent processing jobs (threads), where a number of 0 represents single-threaded mode (default is 4 if multi-threaded mode is supported).
 .It Fl l Ar log_filename
 logs export errors and the digest (hash) to the log filename
 .It Fl o Ar offset
