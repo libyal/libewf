@@ -7333,8 +7333,6 @@ off64_t libewf_handle_seek_offset(
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
-
-		offset = -1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(

@@ -194,7 +194,6 @@ int libewf_file_entry_get_type(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_type";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -224,12 +223,10 @@ int libewf_file_entry_get_type(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -237,23 +234,22 @@ int libewf_file_entry_get_type(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_type(
-		          single_file_entry,
-		          type,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve type.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_type(
+	     single_file_entry,
+	     type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -270,7 +266,15 @@ int libewf_file_entry_get_type(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the flags
@@ -284,7 +288,6 @@ int libewf_file_entry_get_flags(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_flags";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -314,12 +317,10 @@ int libewf_file_entry_get_flags(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -327,23 +328,22 @@ int libewf_file_entry_get_flags(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_flags(
-		          single_file_entry,
-		          flags,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve flags.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_flags(
+	     single_file_entry,
+	     flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve flags.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -360,7 +360,15 @@ int libewf_file_entry_get_flags(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the media data offset
@@ -374,7 +382,6 @@ int libewf_file_entry_get_media_data_offset(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -404,12 +411,10 @@ int libewf_file_entry_get_media_data_offset(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -417,23 +422,22 @@ int libewf_file_entry_get_media_data_offset(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_data_offset(
-		          single_file_entry,
-		          media_data_offset,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data offset.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_data_offset(
+	     single_file_entry,
+	     media_data_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data offset.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -450,7 +454,15 @@ int libewf_file_entry_get_media_data_offset(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the media data size
@@ -464,7 +476,6 @@ int libewf_file_entry_get_media_data_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_size";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -494,12 +505,10 @@ int libewf_file_entry_get_media_data_size(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -507,23 +516,22 @@ int libewf_file_entry_get_media_data_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_data_size(
-		          single_file_entry,
-		          media_data_size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data size.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_data_size(
+	     single_file_entry,
+	     media_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -540,7 +548,15 @@ int libewf_file_entry_get_media_data_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the duplicate media data offset
@@ -554,7 +570,6 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -584,12 +599,10 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -597,23 +610,22 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_duplicate_data_offset(
-		          single_file_entry,
-		          duplicate_media_data_offset,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve duplicate data offset.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_duplicate_data_offset(
+	     single_file_entry,
+	     duplicate_media_data_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve duplicate data offset.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -630,7 +642,15 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size of the UTF-8 encoded name
@@ -645,7 +665,6 @@ int libewf_file_entry_get_utf8_name_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_name_size";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -675,12 +694,10 @@ int libewf_file_entry_get_utf8_name_size(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -688,23 +705,22 @@ int libewf_file_entry_get_utf8_name_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf8_name_size(
-		          single_file_entry,
-		          utf8_name_size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name size.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_utf8_name_size(
+	     single_file_entry,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -721,7 +737,15 @@ int libewf_file_entry_get_utf8_name_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-8 encoded name value
@@ -737,7 +761,6 @@ int libewf_file_entry_get_utf8_name(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf8_name";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -767,12 +790,10 @@ int libewf_file_entry_get_utf8_name(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -780,24 +801,23 @@ int libewf_file_entry_get_utf8_name(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf8_name(
-		          single_file_entry,
-		          utf8_name,
-		          utf8_name_size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_utf8_name(
+	     single_file_entry,
+	     utf8_name,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -814,7 +834,15 @@ int libewf_file_entry_get_utf8_name(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -829,7 +857,6 @@ int libewf_file_entry_get_utf16_name_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_name_size";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -859,12 +886,10 @@ int libewf_file_entry_get_utf16_name_size(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -872,23 +897,22 @@ int libewf_file_entry_get_utf16_name_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf16_name_size(
-		          single_file_entry,
-		          utf16_name_size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 name size.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_utf16_name_size(
+	     single_file_entry,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -905,7 +929,15 @@ int libewf_file_entry_get_utf16_name_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-16 encoded name value
@@ -921,7 +953,6 @@ int libewf_file_entry_get_utf16_name(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_utf16_name";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -951,12 +982,10 @@ int libewf_file_entry_get_utf16_name(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -964,24 +993,23 @@ int libewf_file_entry_get_utf16_name(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf16_name(
-		          single_file_entry,
-		          utf16_name,
-		          utf16_name_size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_utf16_name(
+	     single_file_entry,
+	     utf16_name,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -998,7 +1026,15 @@ int libewf_file_entry_get_utf16_name(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size
@@ -1012,7 +1048,6 @@ int libewf_file_entry_get_size(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_size";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1042,12 +1077,10 @@ int libewf_file_entry_get_size(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1055,23 +1088,22 @@ int libewf_file_entry_get_size(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_size(
-		          single_file_entry,
-		          size,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_size(
+	     single_file_entry,
+	     size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1088,7 +1120,15 @@ int libewf_file_entry_get_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the creation date and time
@@ -1102,7 +1142,6 @@ int libewf_file_entry_get_creation_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_creation_time";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1132,12 +1171,10 @@ int libewf_file_entry_get_creation_time(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1145,23 +1182,22 @@ int libewf_file_entry_get_creation_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_creation_time(
-		          single_file_entry,
-		          creation_time,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve creation time.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_creation_time(
+	     single_file_entry,
+	     creation_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1178,7 +1214,15 @@ int libewf_file_entry_get_creation_time(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the (file) modification (last written) date and time
@@ -1192,7 +1236,6 @@ int libewf_file_entry_get_modification_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_modification_time";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1222,12 +1265,10 @@ int libewf_file_entry_get_modification_time(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1235,23 +1276,22 @@ int libewf_file_entry_get_modification_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_modification_time(
-		          single_file_entry,
-		          modification_time,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve modification time.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_modification_time(
+	     single_file_entry,
+	     modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1268,7 +1308,15 @@ int libewf_file_entry_get_modification_time(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the access date and time
@@ -1282,7 +1330,6 @@ int libewf_file_entry_get_access_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_access_time";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1312,12 +1359,10 @@ int libewf_file_entry_get_access_time(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1325,23 +1370,22 @@ int libewf_file_entry_get_access_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_access_time(
-		          single_file_entry,
-		          access_time,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve access time.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_access_time(
+	     single_file_entry,
+	     access_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1358,7 +1402,15 @@ int libewf_file_entry_get_access_time(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the (file system entry) modification date and time
@@ -1372,7 +1424,6 @@ int libewf_file_entry_get_entry_modification_time(
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	libewf_single_file_entry_t *single_file_entry     = NULL;
 	static char *function                             = "libewf_file_entry_get_entry_modification_time";
-	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1402,12 +1453,10 @@ int libewf_file_entry_get_entry_modification_time(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1415,23 +1464,22 @@ int libewf_file_entry_get_entry_modification_time(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_entry_modification_time(
-		          single_file_entry,
-		          entry_modification_time,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve entry modification time.",
-			 function );
-		}
+		goto on_error;
+	}
+	if( libewf_single_file_entry_get_entry_modification_time(
+	     single_file_entry,
+	     entry_modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1448,7 +1496,15 @@ int libewf_file_entry_get_entry_modification_time(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-8 encoded MD5 hash value
@@ -1493,12 +1549,10 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1506,24 +1560,25 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf8_hash_value_md5(
-			  single_file_entry,
-			  utf8_string,
-			  utf8_string_size,
-			  error );
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: MD5.",
-			 function );
-		}
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf8_hash_value_md5(
+		  single_file_entry,
+		  utf8_string,
+		  utf8_string_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: MD5.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1541,6 +1596,14 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
@@ -1585,12 +1648,10 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1598,24 +1659,25 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf16_hash_value_md5(
-			  single_file_entry,
-			  utf16_string,
-			  utf16_string_size,
-			  error );
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: MD5.",
-			 function );
-		}
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf16_hash_value_md5(
+		  single_file_entry,
+		  utf16_string,
+		  utf16_string_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: MD5.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1633,6 +1695,14 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
@@ -1677,12 +1747,10 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1690,24 +1758,25 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf8_hash_value_sha1(
-			  single_file_entry,
-			  utf8_string,
-			  utf8_string_size,
-			  error );
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: SHA1.",
-			 function );
-		}
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf8_hash_value_sha1(
+		  single_file_entry,
+		  utf8_string,
+		  utf8_string_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: SHA1.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1725,6 +1794,14 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
@@ -1769,12 +1846,10 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 		return( -1 );
 	}
 #endif
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1782,24 +1857,25 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
-	}
-	else
-	{
-		result = libewf_single_file_entry_get_utf16_hash_value_sha1(
-			  single_file_entry,
-			  utf16_string,
-			  utf16_string_size,
-			  error );
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve hash value: SHA1.",
-			 function );
-		}
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf16_hash_value_sha1(
+		  single_file_entry,
+		  utf16_string,
+		  utf16_string_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value: SHA1.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1817,30 +1893,37 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Reads data at the current offset
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_file_entry_read_buffer(
-         libewf_file_entry_t *file_entry,
+ssize_t libewf_internal_file_entry_read_buffer_from_single_file_entry(
+         libewf_internal_file_entry_t *internal_file_entry,
+         libewf_single_file_entry_t *single_file_entry,
          void *buffer,
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	libewf_internal_file_entry_t *internal_file_entry = NULL;
-	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_read_buffer";
-	off64_t data_offset                               = 0;
-	off64_t duplicate_data_offset                     = 0;
-	size64_t data_size                                = 0;
-	size64_t size                                     = 0;
-	size_t read_size                                  = 0;
-	ssize_t read_count                                = 0;
-	uint32_t flags                                    = 0;
-	int result                                        = 0;
+	static char *function         = "libewf_internal_file_entry_read_buffer_from_single_file_entry";
+	off64_t data_offset           = 0;
+	off64_t duplicate_data_offset = 0;
+	size64_t data_size            = 0;
+	size64_t size                 = 0;
+	size_t read_size              = 0;
+	ssize_t read_count            = 0;
+	uint32_t flags                = 0;
 
-	if( file_entry == NULL )
+	if( internal_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1851,8 +1934,17 @@ ssize_t libewf_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+	if( internal_file_entry->offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid file entry - offset value out of bounds.",
+		 function );
 
+		return( -1 );
+	}
 	if( buffer == NULL )
 	{
 		libcerror_error_set(
@@ -1871,33 +1963,6 @@ ssize_t libewf_file_entry_read_buffer(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid buffer size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->offset < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid file entry - offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
@@ -2085,6 +2150,106 @@ ssize_t libewf_file_entry_read_buffer(
 	return( read_count );
 }
 
+/* Reads data at the current offset
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_file_entry_read_buffer(
+         libewf_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_read_buffer";
+	ssize_t read_count                                = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		goto on_error;
+	}
+	read_count = libewf_internal_file_entry_read_buffer_from_single_file_entry(
+		      internal_file_entry,
+		      single_file_entry,
+		      buffer,
+		      buffer_size,
+		      error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( read_count );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
+}
+
 /* Reads data at a specific offset
  * Returns the number of bytes read or -1 on error
  */
@@ -2095,14 +2260,61 @@ ssize_t libewf_file_entry_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_file_entry_read_buffer_at_offset";
-	ssize_t read_count    = 0;
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_read_buffer_at_offset";
+	ssize_t read_count                                = 0;
 
-	if( libewf_file_entry_seek_offset(
-	     file_entry,
-	     offset,
-	     SEEK_SET,
-	     error ) == -1 )
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		goto on_error;
+	}
+	offset = libewf_internal_file_entry_seek_offset_in_single_file_entry(
+	          internal_file_entry,
+	          single_file_entry,
+	          offset,
+	          SEEK_SET,
+	          error );
+
+	if( offset == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2111,15 +2323,16 @@ ssize_t libewf_file_entry_read_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	read_count = libewf_file_entry_read_buffer(
-	              file_entry,
-	              buffer,
-	              buffer_size,
-	              error );
+	read_count = libewf_internal_file_entry_read_buffer_from_single_file_entry(
+		      internal_file_entry,
+		      single_file_entry,
+		      buffer,
+		      buffer_size,
+		      error );
 
-	if( read_count <= -1 )
+	if( read_count == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2128,51 +2341,55 @@ ssize_t libewf_file_entry_read_buffer_at_offset(
 		 "%s: unable to read buffer.",
 		 function );
 
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( read_count );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Seeks a certain offset of the data
+ * This function is not multi-thread safe acquire write lock before call
  * Returns the offset if seek is successful or -1 on error
  */
-off64_t libewf_file_entry_seek_offset(
-         libewf_file_entry_t *file_entry,
+off64_t libewf_internal_file_entry_seek_offset_in_single_file_entry(
+         libewf_internal_file_entry_t *internal_file_entry,
+         libewf_single_file_entry_t *single_file_entry,
          off64_t offset,
          int whence,
          libcerror_error_t **error )
 {
-	libewf_internal_file_entry_t *internal_file_entry = NULL;
-	libewf_single_file_entry_t *single_file_entry     = NULL;
-	static char *function                             = "libewf_file_entry_seek_offset";
-	size64_t size                                     = 0;
-	int result                                        = 0;
+	static char *function = "libewf_internal_file_entry_seek_offset_in_single_file_entry";
+	size64_t size         = 0;
 
-	if( file_entry == NULL )
+	if( internal_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
-
-	result = libcdata_tree_node_get_value(
-	          internal_file_entry->file_entry_tree_node,
-	          (intptr_t **) &single_file_entry,
-	          error );
-
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
 		return( -1 );
@@ -2237,6 +2454,105 @@ off64_t libewf_file_entry_seek_offset(
 	return( offset );
 }
 
+/* Seeks a certain offset of the data
+ * Returns the offset if seek is successful or -1 on error
+ */
+off64_t libewf_file_entry_seek_offset(
+         libewf_file_entry_t *file_entry,
+         off64_t offset,
+         int whence,
+         libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function                             = "libewf_file_entry_seek_offset";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libcdata_tree_node_get_value(
+	     internal_file_entry->file_entry_tree_node,
+	     (intptr_t **) &single_file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value from file entry tree node.",
+		 function );
+
+		goto on_error;
+	}
+	offset = libewf_internal_file_entry_seek_offset_in_single_file_entry(
+	          internal_file_entry,
+	          single_file_entry,
+	          offset,
+	          whence,
+	          error );
+
+	if( offset == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( offset );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
+}
+
 /* Retrieves the current offset of the data
  * Returns the offset if successful or -1 on error
  */
@@ -2283,8 +2599,38 @@ int libewf_file_entry_get_offset(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*offset = internal_file_entry->offset;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -2298,6 +2644,7 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_get_number_of_sub_file_entries";
+	int result                                        = 0;
 
 	if( file_entry == NULL )
 	{
@@ -2312,10 +2659,27 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
-	if( libcdata_tree_node_get_number_of_sub_nodes(
-	     internal_file_entry->file_entry_tree_node,
-	     number_of_sub_file_entries,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libcdata_tree_node_get_number_of_sub_nodes(
+	          internal_file_entry->file_entry_tree_node,
+	          number_of_sub_file_entries,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2323,10 +2687,23 @@ int libewf_file_entry_get_number_of_sub_file_entries(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of sub file entries.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the sub file entry for the specific index
@@ -2388,6 +2765,21 @@ int libewf_file_entry_get_sub_file_entry(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libcdata_tree_node_get_sub_node_by_index(
 	     internal_file_entry->file_entry_tree_node,
              sub_file_entry_index,
@@ -2401,7 +2793,7 @@ int libewf_file_entry_get_sub_file_entry(
 		 "%s: unable to retrieve sub file entry tree node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( sub_node == NULL )
 	{
@@ -2412,7 +2804,7 @@ int libewf_file_entry_get_sub_file_entry(
 		 "%s: invalid sub node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_file_entry_initialize(
 	     sub_file_entry,
@@ -2427,9 +2819,32 @@ int libewf_file_entry_get_sub_file_entry(
 		 "%s: unable to initialize sub file entry.",
 		 function );
 
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for the specific UTF-8 encoded name
@@ -2494,6 +2909,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_single_file_tree_get_sub_node_by_utf8_name(
 	          internal_file_entry->file_entry_tree_node,
 	          utf8_string,
@@ -2511,7 +2941,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 		 "%s: unable to retrieve sub file entry by UTF-8 name.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
@@ -2528,10 +2958,33 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 			 "%s: unable to initialize sub file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for the specific UTF-8 encoded path
@@ -2613,6 +3066,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -2627,7 +3095,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( single_file_entry == NULL )
 	{
@@ -2638,7 +3106,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 		 "%s: missing file entry values.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	node = internal_file_entry->file_entry_tree_node;
 
@@ -2683,7 +3151,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 			 "%s: missing sub file entry name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		result = libewf_single_file_tree_get_sub_node_by_utf8_name(
 			  node,
@@ -2702,7 +3170,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 			 "%s: unable to retrieve sub node by name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -2725,10 +3193,33 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_path(
 			 "%s: unable to initialize sub file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for the specific UTF-16 encoded name
@@ -2793,6 +3284,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libewf_single_file_tree_get_sub_node_by_utf16_name(
 	          internal_file_entry->file_entry_tree_node,
 	          utf16_string,
@@ -2810,7 +3316,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 		 "%s: unable to retrieve sub file entry by UTF-16 name.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
@@ -2827,10 +3333,33 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 			 "%s: unable to initialize sub file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for the specific UTF-16 encoded path
@@ -2912,6 +3441,21 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libcdata_tree_node_get_value(
 	          internal_file_entry->file_entry_tree_node,
 	          (intptr_t **) &single_file_entry,
@@ -2926,7 +3470,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 		 "%s: unable to retrieve value from file entry tree node.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( single_file_entry == NULL )
 	{
@@ -2937,7 +3481,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 		 "%s: missing file entry values.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	node = internal_file_entry->file_entry_tree_node;
 
@@ -2982,7 +3526,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 			 "%s: missing sub file entry name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		result = libewf_single_file_tree_get_sub_node_by_utf16_name(
 			  node,
@@ -3001,7 +3545,7 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 			 "%s: unable to retrieve sub node by name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -3024,9 +3568,32 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 			 "%s: unable to initialize sub file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_file_entry->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 

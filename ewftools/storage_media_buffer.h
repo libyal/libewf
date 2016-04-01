@@ -45,6 +45,10 @@ struct storage_media_buffer
 	 */
 	uint8_t mode;
 
+	/* The storage media offset
+	 */
+	off64_t storage_media_offset;
+
 	/* The raw buffer
 	 */
 	uint8_t *raw_buffer;
@@ -90,6 +94,14 @@ struct storage_media_buffer
 	/* The checksum of the data within the buffer
 	 */
 	uint32_t checksum;
+
+	/* The requested size
+	 */
+	size_t requested_size;
+
+	/* The processed size
+	 */
+	size_t processed_size;
 };
 
 int storage_media_buffer_initialize(

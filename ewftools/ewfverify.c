@@ -44,6 +44,7 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "log_handle.h"
 #include "verification_handle.h"
@@ -165,6 +166,12 @@ int main( int argc, char * const argv[] )
 	uint8_t zero_chunk_on_error                                   = 0;
 	int number_of_filenames                                       = 0;
 	int result                                                    = 0;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	uint8_t use_multi_threading                                   = 1;
+#else
+	uint8_t use_multi_threading                                   = 0;
+#endif
 
 	libcnotify_stream_set(
 	 stderr,
@@ -294,11 +301,11 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 NULL );
 #endif
-
 	if( verification_handle_initialize(
 	     &ewfverify_verification_handle,
 	     calculate_md5,
 	     use_chunk_data_functions,
+	     use_multi_threading,
 	     &error ) != 1 )
 	{
 		fprintf(

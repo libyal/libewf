@@ -28,9 +28,11 @@
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libcnotify.h"
 #include "ewftools_libcpath.h"
 #include "ewftools_libcsplit.h"
 #include "ewftools_libcstring.h"
+#include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
 #include "log_handle.h"
@@ -50,6 +52,7 @@ int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
      uint8_t use_chunk_data_functions,
+     uint8_t use_multi_threading,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -198,12 +201,15 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-	( *verification_handle )->input_format             = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
-	( *verification_handle )->calculate_md5            = calculate_md5;
-	( *verification_handle )->use_chunk_data_functions = use_chunk_data_functions;
-	( *verification_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
-	( *verification_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *verification_handle )->notify_stream            = VERIFICATION_HANDLE_NOTIFY_STREAM;
+	( *verification_handle )->input_format                   = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
+	( *verification_handle )->calculate_md5                  = calculate_md5;
+	( *verification_handle )->use_chunk_data_functions       = use_chunk_data_functions;
+	( *verification_handle )->use_multi_threading            = use_multi_threading;
+	( *verification_handle )->number_of_threads              = 1;
+	( *verification_handle )->maximum_number_of_queued_items = 256;
+	( *verification_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
+	( *verification_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *verification_handle )->notify_stream                  = VERIFICATION_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -678,141 +684,17 @@ int verification_handle_close(
 	return( 0 );
 }
 
-/* Prepares a buffer after reading the input of the verification handle
- * Returns the resulting buffer size or -1 on error
- */
-ssize_t verification_handle_prepare_read_buffer(
-         verification_handle_t *verification_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error )
-{
-	static char *function = "verification_handle_prepare_read_buffer";
-	ssize_t process_count = 0;
-
-	if( verification_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
-
-		process_count = libewf_handle_prepare_read_chunk(
-		                 verification_handle->input_handle,
-		                 storage_media_buffer->compression_buffer,
-		                 storage_media_buffer->compression_buffer_data_size,
-		                 storage_media_buffer->raw_buffer,
-		                 &( storage_media_buffer->raw_buffer_data_size ),
-		                 storage_media_buffer->is_compressed,
-		                 storage_media_buffer->checksum,
-		                 storage_media_buffer->process_checksum,
-		                 error );
-
-		if( process_count == -1 )
-		{
-			libcerror_error_free(
-			 error );
-
-			/* Wipe the chunk if nescessary
-			 */
-			if( verification_handle->zero_chunk_on_error != 0 )
-			{
-				if( ( storage_media_buffer->is_compressed != 0 )
-				 && ( memory_set(
-				       storage_media_buffer->raw_buffer,
-				       0,
-				       storage_media_buffer->raw_buffer_size ) == NULL ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to zero raw buffer.",
-					 function );
-
-					return( -1 );
-				}
-				if( memory_set(
-				     storage_media_buffer->compression_buffer,
-				     0,
-				     storage_media_buffer->compression_buffer_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to zero compression buffer.",
-					 function );
-
-					return( -1 );
-				}
-			}
-			process_count = verification_handle->chunk_size;
-
-			/* Append a read error
-			 */
-			if( verification_handle_append_read_error(
-			     verification_handle,
-			     verification_handle->last_offset_read,
-			     process_count,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append read error.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		if( storage_media_buffer->is_compressed == 0 )
-		{
-			storage_media_buffer->data_in_compression_buffer = 1;
-		}
-		else
-		{
-			storage_media_buffer->data_in_compression_buffer = 0;
-		}
-	}
-	else
-	{
-		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
-	}
-	verification_handle->last_offset_read += process_count;
-
-	return( process_count );
-}
-
-/* Reads a buffer from the input of the verification handle
+/* Reads a storage media buffer from the input of the verification handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t verification_handle_read_buffer(
+ssize_t verification_handle_read_storage_media_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error )
 {
-	static char *function = "verification_handle_read_buffer";
+	static char *function = "verification_handle_read_storage_media_buffer";
 	ssize_t read_count    = 0;
 
 	if( verification_handle == NULL )
@@ -868,6 +750,9 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
+	storage_media_buffer->storage_media_offset = storage_media_offset;
+	storage_media_buffer->requested_size       = read_size;
+
 	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
 		storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
@@ -877,6 +762,159 @@ ssize_t verification_handle_read_buffer(
 		storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
 	}
 	return( read_count );
+}
+
+/* Processes a storage media buffer for verification
+ * Returns the resulting buffer size or -1 on error
+ */
+ssize_t verification_handle_process_storage_media_buffer(
+         verification_handle_t *verification_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         libcerror_error_t **error )
+{
+        static char *function = "verification_handle_process_storage_media_buffer";
+	ssize_t process_count = 0;
+
+	if( verification_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		storage_media_buffer->raw_buffer_data_size = storage_media_buffer->raw_buffer_size;
+
+		process_count = libewf_handle_prepare_read_chunk(
+		                 verification_handle->input_handle,
+		                 storage_media_buffer->compression_buffer,
+		                 storage_media_buffer->compression_buffer_data_size,
+		                 storage_media_buffer->raw_buffer,
+		                 &( storage_media_buffer->raw_buffer_data_size ),
+		                 storage_media_buffer->is_compressed,
+		                 storage_media_buffer->checksum,
+		                 storage_media_buffer->process_checksum,
+		                 error );
+
+		if( process_count < 0 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( ( libcnotify_verbose != 0 )
+			 && ( error != NULL ) )
+			{
+				libcnotify_print_error_backtrace(
+				 *error );
+			}
+#endif
+			libcerror_error_free(
+			 error );
+
+			/* Wipe the chunk if nescessary
+			 */
+			if( verification_handle->zero_chunk_on_error != 0 )
+			{
+				if( ( storage_media_buffer->is_compressed != 0 )
+				 && ( memory_set(
+				       storage_media_buffer->raw_buffer,
+				       0,
+				       storage_media_buffer->raw_buffer_size ) == NULL ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero raw buffer.",
+					 function );
+
+					return( -1 );
+				}
+				if( memory_set(
+				     storage_media_buffer->compression_buffer,
+				     0,
+				     storage_media_buffer->compression_buffer_size ) == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to zero compression buffer.",
+					 function );
+
+					return( -1 );
+				}
+			}
+			process_count = verification_handle->chunk_size;
+
+			/* Append a read error
+			 */
+			if( verification_handle_append_read_error(
+			     verification_handle,
+			     storage_media_buffer->storage_media_offset,
+			     process_count,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append read error.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		if( process_count > (ssize_t) storage_media_buffer->requested_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: more bytes read than requested.",
+			 function );
+
+			return( -1 );
+		}
+		if( storage_media_buffer->is_compressed == 0 )
+		{
+			storage_media_buffer->data_in_compression_buffer = 1;
+		}
+		else
+		{
+			storage_media_buffer->data_in_compression_buffer = 0;
+		}
+	}
+	else
+	{
+		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
+	}
+	storage_media_buffer->processed_size = (size_t) process_count;
+
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		/* Set the chunk data size in the compression buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			storage_media_buffer->compression_buffer_data_size = (ssize_t) process_count;
+		}
+	}
+	return( process_count );
 }
 
 /* Initializes the integrity hash(es)
@@ -1271,6 +1309,226 @@ int verification_handle_finalize_integrity_hash(
 	return( 1 );
 }
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+/* Prepares a storage media buffer for verification
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     verification_handle_t *verification_handle )
+{
+        libcerror_error_t *error = NULL;
+        static char *function    = "verification_handle_process_storage_media_buffer_callback";
+	ssize_t process_count    = 0;
+
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	process_count = verification_handle_process_storage_media_buffer(
+			 verification_handle,
+			 storage_media_buffer,
+			 &error );
+
+	if( process_count < 0 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to process storage media buffer after read.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_pool_push(
+	     verification_handle->output_thread_pool,
+	     (intptr_t *) storage_media_buffer,
+	     &error ) == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to push storage media buffer onto output thread pool queue.",
+		 function );
+
+		goto on_error;
+	}
+	storage_media_buffer = NULL;
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Prepares a storage media buffer for verification
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     verification_handle_t *verification_handle )
+{
+        libcerror_error_t *error = NULL;
+	uint8_t *data            = NULL;
+        static char *function    = "verification_handle_process_storage_media_buffer_callback";
+	size_t data_size         = 0;
+
+	if( verification_handle == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( storage_media_buffer->storage_media_offset != verification_handle->last_offset_hashed )
+	{
+		if( libcthreads_thread_pool_push(
+		     verification_handle->output_thread_pool,
+		     (intptr_t *) storage_media_buffer,
+		     &error ) == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to push storage media buffer onto output thread pool queue.",
+			 function );
+
+			goto on_error;
+		}
+		return( 1 );
+	}
+	if( storage_media_buffer_get_data(
+	     storage_media_buffer,
+	     &data,
+	     &data_size,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine storage media buffer data.",
+		 function );
+
+		goto on_error;
+	}
+	if( verification_handle_update_integrity_hash(
+	     verification_handle,
+	     data,
+	     storage_media_buffer->processed_size,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to update integrity hash(es).",
+		 function );
+
+		goto on_error;
+	}
+	verification_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+
+	if( storage_media_buffer_free(
+	     &storage_media_buffer,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_update(
+	     verification_handle->process_status,
+	     verification_handle->last_offset_hashed,
+	     verification_handle->media_size,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to update process status.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 /* Verifies the input
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -1280,12 +1538,11 @@ int verification_handle_verify_input(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	uint8_t *data                                = NULL;
 	static char *function                        = "verification_handle_verify_input";
-	size64_t media_size                          = 0;
-	size64_t verify_count                        = 0;
+	off64_t storage_media_offset                 = 0;
+	size64_t remaining_media_size                = 0;
 	size_t data_size                             = 0;
 	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
@@ -1343,9 +1600,22 @@ int verification_handle_verify_input(
 
 		return( -1 );
 	}
+#if !defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( verification_handle->use_multi_threading != 0 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: multi-threading not supported.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libewf_handle_get_media_size(
 	     verification_handle->input_handle,
-	     &media_size,
+	     &( verification_handle->media_size ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1374,21 +1644,47 @@ int verification_handle_verify_input(
 		}
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_BUFFERED;
 	}
-	if( storage_media_buffer_initialize(
-	     &storage_media_buffer,
-	     storage_media_buffer_mode,
-	     process_buffer_size,
-	     error ) != 1 )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( verification_handle->use_multi_threading != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create storage media buffer.",
-		 function );
+		if( libcthreads_thread_pool_create(
+		     &( verification_handle->process_thread_pool ),
+		     NULL,
+		     verification_handle->number_of_threads,
+		     verification_handle->maximum_number_of_queued_items,
+		     (int (*)(intptr_t *, void *)) &verification_handle_process_storage_media_buffer_callback,
+		     (void *) verification_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize process thread pool.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		if( libcthreads_thread_pool_create(
+		     &( verification_handle->output_thread_pool ),
+		     NULL,
+		     1,
+		     verification_handle->maximum_number_of_queued_items,
+		     (int (*)(intptr_t *, void *)) &verification_handle_output_storage_media_buffer_callback,
+		     (void *) verification_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize output thread pool.",
+			 function );
+
+			goto on_error;
+		}
 	}
+#endif
 	if( verification_handle_initialize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -1403,7 +1699,7 @@ int verification_handle_verify_input(
 		goto on_error;
 	}
 	if( process_status_initialize(
-	     &process_status,
+	     &( verification_handle->process_status ),
 	     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
 	     _LIBCSTRING_SYSTEM_STRING( "verified" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Read" ),
@@ -1421,7 +1717,7 @@ int verification_handle_verify_input(
 		goto on_error;
 	}
 	if( process_status_start(
-	     process_status,
+	     verification_handle->process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1433,17 +1729,42 @@ int verification_handle_verify_input(
 
 		goto on_error;
 	}
-	while( verify_count < media_size )
+	remaining_media_size = verification_handle->media_size;
+
+	while( remaining_media_size > 0 )
 	{
+		if( verification_handle->abort != 0 )
+		{
+			break;
+		}
+		if( storage_media_buffer == NULL )
+		{
+			if( storage_media_buffer_initialize(
+			     &storage_media_buffer,
+			     storage_media_buffer_mode,
+			     process_buffer_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create storage media buffer.",
+				 function );
+
+				goto on_error;
+			}
+		}
 		read_size = process_buffer_size;
 
-		if( ( media_size - verify_count ) < read_size )
+		if( remaining_media_size < read_size )
 		{
-			read_size = (size_t) ( media_size - verify_count );
+			read_size = (size_t) remaining_media_size;
 		}
-		read_count = verification_handle_read_buffer(
+		read_count = verification_handle_read_storage_media_buffer(
 		              verification_handle,
 		              storage_media_buffer,
+		              storage_media_offset,
 		              read_size,
 		              error );
 
@@ -1469,44 +1790,47 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
-		process_count = verification_handle_prepare_read_buffer(
+		storage_media_offset += (off64_t) read_size;
+		remaining_media_size -= (size64_t) read_size;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+		if( verification_handle->use_multi_threading != 0 )
+		{
+			if( libcthreads_thread_pool_push(
+			     verification_handle->process_thread_pool,
+			     (intptr_t *) storage_media_buffer,
+			     error ) == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to push storage media buffer onto process thread pool queue.",
+				 function );
+
+				goto on_error;
+			}
+			storage_media_buffer = NULL;
+
+			continue;
+		}
+#endif
+		process_count = verification_handle_process_storage_media_buffer(
 		                 verification_handle,
 		                 storage_media_buffer,
 		                 error );
 
-		if( process_count < 0 )
+		if( process_count <= 0 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer after read.",
+			 "%s: unable to process storage media buffer after read.",
 			 function );
 
 			goto on_error;
 		}
-		if( process_count > (ssize_t) read_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.",
-			 function );
-
-			goto on_error;
-		}
-		if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-		{
-			/* Set the chunk data size in the compression buffer
-			 */
-			if( storage_media_buffer->data_in_compression_buffer == 1 )
-			{
-				storage_media_buffer->compression_buffer_data_size = (ssize_t) process_count;
-			}
-		}
-		verify_count += (size64_t) process_count;
-
 		if( storage_media_buffer_get_data(
 		     storage_media_buffer,
 		     &data,
@@ -1525,7 +1849,7 @@ int verification_handle_verify_input(
 		if( verification_handle_update_integrity_hash(
 		     verification_handle,
 		     data,
-		     process_count,
+		     storage_media_buffer->processed_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1537,10 +1861,12 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
+		verification_handle->last_offset_hashed += (off64_t) process_count;
+
 		if( process_status_update(
-		     process_status,
-		     verify_count,
-		     media_size,
+		     verification_handle->process_status,
+		     verification_handle->last_offset_hashed,
+		     verification_handle->media_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1552,24 +1878,54 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
-		if( verification_handle->abort != 0 )
-		{
-			break;
-		}
   	}
-	if( storage_media_buffer_free(
-	     &storage_media_buffer,
-	     error ) != 1 )
+	if( storage_media_buffer != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free storage media buffer.",
-		 function );
+		if( storage_media_buffer_free(
+		     &storage_media_buffer,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free storage media buffer.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( verification_handle->use_multi_threading != 0 )
+	{
+		if( libcthreads_thread_pool_join(
+		     &( verification_handle->process_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join process thread pool.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcthreads_thread_pool_join(
+		     &( verification_handle->output_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join output thread pool.",
+			 function );
+
+			goto on_error;
+		}
+	}
+#endif
 	if( verification_handle_finalize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -1601,8 +1957,8 @@ int verification_handle_verify_input(
 		status = PROCESS_STATUS_ABORTED;
 	}
 	if( process_status_stop(
-	     process_status,
-	     verify_count,
+	     verification_handle->process_status,
+	     verification_handle->last_offset_hashed,
 	     status,
 	     error ) != 1 )
 	{
@@ -1616,7 +1972,7 @@ int verification_handle_verify_input(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &process_status,
+	     &( verification_handle->process_status ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1792,23 +2148,37 @@ int verification_handle_verify_input(
 	return( 0 );
 
 on_error:
-	if( process_status != NULL )
-	{
-		process_status_stop(
-		 process_status,
-		 verify_count,
-		 PROCESS_STATUS_FAILED,
-		 NULL );
-		process_status_free(
-		 &process_status,
-		 NULL );
-	}
 	if( storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
 		 &storage_media_buffer,
 		 NULL );
 	}
+	if( verification_handle->process_status != NULL )
+	{
+		process_status_stop(
+		 verification_handle->process_status,
+		 verification_handle->last_offset_hashed,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &( verification_handle->process_status ),
+		 NULL );
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( verification_handle->process_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( verification_handle->process_thread_pool ),
+		 NULL );
+	}
+	if( verification_handle->output_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( verification_handle->output_thread_pool ),
+		 NULL );
+	}
+#endif
 	return( -1 );
 }
 
@@ -1822,7 +2192,6 @@ int verification_handle_verify_single_files(
      libcerror_error_t **error )
 {
 	libewf_file_entry_t *file_entry    = NULL;
-	process_status_t *process_status   = NULL;
 	static char *function              = "verification_handle_verify_single_files";
 	uint32_t number_of_checksum_errors = 0;
 	int result                         = 0;
@@ -1853,7 +2222,7 @@ int verification_handle_verify_single_files(
 		goto on_error;
 	}
 	if( process_status_initialize(
-	     &process_status,
+	     &( verification_handle->process_status ),
 	     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
 	     _LIBCSTRING_SYSTEM_STRING( "verified" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Read" ),
@@ -1871,7 +2240,7 @@ int verification_handle_verify_single_files(
 		goto on_error;
 	}
 	if( process_status_start(
-	     process_status,
+	     verification_handle->process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1903,7 +2272,7 @@ int verification_handle_verify_single_files(
 		goto on_error;
 	}
 	if( process_status_stop(
-	     process_status,
+	     verification_handle->process_status,
 	     0,
 	     PROCESS_STATUS_COMPLETED,
 	     error ) != 1 )
@@ -1918,7 +2287,7 @@ int verification_handle_verify_single_files(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &process_status,
+	     &( verification_handle->process_status ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1965,15 +2334,15 @@ int verification_handle_verify_single_files(
 	return( 0 );
 
 on_error:
-	if( process_status != NULL )
+	if( verification_handle->process_status != NULL )
 	{
 		process_status_stop(
-		 process_status,
+		 verification_handle->process_status,
 		 0,
 		 PROCESS_STATUS_FAILED,
 		 NULL );
 		process_status_free(
-		 &process_status,
+		 &( verification_handle->process_status ),
 		 NULL );
 	}
 	if( file_entry != NULL )

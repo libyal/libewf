@@ -112,7 +112,7 @@ struct device_handle
 	 */
 	uint8_t zero_buffer_on_error;
 
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
 };

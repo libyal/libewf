@@ -23,9 +23,7 @@ Threat safety
  - add lock libewf_handle_append_track
  - libewf_handle_copy_header_values (write lock)
  - write lock libewf_handle_get_ ... _hash_values
-* libewf_file_entry
-  - libewf_file_entry_read_buffer and beyond
-  - TODO
+ - use on_error (continue from libewf_handle_get_compression_method)
 
 Tests:
 * extend ewf_test_handle_get_values with
@@ -424,7 +422,8 @@ Tools:
   - Windows add ImDisk implementation ?
   - MacOS native API support ?
 * ewfverify
-  - allow for multi stage verification, where user suspends and resumes
+  - allow for multi stage verification, where user suspends and resumes?
+  - for multi threading measure: number of items queued, number of items requeued
 * process status
   - improve and remove "This could take a while." ?
 * libsystem path implement GetVolumeInformation
@@ -469,6 +468,7 @@ Closed:
 20160041
 * worked on tests
 * worked on thread locking support
+* worked on multi threading support in ewfverify
 
 20160331
 * worked on tests

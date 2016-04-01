@@ -1008,7 +1008,6 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-/* TODO implement thread support
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( ewf_test_read_from_handle_multi_thread(
 	     handle,
@@ -1022,7 +1021,6 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-*/
 	/* Clean up
 	 */
 	if( libewf_handle_close(

@@ -56,7 +56,7 @@ struct mount_handle
 	 */
 	libewf_file_entry_t *root_file_entry;
 
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
 };

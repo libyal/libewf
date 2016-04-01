@@ -561,7 +561,7 @@ int ewfacquire_process_storage_media_buffer(
      void *arguments LIBCSYSTEM_ATTRIBUTE_UNUSED )
 {
         libcerror_error_t *error = NULL;
-        static char *function    = "cthreads_test_thread_pool_callback_function";
+        static char *function    = "ewfacquire_process_storage_media_buffer";
         int result               = 0;
 
 	LIBCSYSTEM_UNREFERENCED_PARAMETER( arguments )
@@ -582,8 +582,8 @@ int ewfacquire_read_input(
      off64_t resume_acquiry_offset,
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
-     uint8_t use_multi_threading,
      uint8_t use_chunk_data_functions,
+     uint8_t use_multi_threading,
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
@@ -777,8 +777,7 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( ( use_multi_threading != 0 )
-	 || ( use_chunk_data_functions != 0 ) )
+	if( use_chunk_data_functions != 0 )
 	{
 		process_buffer_size       = (size_t) chunk_size;
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
@@ -812,7 +811,7 @@ int ewfacquire_read_input(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize integrity hash(es).",
+			 "%s: unable to initialize thread pool.",
 			 function );
 
 			goto on_error;
@@ -1322,12 +1321,6 @@ int ewfacquire_read_input(
 	return( 1 );
 
 on_error:
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
-	}
 	if( process_status != NULL )
 	{
 		process_status_stop(
@@ -1337,6 +1330,20 @@ on_error:
 		 NULL );
 		process_status_free(
 		 &process_status,
+		 NULL );
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( process_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &process_thread_pool,
+		 NULL );
+	}
+#endif
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
 		 NULL );
 	}
 	return( -1 );
@@ -2972,8 +2979,8 @@ int main( int argc, char * const argv[] )
 		  resume_acquiry_offset,
 		  swap_byte_pairs,
 		  print_status_information,
-	          use_multi_threading,
 	          use_chunk_data_functions,
+	          use_multi_threading,
 		  log_handle,
 		  &error );
 

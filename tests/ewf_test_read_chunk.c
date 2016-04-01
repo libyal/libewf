@@ -37,6 +37,8 @@
 #define EWF_TEST_READ_VERBOSE
  */
 
+#define EWF_TEST_READ_CHUNK_NUMBER_OF_THREADS	4
+
 /* Tests libewf_handle_get_offset
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -787,12 +789,12 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-/* TODO implement thread support
+/* TODO implement
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( ewf_test_read_chunk_from_handle_multi_thread(
 	     handle,
 	     media_size,
-	     EWF_TEST_READ_NUMBER_OF_THREADS ) != 1 )
+	     EWF_TEST_READ_CHUNK_NUMBER_OF_THREADS ) != 1 )
 	{
 		fprintf(
 		 stderr,

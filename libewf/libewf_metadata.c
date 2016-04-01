@@ -49,7 +49,6 @@ int libewf_handle_get_sectors_per_chunk(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_sectors_per_chunk";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -110,12 +109,10 @@ int libewf_handle_get_sectors_per_chunk(
 		 "%s: invalid sectors per chunk value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*sectors_per_chunk = internal_handle->media_values->sectors_per_chunk;
-	}
+	*sectors_per_chunk = internal_handle->media_values->sectors_per_chunk;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -131,7 +128,15 @@ int libewf_handle_get_sectors_per_chunk(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the number of sectors per chunk
@@ -144,7 +149,6 @@ int libewf_handle_set_sectors_per_chunk(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_sectors_per_chunk";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -196,26 +200,23 @@ int libewf_handle_set_sectors_per_chunk(
 		 "%s: sectors per chunk cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     sectors_per_chunk,
+	     internal_handle->media_values->bytes_per_sector,
+	     internal_handle->media_values->media_size,
+	     error ) != 1 )
 	{
-		result = libewf_internal_handle_set_media_values(
-		          internal_handle,
-		          sectors_per_chunk,
-		          internal_handle->media_values->bytes_per_sector,
-		          internal_handle->media_values->media_size,
-		          error );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.",
+		 function );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set media values.",
-			 function );
-		}
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -232,7 +233,15 @@ int libewf_handle_set_sectors_per_chunk(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the number of bytes per sector
@@ -245,7 +254,6 @@ int libewf_handle_get_bytes_per_sector(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_bytes_per_sector";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -306,12 +314,10 @@ int libewf_handle_get_bytes_per_sector(
 		 "%s: invalid bytes per sector value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*bytes_per_sector = internal_handle->media_values->bytes_per_sector;
-	}
+	*bytes_per_sector = internal_handle->media_values->bytes_per_sector;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -327,7 +333,15 @@ int libewf_handle_get_bytes_per_sector(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the number of bytes per sector
@@ -340,7 +354,6 @@ int libewf_handle_set_bytes_per_sector(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_bytes_per_sector";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -392,26 +405,23 @@ int libewf_handle_set_bytes_per_sector(
 		 "%s: bytes per sector cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     internal_handle->media_values->sectors_per_chunk,
+	     bytes_per_sector,
+	     internal_handle->media_values->media_size,
+	     error ) != 1 )
 	{
-		result = libewf_internal_handle_set_media_values(
-		          internal_handle,
-		          internal_handle->media_values->sectors_per_chunk,
-		          bytes_per_sector,
-		          internal_handle->media_values->media_size,
-		          error );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.",
+		 function );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set media values.",
-			 function );
-		}
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -428,7 +438,15 @@ int libewf_handle_set_bytes_per_sector(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the number of sectors
@@ -441,7 +459,6 @@ int libewf_handle_get_number_of_sectors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_sectors";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -502,12 +519,10 @@ int libewf_handle_get_number_of_sectors(
 		 "%s: invalid number of sectors value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*number_of_sectors = internal_handle->media_values->number_of_sectors;
-	}
+	*number_of_sectors = internal_handle->media_values->number_of_sectors;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -523,7 +538,15 @@ int libewf_handle_get_number_of_sectors(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the chunk size
@@ -536,7 +559,6 @@ int libewf_handle_get_chunk_size(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_chunk_size";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -597,12 +619,10 @@ int libewf_handle_get_chunk_size(
 		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*chunk_size = internal_handle->media_values->chunk_size;
-	}
+	*chunk_size = internal_handle->media_values->chunk_size;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -618,7 +638,15 @@ int libewf_handle_get_chunk_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the error granularity
@@ -631,7 +659,6 @@ int libewf_handle_get_error_granularity(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_error_granularity";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -692,12 +719,10 @@ int libewf_handle_get_error_granularity(
 		 "%s: invalid error granularity value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*error_granularity = internal_handle->media_values->error_granularity;
-	}
+	*error_granularity = internal_handle->media_values->error_granularity;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -713,7 +738,15 @@ int libewf_handle_get_error_granularity(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the error granularity
@@ -726,7 +759,6 @@ int libewf_handle_set_error_granularity(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_error_granularity";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -777,12 +809,10 @@ int libewf_handle_set_error_granularity(
 		 "%s: error granularity cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		internal_handle->media_values->error_granularity = error_granularity;
-	}
+	internal_handle->media_values->error_granularity = error_granularity;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
@@ -798,7 +828,15 @@ int libewf_handle_set_error_granularity(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the compression method

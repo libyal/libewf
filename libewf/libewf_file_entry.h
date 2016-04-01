@@ -189,6 +189,13 @@ int libewf_file_entry_get_utf16_hash_value_sha1(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
+ssize_t libewf_internal_file_entry_read_buffer_from_single_file_entry(
+         libewf_internal_file_entry_t *internal_file_entry,
+         libewf_single_file_entry_t *single_file_entry,
+         void *buffer,
+         size_t buffer_size,
+         libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 ssize_t libewf_file_entry_read_buffer(
          libewf_file_entry_t *file_entry,
@@ -202,6 +209,13 @@ ssize_t libewf_file_entry_read_buffer_at_offset(
          void *buffer,
          size_t buffer_size,
          off64_t offset,
+         libcerror_error_t **error );
+
+off64_t libewf_internal_file_entry_seek_offset_in_single_file_entry(
+         libewf_internal_file_entry_t *internal_file_entry,
+         libewf_single_file_entry_t *single_file_entry,
+         off64_t offset,
+         int whence,
          libcerror_error_t **error );
 
 LIBEWF_EXTERN \
