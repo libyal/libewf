@@ -175,20 +175,22 @@ int imaging_handle_initialize(
 			goto on_error;
 		}
 	}
-	( *imaging_handle )->calculate_md5            = calculate_md5;
-	( *imaging_handle )->use_chunk_data_functions = use_chunk_data_functions;
-	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
-	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
-	( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
-	( *imaging_handle )->media_flags              = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	( *imaging_handle )->bytes_per_sector         = 512;
-	( *imaging_handle )->sectors_per_chunk        = 64;
-	( *imaging_handle )->sector_error_granularity = 64;
-	( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-	( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
-	( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
+	( *imaging_handle )->calculate_md5                  = calculate_md5;
+	( *imaging_handle )->use_chunk_data_functions       = use_chunk_data_functions;
+	( *imaging_handle )->compression_method             = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	( *imaging_handle )->compression_level              = LIBEWF_COMPRESSION_NONE;
+	( *imaging_handle )->ewf_format                     = LIBEWF_FORMAT_ENCASE6;
+	( *imaging_handle )->media_type                     = LIBEWF_MEDIA_TYPE_FIXED;
+	( *imaging_handle )->media_flags                    = LIBEWF_MEDIA_FLAG_PHYSICAL;
+	( *imaging_handle )->bytes_per_sector               = 512;
+	( *imaging_handle )->sectors_per_chunk              = 64;
+	( *imaging_handle )->sector_error_granularity       = 64;
+	( *imaging_handle )->maximum_segment_size           = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+	( *imaging_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
+	( *imaging_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *imaging_handle )->number_of_threads              = 4;
+	( *imaging_handle )->maximum_number_of_queued_items = 256;
+	( *imaging_handle )->notify_stream                  = IMAGING_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -1013,15 +1015,15 @@ ssize_t imaging_handle_read_buffer(
 	return( read_count );
 }
 
-/* Prepares a buffer before writing the output of the imaging handle
+/* Prepares a storage media buffer before writing the output of the imaging handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t imaging_handle_prepare_write_buffer(
+ssize_t imaging_handle_prepare_write_storage_media_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error )
 {
-	static char *function = "imaging_handle_prepare_write_buffer";
+	static char *function = "imaging_handle_prepare_write_storage_media_buffer";
 	ssize_t process_count = 0;
 
 	if( imaging_handle == NULL )
@@ -1061,7 +1063,7 @@ ssize_t imaging_handle_prepare_write_buffer(
 		                 &( storage_media_buffer->process_checksum ),
 		                 error );
 
-		if( process_count == -1 )
+		if( process_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1077,13 +1079,15 @@ ssize_t imaging_handle_prepare_write_buffer(
 	{
 		process_count = storage_media_buffer->raw_buffer_data_size;
 	}
+	storage_media_buffer->processed_size = (size_t) process_count;
+
 	return( process_count );
 }
 
-/* Writes a buffer to the output of the imaging handle
+/* Writes a storage media buffer to the output of the imaging handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t imaging_handle_write_buffer(
+ssize_t imaging_handle_write_storage_media_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
@@ -1790,6 +1794,297 @@ int imaging_handle_finalize_integrity_hash(
 	}
 	return( 1 );
 }
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+/* Prepares a storage media buffer for imaging
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     imaging_handle_t *imaging_handle )
+{
+        libcerror_error_t *error = NULL;
+        static char *function    = "imaging_handle_process_storage_media_buffer_callback";
+	ssize_t process_count    = 0;
+
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	process_count = imaging_handle_prepare_write_storage_media_buffer(
+			 imaging_handle,
+			 storage_media_buffer,
+			 &error );
+
+	if( process_count < 0 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to prepare storage media buffer before write.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_pool_push_sorted(
+	     imaging_handle->output_thread_pool,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
+	     &error ) == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to push storage media buffer onto output thread pool queue.",
+		 function );
+
+		goto on_error;
+	}
+	storage_media_buffer = NULL;
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Prepares a storage media buffer for imaging
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     imaging_handle_t *imaging_handle )
+{
+	libcdata_list_element_t *element      = NULL;
+	libcdata_list_element_t *next_element = NULL;
+        libcerror_error_t *error              = NULL;
+	uint8_t *data                         = NULL;
+        static char *function                 = "imaging_handle_process_storage_media_buffer_callback";
+	size_t data_size                      = 0;
+	ssize_t write_count                   = 0;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_list_insert_value(
+	     imaging_handle->output_list,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
+	     &error ) == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to insert storage media buffer into output list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_list_get_first_element(
+	     imaging_handle->output_list,
+	     &element,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first element.",
+		 function );
+
+		goto on_error;
+	}
+	while( element != NULL )
+	{
+		if( libcdata_list_element_get_value(
+		     element,
+		     (intptr_t **) &storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from list element.",
+			 function );
+
+			goto on_error;
+		}
+		if( storage_media_buffer->storage_media_offset != imaging_handle->last_offset_written )
+		{
+			break;
+		}
+		if( storage_media_buffer_get_data(
+		     storage_media_buffer,
+		     &data,
+		     &data_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine storage media buffer data.",
+			 function );
+
+			goto on_error;
+		}
+		write_count = imaging_handle_write_storage_media_buffer(
+			       imaging_handle,
+			       storage_media_buffer,
+			       storage_media_buffer->processed_size,
+			       &error );
+
+		if( write_count < 0 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write storage media buffer.",
+			 function );
+
+			goto on_error;
+		}
+		imaging_handle->last_offset_written = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+
+		if( libcdata_list_element_get_next_element(
+		     element,
+		     &next_element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next list element.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_remove_element(
+		     imaging_handle->output_list,
+		     element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to remove list element from output list.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_element_free(
+		     &element,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free list element.",
+			 function );
+
+			goto on_error;
+		}
+		element = next_element;
+
+		if( process_status_update(
+		     imaging_handle->process_status,
+		     imaging_handle->last_offset_written,
+		     imaging_handle->acquiry_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 /* Retrieves the chunk size
  * Returns 1 if successful or -1 on error

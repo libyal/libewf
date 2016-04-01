@@ -47,6 +47,7 @@ ewfacquire_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libbfio.h \
+	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
@@ -84,6 +85,7 @@ ewfacquire_LDADD = \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
@@ -338,6 +340,7 @@ ewfverify_SOURCES = \
 	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewftools_libbfio.h \
+	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
@@ -369,6 +372,7 @@ ewfverify_LDADD = \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \

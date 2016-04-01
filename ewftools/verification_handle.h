@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "digest_hash.h"
+#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
@@ -158,6 +159,10 @@ struct verification_handle
 	/* The output thread pool
 	 */
 	libcthreads_thread_pool_t *output_thread_pool;
+
+	/* The output list
+	 */
+	libcdata_list_t *output_list;
 
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

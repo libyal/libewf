@@ -26,11 +26,13 @@
 #include <file_stream.h>
 #include <types.h>
 
+#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
+#include "process_status.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -227,6 +229,10 @@ struct imaging_handle
 	 */
 	libcthreads_thread_pool_t *output_thread_pool;
 
+	/* The output list
+	 */
+	libcdata_list_t *output_list;
+
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 	/* The libewf output handle
@@ -241,9 +247,17 @@ struct imaging_handle
 	 */
 	size64_t input_media_size;
 
+	/* The last offset written
+	 */
+	off64_t last_offset_written;
+
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
+
+	/* The process status information
+	 */
+	process_status_t *process_status;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -291,12 +305,12 @@ ssize_t imaging_handle_read_buffer(
          size_t read_size,
          libcerror_error_t **error );
 
-ssize_t imaging_handle_prepare_write_buffer(
+ssize_t imaging_handle_prepare_write_storage_media_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error );
 
-ssize_t imaging_handle_write_buffer(
+ssize_t imaging_handle_write_storage_media_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
@@ -331,6 +345,18 @@ int imaging_handle_update_integrity_hash(
 int imaging_handle_finalize_integrity_hash(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+int imaging_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     imaging_handle_t *imaging_handle );
+
+int imaging_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     imaging_handle_t *imaging_handle );
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int imaging_handle_get_chunk_size(
      imaging_handle_t *imaging_handle,

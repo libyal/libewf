@@ -868,38 +868,8 @@ int libewf_handle_signal_abort(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	internal_handle->io_handle->abort = 1;
 
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	return( 1 );
 }
 

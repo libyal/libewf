@@ -160,9 +160,10 @@ int device_handle_close(
      device_handle_t *device_handle,
      libcerror_error_t **error );
 
-ssize_t device_handle_read_buffer(
+ssize_t device_handle_read_storage_media_buffer(
          device_handle_t *device_handle,
-         uint8_t *buffer,
+         storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error );
 

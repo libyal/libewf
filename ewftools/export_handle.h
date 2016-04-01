@@ -33,6 +33,7 @@
 #include "ewftools_libhmac.h"
 #include "ewftools_libsmraw.h"
 #include "log_handle.h"
+#include "process_status.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -221,6 +222,10 @@ struct export_handle
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
+
+	/* The process status information
+	 */
+	process_status_t *process_status;
 
 	/* Value to indicate if abort was signalled
 	 */

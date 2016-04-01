@@ -27,6 +27,7 @@
 #include "digest_hash.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
+#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcpath.h"
@@ -203,10 +204,10 @@ int verification_handle_initialize(
 	( *verification_handle )->input_format                   = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
 	( *verification_handle )->calculate_md5                  = calculate_md5;
 	( *verification_handle )->use_chunk_data_functions       = use_chunk_data_functions;
-	( *verification_handle )->number_of_threads              = 4;
-	( *verification_handle )->maximum_number_of_queued_items = 256;
 	( *verification_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
 	( *verification_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *verification_handle )->number_of_threads              = 4;
+	( *verification_handle )->maximum_number_of_queued_items = 256;
 	( *verification_handle )->notify_stream                  = VERIFICATION_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
@@ -737,7 +738,7 @@ ssize_t verification_handle_read_storage_media_buffer(
 	                      read_size,
 		              error );
 	}
-	if( read_count == -1 )
+	if( read_count < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1348,10 +1349,18 @@ int verification_handle_process_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	if( libcthreads_thread_pool_push_sorted(
+	     verification_handle->output_thread_pool,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
+	     &error ) == -1 )
+/* TODO
 	if( libcthreads_thread_pool_push(
 	     verification_handle->output_thread_pool,
 	     (intptr_t *) storage_media_buffer,
 	     &error ) == -1 )
+*/
 	{
 		libcerror_error_set(
 		 &error,
@@ -1396,10 +1405,12 @@ int verification_handle_output_storage_media_buffer_callback(
      storage_media_buffer_t *storage_media_buffer,
      verification_handle_t *verification_handle )
 {
-        libcerror_error_t *error = NULL;
-	uint8_t *data            = NULL;
-        static char *function    = "verification_handle_process_storage_media_buffer_callback";
-	size_t data_size         = 0;
+	libcdata_list_element_t *element      = NULL;
+	libcdata_list_element_t *next_element = NULL;
+        libcerror_error_t *error              = NULL;
+	uint8_t *data                         = NULL;
+        static char *function                 = "verification_handle_process_storage_media_buffer_callback";
+	size_t data_size                      = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -1423,83 +1434,147 @@ int verification_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
-	if( storage_media_buffer->storage_media_offset != verification_handle->last_offset_hashed )
+	if( libcdata_list_insert_value(
+	     verification_handle->output_list,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
+	     &error ) == -1 )
 	{
-		if( libcthreads_thread_pool_push(
-		     verification_handle->output_thread_pool,
-		     (intptr_t *) storage_media_buffer,
-		     &error ) == -1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to push storage media buffer onto output thread pool queue.",
-			 function );
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to insert storage media buffer into output list.",
+		 function );
 
-			goto on_error;
-		}
-		return( 1 );
+		goto on_error;
 	}
-	if( storage_media_buffer_get_data(
-	     storage_media_buffer,
-	     &data,
-	     &data_size,
+	if( libcdata_list_get_first_element(
+	     verification_handle->output_list,
+	     &element,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine storage media buffer data.",
+		 "%s: unable to retrieve first element.",
 		 function );
 
 		goto on_error;
 	}
-	if( verification_handle_update_integrity_hash(
-	     verification_handle,
-	     data,
-	     storage_media_buffer->processed_size,
-	     &error ) != 1 )
+	while( element != NULL )
 	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to update integrity hash(es).",
-		 function );
+		if( libcdata_list_element_get_value(
+		     element,
+		     (intptr_t **) &storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from list element.",
+			 function );
 
-		goto on_error;
-	}
-	verification_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+			goto on_error;
+		}
+		if( storage_media_buffer->storage_media_offset != verification_handle->last_offset_hashed )
+		{
+			break;
+		}
+		if( storage_media_buffer_get_data(
+		     storage_media_buffer,
+		     &data,
+		     &data_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine storage media buffer data.",
+			 function );
 
-	if( storage_media_buffer_free(
-	     &storage_media_buffer,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free storage media buffer.",
-		 function );
+			goto on_error;
+		}
+		if( verification_handle_update_integrity_hash(
+		     verification_handle,
+		     data,
+		     storage_media_buffer->processed_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to update integrity hash(es).",
+			 function );
 
-		goto on_error;
-	}
-	if( process_status_update(
-	     verification_handle->process_status,
-	     verification_handle->last_offset_hashed,
-	     verification_handle->media_size,
-	     &error ) != 1 )
-	{
-		libcerror_error_set(
-		 &error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update process status.",
-		 function );
+			goto on_error;
+		}
+		verification_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
 
-		goto on_error;
+		if( libcdata_list_element_get_next_element(
+		     element,
+		     &next_element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next list element.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_remove_element(
+		     verification_handle->output_list,
+		     element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to remove list element from output list.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_element_free(
+		     &element,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free list element.",
+			 function );
+
+			goto on_error;
+		}
+		element = next_element;
+
+		if( process_status_update(
+		     verification_handle->process_status,
+		     verification_handle->last_offset_hashed,
+		     verification_handle->media_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 
@@ -1681,6 +1756,19 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
+		if( libcdata_list_initialize(
+		     &( verification_handle->output_list ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create output list.",
+			 function );
+
+			goto on_error;
+		}
 	}
 #endif
 	if( verification_handle_initialize_integrity_hash(
@@ -1772,7 +1860,7 @@ int verification_handle_verify_input(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to read data.",
+			 "%s: unable to read data.",
 			 function );
 
 			goto on_error;
@@ -1809,72 +1897,73 @@ int verification_handle_verify_input(
 				goto on_error;
 			}
 			storage_media_buffer = NULL;
-
-			continue;
 		}
+		else
 #endif
-		process_count = verification_handle_process_storage_media_buffer(
-		                 verification_handle,
-		                 storage_media_buffer,
-		                 error );
-
-		if( process_count <= 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to process storage media buffer after read.",
-			 function );
+			process_count = verification_handle_process_storage_media_buffer(
+			                 verification_handle,
+			                 storage_media_buffer,
+		        	         error );
 
-			goto on_error;
-		}
-		if( storage_media_buffer_get_data(
-		     storage_media_buffer,
-		     &data,
-		     &data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine storage media buffer data.",
-			 function );
+			if( process_count <= 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to process storage media buffer after read.",
+				 function );
 
-			goto on_error;
-		}
-		if( verification_handle_update_integrity_hash(
-		     verification_handle,
-		     data,
-		     storage_media_buffer->processed_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to update integrity hash(es).",
-			 function );
+				goto on_error;
+			}
+			if( storage_media_buffer_get_data(
+			     storage_media_buffer,
+			     &data,
+			     &data_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine storage media buffer data.",
+				 function );
 
-			goto on_error;
-		}
-		verification_handle->last_offset_hashed += (off64_t) process_count;
+				goto on_error;
+			}
+			if( verification_handle_update_integrity_hash(
+			     verification_handle,
+			     data,
+			     storage_media_buffer->processed_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
+				 "%s: unable to update integrity hash(es).",
+				 function );
 
-		if( process_status_update(
-		     verification_handle->process_status,
-		     verification_handle->last_offset_hashed,
-		     verification_handle->media_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to update process status.",
-			 function );
+				goto on_error;
+			}
+			verification_handle->last_offset_hashed += (off64_t) process_count;
 
-			goto on_error;
+			if( process_status_update(
+			     verification_handle->process_status,
+			     verification_handle->last_offset_hashed,
+			     verification_handle->media_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to update process status.",
+				 function );
+
+				goto on_error;
+			}
 		}
   	}
 	if( storage_media_buffer != NULL )
@@ -1921,6 +2010,24 @@ int verification_handle_verify_input(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to join output thread pool.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( verification_handle->output_list != NULL )
+	{
+/* TODO check if output list is empty */
+		if( libcdata_list_free(
+		     &( verification_handle->output_thread_pool ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free output list.",
 			 function );
 
 			goto on_error;
@@ -2177,6 +2284,13 @@ on_error:
 	{
 		libcthreads_thread_pool_join(
 		 &( verification_handle->output_thread_pool ),
+		 NULL );
+	}
+	if( verification_handle->output_list != NULL )
+	{
+		libcdata_list_free(
+		 &( verification_handle->output_thread_pool ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		 NULL );
 	}
 #endif

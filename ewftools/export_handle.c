@@ -4900,7 +4900,7 @@ int export_handle_export_input(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				"%s: unable to prepare buffer before write.",
+				 "%s: unable to prepare buffer before write.",
 				 function );
 
 				goto on_error;

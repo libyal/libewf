@@ -4,6 +4,9 @@ TODO
 * fix failing test pyewf_test_read.py
 
 * add multi threaded tool support
+  - ewfacquirestream
+  - ewfexport
+  - ewfmount - fuse multi thread support ?
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?
@@ -25,6 +28,9 @@ Threat safety
  - write lock libewf_handle_get_ ... _hash_values
  - use on_error (continue from libewf_handle_get_compression_method)
 
+Multi-threading:
+* make process by chunks the default
+
 Tests:
 * extend ewf_test_handle_get_values with
   - session informatation
@@ -39,15 +45,19 @@ Tests:
 * write resume from volume/disk section - basically re-image
 * ewfacquire:
   - add non-unattended tests
+  - add option sets for single/multi threaded, chunks
 * ewfacquire_optical:
   - add non-unattended tests
 * ewfexport:
   - add non-unattended tests
+  - add option sets for single/multi threaded, chunks
   - export of split RAW
 * ewfexport_logical:
   - add non-unattended tests
 * ewfinfo:
   - add DFXML output tests
+*ewfverify
+  - add option sets for single/multi threaded, chunks
 
 * libewf:
   - add unpacked_data_size to chunk data?
@@ -230,12 +240,6 @@ Roadmap:
   - locale support (partial)
   - multi language string support (gettext)
     need WINAPI version of gettext without libiconv dependency
-* enhance thread safety
-  - cross platform thread and locking functions
-  - protect writing to internal data structures
-  - protect reading when writing to internal data structures
-  - thread safe functions
-  - check for race conditions especially on change of data elements
 * library/tools enhancements
   - getoptlong
 * ewfx enhancements

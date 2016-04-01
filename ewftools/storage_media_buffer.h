@@ -125,6 +125,11 @@ int storage_media_buffer_get_data(
      size_t *data_size,
      libcerror_error_t **error );
 
+int storage_media_buffer_compare(
+     storage_media_buffer_t *first_buffer,
+     storage_media_buffer_t *second_buffer,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

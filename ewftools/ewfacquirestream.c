@@ -474,11 +474,10 @@ int ewfacquirestream_read_input(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	process_status_t *process_status             = NULL;
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	uint8_t *data                                = NULL;
 	static char *function                        = "ewfacquirestream_read_input";
-	size64_t acquiry_count                       = 0;
+	size64_t remaining_aquiry_size               = 0;
 	size32_t chunk_size                          = 0;
 	size_t data_size                             = 0;
 	size_t process_buffer_size                   = 0;
@@ -593,7 +592,7 @@ int ewfacquirestream_read_input(
 		goto on_error;
         }
 	if( process_status_initialize(
-	     &process_status,
+	     &( imaging_handle->process_status ),
 	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
 	     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
@@ -611,7 +610,7 @@ int ewfacquirestream_read_input(
 		goto on_error;
 	}
 	if( process_status_start(
-	     process_status,
+	     imaging_handle->process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -623,22 +622,25 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
+	remaining_aquiry_size = imaging_handle->acquiry_offset + imaging_handle->acquiry_size;
+
 	while( ( imaging_handle->acquiry_size == 0 )
-	    || ( acquiry_count < (size64_t) imaging_handle->acquiry_size ) )
+	    || ( remaining_aquiry_size > 0 ) )
 	{
 		read_size = process_buffer_size;
 
 		/* Align with acquiry offset if necessary
 		 */
 		if( ( imaging_handle->acquiry_offset != 0 )
-		 && ( imaging_handle->acquiry_offset < (uint64_t) read_size ) )
+		 && ( imaging_handle->last_offset_written < (off64_t) imaging_handle->acquiry_offset )
+		 && ( (off64_t) read_size > (off64_t) ( imaging_handle->acquiry_offset - imaging_handle->last_offset_written ) ) )
 		{
-			read_size = (size_t) imaging_handle->acquiry_offset;
+			read_size = (size_t) ( imaging_handle->acquiry_offset - imaging_handle->last_offset_written );
 		}
 		else if( ( imaging_handle->acquiry_size != 0 )
-		      && ( ( (size64_t) imaging_handle->acquiry_size - acquiry_count ) < (size64_t) read_size ) )
+		      && ( remaining_aquiry_size < (size64_t) read_size ) )
 		{
-			read_size = (size_t) ( (ssize64_t) imaging_handle->acquiry_size - acquiry_count );
+			read_size = (size_t) remaining_aquiry_size;
 		}
 		/* Read a chunk from the file descriptor
 		 */
@@ -648,7 +650,7 @@ int ewfacquirestream_read_input(
 		              storage_media_buffer->raw_buffer,
 		              storage_media_buffer->raw_buffer_size,
 		              (size32_t) read_size,
-		              acquiry_count,
+		              imaging_handle->last_offset_written,
 		              read_error_retries,
 		              error );
 
@@ -673,14 +675,18 @@ int ewfacquirestream_read_input(
 		}
 		storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
 
+		remaining_aquiry_size -= read_count;
+
 		/* Skip a certain number of bytes if necessary
 		 */
-		if( (size64_t) imaging_handle->acquiry_offset > acquiry_count )
+		if( imaging_handle->last_offset_written < (off64_t) imaging_handle->acquiry_offset )
 		{
-			imaging_handle->acquiry_offset -= read_count;
+			imaging_handle->last_offset_written += read_count;
 
 			continue;
 		}
+		imaging_handle->last_offset_written += read_count;
+
 		/* Swap byte pairs
 		 */
 		if( swap_byte_pairs == 1 )
@@ -733,7 +739,7 @@ int ewfacquirestream_read_input(
 
 			goto on_error;
 		}
-		process_count = imaging_handle_prepare_write_buffer(
+		process_count = imaging_handle_prepare_write_storage_media_buffer(
 		                 imaging_handle,
 		                 storage_media_buffer,
 		                 error );
@@ -744,12 +750,12 @@ int ewfacquirestream_read_input(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer before write.",
+			 "%s: unable to prepare storage media buffer before write.",
 			 function );
 
 			goto on_error;
 		}
-		write_count = imaging_handle_write_buffer(
+		write_count = imaging_handle_write_storage_media_buffer(
 		               imaging_handle,
 		               storage_media_buffer,
 		               process_count,
@@ -761,16 +767,16 @@ int ewfacquirestream_read_input(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write data to file.",
+			 "%s: unable to write storage media buffer.",
 			 function );
 
 			goto on_error;
 		}
-		acquiry_count += read_count;
+		imaging_handle->last_offset_written += read_count;
 
 		 if( process_status_update_unknown_total(
-		      process_status,
-		      acquiry_count,
+		      imaging_handle->process_status,
+		      imaging_handle->last_offset_written,
 		      error ) != 1 )
 		{
 			libcerror_error_set(
@@ -828,15 +834,15 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
-	acquiry_count += write_count;
+	imaging_handle->last_offset_written += write_count;
 
 	if( ewfacquirestream_abort != 0 )
 	{
 		status = PROCESS_STATUS_ABORTED;
 	}
 	if( process_status_stop(
-	     process_status,
-	     acquiry_count,
+	     imaging_handle->process_status,
+	     imaging_handle->last_offset_written,
 	     status,
 	     error ) != 1 )
 	{
@@ -850,7 +856,7 @@ int ewfacquirestream_read_input(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &process_status,
+	     &( imaging_handle->process_status ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -899,15 +905,15 @@ int ewfacquirestream_read_input(
 	return( 1 );
 
 on_error:
-	if( process_status != NULL )
+	if( imaging_handle->process_status != NULL )
 	{
 		process_status_stop(
-		 process_status,
+		 imaging_handle->process_status,
 		 (size64_t) write_count,
 		 PROCESS_STATUS_FAILED,
 		 NULL );
 		process_status_free(
-		 &process_status,
+		 &( imaging_handle->process_status ),
 		 NULL );
 	}
 	if( storage_media_buffer != NULL )

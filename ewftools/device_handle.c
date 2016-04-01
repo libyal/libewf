@@ -982,16 +982,17 @@ int device_handle_close(
 	return( 0 );
 }
 
-/* Reads a buffer from the input of the device handle
+/* Reads a storage media buffer from the input of the device handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t device_handle_read_buffer(
+ssize_t device_handle_read_storage_media_buffer(
          device_handle_t *device_handle,
-         uint8_t *buffer,
+         storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error )
 {
-	static char *function = "device_handle_read_buffer";
+	static char *function = "device_handle_read_storage_media_buffer";
 	ssize_t read_count    = 0;
 
 	if( device_handle == NULL )
@@ -1005,13 +1006,13 @@ ssize_t device_handle_read_buffer(
 
 		return( -1 );
 	}
-	if( buffer == NULL )
+	if( storage_media_buffer == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.",
+		 "%s: invalid storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -1020,7 +1021,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libsmdev_handle_read_buffer(
 			      device_handle->smdev_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1040,7 +1041,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libodraw_handle_read_buffer(
 			      device_handle->odraw_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1060,7 +1061,7 @@ ssize_t device_handle_read_buffer(
 	{
 		read_count = libsmraw_handle_read_buffer(
 			      device_handle->smraw_input_handle,
-			      buffer,
+			      storage_media_buffer->raw_buffer,
 			      read_size,
 		              error );
 
@@ -1076,6 +1077,26 @@ ssize_t device_handle_read_buffer(
 			return( -1 );
 		}
 	}
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	storage_media_buffer->storage_media_offset = storage_media_offset;
+	storage_media_buffer->requested_size       = read_size;
+
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		storage_media_buffer->data_in_compression_buffer = 0;
+	}
+	storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
+
 	return( read_count );
 }
 

@@ -23,6 +23,7 @@
 #include <memory.h>
 
 #include "ewftools_libcerror.h"
+#include "ewftools_libcthreads.h"
 #include "storage_media_buffer.h"
 
 /* Creates a storage media buffer
@@ -356,5 +357,49 @@ int storage_media_buffer_get_data(
 		*data_size = buffer->compression_buffer_data_size;
 	}
 	return( 1 );
+}
+
+/* Compares two storage media buffers
+ * Returns LIBCTHREADS_COMPARE_LESS, LIBCTHREADS_COMPARE_EQUAL, LIBCTHREADS_COMPARE_GREATER
+ * if successful or -1 on error
+ */
+int storage_media_buffer_compare(
+     storage_media_buffer_t *first_buffer,
+     storage_media_buffer_t *second_buffer,
+     libcerror_error_t **error )
+{
+	static char *function = "storage_media_buffer_compare";
+
+	if( first_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( first_buffer->storage_media_offset < second_buffer->storage_media_offset )
+	{
+		return( LIBCTHREADS_COMPARE_LESS ); 
+	}
+	else if( first_buffer->storage_media_offset > second_buffer->storage_media_offset )
+	{
+		return( LIBCTHREADS_COMPARE_GREATER ); 
+	}
+	return( LIBCTHREADS_COMPARE_EQUAL ); 
 }
 
