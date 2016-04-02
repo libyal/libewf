@@ -1444,6 +1444,8 @@ int verification_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	storage_media_buffer = NULL;
+
 	if( libcdata_list_get_first_element(
 	     verification_handle->output_list,
 	     &element,
@@ -1491,6 +1493,8 @@ int verification_handle_output_storage_media_buffer_callback(
 			 "%s: unable to determine storage media buffer data.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		if( verification_handle_update_integrity_hash(
@@ -1506,9 +1510,13 @@ int verification_handle_output_storage_media_buffer_callback(
 			 "%s: unable to update integrity hash(es).",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		verification_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+
+		storage_media_buffer = NULL;
 
 		if( libcdata_list_element_get_next_element(
 		     element,

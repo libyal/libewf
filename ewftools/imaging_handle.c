@@ -1907,6 +1907,8 @@ int imaging_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	storage_media_buffer = NULL;
+
 	if( libcdata_list_get_first_element(
 	     imaging_handle->output_list,
 	     &element,
@@ -1954,6 +1956,8 @@ int imaging_handle_output_storage_media_buffer_callback(
 			 "%s: unable to determine storage media buffer data.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		write_count = imaging_handle_write_storage_media_buffer(
@@ -1971,9 +1975,13 @@ int imaging_handle_output_storage_media_buffer_callback(
 			 "%s: unable to write storage media buffer.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		imaging_handle->last_offset_written = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+
+		storage_media_buffer = NULL;
 
 		if( libcdata_list_element_get_next_element(
 		     element,

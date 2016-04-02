@@ -9,6 +9,8 @@ TODO
 * re-enable bzip2 tests
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
+* ewfacquire/ewfacquirestream check if output file can be written before
+starting multi threaded imaging - to quit early
 
 Threat safety
 * libewf_handle_prepare_read_chunk - remove the need for locks

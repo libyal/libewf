@@ -4767,6 +4767,8 @@ int export_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	storage_media_buffer = NULL;
+
 	if( libcdata_list_get_first_element(
 	     export_handle->output_list,
 	     &element,
@@ -4814,6 +4816,8 @@ int export_handle_output_storage_media_buffer_callback(
 			 "%s: unable to determine storage media buffer data.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		/* Swap byte pairs
@@ -4833,6 +4837,8 @@ int export_handle_output_storage_media_buffer_callback(
 				 "%s: unable to swap byte pairs.",
 				 function );
 
+				storage_media_buffer = NULL;
+
 				goto on_error;
 			}
 		}
@@ -4850,6 +4856,8 @@ int export_handle_output_storage_media_buffer_callback(
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to update integrity hash(es).",
 			 function );
+
+			storage_media_buffer = NULL;
 
 			goto on_error;
 		}
@@ -4870,6 +4878,8 @@ int export_handle_output_storage_media_buffer_callback(
 				 "%s: unable to create output storage media buffer.",
 				 function );
 
+				storage_media_buffer = NULL;
+
 				goto on_error;
 			}
 		}
@@ -4889,8 +4899,12 @@ int export_handle_output_storage_media_buffer_callback(
 			 "%s: unable to write to export handle.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
+		storage_media_buffer = NULL;
+
 		if( libcdata_list_element_get_next_element(
 		     element,
 		     &next_element,
@@ -4920,6 +4934,21 @@ int export_handle_output_storage_media_buffer_callback(
 			goto on_error;
 		}
 /* TODO: if storage media buffer can be passed on do not free it */
+		if( libcdata_list_element_free(
+		     &element,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free list element.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO: if storage media buffer can be passed on do not free it */
 		if( output_storage_media_buffer != NULL )
 		{
 			if( storage_media_buffer_free(
@@ -4935,20 +4964,6 @@ int export_handle_output_storage_media_buffer_callback(
 
 				goto on_error;
 			}
-		}
-		if( libcdata_list_element_free(
-		     &element,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
-		     &error ) != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free list element.",
-			 function );
-
-			goto on_error;
 		}
 		element = next_element;
 
