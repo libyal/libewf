@@ -124,6 +124,17 @@ int libewf_case_data_generate_utf8_string(
 
 		return( -1 );
 	}
+	if( format != LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfvalue_table_get_value_by_identifier(
 	     header_values,
 	     (uint8_t *) "description",

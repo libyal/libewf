@@ -1893,6 +1893,7 @@ int imaging_handle_output_storage_media_buffer_callback(
         static char *function                 = "imaging_handle_process_storage_media_buffer_callback";
 	size_t data_size                      = 0;
 	ssize_t write_count                   = 0;
+	int result                            = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -2044,11 +2045,22 @@ int imaging_handle_output_storage_media_buffer_callback(
 		}
 		element = next_element;
 
-		if( process_status_update(
-		     imaging_handle->process_status,
-		     imaging_handle->last_offset_written,
-		     imaging_handle->acquiry_size,
-		     &error ) != 1 )
+		if( imaging_handle->acquiry_size == 0 )
+		{
+			result = process_status_update_unknown_total(
+			          imaging_handle->process_status,
+			          imaging_handle->last_offset_written,
+		        	  &error );
+		}
+		else
+		{
+			result = process_status_update(
+			          imaging_handle->process_status,
+			          imaging_handle->last_offset_written,
+			          imaging_handle->acquiry_size,
+		        	  &error );
+		}
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 &error,

@@ -293,6 +293,18 @@ ssize_t libewf_handle_prepare_write_chunk(
          int8_t *chunk_io_flags,
          libcerror_error_t **error );
 
+ssize_t libewf_internal_handle_write_chunk_to_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         const void *chunk_buffer,
+         size_t chunk_buffer_size,
+         size_t data_size,
+         int8_t is_compressed,
+         void *checksum_buffer,
+         uint32_t chunk_checksum,
+         int8_t chunk_io_flags,
+         libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_chunk(
          libewf_handle_t *handle,

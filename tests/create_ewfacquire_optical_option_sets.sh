@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to create the ewfacquire option sets
 #
-# Version: 20160320
+# Version: 20160402
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -65,7 +65,7 @@ do
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-f${FORMAT}" > ${OUTPUT_FILE};
+			echo "-f${FORMAT} -j4 -x" > "${OUTPUT_FILE}";
 		done
 	done
 done

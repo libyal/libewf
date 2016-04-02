@@ -237,7 +237,7 @@ int libewf_handle_set_sectors_per_chunk(
 
 on_error:
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_read(
+	libcthreads_read_write_lock_release_for_write(
 	 internal_handle->read_write_lock,
 	 NULL );
 #endif
@@ -442,7 +442,7 @@ int libewf_handle_set_bytes_per_sector(
 
 on_error:
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_read(
+	libcthreads_read_write_lock_release_for_write(
 	 internal_handle->read_write_lock,
 	 NULL );
 #endif
@@ -930,7 +930,6 @@ int libewf_handle_set_compression_method(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_compression_method";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -993,11 +992,11 @@ int libewf_handle_set_compression_method(
 		 "%s: compression values cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else if( ( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
-	      && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	      && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	if( ( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1006,12 +1005,10 @@ int libewf_handle_set_compression_method(
 		 "%s: compression method not supported by format.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		internal_handle->io_handle->compression_method = compression_method;
-	}
+	internal_handle->io_handle->compression_method = compression_method;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
@@ -1027,7 +1024,15 @@ int libewf_handle_set_compression_method(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the compression values
@@ -1135,7 +1140,6 @@ int libewf_handle_set_compression_values(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_compression_values";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1199,11 +1203,11 @@ int libewf_handle_set_compression_values(
 		 "%s: compression values cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
-	      && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	      && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1212,13 +1216,11 @@ int libewf_handle_set_compression_values(
 		 "%s: compression flags not supported by format.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		internal_handle->io_handle->compression_level = compression_level;
-		internal_handle->io_handle->compression_flags = compression_flags;
-	}
+	internal_handle->io_handle->compression_level = compression_level;
+	internal_handle->io_handle->compression_flags = compression_flags;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
@@ -1234,7 +1236,15 @@ int libewf_handle_set_compression_values(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size of the contained media data
@@ -1328,7 +1338,6 @@ int libewf_handle_set_media_size(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_media_size";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1380,26 +1389,23 @@ int libewf_handle_set_media_size(
 		 "%s: media size cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     internal_handle->media_values->sectors_per_chunk,
+	     internal_handle->media_values->bytes_per_sector,
+	     media_size,
+	     error ) != 1 )
 	{
-		result = libewf_internal_handle_set_media_values(
-		          internal_handle,
-		          internal_handle->media_values->sectors_per_chunk,
-		          internal_handle->media_values->bytes_per_sector,
-		          media_size,
-		          error );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.",
+		 function );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set media values.",
-			 function );
-		}
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1416,7 +1422,15 @@ int libewf_handle_set_media_size(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the media type value
@@ -1521,7 +1535,6 @@ int libewf_handle_set_media_type(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_media_type";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1573,12 +1586,10 @@ int libewf_handle_set_media_type(
 		 "%s: media type cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		internal_handle->media_values->media_type = media_type;
-	}
+	internal_handle->media_values->media_type = media_type;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
@@ -1594,7 +1605,15 @@ int libewf_handle_set_media_type(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the media flags
@@ -1607,7 +1626,6 @@ int libewf_handle_get_media_flags(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_media_flags";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1668,12 +1686,10 @@ int libewf_handle_get_media_flags(
 		 "%s: invalid media flags value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*media_flags = internal_handle->media_values->media_flags;
-	}
+	*media_flags = internal_handle->media_values->media_flags;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -1689,7 +1705,15 @@ int libewf_handle_get_media_flags(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the media flags
@@ -1702,7 +1726,6 @@ int libewf_handle_set_media_flags(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_media_flags";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1754,16 +1777,14 @@ int libewf_handle_set_media_flags(
 		 "%s: media flags cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		internal_handle->media_values->media_flags = media_flags;
+	internal_handle->media_values->media_flags = media_flags;
 
-		/* Make sure the lowest bit is always set
-		 */
-		internal_handle->media_values->media_flags |= 0x01;
-	}
+	/* Make sure the lowest bit is always set
+	 */
+	internal_handle->media_values->media_flags |= 0x01;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
@@ -1779,7 +1800,15 @@ int libewf_handle_set_media_flags(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the format type value
@@ -1792,7 +1821,6 @@ int libewf_handle_get_format(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_format";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1864,12 +1892,10 @@ int libewf_handle_get_format(
 		 "%s: invalid format value exceeds maximum.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*format = internal_handle->io_handle->format;
-	}
+	*format = internal_handle->io_handle->format;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -1885,7 +1911,15 @@ int libewf_handle_get_format(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the output format
@@ -1898,7 +1932,6 @@ int libewf_handle_set_format(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_format";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -1982,71 +2015,68 @@ int libewf_handle_set_format(
 		 "%s: format cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
+	}
+/* TODO refactor into separate function */
+	internal_handle->io_handle->format = format;
+
+	if( format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		internal_handle->io_handle->major_version = 2;
+		internal_handle->io_handle->minor_version = 1;
 	}
 	else
 	{
-/* TODO refactor into separate function */
-		internal_handle->io_handle->format = format;
-
-		if( format == LIBEWF_FORMAT_V2_ENCASE7 )
-		{
-			internal_handle->io_handle->major_version = 2;
-			internal_handle->io_handle->minor_version = 1;
-		}
-		else
-		{
-			internal_handle->io_handle->major_version = 1;
-			internal_handle->io_handle->minor_version = 0;
-		}
-		if( ( format == LIBEWF_FORMAT_EWF )
-		 || ( format == LIBEWF_FORMAT_SMART ) )
-		{
-			/* Wraps .s01 to .s99 and then to .saa up to .zzz
-			 * ( ( ( 's' to 'z' = 8 ) * 26 * 26 ) + 99 ) = 5507
-			 */
-			internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 5507;
-			internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
-		}
-		else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
-		{
-			/* Wraps .Ex01 to .Ex99 and then to .ExAA up to .EzZZ
-			 * ( ( ( 'x' to 'z' = 3 ) * 26 * 26 ) + 99 ) = 2127
-			 */
-			internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 2127;
-			internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
-		}
-		else
-		{
-			/* Wraps .E01 to .E99 and then to .EAA up to .ZZZ
-			 * ( ( ( 'E' to 'Z' or 'e' to 'z' = 22 ) * 26 * 26 ) + 99 ) = 14971
-			 */
-			internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 14971;
-			internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
-		}
-		/* Determine the maximum number of table entries
+		internal_handle->io_handle->major_version = 1;
+		internal_handle->io_handle->minor_version = 0;
+	}
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_SMART ) )
+	{
+		/* Wraps .s01 to .s99 and then to .saa up to .zzz
+		 * ( ( ( 's' to 'z' = 8 ) * 26 * 26 ) + 99 ) = 5507
 		 */
-		if( ( format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( format == LIBEWF_FORMAT_ENCASE7 ) )
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
-		}
-		else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
-		}
-		else if( format == LIBEWF_FORMAT_EWFX )
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
-		}
-		else
-		{
-			internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
-			internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF;
-		}
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 5507;
+		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART;
+	}
+	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		/* Wraps .Ex01 to .Ex99 and then to .ExAA up to .EzZZ
+		 * ( ( ( 'x' to 'z' = 3 ) * 26 * 26 ) + 99 ) = 2127
+		 */
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 2127;
+		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF2;
+	}
+	else
+	{
+		/* Wraps .E01 to .E99 and then to .EAA up to .ZZZ
+		 * ( ( ( 'E' to 'Z' or 'e' to 'z' = 22 ) * 26 * 26 ) + 99 ) = 14971
+		 */
+		internal_handle->write_io_handle->maximum_number_of_segments = (uint32_t) 14971;
+		internal_handle->io_handle->segment_file_type                = LIBEWF_SEGMENT_FILE_TYPE_EWF1;
+	}
+	/* Determine the maximum number of table entries
+	 */
+	if( ( format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( format == LIBEWF_FORMAT_ENCASE7 ) )
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
+	}
+	else if( format == LIBEWF_FORMAT_V2_ENCASE7 )
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT64_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
+	}
+	else if( format == LIBEWF_FORMAT_EWFX )
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES;
+	}
+	else
+	{
+		internal_handle->write_io_handle->maximum_segment_file_size  = INT32_MAX;
+		internal_handle->write_io_handle->maximum_chunks_per_section = LIBEWF_MAXIMUM_TABLE_ENTRIES_EWF;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -2063,7 +2093,15 @@ int libewf_handle_set_format(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the segment file version
@@ -2172,7 +2210,6 @@ int libewf_handle_get_segment_file_set_identifier(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_segment_file_set_identifier";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -2247,7 +2284,7 @@ int libewf_handle_get_segment_file_set_identifier(
 		 "%s: unable to set set identifier.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -2264,7 +2301,15 @@ int libewf_handle_get_segment_file_set_identifier(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the segment file set identifier
@@ -2279,7 +2324,6 @@ int libewf_handle_set_segment_file_set_identifier(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_set_segment_file_set_identifier";
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -2353,12 +2397,12 @@ int libewf_handle_set_segment_file_set_identifier(
 		 "%s: set identifier cannot be changed.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else if( memory_copy(
-	          internal_handle->media_values->set_identifier,
-	          set_identifier,
-	          16 ) == NULL )
+	if( memory_copy(
+	     internal_handle->media_values->set_identifier,
+	     set_identifier,
+	     16 ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2367,7 +2411,7 @@ int libewf_handle_set_segment_file_set_identifier(
 		 "%s: unable to copy set indentifier.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -2384,7 +2428,15 @@ int libewf_handle_set_segment_file_set_identifier(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the MD5 hash
@@ -2398,7 +2450,6 @@ int libewf_handle_get_md5_hash(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_md5_hash";
-	void *result_copy                         = NULL;
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2447,9 +2498,22 @@ int libewf_handle_get_md5_hash(
 
 		return( -1 );
 	}
-/* TODO add write lock */
-	if( ( ( internal_handle->hash_sections->md5_hash_set == 0 )
-	  || ( internal_handle->hash_sections->md5_digest_set == 0 ) )
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
 	 && ( internal_handle->hash_values != NULL ) )
 	{
 		if( libewf_hash_values_generate_md5_hash(
@@ -2466,63 +2530,47 @@ int libewf_handle_get_md5_hash(
 			 "%s: unable to parse MD5 hash value for its value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
+	if( internal_handle->hash_sections->md5_digest_set != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
-	 && ( internal_handle->hash_sections->md5_digest_set == 0 ) )
-	{
-		result = 0;
-	}
-	else
-	{
-		if( internal_handle->hash_sections->md5_digest_set != 0 )
-		{
-			result_copy = memory_copy(
-			               md5_hash,
-			               internal_handle->hash_sections->md5_digest,
-			               16 );
-		}
-		else if( internal_handle->hash_sections->md5_hash_set != 0 )
-		{
-			result_copy = memory_copy(
-			               md5_hash,
-			               internal_handle->hash_sections->md5_hash,
-			               16 );
-		}
-		if( result_copy == NULL )
+		if( memory_copy(
+		     md5_hash,
+		     internal_handle->hash_sections->md5_digest,
+		     16 ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set MD5 hash.",
+			 "%s: unable to copy MD5 digest.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
-		else
+		result = 1;
+	}
+	else if( internal_handle->hash_sections->md5_hash_set != 0 )
+	{
+		if( memory_copy(
+		     md5_hash,
+		     internal_handle->hash_sections->md5_hash,
+		     16 ) == NULL )
 		{
-			result = 1;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy MD5 hash.",
+			 function );
+
+			goto on_error;
 		}
+		result = 1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
+	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
 	     error ) != 1 )
 	{
@@ -2530,13 +2578,21 @@ int libewf_handle_get_md5_hash(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the MD5 hash
@@ -2597,7 +2653,21 @@ int libewf_handle_set_md5_hash(
 
 		return( -1 );
 	}
-/* TODO add write lock */
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( ( internal_handle->read_io_handle != NULL )
 	 || ( internal_handle->hash_sections->md5_hash_set != 0 )
 	 || ( internal_handle->hash_sections->md5_digest_set != 0 ) )
@@ -2609,7 +2679,24 @@ int libewf_handle_set_md5_hash(
 		 "%s: MD5 hash cannot be changed.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( internal_handle->hash_values == NULL )
+	{
+		if( libewf_hash_values_initialize(
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.",
+			 function );
+
+			goto on_error;
+		}
+		internal_handle->hash_values_parsed = 1;
 	}
 	if( memory_copy(
 	     internal_handle->hash_sections->md5_hash,
@@ -2623,8 +2710,10 @@ int libewf_handle_set_md5_hash(
 		 "%s: unable to set MD5 hash.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
+	internal_handle->hash_sections->md5_hash_set = 1;
+
 	if( memory_copy(
 	     internal_handle->hash_sections->md5_digest,
 	     md5_hash,
@@ -2637,25 +2726,10 @@ int libewf_handle_set_md5_hash(
 		 "%s: unable to set MD5 hash.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_hash_values_initialize(
-		     &( internal_handle->hash_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
+	internal_handle->hash_sections->md5_digest_set = 1;
 
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
 	if( libewf_hash_values_parse_md5_hash(
 	     internal_handle->hash_values,
 	     md5_hash,
@@ -2669,12 +2743,32 @@ int libewf_handle_set_md5_hash(
 		 "%s: unable to parse MD5 hash for its value.",
 		 function );
 
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	internal_handle->hash_sections->md5_hash_set   = 1;
-	internal_handle->hash_sections->md5_digest_set = 1;
-
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the SHA1 hash
@@ -2688,7 +2782,6 @@ int libewf_handle_get_sha1_hash(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_sha1_hash";
-	void *result_copy                         = NULL;
 	int result                                = 0;
 
 	if( handle == NULL )
@@ -2737,7 +2830,21 @@ int libewf_handle_get_sha1_hash(
 
 		return( -1 );
 	}
-/* TODO add write lock */
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( ( internal_handle->hash_sections->sha1_digest_set == 0 )
 	 && ( internal_handle->hash_values != NULL ) )
 	{
@@ -2755,63 +2862,47 @@ int libewf_handle_get_sha1_hash(
 			 "%s: unable to parse MD5 hash value for its value.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
+	if( internal_handle->hash_sections->sha1_digest_set != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( ( internal_handle->hash_sections->sha1_hash_set == 0 )
-	 && ( internal_handle->hash_sections->sha1_digest_set == 0 ) )
-	{
-		result = 0;
-	}
-	else
-	{
-		if( internal_handle->hash_sections->sha1_digest_set != 0 )
-		{
-			result_copy = memory_copy(
-			               sha1_hash,
-			               internal_handle->hash_sections->sha1_digest,
-			               20 );
-		}
-		else if( internal_handle->hash_sections->sha1_hash_set != 0 )
-		{
-			result_copy = memory_copy(
-			               sha1_hash,
-			               internal_handle->hash_sections->sha1_hash,
-			               20 );
-		}
-		if( result_copy == NULL )
+		if( memory_copy(
+		     sha1_hash,
+		     internal_handle->hash_sections->sha1_digest,
+		     20 ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set SHA1 hash.",
+			 "%s: unable to copy SHA1 digest.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
-		else
+		result = 1;
+	}
+	else if( internal_handle->hash_sections->sha1_hash_set != 0 )
+	{
+		if( memory_copy(
+		     sha1_hash,
+		     internal_handle->hash_sections->sha1_hash,
+		     20 ) == NULL )
 		{
-			result = 1;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy SHA1 hash.",
+			 function );
+
+			goto on_error;
 		}
+		result = 1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
+	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
 	     error ) != 1 )
 	{
@@ -2819,13 +2910,21 @@ int libewf_handle_get_sha1_hash(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
 #endif
 	return( result );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the SHA1 hash
@@ -2886,7 +2985,21 @@ int libewf_handle_set_sha1_hash(
 
 		return( -1 );
 	}
-/* TODO add write lock */
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( ( internal_handle->read_io_handle != NULL )
 	 || ( internal_handle->hash_sections->sha1_hash_set != 0 )
 	 || ( internal_handle->hash_sections->sha1_digest_set != 0 ) )
@@ -2898,7 +3011,24 @@ int libewf_handle_set_sha1_hash(
 		 "%s: SHA1 hash cannot be changed.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( internal_handle->hash_values == NULL )
+	{
+		if( libewf_hash_values_initialize(
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.",
+			 function );
+
+			goto on_error;
+		}
+		internal_handle->hash_values_parsed = 1;
 	}
 	if( memory_copy(
 	     internal_handle->hash_sections->sha1_hash,
@@ -2912,8 +3042,10 @@ int libewf_handle_set_sha1_hash(
 		 "%s: unable to set SHA1 hash.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
+	internal_handle->hash_sections->sha1_hash_set = 1;
+
 	if( memory_copy(
 	     internal_handle->hash_sections->sha1_digest,
 	     sha1_hash,
@@ -2926,25 +3058,10 @@ int libewf_handle_set_sha1_hash(
 		 "%s: unable to set SHA1 hash.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( internal_handle->hash_values_parsed == 0 )
-	{
-		if( libewf_hash_values_initialize(
-		     &( internal_handle->hash_values ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
+	internal_handle->hash_sections->sha1_digest_set = 1;
 
-			return( -1 );
-		}
-		internal_handle->hash_values_parsed = 1;
-	}
 	if( libewf_hash_values_parse_sha1_hash(
 	     internal_handle->hash_values,
 	     sha1_hash,
@@ -2958,12 +3075,32 @@ int libewf_handle_set_sha1_hash(
 		 "%s: unable to parse SHA1 hash for its value.",
 		 function );
 
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	internal_handle->hash_sections->sha1_hash_set   = 1;
-	internal_handle->hash_sections->sha1_digest_set = 1;
-
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Sets the read zero chunk on error
@@ -3124,7 +3261,6 @@ int libewf_handle_get_number_of_acquiry_errors(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_acquiry_errors";
 	int number_of_elements                    = 0;
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3165,21 +3301,24 @@ int libewf_handle_get_number_of_acquiry_errors(
 		return( -1 );
 	}
 #endif
-	result = libcdata_range_list_get_number_of_elements(
-	          internal_handle->acquiry_errors,
-	          &number_of_elements,
-	          error );
-
-	if( result != 1 )
+	if( internal_handle->acquiry_errors != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from acquiry errors range list.",
-		 function );
+		if( libcdata_range_list_get_number_of_elements(
+		     internal_handle->acquiry_errors,
+		     &number_of_elements,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of elements from acquiry errors range list.",
+			 function );
+
+			goto on_error;
+		}
 	}
-	else if( number_of_elements < 0 )
+	if( number_of_elements < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3188,12 +3327,10 @@ int libewf_handle_get_number_of_acquiry_errors(
 		 "%s: invalid number of elements value out of bounds.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*number_of_errors = (uint32_t) number_of_elements;
-	}
+	*number_of_errors = (uint32_t) number_of_elements;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -3209,7 +3346,15 @@ int libewf_handle_get_number_of_acquiry_errors(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves an acquiry error
@@ -3302,6 +3447,7 @@ int libewf_handle_append_acquiry_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_append_acquiry_error";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3316,14 +3462,31 @@ int libewf_handle_append_acquiry_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libcdata_range_list_insert_range(
-	     internal_handle->acquiry_errors,
-	     start_sector,
-	     number_of_sectors,
-	     NULL,
-	     NULL,
-	     NULL,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libcdata_range_list_insert_range(
+	          internal_handle->acquiry_errors,
+	          start_sector,
+	          number_of_sectors,
+	          NULL,
+	          NULL,
+	          NULL,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3331,10 +3494,23 @@ int libewf_handle_append_acquiry_error(
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to insert acquiry error in range list.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the number of checksum errors
@@ -3347,7 +3523,7 @@ int libewf_handle_get_number_of_checksum_errors(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_checksum_errors";
-	int result                                = 0;
+	uint32_t number_of_elements               = 0;
 
 	if( handle == NULL )
 	{
@@ -3388,19 +3564,12 @@ int libewf_handle_get_number_of_checksum_errors(
 		return( -1 );
 	}
 #endif
-	if( internal_handle->chunk_table == NULL )
+	if( internal_handle->chunk_table != NULL )
 	{
-		*number_of_errors = 0;
-		result            = 1;
-	}
-	else
-	{
-		result = libewf_chunk_table_get_number_of_checksum_errors(
-		          internal_handle->chunk_table,
-		          number_of_errors,
-		          error );
-
-		if( result != 1 )
+		if( libewf_chunk_table_get_number_of_checksum_errors(
+		     internal_handle->chunk_table,
+		     &number_of_elements,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3408,8 +3577,23 @@ int libewf_handle_get_number_of_checksum_errors(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of checksum errors.",
 			 function );
+
+			goto on_error;
 		}
 	}
+	if( number_of_elements < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of elements value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	*number_of_errors = number_of_elements;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -3425,7 +3609,15 @@ int libewf_handle_get_number_of_checksum_errors(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves a checksum error
@@ -3527,6 +3719,7 @@ int libewf_handle_append_checksum_error(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_append_checksum_error";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3541,11 +3734,28 @@ int libewf_handle_append_checksum_error(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( libewf_chunk_table_append_checksum_error(
-	     internal_handle->chunk_table,
-	     start_sector,
-	     number_of_sectors,
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_chunk_table_append_checksum_error(
+	          internal_handle->chunk_table,
+	          start_sector,
+	          number_of_sectors,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3553,10 +3763,23 @@ int libewf_handle_append_checksum_error(
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append checksum error.",
 		 function );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the number of sessions
@@ -3570,7 +3793,6 @@ int libewf_handle_get_number_of_sessions(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_sessions";
 	int number_of_entries                     = 0;
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3611,21 +3833,24 @@ int libewf_handle_get_number_of_sessions(
 		return( -1 );
 	}
 #endif
-	result = libcdata_array_get_number_of_entries(
-	          internal_handle->sessions,
-	          &number_of_entries,
-	          error );
-
-	if( result != 1 )
+	if( internal_handle->sessions != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries from sessions array.",
-		 function );
+		if( libcdata_array_get_number_of_entries(
+		     internal_handle->sessions,
+		     &number_of_entries,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of entries from sessions array.",
+			 function );
+
+			goto on_error;
+		}
 	}
-	else if( number_of_entries < 0 )
+	if( number_of_entries < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3634,12 +3859,10 @@ int libewf_handle_get_number_of_sessions(
 		 "%s: invalid number of entries value out of bounds.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*number_of_sessions = (uint32_t) number_of_entries;
-	}
+	*number_of_sessions = (uint32_t) number_of_entries;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -3655,7 +3878,15 @@ int libewf_handle_get_number_of_sessions(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves a session
@@ -3671,7 +3902,6 @@ int libewf_handle_get_session(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_session";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3701,13 +3931,11 @@ int libewf_handle_get_session(
 		return( -1 );
 	}
 #endif
-	result = libcdata_array_get_entry_by_index(
-	          internal_handle->sessions,
-	          (int) index,
-	          (intptr_t **) &sector_range,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_array_get_entry_by_index(
+	     internal_handle->sessions,
+	     (int) index,
+	     (intptr_t **) &sector_range,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3716,25 +3944,24 @@ int libewf_handle_get_session(
 		 "%s: unable to retrieve session sector range: %" PRIu32 " from array.",
 		 function,
 		 index );
-	}
-	else
-	{
-		result = libewf_sector_range_get(
-		          sector_range,
-		          start_sector,
-		          number_of_sectors,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve session: %" PRIu32 " sector range.",
-			 function,
-			 index );
-		}
+		goto on_error;
+	}
+	if( libewf_sector_range_get(
+	     sector_range,
+	     start_sector,
+	     number_of_sectors,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve session: %" PRIu32 " sector range.",
+		 function,
+		 index );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -3751,7 +3978,15 @@ int libewf_handle_get_session(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Appends a session
@@ -3781,6 +4016,21 @@ int libewf_handle_append_session(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libewf_sector_range_initialize(
 	     &sector_range,
 	     error ) != 1 )
@@ -3824,6 +4074,21 @@ int libewf_handle_append_session(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -3833,6 +4098,11 @@ on_error:
 		 &sector_range,
 		 NULL );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -3847,7 +4117,6 @@ int libewf_handle_get_number_of_tracks(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_tracks";
 	int number_of_entries                     = 0;
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3888,21 +4157,24 @@ int libewf_handle_get_number_of_tracks(
 		return( -1 );
 	}
 #endif
-	result = libcdata_array_get_number_of_entries(
-	          internal_handle->tracks,
-	          &number_of_entries,
-	          error );
-
-	if( result != 1 )
+	if( internal_handle->tracks != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries from tracks array.",
-		 function );
+		if( libcdata_array_get_number_of_entries(
+		     internal_handle->tracks,
+		     &number_of_entries,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of entries from tracks array.",
+			 function );
+
+			goto on_error;
+		}
 	}
-	else if( number_of_entries < 0 )
+	if( number_of_entries < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3911,12 +4183,10 @@ int libewf_handle_get_number_of_tracks(
 		 "%s: invalid number of entries value out of bounds.",
 		 function );
 
-		result = -1;
+		goto on_error;
 	}
-	else
-	{
-		*number_of_tracks = (uint32_t) number_of_entries;
-	}
+	*number_of_tracks = (uint32_t) number_of_entries;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -3932,7 +4202,15 @@ int libewf_handle_get_number_of_tracks(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves a track
@@ -3948,7 +4226,6 @@ int libewf_handle_get_track(
 	libewf_internal_handle_t *internal_handle = NULL;
 	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_track";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -3978,13 +4255,11 @@ int libewf_handle_get_track(
 		return( -1 );
 	}
 #endif
-	result = libcdata_array_get_entry_by_index(
-	          internal_handle->tracks,
-	          (int) index,
-	          (intptr_t **) &sector_range,
-	          error );
-
-	if( result != 1 )
+	if( libcdata_array_get_entry_by_index(
+	     internal_handle->tracks,
+	     (int) index,
+	     (intptr_t **) &sector_range,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3993,25 +4268,24 @@ int libewf_handle_get_track(
 		 "%s: unable to retrieve track sector range: %" PRIu32 " from array.",
 		 function,
 		 index );
-	}
-	else
-	{
-		result = libewf_sector_range_get(
-		          sector_range,
-		          start_sector,
-		          number_of_sectors,
-		          error );
 
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve track: %" PRIu32 " sector range.",
-			 function,
-			 index );
-		}
+		goto on_error;
+	}
+	if( libewf_sector_range_get(
+	     sector_range,
+	     start_sector,
+	     number_of_sectors,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve track: %" PRIu32 " sector range.",
+		 function,
+		 index );
+
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -4028,7 +4302,15 @@ int libewf_handle_get_track(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Appends a track
@@ -4058,6 +4340,21 @@ int libewf_handle_append_track(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libewf_sector_range_initialize(
 	     &sector_range,
 	     error ) != 1 )
@@ -4101,6 +4398,21 @@ int libewf_handle_append_track(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -4110,6 +4422,11 @@ on_error:
 		 &sector_range,
 		 NULL );
 	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -4441,7 +4758,6 @@ int libewf_handle_get_number_of_header_values(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_header_values";
 	int number_of_header_values               = 0;
-	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -4484,12 +4800,10 @@ int libewf_handle_get_number_of_header_values(
 #endif
 	if( internal_handle->header_values != NULL )
 	{
-		result = libfvalue_table_get_number_of_values(
-		          internal_handle->header_values,
-		          &number_of_header_values,
-		          error );
-
-		if( result != 1 )
+		if( libfvalue_table_get_number_of_values(
+		     internal_handle->header_values,
+		     &number_of_header_values,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4497,23 +4811,23 @@ int libewf_handle_get_number_of_header_values(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve number of header values.",
 			 function );
-		}
-		else if( number_of_header_values < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid number of header values value out of bounds.",
-			 function );
 
-			result = -1;
-		}
-		else
-		{
-			*number_of_values = (uint32_t) number_of_header_values;
+			goto on_error;
 		}
 	}
+	if( number_of_header_values < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of header values value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	*number_of_values = (uint32_t) number_of_header_values;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -4529,7 +4843,15 @@ int libewf_handle_get_number_of_header_values(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size of the value identifier of a specific index
@@ -5513,7 +5835,6 @@ int libewf_handle_get_number_of_hash_values(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_number_of_hash_values";
 	int number_of_hash_values                 = 0;
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -5539,7 +5860,21 @@ int libewf_handle_get_number_of_hash_values(
 
 		return( -1 );
 	}
-/* TODO add write lock */
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_handle->hash_values_parsed == 0 )
 	{
 		if( libewf_internal_handle_parse_hash_values(
@@ -5553,33 +5888,16 @@ int libewf_handle_get_number_of_hash_values(
 			 "%s: unable to parse hash values.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		internal_handle->hash_values_parsed = 1;
 	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( internal_handle->hash_values != NULL )
 	{
-		result = libfvalue_table_get_number_of_values(
-		          internal_handle->hash_values,
-		          &number_of_hash_values,
-		          error );
-
-		if( result != 1 )
+		if( libfvalue_table_get_number_of_values(
+		     internal_handle->hash_values,
+		     &number_of_hash_values,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -5588,24 +5906,22 @@ int libewf_handle_get_number_of_hash_values(
 			 "%s: unable to retrieve number of hash values.",
 			 function );
 
-			return( -1 );
-		}
-		else if( number_of_hash_values < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid number of hash values value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		else
-		{
-			*number_of_values = (uint32_t) number_of_hash_values;
+			goto on_error;
 		}
 	}
+	if( number_of_hash_values < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of hash values value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	*number_of_values = (uint32_t) number_of_hash_values;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_handle->read_write_lock,
@@ -5621,7 +5937,15 @@ int libewf_handle_get_number_of_hash_values(
 		return( -1 );
 	}
 #endif
-	return( result );
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Retrieves the size of the hash value identifier of a specific index

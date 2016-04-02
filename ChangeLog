@@ -2,6 +2,7 @@ TODO
 * clean up TODO refactor notes
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 * fix failing test pyewf_test_read.py
+* fix ewfexport/ewfverify tests locking?
 
 * add multi threaded tool support
   - ewfacquirestream
@@ -13,20 +14,16 @@ TODO
 * ewfacquire allow to set the the maximum number of table entries?
 
 Threat safety
-* libewf_handle
-  - libewf_handle_prepare_write_chunk
-  - libewf_handle_write_chunk
+* libewf_handle_prepare_read_chunk - remove the need for locks
+* libewf_handle_prepare_write_chunk - remove the need for locks
 * libewf_metadata
- - refactor libewf_handle_set_format
- - refactor and add lock libewf_handle_set_md5_hash
- - refactor and add lock libewf_handle_set_sha1_hash
- - add lock libewf_handle_append_acquiry_error
- - add lock libewf_handle_append_checksum_error
- - add lock libewf_handle_append_session
- - add lock libewf_handle_append_track
  - libewf_handle_copy_header_values (write lock)
+ - libewf_handle_copy_media_values
+ - use on_error (continue from libewf_handle_get_header_value_identifier_size)
  - write lock libewf_handle_get_ ... _hash_values
- - use on_error (continue from libewf_handle_get_compression_method)
+ - refactor libewf_handle_set_format
+ - refactor libewf_handle_set_md5_hash
+ - refactor libewf_handle_set_sha1_hash
 
 Multi-threading:
 * make process by chunks the default
@@ -41,7 +38,6 @@ Tests:
   - libewf_handle_set_sha1_hash
   - header value date and time formats?
 * clean up ewf_test_read_chunk.c to match ewf_test_read.c
-* ewftools: test with -x
 * write resume from volume/disk section - basically re-image
 * ewfacquire:
   - add non-unattended tests
@@ -477,10 +473,13 @@ Closed:
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
 
-20160041
+20160402
+* worked on multi threading support in ewfacquirestream
+
+20160401
 * worked on tests
 * worked on thread locking support
-* worked on multi threading support in ewfverify
+* worked on multi threading support in ewfverify and ewfacquire
 
 20160331
 * worked on tests

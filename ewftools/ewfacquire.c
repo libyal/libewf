@@ -1216,7 +1216,7 @@ int ewfacquire_read_input(
 	{
 /* TODO check if output list is empty */
 		if( libcdata_list_free(
-		     &( imaging_handle->output_thread_pool ),
+		     &( imaging_handle->output_list ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		     error ) != 1 )
 		{
@@ -1445,7 +1445,7 @@ on_error:
 	if( imaging_handle->output_list != NULL )
 	{
 		libcdata_list_free(
-		 &( imaging_handle->output_thread_pool ),
+		 &( imaging_handle->output_list ),
 		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		 NULL );
 	}

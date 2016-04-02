@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to create the ewfacquire option sets
 #
-# Version: 20160320
+# Version: 20160402
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -70,7 +70,7 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-f${FORMAT}" > ${OUTPUT_FILE};
+				echo "-f${FORMAT} -j0" > "${OUTPUT_FILE}";
 			done
 
 			for FORMAT in encase7 encase7-v2 smart;
@@ -90,7 +90,7 @@ do
 
 						echo "Creating option set file: ${OUTPUT_FILE}";
 
-						echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -f${FORMAT}" > ${OUTPUT_FILE};
+						echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -f${FORMAT} -j0" > "${OUTPUT_FILE}";
 					done
 				done
 
@@ -99,7 +99,7 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-cdeflate:none -f${FORMAT} -S1MiB" > ${OUTPUT_FILE};
+				echo "-cdeflate:none -f${FORMAT} -j0 -S1MiB" > "${OUTPUT_FILE}";
 			done
 
 			# Test the different supported chunk sizes.
@@ -109,7 +109,7 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-b${CHUNK_SIZE} -cdeflate:empty-block -fencase7" > ${OUTPUT_FILE};
+				echo "-b${CHUNK_SIZE} -cdeflate:empty-block -fencase7 -j0" > "${OUTPUT_FILE}";
 			done
 
 			# Test the different supported formats. 
@@ -119,14 +119,14 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-cdeflate:empty-block -d${HASHING_METHOD} -fencase7" > ${OUTPUT_FILE};
+				echo "-cdeflate:empty-block -d${HASHING_METHOD} -fencase7 -j0" > "${OUTPUT_FILE}";
 			done
 
 			OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.hash:all";
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-cdeflate:empty-block -dsha1,sha256 -fencase7" > ${OUTPUT_FILE};
+			echo "-cdeflate:empty-block -dsha1,sha256 -fencase7 -j0" > "${OUTPUT_FILE}";
 		else
 			for FORMAT in encase7 encase7-v2 smart;
 			do
@@ -134,7 +134,7 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-cdeflate:empty-block -f${FORMAT}" > ${OUTPUT_FILE};
+				echo "-cdeflate:empty-block -f${FORMAT} -j4 -x" > "${OUTPUT_FILE}";
 			done
 		fi
 	done

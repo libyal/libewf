@@ -2019,7 +2019,7 @@ int verification_handle_verify_input(
 	{
 /* TODO check if output list is empty */
 		if( libcdata_list_free(
-		     &( verification_handle->output_thread_pool ),
+		     &( verification_handle->output_list ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		     error ) != 1 )
 		{
@@ -2289,7 +2289,7 @@ on_error:
 	if( verification_handle->output_list != NULL )
 	{
 		libcdata_list_free(
-		 &( verification_handle->output_thread_pool ),
+		 &( verification_handle->output_list ),
 		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		 NULL );
 	}
