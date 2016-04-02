@@ -1,10 +1,8 @@
 TODO
 * clean up TODO refactor notes
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
-* fix failing test pyewf_test_read.py
 
 * add multi threaded tool support
-  - ewfexport
   - ewfmount - fuse multi thread support ?
   - handle abort paths
 * chunk table get chunk from chunk_table->corrupted_chunks_list
@@ -53,157 +51,6 @@ Tests:
   - add DFXML output tests
 *ewfverify
   - add option sets for single/multi threaded, chunks
-
-* libewf:
-  - add unpacked_data_size to chunk data?
-  - empty caches on close
-
-* check if empty block check or equiv is always done (except for no compression).
-* user header and header2 time difference to calculate the timezone
-
-* ewftools:
-  - if one option available just print and continue
-  - if set by command lien just print and continue
-  - port multi threaded ewfacquirestream
-  - add multi threading support
-  - allow to set date and time
-* ewfacquire:
-  - print status info without confirmation in unattended mode
-* ewfexport:
-  - if EWF file is empty still write an emtpy file
-
-* fix last_chunk_data_offset calculation for table2
-  in combination with libewf_chunk_group_correct_v1
-* chunk data
-  - related calculation into chunk data
-  - change API to have chunk type
-* libewf_chunk_data_check_for_empty_block
-  - use memcmp instead?
-  - write a test at configure time to determine which approach is faster
-  - same for adler32 ?
-
-  - sections list on write: cache section descriptors instead of free-ing them?
-
-  - segment files cache on write set to 1 ?
-
-  - create a single chunk groups cache ? instead per segment file ?
-
-  - check if chunks groups list is filled in on demand scenario
-
-  - only use backup range (table2) during initial phase?
-    - nope also necessary during reread
-
-  - use mapped offset to determine first chunk index (+/-)
-    - what about base offset ?
-    - make mapped offsets absolute ?
-
-  - refactor chunk table to:
-    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
-      successive calls to fdata types
-    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
-      back to read IO handle ?
-
-  - handle: replace chunk_index calcuations by current_chunk_index tracking ?
-  - libewf_filename_create: change to accept ( segment_number - 1 )
-  - libewf_write_io_handle_initialize_resume: re-map mapped offset ranges ?
-
-  - write_io_handle->number_of_table_entries still needed ?
-
-  - add write support to the various fdata lists ?
-
-    and refactor it to have a generic solution if range list is not set fall back
-
-* pyewf
-  - change header and hash values into sequence objects
-
-* add bzip2 compression support
-* add function to retrieve:
-  - compression values
-
-* add support for set identifier change ?
-* check alignment of:
-  section_data_read CHS cylinders, SMART logs start sector
-
-* check behavior of ewfacquire resume and specified offset
-
-* complete ewfrecover
-  - max segment size
-  - try to read the chunks by calculating the checksums and see where they align
-
-* corruption scenarios
-  - libewf_segment_file_read deal with corrupted segment file header ?
-  - add strict chunk data flag handling
-  - document how libewf deals with corruption scenarios
-  - valid table and table2 with different information
-    (for now use table if number of entries is not 0)
-  - tainted table and table2
-  - tainted table or table2 (use the one that is not tainted)
-
-* implement new chunk IO functions where chunk is an object
-
-* add stream write support for EWF-S01 use fill space solution in table section
-
-* fix double _FILE_OFFSET_BITS=64
-
-* fix output: number of entries: 19175 exceeds maximum: 16375
-
-* add light-weight function to determine byte frequency ? to check if compression is viable ?
-* work on deduplication support
-
-* allow zlib to be replaced by alternative back-end
-
-* libewf_filename_create split off wide variant ?
-
-* check if compression level none is passed for EWF-S01
-  - validate SMART forced compression of uncompressed chunks
-
-* Ex01/Lx01 format
-  - encryption support (read/write)
-  - analytical data
-    - parse (read)
-  - case data (write)
-    - compression method support
-    - write blocker type support
-  - device information
-    - check TODO (read/write)
-
-* Ex01/Lx01 test images
-  - memory image -> winen and encase ?
-  - resumed ?
-  - encrypted
-  - open single files ?
-
-* Ex01/Lx01 read support
-  - add generic way to parse file object data ?
-  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
-  - complete: libewf_chunk_table_fill_v2
-
-* Ex01 write support
-  - pattern fill chunk support (set chunk table entry, test)
-  - enable secion data integrity hash support
-  - add support for write resume
-
-* Lx01 write support
-  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
-
-* Ex01/Lx01 extensions
-  - implement SHA256 hash section
-  - allow pattern fill to have a size
-  - hash based imaging?
-
-* ewfexport:
-  - EnCase7 L01 ignore root entry like ewfmount
-  - support for volume letter in -t argument
-  - output chunk mode
-
-* pyewf
-  - update (+/-)
-  - file entry data ? instead of file entry
-* ewfmount
-  - check access rights on fuse mount point
-  - add stat info on readdir (see regfmount)
-  - provide means to have a similar naming approach as mount_ewf.py
-* check performance
 
 Error tolerance:
 * add setting to be less strict
@@ -378,6 +225,11 @@ Debug
 * print offsets of segment files
 
 Tools:
+* if one option available just print and continue
+* if set by command lien just print and continue
+* port multi threaded ewfacquirestream
+* add multi threading support
+* allow to set date and time
 * locale support
   - print output convert to system string
   - reduce string conversions, use as much as possible the system string type in the tools
@@ -388,7 +240,11 @@ Tools:
   - compile on system without libcrypto
   - remove the cryptographic options if crypto library is missing
 * have failed on open return a more sensible error (extract from error)
-* ewfacquire
+* process status
+  - improve and remove "This could take a while." ?
+* libsystem path implement GetVolumeInformation
+* ewfacquire:
+  - print status info without confirmation in unattended mode
   - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
     no, although not set in EWF file, the granualarity is still used in handling read errors
   - warn if values exceed maximum segment count
@@ -407,7 +263,15 @@ Tools:
 * ewfacquirestream
   - implement stream handle
   - add multi threading support
-* ewfexport
+* ewfdebug
+  - create a tool to analyse a single segment file
+  - implement low and high level api separation
+* ewfexport:
+  - if EWF file is empty still write an emtpy file
+  - add support for multi threaded logical export
+  - EnCase7 L01 ignore root entry like ewfmount
+  - support for volume letter in -t argument
+  - add support for different output chunk mode
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
   - allow different input and output header codepages?
@@ -418,23 +282,155 @@ Tools:
   - improve -f files error tollerability
   - add multi threading support
   - add multi threading support for logical images
-* ewfdebug
-  - create a tool to analyse a single segment file
-  - implement low and high level api separation
 * ewfmount
   - Windows finish Dokan implementation
   - Windows add ImDisk implementation ?
   - MacOS native API support ?
   - add multi threading support
   - add multi threading support for logical images
-* ewfverify
+* ewfverify:
   - allow for multi stage verification, where user suspends and resumes?
   - for multi threading measure: number of items queued, number of items
   requeued, number of threads
   - add multi threading support for logical images
-* process status
-  - improve and remove "This could take a while." ?
-* libsystem path implement GetVolumeInformation
+  - add support for multi threaded logical verify
+
+Unsorted:
+* libewf:
+  - add unpacked_data_size to chunk data?
+  - empty caches on close
+
+* check if empty block check or equiv is always done (except for no compression).
+* user header and header2 time difference to calculate the timezone
+
+* fix last_chunk_data_offset calculation for table2
+  in combination with libewf_chunk_group_correct_v1
+* chunk data
+  - related calculation into chunk data
+  - change API to have chunk type
+* libewf_chunk_data_check_for_empty_block
+  - use memcmp instead?
+  - write a test at configure time to determine which approach is faster
+  - same for adler32 ?
+
+  - sections list on write: cache section descriptors instead of free-ing them?
+
+  - segment files cache on write set to 1 ?
+
+  - create a single chunk groups cache ? instead per segment file ?
+
+  - check if chunks groups list is filled in on demand scenario
+
+  - only use backup range (table2) during initial phase?
+    - nope also necessary during reread
+
+  - use mapped offset to determine first chunk index (+/-)
+    - what about base offset ?
+    - make mapped offsets absolute ?
+
+  - refactor chunk table to:
+    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
+      successive calls to fdata types
+    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
+      back to read IO handle ?
+
+  - handle: replace chunk_index calcuations by current_chunk_index tracking ?
+  - libewf_filename_create: change to accept ( segment_number - 1 )
+  - libewf_write_io_handle_initialize_resume: re-map mapped offset ranges ?
+
+  - write_io_handle->number_of_table_entries still needed ?
+
+  - add write support to the various fdata lists ?
+
+    and refactor it to have a generic solution if range list is not set fall back
+
+* pyewf
+  - change header and hash values into sequence objects
+
+* add bzip2 compression support
+* add function to retrieve:
+  - compression values
+
+* add support for set identifier change ?
+* check alignment of:
+  section_data_read CHS cylinders, SMART logs start sector
+
+* check behavior of ewfacquire resume and specified offset
+
+* complete ewfrecover
+  - max segment size
+  - try to read the chunks by calculating the checksums and see where they align
+
+* corruption scenarios
+  - libewf_segment_file_read deal with corrupted segment file header ?
+  - add strict chunk data flag handling
+  - document how libewf deals with corruption scenarios
+  - valid table and table2 with different information
+    (for now use table if number of entries is not 0)
+  - tainted table and table2
+  - tainted table or table2 (use the one that is not tainted)
+
+* implement new chunk IO functions where chunk is an object
+
+* add stream write support for EWF-S01 use fill space solution in table section
+
+* fix double _FILE_OFFSET_BITS=64
+
+* fix output: number of entries: 19175 exceeds maximum: 16375
+
+* add light-weight function to determine byte frequency ? to check if compression is viable ?
+* work on deduplication support
+
+* allow zlib to be replaced by alternative back-end
+
+* libewf_filename_create split off wide variant ?
+
+* check if compression level none is passed for EWF-S01
+  - validate SMART forced compression of uncompressed chunks
+
+* Ex01/Lx01 format
+  - encryption support (read/write)
+  - analytical data
+    - parse (read)
+  - case data (write)
+    - compression method support
+    - write blocker type support
+  - device information
+    - check TODO (read/write)
+
+* Ex01/Lx01 test images
+  - memory image -> winen and encase ?
+  - resumed ?
+  - encrypted
+  - open single files ?
+
+* Ex01/Lx01 read support
+  - add generic way to parse file object data ?
+  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
+  - complete: libewf_chunk_table_fill_v2
+
+* Ex01 write support
+  - pattern fill chunk support (set chunk table entry, test)
+  - enable secion data integrity hash support
+  - add support for write resume
+
+* Lx01 write support
+  - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
+
+* Ex01/Lx01 extensions
+  - implement SHA256 hash section
+  - allow pattern fill to have a size
+  - hash based imaging?
+
+* pyewf
+  - update (+/-)
+  - file entry data ? instead of file entry
+* ewfmount
+  - check access rights on fuse mount point
+  - add stat info on readdir (see regfmount)
+  - provide means to have a similar naming approach as mount_ewf.py
+* check performance
+
 
 Performance:
 * map full RAW storage media data into memory?
@@ -475,6 +471,7 @@ Closed:
 
 20160402
 * worked on multi threading support in ewfacquirestream
+* fixes for Python-bindings tests
 
 20160401
 * worked on tests
