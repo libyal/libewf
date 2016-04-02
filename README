@@ -34,11 +34,11 @@ Work in progress:
 * Dokan library support (experimental)
 * Python bindings (including Python 3 support)
 * write EWF2-Ex01 support
+* Multi-threading support
 
 Planned:
 
 * write EWF-L01 and EWF2-Lx01 (long-term)
-* Multi-threading support
 
 The libewf package contains the following tools:
 

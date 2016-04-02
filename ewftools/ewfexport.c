@@ -959,7 +959,7 @@ int main( int argc, char * const argv[] )
 				else if( result == 0 )
 				{
 					fprintf(
-					 stdout,
+					 stderr,
 					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
@@ -1331,7 +1331,7 @@ on_abort:
 	if( ewfexport_abort != 0 )
 	{
 		fprintf(
-		 stdout,
+		 stderr,
 		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
 		 program );
 
@@ -1340,14 +1340,14 @@ on_abort:
 	if( result != 1 )
 	{
 		fprintf(
-		 stdout,
+		 stderr,
 		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
 		 program );
 
 		return( EXIT_FAILURE );
 	}
 	fprintf(
-	 stdout,
+	 stderr,
 	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
 	 program );
 

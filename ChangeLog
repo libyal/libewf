@@ -45,6 +45,7 @@ Tests:
   - add non-unattended tests
   - add option sets for single/multi threaded, chunks
   - export of split RAW
+  - test writing to stdout and catch https://github.com/libyal/libewf/issues/23
 * ewfexport_logical:
   - add non-unattended tests
 * ewfinfo:
@@ -472,6 +473,7 @@ Closed:
 20160402
 * worked on multi threading support in ewfacquirestream
 * fixes for Python-bindings tests
+* fixes for ewfexport writing notification messsages to stdout
 
 20160401
 * worked on tests
