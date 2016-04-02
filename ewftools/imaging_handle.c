@@ -1350,15 +1350,13 @@ int imaging_handle_get_offset(
  */
 int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
      libcerror_error_t **error )
 {
-	uint8_t *data         = NULL;
 	static char *function = "imaging_handle_swap_byte_pairs";
-	size_t data_size      = 0;
-	size_t iterator       = 0;
-	uint8_t byte          = 0;
+	size_t buffer_offset  = 0;
+	uint8_t byte_value    = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -1371,19 +1369,19 @@ int imaging_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	if( storage_media_buffer == NULL )
+	if( buffer == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( read_size == 0 )
-	 || ( read_size > (size_t) SSIZE_MAX ) )
+	if( ( buffer_size == 0 )
+	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1396,7 +1394,7 @@ int imaging_handle_swap_byte_pairs(
 	}
 	/* If the last bit is set the value is odd
 	 */
-	if( ( read_size & 0x01 ) != 0 )
+	if( ( buffer_size & 0x01 ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1407,37 +1405,13 @@ int imaging_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	if( storage_media_buffer_get_data(
-	     storage_media_buffer,
-	     &data,
-	     &data_size,
-	     error ) != 1 )
+	for( buffer_offset = 0;
+	     buffer_offset < buffer_size;
+	     buffer_offset += 2 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve storage media buffer data.",
-		 function );
-
-		return( -1 );
-	}
-	if( read_size != data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: mismatch in read size and data size.",
-		 function );
-
-		return( -1 );
-	}
-	for( iterator = 0; iterator < read_size; iterator += 2 )
-	{
-		byte                 = data[ iterator ];
-		data[ iterator ]     = data[ iterator + 1 ];
-		data[ iterator + 1 ] = byte;
+		byte_value                  = buffer[ buffer_offset ];
+		buffer[ buffer_offset ]     = buffer[ buffer_offset + 1 ];
+		buffer[ buffer_offset + 1 ] = byte_value;
 	}
 	return( 1 );
 }
@@ -1536,7 +1510,7 @@ on_error:
  */
 int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error )
 {

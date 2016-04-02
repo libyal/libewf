@@ -1010,7 +1010,7 @@ on_error:
  */
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error )
 {
@@ -1355,12 +1355,6 @@ int verification_handle_process_storage_media_buffer_callback(
 	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
 	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
 	     &error ) == -1 )
-/* TODO
-	if( libcthreads_thread_pool_push(
-	     verification_handle->output_thread_pool,
-	     (intptr_t *) storage_media_buffer,
-	     &error ) == -1 )
-*/
 	{
 		libcerror_error_set(
 		 &error,
@@ -1876,8 +1870,8 @@ int verification_handle_verify_input(
 
 			goto on_error;
 		}
-		storage_media_offset += (off64_t) read_size;
-		remaining_media_size -= (size64_t) read_size;
+		storage_media_offset += read_count;
+		remaining_media_size -= read_count;
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 		if( verification_handle->number_of_threads != 0 )
@@ -1906,7 +1900,7 @@ int verification_handle_verify_input(
 			                 storage_media_buffer,
 		        	         error );
 
-			if( process_count <= 0 )
+			if( process_count < 0 )
 			{
 				libcerror_error_set(
 				 error,

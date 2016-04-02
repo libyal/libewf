@@ -246,17 +246,12 @@ int verification_handle_initialize_integrity_hash(
 
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 
 int verification_handle_finalize_integrity_hash(
      verification_handle_t *verification_handle,
-     libcerror_error_t **error );
-
-int verification_handle_update_integrity_hash_of_storage_media_buffer(
-     verification_handle_t *verification_handle,
-     storage_media_buffer_t *storage_media_buffer,
      libcerror_error_t **error );
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )

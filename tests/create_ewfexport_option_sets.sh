@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to create the ewfexport option sets
 #
-# Version: 20160320
+# Version: 20160402
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -65,7 +65,7 @@ do
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-f${FORMAT}" > ${OUTPUT_FILE};
+			echo "-f${FORMAT} -j0" > "${OUTPUT_FILE}";
 		done
 
 		# Test the different supported compression methods and levels.
@@ -83,7 +83,7 @@ do
 
 				echo "Creating option set file: ${OUTPUT_FILE}";
 
-				echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -fencase7" > ${OUTPUT_FILE};
+				echo "-c${COMPRESSION_METHOD}:${COMPRESSION_LEVEL} -fencase7 -j0" > "${OUTPUT_FILE}";
 			done
 		done
 
@@ -94,7 +94,7 @@ do
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-b${CHUNK_SIZE} -fencase7" > ${OUTPUT_FILE};
+			echo "-b${CHUNK_SIZE} -fencase7 -j0" > "${OUTPUT_FILE}";
 		done
 
 		# Test the different supported formats. 
@@ -104,14 +104,14 @@ do
 
 			echo "Creating option set file: ${OUTPUT_FILE}";
 
-			echo "-d${HASHING_METHOD} -fencase7" > ${OUTPUT_FILE};
+			echo "-d${HASHING_METHOD} -fencase7 -j0" > "${OUTPUT_FILE}";
 		done
 
 		OUTPUT_FILE="${TEST_SET_DIR}/${INPUT_NAME}.hash:all";
 
 		echo "Creating option set file: ${OUTPUT_FILE}";
 
-		echo "-dsha1,sha256 -fencase7" > ${OUTPUT_FILE};
+		echo "-dsha1,sha256 -fencase7 -j0" > "${OUTPUT_FILE}";
 	done
 done
 

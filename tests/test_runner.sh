@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160401
+# Version: 20160402
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -332,19 +332,19 @@ run_test_with_arguments()
 		then
 			if test ${IS_PYTHON_SCRIPT} -eq 0;
 			then
-				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "set non-stop on" -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			else
-				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "set non-stop on" -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			fi
 		else
 			if test ${IS_PYTHON_SCRIPT} -eq 0;
 			then
-				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" gdb -ex "set non-stop on" -ex "run" -ex "quit" --args "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			else
-				LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" gdb -ex "set non-stop on" -ex "run" -ex "quit" --args "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			fi
 		fi

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160328
+# Version: 20160402
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -31,13 +31,13 @@ run_ewfacquire_device()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE}
+	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -j 4 -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u -x ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE}
 
 	local RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
-                /usr/bin/time -v ${VERIFY_TOOL} -q ${TMPDIR}/${INPUT_NAME}.acquire.*
+                /usr/bin/time -v ${VERIFY_TOOL} -j 4 -q -x ${TMPDIR}/${INPUT_NAME}.acquire.*
 
                 RESULT=$?;
         fi

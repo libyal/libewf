@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "digest_hash.h"
+#include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
@@ -169,13 +170,17 @@ struct export_handle
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 
-	/* The process thread pool
+	/* The input process thread pool
 	 */
-	libcthreads_thread_pool_t *process_thread_pool;
+	libcthreads_thread_pool_t *input_process_thread_pool;
 
 	/* The output thread pool
 	 */
 	libcthreads_thread_pool_t *output_thread_pool;
+
+	/* The output list
+	 */
+	libcdata_list_t *output_list;
 
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
@@ -199,6 +204,10 @@ struct export_handle
 	 */
 	size32_t input_chunk_size;
 
+	/* The output chunk size
+	 */
+	size32_t output_chunk_size;
+
 	/* The number of bytes per sector
 	 */
 	uint32_t bytes_per_sector;
@@ -218,6 +227,14 @@ struct export_handle
 	/* Value to indicate if the chunk should be zeroed on error
 	 */
 	int zero_chunk_on_error;
+
+	/* Value to indicate if byte pairs should be swapped
+	 */
+	uint8_t swap_byte_pairs;
+
+	/* The last offset hashed
+	 */
+	off64_t last_offset_hashed;
 
 	/* The notification output stream
 	 */
@@ -266,23 +283,24 @@ int export_handle_close(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
-ssize_t export_handle_prepare_read_buffer(
+ssize_t export_handle_prepare_read_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error );
 
-ssize_t export_handle_read_buffer(
+ssize_t export_handle_read_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error );
 
-ssize_t export_handle_prepare_write_buffer(
+ssize_t export_handle_prepare_write_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error );
 
-ssize_t export_handle_write_buffer(
+ssize_t export_handle_write_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
@@ -295,8 +313,8 @@ off64_t export_handle_seek_offset(
 
 int export_handle_swap_byte_pairs(
      export_handle_t *export_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
      libcerror_error_t **error );
 
 int export_handle_initialize_integrity_hash(
@@ -305,7 +323,7 @@ int export_handle_initialize_integrity_hash(
 
 int export_handle_update_integrity_hash(
      export_handle_t *export_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 
@@ -444,9 +462,28 @@ int export_handle_append_read_error(
       size_t number_of_bytes,
       libcerror_error_t **error );
 
+ssize_t export_handle_write(
+         export_handle_t *export_handle,
+         storage_media_buffer_t *input_storage_media_buffer,
+         storage_media_buffer_t *output_storage_media_buffer,
+         size_t input_size,
+         libcerror_error_t **error );
+
 ssize_t export_handle_finalize(
          export_handle_t *export_handle,
          libcerror_error_t **error );
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+int export_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     export_handle_t *export_handle );
+
+int export_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     export_handle_t *export_handle );
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int export_handle_export_input(
      export_handle_t *export_handle,

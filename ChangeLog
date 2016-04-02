@@ -2,12 +2,11 @@ TODO
 * clean up TODO refactor notes
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 * fix failing test pyewf_test_read.py
-* fix ewfexport/ewfverify tests locking?
 
 * add multi threaded tool support
-  - ewfacquirestream
   - ewfexport
   - ewfmount - fuse multi thread support ?
+  - handle abort paths
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * re-enable bzip2 tests
 * throttle the size of the sections list?
@@ -195,6 +194,7 @@ Tests:
 * ewfexport:
   - EnCase7 L01 ignore root entry like ewfmount
   - support for volume letter in -t argument
+  - output chunk mode
 
 * pyewf
   - update (+/-)

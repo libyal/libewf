@@ -328,8 +328,8 @@ int imaging_handle_get_offset(
 
 int imaging_handle_swap_byte_pairs(
      imaging_handle_t *imaging_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
      libcerror_error_t **error );
 
 int imaging_handle_initialize_integrity_hash(
@@ -338,7 +338,7 @@ int imaging_handle_initialize_integrity_hash(
 
 int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 

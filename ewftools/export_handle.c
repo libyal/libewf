@@ -36,6 +36,7 @@
 #include "ewfinput.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libcfile.h"
+#include "ewftools_libcnotify.h"
 #include "ewftools_libcpath.h"
 #include "ewftools_libcsplit.h"
 #include "ewftools_libcstring.h"
@@ -177,16 +178,18 @@ int export_handle_initialize(
 			goto on_error;
 		}
 	}
-	( *export_handle )->calculate_md5            = calculate_md5;
-	( *export_handle )->use_chunk_data_functions = use_chunk_data_functions;
-	( *export_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *export_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
-	( *export_handle )->output_format            = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
-	( *export_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
-	( *export_handle )->sectors_per_chunk        = 64;
-	( *export_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
-	( *export_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *export_handle )->notify_stream            = EXPORT_HANDLE_NOTIFY_STREAM;
+	( *export_handle )->calculate_md5                  = calculate_md5;
+	( *export_handle )->use_chunk_data_functions       = use_chunk_data_functions;
+	( *export_handle )->compression_method             = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	( *export_handle )->compression_level              = LIBEWF_COMPRESSION_NONE;
+	( *export_handle )->output_format                  = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+	( *export_handle )->ewf_format                     = LIBEWF_FORMAT_ENCASE6;
+	( *export_handle )->sectors_per_chunk              = 64;
+	( *export_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
+	( *export_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *export_handle )->number_of_threads              = 4;
+	( *export_handle )->maximum_number_of_queued_items = 256;
+	( *export_handle )->notify_stream                  = EXPORT_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -915,15 +918,15 @@ int export_handle_close(
 	return( 0 );
 }
 
-/* Prepares a buffer after reading the input of the export handle
+/* Prepares a storage media buffer after reading the input of the export handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t export_handle_prepare_read_buffer(
+ssize_t export_handle_prepare_read_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error )
 {
-	static char *function = "export_handle_prepare_read_buffer";
+	static char *function = "export_handle_prepare_read_storage_media_buffer";
 	ssize_t process_count = 0;
 
 	if( export_handle == NULL )
@@ -963,7 +966,7 @@ ssize_t export_handle_prepare_read_buffer(
 		                 storage_media_buffer->process_checksum,
 		                 error );
 
-		if( process_count == -1 )
+		if( process_count < 0 )
 		{
 			libcerror_error_free(
 			 error );
@@ -1022,6 +1025,17 @@ ssize_t export_handle_prepare_read_buffer(
 				return( -1 );
 			}
 		}
+		if( process_count > (ssize_t) storage_media_buffer->requested_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: more bytes read than requested.",
+			 function );
+
+			return( -1 );
+		}
 		if( storage_media_buffer->is_compressed == 0 )
 		{
 			storage_media_buffer->data_in_compression_buffer = 1;
@@ -1036,19 +1050,31 @@ ssize_t export_handle_prepare_read_buffer(
 	{
 		process_count = (ssize_t) storage_media_buffer->raw_buffer_data_size;
 	}
+	storage_media_buffer->processed_size = (size_t) process_count;
+
+	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		/* Set the chunk data size in the compression buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			storage_media_buffer->compression_buffer_data_size = (size_t) process_count;
+		}
+	}
 	return( process_count );
 }
 
-/* Reads a buffer from the input of the export handle
+/* Reads a storage media buffer from the input of the export handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t export_handle_read_buffer(
+ssize_t export_handle_read_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
+         off64_t storage_media_offset,
          size_t read_size,
          libcerror_error_t **error )
 {
-	static char *function = "export_handle_read_buffer";
+	static char *function = "export_handle_read_storage_media_buffer";
 	ssize_t read_count    = 0;
 
 	if( export_handle == NULL )
@@ -1093,7 +1119,7 @@ ssize_t export_handle_read_buffer(
 	                      read_size,
 		              error );
 	}
-	if( read_count == -1 )
+	if( read_count < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1104,6 +1130,9 @@ ssize_t export_handle_read_buffer(
 
 		return( -1 );
 	}
+	storage_media_buffer->storage_media_offset = storage_media_offset;
+	storage_media_buffer->requested_size       = read_size;
+
 	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 	{
 		storage_media_buffer->compression_buffer_data_size = (size_t) read_count;
@@ -1115,15 +1144,15 @@ ssize_t export_handle_read_buffer(
 	return( read_count );
 }
 
-/* Prepares a buffer before writing the output of the export handle
+/* Prepares a storage media buffer before writing the output of the export handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t export_handle_prepare_write_buffer(
+ssize_t export_handle_prepare_write_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          libcerror_error_t **error )
 {
-	static char *function = "export_handle_prepare_write_buffer";
+	static char *function = "export_handle_prepare_write_storage_media_buffer";
 	ssize_t process_count = 0;
 
 	if( export_handle == NULL )
@@ -1176,7 +1205,7 @@ ssize_t export_handle_prepare_write_buffer(
 					 &( storage_media_buffer->process_checksum ),
 					 error );
 
-			if( process_count == -1 )
+			if( process_count < 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -1200,16 +1229,16 @@ ssize_t export_handle_prepare_write_buffer(
 	return( process_count );
 }
 
-/* Writes a buffer to the output of the export handle
+/* Writes a storage media buffer to the output of the export handle
  * Returns the number of bytes written or -1 on error
  */
-ssize_t export_handle_write_buffer(
+ssize_t export_handle_write_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
          libcerror_error_t **error )
 {
-	static char *function        = "export_handle_write_buffer";
+	static char *function        = "export_handle_write_storage_media_buffer";
 	size_t raw_write_buffer_size = 0;
 	ssize_t write_count          = 0;
 	uint8_t *raw_write_buffer    = NULL;
@@ -1295,7 +1324,7 @@ ssize_t export_handle_write_buffer(
 				       write_size,
 				       error );
 		}
-		if( write_count == -1 )
+		if( write_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1324,7 +1353,7 @@ ssize_t export_handle_write_buffer(
 				       write_size,
 				       error );
 		}
-		if( write_count == -1 )
+		if( write_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1383,15 +1412,13 @@ off64_t export_handle_seek_offset(
  */
 int export_handle_swap_byte_pairs(
      export_handle_t *export_handle,
-     storage_media_buffer_t *storage_media_buffer,
-     size_t read_size,
+     uint8_t *buffer,
+     size_t buffer_size,
      libcerror_error_t **error )
 {
-	uint8_t *data         = NULL;
 	static char *function = "export_handle_swap_byte_pairs";
-	size_t data_offset    = 0;
-	size_t data_size      = 0;
-	uint8_t byte          = 0;
+	size_t buffer_offset  = 0;
+	uint8_t byte_value    = 0;
 
 	if( export_handle == NULL )
 	{
@@ -1404,75 +1431,49 @@ int export_handle_swap_byte_pairs(
 
 		return( -1 );
 	}
-	if( storage_media_buffer == NULL )
+	if( buffer == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( read_size == 0 )
-	 || ( read_size > (size_t) SSIZE_MAX ) )
+	if( ( buffer_size == 0 )
+	 || ( buffer_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid read size value out of bounds.",
+		 "%s: invalid buffer size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
 	/* If the last bit is set the value is odd
 	 */
-	if( ( read_size & 0x01 ) != 0 )
+	if( ( buffer_size & 0x01 ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid read size value is odd.",
+		 "%s: invalid buffer size value is odd.",
 		 function );
 
 		return( -1 );
 	}
-	if( storage_media_buffer_get_data(
-	     storage_media_buffer,
-	     &data,
-	     &data_size,
-	     error ) != 1 )
+	for( buffer_offset = 0;
+	     buffer_offset < buffer_size;
+	     buffer_offset += 2 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve storage media buffer data.",
-		 function );
-
-		return( -1 );
-	}
-	if( read_size != data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: mismatch in read size and data size.",
-		 function );
-
-		return( -1 );
-	}
-	for( data_offset = 0;
-	     data_offset < read_size;
-	     data_offset += 2 )
-	{
-		byte                    = data[ data_offset ];
-		data[ data_offset ]     = data[ data_offset + 1 ];
-		data[ data_offset + 1 ] = byte;
+		byte_value                  = buffer[ buffer_offset ];
+		buffer[ buffer_offset ]     = buffer[ buffer_offset + 1 ];
+		buffer[ buffer_offset + 1 ] = byte_value;
 	}
 	return( 1 );
 }
@@ -1571,7 +1572,7 @@ on_error:
  */
 int export_handle_update_integrity_hash(
      export_handle_t *export_handle,
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error )
 {
@@ -1837,7 +1838,7 @@ int export_handle_input_is_corrupted(
      export_handle_t *export_handle,
      libcerror_error_t **error )
 {
-	static char *function = "export_handle_get_output_chunk_size";
+	static char *function = "export_handle_input_is_corrupted";
 	int result            = 0;
 
 	if( export_handle == NULL )
@@ -4359,6 +4360,173 @@ int export_handle_append_read_error(
 	return( 1 );
 }
 
+/* Writes a storage media buffer to the export handle
+ * Returns the number of input bytes written or -1 on error
+ */
+ssize_t export_handle_write(
+         export_handle_t *export_handle,
+         storage_media_buffer_t *input_storage_media_buffer,
+         storage_media_buffer_t *output_storage_media_buffer,
+         size_t input_size,
+         libcerror_error_t **error )
+{
+	uint8_t *input_buffer = NULL;
+	static char *function = "export_handle_write";
+	size_t write_size     = 0;
+	ssize_t process_count = 0;
+	ssize_t write_count   = 0;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( input_storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid input storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	{
+		if( output_storage_media_buffer == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid output storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	while( input_size > 0 )
+	{
+		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			if( input_size > (ssize_t) export_handle->output_chunk_size )
+			{
+				write_size = export_handle->output_chunk_size;
+			}
+			else
+			{
+				write_size = (size_t) input_size;
+			}
+			if( ( output_storage_media_buffer->raw_buffer_data_size + write_size ) > export_handle->output_chunk_size )
+			{
+				write_size = export_handle->output_chunk_size - output_storage_media_buffer->raw_buffer_data_size;
+			}
+			if( input_storage_media_buffer->data_in_compression_buffer == 1 )
+			{
+				input_buffer = input_storage_media_buffer->compression_buffer;
+			}
+			else
+			{
+				input_buffer = input_storage_media_buffer->raw_buffer;
+			}
+			if( memory_copy(
+			     &( output_storage_media_buffer->raw_buffer[ output_storage_media_buffer->raw_buffer_data_size ] ),
+			     input_buffer,
+			     write_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy data from input buffer to output raw buffer.",
+				 function );
+
+				return( -1 );
+			}
+			output_storage_media_buffer->raw_buffer_data_size += write_size;
+
+			/* Make sure the output chunk is filled upto the output chunk size
+			 */
+			if( ( export_handle->last_offset_hashed < (off64_t) export_handle->export_size )
+			 && ( output_storage_media_buffer->raw_buffer_data_size < export_handle->output_chunk_size ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid export handle - output chunk size value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			process_count = export_handle_prepare_write_storage_media_buffer(
+					 export_handle,
+					 output_storage_media_buffer,
+					 error );
+		}
+		else
+		{
+			process_count = export_handle_prepare_write_storage_media_buffer(
+					 export_handle,
+					 input_storage_media_buffer,
+					 error );
+		}
+		if( process_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to prepare storage media buffer before write.",
+			 function );
+
+			return( -1 );
+		}
+		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			write_count = export_handle_write_storage_media_buffer(
+				       export_handle,
+				       output_storage_media_buffer,
+				       process_count,
+				       error );
+		}
+		else
+		{
+			write_count = export_handle_write_storage_media_buffer(
+				       export_handle,
+				       input_storage_media_buffer,
+				       process_count,
+				       error );
+		}
+		if( write_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+		input_size  -= process_count;
+		write_count += process_count;
+
+		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+		{
+			output_storage_media_buffer->raw_buffer_data_size = 0;
+		}
+	}
+	return( write_count );
+}
+
 /* Finalizes the export handle
  * Returns the number of input bytes written or -1 on error
  */
@@ -4446,7 +4614,7 @@ ssize_t export_handle_finalize(
 		               export_handle->ewf_output_handle,
 	        	       error );
 
-		if( write_count == -1 )
+		if( write_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4461,6 +4629,377 @@ ssize_t export_handle_finalize(
 	return( write_count );
 }
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+/* Prepares a storage media buffer for export
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_process_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     export_handle_t *export_handle )
+{
+        libcerror_error_t *error = NULL;
+        static char *function    = "export_handle_process_storage_media_buffer_callback";
+	ssize_t process_count    = 0;
+
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	process_count = export_handle_prepare_read_storage_media_buffer(
+	                 export_handle,
+	                 storage_media_buffer,
+	                 &error );
+
+	if( process_count < 0 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to prepare storage media buffer after read.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_pool_push_sorted(
+	     export_handle->output_thread_pool,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
+	     &error ) == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to push storage media buffer onto output thread pool queue.",
+		 function );
+
+		goto on_error;
+	}
+	storage_media_buffer = NULL;
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Prepares a storage media buffer for export
+ * Callback function for the process thread pool
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_output_storage_media_buffer_callback(
+     storage_media_buffer_t *storage_media_buffer,
+     export_handle_t *export_handle )
+{
+	libcdata_list_element_t *element                    = NULL;
+	libcdata_list_element_t *next_element               = NULL;
+        libcerror_error_t *error                            = NULL;
+	storage_media_buffer_t *output_storage_media_buffer = NULL;
+	uint8_t *data                                       = NULL;
+        static char *function                               = "export_handle_process_storage_media_buffer_callback";
+	size_t data_size                                    = 0;
+	ssize_t write_count                                 = 0;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_list_insert_value(
+	     export_handle->output_list,
+	     (intptr_t *) storage_media_buffer,
+	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
+	     LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
+	     &error ) == -1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to insert storage media buffer into output list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_list_get_first_element(
+	     export_handle->output_list,
+	     &element,
+	     &error ) != 1 )
+	{
+		libcerror_error_set(
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first element.",
+		 function );
+
+		goto on_error;
+	}
+	while( element != NULL )
+	{
+		if( libcdata_list_element_get_value(
+		     element,
+		     (intptr_t **) &storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from list element.",
+			 function );
+
+			goto on_error;
+		}
+		if( storage_media_buffer->storage_media_offset != export_handle->last_offset_hashed )
+		{
+			break;
+		}
+		if( storage_media_buffer_get_data(
+		     storage_media_buffer,
+		     &data,
+		     &data_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine storage media buffer data.",
+			 function );
+
+			goto on_error;
+		}
+		/* Swap byte pairs
+		 */
+		if( export_handle->swap_byte_pairs == 1 )
+		{
+			if( export_handle_swap_byte_pairs(
+			     export_handle,
+			     data,
+			     storage_media_buffer->processed_size,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to swap byte pairs.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		/* Digest hashes are calcultated after swap
+		 */
+		if( export_handle_update_integrity_hash(
+		     export_handle,
+		     data,
+		     storage_media_buffer->processed_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to update integrity hash(es).",
+			 function );
+
+			goto on_error;
+		}
+		export_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
+
+		if( export_handle->use_chunk_data_functions != 0 )
+		{
+			if( storage_media_buffer_initialize(
+			     &output_storage_media_buffer,
+			     STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA,
+			     export_handle->output_chunk_size,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create output storage media buffer.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		write_count = export_handle_write(
+			       export_handle,
+			       storage_media_buffer,
+			       output_storage_media_buffer,
+			       storage_media_buffer->processed_size,
+			       &error );
+
+		if( write_count < 0 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write to export handle.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_element_get_next_element(
+		     element,
+		     &next_element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next list element.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_remove_element(
+		     export_handle->output_list,
+		     element,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to remove list element from output list.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO: if storage media buffer can be passed on do not free it */
+		if( output_storage_media_buffer != NULL )
+		{
+			if( storage_media_buffer_free(
+			     &output_storage_media_buffer,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free output storage media buffer.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( libcdata_list_element_free(
+		     &element,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free list element.",
+			 function );
+
+			goto on_error;
+		}
+		element = next_element;
+
+		if( process_status_update(
+		     export_handle->process_status,
+		     export_handle->last_offset_hashed,
+		     export_handle->input_media_size,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_print_error_backtrace(
+			 error );
+		}
+#endif
+		libcerror_error_free(
+		 &error );
+	}
+	if( output_storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &output_storage_media_buffer,
+		 NULL );
+	}
+	if( storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &storage_media_buffer,
+		 NULL );
+	}
+	return( -1 );
+}
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 /* Exports the input
  * Returns 1 if successful or -1 on error
  */
@@ -4471,23 +5010,18 @@ int export_handle_export_input(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	process_status_t *process_status                    = NULL;
-	storage_media_buffer_t *storage_media_buffer        = NULL;
+	storage_media_buffer_t *input_storage_media_buffer  = NULL;
 	storage_media_buffer_t *output_storage_media_buffer = NULL;
 	uint8_t *data                                       = NULL;
-	uint8_t *input_buffer                               = NULL;
 	static char *function                               = "export_handle_export_input";
-	size64_t export_count                               = 0;
-	size64_t media_size                                 = 0;
-	size32_t output_chunk_size                          = 0;
+	off64_t input_storage_media_offset                  = 0;
+	size64_t remaining_export_size                      = 0;
 	size_t process_buffer_size                          = 0;
 	size_t data_size                                    = 0;
 	size_t read_size                                    = 0;
-	size_t write_size                                   = 0;
+	ssize_t process_count                               = 0;
 	ssize_t read_count                                  = 0;
-	ssize_t read_process_count                          = 0;
 	ssize_t write_count                                 = 0;
-	ssize_t write_process_count                         = 0;
 	uint8_t storage_media_buffer_mode                   = 0;
 	int status                                          = PROCESS_STATUS_COMPLETED;
 
@@ -4535,21 +5069,20 @@ int export_handle_export_input(
 
 		return( -1 );
 	}
-	if( libewf_handle_get_media_size(
-	     export_handle->input_handle,
-	     &media_size,
-	     error ) != 1 )
+#if !defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( export_handle->number_of_threads != 0 )
 	{
 		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
+		 &error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: multi-threading not supported.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( ( export_handle->export_size > media_size )
+#endif
+	if( ( export_handle->export_size > export_handle->input_media_size )
 	 || ( export_handle->export_size > (ssize64_t) INT64_MAX ) )
 	{
 		libcerror_error_set(
@@ -4563,8 +5096,8 @@ int export_handle_export_input(
 	}
 	if( export_handle->export_offset > 0 )
 	{
-		if( ( export_handle->export_offset >= (uint64_t) media_size )
-		 || ( ( export_handle->export_size + export_handle->export_offset ) > (uint64_t) media_size ) )
+		if( ( export_handle->export_offset >= (uint64_t) export_handle->input_media_size )
+		 || ( ( export_handle->export_size + export_handle->export_offset ) > (uint64_t) export_handle->input_media_size ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -4594,7 +5127,7 @@ int export_handle_export_input(
 	{
 		if( export_handle_get_output_chunk_size(
 		     export_handle,
-		     &output_chunk_size,
+		     &( export_handle->output_chunk_size ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4606,7 +5139,7 @@ int export_handle_export_input(
 
 			goto on_error;
 		}
-		if( output_chunk_size == 0 )
+		if( export_handle->output_chunk_size == 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4632,39 +5165,62 @@ int export_handle_export_input(
 		}
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_BUFFERED;
 	}
-	if( storage_media_buffer_initialize(
-	     &storage_media_buffer,
-	     storage_media_buffer_mode,
-	     process_buffer_size,
-	     error ) != 1 )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( export_handle->number_of_threads != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create storage media buffer.",
-		 function );
-
-		goto on_error;
-	}
-	if( export_handle->use_chunk_data_functions != 0 )
-	{
-		if( storage_media_buffer_initialize(
-		     &output_storage_media_buffer,
-		     STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA,
-		     output_chunk_size,
+		if( libcthreads_thread_pool_create(
+		     &( export_handle->input_process_thread_pool ),
+		     NULL,
+		     export_handle->number_of_threads,
+		     export_handle->maximum_number_of_queued_items,
+		     (int (*)(intptr_t *, void *)) &export_handle_process_storage_media_buffer_callback,
+		     (void *) export_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create output storage media buffer.",
+			 "%s: unable to initialize input process thread pool.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcthreads_thread_pool_create(
+		     &( export_handle->output_thread_pool ),
+		     NULL,
+		     1,
+		     export_handle->maximum_number_of_queued_items,
+		     (int (*)(intptr_t *, void *)) &export_handle_output_storage_media_buffer_callback,
+		     (void *) export_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize output thread pool.",
+			 function );
+
+			goto on_error;
+		}
+		if( libcdata_list_initialize(
+		     &( export_handle->output_list ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create output list.",
 			 function );
 
 			goto on_error;
 		}
 	}
+#endif
+	export_handle->swap_byte_pairs = swap_byte_pairs;
+
 	if( export_handle_initialize_integrity_hash(
 	     export_handle,
 	     error ) != 1 )
@@ -4679,7 +5235,7 @@ int export_handle_export_input(
 		goto on_error;
         }
 	if( process_status_initialize(
-	     &process_status,
+	     &( export_handle->process_status ),
 	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
 	     _LIBCSTRING_SYSTEM_STRING( "exported" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
@@ -4697,7 +5253,7 @@ int export_handle_export_input(
 		goto on_error;
 	}
 	if( process_status_start(
-	     process_status,
+	     export_handle->process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4709,17 +5265,42 @@ int export_handle_export_input(
 
 		goto on_error;
 	}
-	while( export_count < (size64_t) export_handle->export_size )
+	remaining_export_size = (size64_t) export_handle->export_size;
+
+	while( remaining_export_size > 0 )
 	{
+		if( export_handle->abort != 0 )
+		{
+			break;
+		}
+		if( input_storage_media_buffer == NULL )
+		{
+			if( storage_media_buffer_initialize(
+			     &input_storage_media_buffer,
+			     storage_media_buffer_mode,
+			     process_buffer_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create input storage media buffer.",
+				 function );
+
+				goto on_error;
+			}
+		}
 		read_size = process_buffer_size;
 
-		if( ( media_size - export_count ) < read_size )
+		if( remaining_export_size < read_size )
 		{
-			read_size = (size_t) ( media_size - export_count );
+			read_size = (size_t) remaining_export_size;
 		}
-		read_count = export_handle_read_buffer(
+		read_count = export_handle_read_storage_media_buffer(
 		              export_handle,
-		              storage_media_buffer,
+		              input_storage_media_buffer,
+		              input_storage_media_offset,
 		              read_size,
 		              error );
 
@@ -4745,217 +5326,153 @@ int export_handle_export_input(
 
 			goto on_error;
 		}
-		read_process_count = export_handle_prepare_read_buffer(
-		                      export_handle,
-		                      storage_media_buffer,
-		                      error );
+		input_storage_media_offset += read_count;
+		remaining_export_size      -= read_count;
 
-		if( read_process_count < 0 )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+		if( export_handle->number_of_threads != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to prepare buffer after read.",
-			 function );
-
-			goto on_error;
-		}
-		if( read_process_count > (ssize_t) read_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.",
-			 function );
-
-			goto on_error;
-		}
-		if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-		{
-			/* Set the chunk data size in the compression buffer
-			 */
-			if( storage_media_buffer->data_in_compression_buffer == 1 )
-			{
-				storage_media_buffer->compression_buffer_data_size = (size_t) read_process_count;
-			}
-		}
-		/* Swap byte pairs
-		 */
-		if( swap_byte_pairs == 1 )
-		{
-			if( export_handle_swap_byte_pairs(
-			     export_handle,
-			     storage_media_buffer,
-			     read_process_count,
-			     error ) != 1 )
+			if( libcthreads_thread_pool_push(
+			     export_handle->input_process_thread_pool,
+			     (intptr_t *) input_storage_media_buffer,
+			     error ) == -1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_GENERIC,
-				 "%s: unable to swap byte pairs.",
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to push storage media buffer onto input process thread pool queue.",
 				 function );
 
 				goto on_error;
 			}
+			input_storage_media_buffer = NULL;
 		}
-		if( storage_media_buffer_get_data(
-		     storage_media_buffer,
-		     &data,
-		     &data_size,
-		     error ) != 1 )
+		else
+#endif
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve storage media buffer data.",
-			 function );
+			process_count = export_handle_prepare_read_storage_media_buffer(
+			                 export_handle,
+			                 input_storage_media_buffer,
+		        	         error );
 
-			goto on_error;
-		}
-		/* Digest hashes are calcultated after swap
-		 */
-		if( export_handle_update_integrity_hash(
-		     export_handle,
-		     data,
-		     read_process_count,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to update integrity hash(es).",
-			 function );
-
-			goto on_error;
-		}
-		export_count += read_process_count;
-
-		while( read_process_count > 0 )
-		{
-			if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-			{
-				if( read_process_count > (ssize_t) output_chunk_size )
-				{
-					write_size = output_chunk_size;
-				}
-				else
-				{
-					write_size = (size_t) read_process_count;
-				}
-				if( ( output_storage_media_buffer->raw_buffer_data_size + write_size ) > output_chunk_size )
-				{
-					write_size = output_chunk_size -  output_storage_media_buffer->raw_buffer_data_size;
-				}
-				if( storage_media_buffer->data_in_compression_buffer == 1 )
-				{
-					input_buffer = storage_media_buffer->compression_buffer;
-				}
-				else
-				{
-					input_buffer = storage_media_buffer->raw_buffer;
-				}
-				if( memory_copy(
-				     &( output_storage_media_buffer->raw_buffer[ output_storage_media_buffer->raw_buffer_data_size ] ),
-				     input_buffer,
-				     write_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-					 "%s: unable to copy data from input buffer to output raw buffer.",
-					 function );
-
-					goto on_error;
-				}
-				output_storage_media_buffer->raw_buffer_data_size += write_size;
-
-				/* Make sure the output chunk is filled upto the output chunk size
-				 */
-				if( ( export_count < (size64_t) export_handle->export_size )
-				 && ( output_storage_media_buffer->raw_buffer_data_size < output_chunk_size ) )
-				{
-					continue;
-				}
-				write_process_count = export_handle_prepare_write_buffer(
-				                       export_handle,
-				                       output_storage_media_buffer,
-				                       error );
-			}
-			else
-			{
-				write_process_count = export_handle_prepare_write_buffer(
-				                       export_handle,
-				                       storage_media_buffer,
-				                       error );
-			}
-			if( write_process_count < 0 )
+			if( process_count < 0 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to prepare buffer before write.",
+				 "%s: unable to prepare storage media buffer after read.",
 				 function );
 
 				goto on_error;
 			}
-			if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+			if( storage_media_buffer_get_data(
+			     input_storage_media_buffer,
+			     &data,
+			     &data_size,
+			     error ) != 1 )
 			{
-				write_count = export_handle_write_buffer(
-					       export_handle,
-					       output_storage_media_buffer,
-					       write_process_count,
-					       error );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve storage media buffer data.",
+				 function );
+
+				goto on_error;
 			}
-			else
+			/* Swap byte pairs
+			 */
+			if( export_handle->swap_byte_pairs == 1 )
 			{
-				write_count = export_handle_write_buffer(
-					       export_handle,
-					       storage_media_buffer,
-					       write_process_count,
-					       error );
+				if( export_handle_swap_byte_pairs(
+				     export_handle,
+				     data,
+				     input_storage_media_buffer->processed_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to swap byte pairs.",
+					 function );
+
+					goto on_error;
+				}
 			}
+			/* Digest hashes are calcultated after swap
+			 */
+			if( export_handle_update_integrity_hash(
+			     export_handle,
+			     data,
+			     input_storage_media_buffer->processed_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
+				 "%s: unable to update integrity hash(es).",
+				 function );
+
+				goto on_error;
+			}
+			export_handle->last_offset_hashed += input_storage_media_buffer->processed_size;
+
+			if( ( export_handle->use_chunk_data_functions != 0 )
+			 && ( output_storage_media_buffer == NULL ) )
+			{
+				if( storage_media_buffer_initialize(
+				     &output_storage_media_buffer,
+				     STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA,
+				     export_handle->output_chunk_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create output storage media buffer.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			write_count = export_handle_write(
+			               export_handle,
+			               input_storage_media_buffer,
+			               output_storage_media_buffer,
+			               input_storage_media_buffer->processed_size,
+			               error );
+
 			if( write_count < 0 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write data to file.",
+				 "%s: unable to write to export handle.",
 				 function );
 
 				goto on_error;
 			}
-			if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+			if( process_status_update(
+			     export_handle->process_status,
+			     export_handle->last_offset_hashed,
+			     export_handle->export_size,
+			     error ) != 1 )
 			{
-				output_storage_media_buffer->raw_buffer_data_size = 0;
-			}
-			read_process_count -= write_process_count;
-		}
-		if( process_status_update(
-		     process_status,
-		     export_count,
-		     export_handle->export_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to update process status.",
-			 function );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to update process status.",
+				 function );
 
-			goto on_error;
-		}
-		if( export_handle->abort != 0 )
-		{
-			break;
+				goto on_error;
+			}
 		}
   	}
 	if( output_storage_media_buffer != NULL )
@@ -4974,19 +5491,74 @@ int export_handle_export_input(
 			goto on_error;
 		}
 	}
-	if( storage_media_buffer_free(
-	     &storage_media_buffer,
-	     error ) != 1 )
+	if( input_storage_media_buffer != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free input storage media buffer.",
-		 function );
+		if( storage_media_buffer_free(
+		     &input_storage_media_buffer,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free input storage media buffer.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( export_handle->input_process_thread_pool != NULL )
+	{
+		if( libcthreads_thread_pool_join(
+		     &( export_handle->input_process_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join input process thread pool.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( export_handle->output_thread_pool != NULL )
+	{
+		if( libcthreads_thread_pool_join(
+		     &( export_handle->output_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join output thread pool.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( export_handle->output_list != NULL )
+	{
+/* TODO check if output list is empty */
+		if( libcdata_list_free(
+		     &( export_handle->output_list ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free output list.",
+			 function );
+
+			goto on_error;
+		}
+	}
+#endif
 	if( export_handle_finalize_integrity_hash(
 	     export_handle,
 	     error ) != 1 )
@@ -5004,7 +5576,7 @@ int export_handle_export_input(
 	               export_handle,
 	               error );
 
-	if( write_count == -1 )
+	if( write_count < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5020,8 +5592,8 @@ int export_handle_export_input(
 		status = PROCESS_STATUS_ABORTED;
 	}
 	if( process_status_stop(
-	     process_status,
-	     export_count,
+	     export_handle->process_status,
+	     export_handle->last_offset_hashed,
 	     status,
 	     error ) != 1 )
 	{
@@ -5035,7 +5607,7 @@ int export_handle_export_input(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &process_status,
+	     &( export_handle->process_status ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5112,29 +5684,50 @@ int export_handle_export_input(
 	return( 1 );
 
 on_error:
-	if( process_status != NULL )
-	{
-		process_status_stop(
-		 process_status,
-		 export_count,
-		 PROCESS_STATUS_FAILED,
-		 NULL );
-		process_status_free(
-		 &process_status,
-		 NULL );
-	}
 	if( output_storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
 		 &output_storage_media_buffer,
 		 NULL );
 	}
-	if( storage_media_buffer != NULL )
+	if( input_storage_media_buffer != NULL )
 	{
 		storage_media_buffer_free(
-		 &storage_media_buffer,
+		 &input_storage_media_buffer,
 		 NULL );
 	}
+	if( export_handle->process_status != NULL )
+	{
+		process_status_stop(
+		 export_handle->process_status,
+		 export_handle->last_offset_hashed,
+		 PROCESS_STATUS_FAILED,
+		 NULL );
+		process_status_free(
+		 &( export_handle->process_status ),
+		 NULL );
+	}
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	if( export_handle->input_process_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( export_handle->input_process_thread_pool ),
+		 NULL );
+	}
+	if( export_handle->output_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( export_handle->output_thread_pool ),
+		 NULL );
+	}
+	if( export_handle->output_list != NULL )
+	{
+		libcdata_list_free(
+		 &( export_handle->output_list ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		 NULL );
+	}
+#endif
 	return( -1 );
 }
 
@@ -5148,12 +5741,11 @@ int export_handle_export_single_files(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	libewf_file_entry_t *file_entry  = NULL;
-	process_status_t *process_status = NULL;
-	static char *function            = "export_handle_export_single_files";
-	size_t export_path_size          = 0;
-	int result                       = 0;
-	int status                       = PROCESS_STATUS_COMPLETED;
+	libewf_file_entry_t *file_entry = NULL;
+	static char *function           = "export_handle_export_single_files";
+	size_t export_path_size         = 0;
+	int result                      = 0;
+	int status                      = PROCESS_STATUS_COMPLETED;
 
 	if( export_handle == NULL )
 	{
@@ -5218,7 +5810,7 @@ int export_handle_export_single_files(
 		goto on_error;
 	}
 	if( process_status_initialize(
-	     &process_status,
+	     &( export_handle->process_status ),
 	     _LIBCSTRING_SYSTEM_STRING( "Export" ),
 	     _LIBCSTRING_SYSTEM_STRING( "exported" ),
 	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
@@ -5236,7 +5828,7 @@ int export_handle_export_single_files(
 		goto on_error;
 	}
 	if( process_status_start(
-	     process_status,
+	     export_handle->process_status,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5298,7 +5890,7 @@ int export_handle_export_single_files(
 		status = PROCESS_STATUS_ABORTED;
 	}
 	if( process_status_stop(
-	     process_status,
+	     export_handle->process_status,
 	     0,
 	     status,
 	     error ) != 1 )
@@ -5313,7 +5905,7 @@ int export_handle_export_single_files(
 		goto on_error;
 	}
 	if( process_status_free(
-	     &process_status,
+	     &( export_handle->process_status ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5341,15 +5933,15 @@ int export_handle_export_single_files(
 	return( 1 );
 
 on_error:
-	if( process_status != NULL )
+	if( export_handle->process_status != NULL )
 	{
 		process_status_stop(
-		 process_status,
+		 export_handle->process_status,
 		 0,
 		 PROCESS_STATUS_FAILED,
 		 NULL );
 		process_status_free(
-		 &process_status,
+		 &( export_handle->process_status ),
 		 NULL );
 	}
 	if( file_entry != NULL )

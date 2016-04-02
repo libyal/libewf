@@ -1015,30 +1015,7 @@ int ewfacquire_read_input(
 			}
 			storage_media_offset  += read_count;
 			remaining_aquiry_size -= read_count;
-
-			/* Swap byte pairs
-			 */
-			if( swap_byte_pairs == 1 )
-			{
-				if( imaging_handle_swap_byte_pairs(
-				     imaging_handle,
-				     storage_media_buffer,
-				     read_count,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-					 LIBCERROR_CONVERSION_ERROR_GENERIC,
-					 "%s: unable to swap byte pairs.",
-					 function );
-
-					goto on_error;
-				}
-			}
 		}
-		/* Digest hashes are calcultated after swap
-		 */
 		if( storage_media_buffer_get_data(
 		     storage_media_buffer,
 		     &data,
@@ -1054,6 +1031,29 @@ int ewfacquire_read_input(
 
 			goto on_error;
 		}
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( imaging_handle->last_offset_written >= resume_acquiry_offset ) )
+		{
+			if( imaging_handle_swap_byte_pairs(
+			     imaging_handle,
+			     data,
+			     read_count,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to swap byte pairs.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		/* Digest hashes are calcultated after swap
+		 */
 		if( imaging_handle_update_integrity_hash(
 		     imaging_handle,
 		     data,
