@@ -2206,7 +2206,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
+			 "Device returned unsupported bytes per sector defaulting to: %" PRIu32 ".\n",
 			 ewfacquire_imaging_handle->bytes_per_sector );
 		}
 	}

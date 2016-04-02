@@ -3581,17 +3581,6 @@ int libewf_handle_get_number_of_checksum_errors(
 			goto on_error;
 		}
 	}
-	if( number_of_elements < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
 	*number_of_errors = number_of_elements;
 
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )

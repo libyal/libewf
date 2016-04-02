@@ -474,6 +474,8 @@ Closed:
 * worked on multi threading support in ewfacquirestream
 * fixes for Python-bindings tests
 * fixes for ewfexport writing notification messsages to stdout
+* changes for deployment
+* increased granularity of process status
 
 20160401
 * worked on tests

@@ -81,9 +81,9 @@ struct process_status
 	 */
 	size64_t last_bytes_total;
 
-	/* The last percentage
+	/* The last parts per million
 	 */
-	int8_t last_percentage;
+	int64_t last_parts_per_million;
 };
 
 int process_status_initialize(

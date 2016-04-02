@@ -40,7 +40,7 @@
 #include "process_status.h"
 
 /* Creates process status information
- * Make sure the value X is referencing, is set to NULL
+ * Make sure the value process_status is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int process_status_initialize(
@@ -259,7 +259,7 @@ int process_status_start(
 
 		return( -1 );
 	}
-	process_status->last_percentage = -1;
+	process_status->last_parts_per_million = -1;
 
 	if( libcdatetime_elements_set_current_time_localtime(
 	     process_status->start_time_elements,
@@ -343,10 +343,10 @@ int process_status_update(
      libcerror_error_t **error )
 {
 	static char *function               = "process_status_update";
+	int64_t new_parts_per_million       = 0;
 	int64_t number_of_seconds           = 0;
 	int64_t remaining_number_of_seconds = 0;
 	int64_t total_number_of_seconds     = 0;
-	int8_t new_percentage               = 0;
 
 	if( process_status == NULL )
 	{
@@ -366,7 +366,7 @@ int process_status_update(
 		if( ( bytes_total > 0 )
 		 && ( bytes_read > 0 ) )
 		{
-			new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
+			new_parts_per_million = (int64_t) ( ( bytes_read * 1000000 ) / bytes_total );
 		}
 		if( libcdatetime_elements_set_current_time_localtime(
 		     process_status->current_time_elements,
@@ -429,12 +429,13 @@ int process_status_update(
 
 				return( -1 );
 			}
-			process_status->last_percentage = new_percentage;
+			process_status->last_parts_per_million = new_parts_per_million;
 
 			fprintf(
 			 process_status->output_stream,
-			 "Status: at %" PRIu8 "%%.\n",
-			 new_percentage );
+			 "Status: at %" PRIi64 ".%" PRIi64 "%%.\n",
+			 new_parts_per_million / 10000,
+			 ( new_parts_per_million % 10000 ) / 1000 );
 
 			fprintf(
 			 process_status->output_stream,
@@ -457,9 +458,9 @@ int process_status_update(
 			 process_status->output_stream,
 			 ".\n" );
 
-			if( new_percentage > 0 )
+			if( new_parts_per_million > 0 )
 			{
-				total_number_of_seconds     = ( ( number_of_seconds * 100 ) / new_percentage );
+				total_number_of_seconds     = ( number_of_seconds * 1000000 ) / new_parts_per_million;
 				remaining_number_of_seconds = total_number_of_seconds - number_of_seconds;
 
 				/* Negative time means nearly finished
