@@ -34,7 +34,7 @@ this file type.
 [preface]
 == License
 ....
-Copyright (C) 2006-2015, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the 
 terms of the GNU Free Documentation License, Version 1.3 or any later version 
 published by the Free Software Foundation; with no Invariant Sections, no 
@@ -136,6 +136,7 @@ Other small corrections.
 | 0.0.78 | J.B. Metz | March 2013 | Improved description of zlib compressed data format (RFC1950) and deflate compression (RFC1951). +
 Updated the information regarding Logicube products and the data section checksum behavior.
 | 0.0.79 | J.B. Metz | August 2015 | Switched to asciidoc format.
+| 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
 |===
 
 :numbered:
@@ -1688,8 +1689,7 @@ The ltree header is 6 bytes of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 16 | | Integrity hash +
 Contains the MD5 of the ltree data
-| 16 | 4 | | Data size
-| 20 | 4 | | [yellow-background]*Unknown (empty values)*
+| 16 | 8 | | Data size
 | 24 | 4 | | Checksum +
 Adler-32 of all the data within the ltree header where the checksum value itself is zeroed out.
 | 28 | 20 | | [yellow-background]*Unknown (empty values)*
@@ -1805,18 +1805,40 @@ The 14th line consist of the following tab (0x09) separated values.
 | 2 | n |
 | 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
 | 4 | ev | [yellow-background]*Unknown (Evidence number)*
-| 5 | tb | [yellow-background]*Unknown (Total bytes)*
-| 6 | lo | [yellow-background]*Unknown (Logical offset)* +
+| 5 | do | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9)
+| 6 | loc | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9)
+| 7 | se | [yellow-background]*Unknown (Serial number)* +
+(introduced in EnCase 7.9)
+| 8 | mfr | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9)
+| 9 | mo | [yellow-background]*Unknown (Model)* +
+(introduced in EnCase 7.9)
+| 10 | tb | [yellow-background]*Unknown (Total bytes)*
+| 11 | lo | [yellow-background]*Unknown (Logical offset)* +
 -1 when not set
-| 7 | po | [yellow-background]*Unknown (Physical offset)* +
+| 12 | po | [yellow-background]*Unknown (Physical offset)* +
 -1 when not set
-| 8 | ah | [yellow-background]*Unknown (Acquire hash)*
-| 9 | sh | [yellow-background]*Unknown* +
+| 13 | ah | [yellow-background]*Unknown (Acquire hash)*
+| 14 | sh | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
-| 10 | gu | [yellow-background]*Unknown (GUID)*
-| 11 | pgu | [yellow-background]*Unknown* +
+| 15 | gu | [yellow-background]*Unknown (GUID)* +
+Contains "0" if not set
+| 16 | pgu | [yellow-background]*Unknown (Physical GUID)* +
+Contains "0" if not set +
 (introduced in EnCase 7)
-| 12 | aq | [yellow-background]*Unknown (Acquire date)*
+| 17 | aq | [yellow-background]*Unknown (Acquire date)*
+| 18 | ip | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9)
+| 19 | si | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9)
+| 20 | ma | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9) +
+Seen: "0"
+| 21 | dt | [yellow-background]*Unknown* +
+(introduced in EnCase 7.9) +
+Seen: "f"
 |===
 
 "Acquire date" is in the form of: "1142163845", which is a Unix epoch time 
@@ -1932,39 +1954,72 @@ The MD5 hash of the file data
 | 12 | sha | SHA1 hash +
 Judging by the size this value is assumed to be the SHA1 hash of the file data, does not seem to be currently set by EnCase +
 (Introduced in EnCase 7)
-| 13 | p | Is parent +
+| 13 | ent | [yellow-background]*Unknown* +
+(Introduced in EnCase 7.9)
+| 14 | snh | [yellow-background]*Unknown (Short or 8.3 name)* +
+Contains "13 FILENAME.EXT" where the first number is the number of characters in the name? +
+(Introduced in EnCase 7.9)
+| 15 | p | Is parent +
 1 => if the single file entry is a directory +
 (null) => if single file entry is a file
-| 14 | n | Name
-| 15 | du | Duplicate data offset +
+| 16 | n | Name
+| 17 | du | Duplicate data offset +
 Relative from the start of the media data
-| 16 | lo | [yellow-background]*Unknown (Logical Offset?)*
-| 17 | po | [yellow-background]*Unknown (Physical Offset?)*
+| 18 | lo | [yellow-background]*Unknown (Logical Offset?)*
+| 19 | po | [yellow-background]*Unknown (Physical Offset?)*
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
-| 18 | pm | [yellow-background]*Unknown (permissions index?)* +
+| 20 | pm | [yellow-background]*Unknown (permissions index?)* +
 [yellow-background]*-1 has a special meaning?*
-| 19 | oes | [yellow-background]*Unknown* +
+| 21 | oes | [yellow-background]*Unknown (Original extents)* +
 (Introduced in EnCase 7)
-| 20 | opr | Flags +
+| 22 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
-| 21 | src | [yellow-background]*Unknown (Possible the source identifier)*
-| 22 | sub | [yellow-background]*Unknown (Possible the subject identifier)*
-| 23 | cid | [yellow-background]*Unknown*
-| 24 | jq | [yellow-background]*Unknown*
-| 25 | alt | [yellow-background]*Unknown* +
+| 23 | src | [yellow-background]*Unknown (Possible the source identifier)*
+| 24 | sub | [yellow-background]*Unknown (Possible the subject identifier)*
+| 25 | cid | [yellow-background]*Unknown*
+| 26 | jq | [yellow-background]*Unknown*
+| 27 | alt | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 26 | ep | [yellow-background]*Unknown* +
+| 28 | ep | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 27 | aq | [yellow-background]*Unknown*
-| 28 | cfi | [yellow-background]*Unknown*
-| 29 | sg | [yellow-background]*Unknown* +
+| 29 | aq | [yellow-background]*Unknown*
+| 30 | cfi | [yellow-background]*Unknown*
+| 31 | sg | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 30 | lpt | [yellow-background]*Unknown*
+| 32 | ea | [yellow-background]*Unknown* +
+(Introduced in EnCase 7.9)
+| 33 | lpt | [yellow-background]*Unknown*
 |===
 
 If the "ha" value contains "00000000000000000000000000000000." this means the 
 MD5 hash is not set. The same applies for the "sha" value when it contains 
 "0000000000000000000000000000000000000000" the SHA1 has is not set.
+
+====== Original extents
+[yellow-background]*TODO: add some text*
+
+....
+1 30a555b 30a6000 12011ae00 9008d7 3f 43 1 12011ae00 30a6000 120113 30a6 9008d7 18530
+....
+
+====== Unknonw ea
+[yellow-background]*TODO: add some text*
+
+Contains base-16 encoded data:
+....
+0x00000000  00 00 00 00 01 0b 00 00  00 01 00 00 00 41 00 74  .............A.t
+0x00000010  00 74 00 72 00 69 00 62  00 75 00 74 00 65 00 73  .t.r.i.b.u.t.e.s
+0x00000020  00 00 00 00 00 01 00 00  00 01 04 00 00 00 01 00  ................
+0x00000030  00 00 45 00 46 00 53 00  00 00 00 00 01 00 00 00  ..E.F.S.........
+0x00000040  00 0c 00 00 00 02 00 00  00 53 00 65 00 71 00 75  .........S.e.q.u
+0x00000050  00 65 00 6e 00 63 00 65  00 20 00 49 00 44 00 00  .e.n.c.e. .I.D..
+0x00000060  00 31 00 00 00 01 00 00  00 00 18 00 00 00 08 00  .1..............
+0x00000070  00 00 4c 00 6f 00 67 00  69 00 63 00 61 00 6c 00  ..L.o.g.i.c.a.l.
+0x00000080  20 00 73 00 65 00 71 00  75 00 65 00 6e 00 63 00   .s.e.q.u.e.n.c.
+0x00000090  65 00 20 00 6e 00 75 00  6d 00 62 00 65 00 72 00  e. .n.u.m.b.e.r.
+0x000000a0  00 00 31 00 39 00 33 00  31 00 31 00 45 00 44 00  ..1.9.3.1.1.E.D.
+0x000000b0  00 00                                             ..
+....
 
 ====== Ltree file entries
 The ltree entries of files and directories consist of entries starting with: 26 

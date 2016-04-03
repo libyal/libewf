@@ -39,15 +39,9 @@ struct ewf_ltree_header
 	uint8_t integrity_hash[ 16 ];
 
 	/* The size of the data in bytes
-	 * consists of 4 bytes (32 bits)
+	 * consists of 8 bytes (64 bits)
 	 */
-	uint8_t data_size[ 4 ];
-
-	/* Unknown
-	 * consists of 4 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown1[ 4 ];
+	uint8_t data_size[ 8 ];
 
 	/* The section checksum of all data in the header
 	 * where the checksum value itself is zeroed out
@@ -59,12 +53,12 @@ struct ewf_ltree_header
 	 * consists of 20 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown2[ 20 ];
+	uint8_t unknown1[ 20 ];
 };
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_LTREE_H ) */
 

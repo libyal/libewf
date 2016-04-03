@@ -222,8 +222,9 @@ API changes
   - export libewf_glob_file_io_handle
     refactor glob functions to use libbfio handle input and return libbfio pool?
     think about libewf_glob_file_io_handle and abstration of file io handle get/set name
-* LVF write support
-  - libewf_add/remove_file for LVF
+* LVF support
+  - add LVF write support: libewf_add/remove_file
+  - add support for single file entry with "no content"
 * file structure API extension (idea)
 
 Debug

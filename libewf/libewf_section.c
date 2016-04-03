@@ -5513,8 +5513,8 @@ ssize_t libewf_section_ltree_read(
 
 	static char *function        = "libewf_section_ltree_read";
 	ssize_t read_count           = 0;
+	uint64_t data_size           = 0;
 	uint32_t calculated_checksum = 0;
-	uint32_t data_size           = 0;
 	uint32_t stored_checksum     = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
@@ -5640,7 +5640,7 @@ ssize_t libewf_section_ltree_read(
 			 0 );
 		}
 #endif
-		byte_stream_copy_to_uint32_little_endian(
+		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_ltree_header_t *) *ltree_data )->data_size,
 		 data_size );
 
@@ -5660,17 +5660,9 @@ ssize_t libewf_section_ltree_read(
 			 0 );
 
 			libcnotify_printf(
-			 "%s: data size\t\t\t\t\t: %" PRIu32 "\n",
+			 "%s: data size\t\t\t\t\t: %" PRIu64 "\n",
 			 function,
 			 data_size );
-
-			libcnotify_printf(
-			 "%s: unknown1:\n",
-			 function );
-			libcnotify_print_data(
-			 ( (ewf_ltree_header_t *) *ltree_data )->unknown1,
-			 4,
-			 0 );
 
 			libcnotify_printf(
 			 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -5678,10 +5670,10 @@ ssize_t libewf_section_ltree_read(
 			 stored_checksum );
 
 			libcnotify_printf(
-			 "%s: unknown2:\n",
+			 "%s: unknown1:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (ewf_ltree_header_t *) *ltree_data )->unknown2,
+			 ( (ewf_ltree_header_t *) *ltree_data )->unknown1,
 			 20,
 			 0 );
 		}
@@ -6123,17 +6115,9 @@ ssize_t libewf_section_ltree_write(
 			 0 );
 
 			libcnotify_printf(
-			 "%s: data size\t\t\t\t\t: %" PRIu32 "\n",
+			 "%s: data size\t\t\t\t\t: %" PRIzd "\n",
 			 function,
 			 ltree_data_size );
-
-			libcnotify_printf(
-			 "%s: unknown1:\n",
-			 function );
-			libcnotify_print_data(
-			 ( (ewf_ltree_header_t *) section_data )->unknown1,
-			 4,
-			 0 );
 
 			libcnotify_printf(
 			 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -6141,10 +6125,10 @@ ssize_t libewf_section_ltree_write(
 			 calculated_checksum );
 
 			libcnotify_printf(
-			 "%s: unknown2:\n",
+			 "%s: unknown1:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (ewf_ltree_header_t *) section_data )->unknown2,
+			 ( (ewf_ltree_header_t *) section_data )->unknown1,
 			 20,
 			 0 );
 		}
