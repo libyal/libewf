@@ -4416,7 +4416,7 @@ ssize_t export_handle_write(
 	{
 		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 		{
-			if( input_size > (ssize_t) export_handle->output_chunk_size )
+			if( input_size > (size_t) export_handle->output_chunk_size )
 			{
 				write_size = export_handle->output_chunk_size;
 			}

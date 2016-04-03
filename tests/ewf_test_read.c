@@ -598,6 +598,7 @@ int ewf_test_read_callback_function(
 
 	libcerror_error_t *error = NULL;
 	static char *function    = "ewf_test_read_callback_function";
+	off64_t read_offset      = 0;
 	size_t read_size         = EWF_TEST_READ_BUFFER_SIZE;
 	ssize_t read_count       = 0;
 	int number_of_iterations = 3;
@@ -638,9 +639,11 @@ int ewf_test_read_callback_function(
 
 		if( number_of_iterations > 0 )
 		{
+			read_offset = -1 * (off64_t) read_size;
+
 			if( libewf_handle_seek_offset(
 			     handle,
-			     (off64_t) -read_size,
+			     read_offset,
 			     SEEK_CUR,
 			     &error ) == -1 )
 			{
@@ -722,9 +725,9 @@ int ewf_test_read_from_handle_multi_thread(
 
 		if( (size64_t) expected_offset > media_size )
 		{
-			expected_offset = media_size;
+			expected_offset = (off64_t) media_size;
 
-			number_of_iterations = media_size / EWF_TEST_READ_BUFFER_SIZE;
+			number_of_iterations = (int) ( media_size / EWF_TEST_READ_BUFFER_SIZE );
 
 			if( ( media_size % EWF_TEST_READ_BUFFER_SIZE ) != 0 )
 			{

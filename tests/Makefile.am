@@ -79,7 +79,8 @@ check_PROGRAMS = \
 ewf_test_get_version_SOURCES = \
 	ewf_test_get_version.c \
 	ewf_test_libcstring.h \
-	ewf_test_libewf.h
+	ewf_test_libewf.h \
+	ewf_test_unused.h
 
 ewf_test_get_version_LDADD = \
 	../libewf/libewf.la \
@@ -106,6 +107,8 @@ ewf_test_handle_get_values_SOURCES = \
 
 ewf_test_handle_get_values_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
@@ -122,6 +125,8 @@ ewf_test_open_close_SOURCES = \
 
 ewf_test_open_close_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
@@ -139,7 +144,10 @@ ewf_test_read_SOURCES = \
 
 ewf_test_read_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@
@@ -154,6 +162,8 @@ ewf_test_read_chunk_SOURCES = \
 
 ewf_test_read_chunk_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
@@ -169,6 +179,8 @@ ewf_test_seek_SOURCES = \
 
 ewf_test_seek_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
@@ -202,6 +214,8 @@ ewf_test_write_SOURCES = \
 
 ewf_test_write_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
@@ -217,6 +231,8 @@ ewf_test_write_chunk_SOURCES = \
 
 ewf_test_write_chunk_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \

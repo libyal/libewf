@@ -45,9 +45,24 @@ int byte_size_string_create(
      int units,
      libcerror_error_t **error );
 
+int byte_size_string_create_with_decimal_point(
+     libcstring_system_character_t *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t size,
+     int units,
+     int decimal_point,
+     libcerror_error_t **error );
+
 int byte_size_string_convert(
      const libcstring_system_character_t *byte_size_string,
      size_t byte_size_string_length,
+     uint64_t *size,
+     libcerror_error_t **error );
+
+int byte_size_string_convert_with_decimal_point(
+     const libcstring_system_character_t *byte_size_string,
+     size_t byte_size_string_length,
+     int decimal_point,
      uint64_t *size,
      libcerror_error_t **error );
 

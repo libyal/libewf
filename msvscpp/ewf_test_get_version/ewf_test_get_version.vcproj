@@ -193,6 +193,10 @@
 				RelativePath="..\..\tests\ewf_test_libewf.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

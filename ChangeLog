@@ -1,8 +1,12 @@
 TODO
+* memory usage of acquisition of Ex01 file? - chunk group size?
+* memory usage of acquisition of Ex01 file? - -x versus non-x
+* speed of verification of Ex01 file? - debug outout related?
+
 * clean up TODO refactor notes
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 * look into issues with high speed variations between chunk and non-chunk modes
-* check ewfexport for memory corruption
+* process status change the code to have to determine decimal point only once
 
 * add multi threaded tool support
   - ewfmount - fuse multi thread support ?
@@ -474,6 +478,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160403
+* worked on deployment
 
 20160402
 * worked on multi threading support in ewfacquirestream

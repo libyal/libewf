@@ -396,7 +396,7 @@ enum LIBEWF_PACK_FLAGS
 	LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING			= 0x10
 };
 
-/* The minimum chunk size is 32k or ( 64 sectors * 512 )
+/* The minimum chunk size is 32 KiB or ( 64 sectors x 512 bytes )
  */
 #define LIBEWF_MINIMUM_CHUNK_SIZE				32768
 
@@ -412,7 +412,7 @@ enum LIBEWF_PACK_FLAGS
 /* The maximum number of table entries allowed by the library (2 MiB / 4)
  * For a 32k chunk this would be 32 KiB x (2 MiB / 4) = 16 GiB
  */
-#define LIBEWF_MAXIMUM_TABLE_ENTRIES				( ( 16 * 1024 * 1024 ) / 4 )
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES				( ( 2 * 1024 * 1024 ) / 4 )
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define LIBEWF_2_TIB						0x20000000000UL

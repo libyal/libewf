@@ -1,7 +1,7 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160402
+# Version: 20160403
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -20,7 +20,11 @@ run_ewfacquire_device()
 	local TEST_DESCRIPTION=$2;
 	local INPUT_DEVICE=$3;
 	local INPUT_SIZE=$4;
-	IFS=" " read -a ACQUIRE_OPTIONS <<< $5;
+	local PROCESSING_OPTIONS=();
+	local ACQUIRE_OPTIONS=();
+
+	IFS=" " read -a PROCESSING_OPTIONS <<< $5;
+	IFS=" " read -a ACQUIRE_OPTIONS <<< $6;
 
 	local INPUT_NAME=`basename ${INPUT_DEVICE}`;
 
@@ -31,13 +35,13 @@ run_ewfacquire_device()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -j 4 -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u -x ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE}
+	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${PROCESSING_OPTIONS[*]} ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE};
 
 	local RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
-                /usr/bin/time -v ${VERIFY_TOOL} -j 4 -q -x ${TMPDIR}/${INPUT_NAME}.acquire.*
+                /usr/bin/time -v ${VERIFY_TOOL} ${PROCESSING_OPTIONS[*]} ${TMPDIR}/${INPUT_NAME}.acquire.*;
 
                 RESULT=$?;
         fi
@@ -106,6 +110,8 @@ source ${TEST_RUNNER};
 # Set upper virtual memory limit to 1 GiB
 ulimit -Sv 1048576;
 
+local PROCESSING_OPTIONS="-j4 -x";
+
 for FORMAT in encase7 encase7-v2;
 do
 	# > 2 GiB test
@@ -113,14 +119,14 @@ do
 
 	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
 
 	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -128,7 +134,7 @@ do
 	# Test +64 segment files.
 	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT} -S16MiB";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -138,14 +144,14 @@ do
 
 	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
 
 	ACQUIRE_OPTIONS="-cdeflate:none -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/urandom" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -155,7 +161,7 @@ do
 
 	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi
@@ -165,7 +171,7 @@ do
 
 	ACQUIRE_OPTIONS="-cdeflate:empty-block -f${FORMAT}";
 
-	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${ACQUIRE_OPTIONS}";
+	if ! run_ewfacquire_device "${TEST_SET_DIR}" "${TEST_PROFILE}" "/dev/zero" ${INPUT_SIZE} "${PROCESSING_OPTIONS}" "${ACQUIRE_OPTIONS}";
 	then
 		exit ${EXIT_FAILURE};
 	fi

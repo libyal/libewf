@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160402
+# Version: 20160403
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -354,25 +354,27 @@ run_test_with_arguments()
 		local TEST_EXECUTABLE=$( find_binary_executable ${TEST_EXECUTABLE} );
 		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
+
 		local VALGRIND_LOG="valgrind.log-$$";
+		local VALGRIND_OPTIONS=("--tool=memcheck" "--leak-check=full" "--show-leak-kinds=definite,indirect,possible" "--track-origins=yes" "--log-file=${VALGRIND_LOG}");
 
 		if test "${PLATFORM}" = "Darwin";
 		then
 			if test ${IS_PYTHON_SCRIPT} -eq 0;
 			then
-				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind ${VALGRIND_OPTIONS[*]} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			else
-				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind ${VALGRIND_OPTIONS[*]} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			fi
 		else
 			if test ${IS_PYTHON_SCRIPT} -eq 0;
 			then
-				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" valgrind ${VALGRIND_OPTIONS[*]} "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			else
-				LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes --log-file=${VALGRIND_LOG} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" valgrind ${VALGRIND_OPTIONS[*]} "${TEST_EXECUTABLE}" ${ARGUMENTS[*]};
 				RESULT=$?;
 			fi
 		fi
@@ -382,11 +384,28 @@ run_test_with_arguments()
 
 			if test $? -ne ${EXIT_SUCCESS};
 			then
-				echo "Memory leakage detected.";
+				# Ignore "still reachable"
+				# Also see: http://valgrind.org/docs/manual/faq.html#faq.deflost
 
-				cat ${VALGRIND_LOG};
+				grep "definitely lost: 0 bytes in 0 blocks" ${VALGRIND_LOG} > /dev/null 2>&1;
+				RESULT_DIRECTLY_LOST=$?;
 
-				RESULT=${EXIT_FAILURE};
+				grep "indirectly lost: 0 bytes in 0 blocks" ${VALGRIND_LOG} > /dev/null 2>&1;
+				RESULT_INDIRECTLY_LOST=$?;
+
+				grep "possibly lost: 0 bytes in 0 blocks" ${VALGRIND_LOG} > /dev/null 2>&1;
+				RESULT_POSSIBLY_LOST=$?;
+
+				grep "suppressed: 0 bytes in 0 blocks" ${VALGRIND_LOG} > /dev/null 2>&1;
+				RESULT_SUPPRESSED=$?;
+
+				if test ${RESULT_DIRECTLY_LOST} -ne ${EXIT_SUCCESS} || test ${RESULT_INDIRECTLY_LOST} -ne ${EXIT_SUCCESS} || test ${RESULT_POSSIBLY_LOST} -ne ${EXIT_SUCCESS} || test ${RESULT_SUPPRESSED} -ne ${EXIT_SUCCESS};
+				then
+					echo "Memory leakage detected.";
+					cat ${VALGRIND_LOG};
+
+					RESULT=${EXIT_FAILURE};
+				fi
 			fi
 		fi
 		rm -f ${VALGRIND_LOG};

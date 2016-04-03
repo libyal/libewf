@@ -57,6 +57,10 @@ struct process_status
 	 */
 	const libcstring_system_character_t *status_summary_string;
 
+	/* The decimal point
+	 */
+	int decimal_point;
+
 	/* The ouput stream
 	 */
 	FILE *output_stream;

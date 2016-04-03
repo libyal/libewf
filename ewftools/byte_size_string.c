@@ -38,15 +38,61 @@ int byte_size_string_create(
      int units,
      libcerror_error_t **error )
 {
+	static char *function = "byte_size_string_create";
+	int decimal_point     = 0;
+
+	if( libclocale_locale_get_decimal_point(
+	     &decimal_point,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve locale decimal point.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_size_string_create_with_decimal_point(
+	     byte_size_string,
+	     byte_size_string_length,
+	     size,
+	     units,
+	     decimal_point,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to create byte size string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Creates a human readable byte size string
+ * Returns 1 if successful or -1 on error
+ */
+int byte_size_string_create_with_decimal_point(
+     libcstring_system_character_t *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t size,
+     int units,
+     int decimal_point,
+     libcerror_error_t **error )
+{
 	const libcstring_system_character_t *factor_string = NULL;
 	const libcstring_system_character_t *units_string  = NULL;
-	static char *function                              = "byte_size_string_create";
+	static char *function                              = "byte_size_string_create_with_decimal_point";
 	ssize_t print_count                                = 0;
 	uint64_t factored_size                             = 0;
 	uint64_t last_factored_size                        = 0;
 	int8_t factor                                      = 0;
 	int8_t remainder                                   = -1;
-	int decimal_point                                  = 0;
 
 	if( byte_size_string == NULL )
 	{
@@ -145,19 +191,6 @@ int byte_size_string_create(
 	}
 	if( remainder >= 0 )
 	{
-		if( libclocale_locale_get_decimal_point(
-		     &decimal_point,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve locale decimal point.",
-			 function );
-
-			return( -1 );
-		}
 		print_count = libcstring_system_string_sprintf(
 		               byte_size_string,
 		               byte_size_string_length,
@@ -208,12 +241,56 @@ int byte_size_string_convert(
      uint64_t *size,
      libcerror_error_t **error )
 {
-	static char *function            = "byte_size_string_convert";
+	static char *function = "byte_size_string_convert";
+	int decimal_point     = 0;
+
+	if( libclocale_locale_get_decimal_point(
+	     &decimal_point,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve locale decimal point.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_size_string_convert_with_decimal_point(
+	     byte_size_string,
+	     byte_size_string_length,
+	     decimal_point,
+	     size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve byte size from string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Converts a human readable byte size string into a value
+ * Returns 1 if successful or -1 on error
+ */
+int byte_size_string_convert_with_decimal_point(
+     const libcstring_system_character_t *byte_size_string,
+     size_t byte_size_string_length,
+     int decimal_point,
+     uint64_t *size,
+     libcerror_error_t **error )
+{
+	static char *function            = "byte_size_string_convert_with_decimal_point";
 	size_t byte_size_string_iterator = 0;
 	uint64_t byte_size               = 0;
 	int8_t factor                    = 0;
 	int8_t remainder                 = -1;
-	int decimal_point                = 0;
 	int units                        = 0;
 
 	if( byte_size_string == NULL )
@@ -234,19 +311,6 @@ int byte_size_string_convert(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid size.",
-		 function );
-
-		return( -1 );
-	}
-	if( libclocale_locale_get_decimal_point(
-	     &decimal_point,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve locale decimal point.",
 		 function );
 
 		return( -1 );

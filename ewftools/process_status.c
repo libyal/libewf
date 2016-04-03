@@ -35,6 +35,7 @@
 #include "byte_size_string.h"
 #include "ewftools_libcdatetime.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
 #include "process_status.h"
@@ -144,6 +145,19 @@ int process_status_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create last time elements.",
+		 function );
+
+		goto on_error;
+	}
+	if( libclocale_locale_get_decimal_point(
+	     &( ( *process_status )->decimal_point ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve locale decimal point.",
 		 function );
 
 		goto on_error;
@@ -433,8 +447,9 @@ int process_status_update(
 
 			fprintf(
 			 process_status->output_stream,
-			 "Status: at %" PRIi64 ".%" PRIi64 "%%.\n",
+			 "Status: at %" PRIi64 "%c%" PRIi64 "%%\n",
 			 new_parts_per_million / 10000,
+			 (char) process_status->decimal_point,
 			 ( new_parts_per_million % 10000 ) / 1000 );
 
 			fprintf(
@@ -456,7 +471,7 @@ int process_status_update(
 
 			fprintf(
 			 process_status->output_stream,
-			 ".\n" );
+			 "\n" );
 
 			if( new_parts_per_million > 0 )
 			{
@@ -484,7 +499,7 @@ int process_status_update(
 
 				fprintf(
 				 process_status->output_stream,
-				 ".\n" );
+				 "\n" );
 			}
 			fprintf(
 			 process_status->output_stream,
@@ -609,7 +624,7 @@ int process_status_update_unknown_total(
 
 			fprintf(
 			 process_status->output_stream,
-			 ".\n\n" );
+			 "\n\n" );
 		}
 	}
 	return( 1 );
@@ -705,7 +720,7 @@ int process_status_stop(
 		{
 			fprintf(
 			 process_status->output_stream,
-			 ".\n" );
+			 "\n" );
 		}
 		if( ( status == PROCESS_STATUS_COMPLETED )
 	 	 && ( process_status->status_summary_string != NULL )
@@ -750,7 +765,7 @@ int process_status_stop(
 
 			fprintf(
 			 process_status->output_stream,
-			 ".\n" );
+			 "\n" );
 		}
 	}
 	return( 1 );
