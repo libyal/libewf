@@ -4805,7 +4805,7 @@ ssize_t libewf_section_md5_hash_write(
 	     section_offset,
 	     (size64_t) ( section_descriptor_data_size + md5_hash_data_size ),
 	     (size64_t) md5_hash_data_size,
-	     section_padding_size,
+	     (uint32_t) section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5316,7 +5316,7 @@ ssize_t libewf_section_sha1_hash_write(
 	     section_offset,
 	     (size64_t) ( section_descriptor_data_size + sha1_hash_data_size ),
 	     (size64_t) sha1_hash_data_size,
-	     section_padding_size,
+	     (uint32_t) section_padding_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

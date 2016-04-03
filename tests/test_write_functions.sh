@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API write functions testing script
 #
-# Version: 20160328
+# Version: 20160403
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -16,40 +16,11 @@ OPTION_SETS="";
 
 TEST_TOOL_DIRECTORY=".";
 
-test_write()
-{ 
-	local TEST_EXECUTABLE=$1;
-	local MEDIA_SIZE=$2;
-	local MAXIMUM_SEGMENT_SIZE=$3;
-	local COMPRESSION_LEVEL=$4;
-
-	TMPDIR="tmp$$";
-
-	rm -rf ${TMPDIR};
-	mkdir ${TMPDIR};
-
-	run_test_with_arguments ${TEST_EXECUTABLE} -B ${MEDIA_SIZE} -c `echo ${COMPRESSION_LEVEL} | cut -c 1` -S ${MAXIMUM_SEGMENT_SIZE} "${TMPDIR}/write";
-
-	RESULT=$?;
-
-	rm -rf ${TMPDIR};
-
-	echo -n "Testing write chunk with media size: ${MEDIA_SIZE}, maximum segment size: ${MAXIMUM_SEGMENT_SIZE} and compression level: ${COMPRESSION_LEVEL} ";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
-	return ${RESULT};
-}
-
 test_api_write_function()
-{
-	local TEST_PROFILE=$1;
-	local TEST_FUNCTION=$2;
-	local OPTION_SETS=$3;
+{ 
+	local TEST_FUNCTION=$1;
+	shift 1;
+	local ARGUMENTS=$@;
 
 	local TEST_TOOL="${TEST_PREFIX}_test_${TEST_FUNCTION}";
 
@@ -66,11 +37,39 @@ test_api_write_function()
 
 		return ${EXIT_FAILURE};
 	fi
-	echo "Testing API function: lib${TEST_PREFIX}_${TEST_FUNCTION}";
+	TMPDIR="tmp$$";
+
+	rm -rf ${TMPDIR};
+	mkdir ${TMPDIR};
+
+	run_test_with_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[*]} "${TMPDIR}/write";
+
+	RESULT=$?;
+
+	rm -rf ${TMPDIR};
+
+	echo -n "Testing write function: lib${TEST_PREFIX}_${TEST_FUNCTION}";
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		echo " (FAIL)";
+	else
+		echo " (PASS)";
+	fi
+	return ${RESULT};
+}
+
+test_write()
+{
+	local TEST_PROFILE=$1;
+	local TEST_FUNCTION=$2;
+	local OPTION_SETS=$3;
 
 	for COMPRESSION_LEVEL in none empty-block fast best;
 	do
-		test_write "${TEST_EXECUTABLE}" 0 0 "${COMPRESSION_LEVEL}";
+		COMPRESSION_LEVEL=`echo ${COMPRESSION_LEVEL} | cut -c 1`;
+
+		test_api_write_function "${TEST_FUNCTION}" -B0 -c${COMPRESSION_LEVEL} -S0;
 		RESULT=$?;
 
 		if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -78,7 +77,7 @@ test_api_write_function()
 			return ${RESULT};
 		fi
 
-		test_write "${TEST_EXECUTABLE}" 0 10000 "${COMPRESSION_LEVEL}";
+		test_api_write_function "${TEST_FUNCTION}" -B0 -c${COMPRESSION_LEVEL} -S10000;
 		RESULT=$?;
 
 		if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -86,7 +85,7 @@ test_api_write_function()
 			return ${RESULT};
 		fi
 
-		test_write "${TEST_EXECUTABLE}" 100000 0 "${COMPRESSION_LEVEL}";
+		test_api_write_function "${TEST_FUNCTION}" -B100000 -c${COMPRESSION_LEVEL} -S0;
 		RESULT=$?;
 
 		if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -94,7 +93,7 @@ test_api_write_function()
 			return ${RESULT};
 		fi
 
-		test_write "${TEST_EXECUTABLE}" 100000 10000 "${COMPRESSION_LEVEL}";
+		test_api_write_function "${TEST_FUNCTION}" -B100000 -c${COMPRESSION_LEVEL} -S10000;
 		RESULT=$?;
 
 		if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -131,7 +130,7 @@ source ${TEST_RUNNER};
 
 for TEST_FUNCTION in ${TEST_FUNCTIONS};
 do
-	test_api_write_function "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}";
+	test_write "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}";
 	RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};

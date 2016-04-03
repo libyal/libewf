@@ -3340,7 +3340,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	write_io_handle->input_write_count                        += input_data_size;
 	write_io_handle->chunks_section_write_count               += write_count;
-	write_io_handle->chunks_section_padding_size              += chunk_data->padding_size;
+	write_io_handle->chunks_section_padding_size              += (uint32_t) chunk_data->padding_size;
 	write_io_handle->remaining_segment_file_size              -= write_count;
 	write_io_handle->number_of_chunks_written_to_segment_file += 1;
 	write_io_handle->number_of_chunks_written_to_section      += 1;

@@ -1,6 +1,8 @@
 TODO
 * clean up TODO refactor notes
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
+* look into issues with high speed variations between chunk and non-chunk modes
+* check ewfexport for memory corruption
 
 * add multi threaded tool support
   - ewfmount - fuse multi thread support ?
