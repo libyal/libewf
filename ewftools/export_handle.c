@@ -47,6 +47,8 @@
 #include "export_handle.h"
 #include "guid.h"
 #include "process_status.h"
+#include "storage_media_buffer.h"
+#include "storage_media_buffer_queue.h"
 
 #define EXPORT_HANDLE_BUFFER_SIZE		8192
 #define EXPORT_HANDLE_INPUT_BUFFER_SIZE		64
@@ -4691,6 +4693,25 @@ int export_handle_process_storage_media_buffer_callback(
 	return( 1 );
 
 on_error:
+	if( storage_media_buffer != NULL )
+	{
+		if( storage_media_buffer_queue_release_buffer(
+		     export_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+		}
+	}
 	if( error != NULL )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -4702,12 +4723,6 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
-	}
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
 	}
 	return( -1 );
 }
@@ -4796,6 +4811,8 @@ int export_handle_output_storage_media_buffer_callback(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve value from list element.",
 			 function );
+
+			storage_media_buffer = NULL;
 
 			goto on_error;
 		}
@@ -4903,8 +4920,6 @@ int export_handle_output_storage_media_buffer_callback(
 
 			goto on_error;
 		}
-		storage_media_buffer = NULL;
-
 		if( libcdata_list_element_get_next_element(
 		     element,
 		     &next_element,
@@ -4916,6 +4931,8 @@ int export_handle_output_storage_media_buffer_callback(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve next list element.",
 			 function );
+
+			storage_media_buffer = NULL;
 
 			goto on_error;
 		}
@@ -4931,12 +4948,15 @@ int export_handle_output_storage_media_buffer_callback(
 			 "%s: unable to remove list element from output list.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
-/* TODO: if storage media buffer can be passed on do not free it */
+		/* The output list no longer manages the list element and the storage media buffer it contains
+		 */
 		if( libcdata_list_element_free(
 		     &element,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     NULL,
 		     &error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4948,6 +4968,23 @@ int export_handle_output_storage_media_buffer_callback(
 
 			goto on_error;
 		}
+/* TODO: if storage media buffer can be passed on do not release it */
+		if( storage_media_buffer_queue_release_buffer(
+		     export_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			goto on_error;
+		}
+		storage_media_buffer = NULL;
+
 /* TODO: if storage media buffer can be passed on do not free it */
 		if( output_storage_media_buffer != NULL )
 		{
@@ -4986,6 +5023,32 @@ int export_handle_output_storage_media_buffer_callback(
 	return( 1 );
 
 on_error:
+	if( storage_media_buffer != NULL )
+	{
+		if( storage_media_buffer_queue_release_buffer(
+		     export_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+		}
+	}
+/* TODO move to queue */
+	if( output_storage_media_buffer != NULL )
+	{
+		storage_media_buffer_free(
+		 &output_storage_media_buffer,
+		 NULL );
+	}
 	if( error != NULL )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -4997,18 +5060,6 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
-	}
-	if( output_storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &output_storage_media_buffer,
-		 NULL );
-	}
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
 	}
 	return( -1 );
 }
@@ -5232,6 +5283,22 @@ int export_handle_export_input(
 
 			goto on_error;
 		}
+		if( storage_media_buffer_queue_initialize(
+		     &( export_handle->storage_media_buffer_queue ),
+		     export_handle->maximum_number_of_queued_items,
+		     storage_media_buffer_mode,
+		     process_buffer_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize storage media buffer queue.",
+			 function );
+
+			goto on_error;
+		}
 	}
 #endif
 	export_handle->swap_byte_pairs = swap_byte_pairs;
@@ -5280,6 +5347,24 @@ int export_handle_export_input(
 
 		goto on_error;
 	}
+	if( export_handle->number_of_threads == 0 )
+	{
+		if( storage_media_buffer_initialize(
+		     &input_storage_media_buffer,
+		     storage_media_buffer_mode,
+		     process_buffer_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create input storage media buffer.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	remaining_export_size = (size64_t) export_handle->export_size;
 
 	while( remaining_export_size > 0 )
@@ -5288,24 +5373,36 @@ int export_handle_export_input(
 		{
 			break;
 		}
-		if( input_storage_media_buffer == NULL )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+		if( export_handle->number_of_threads != 0 )
 		{
-			if( storage_media_buffer_initialize(
+			if( storage_media_buffer_queue_grab_buffer(
+			     export_handle->storage_media_buffer_queue,
 			     &input_storage_media_buffer,
-			     storage_media_buffer_mode,
-			     process_buffer_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create input storage media buffer.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to grab input storage media buffer from queue.",
+				 function );
+
+				goto on_error;
+			}
+			if( input_storage_media_buffer == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing input storage media buffer.",
 				 function );
 
 				goto on_error;
 			}
 		}
+#endif
 		read_size = process_buffer_size;
 
 		if( remaining_export_size < read_size )
@@ -5506,7 +5603,7 @@ int export_handle_export_input(
 			goto on_error;
 		}
 	}
-	if( input_storage_media_buffer != NULL )
+	if( export_handle->number_of_threads == 0 )
 	{
 		if( storage_media_buffer_free(
 		     &input_storage_media_buffer,
@@ -5568,6 +5665,22 @@ int export_handle_export_input(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free output list.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( export_handle->storage_media_buffer_queue != NULL )
+	{
+		if( storage_media_buffer_queue_free(
+		     &( export_handle->storage_media_buffer_queue ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free storage media buffer queue.",
 			 function );
 
 			goto on_error;
@@ -5740,6 +5853,12 @@ on_error:
 		libcdata_list_free(
 		 &( export_handle->output_list ),
 		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		 NULL );
+	}
+	if( export_handle->storage_media_buffer_queue != NULL )
+	{
+		storage_media_buffer_queue_free(
+		 &( export_handle->storage_media_buffer_queue ),
 		 NULL );
 	}
 #endif

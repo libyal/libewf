@@ -39,6 +39,7 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libcfile.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
@@ -47,7 +48,6 @@
 #include "export_handle.h"
 #include "log_handle.h"
 #include "platform.h"
-#include "storage_media_buffer.h"
 
 #define EWFRECOVER_INPUT_BUFFER_SIZE		64
 
@@ -84,7 +84,6 @@ void usage_fprint(
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows minimal status information\n" );
 	fprintf( stream, "\t-t:        specify the target file to recover to (default is recover)\n" );
-	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
@@ -143,30 +142,31 @@ int main( int argc, char * const argv[] )
 #endif
 	libcstring_system_character_t acquiry_operating_system[ 32 ];
 
-	libcstring_system_character_t * const *source_filenames    = NULL;
+	libcstring_system_character_t * const *source_filenames   = NULL;
 
-	libcerror_error_t *error                                   = NULL;
+	libcfile_file_t *target_file                              = NULL;
+	libcerror_error_t *error                                  = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                    = NULL;
+	libcsystem_glob_t *glob                                   = NULL;
 #endif
 
-	libcstring_system_character_t *acquiry_software_version    = NULL;
-	libcstring_system_character_t *log_filename                = NULL;
-	libcstring_system_character_t *option_header_codepage      = NULL;
-	libcstring_system_character_t *option_process_buffer_size  = NULL;
-	libcstring_system_character_t *option_target_path          = NULL;
-	libcstring_system_character_t *program                     = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
+	libcstring_system_character_t *acquiry_software_version   = NULL;
+	libcstring_system_character_t *log_filename               = NULL;
+	libcstring_system_character_t *option_header_codepage     = NULL;
+	libcstring_system_character_t *option_process_buffer_size = NULL;
+	libcstring_system_character_t *option_target_path         = NULL;
+	libcstring_system_character_t *program                    = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
 
-	log_handle_t *log_handle                                   = NULL;
+	log_handle_t *log_handle                                  = NULL;
 
-	libcstring_system_integer_t option                         = 0;
-	uint8_t calculate_md5                                      = 1;
-	uint8_t print_status_information                           = 1;
-	uint8_t use_chunk_data_functions                           = 0;
-	uint8_t verbose                                            = 0;
-	int number_of_filenames                                    = 0;
-	int result                                                 = 1;
+	libcstring_system_integer_t option                        = 0;
+	uint8_t calculate_md5                                     = 1;
+	uint8_t print_status_information                          = 1;
+	uint8_t use_chunk_data_functions                          = 0;
+	uint8_t verbose                                           = 0;
+	int number_of_filenames                                   = 0;
+	int result                                                = 1;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -228,7 +228,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:f:hl:p:qt:uvVx" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "A:f:hl:p:qt:vVx" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -521,7 +521,7 @@ int main( int argc, char * const argv[] )
 	}
 	else
 	{
-		/* Make sure the target filename is set in unattended mode
+		/* Make sure the target filename is set
 		 */
 		if( export_handle_set_string(
 		     ewfrecover_export_handle,
@@ -536,6 +536,56 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
+	}
+	/* Make sure we can write the target file
+	 */
+	if( libcfile_file_initialize(
+	     &target_file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create target file.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_open_wide(
+	          target_file,
+	          ewfrecover_export_handle->target_path,
+	          LIBCFILE_OPEN_WRITE,
+	          &error );
+#else
+	result = libcfile_file_open(
+	          target_file,
+	          ewfrecover_export_handle->target_path,
+	          LIBCFILE_OPEN_WRITE,
+	          &error );
+#endif
+	if( result != 1 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		libcnotify_print_error_backtrace(
+		 error );
+#endif
+		libcerror_error_free(
+		 &error );
+
+		fprintf(
+		 stdout,
+		 "Unable to write target file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &target_file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free target file.\n" );
+
+		goto on_error;
 	}
 	if( option_process_buffer_size != NULL )
 	{

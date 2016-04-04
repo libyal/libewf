@@ -50,6 +50,7 @@ ewfacquire_SOURCES = \
 	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
+	ewftools_libcfile.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
@@ -69,7 +70,8 @@ ewfacquire_SOURCES = \
 	log_handle.c log_handle.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	storage_media_buffer.c storage_media_buffer.h
+	storage_media_buffer.c storage_media_buffer.h \
+	storage_media_buffer_queue.c storage_media_buffer_queue.h
 
 ewfacquire_LDADD = \
 	@LIBODRAW_LIBADD@ \
@@ -109,6 +111,7 @@ ewfacquirestream_SOURCES = \
 	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
+	ewftools_libcfile.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
@@ -128,7 +131,8 @@ ewfacquirestream_SOURCES = \
 	log_handle.c log_handle.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	storage_media_buffer.c storage_media_buffer.h
+	storage_media_buffer.c storage_media_buffer.h \
+	storage_media_buffer_queue.c storage_media_buffer_queue.h
 
 ewfacquirestream_LDADD = \
 	@LIBUUID_LIBADD@ \
@@ -207,7 +211,8 @@ ewfexport_SOURCES = \
 	log_handle.c log_handle.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	storage_media_buffer.c storage_media_buffer.h
+	storage_media_buffer.c storage_media_buffer.h \
+	storage_media_buffer_queue.c storage_media_buffer_queue.h
 
 ewfexport_LDADD = \
 	@LIBSMRAW_LIBADD@ \
@@ -336,7 +341,8 @@ ewfrecover_SOURCES = \
 	log_handle.c log_handle.h \
 	platform.c platform.h \
 	process_status.c process_status.h \
-	storage_media_buffer.c storage_media_buffer.h
+	storage_media_buffer.c storage_media_buffer.h \
+	storage_media_buffer_queue.c storage_media_buffer_queue.h
 
 ewfrecover_LDADD = \
 	@LIBSMRAW_LIBADD@ \
@@ -390,6 +396,7 @@ ewfverify_SOURCES = \
 	log_handle.c log_handle.h \
 	process_status.c process_status.h \
 	storage_media_buffer.c storage_media_buffer.h \
+	storage_media_buffer_queue.c storage_media_buffer_queue.h \
 	verification_handle.c verification_handle.h
 
 ewfverify_LDADD = \

@@ -221,6 +221,10 @@
 				RelativePath="..\..\ewftools\storage_media_buffer.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -257,6 +261,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewftools_libcerror.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_libcfile.h"
 				>
 			</File>
 			<File
@@ -337,6 +345,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\storage_media_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.h"
 				>
 			</File>
 		</Filter>

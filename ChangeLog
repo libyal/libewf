@@ -1,4 +1,8 @@
 TODO
+* fix issue with test_ewfexport_logical.sh
+* test runner improve gdb/valgrind support to run tests as regular
+* allow to set the number of values in the queue, thread pools and list
+
 * memory usage of acquisition of Ex01 file? - chunk group size?
 * memory usage of acquisition of Ex01 file? - -x versus non-x
 * speed of verification of Ex01 file? - debug outout related?
@@ -12,11 +16,8 @@ TODO
   - ewfmount - fuse multi thread support ?
   - handle abort paths
 * chunk table get chunk from chunk_table->corrupted_chunks_list
-* re-enable bzip2 tests
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
-* ewfacquire/ewfacquirestream check if output file can be written before
-starting multi threaded imaging - to quit early
 
 Threat safety
 * libewf_handle_prepare_read_chunk - remove the need for locks
@@ -128,6 +129,7 @@ Further analysis of the EWF format:
   - requires support for ADCRYPT file format
 
 Features
+* add bzip2 support and tests
 * resume write support for ENCASE1/SMART table sections ?
 * implement low memory usage option
   - trade off IO versus memory use
@@ -357,7 +359,6 @@ Unsorted:
 * pyewf
   - change header and hash values into sequence objects
 
-* add bzip2 compression support
 * add function to retrieve:
   - compression values
 
@@ -478,6 +479,14 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160404
+* disabled bzip2 support for now
+* add check to see if target file can be written in ewfacquire,
+  ewfacquirestream, ewfexport, ewfrecover
+* created a queue of storage media buffers
+  - this blocks the reader thread if the queue is empty
+  - this limits the maximum size of output list
 
 20160403
 * worked on deployment

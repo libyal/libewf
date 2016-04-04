@@ -45,6 +45,7 @@
 #include "imaging_handle.h"
 #include "platform.h"
 #include "storage_media_buffer.h"
+#include "storage_media_buffer_queue.h"
 
 #define IMAGING_HANDLE_INPUT_BUFFER_SIZE	64
 #define IMAGING_HANDLE_STRING_SIZE		1024
@@ -1831,6 +1832,25 @@ int imaging_handle_process_storage_media_buffer_callback(
 	return( 1 );
 
 on_error:
+	if( storage_media_buffer != NULL )
+	{
+		if( storage_media_buffer_queue_release_buffer(
+		     imaging_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+		}
+	}
 	if( error != NULL )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -1842,12 +1862,6 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
-	}
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
 	}
 	return( -1 );
 }
@@ -1864,7 +1878,7 @@ int imaging_handle_output_storage_media_buffer_callback(
 	libcdata_list_element_t *next_element = NULL;
         libcerror_error_t *error              = NULL;
 	uint8_t *data                         = NULL;
-        static char *function                 = "imaging_handle_process_storage_media_buffer_callback";
+        static char *function                 = "imaging_handle_output_storage_media_buffer_callback";
 	size_t data_size                      = 0;
 	ssize_t write_count                   = 0;
 	int result                            = 0;
@@ -1937,6 +1951,8 @@ int imaging_handle_output_storage_media_buffer_callback(
 			 "%s: unable to retrieve value from list element.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
 		if( storage_media_buffer->storage_media_offset != imaging_handle->last_offset_written )
@@ -1981,8 +1997,6 @@ int imaging_handle_output_storage_media_buffer_callback(
 		}
 		imaging_handle->last_offset_written = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
 
-		storage_media_buffer = NULL;
-
 		if( libcdata_list_element_get_next_element(
 		     element,
 		     &next_element,
@@ -1994,6 +2008,8 @@ int imaging_handle_output_storage_media_buffer_callback(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve next list element.",
 			 function );
+
+			storage_media_buffer = NULL;
 
 			goto on_error;
 		}
@@ -2009,11 +2025,15 @@ int imaging_handle_output_storage_media_buffer_callback(
 			 "%s: unable to remove list element from output list.",
 			 function );
 
+			storage_media_buffer = NULL;
+
 			goto on_error;
 		}
+		/* The output list no longer manages the list element and the storage media buffer it contains
+		 */
 		if( libcdata_list_element_free(
 		     &element,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     NULL,
 		     &error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2026,6 +2046,22 @@ int imaging_handle_output_storage_media_buffer_callback(
 			goto on_error;
 		}
 		element = next_element;
+
+		if( storage_media_buffer_queue_release_buffer(
+		     imaging_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			goto on_error;
+		}
+		storage_media_buffer = NULL;
 
 		if( imaging_handle->acquiry_size == 0 )
 		{
@@ -2057,6 +2093,25 @@ int imaging_handle_output_storage_media_buffer_callback(
 	return( 1 );
 
 on_error:
+	if( storage_media_buffer != NULL )
+	{
+		if( storage_media_buffer_queue_release_buffer(
+		     imaging_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     &error ) != 1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+		}
+	}
 	if( error != NULL )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2068,12 +2123,6 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
-	}
-	if( storage_media_buffer != NULL )
-	{
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
 	}
 	return( -1 );
 }

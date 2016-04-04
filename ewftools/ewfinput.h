@@ -32,7 +32,11 @@
 extern "C" {
 #endif
 
+#if defined( HAVE_BZIP2_SUPPORT )
 #define EWFINPUT_COMPRESSION_METHODS_AMOUNT		2
+#else
+#define EWFINPUT_COMPRESSION_METHODS_AMOUNT		1
+#endif
 #define EWFINPUT_COMPRESSION_METHODS_DEFAULT		0
 
 #define EWFINPUT_COMPRESSION_LEVELS_AMOUNT		4
@@ -50,7 +54,11 @@ extern "C" {
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		12
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		2
 
+#if defined( HAVE_BZIP2_SUPPORT )
 extern libcstring_system_character_t *ewfinput_compression_methods[ 2 ];
+#else
+extern libcstring_system_character_t *ewfinput_compression_methods[ 1 ];
+#endif
 extern libcstring_system_character_t *ewfinput_compression_levels[ 4 ];
 extern libcstring_system_character_t *ewfinput_format_types[ 15 ];
 extern libcstring_system_character_t *ewfinput_media_types[ 4 ];

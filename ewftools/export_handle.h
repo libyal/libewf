@@ -182,6 +182,10 @@ struct export_handle
 	 */
 	libcdata_list_t *output_list;
 
+	/* The storage media buffer queue
+	 */
+	libcthreads_queue_t *storage_media_buffer_queue;
+
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 	/* The libewf input handle

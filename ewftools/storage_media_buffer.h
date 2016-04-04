@@ -134,5 +134,5 @@ int storage_media_buffer_compare(
 }
 #endif
 
-#endif
+#endif /* !defined( _STORAGE_MEDIA_BUFFER_H ) */
 

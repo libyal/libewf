@@ -1,6 +1,6 @@
 dnl Functions for libcthreads
 dnl
-dnl Version: 20160104
+dnl Version: 20160404
 
 dnl Function to detect if libcthreads is available
 dnl ac_libcthreads_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBCTHREADS_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libcthreads],
-    [libcthreads >= 20160104],
+    [libcthreads >= 20160404],
     [ac_cv_libcthreads=yes],
     [ac_cv_libcthreads=no])
    ])

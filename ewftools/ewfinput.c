@@ -41,9 +41,14 @@
 
 /* Input selection defintions
  */
+#if defined( HAVE_BZIP2_SUPPORT )
 libcstring_system_character_t *ewfinput_compression_methods[ 2 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "deflate" ),
 	_LIBCSTRING_SYSTEM_STRING( "bzip2" ) };
+#else
+libcstring_system_character_t *ewfinput_compression_methods[ 1 ] = {
+	_LIBCSTRING_SYSTEM_STRING( "deflate" ) };
+#endif
 
 libcstring_system_character_t *ewfinput_compression_levels[ 4 ] = {
 	_LIBCSTRING_SYSTEM_STRING( "none" ),
@@ -452,6 +457,7 @@ int ewfinput_determine_compression_method(
 	string_length = libcstring_system_string_length(
 	                 string );
 
+#if defined( HAVE_BZIP2_SUPPORT )
 	if( string_length == 5 )
 	{
 		if( libcstring_system_string_compare(
@@ -474,6 +480,19 @@ int ewfinput_determine_compression_method(
 			result              = 1;
 		}
 	}
+#else
+	if( string_length == 7 )
+	{
+		if( libcstring_system_string_compare(
+		     string,
+		     _LIBCSTRING_SYSTEM_STRING( "deflate" ),
+		     7 ) == 0 )
+		{
+			*compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+			result              = 1;
+		}
+	}
+#endif
 	return( result );
 }
 

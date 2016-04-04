@@ -36,6 +36,7 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libcfile.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
@@ -46,6 +47,7 @@
 #include "log_handle.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
+#include "storage_media_buffer_queue.h"
 
 imaging_handle_t *ewfacquirestream_imaging_handle = NULL;
 int ewfacquirestream_abort                        = 0;
@@ -127,8 +129,12 @@ void usage_fprint(
 	                 "\t    or 32768\n" );
 	fprintf( stream, "\t-B: specify the number of bytes to acquire (default is all bytes)\n" );
 	fprintf( stream, "\t-c: specify the compression values as: level or method:level\n"
+#if defined( HAVE_BZIP2_SUPPORT )
 	                 "\t    compression method options: deflate (default), bzip2\n"
 	                 "\t    (bzip2 is only supported by EWF2 formats)\n"
+#else
+	                 "\t    compression method options: deflate (default)\n"
+#endif
 	                 "\t    compression level options: none (default), empty-block,\n"
 	                 "\t    fast or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
@@ -629,6 +635,22 @@ int ewfacquirestream_read_input(
 
 			goto on_error;
 		}
+		if( storage_media_buffer_queue_initialize(
+		     &( imaging_handle->storage_media_buffer_queue ),
+		     imaging_handle->maximum_number_of_queued_items,
+		     storage_media_buffer_mode,
+		     process_buffer_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize storage media buffer queue.",
+			 function );
+
+			goto on_error;
+		}
 	}
 #endif
 	if( imaging_handle_initialize_integrity_hash(
@@ -675,6 +697,24 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
+	if( imaging_handle->number_of_threads == 0 )
+	{
+		if( storage_media_buffer_initialize(
+		     &storage_media_buffer,
+		     storage_media_buffer_mode,
+		     process_buffer_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create storage media buffer.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	remaining_aquiry_size = imaging_handle->acquiry_size;
 	skip_aquiry_size      = imaging_handle->acquiry_offset;
 
@@ -685,24 +725,36 @@ int ewfacquirestream_read_input(
 		{
 			break;
 		}
-		if( storage_media_buffer == NULL )
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+		if( imaging_handle->number_of_threads != 0 )
 		{
-			if( storage_media_buffer_initialize(
+			if( storage_media_buffer_queue_grab_buffer(
+			     imaging_handle->storage_media_buffer_queue,
 			     &storage_media_buffer,
-			     storage_media_buffer_mode,
-			     process_buffer_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create storage media buffer.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to grab storage media buffer from queue.",
+				 function );
+
+				goto on_error;
+			}
+			if( storage_media_buffer == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing storage media buffer.",
 				 function );
 
 				goto on_error;
 			}
 		}
+#endif
 		read_size = process_buffer_size;
 
 		/* Align with acquiry offset if necessary
@@ -882,7 +934,7 @@ int ewfacquirestream_read_input(
 			}
 		}
 	}
-	if( storage_media_buffer != NULL )
+	if( imaging_handle->number_of_threads == 0 )
 	{
 		if( storage_media_buffer_free(
 		     &storage_media_buffer,
@@ -944,6 +996,22 @@ int ewfacquirestream_read_input(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free output list.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( imaging_handle->storage_media_buffer_queue != NULL )
+	{
+		if( storage_media_buffer_queue_free(
+		     &( imaging_handle->storage_media_buffer_queue ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free storage media buffer queue.",
 			 function );
 
 			goto on_error;
@@ -1086,6 +1154,12 @@ on_error:
 		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
 		 NULL );
 	}
+	if( imaging_handle->storage_media_buffer_queue != NULL )
+	{
+		storage_media_buffer_queue_free(
+		 &( imaging_handle->storage_media_buffer_queue ),
+		 NULL );
+	}
 #endif
 	return( -1 );
 }
@@ -1099,6 +1173,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcerror_error_t *error                                        = NULL;
+	libcfile_file_t *target_file                                    = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_additional_digest_types   = NULL;
@@ -1467,6 +1542,54 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
+	if( libcfile_file_initialize(
+	     &target_file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create target file.\n" );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_open_wide(
+		  target_file,
+		  ewfacquirestream_imaging_handle->target_filename,
+		  LIBCFILE_OPEN_WRITE,
+		  &error );
+#else
+	result = libcfile_file_open(
+		  target_file,
+		  ewfacquirestream_imaging_handle->target_filename,
+		  LIBCFILE_OPEN_WRITE,
+		  &error );
+#endif
+	if( result != 1 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		libcnotify_print_error_backtrace(
+		 error );
+#endif
+		libcerror_error_free(
+		 &error );
+
+		fprintf(
+		 stdout,
+		 "Unable to write target file.\n" );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &target_file,
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free target file.\n" );
+
+		goto on_error;
+	}
 	if( option_secondary_target_filename != NULL )
 	{
 		if( imaging_handle_set_string(
@@ -1479,6 +1602,56 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unable to set secondary target filename.\n" );
+
+			goto on_error;
+		}
+		/* Make sure we can write the secondary target file
+		 */
+		if( libcfile_file_initialize(
+		     &target_file,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to create secondary target file.\n" );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libcfile_file_open_wide(
+			  target_file,
+			  ewfacquirestream_imaging_handle->secondary_target_filename,
+			  LIBCFILE_OPEN_WRITE,
+			  &error );
+#else
+		result = libcfile_file_open(
+			  target_file,
+			  ewfacquirestream_imaging_handle->secondary_target_filename,
+			  LIBCFILE_OPEN_WRITE,
+			  &error );
+#endif
+		if( result != 1 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libcnotify_print_error_backtrace(
+			 error );
+#endif
+			libcerror_error_free(
+			 &error );
+
+			fprintf(
+			 stdout,
+			 "Unable to write secondary target file.\n" );
+
+			goto on_error;
+		}
+		if( libcfile_file_free(
+		     &target_file,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free secondary target file.\n" );
 
 			goto on_error;
 		}
@@ -2053,6 +2226,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( target_file != NULL )
+	{
+		libcfile_file_free(
+		 &target_file,
+		 NULL );
 	}
 	if( log_handle != NULL )
 	{

@@ -40,6 +40,7 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libcfile.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
@@ -49,7 +50,6 @@
 #include "export_handle.h"
 #include "log_handle.h"
 #include "platform.h"
-#include "storage_media_buffer.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE		64
 
@@ -128,8 +128,12 @@ void usage_fprint(
 	                 "\t           formats)\n" );
 	fprintf( stream, "\t-B:        specify the number of bytes to export (default is all bytes)\n" );
 	fprintf( stream, "\t-c:        specify the compression values as: level or method:level\n"
+#if defined( HAVE_BZIP2_SUPPORT )
 	                 "\t           compression method options: deflate (default), bzip2\n"
 	                 "\t           (bzip2 is only supported by EWF2 formats)\n"
+#else
+	                 "\t           compression method options: deflate (default)\n"
+#endif
 	                 "\t           compression level options: none (default), empty-block,\n"
 	                 "\t           fast or best\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
@@ -239,6 +243,7 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t * const *source_filenames       = NULL;
 
 	libcerror_error_t *error                                      = NULL;
+	libcfile_file_t *target_file                                  = NULL;
 
 #if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                       = NULL;
@@ -667,6 +672,59 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unable to set target path.\n" );
+
+			goto on_error;
+		}
+	}
+	/* Make sure we can write the target file
+	 */
+	if( interactive_mode == 0 )
+	{
+		if( libcfile_file_initialize(
+		     &target_file,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to create target file.\n" );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libcfile_file_open_wide(
+			  target_file,
+			  ewfexport_export_handle->target_path,
+			  LIBCFILE_OPEN_WRITE,
+			  &error );
+#else
+		result = libcfile_file_open(
+			  target_file,
+			  ewfexport_export_handle->target_path,
+			  LIBCFILE_OPEN_WRITE,
+			  &error );
+#endif
+		if( result != 1 )
+		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libcnotify_print_error_backtrace(
+			 error );
+#endif
+			libcerror_error_free(
+			 &error );
+
+			fprintf(
+			 stdout,
+			 "Unable to write target file.\n" );
+
+			goto on_error;
+		}
+		if( libcfile_file_free(
+		     &target_file,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to free target file.\n" );
 
 			goto on_error;
 		}
@@ -1360,6 +1418,12 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
+	}
+	if( target_file != NULL )
+	{
+		libcfile_file_free(
+		 &target_file,
+		 NULL );
 	}
 	if( log_handle != NULL )
 	{
