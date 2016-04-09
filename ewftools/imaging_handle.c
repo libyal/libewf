@@ -630,7 +630,7 @@ int imaging_handle_open_output(
 			 "%s: unable to resolve filename(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		access_flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
@@ -662,21 +662,7 @@ int imaging_handle_open_output(
 		 "%s: unable to open file.",
 		 function );
 
-		if( libewf_filenames != filenames )
-		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
-		}
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_filenames != filenames )
 	{
@@ -699,10 +685,27 @@ int imaging_handle_open_output(
 			 "%s: unable to free globbed filenames.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( libewf_filenames != filenames )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+	}
+	return( -1 );
 }
 
 /* Opens the secondary output of the imaging handle
@@ -787,7 +790,7 @@ int imaging_handle_open_secondary_output(
 			 "%s: unable to resolve filename(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		access_flags = LIBEWF_OPEN_WRITE_RESUME;
 	}
@@ -807,21 +810,7 @@ int imaging_handle_open_secondary_output(
 		 "%s: unable to create secondary output handle.",
 		 function );
 
-		if( libewf_filenames != filenames )
-		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
-		}
-		return( -1 );
+		goto on_error;
 	}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
@@ -846,25 +835,7 @@ int imaging_handle_open_secondary_output(
 		 "%s: unable to open file.",
 		 function );
 
-		libewf_handle_free(
-		 &( imaging_handle->secondary_output_handle ),
-		 NULL );
-
-		if( libewf_filenames != filenames )
-		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
-		}
-		return( -1 );
+		goto on_error;
 	}
 	if( libewf_filenames != filenames )
 	{
@@ -887,14 +858,107 @@ int imaging_handle_open_secondary_output(
 			 "%s: unable to free globbed filenames.",
 			 function );
 
-			libewf_handle_free(
-			 &( imaging_handle->secondary_output_handle ),
-			 NULL );
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( imaging_handle->secondary_output_handle != NULL )
+	{
+		libewf_handle_free(
+		 &( imaging_handle->secondary_output_handle ),
+		 NULL );
+	}
+	if( libewf_filenames != filenames )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 libewf_filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+	}
+	return( -1 );
+}
+
+/* Opens the output of the imaging handle for resume
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_open_output_resume(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *filename,
+     off64_t *resume_acquiry_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "imaging_handle_open_output_resume";
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle_open_output(
+	     imaging_handle,
+	     filename,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file.",
+		 function );
+
+		goto on_error;
+	}
+	if( imaging_handle_get_output_values(
+	     imaging_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine previous acquiry parameters.",
+		 function );
+
+		goto on_error;
+	}
+	if( imaging_handle_get_offset(
+	     imaging_handle,
+	     resume_acquiry_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine resume acquiry offset.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	imaging_handle_close(
+	 imaging_handle,
+	 NULL );
+
+	return( -1 );
 }
 
 /* Closes the imaging handle

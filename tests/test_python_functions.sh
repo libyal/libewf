@@ -87,6 +87,8 @@ fi
 
 source ${TEST_RUNNER};
 
+RESULT=${EXIT_IGNORE};
+
 for TEST_FUNCTION in ${TEST_FUNCTIONS};
 do
 	test_python_function "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}";

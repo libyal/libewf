@@ -1,5 +1,4 @@
 TODO
-* fix issue with test_ewfexport_logical.sh
 * test runner improve gdb/valgrind support to run tests as regular
 * allow to set the number of values in the queue, thread pools and list
 

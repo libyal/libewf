@@ -40,12 +40,7 @@ test_write_resume()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		run_test_with_arguments ${ACQUIRE_TOOL} -q -R ${INPUT_FILE} > ${TMPDIR}/output <<EOI
-${TMPDIR}/resume.E01
-
-
-yes
-EOI
+		run_test_with_arguments ${ACQUIRE_TOOL} -q -R ${INPUT_FILE} -t ${TMPDIR}/resume.E01 -u > ${TMPDIR}/output;
 
 		RESULT=$?;
 	fi

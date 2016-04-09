@@ -917,7 +917,8 @@ int ewfacquire_read_input(
 			break;
 		}
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
-		if( imaging_handle->number_of_threads != 0 )
+		if( ( storage_media_buffer == NULL )
+		 && ( imaging_handle->number_of_threads != 0 ) )
 		{
 			if( storage_media_buffer_queue_grab_buffer(
 			     imaging_handle->storage_media_buffer_queue,
@@ -2043,23 +2044,67 @@ int main( int argc, char * const argv[] )
 	 */
 	if( interactive_mode == 0 )
 	{
-		if( imaging_handle_check_write_access(
-		     ewfacquire_imaging_handle,
-		     ewfacquire_imaging_handle->target_filename,
-		     &error ) != 1 )
+		if( resume_acquiry == 0 )
 		{
+			if( imaging_handle_check_write_access(
+			     ewfacquire_imaging_handle,
+			     ewfacquire_imaging_handle->target_filename,
+			     &error ) != 1 )
+			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			libcnotify_print_error_backtrace(
-			 error );
+				libcnotify_print_error_backtrace(
+				 error );
 #endif
-			libcerror_error_free(
-			 &error );
+				libcerror_error_free(
+				 &error );
 
-			fprintf(
-			 stdout,
-			 "Unable to write target file.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to write target file.\n" );
 
-			goto on_error;
+				goto on_error;
+			}
+		}
+		else
+		{
+			if( libcsystem_signal_attach(
+			     ewfacquire_signal_handler,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to attach signal handler.\n" );
+
+				goto on_error;
+			}
+			if( imaging_handle_open_output_resume(
+			     ewfacquire_imaging_handle,
+			     ewfacquire_imaging_handle->target_filename,
+			     &resume_acquiry_offset,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stdout,
+				 "Unable to resume acquire - starting from scratch.\n" );
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+				libcnotify_print_error_backtrace(
+				 error );
+#endif
+				libcerror_error_free(
+				 &error );
+
+				resume_acquiry = 0;
+			}
+			if( libcsystem_signal_detach(
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to detach signal handler.\n" );
+
+				goto on_error;
+			}
 		}
 	}
 	if( option_secondary_target_filename != NULL )
@@ -2532,13 +2577,16 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "Acquiry parameters required, please provide the necessary input\n" );
 
-		if( resume_acquiry != 0 )
+		if( option_target_filename == NULL )
 		{
-			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" );
-		}
-		else if( option_target_filename == NULL )
-		{
-			request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" );
+			if( resume_acquiry != 0 )
+			{
+				request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename with extension" );
+			}
+			else
+			{
+				request_string = _LIBCSTRING_SYSTEM_STRING( "Image path and filename without extension" );
+			}
 		}
 		if( request_string != NULL )
 		{
@@ -2565,21 +2613,26 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
-				else if( imaging_handle_check_write_access(
-				          ewfacquire_imaging_handle,
-				          ewfacquire_imaging_handle->target_filename,
-				          &error ) != 1 )
+				else if( resume_acquiry == 0 )
 				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					libcnotify_print_error_backtrace(
-					 error );
-#endif
-					libcerror_error_free(
-					 &error );
+					result = imaging_handle_check_write_access(
+					          ewfacquire_imaging_handle,
+					          ewfacquire_imaging_handle->target_filename,
+					          &error );
 
-					fprintf(
-					 stdout,
-					 "Unable to write target file, please try again or terminate using Ctrl^C.\n" );
+					if( result != 1 )
+					{
+#if defined( HAVE_VERBOSE_OUTPUT )
+						libcnotify_print_error_backtrace(
+						 error );
+#endif
+						libcerror_error_free(
+						 &error );
+
+						fprintf(
+						 stdout,
+						 "Unable to write target file, please try again or terminate using Ctrl^C.\n" );
+					}
 				}
 			}
 			while( result != 1 );
@@ -2596,10 +2649,10 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-			if( imaging_handle_open_output(
+			if( imaging_handle_open_output_resume(
 			     ewfacquire_imaging_handle,
 			     ewfacquire_imaging_handle->target_filename,
-			     resume_acquiry,
+			     &resume_acquiry_offset,
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2627,48 +2680,6 @@ int main( int argc, char * const argv[] )
 		}
 		if( resume_acquiry != 0 )
 		{
-			if( imaging_handle_get_output_values(
-			     ewfacquire_imaging_handle,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to determine previous acquiry parameters.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-
-				imaging_handle_close(
-				 ewfacquire_imaging_handle,
-				 NULL );
-
-				resume_acquiry = 0;
-			}
-		}
-		if( resume_acquiry != 0 )
-		{
-			if( imaging_handle_get_offset(
-			     ewfacquire_imaging_handle,
-			     &resume_acquiry_offset,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stdout,
-				 "Unable to determine resume acquiry offset.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-
-				imaging_handle_close(
-				 ewfacquire_imaging_handle,
-				 NULL );
-
-				resume_acquiry = 0;
-			}
 			fprintf(
 			 stdout,
 			 "Resuming acquire at offset: %" PRIi64 ".\n",

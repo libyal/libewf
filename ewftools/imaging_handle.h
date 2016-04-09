@@ -299,6 +299,12 @@ int imaging_handle_open_secondary_output(
      uint8_t resume,
      libcerror_error_t **error );
 
+int imaging_handle_open_output_resume(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *filename,
+     off64_t *resume_acquiry_offset,
+     libcerror_error_t **error );
+
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
