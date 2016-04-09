@@ -126,9 +126,9 @@ ewf_test_open_close_SOURCES = \
 ewf_test_open_close_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCNOTIFY_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@

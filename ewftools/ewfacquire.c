@@ -33,7 +33,6 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcfile.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
@@ -1540,7 +1539,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t media_information_serial_number[ 64 ];
 
 	libcerror_error_t *error                                        = NULL;
-	libcfile_file_t *target_file                                    = NULL;
 
 	libcstring_system_character_t *log_filename                     = NULL;
 	libcstring_system_character_t *option_additional_digest_types   = NULL;
@@ -2045,30 +2043,10 @@ int main( int argc, char * const argv[] )
 	 */
 	if( interactive_mode == 0 )
 	{
-		if( libcfile_file_initialize(
-		     &target_file,
+		if( imaging_handle_check_write_access(
+		     ewfacquire_imaging_handle,
+		     ewfacquire_imaging_handle->target_filename,
 		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create target file.\n" );
-
-			goto on_error;
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libcfile_file_open_wide(
-			  target_file,
-			  ewfacquire_imaging_handle->target_filename,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#else
-		result = libcfile_file_open(
-			  target_file,
-			  ewfacquire_imaging_handle->target_filename,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#endif
-		if( result != 1 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			libcnotify_print_error_backtrace(
@@ -2080,16 +2058,6 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stdout,
 			 "Unable to write target file.\n" );
-
-			goto on_error;
-		}
-		if( libcfile_file_free(
-		     &target_file,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free target file.\n" );
 
 			goto on_error;
 		}
@@ -2111,30 +2079,10 @@ int main( int argc, char * const argv[] )
 		}
 		/* Make sure we can write the secondary target file
 		 */
-		if( libcfile_file_initialize(
-		     &target_file,
+		if( imaging_handle_check_write_access(
+		     ewfacquire_imaging_handle,
+		     ewfacquire_imaging_handle->secondary_target_filename,
 		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create secondary target file.\n" );
-
-			goto on_error;
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libcfile_file_open_wide(
-			  target_file,
-			  ewfacquire_imaging_handle->secondary_target_filename,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#else
-		result = libcfile_file_open(
-			  target_file,
-			  ewfacquire_imaging_handle->secondary_target_filename,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#endif
-		if( result != 1 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			libcnotify_print_error_backtrace(
@@ -2146,16 +2094,6 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stdout,
 			 "Unable to write secondary target file.\n" );
-
-			goto on_error;
-		}
-		if( libcfile_file_free(
-		     &target_file,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free secondary target file.\n" );
 
 			goto on_error;
 		}
@@ -2627,54 +2565,21 @@ int main( int argc, char * const argv[] )
 					 stdout,
 					 "Target is required, please try again or terminate using Ctrl^C.\n" );
 				}
-				else
+				else if( imaging_handle_check_write_access(
+				          ewfacquire_imaging_handle,
+				          ewfacquire_imaging_handle->target_filename,
+				          &error ) != 1 )
 				{
-					if( libcfile_file_initialize(
-					     &target_file,
-					     &error ) != 1 )
-					{
-						fprintf(
-						 stderr,
-						 "Unable to create target file.\n" );
-
-						goto on_error;
-					}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-					result = libcfile_file_open_wide(
-					          target_file,
-					          ewfacquire_imaging_handle->target_filename,
-					          LIBCFILE_OPEN_WRITE,
-					          &error );
-#else
-					result = libcfile_file_open(
-					          target_file,
-					          ewfacquire_imaging_handle->target_filename,
-					          LIBCFILE_OPEN_WRITE,
-					          &error );
-#endif
-					if( result != 1 )
-					{
 #if defined( HAVE_VERBOSE_OUTPUT )
-						libcnotify_print_error_backtrace(
-						 error );
+					libcnotify_print_error_backtrace(
+					 error );
 #endif
-						libcerror_error_free(
-						 &error );
+					libcerror_error_free(
+					 &error );
 
-						fprintf(
-						 stdout,
-						 "Unable to write target file, please try again or terminate using Ctrl^C.\n" );
-					}
-					if( libcfile_file_free(
-					     &target_file,
-					     &error ) != 1 )
-					{
-						fprintf(
-						 stderr,
-						 "Unable to free target file.\n" );
-
-						goto on_error;
-					}
+					fprintf(
+					 stdout,
+					 "Unable to write target file, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
 			while( result != 1 );
@@ -3468,12 +3373,6 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
-	}
-	if( target_file != NULL )
-	{
-		libcfile_file_free(
-		 &target_file,
-		 NULL );
 	}
 	if( log_handle != NULL )
 	{

@@ -671,6 +671,124 @@ int export_handle_open_input(
 	return( 1 );
 }
 
+/* Checks if a file can be written
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_check_write_access(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *filename,
+     libcerror_error_t **error )
+{
+	libcfile_file_t *target_file = NULL;
+	static char *function        = "export_handle_check_write_access";
+	int result                   = 0;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcfile_file_initialize(
+	     &target_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create target file.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_open_wide(
+		  target_file,
+		  filename,
+		  LIBCFILE_OPEN_WRITE,
+		  error );
+#else
+	result = libcfile_file_open(
+		  target_file,
+		  filename,
+		  LIBCFILE_OPEN_WRITE,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open target file.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcfile_file_close(
+	     target_file,
+	     error ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close target file.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcfile_file_free(
+	     &target_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free target file.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libcfile_file_remove_wide(
+		  filename,
+		  error );
+#else
+	result = libcfile_file_remove(
+		  filename,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_UNLINK_FAILED,
+		 "%s: unable to remove target file.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( target_file != NULL )
+	{
+		libcfile_file_free(
+		 &target_file,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Opens the output of the export handle
  * Returns 1 if successful or -1 on error
  */
@@ -3363,7 +3481,7 @@ int export_handle_set_number_of_threads(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid imaging handle.",
+		 "%s: invalid export handle.",
 		 function );
 
 		return( -1 );

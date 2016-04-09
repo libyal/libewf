@@ -272,6 +272,11 @@ int export_handle_set_maximum_number_of_open_handles(
      int maximum_number_of_open_handles,
      libcerror_error_t **error );
 
+int export_handle_check_write_access(
+     export_handle_t *export_handle,
+     const libcstring_system_character_t *filename,
+     libcerror_error_t **error );
+
 int export_handle_open_input(
      export_handle_t *export_handle,
      libcstring_system_character_t * const * filenames,

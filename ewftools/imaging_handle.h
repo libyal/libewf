@@ -282,6 +282,11 @@ int imaging_handle_signal_abort(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
 
+int imaging_handle_check_write_access(
+     imaging_handle_t *imaging_handle,
+     const libcstring_system_character_t *filename,
+     libcerror_error_t **error );
+
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
      const libcstring_system_character_t *filename,

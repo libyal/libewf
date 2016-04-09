@@ -35,13 +35,13 @@ run_ewfacquire_device()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${PROCESSING_OPTIONS[*]} ${ACQUIRE_OPTIONS[*]} ${INPUT_DEVICE};
+	/usr/bin/time -v ${ACQUIRE_TOOL} -B ${INPUT_SIZE} -C Case -D Description -E Evidence -e Examiner -m removable -M logical -N Notes -P 512 -q -t ${TMPDIR}/${INPUT_NAME}.acquire -u ${PROCESSING_OPTIONS[@]} ${ACQUIRE_OPTIONS[@]} ${INPUT_DEVICE};
 
 	local RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
         then
-                /usr/bin/time -v ${VERIFY_TOOL} ${PROCESSING_OPTIONS[*]} ${TMPDIR}/${INPUT_NAME}.acquire.*;
+                /usr/bin/time -v ${VERIFY_TOOL} ${PROCESSING_OPTIONS[@]} ${TMPDIR}/${INPUT_NAME}.acquire.*;
 
                 RESULT=$?;
         fi

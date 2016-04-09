@@ -40,7 +40,6 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcfile.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcstring.h"
@@ -243,7 +242,6 @@ int main( int argc, char * const argv[] )
 	libcstring_system_character_t * const *source_filenames       = NULL;
 
 	libcerror_error_t *error                                      = NULL;
-	libcfile_file_t *target_file                                  = NULL;
 
 #if !defined( HAVE_GLOB_H )
 	libcsystem_glob_t *glob                                       = NULL;
@@ -680,30 +678,10 @@ int main( int argc, char * const argv[] )
 	 */
 	if( interactive_mode == 0 )
 	{
-		if( libcfile_file_initialize(
-		     &target_file,
+		if( export_handle_check_write_access(
+		     ewfexport_export_handle,
+		     ewfexport_export_handle->target_path,
 		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to create target file.\n" );
-
-			goto on_error;
-		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libcfile_file_open_wide(
-			  target_file,
-			  ewfexport_export_handle->target_path,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#else
-		result = libcfile_file_open(
-			  target_file,
-			  ewfexport_export_handle->target_path,
-			  LIBCFILE_OPEN_WRITE,
-			  &error );
-#endif
-		if( result != 1 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			libcnotify_print_error_backtrace(
@@ -715,16 +693,6 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stdout,
 			 "Unable to write target file.\n" );
-
-			goto on_error;
-		}
-		if( libcfile_file_free(
-		     &target_file,
-		     &error ) != 1 )
-		{
-			fprintf(
-			 stderr,
-			 "Unable to free target file.\n" );
 
 			goto on_error;
 		}
@@ -1418,12 +1386,6 @@ on_error:
 		 error );
 		libcerror_error_free(
 		 &error );
-	}
-	if( target_file != NULL )
-	{
-		libcfile_file_free(
-		 &target_file,
-		 NULL );
 	}
 	if( log_handle != NULL )
 	{

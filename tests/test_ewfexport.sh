@@ -33,7 +33,7 @@ test_callback()
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 	INPUT_FILE=`readlink -f "${INPUT_FILE}"`;
 
-	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[*]} "${INPUT_FILE}" > /dev/null 2>&1);
+	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${INPUT_FILE}" > /dev/null 2>&1);
 	local RESULT=$?;
 
 	if test -f "${TMPDIR}/export.raw";

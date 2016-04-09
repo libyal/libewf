@@ -66,6 +66,18 @@ int storage_media_buffer_queue_initialize(
 
 		return( -1 );
 	}
+	if( ( maximum_number_of_values < 0 )
+	 || ( maximum_number_of_values > (size_t) ( SSIZE_MAX - 1 ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid maximum number of values value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( libcthreads_queue_initialize(
 	     queue,
 	     maximum_number_of_values,
@@ -84,10 +96,12 @@ int storage_media_buffer_queue_initialize(
 	     value_index < maximum_number_of_values;
 	     value_index++ )
 	{
+		/* Add 1 to prevent the queue blocking if full
+		 */
 		if( storage_media_buffer_initialize(
 		     &buffer,
 		     storage_media_buffer_mode,
-		     storage_media_buffer_size,
+		     storage_media_buffer_size + 1,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

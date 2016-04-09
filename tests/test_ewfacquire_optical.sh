@@ -36,7 +36,7 @@ test_callback()
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[*]} -T"${INPUT_FILE}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
+	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[@]} -T"${INPUT_FILE}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";

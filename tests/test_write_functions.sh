@@ -42,7 +42,7 @@ test_api_write_function()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	run_test_with_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[*]} "${TMPDIR}/write";
+	run_test_with_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${TMPDIR}/write";
 
 	RESULT=$?;
 
