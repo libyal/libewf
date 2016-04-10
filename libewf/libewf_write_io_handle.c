@@ -716,6 +716,8 @@ int libewf_write_io_handle_initialize_values(
 			goto on_error;
 		}
 	}
+	io_handle->chunk_size = media_values->chunk_size;
+
 	if( ( write_io_handle->pack_flags & LIBEWF_PACK_FLAG_FORCE_COMPRESSION ) == 0 )
 	{
 		if( write_io_handle->compressed_zero_byte_empty_block == NULL )

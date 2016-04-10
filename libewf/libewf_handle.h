@@ -28,6 +28,7 @@
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
+#include "libewf_data_chunk.h"
 #include "libewf_extern.h"
 #include "libewf_hash_sections.h"
 #include "libewf_libbfio.h"
@@ -96,6 +97,10 @@ struct libewf_internal_handle
 	/* The current (storage media) offset
 	 */
 	off64_t current_offset;
+
+	/* The current (storage media) chunk index
+	 */
+	uint64_t current_chunk_index;
 
 	/* The segment file table
 	 */
@@ -225,40 +230,6 @@ int libewf_handle_close(
      libewf_handle_t *handle,
      libcerror_error_t **error );
 
-LIBEWF_EXTERN \
-ssize_t libewf_handle_prepare_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         void *uncompressed_chunk_buffer,
-         size_t *uncompressed_chunk_buffer_size,
-         int8_t is_compressed,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error );
-
-ssize_t libewf_internal_handle_read_chunk_from_file_io_pool(
-         libewf_internal_handle_t *internal_handle,
-         libbfio_pool_t *file_io_pool,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         void *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-ssize_t libewf_handle_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         void *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error );
-
 ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
          libewf_internal_handle_t *internal_handle,
          libbfio_pool_t *file_io_pool,
@@ -281,42 +252,6 @@ ssize_t libewf_handle_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error );
 
-LIBEWF_EXTERN \
-ssize_t libewf_handle_prepare_write_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         void *compressed_chunk_buffer,
-         size_t *compressed_chunk_buffer_size,
-         int8_t *is_compressed,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error );
-
-ssize_t libewf_internal_handle_write_chunk_to_file_io_pool(
-         libewf_internal_handle_t *internal_handle,
-         libbfio_pool_t *file_io_pool,
-         const void *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t data_size,
-         int8_t is_compressed,
-         void *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error );
-
-LIBEWF_EXTERN \
-ssize_t libewf_handle_write_chunk(
-         libewf_handle_t *handle,
-         const void *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t data_size,
-         int8_t is_compressed,
-         void *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error );
-
 ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
          libewf_internal_handle_t *internal_handle,
          libbfio_pool_t *file_io_pool,
@@ -337,6 +272,36 @@ ssize_t libewf_handle_write_buffer_at_offset(
          const void *buffer,
          size_t buffer_size,
          off64_t offset,
+         libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_handle_get_data_chunk(
+     libewf_handle_t *handle,
+     libewf_data_chunk_t **data_chunk,
+     libcerror_error_t **error );
+
+ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         libewf_internal_data_chunk_t *internal_data_chunk,
+         libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+ssize_t libewf_handle_read_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
+         libcerror_error_t **error );
+
+ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         libewf_internal_data_chunk_t *internal_data_chunk,
+         libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+ssize_t libewf_handle_write_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
          libcerror_error_t **error );
 
 ssize_t libewf_internal_handle_write_finalize_file_io_pool(

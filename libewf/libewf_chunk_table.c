@@ -907,8 +907,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		}
 		if( libewf_chunk_data_unpack(
 		     *chunk_data,
-		     media_values->chunk_size,
-		     io_handle->compression_method,
+		     io_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -923,24 +922,6 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		}
 		if( ( ( *chunk_data )->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
 		{
-			if( io_handle->zero_on_error != 0 )
-			{
-				if( memory_set(
-				     ( *chunk_data )->data,
-				     0,
-				     ( *chunk_data )->data_size ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to zero chunk: %" PRIu64 " data.",
-					 function,
-					 chunk_index );
-
-					goto on_error;
-				}
-			}
 			chunk_offset = offset - *chunk_data_offset;
 		}
 	}
@@ -955,9 +936,10 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		{
 			chunk_data_size = (size_t) ( media_values->media_size - chunk_offset );
 		}
-		if( libewf_chunk_data_initialize_clear_data(
+		if( libewf_chunk_data_initialize(
 		     &corrupted_chunk_data,
-		     chunk_data_size,
+		     media_values->chunk_size,
+		     1,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

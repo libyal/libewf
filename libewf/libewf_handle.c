@@ -29,6 +29,7 @@
 #include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
+#include "libewf_data_chunk.h"
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
@@ -3401,7 +3402,9 @@ int libewf_internal_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( ( access_flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
+	if( ( ( access_flags & ~( LIBEWF_ACCESS_FLAG_READ | LIBEWF_ACCESS_FLAG_WRITE | LIBEWF_ACCESS_FLAG_RESUME ) ) != 0 )
+	 || ( ( ( access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
+	  &&  ( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3808,6 +3811,7 @@ int libewf_internal_handle_open_file_io_pool(
 			goto on_error;
 		}
 	}
+			internal_handle->io_handle->chunk_size = internal_handle->media_values->chunk_size;
 	internal_handle->io_handle->access_flags = access_flags;
 	internal_handle->file_io_pool            = file_io_pool;
 	internal_handle->segment_table           = segment_table;
@@ -4344,567 +4348,9 @@ int libewf_handle_close(
 	return( result );
 }
 
-/* Prepares chunk of (media) data after reading it according to the handle settings
- * It applies decompression if necessary and validates the chunk checksum
- * This function should be used after libewf_handle_read_chunk
- * The value chunk_buffer_size contains the size of the chunk
- * Returns the resulting chunk size or -1 on error
- */
-ssize_t libewf_handle_prepare_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         void *uncompressed_chunk_buffer,
-         size_t *uncompressed_chunk_buffer_size,
-         int8_t is_compressed,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_prepare_read_chunk";
-	size32_t chunk_size                       = 0;
-	uint32_t chunk_range_flags                = 0;
-	uint16_t compression_method               = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( uncompressed_chunk_buffer_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid uncompressed chunk buffer size.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	chunk_size         = internal_handle->media_values->chunk_size;
-	compression_method = internal_handle->io_handle->compression_method;
-
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_IS_PACKED ) == 0 )
-	{
-		*uncompressed_chunk_buffer_size = chunk_buffer_size;
-	}
-	else
-	{
-		if( is_compressed != 0 )
-		{
-			chunk_range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
-		}
-		else
-		{
-			chunk_range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
-
-			uncompressed_chunk_buffer       = chunk_buffer;
-			*uncompressed_chunk_buffer_size = chunk_buffer_size;
-		}
-		if( libewf_chunk_data_unpack_buffer(
-		     uncompressed_chunk_buffer,
-		     uncompressed_chunk_buffer_size,
-		     chunk_buffer,
-		     chunk_buffer_size,
-		     chunk_size,
-		     compression_method,
-		     chunk_range_flags,
-		     chunk_checksum,
-		     chunk_io_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to unpack chunk buffer.",
-			 function );
-
-			return( -1 );
-		}
-/* TODO chunk data refactor
-		chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_IS_PACKED );
-*/
-	}
-	return( (ssize_t) *uncompressed_chunk_buffer_size );
-}
-
-/* Reads a chunk of (media) data from the current offset into a buffer
- * Will read until the requested size is filled or the entire chunk is read
- * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
- * and is used for uncompressed chunks only
- * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
- * otherwise the checksum is considered part of the data in the chunk buffer
- * The value chunk_buffer_size contains the size of the chunk buffer
- * This function is not multi-thread safe acquire write lock before call
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libewf_internal_handle_read_chunk_from_file_io_pool(
-         libewf_internal_handle_t *internal_handle,
-         libbfio_pool_t *file_io_pool,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         void *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_chunk_data_t *chunk_data = NULL;
-	uint8_t *chunk_data_buffer      = NULL;
-	static char *function           = "libewf_internal_handle_read_chunk_from_file_io_pool";
-	off64_t chunk_data_offset       = 0;
-	size_t data_size                = 0;
-	size_t read_size                = 0;
-	uint64_t chunk_index            = 0;
-
-	if( internal_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_data != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunk data set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->current_offset < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid handle - invalid IO handle - current offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values->chunk_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid media values - missing chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( chunk_buffer_size == 0 )
-	 || ( chunk_buffer_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid chunk buffer size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( is_compressed == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid is compressed.",
-		 function );
-
-		return( -1 );
-	}
-	if( checksum_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid checksum buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_checksum == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk checksum.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_io_flags == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk IO flags.",
-		 function );
-
-		return( -1 );
-	}
-	if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
-	{
-		return( 0 );
-	}
-	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
-
-	if( libewf_chunk_table_get_chunk_data_by_offset(
-	     internal_handle->chunk_table,
-	     chunk_index,
-	     internal_handle->io_handle,
-	     file_io_pool,
-	     internal_handle->media_values,
-	     internal_handle->segment_table,
-	     internal_handle->chunk_groups_cache,
-	     internal_handle->chunks_cache,
-	     internal_handle->current_offset,
-	     &chunk_data,
-	     &chunk_data_offset,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to read chunk: %" PRIu64 " data.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	if( chunk_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk: %" PRIu64 " data.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	*is_compressed = 0;
-
-	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
-	{
-		chunk_data_buffer = chunk_data->data;
-		read_size         = chunk_data->data_size;
-		*chunk_io_flags   = LIBEWF_CHUNK_IO_FLAG_IS_PACKED;
-
-		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-		{
-			*is_compressed = 1;
-		}
-		/* If the chunk data has a checksum and if the checksum buffer is not aligned
-		 * with the chunk buffer the chunk and checksum are stored separately
-		 * otherwise the checksum will be read at the same time as the chunk buffer
-		 */
-		else if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
-		{
-			if( read_size < 4 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk: %" PRIu64 " data size value out of bounds.",
-				 function,
-				 chunk_index );
-
-				return( -1 );
-			}
-			if( &( ( (uint8_t *) chunk_buffer )[ read_size - 4 ] ) != checksum_buffer )
-			{
-				if( memory_copy(
-				     checksum_buffer,
-				     &( chunk_data_buffer[ read_size - 4 ] ),
-				     4 ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-					 "%s: unable to copy chunk: %" PRIu64 " checksum data in chunk buffer.",
-					 function,
-					 chunk_index );
-
-					return( -1 );
-				}
-				byte_stream_copy_to_uint32_little_endian(
-				 (uint8_t *) checksum_buffer,
-				 *chunk_checksum );
-
-				*chunk_io_flags |= LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET;
-			}
-		}
-	}
-	else
-	{
-		chunk_data_buffer = chunk_data->data;
-		read_size         = chunk_data->data_size;
-		*chunk_io_flags   = 0;
-	}
-	if( read_size >= chunk_buffer_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid chunk: %" PRIu64 " buffer size value too small.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	if( memory_copy(
-	     chunk_buffer,
-	     chunk_data_buffer,
-	     read_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy chunk: %" PRIu64 " data to chunk buffer.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_PACKED ) != 0 )
-	{
-		data_size = (size_t) internal_handle->media_values->chunk_size;
-	}
-	else
-	{
-		data_size = chunk_data->data_size;
-	}
-	if( (size64_t) ( internal_handle->current_offset + data_size ) >= internal_handle->media_values->media_size )
-	{
-		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
-	}
-	internal_handle->current_offset += (off64_t) data_size;
-
-	return( (ssize_t) read_size );
-}
-
-/* Reads a chunk of (media) data from the current offset into a buffer
- * Will read until the requested size is filled or the entire chunk is read
- * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
- * and is used for uncompressed chunks only
- * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
- * otherwise the checksum is considered part of the data in the chunk buffer
- * The value chunk_buffer_size contains the size of the chunk buffer
- * Returns the number of bytes read or -1 on error
- */
-ssize_t libewf_handle_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         void *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_read_chunk";
-	ssize_t read_count                        = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->file_io_pool == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing file IO pool.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	read_count = libewf_internal_handle_read_chunk_from_file_io_pool(
-		      internal_handle,
-		      internal_handle->file_io_pool,
-	              chunk_buffer,
-	              chunk_buffer_size,
-	              is_compressed,
-	              checksum_buffer,
-	              chunk_checksum,
-	              chunk_io_flags,
-		      error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk.",
-		 function );
-
-		read_count = -1;
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( read_count );
-}
-
 /* Reads (media) data from the last current into a buffer using a Basic File IO (bfio) pool
  * This function is not multi-thread safe acquire write lock before call
- * Returns the number of bytes read or -1 on error
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
 ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
          libewf_internal_handle_t *internal_handle,
@@ -5116,7 +4562,7 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 }
 
 /* Reads (media) data at the current offset into a buffer
- * Returns the number of bytes read or -1 on error
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
 ssize_t libewf_handle_read_buffer(
          libewf_handle_t *handle,
@@ -5204,7 +4650,7 @@ ssize_t libewf_handle_read_buffer(
 }
 
 /* Reads (media) data at a specific offset
- * Returns the number of bytes read or -1 on error
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
 ssize_t libewf_handle_read_buffer_at_offset(
          libewf_handle_t *handle,
@@ -5315,717 +4761,11 @@ on_error:
 	return( -1 );
 }
 
-/* Prepares a chunk of (media) data before writing according to the handle settings
- * This function should be used before libewf_handle_write_chunk
- * The chunk_buffer_size should contain the actual chunk size
- * The function sets the is_compressed, chunk_checksum and chunk_io_flags values
- * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
- * and needs to be written separately from the chunk data, in case of an uncompressed chunk
- * Returns the resulting chunk size or -1 on error
- */
-ssize_t libewf_handle_prepare_write_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         void *compressed_chunk_buffer,
-         size_t *compressed_chunk_buffer_size,
-         int8_t *is_compressed,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_prepare_write_chunk";
-	size32_t chunk_size                       = 0;
-	size_t chunk_padding_size                 = 0;
-	uint64_t fill_pattern                     = 0;
-	uint32_t chunk_range_flags                = 0;
-	uint16_t compression_method               = 0;
-	uint8_t compression_flags                 = 0;
-	uint8_t pack_flags                        = 0;
-	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
-	int result                                = 0;
-
-/* TODO chunk data rewrite */
-	size_t compressed_chunk_buffer_offset     = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_buffer_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk buffer size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( compressed_chunk_buffer_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed chunk buffer size.",
-		 function );
-
-		return( -1 );
-	}
-	if( is_compressed == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid is compressed.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_buffer_size == 0 )
-	{
-		return( 0 );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	chunk_size         = internal_handle->media_values->chunk_size;
-	compression_method = internal_handle->io_handle->compression_method;
-	compression_level  = internal_handle->io_handle->compression_level;
-	compression_flags  = internal_handle->io_handle->compression_flags;
-	pack_flags         = internal_handle->write_io_handle->pack_flags;
-
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( chunk_buffer_size > (size_t) chunk_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid chunk buffer size: %" PRIzd " value exceeds media values chunk size: %" PRIu32 ".",
-		 function,
-		 chunk_buffer_size,
-		 chunk_size );
-
-		return( -1 );
-	}
-	if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
-	 || ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 ) )
-	{
-		if( ( chunk_buffer_size % 8 ) == 0 )
-		{
-			result = libewf_chunk_data_check_for_64_bit_pattern_fill(
-				  chunk_buffer,
-				  chunk_buffer_size,
-				  &fill_pattern,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if chunk data contains a fill pattern.",
-				 function );
-
-				return( -1 );
-			}
-			else if( result != 0 )
-			{
-				if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
-				{
-					pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
-					pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-					pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
-				}
-				else if( fill_pattern == 0 )
-				{
-					pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
-					pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-					pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
-				}
-			}
-		}
-		else if( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
-		{
-			result = libewf_chunk_data_check_for_empty_block(
-				  chunk_buffer,
-				  chunk_buffer_size,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if chunk data is an empty block.",
-				 function );
-
-				return( -1 );
-			}
-			else if( result != 0 )
-			{
-				if( *( (uint8_t *) chunk_buffer ) == 0 )
-				{
-					pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
-					pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-					pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
-				}
-			}
-		}
-	}
-	if( libewf_chunk_data_pack_buffer(
-	     chunk_buffer,
-	     chunk_buffer_size,
-	     compressed_chunk_buffer,
-	     &compressed_chunk_buffer_offset,
-	     compressed_chunk_buffer_size,
-	     chunk_size,
-	     chunk_buffer_size,
-	     &chunk_padding_size,
-	     compression_method,
-	     compression_level,
-	     &chunk_range_flags,
-	     chunk_checksum,
-	     chunk_io_flags,
-	     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
-	     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
-	     pack_flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to pack chunk buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( chunk_range_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-	{
-		*is_compressed = 1;
-	}
-	else
-	{
-		*is_compressed = 0;
-	}
-	return( (ssize_t) *compressed_chunk_buffer_size );
-}
-
-/* Writes a chunk of (media) data in EWF format at the current offset
- * the necessary settings of the write values must have been made
- * chunk_buffer_size contains the size of the data within the buffer while
- * data_size contains the size of the actual input data
- * Will initialize write if necessary
- * This function is not multi-thread safe acquire write lock before call
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-ssize_t libewf_internal_handle_write_chunk_to_file_io_pool(
-         libewf_internal_handle_t *internal_handle,
-         libbfio_pool_t *file_io_pool,
-         const void *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t data_size,
-         int8_t is_compressed,
-         void *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_chunk_data_t *chunk_data = NULL;
-	static char *function           = "libewf_internal_handle_write_chunk_to_file_io_pool";
-	ssize_t write_count             = 0;
-	uint64_t chunk_index            = 0;
-	int chunk_exists                = 0;
-
-	if( internal_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_data != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunk data set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->current_offset < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid handle - invalid IO handle - current offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values->chunk_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid media values - missing chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write_io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write_io_handle->values_initialized == 0 )
-	{
-		if( libewf_write_io_handle_initialize_values(
-		     internal_handle->write_io_handle,
-		     internal_handle->io_handle,
-		     internal_handle->media_values,
-		     internal_handle->segment_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write IO handle values.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( chunk_buffer == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.",
-		 function );
-
-		goto on_error;
-	}
-#if SIZE_OF_SIZE_T > 4
-	if( chunk_buffer_size > (size_t) UINT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk buffer size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-#endif
-	if( data_size > internal_handle->media_values->chunk_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: data size cannot be larger than maximum chunk size.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size ) )
-	{
-		return( 0 );
-	}
-	if( chunk_buffer_size == 0 )
-	{
-		return( 0 );
-	}
-	if( ( internal_handle->media_values->media_size != 0 )
-	 && ( (size64_t) ( internal_handle->current_offset + data_size ) >= internal_handle->media_values->media_size ) )
-	{
-		data_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
-	}
-	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: writing chunk: %" PRIu64 " with chunk buffer of size: %" PRIzd " and data of size: %" PRIzd ".\n",
-		 function,
-		 chunk_index,
-		 chunk_buffer_size,
-		 data_size );
-	}
-#endif
-	if( libewf_chunk_data_initialize(
-	     &chunk_data,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk: %" PRIu64 " data.",
-		 function,
-		 chunk_index );
-
-		goto on_error;
-	}
-	if( is_compressed != 0 )
-	{
-		chunk_data->range_flags = LIBEWF_RANGE_FLAG_IS_COMPRESSED;
-	}
-	else if( ( chunk_io_flags & LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET ) != 0 )
-	{
-		/* Check if the chunk and checksum buffers are aligned
-		 * if so write the chunk and checksum at the same time
-		 */
-		if( checksum_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid checksum buffer.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_from_uint32_little_endian(
-		 (uint8_t *) checksum_buffer,
-		 chunk_checksum );
-
-		if( checksum_buffer == &( ( (uint8_t *) chunk_buffer )[ chunk_buffer_size ] ) )
-		{
-			chunk_buffer_size += 4;
-
-			chunk_io_flags &= ~( LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET );
-		}
-		else
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 (uint8_t *) checksum_buffer,
-			 chunk_data->checksum );
-		}
-		chunk_data->range_flags = LIBEWF_RANGE_FLAG_HAS_CHECKSUM;
-	}
-	chunk_data->data                = (uint8_t *) chunk_buffer;
-	chunk_data->allocated_data_size = chunk_buffer_size;
-	chunk_data->flags               = LIBEWF_CHUNK_DATA_ITEM_FLAG_NON_MANAGED_DATA;
-	chunk_data->chunk_io_flags      = chunk_io_flags;
-
-	chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
-	                internal_handle->chunk_table,
-	                chunk_index,
-	                internal_handle->file_io_pool,
-	                internal_handle->segment_table,
-	                internal_handle->chunk_groups_cache,
-	                internal_handle->current_offset,
-			error );
-
-	if( chunk_exists == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
-		 function,
-		 chunk_index );
-
-		return( -1 );
-	}
-	else if( chunk_exists != 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: chunk: %" PRIu64 " already exists.",
-		 function,
-		 chunk_index );
-
-		goto on_error;
-	}
-	chunk_data->data_size = chunk_buffer_size;
-
-	write_count = libewf_write_io_handle_write_new_chunk(
-	               internal_handle->write_io_handle,
-	               internal_handle->io_handle,
-	               internal_handle->file_io_pool,
-	               internal_handle->media_values,
-	               internal_handle->segment_table,
-	               internal_handle->header_values,
-	               internal_handle->hash_values,
-	               internal_handle->hash_sections,
-	               internal_handle->sessions,
-	               internal_handle->tracks,
-	               internal_handle->acquiry_errors,
-	               chunk_index,
-	               chunk_data,
-	               data_size,
-	               error );
-
-	if( write_count < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write raw chunk data.",
-		 function );
-
-		goto on_error;
-	}
-	internal_handle->current_offset += (off64_t) data_size;
-
-	if( libewf_chunk_data_free(
-	     &chunk_data,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free chunk data.",
-		 function );
-
-		goto on_error;
-	}
-	return( (ssize_t) chunk_buffer_size );
-
-on_error:
-	if( chunk_data != NULL )
-	{
-		libewf_chunk_data_free(
-		 &chunk_data,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Writes a chunk of (media) data in EWF format at the current offset
- * the necessary settings of the write values must have been made
- * chunk_buffer_size contains the size of the data within the buffer while
- * data_size contains the size of the actual input data
- * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-ssize_t libewf_handle_write_chunk(
-         libewf_handle_t *handle,
-         const void *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t data_size,
-         int8_t is_compressed,
-         void *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libcerror_error_t **error )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_write_chunk";
-	ssize_t read_count                        = 0;
-
-	if( handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->file_io_pool == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing file IO pool.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	read_count = libewf_internal_handle_write_chunk_to_file_io_pool(
-		      internal_handle,
-		      internal_handle->file_io_pool,
-	              chunk_buffer,
-	              chunk_buffer_size,
-	              data_size,
-	              is_compressed,
-	              checksum_buffer,
-	              chunk_checksum,
-	              chunk_io_flags,
-		      error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk.",
-		 function );
-
-		read_count = -1;
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_handle->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( read_count );
-}
-
 /* Writes (media) data at the current offset from a buffer using a Basic File IO (bfio) pool
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
  * This function is not multi-thread safe acquire write lock before call
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
  */
 ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
          libewf_internal_handle_t *internal_handle,
@@ -6124,25 +4864,6 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 
 		return( -1 );
 	}
-	if( internal_handle->write_io_handle->values_initialized == 0 )
-	{
-		if( libewf_write_io_handle_initialize_values(
-		     internal_handle->write_io_handle,
-		     internal_handle->io_handle,
-		     internal_handle->media_values,
-		     internal_handle->segment_table,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize write IO handle values.",
-			 function );
-
-			return( -1 );
-		}
-	}
 	if( buffer == NULL )
 	{
 		libcerror_error_set(
@@ -6233,11 +4954,10 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 		}
 		if( internal_handle->chunk_data == NULL )
 		{
-			/* Reserve 4 bytes for the chunk checksum
-			 */
 			if( libewf_chunk_data_initialize(
 			     &( internal_handle->chunk_data ),
-			     (size_t) internal_handle->media_values->chunk_size + 4,
+			     internal_handle->media_values->chunk_size,
+			     0,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -6322,10 +5042,7 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 
 			if( libewf_chunk_data_pack(
 			     internal_handle->chunk_data,
-			     internal_handle->media_values->chunk_size,
-			     internal_handle->io_handle->compression_method,
-			     internal_handle->io_handle->compression_level,
-			     internal_handle->io_handle->compression_flags,
+			     internal_handle->io_handle,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 			     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 			     internal_handle->write_io_handle->pack_flags,
@@ -6404,7 +5121,7 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 /* Writes (media) data at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
  */
 ssize_t libewf_handle_write_buffer(
          libewf_handle_t *handle,
@@ -6455,6 +5172,25 @@ ssize_t libewf_handle_write_buffer(
 		return( -1 );
 	}
 #endif
+	if( internal_handle->write_io_handle->values_initialized == 0 )
+	{
+		if( libewf_write_io_handle_initialize_values(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->media_values,
+		     internal_handle->segment_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write IO handle values.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
 	               internal_handle,
 	               internal_handle->file_io_pool,
@@ -6471,7 +5207,7 @@ ssize_t libewf_handle_write_buffer(
 		 "%s: unable to write buffer.",
 		 function );
 
-		write_count = -1;
+		goto on_error;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -6489,12 +5225,20 @@ ssize_t libewf_handle_write_buffer(
 	}
 #endif
 	return( write_count );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
 }
 
 /* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
  */
 ssize_t libewf_handle_write_buffer_at_offset(
          libewf_handle_t *handle,
@@ -6546,6 +5290,25 @@ ssize_t libewf_handle_write_buffer_at_offset(
 		return( -1 );
 	}
 #endif
+	if( internal_handle->write_io_handle->values_initialized == 0 )
+	{
+		if( libewf_write_io_handle_initialize_values(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->media_values,
+		     internal_handle->segment_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write IO handle values.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	if( libewf_internal_handle_seek_offset(
 	     internal_handle,
 	     offset,
@@ -6603,6 +5366,682 @@ on_error:
 	 NULL );
 #endif
 	return( -1 );
+}
+
+/* Retrieves a (media) data chunk
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_data_chunk(
+     libewf_handle_t *handle,
+     libewf_data_chunk_t **data_chunk,
+     libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_data_chunk";
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_chunk == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( *data_chunk != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: data chunk value already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( ( internal_handle->write_io_handle != NULL )
+	 && ( internal_handle->write_io_handle->values_initialized == 0 ) )
+	{
+		if( libewf_write_io_handle_initialize_values(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->media_values,
+		     internal_handle->segment_table,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write IO handle values.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libewf_data_chunk_initialize(
+	     data_chunk,
+	     internal_handle->io_handle,
+	     internal_handle->write_io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create data chunk.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_handle->read_write_lock,
+	 NULL );
+#endif
+	return( -1 );
+}
+
+/* Reads a (media) data chunk at the current offset
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ */
+ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         libewf_internal_data_chunk_t *internal_data_chunk,
+         libcerror_error_t **error )
+{
+	libewf_chunk_data_t *chunk_data = NULL;
+	static char *function           = "libewf_internal_handle_read_data_chunk_from_file_io_pool";
+	off64_t chunk_data_offset       = 0;
+	ssize_t read_count              = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunk data set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->current_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid handle - invalid IO handle - current offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values->chunk_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid media values - missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_data_chunk == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
+	{
+		return( 0 );
+	}
+/* TODO remove need to calculate */
+	internal_handle->current_chunk_index = internal_handle->current_offset
+	                                     / internal_handle->media_values->chunk_size;
+
+	internal_handle->current_offset = (off64_t) internal_handle->current_chunk_index
+	                                * (off64_t) internal_handle->media_values->chunk_size;
+
+	if( libewf_chunk_table_get_chunk_data_by_offset(
+	     internal_handle->chunk_table,
+	     internal_handle->current_chunk_index,
+	     internal_handle->io_handle,
+	     file_io_pool,
+	     internal_handle->media_values,
+	     internal_handle->segment_table,
+	     internal_handle->chunk_groups_cache,
+	     internal_handle->chunks_cache,
+	     internal_handle->current_offset,
+	     &chunk_data,
+	     &chunk_data_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk: %" PRIu64 " data.",
+		 function,
+		 internal_handle->current_chunk_index );
+
+		return( -1 );
+	}
+	if( chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk: %" PRIu64 " data.",
+		 function,
+		 internal_handle->current_chunk_index );
+
+		return( -1 );
+	}
+	read_count = (ssize_t) chunk_data->data_size;
+
+	if( libewf_internal_data_chunk_set_chunk_data(
+	     internal_data_chunk,
+	     internal_handle->current_chunk_index,
+	     chunk_data,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set chunk: %" PRIu64 " data in data chunk.",
+		 function,
+		 internal_handle->current_chunk_index );
+
+		return( -1 );
+	}
+	internal_handle->current_offset += read_count;
+
+	internal_handle->current_chunk_index++;
+
+	return( read_count );
+}
+
+/* Reads a (media) data chunk at the current offset
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ */
+ssize_t libewf_handle_read_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
+         libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_read_data_chunk";
+	ssize_t read_count                        = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	read_count = libewf_internal_handle_read_data_chunk_from_file_io_pool(
+	              internal_handle,
+	              internal_handle->file_io_pool,
+	              (libewf_internal_data_chunk_t *) data_chunk,
+	              error );
+
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read data chunk.",
+		 function );
+
+		read_count = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( read_count );
+}
+
+/* Writes a (media) data chunk at the current offset
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
+ */
+ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
+         libewf_internal_handle_t *internal_handle,
+         libbfio_pool_t *file_io_pool,
+         libewf_internal_data_chunk_t *internal_data_chunk,
+         libcerror_error_t **error )
+{
+	static char *function = "libewf_internal_handle_write_data_chunk_to_file_io_pool";
+	size_t data_size      = 0;
+	ssize_t write_count   = 0;
+	int chunk_exists      = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - chunk data set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->current_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid handle - invalid IO handle - current offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values->chunk_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid media values - missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write_io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle write.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_data_chunk == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->media_values->media_size != 0 )
+	 && ( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size ) )
+	{
+		return( 0 );
+	}
+	data_size = internal_data_chunk->data_size;
+
+	if( internal_handle->media_values->media_size != 0 )
+	{
+		if( (size64_t) ( internal_handle->current_offset + data_size ) > internal_handle->media_values->media_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: last data chunk size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+	}
+/* TODO remove need to calculate */
+	internal_handle->current_chunk_index = internal_handle->current_offset
+	                                     / internal_handle->media_values->chunk_size;
+
+	internal_handle->current_offset = (off64_t) internal_handle->current_chunk_index
+	                                * (off64_t) internal_handle->media_values->chunk_size;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: writing chunk: %" PRIu64 " of size: %" PRIzd ".\n",
+		 function,
+		 internal_handle->current_chunk_index,
+		 data_size );
+	}
+#endif
+	chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
+	                internal_handle->chunk_table,
+	                internal_handle->current_chunk_index,
+	                internal_handle->file_io_pool,
+	                internal_handle->segment_table,
+	                internal_handle->chunk_groups_cache,
+	                internal_handle->current_offset,
+			error );
+
+	if( chunk_exists == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
+		 function,
+		 internal_handle->current_chunk_index );
+
+		return( -1 );
+	}
+	else if( chunk_exists != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: chunk: %" PRIu64 " already exists.",
+		 function,
+		 internal_handle->current_chunk_index );
+
+		return( -1 );
+	}
+	write_count = libewf_write_io_handle_write_new_chunk(
+	               internal_handle->write_io_handle,
+	               internal_handle->io_handle,
+	               internal_handle->file_io_pool,
+	               internal_handle->media_values,
+	               internal_handle->segment_table,
+	               internal_handle->header_values,
+	               internal_handle->hash_values,
+	               internal_handle->hash_sections,
+	               internal_handle->sessions,
+	               internal_handle->tracks,
+	               internal_handle->acquiry_errors,
+	               internal_handle->current_chunk_index,
+	               internal_data_chunk->chunk_data,
+	               data_size,
+	               error );
+
+	if( write_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->current_offset += (off64_t) data_size;
+
+	return( write_count );
+}
+
+/* Writes a (media) data chunk at the current offset
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
+ */
+ssize_t libewf_handle_write_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
+         libcerror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_write_data_chunk";
+	ssize_t write_count                       = 0;
+
+	if( handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	write_count = libewf_internal_handle_write_data_chunk_to_file_io_pool(
+	               internal_handle,
+	               internal_handle->file_io_pool,
+	               (libewf_internal_data_chunk_t *) data_chunk,
+	               error );
+
+	if( write_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write data chunk.",
+		 function );
+
+		write_count = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( write_count );
 }
 
 /* Finalizes the write by correcting the EWF the meta data in the segment files
@@ -6757,10 +6196,7 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
-		     internal_handle->media_values->chunk_size,
-		     internal_handle->io_handle->compression_method,
-		     internal_handle->io_handle->compression_level,
-		     internal_handle->io_handle->compression_flags,
+		     internal_handle->io_handle,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block,
 		     internal_handle->write_io_handle->compressed_zero_byte_empty_block_size,
 		     internal_handle->write_io_handle->pack_flags,
@@ -9016,8 +8452,7 @@ int libewf_internal_handle_get_media_values(
 			 */
 			if( libewf_chunk_data_unpack(
 			     chunk_data,
-			     internal_handle->media_values->chunk_size,
-			     internal_handle->io_handle->compression_method,
+			     internal_handle->io_handle,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

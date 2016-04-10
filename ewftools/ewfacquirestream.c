@@ -455,11 +455,6 @@ ssize_t ewfacquirestream_read_chunk(
 	}
 	storage_media_buffer->storage_media_offset = storage_media_offset;
 	storage_media_buffer->requested_size       = buffer_read_size;
-
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		storage_media_buffer->data_in_compression_buffer = 0;
-	}
 	storage_media_buffer->raw_buffer_data_size = buffer_offset;
 
 	return( (ssize_t) buffer_offset );
@@ -636,6 +631,7 @@ int ewfacquirestream_read_input(
 		}
 		if( storage_media_buffer_queue_initialize(
 		     &( imaging_handle->storage_media_buffer_queue ),
+		     imaging_handle->output_handle,
 		     imaging_handle->maximum_number_of_queued_items,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
@@ -700,6 +696,7 @@ int ewfacquirestream_read_input(
 	{
 		if( storage_media_buffer_initialize(
 		     &storage_media_buffer,
+		     imaging_handle->output_handle,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
 		     error ) != 1 )
@@ -882,8 +879,7 @@ int ewfacquirestream_read_input(
 		else
 #endif
 		{
-			process_count = imaging_handle_prepare_write_storage_media_buffer(
-			                 imaging_handle,
+			process_count = storage_media_buffer_write_process(
 			                 storage_media_buffer,
 			                 error );
 

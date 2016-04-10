@@ -309,22 +309,6 @@ int imaging_handle_close(
      imaging_handle_t *imaging_handle,
      libcerror_error_t **error );
 
-ssize_t imaging_handle_prepare_read_buffer(
-         imaging_handle_t *imaging_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error );
-
-ssize_t imaging_handle_read_buffer(
-         imaging_handle_t *imaging_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         size_t read_size,
-         libcerror_error_t **error );
-
-ssize_t imaging_handle_prepare_write_storage_media_buffer(
-         imaging_handle_t *imaging_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error );
-
 ssize_t imaging_handle_write_storage_media_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,

@@ -129,43 +129,45 @@ int ewf_test_seek_offset(
 	return( 1 );
 }
 
-/* Tests libewf_handle_read_chunk and libewf_handle_prepare_read_chunk
+/* Tests libewf_handle_read_data_chunk and libewf_data_chunk_read_buffer
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int ewf_test_read_chunk(
      libewf_handle_t *handle,
      uint8_t *data_buffer,
      size_t data_buffer_size,
-     uint8_t *chunk_buffer,
-     size_t chunk_buffer_size,
      size64_t input_size,
      size64_t expected_size,
      libcerror_error_t **error )
 {
-	uint8_t checksum_buffer[ 4 ];
-
-	static char *function   = "ewf_test_read_chunk";
-	size64_t remaining_size = 0;
-	size64_t result_size    = 0;
-	size_t data_size        = 0;
-	ssize_t process_count   = 0;
-	ssize_t read_count      = 0;
-	uint32_t chunk_checksum = 0;
-	int8_t is_compressed    = 0;
-	int8_t process_checksum = 0;
+	libewf_data_chunk_t *data_chunk = NULL;
+	static char *function           = "ewf_test_read_chunk";
+	size64_t remaining_size         = 0;
+	size64_t result_size            = 0;
+	ssize_t process_count           = 0;
+	ssize_t read_count              = 0;
 
 	remaining_size = input_size;
 
+	if( libewf_handle_get_data_chunk(
+	     handle,
+	     &data_chunk,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to retrieve data chunk.",
+		 function );
+
+		goto on_error;
+	}
 	while( remaining_size > 0 )
 	{
-		read_count = libewf_handle_read_chunk(
+		read_count = libewf_handle_read_data_chunk(
 			      handle,
-			      chunk_buffer,
-			      chunk_buffer_size,
-			      &is_compressed,
-			      (void *) checksum_buffer,
-			      &chunk_checksum,
-			      &process_checksum,
+			      data_chunk,
 			      error );
 
 		if( read_count < 0 )
@@ -176,25 +178,18 @@ int ewf_test_read_chunk(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read chunk of size: %" PRIzd ".",
 			 function,
-			 chunk_buffer_size );
+			 data_buffer_size );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( read_count == 0 )
 		{
 			break;
 		}
-		data_size = data_buffer_size;
-
-		process_count = libewf_handle_prepare_read_chunk(
-		                 handle,
-		                 chunk_buffer,
-		                 (size_t) read_count,
+		process_count = libewf_data_chunk_read_buffer(
+		                 data_chunk,
 		                 data_buffer,
-		                 &data_size,
-		                 is_compressed,
-		                 chunk_checksum,
-		                 process_checksum,
+		                 data_buffer_size,
 		                 error );
 
 		if( process_count < 0 )
@@ -207,10 +202,23 @@ int ewf_test_read_chunk(
 			 function,
 			 read_count );
 
-			return( -1 );
+			goto on_error;
 		}
 		remaining_size -= (size64_t) process_count;
 		result_size    += (size64_t) process_count;
+	}
+	if( libewf_data_chunk_free(
+	     &data_chunk,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free data chunk.",
+		 function );
+
+		goto on_error;
 	}
 	if( expected_size != result_size )
 	{
@@ -223,6 +231,15 @@ int ewf_test_read_chunk(
 		return( 0 );
 	}
 	return( 1 );
+
+on_error:
+	if( data_chunk != NULL )
+	{
+		libewf_data_chunk_free(
+		 &data_chunk,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Tests reading chunks at a specific offset
@@ -237,12 +254,9 @@ int ewf_test_read_chunk_at_offset(
      off64_t expected_offset,
      size64_t expected_size )
 {
-	libcerror_error_t *error   = NULL;
-	uint8_t *chunk_buffer     = NULL;
+	libcerror_error_t *error  = NULL;
 	uint8_t *data_buffer      = NULL;
 	const char *whence_string = NULL;
-	size_t chunk_buffer_size  = 0;
-	size_t data_buffer_size   = 0;
 	int result                = 0;
 
 	if( chunk_size == 0 )
@@ -285,17 +299,8 @@ int ewf_test_read_chunk_at_offset(
 	          expected_offset,
 	          &error );
 
-	data_buffer_size = chunk_size;
-
 	data_buffer = (uint8_t *) memory_allocate(
-	                           sizeof( uint8_t ) * data_buffer_size );
-
-	/* The chunk buffer should at least have a size of: chunk_size + 16
-	 */
-	chunk_buffer_size = chunk_size * 2;
-
-	chunk_buffer = (uint8_t *) memory_allocate(
-	                            sizeof( uint8_t ) * chunk_buffer_size );
+	                           sizeof( uint8_t ) * chunk_size );
 
 	if( result == 1 )
 	{
@@ -304,16 +309,12 @@ int ewf_test_read_chunk_at_offset(
 			result = ewf_test_read_chunk(
 				  handle,
 				  data_buffer,
-				  data_buffer_size,
-				  chunk_buffer,
-				  chunk_buffer_size,
+				  chunk_size,
 				  input_size,
 				  expected_size,
 			          &error );
 		}
 	}
-	memory_free(
-	 chunk_buffer );
 	memory_free(
 	 data_buffer );
 

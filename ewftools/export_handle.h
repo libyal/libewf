@@ -292,11 +292,6 @@ int export_handle_close(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
-ssize_t export_handle_prepare_read_storage_media_buffer(
-         export_handle_t *export_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         libcerror_error_t **error );
-
 ssize_t export_handle_read_storage_media_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,

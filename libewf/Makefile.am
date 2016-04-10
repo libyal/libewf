@@ -45,6 +45,7 @@ libewf_la_SOURCES = \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \
 	libewf_compression.c libewf_compression.h \
+	libewf_data_chunk.c libewf_data_chunk.h \
 	libewf_date_time.c libewf_date_time.h \
 	libewf_date_time_values.c libewf_date_time_values.h \
 	libewf_debug.c libewf_debug.h \

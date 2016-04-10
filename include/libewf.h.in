@@ -347,46 +347,8 @@ int libewf_handle_close(
      libewf_handle_t *handle,
      libewf_error_t **error );
 
-/* Prepares chunk of (media) data after reading it according to the handle settings
- * It applies decompression if necessary and validates the chunk checksum
- * This function should be used after libewf_handle_read_chunk
- * The value chunk_buffer_size contains the size of the chunk
- * Returns the resulting chunk size or -1 on error
- */
-LIBEWF_EXTERN \
-ssize_t libewf_handle_prepare_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         void *uncompressed_chunk_buffer,
-         size_t *uncompressed_chunk_buffer_size,
-         int8_t is_compressed,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libewf_error_t **error );
-
-/* Reads a chunk of (media) data from the current offset into a buffer
- * Will read until the requested size is filled or the entire chunk is read
- * The value chunk_checksum is set to a runtime version of the value in the checksum_buffer
- * and is used for uncompressed chunks only
- * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was read into checksum_buffer
- * otherwise the checksum is considered part of the data in the chunk buffer
- * The value chunk_buffer_size contains the size of the chunk buffer
- * Returns the number of bytes read or -1 on error
- */
-LIBEWF_EXTERN \
-ssize_t libewf_handle_read_chunk(
-         libewf_handle_t *handle,
-         void *chunk_buffer,
-         size_t chunk_buffer_size,
-         int8_t *is_compressed,
-         void *checksum_buffer,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libewf_error_t **error );
-
 /* Reads (media) data at the current offset into a buffer
- * Returns the number of bytes read or -1 on error
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_read_buffer(
@@ -396,7 +358,7 @@ ssize_t libewf_handle_read_buffer(
          libewf_error_t **error );
 
 /* Reads (media) data at a specific offset
- * Returns the number of bytes read or -1 on error
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_read_buffer_at_offset(
@@ -406,49 +368,10 @@ ssize_t libewf_handle_read_buffer_at_offset(
          off64_t offset,
          libewf_error_t **error );
 
-/* Prepares a chunk of (media) data before writing according to the handle settings
- * This function should be used before libewf_handle_write_chunk
- * The chunk_buffer_size should contain the actual chunk size
- * The function sets the is_compressed, chunk_checksum and chunk_io_flags values
- * The LIBEWF_CHUNK_IO_FLAG_CHECKSUM_SET chunk_io_flags is set if the checksum was set in checksum_buffer
- * and needs to be written separately from the chunk data, in case of an uncompressed chunk
- * Returns the resulting chunk size or -1 on error
- */
-LIBEWF_EXTERN \
-ssize_t libewf_handle_prepare_write_chunk(
-         libewf_handle_t *handle,
-         void *buffer,
-         size_t buffer_size,
-         void *compressed_chunk_buffer,
-         size_t *compressed_chunk_buffer_size,
-         int8_t *is_compressed,
-         uint32_t *chunk_checksum,
-         int8_t *chunk_io_flags,
-         libewf_error_t **error );
-
-/* Writes a chunk of (media) data in EWF format at the current offset
- * the necessary settings of the write values must have been made
- * chunk_buffer_size contains the size of the data within the buffer while
- * data_size contains the size of the actual input data
- * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
- */
-LIBEWF_EXTERN \
-ssize_t libewf_handle_write_chunk(
-         libewf_handle_t *handle,
-         const void *chunk_buffer,
-         size_t chunk_buffer_size,
-         size_t data_size,
-         int8_t is_compressed,
-         void *checksum_buffer,
-         uint32_t chunk_checksum,
-         int8_t chunk_io_flags,
-         libewf_error_t **error );
-
 /* Writes (media) data at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_buffer(
@@ -460,7 +383,7 @@ ssize_t libewf_handle_write_buffer(
 /* Writes (media) data at a specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the number of input bytes written, 0 when no longer bytes can be written or -1 on error
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_buffer_at_offset(
@@ -470,9 +393,36 @@ ssize_t libewf_handle_write_buffer_at_offset(
          off64_t offset,
          libewf_error_t **error );
 
+/* Retrieves a (media) data chunk
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_data_chunk(
+     libewf_handle_t *handle,
+     libewf_data_chunk_t **data_chunk,
+     libewf_error_t **error );
+
+/* Reads a (media) data chunk at the current offset
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ */
+LIBEWF_EXTERN \
+ssize_t libewf_handle_read_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
+         libewf_error_t **error );
+
+/* Writes a (media) data chunk at the current offset
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
+ */
+LIBEWF_EXTERN \
+ssize_t libewf_handle_write_data_chunk(
+         libewf_handle_t *handle,
+         libewf_data_chunk_t *data_chunk,
+         libewf_error_t **error );
+
 /* Finalizes the write by correcting the EWF the meta data in the segment files
  * This function is required after writing from stream
- * Returns the number of input bytes written or -1 on error
+ * Returns the number of bytes written or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_write_finalize(
@@ -1550,7 +1500,43 @@ int libewf_handle_get_file_entry_by_utf16_path(
      libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
- * Single file entry functions
+ * Data chunk functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a data chunk
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_data_chunk_free(
+     libewf_data_chunk_t **data_chunk,
+     libewf_error_t **error );
+
+/* Reads a buffer from the data chunk
+ * It applies decompression if necessary and validates the chunk checksum
+ * This function should be used after libewf_handle_read_data_chunk
+ * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ */
+LIBEWF_EXTERN \
+ssize_t libewf_data_chunk_read_buffer(
+         libewf_data_chunk_t *data_chunk,
+         void *buffer,
+         size_t buffer_size,
+         libewf_error_t **error );
+
+/* Writes a buffer to the data chunk
+ * It applies compression if necessary and calculated the chunk checksum
+ * This function should be used before libewf_handle_write_data_chunk
+ * Returns the number of bytes written, 0 when no longer data can be written or -1 on error
+ */
+LIBEWF_EXTERN \
+ssize_t libewf_data_chunk_write_buffer(
+         libewf_data_chunk_t *data_chunk,
+         const void *buffer,
+         size_t buffer_size,
+         libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * File entry functions
  * ------------------------------------------------------------------------- */
 
 /* Frees a file entry

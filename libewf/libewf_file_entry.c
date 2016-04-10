@@ -24,7 +24,6 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
-#include "libewf_extern.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
 #include "libewf_libcdata.h"

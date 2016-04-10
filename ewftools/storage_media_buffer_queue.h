@@ -27,6 +27,7 @@
 
 #include "ewftools_libcerror.h"
 #include "ewftools_libcthreads.h"
+#include "ewftools_libewf.h"
 #include "storage_media_buffer.h"
 
 #if defined( __cplusplus )
@@ -37,6 +38,7 @@ extern "C" {
 
 int storage_media_buffer_queue_initialize(
      libcthreads_queue_t **queue,
+     libewf_handle_t *handle,
      int maximum_number_of_values,
      uint8_t storage_media_buffer_mode,
      size_t storage_media_buffer_size,

@@ -44,20 +44,16 @@ int ewf_test_write_chunk(
      uint8_t compression_flags,
      libcerror_error_t **error )
 {
-	libewf_handle_t *handle             = NULL;
-	uint8_t *checksum_buffer            = NULL;
-	uint8_t *chunk_buffer               = NULL;
-	uint8_t *compressed_chunk_buffer    = NULL;
-	static char *function               = "ewf_test_write_chunk";
-	size_t chunk_buffer_size            = 0;
-	size_t compressed_chunk_buffer_size = 0;
-	ssize_t process_count               = 0;
-	ssize_t write_count                 = 0;
-	uint32_t chunk_checksum             = 0;
-	uint32_t sectors_per_chunk          = 0;
-	int8_t is_compressed                = 0;
-	int8_t process_checksum             = 0;
-	int sector_iterator                 = 0;
+	libewf_data_chunk_t *data_chunk = NULL;
+	libewf_handle_t *handle         = NULL;
+	uint8_t *chunk_buffer           = NULL;
+	static char *function           = "ewf_test_write_chunk";
+	size_t chunk_buffer_size        = 0;
+	size_t write_size               = 0;
+	ssize_t process_count           = 0;
+	ssize_t write_count             = 0;
+	uint32_t sectors_per_chunk      = 0;
+	int sector_iterator             = 0;
 
 	if( libewf_handle_initialize(
 	     &handle,
@@ -162,24 +158,27 @@ int ewf_test_write_chunk(
 
 		goto on_error;
 	}
+	if( libewf_handle_get_data_chunk(
+	     handle,
+	     &data_chunk,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to retrieve data chunk.",
+		 function );
+
+		goto on_error;
+	}
 	chunk_buffer_size = sectors_per_chunk * 512;
 
-	/* Use the chunck buffer also as checksum buffer
+	/* Use the chunk buffer also as checksum buffer
 	 */
 	chunk_buffer = (uint8_t *) memory_allocate(
-	                            sizeof( uint8_t ) * ( chunk_buffer_size + 4 ) );
+	                            sizeof( uint8_t ) * chunk_buffer_size );
 
-	/* The compressed data can become larger than the uncompressed data
-	 */
-	compressed_chunk_buffer_size = chunk_buffer_size * 2;
-
-	compressed_chunk_buffer = (uint8_t *) memory_allocate(
-	                                       sizeof( uint8_t ) * compressed_chunk_buffer_size );
-
-	if( chunk_buffer != NULL )
-	{
-		checksum_buffer = &( chunk_buffer[ chunk_buffer_size - 1 ] );
-	}
 	for( sector_iterator = 0;
 	     sector_iterator < 26;
 	     sector_iterator++ )
@@ -198,63 +197,44 @@ int ewf_test_write_chunk(
 
 			goto on_error;
 		}
-		process_count = libewf_handle_prepare_write_chunk(
-				 handle,
+		if( chunk_buffer_size < media_size )
+		{
+			write_size = chunk_buffer_size;
+		}
+		else
+		{
+			write_size = (size_t) media_size;
+		}
+		process_count = libewf_data_chunk_write_buffer(
+				 data_chunk,
 				 chunk_buffer,
-				 chunk_buffer_size,
-				 compressed_chunk_buffer,
-				 &compressed_chunk_buffer_size,
-				 &is_compressed,
-				 &chunk_checksum,
-				 &process_checksum,
+				 write_size,
 				 error );
 
 		if( process_count == -1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to prepare chunk buffer before writing.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write buffer to data chunk.",
 			 function );
 
 			goto on_error;
 		}
-		if( is_compressed == 0 )
-		{
-			write_count = libewf_handle_write_chunk(
-				       handle,
-				       chunk_buffer,
-				       chunk_buffer_size,
-				       chunk_buffer_size,
-				       is_compressed,
-				       checksum_buffer,
-				       chunk_checksum,
-				       process_checksum,
-				       error );
-		}
-		else
-		{
-			write_count = libewf_handle_write_chunk(
-				       handle,
-				       compressed_chunk_buffer,
-				       compressed_chunk_buffer_size,
-				       chunk_buffer_size,
-				       is_compressed,
-				       checksum_buffer,
-				       chunk_checksum,
-				       process_checksum,
-				       error );
-		}
+		write_count = libewf_handle_write_data_chunk(
+			       handle,
+			       data_chunk,
+			       error );
+
 		if( write_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable write chunk of size: %" PRIzd ".",
-			 function,
-			 chunk_buffer_size );
+			 "%s: unable write data chunk to handle.",
+			 function );
 
 			goto on_error;
 		}
@@ -272,15 +252,23 @@ int ewf_test_write_chunk(
 		}
 	}
 	memory_free(
-	 compressed_chunk_buffer );
-
-	compressed_chunk_buffer = NULL;
-	
-	memory_free(
 	 chunk_buffer );
 
 	chunk_buffer = NULL;
 	
+	if( libewf_data_chunk_free(
+	     &data_chunk,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free data chunk.",
+		 function );
+
+		goto on_error;
+	}
 	if( libewf_handle_close(
 	     handle,
 	     error ) != 0 )
@@ -310,15 +298,16 @@ int ewf_test_write_chunk(
 	return( 1 );
 
 on_error:
-	if( compressed_chunk_buffer != NULL )
-	{
-		memory_free(
-		 compressed_chunk_buffer );
-	}
 	if( chunk_buffer != NULL )
 	{
 		memory_free(
 		 chunk_buffer );
+	}
+	if( data_chunk != NULL )
+	{
+		libewf_data_chunk_free(
+		 &data_chunk,
+		 NULL );
 	}
 	if( handle != NULL )
 	{
@@ -340,11 +329,11 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	libcerror_error_t *error                                   = NULL;
 	libcstring_system_character_t *option_chunk_size           = NULL;
 	libcstring_system_character_t *option_compression_level    = NULL;
 	libcstring_system_character_t *option_maximum_segment_size = NULL;
 	libcstring_system_character_t *option_media_size           = NULL;
-	libcerror_error_t *error                                     = NULL;
 	libcstring_system_integer_t option                          = 0;
 	size64_t chunk_size                                         = 0;
 	size64_t maximum_segment_size                               = 0;

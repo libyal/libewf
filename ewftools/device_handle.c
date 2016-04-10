@@ -1090,11 +1090,6 @@ ssize_t device_handle_read_storage_media_buffer(
 	}
 	storage_media_buffer->storage_media_offset = storage_media_offset;
 	storage_media_buffer->requested_size       = read_size;
-
-	if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		storage_media_buffer->data_in_compression_buffer = 0;
-	}
 	storage_media_buffer->raw_buffer_data_size = (size_t) read_count;
 
 	return( read_count );

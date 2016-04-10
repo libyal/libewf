@@ -58,10 +58,6 @@ struct verification_handle
 	 */
 	int header_codepage;
 
-	/* Value to indicate if the chunk should be zeroed on error
-	 */
-	uint8_t zero_chunk_on_error;
-
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
@@ -231,13 +227,6 @@ int verification_handle_open_input(
 int verification_handle_close(
      verification_handle_t *verification_handle,
      libcerror_error_t **error );
-
-ssize_t verification_handle_read_storage_media_buffer(
-         verification_handle_t *verification_handle,
-         storage_media_buffer_t *storage_media_buffer,
-         off64_t storage_media_offset,
-         size_t read_size,
-         libcerror_error_t **error );
 
 ssize_t verification_handle_process_storage_media_buffer(
          verification_handle_t *verification_handle,

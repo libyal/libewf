@@ -1,4 +1,12 @@
 TODO
+* fix issue with test_ewfexport.sh
+* refactor libewf_internal_data_chunk_set_chunk_data not to clone ?
+* ewfacquire do not support secondary output and resume
+* complete: libewf_chunk_table_fill_v2
+* pattern fill chunk support (set chunk table entry, test)
+* pass zero byte empty block compressed data cache as a pointer
+  do not copy data to compressed chunk cache
+
 * be able to handle large chunk tables for version 2
 * test runner improve gdb/valgrind support to run tests as regular
 * allow to set the number of values in the queue, thread pools and list
@@ -20,8 +28,6 @@ TODO
 * ewfacquire allow to set the the maximum number of table entries?
 
 Threat safety
-* libewf_handle_prepare_read_chunk - remove the need for locks
-* libewf_handle_prepare_write_chunk - remove the need for locks
 * libewf_metadata
  - libewf_handle_copy_header_values (write lock)
  - libewf_handle_copy_media_values
@@ -192,8 +198,6 @@ Possible performance improvements:
   - what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize string functions
   - pass length/size as much as possible
-* pass zero byte empty block compressed data cache as a pointer
-  do not copy data to compressed chunk cache
 * do not write section start on data update
   - performance improvement is insignificant
 * read certain section data on demand ?
@@ -381,8 +385,6 @@ Unsorted:
   - tainted table and table2
   - tainted table or table2 (use the one that is not tainted)
 
-* implement new chunk IO functions where chunk is an object
-
 * add stream write support for EWF-S01 use fill space solution in table section
 
 * fix double _FILE_OFFSET_BITS=64
@@ -418,10 +420,8 @@ Unsorted:
 * Ex01/Lx01 read support
   - add generic way to parse file object data ?
   - make sure to correctly deal with aligment padding (should only affect one of the Lx01 tables)
-  - complete: libewf_chunk_table_fill_v2
 
 * Ex01 write support
-  - pattern fill chunk support (set chunk table entry, test)
   - enable secion data integrity hash support
   - add support for write resume
 
@@ -482,6 +482,7 @@ Closed:
 
 20160410
 * worked on version 2 format support
+* worked on new read/write chunk API
 
 20160409
 * worked on multi threading support in ewfacquirestream

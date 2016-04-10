@@ -830,6 +830,7 @@ int ewfacquire_read_input(
 		}
 		if( storage_media_buffer_queue_initialize(
 		     &( imaging_handle->storage_media_buffer_queue ),
+		     imaging_handle->output_handle,
 		     imaging_handle->maximum_number_of_queued_items,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
@@ -894,6 +895,7 @@ int ewfacquire_read_input(
 	{
 		if( storage_media_buffer_initialize(
 		     &storage_media_buffer,
+		     imaging_handle->output_handle,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
 		     error ) != 1 )
@@ -961,11 +963,11 @@ int ewfacquire_read_input(
 			{
 				read_size = (size_t) ( resume_acquiry_offset - acquiry_count );
 			}
-			read_count = imaging_handle_read_buffer(
-				      imaging_handle,
-				      storage_media_buffer,
-				      read_size,
-				      error );
+			read_count = storage_media_buffer_read_from_handle(
+			              storage_media_buffer,
+			              imaging_handle->output_handle,
+			              read_size,
+			              error );
 
 			if( read_count < 0 )
 			{
@@ -991,8 +993,7 @@ int ewfacquire_read_input(
 			}
 			storage_media_buffer->storage_media_offset = storage_media_offset;
 
-			process_count = imaging_handle_prepare_read_buffer(
-					 imaging_handle,
+			process_count = storage_media_buffer_read_process(
 					 storage_media_buffer,
 					 error );
 
@@ -1019,15 +1020,6 @@ int ewfacquire_read_input(
 				 read_size );
 
 				goto on_error;
-			}
-			if( storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-			{
-				/* Set the chunk data size in the compression buffer
-				 */
-				if( storage_media_buffer->data_in_compression_buffer == 1 )
-				{
-					storage_media_buffer->compression_buffer_data_size = (size_t) process_count;
-				}
 			}
 			read_count = process_count;
 
@@ -1163,8 +1155,7 @@ int ewfacquire_read_input(
 #endif
 		else
 		{
-			process_count = imaging_handle_prepare_write_storage_media_buffer(
-					 imaging_handle,
+			process_count = storage_media_buffer_write_process(
 					 storage_media_buffer,
 					 error );
 
