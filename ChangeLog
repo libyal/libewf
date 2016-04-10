@@ -1,4 +1,5 @@
 TODO
+* be able to handle large chunk tables for version 2
 * test runner improve gdb/valgrind support to run tests as regular
 * allow to set the number of values in the queue, thread pools and list
 
@@ -478,6 +479,13 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160410
+* worked on version 2 format support
+
+20160409
+* worked on multi threading support in ewfacquirestream
+* worked on tests
 
 20160404
 * disabled bzip2 support for now

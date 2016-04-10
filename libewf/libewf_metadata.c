@@ -1178,6 +1178,17 @@ int libewf_handle_set_compression_values(
 
 		return( -1 );
 	}
+	if( ( compression_flags & ~( LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported compression flags.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_handle->read_write_lock,
@@ -1205,18 +1216,10 @@ int libewf_handle_set_compression_values(
 
 		goto on_error;
 	}
-	if( ( ( compression_flags & LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION ) != 0 )
-	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
-	 && ( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
+	if( ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2 )
+	 && ( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: compression flags not supported by format.",
-		 function );
-
-		goto on_error;
+		compression_flags |= LIBEWF_COMPRESS_FLAG_USE_PATTERN_FILL_COMPRESSION;
 	}
 	internal_handle->io_handle->compression_level = compression_level;
 	internal_handle->io_handle->compression_flags = compression_flags;
