@@ -32,7 +32,7 @@ test_callback()
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
-	INPUT_BASENAME=`echo "${INPUT_FILE}" | sed 's/_*[0-9]*[.][cC][uU][eE]$//'`;
+	INPUT_BASENAME=`echo "${INPUT_FILE_FULL_PATH}" | sed 's/_*[0-9]*[.][cC][uU][eE]$//'`;
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
