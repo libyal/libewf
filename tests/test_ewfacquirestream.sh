@@ -1,7 +1,7 @@
 #!/bin/bash
 # Acquirestream tool testing script
 #
-# Version: 20160328
+# Version: 20160411
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -31,11 +31,11 @@ test_callback()
 	local ARGUMENTS=$@;
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
-	INPUT_FILE=`readlink -f "${INPUT_FILE}"`;
+	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[@]} < "${INPUT_FILE}" | sed '1,2d' > "${TEST_LOG}");
+	(cd ${TMPDIR} && run_test_with_input_and_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} < "${INPUT_FILE_FULL_PATH}" | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";

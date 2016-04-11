@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160407
+# Version: 20160411
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -623,10 +623,6 @@ run_test_with_input_and_arguments()
 # Note that this function is not intended to be directly invoked
 # from outside the test runner script.
 #
-# Globals:
-#   CHECK_WITH_GDB
-#   CHECK_WITH_VALGRIND
-#
 # Arguments:
 #   a string containing the path of the test set directory
 #   a string containing the description of the test
@@ -668,12 +664,7 @@ run_test_on_input_file()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if ! test -z ${CHECK_WITH_GDB} || ! test -z ${CHECK_WITH_VALGRIND};
-	then
-		run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "${INPUT_FILE}" ${ARGUMENTS[@]} ${OPTIONS[@]};
-		RESULT=$?;
-
-	elif test "${TEST_MODE}" = "with_callback";
+	if test "${TEST_MODE}" = "with_callback";
 	then
 		test_callback "${TMPDIR}" "${TEST_SET_DIRECTORY}" "${TEST_OUTPUT}" "${TEST_EXECUTABLE}" "${TEST_INPUT}" ${ARGUMENTS[@]} ${OPTIONS[@]};
 		RESULT=$?;

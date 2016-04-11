@@ -20,34 +20,34 @@ test_write_resume()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	${ACQUIRE_TOOL} -b 64 -c deflate:none -C Case -D Description -E Evidence -e Examiner -f encase5 -m removable -M logical -N Notes -q -S 650MB -t ${TMPDIR}/resume -u ${INPUT_FILE} > /dev/null;
+	${ACQUIRE_TOOL} -b 64 -c deflate:none -C Case -D Description -E Evidence -e Examiner -f encase5 -m removable -M logical -N Notes -q -S 650MB -t ${TMPDIR}/acquire_resume -u ${INPUT_FILE} > /dev/null;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${VERIFY_TOOL} -q ${TMPDIR}/resume.E01 > /dev/null;
+		${VERIFY_TOOL} -q ${TMPDIR}/acquire_resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${TRUNCATE_TOOL} ${RESUME_OFFSET} ${TMPDIR}/resume.E01 > /dev/null;
+		${TRUNCATE_TOOL} ${RESUME_OFFSET} ${TMPDIR}/acquire_resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		run_test_with_arguments ${ACQUIRE_TOOL} -q -R ${INPUT_FILE} -t ${TMPDIR}/resume.E01 -u > ${TMPDIR}/output;
+		run_test_with_arguments ${ACQUIRE_TOOL} -q -R ${INPUT_FILE} -t ${TMPDIR}/acquire_resume.E01 -u > ${TMPDIR}/output;
 
 		RESULT=$?;
 	fi
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${VERIFY_TOOL} -q ${TMPDIR}/resume.E01 > /dev/null;
+		${VERIFY_TOOL} -q ${TMPDIR}/acquire_resume.E01 > /dev/null;
 
 		RESULT=$?;
 	fi

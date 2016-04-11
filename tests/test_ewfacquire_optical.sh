@@ -1,7 +1,7 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160328
+# Version: 20160411
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -31,12 +31,12 @@ test_callback()
 	local ARGUMENTS=$@;
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
-	INPUT_FILE=`readlink -f "${INPUT_FILE}"`;
+	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 	INPUT_BASENAME=`echo "${INPUT_FILE}" | sed 's/_*[0-9]*[.][cC][uU][eE]$//'`;
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[@]} -T"${INPUT_FILE}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
+	(cd ${TMPDIR} && run_test_with_input_and_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} -T"${INPUT_FILE_FULL_PATH}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
@@ -55,7 +55,7 @@ test_callback()
 	fi
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${VERIFY_TOOL} -q ${TMPDIR}/acquire.* > /dev/null;
+		${VERIFY_TOOL} -q ${TMPDIR}/acquire_optical.* > /dev/null;
 		local RESULT=$?;
 	fi
 	return ${RESULT};
@@ -112,7 +112,7 @@ source ${TEST_RUNNER};
 
 assert_availability_binary md5sum;
 
-run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -CCase -DDescription -EEvidence -eExaminer -moptical -Mlogical -NNotes -q -tacquire -u;
+run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -CCase -DDescription -EEvidence -eExaminer -moptical -Mlogical -NNotes -q -tacquire_optical -u;
 RESULT=$?;
 
 exit ${RESULT};

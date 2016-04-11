@@ -1,14 +1,15 @@
 TODO
 * fix issue with test_ewfexport.sh
+* multi threaded tool support - handle abort paths
+
 * refactor libewf_internal_data_chunk_set_chunk_data not to clone ?
-* ewfacquire do not support secondary output and resume
+* ewfacquire error when both secondary output and resume are set
 * complete: libewf_chunk_table_fill_v2
 * pattern fill chunk support (set chunk table entry, test)
 * pass zero byte empty block compressed data cache as a pointer
   do not copy data to compressed chunk cache
 
 * be able to handle large chunk tables for version 2
-* test runner improve gdb/valgrind support to run tests as regular
 * allow to set the number of values in the queue, thread pools and list
 
 * memory usage of acquisition of Ex01 file? - chunk group size?
@@ -22,7 +23,6 @@ TODO
 
 * add multi threaded tool support
   - ewfmount - fuse multi thread support ?
-  - handle abort paths
 * chunk table get chunk from chunk_table->corrupted_chunks_list
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
@@ -479,6 +479,9 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160411
+* worked on tests
 
 20160410
 * worked on version 2 format support

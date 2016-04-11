@@ -1,7 +1,7 @@
 #!/bin/bash
 # Export tool testing script
 #
-# Version: 20160328
+# Version: 20160411
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -31,9 +31,9 @@ test_callback()
 	local ARGUMENTS=$@;
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
-	INPUT_FILE=`readlink -f "${INPUT_FILE}"`;
+	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 
-	(cd ${TMPDIR} && ${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${INPUT_FILE}" > /dev/null 2>&1);
+	(cd ${TMPDIR} && run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "${INPUT_FILE_FULL_PATH}" ${ARGUMENTS[@]} ${OPTIONS[@]} > /dev/null 2>&1);
 	local RESULT=$?;
 
 	if test -f "${TMPDIR}/export.raw";
