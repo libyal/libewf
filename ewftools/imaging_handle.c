@@ -177,22 +177,21 @@ int imaging_handle_initialize(
 			goto on_error;
 		}
 	}
-	( *imaging_handle )->calculate_md5                  = calculate_md5;
-	( *imaging_handle )->use_chunk_data_functions       = use_chunk_data_functions;
-	( *imaging_handle )->compression_method             = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *imaging_handle )->compression_level              = LIBEWF_COMPRESSION_NONE;
-	( *imaging_handle )->ewf_format                     = LIBEWF_FORMAT_ENCASE6;
-	( *imaging_handle )->media_type                     = LIBEWF_MEDIA_TYPE_FIXED;
-	( *imaging_handle )->media_flags                    = LIBEWF_MEDIA_FLAG_PHYSICAL;
-	( *imaging_handle )->bytes_per_sector               = 512;
-	( *imaging_handle )->sectors_per_chunk              = 64;
-	( *imaging_handle )->sector_error_granularity       = 64;
-	( *imaging_handle )->maximum_segment_size           = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-	( *imaging_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
-	( *imaging_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *imaging_handle )->number_of_threads              = 4;
-	( *imaging_handle )->maximum_number_of_queued_items = 256;
-	( *imaging_handle )->notify_stream                  = IMAGING_HANDLE_NOTIFY_STREAM;
+	( *imaging_handle )->calculate_md5            = calculate_md5;
+	( *imaging_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
+	( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
+	( *imaging_handle )->media_flags              = LIBEWF_MEDIA_FLAG_PHYSICAL;
+	( *imaging_handle )->bytes_per_sector         = 512;
+	( *imaging_handle )->sectors_per_chunk        = 64;
+	( *imaging_handle )->sector_error_granularity = 64;
+	( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+	( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+	( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *imaging_handle )->number_of_threads        = 4;
+	( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 

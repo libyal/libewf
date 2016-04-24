@@ -38,8 +38,7 @@ int storage_media_buffer_initialize(
      size_t size,
      libcerror_error_t **error )
 {
-	static char *function  = "storage_media_buffer_initialize";
-	size_t raw_buffer_size = 0;
+	static char *function = "storage_media_buffer_initialize";
 
 	if( buffer == NULL )
 	{
@@ -121,19 +120,11 @@ int storage_media_buffer_initialize(
 	}
 	if( size > 0 )
 	{
-		raw_buffer_size = size;
-
-		if( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-		{
-			/* Add 4 bytes to allow for write checksum buffer alignment
-			 */
-			raw_buffer_size += 4;
-		}
 /* TODO can low level functions and direct IO be combined ? */
 #if defined( memory_allocate_aligned )
 		if( memory_allocate_aligned(
 		     (void **) &( ( *buffer )->raw_buffer ),
-		     raw_buffer_size,
+		     size,
 		     512 ) != 0 )
 		{
 			libcerror_error_set(
@@ -147,7 +138,7 @@ int storage_media_buffer_initialize(
 		}
 #else
 		( *buffer )->raw_buffer = (uint8_t *) memory_allocate(
-		                                       sizeof( uint8_t ) * raw_buffer_size );
+		                                       sizeof( uint8_t ) * size );
 			
 		if( ( *buffer )->raw_buffer == NULL )
 		{

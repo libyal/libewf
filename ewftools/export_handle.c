@@ -180,18 +180,17 @@ int export_handle_initialize(
 			goto on_error;
 		}
 	}
-	( *export_handle )->calculate_md5                  = calculate_md5;
-	( *export_handle )->use_chunk_data_functions       = use_chunk_data_functions;
-	( *export_handle )->compression_method             = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *export_handle )->compression_level              = LIBEWF_COMPRESSION_NONE;
-	( *export_handle )->output_format                  = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
-	( *export_handle )->ewf_format                     = LIBEWF_FORMAT_ENCASE6;
-	( *export_handle )->sectors_per_chunk              = 64;
-	( *export_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
-	( *export_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *export_handle )->number_of_threads              = 4;
-	( *export_handle )->maximum_number_of_queued_items = 256;
-	( *export_handle )->notify_stream                  = EXPORT_HANDLE_NOTIFY_STREAM;
+	( *export_handle )->calculate_md5            = calculate_md5;
+	( *export_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *export_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	( *export_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+	( *export_handle )->output_format            = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
+	( *export_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
+	( *export_handle )->sectors_per_chunk        = 64;
+	( *export_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+	( *export_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *export_handle )->number_of_threads        = 4;
+	( *export_handle )->notify_stream            = EXPORT_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -4906,6 +4905,7 @@ int export_handle_export_input(
 	ssize_t read_count                                  = 0;
 	ssize_t write_count                                 = 0;
 	uint8_t storage_media_buffer_mode                   = 0;
+	int maximum_number_of_queued_items                  = 0;
 	int status                                          = PROCESS_STATUS_COMPLETED;
 
 	if( export_handle == NULL )
@@ -5050,12 +5050,14 @@ int export_handle_export_input(
 	}
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( export_handle->number_of_threads != 0 )
+		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+
 	{
 		if( libcthreads_thread_pool_create(
 		     &( export_handle->input_process_thread_pool ),
 		     NULL,
 		     export_handle->number_of_threads,
-		     export_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &export_handle_process_storage_media_buffer_callback,
 		     (void *) export_handle,
 		     error ) != 1 )
@@ -5073,7 +5075,7 @@ int export_handle_export_input(
 		     &( export_handle->output_thread_pool ),
 		     NULL,
 		     1,
-		     export_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &export_handle_output_storage_media_buffer_callback,
 		     (void *) export_handle,
 		     error ) != 1 )
@@ -5103,7 +5105,7 @@ int export_handle_export_input(
 		if( storage_media_buffer_queue_initialize(
 		     &( export_handle->storage_media_buffer_queue ),
 		     export_handle->input_handle,
-		     export_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
 		     error ) != 1 )

@@ -202,14 +202,13 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-	( *verification_handle )->input_format                   = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
-	( *verification_handle )->calculate_md5                  = calculate_md5;
-	( *verification_handle )->use_chunk_data_functions       = use_chunk_data_functions;
-	( *verification_handle )->header_codepage                = LIBEWF_CODEPAGE_ASCII;
-	( *verification_handle )->process_buffer_size            = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *verification_handle )->number_of_threads              = 4;
-	( *verification_handle )->maximum_number_of_queued_items = 256;
-	( *verification_handle )->notify_stream                  = VERIFICATION_HANDLE_NOTIFY_STREAM;
+	( *verification_handle )->input_format             = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
+	( *verification_handle )->calculate_md5            = calculate_md5;
+	( *verification_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *verification_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
+	( *verification_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
+	( *verification_handle )->number_of_threads        = 4;
+	( *verification_handle )->notify_stream            = VERIFICATION_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -1462,6 +1461,7 @@ int verification_handle_verify_input(
 	uint32_t number_of_checksum_errors           = 0;
 	uint8_t storage_media_buffer_mode            = 0;
 	int is_corrupted                             = 0;
+	int maximum_number_of_queued_items           = 0;
 	int md5_hash_compare                         = 0;
 	int sha1_hash_compare                        = 0;
 	int sha256_hash_compare                      = 0;
@@ -1558,11 +1558,13 @@ int verification_handle_verify_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( verification_handle->number_of_threads != 0 )
 	{
+		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+
 		if( libcthreads_thread_pool_create(
 		     &( verification_handle->process_thread_pool ),
 		     NULL,
 		     verification_handle->number_of_threads,
-		     verification_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &verification_handle_process_storage_media_buffer_callback,
 		     (void *) verification_handle,
 		     error ) != 1 )
@@ -1580,7 +1582,7 @@ int verification_handle_verify_input(
 		     &( verification_handle->output_thread_pool ),
 		     NULL,
 		     1,
-		     verification_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &verification_handle_output_storage_media_buffer_callback,
 		     (void *) verification_handle,
 		     error ) != 1 )
@@ -1610,7 +1612,7 @@ int verification_handle_verify_input(
 		if( storage_media_buffer_queue_initialize(
 		     &( verification_handle->storage_media_buffer_queue ),
 		     verification_handle->input_handle,
-		     verification_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
 		     error ) != 1 )

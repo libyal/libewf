@@ -2,7 +2,7 @@
 #
 # Python-bindings get version test program
 #
-# Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -23,7 +23,7 @@
 import argparse
 import sys
 
-import pyfsntfs
+import pyewf
 
 
 def main():
@@ -33,7 +33,7 @@ def main():
   options = args_parser.parse_args()
 
   try:
-    pyfsntfs.get_version()
+    pyewf.get_version()
   except Exception:
     return False
 

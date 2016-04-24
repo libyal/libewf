@@ -461,14 +461,14 @@ int ewf_test_read_from_handle(
 
 	/* Case 2: test read beyond media size
 	 */
+	read_offset = (off64_t) ( media_size - 1024 );
+	read_size   = 4096;
+
 	if( media_size < 1024 )
 	{
 		/* Test: offset: <media_size - 1024> size: 4096
 		 * Expected result: offset: -1 size: <undetermined>
 		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = 4096;
-
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
 		          read_offset,
@@ -507,9 +507,6 @@ int ewf_test_read_from_handle(
 		/* Test: offset: <media_size - 1024> size: 4096
 		 * Expected result: offset: <media_size - 1024> size: 1024
 		 */
-		read_offset = (off64_t) ( media_size - 1024 );
-		read_size   = 4096;
-
 		result = ewf_test_seek_offset_and_read_buffer(
 		          handle,
 		          read_offset,

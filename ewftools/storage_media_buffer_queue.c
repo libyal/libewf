@@ -69,7 +69,7 @@ int storage_media_buffer_queue_initialize(
 		return( -1 );
 	}
 	if( ( maximum_number_of_values < 0 )
-	 || ( maximum_number_of_values > (size_t) ( SSIZE_MAX - 1 ) ) )
+	 || ( maximum_number_of_values > (int) ( INT_MAX - 1 ) ) )
 	{
 		libcerror_error_set(
 		 error,

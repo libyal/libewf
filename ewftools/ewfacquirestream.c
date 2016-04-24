@@ -487,6 +487,7 @@ int ewfacquirestream_read_input(
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
 	uint8_t storage_media_buffer_mode            = 0;
+	int maximum_number_of_queued_items           = 0;
 	int status                                   = PROCESS_STATUS_COMPLETED;
 
 	if( imaging_handle == NULL )
@@ -580,11 +581,13 @@ int ewfacquirestream_read_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( imaging_handle->number_of_threads != 0 )
 	{
+		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+
 		if( libcthreads_thread_pool_create(
 		     &( imaging_handle->process_thread_pool ),
 		     NULL,
 		     imaging_handle->number_of_threads,
-		     imaging_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &imaging_handle_process_storage_media_buffer_callback,
 		     (void *) imaging_handle,
 		     error ) != 1 )
@@ -602,7 +605,7 @@ int ewfacquirestream_read_input(
 		     &( imaging_handle->output_thread_pool ),
 		     NULL,
 		     1,
-		     imaging_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     (int (*)(intptr_t *, void *)) &imaging_handle_output_storage_media_buffer_callback,
 		     (void *) imaging_handle,
 		     error ) != 1 )
@@ -632,7 +635,7 @@ int ewfacquirestream_read_input(
 		if( storage_media_buffer_queue_initialize(
 		     &( imaging_handle->storage_media_buffer_queue ),
 		     imaging_handle->output_handle,
-		     imaging_handle->maximum_number_of_queued_items,
+		     maximum_number_of_queued_items,
 		     storage_media_buffer_mode,
 		     process_buffer_size,
 		     error ) != 1 )

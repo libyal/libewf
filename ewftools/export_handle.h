@@ -164,10 +164,6 @@ struct export_handle
 	 */
 	int number_of_threads;
 
-	/* The maximum number of items queued in the process thread pool
-	 */
-	int maximum_number_of_queued_items;
-
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 
 	/* The input process thread pool
