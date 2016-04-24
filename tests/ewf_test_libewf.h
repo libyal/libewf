@@ -24,10 +24,10 @@
 
 #include <common.h>
 
-/* If Cygwin libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
+/* If Cygwin libtool DLL support is enabled and do not want to create static
+ * executables set LIBEWF_DLL_IMPORT before including libewf.h
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#if defined( _WIN32 ) && defined( DLL_EXPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBEWF_DLL_IMPORT
 #endif
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160411
+# Version: 20160423
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -77,10 +77,13 @@ find_binary_executable()
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 
-	local EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
+	# Note that the behavior of `file -bi` is not helpful on Mac OS X.
+	local EXECUTABLE_TYPE=`file -b ${TEST_EXECUTABLE}`;
 
 	# Check if the test executable is a libtool shell script.
-	echo "${EXECUTABLE_TYPE}" | grep "text/x-shellscript" > /dev/null 2>&1;
+	# Linux: POSIX shell script, ASCII text executable, with very long lines
+	# Mac OS X: POSIX shell script text executable
+	echo "${EXECUTABLE_TYPE}" | grep "POSIX shell script" > /dev/null 2>&1;
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
@@ -92,9 +95,12 @@ find_binary_executable()
 
 		if test -x ${TEST_EXECUTABLE};
 		then
-			EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
+			# Note that the behavior of `file -bi` is not helpful on Mac OS X.
+			EXECUTABLE_TYPE=`file -b ${TEST_EXECUTABLE}`;
 
-			echo "${EXECUTABLE_TYPE}" | grep "application/x-executable" > /dev/null 2>&1;
+			# Linux: ELF 64-bit LSB executable, x86-64, ...
+			# Mac OS X: Mach-O 64-bit executable x86_64
+			echo "${EXECUTABLE_TYPE}" | grep "executable" > /dev/null 2>&1;
 			RESULT=$?;
 
 			if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -129,16 +135,25 @@ find_binary_library_path()
 		LIBRARY_NAME=`dirname ${LIBRARY_NAME}`;
 		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/\(.*\)tools$/lib\1/'`;
 	else
-		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/^\(.*\)_test_.*$/lib\1/'`;
+		LIBRARY_NAME=`basename ${LIBRARY_NAME} | sed 's/^py//' | sed 's/^\([^_]*\)_test_.*$/lib\1/'`;
 	fi
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
 
-	echo "${TEST_EXECUTABLE}/${LIBRARY_NAME}/.libs";
+	local LIBRARY_PATH="${TEST_EXECUTABLE}/${LIBRARY_NAME}/.libs";
+
+	if ! test -d "${LIBRARY_PATH}";
+	then
+		LIBRARY_PATH="../${LIBRARY_NAME}/.libs";
+	fi
+	echo "${LIBRARY_PATH}";
 }
 
 # Searches for the path to the binary variant of the Python module
+#
+# Globals:
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -149,23 +164,30 @@ find_binary_library_path()
 find_binary_python_module_path()
 {
 	local TEST_EXECUTABLE=$1;
-	local PYTHON_MODULE_NAME="${TEST_EXECUTABLE}";
 
-	echo ${PYTHON_MODULE_NAME} | grep 'tools' > /dev/null 2>&1;
+	local PYTHON_MODULE_NAME=`basename ${TEST_EXECUTABLE} | sed 's/^py\(.*\)_test_.*$/py\1/'`;
 
-	if test $? -eq ${EXIT_SUCCESS};
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
+
+	PYTHON_VERSION=`echo ${PYTHON_VERSION} | cut -c1`;
+
+	local PYTHON_MODULE_PATH="${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}-python${PYTHON_VERSION}/.libs";
+
+	if ! test -d "${PYTHON_MODULE_PATH}";
 	then
-		PYTHON_MODULE_NAME=`dirname ${PYTHON_MODULE_NAME}`;
-		PYTHON_MODULE_NAME=`dirname ${PYTHON_MODULE_NAME}`;
-		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/\(.*\)tools$/py\1/'`;
-	else
-		PYTHON_MODULE_NAME=`basename ${PYTHON_MODULE_NAME} | sed 's/^\(.*\)_test_.*$/py\1/'`;
+		PYTHON_MODULE_PATH="../${PYTHON_MODULE_NAME}-python${PYTHON_VERSION}/.libs";
 	fi
-	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
-	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
-	TEST_EXECUTABLE=`dirname ${TEST_EXECUTABLE}`;
-
-	echo "${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}/.libs";
+	if ! test -d "${PYTHON_MODULE_PATH}";
+	then
+		PYTHON_MODULE_PATH="${TEST_EXECUTABLE}/${PYTHON_MODULE_NAME}/.libs";
+	fi
+	if ! test -d "${PYTHON_MODULE_PATH}";
+	then
+		PYTHON_MODULE_PATH="../${PYTHON_MODULE_NAME}/.libs";
+	fi
+	echo "${PYTHON_MODULE_PATH}";
 }
 
 # Determines the test option file.
@@ -290,7 +312,7 @@ read_option_file()
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
-#   PYTHON
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -312,14 +334,28 @@ run_test_with_arguments()
 
 		return ${EXIT_FAILURE};
 	fi
-	local EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
-
 	local PLATFORM=`uname -s`;
 
+	# Note that the behavior of `file -bi` is not helpful on Mac OS X.
+	local EXECUTABLE_TYPE=`file -b ${TEST_EXECUTABLE}`;
+
 	# Check if the test executable is a Python script.
-	echo "${EXECUTABLE_TYPE}" | grep "text/x-python" > /dev/null 2>&1;
+	# Linux: Python script, ASCII text executable
+	# Mac OS X: a python script text executable
+	echo "${EXECUTABLE_TYPE}" | grep -i "python script" > /dev/null 2>&1;
 	local IS_PYTHON_SCRIPT=$?;
 
+	if test ${IS_PYTHON_SCRIPT} -eq 0;
+	then
+		local PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
+
+		if ! test -x ${PYTHON};
+		then
+			echo "Missing executable: ${PYTHON}";
+
+			exit ${EXIT_FAILURE};
+		fi
+	fi
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
@@ -419,15 +455,28 @@ run_test_with_arguments()
 
 			return ${EXIT_FAILURE};
 		fi
+		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
 
-		if ! test -z ${CHECK_WITH_STDERR};
+		if test "${PLATFORM}" = "Darwin";
 		then
-			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]};
-			RESULT=$?;
+			if ! test -z ${CHECK_WITH_STDERR};
+			then
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]};
+				RESULT=$?;
+			else
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} 2> /dev/null;
+				RESULT=$?;
+			fi
 		else
-			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} 2> /dev/null;
-			RESULT=$?;
+			if ! test -z ${CHECK_WITH_STDERR};
+			then
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]};
+				RESULT=$?;
+			else
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} 2> /dev/null;
+				RESULT=$?;
+			fi
 		fi
 	else
 		if ! test -x "${TEST_EXECUTABLE}";
@@ -456,7 +505,7 @@ run_test_with_arguments()
 #   CHECK_WITH_GDB
 #   CHECK_WITH_STDERR
 #   CHECK_WITH_VALGRIND
-#   PYTHON
+#   PYTHON_VERSION
 #
 # Arguments:
 #   a string containing the path of the test executable
@@ -480,14 +529,28 @@ run_test_with_input_and_arguments()
 
 		return ${EXIT_FAILURE};
 	fi
-	local EXECUTABLE_TYPE=`file -bi ${TEST_EXECUTABLE} | sed 's/;.*$//'`;
-
 	local PLATFORM=`uname -s`;
 
+	# Note that the behavior of `file -bi` is not helpful on Mac OS X.
+	local EXECUTABLE_TYPE=`file -b ${TEST_EXECUTABLE}`;
+
 	# Check if the test executable is a Python script.
-	echo "${EXECUTABLE_TYPE}" | grep "text/x-python" > /dev/null 2>&1;
+	# Linux: Python script, ASCII text executable
+	# Mac OS X: a python script text executable
+	echo "${EXECUTABLE_TYPE}" | grep -i "python script" > /dev/null 2>&1;
 	local IS_PYTHON_SCRIPT=$?;
 
+	if test ${IS_PYTHON_SCRIPT} -eq 0;
+	then
+		local PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
+
+		if ! test -x ${PYTHON};
+		then
+			echo "Missing executable: ${PYTHON}";
+
+			exit ${EXIT_FAILURE};
+		fi
+	fi
 	local RESULT=0;
 
 	if ! test -z ${CHECK_WITH_GDB};
@@ -587,15 +650,28 @@ run_test_with_input_and_arguments()
 
 			return ${EXIT_FAILURE};
 		fi
+		local LIBRARY_PATH=$( find_binary_library_path ${TEST_EXECUTABLE} );
 		local PYTHON_MODULE_PATH=$( find_binary_python_module_path ${TEST_EXECUTABLE} );
 
-		if ! test -z ${CHECK_WITH_STDERR};
+		if test "${PLATFORM}" = "Darwin";
 		then
-			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}";
-			RESULT=$?;
+			if ! test -z ${CHECK_WITH_STDERR};
+			then
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}";
+				RESULT=$?;
+			else
+				DYLD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}" 2> /dev/null;
+				RESULT=$?;
+			fi
 		else
-			PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}" 2> /dev/null;
-			RESULT=$?;
+			if ! test -z ${CHECK_WITH_STDERR};
+			then
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}";
+				RESULT=$?;
+			else
+				LD_LIBRARY_PATH="${LIBRARY_PATH}" PYTHONPATH="${PYTHON_MODULE_PATH}" "${PYTHON}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${INPUT_FILE}" 2> /dev/null;
+				RESULT=$?;
+			fi
 		fi
 	else
 		if ! test -x "${TEST_EXECUTABLE}";
@@ -765,6 +841,7 @@ run_test_on_input_directory()
 	local ARGUMENTS=$@;
 
 	assert_availability_binary cat;
+	assert_availability_binary cut;
 	assert_availability_binary diff;
 	assert_availability_binary file;
 	assert_availability_binary gzip;

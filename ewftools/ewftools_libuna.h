@@ -1,9 +1,7 @@
 /*
- * The internal libuna header
+ * The libuna header wrapper
  *
  * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
- *
- * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -54,7 +52,7 @@
 
 #include <libuna.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBUNA ) */
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBUNA_H ) */
 

@@ -86,6 +86,12 @@ Handle functions
 .Fn libewf_handle_write_buffer "libewf_handle_t *handle, const void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_buffer_at_offset "libewf_handle_t *handle, const void *buffer, size_t buffer_size, off64_t offset, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_data_chunk "libewf_handle_t *handle, libewf_data_chunk_t **data_chunk, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_handle_read_data_chunk "libewf_handle_t *handle, libewf_data_chunk_t *data_chunk, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_handle_write_data_chunk "libewf_handle_t *handle, libewf_data_chunk_t *data_chunk, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_finalize "libewf_handle_t *handle, libewf_error_t **error"
 .Ft off64_t
@@ -271,7 +277,15 @@ Meta data functions
 .Ft int
 .Fn libewf_handle_get_file_entry_by_utf16_path "libewf_handle_t *handle, const uint16_t *utf16_string, size_t utf16_string_length, libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Pp
-Single file entry functions
+Data chunk functions
+.Ft int
+.Fn libewf_data_chunk_free "libewf_data_chunk_t **data_chunk, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_data_chunk_read_buffer "libewf_data_chunk_t *data_chunk, void *buffer, size_t buffer_size, libewf_error_t **error"
+.Ft ssize_t
+.Fn libewf_data_chunk_write_buffer "libewf_data_chunk_t *data_chunk, const void *buffer, size_t buffer_size, libewf_error_t **error"
+.Pp
+File entry functions
 .Ft int
 .Fn libewf_file_entry_free "libewf_file_entry_t **file_entry, libewf_error_t **error"
 .Ft int

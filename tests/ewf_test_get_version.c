@@ -30,32 +30,45 @@
 #include "ewf_test_libewf.h"
 #include "ewf_test_unused.h"
 
+/* Tests retrieving the library version
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_get_version(
+     void )
+{
+	const char *version_string = NULL;
+	int result                 = 0;
+
+	version_string = libewf_get_version();
+
+	result = libcstring_narrow_string_compare(
+	          version_string,
+	          LIBEWF_VERSION_STRING,
+	          9 );
+
+	if( result != 0 )
+	{
+		return( 0 );
+	}
+	return( 1 );
+}
+
 /* The main program
  */
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-int wmain( int argc, wchar_t * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
+int wmain(
+     int argc EWF_TEST_ATTRIBUTE_UNUSED,
+     wchar_t * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #else
-int main( int argc, char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
+int main(
+     int argc EWF_TEST_ATTRIBUTE_UNUSED,
+     char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	const char *version_string = NULL;
-
+	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( argc != 1 )
-	{
-		fprintf(
-		 stderr,
-		 "Unsupported number of arguments.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	version_string = libewf_get_version();
-
-	if( libcstring_narrow_string_compare(
-	     version_string,
-	     LIBEWF_VERSION_STRING,
-	     9 ) != 0 )
+	if( ewf_test_get_version() != 1 )
 	{
 		return( EXIT_FAILURE );
 	}

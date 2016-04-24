@@ -1,14 +1,14 @@
 #!/bin/bash
 # Library API functions testing script
 #
-# Version: 20160401
+# Version: 20160420
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\).*$/\1/'`;
 
 TEST_PROFILE="lib${TEST_PREFIX}";
 TEST_FUNCTIONS="get_version";
@@ -92,6 +92,8 @@ fi
 
 source ${TEST_RUNNER};
 
+RESULT=${EXIT_IGNORE};
+
 for TEST_FUNCTION in ${TEST_FUNCTIONS};
 do
 	test_api_function "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}";
@@ -103,7 +105,7 @@ do
 	fi
 done
 
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if test ${RESULT} -ne ${EXIT_SUCCESS} && test ${RESULT} -ne ${EXIT_IGNORE};
 then
 	exit ${RESULT};
 fi

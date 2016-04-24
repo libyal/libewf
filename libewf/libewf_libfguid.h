@@ -43,7 +43,7 @@
 
 #include <libfguid.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBFGUID ) */
 
-#endif
+#endif /* !defined( _LIBEWF_LIBFGUID_H ) */
 

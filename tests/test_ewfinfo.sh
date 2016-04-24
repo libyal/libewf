@@ -8,7 +8,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\).*$/\1/'`;
 TEST_SUFFIX="info";
 
 TEST_PROFILE="${TEST_PREFIX}${TEST_SUFFIX}";

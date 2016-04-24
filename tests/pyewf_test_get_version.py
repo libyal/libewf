@@ -2,7 +2,7 @@
 #
 # Python-bindings get version test program
 #
-# Copyright (C) 2008-2016, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 import argparse
 import sys
@@ -45,4 +44,3 @@ if __name__ == "__main__":
     sys.exit(1)
   else:
     sys.exit(0)
-

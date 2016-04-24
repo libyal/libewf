@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWFTOOLS_LIBCDATETIME_H )
-#define _LIBEWFTOOLS_LIBCDATETIME_H
+#if !defined( _EWFTOOLS_LIBCDATETIME_H )
+#define _EWFTOOLS_LIBCDATETIME_H
 
 #include <common.h>
 
@@ -44,7 +44,7 @@
 
 #include <libcdatetime.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCDATETIME ) */
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBCDATETIME_H ) */
 
