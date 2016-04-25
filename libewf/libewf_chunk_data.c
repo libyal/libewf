@@ -72,7 +72,7 @@ int libewf_chunk_data_initialize(
 		return( -1 );
 	}
 	if( ( chunk_size == 0 )
-	 || ( chunk_size > (size32_t) INT32_MAX ) )
+	 || ( chunk_size > (size32_t) ( INT32_MAX - 16 ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -118,7 +118,7 @@ int libewf_chunk_data_initialize(
 	}
 	/* Reserve 4 bytes for the chunk checksum
 	 */
-	allocated_data_size = chunk_size + 4;
+	allocated_data_size = (size_t) chunk_size + 4;
 
 	/* The allocated data size should be rounded to the next 16-byte increment
 	 */
@@ -648,7 +648,15 @@ int libewf_chunk_data_pack(
 					{
 						pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
 						pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-						pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
+
+						if( io_handle->major_version == 2 )
+						{
+							pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
+						}
+						else
+						{
+							pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
+						}
 					}
 				}
 			}
@@ -1330,6 +1338,20 @@ int libewf_chunk_data_unpack(
 
 				return( -1 );
 			}
+			if( memory_set(
+			     chunk_data->data,
+			     0,
+			     sizeof( uint8_t ) * chunk_data->allocated_data_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear data.",
+				 function );
+
+				return( -1 );
+			}
 			chunk_data->data_size = (size_t) chunk_data->chunk_size;
 		}
 		if( libewf_chunk_data_unpack_buffer(
@@ -1365,6 +1387,7 @@ int libewf_chunk_data_unpack(
 			libcerror_error_free(
 			 error );
 
+			chunk_data->data_size    = (size_t) chunk_data->chunk_size;
 			chunk_data->range_flags |= LIBEWF_RANGE_FLAG_IS_CORRUPTED;
 		}
 		chunk_data->range_flags &= ~( LIBEWF_RANGE_FLAG_IS_PACKED );
@@ -1661,7 +1684,7 @@ int libewf_chunk_data_check_for_empty_block(
 
 	/* Only optimize for data larger than the alignment
 	 */
-	if( data_size > ( 2 * sizeof( libewf_aligned_t ) ) )
+	if( data_size > ( sizeof( libewf_aligned_t ) + sizeof( libewf_aligned_t ) ) )
 	{
 		/* Align the data start
 		 */
@@ -1689,7 +1712,7 @@ int libewf_chunk_data_check_for_empty_block(
 		aligned_data_start = (libewf_aligned_t *) data_start;
 		aligned_data_index = (libewf_aligned_t *) data_index;
 
-		while( data_size > sizeof( libewf_aligned_t ) )
+		while( data_size > ( sizeof( libewf_aligned_t ) + sizeof( libewf_aligned_t ) ) )
 		{
 			if( *aligned_data_start != *aligned_data_index )
 			{
@@ -2227,11 +2250,6 @@ int libewf_chunk_data_read_element_data(
 	static char *function           = "libewf_chunk_data_read_element_data";
 	ssize_t read_count              = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	off64_t storage_media_offset    = 0;
-	uint64_t chunk_index            = -1;
-#endif
-
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
 
 	if( io_handle == NULL )
@@ -2285,17 +2303,9 @@ int libewf_chunk_data_read_element_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-/* TODO determine chunk index ? */
-		chunk_index = storage_media_offset / io_handle->chunk_size;
-	}
-#endif
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
 		libcnotify_printf(
-		 "%s: reading chunk: %" PRIu64 " at offset: 0x%08" PRIx64 " with size: %" PRIu64 " in file IO pool entry: %d.\n",
+		 "%s: reading chunk at offset: 0x%08" PRIx64 " with size: %" PRIu64 " in file IO pool entry: %d.\n",
 		 function,
-		 chunk_index,
 		 chunk_data_offset,
 		 chunk_data_size,
 		 file_io_pool_entry );
@@ -2336,22 +2346,19 @@ int libewf_chunk_data_read_element_data(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " file IO pool entry\t: %d\n",
+		 "%s: chunk file IO pool entry\t\t: %d\n",
 		 function,
-		 chunk_index,
 		 file_io_pool_entry );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 "%s: chunk offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
-		 chunk_index,
 		 chunk_data_offset,
 		 chunk_data_offset );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " size\t\t\t: %" PRIu64 "\n",
+		 "%s: chunk size\t\t\t\t: %" PRIu64 "\n",
 		 function,
-		 chunk_index,
 		 chunk_data_size );
 
 		if( ( ( chunk_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
@@ -2362,15 +2369,13 @@ int libewf_chunk_data_read_element_data(
 			 chunk_data->checksum );
 		}
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " checksum\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: chunk checksum\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 chunk_index,
 		 chunk_data->checksum );
 
 		libcnotify_printf(
-		 "%s: chunk: %" PRIu64 " flags:\n",
-		 function,
-		 chunk_index );
+		 "%s: chunk flags:\n",
+		 function );
 
 		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 		{

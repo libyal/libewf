@@ -844,6 +844,18 @@ int libewf_write_io_handle_initialize_values(
 			}
 			else
 			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: compressed zero byte empty block data:\n",
+					 function );
+					libcnotify_print_data(
+					 compressed_zero_byte_empty_block,
+					 write_io_handle->compressed_zero_byte_empty_block_size,
+					 0 );
+				}
+#endif
 				write_io_handle->compressed_zero_byte_empty_block = compressed_zero_byte_empty_block;
 			}
 			compressed_zero_byte_empty_block = NULL;

@@ -499,10 +499,11 @@ int libewf_chunk_group_fill_v1(
 			 base_offset );
 
 			libcnotify_printf(
-			 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 "\n",
+			 "%s: table entry: %05" PRIu32 " chunk data offset\t: 0x%08" PRIx32 " (file offset: 0x%08" PRIx64 ")\n",
 			 function,
 			 table_entry_index,
-			 current_offset );
+			 current_offset,
+			 base_offset + current_offset );
 
 			libcnotify_printf(
 			 "%s: table entry: %05" PRIu32 " chunk data size\t\t: %" PRIu32 "\n",
