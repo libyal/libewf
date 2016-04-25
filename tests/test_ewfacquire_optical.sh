@@ -32,11 +32,11 @@ test_callback()
 
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
-	INPUT_BASENAME=`echo "${INPUT_FILE_FULL_PATH}" | sed 's/_*[0-9]*[.][cC][uU][eE]$//'`;
+	INPUT_BASENAME=`echo "${INPUT_FILE_FULL_PATH}" | sed 's/[.][cC][uU][eE]$//' | sed 's/_[0-9]*$//'`;
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && run_test_with_input_and_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} -T"${INPUT_FILE_FULL_PATH}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
+	(cd ${TMPDIR} && run_test_with_arguments "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} -T"${INPUT_FILE_FULL_PATH}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
@@ -55,7 +55,7 @@ test_callback()
 	fi
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${VERIFY_TOOL} -q ${TMPDIR}/acquire_optical.* > /dev/null;
+		run_test_with_input_and_arguments "${VERIFY_TOOL}" ${TMPDIR}/acquire_optical.* -q > /dev/null;
 		local RESULT=$?;
 	fi
 	return ${RESULT};
@@ -109,8 +109,6 @@ then
 fi
 
 source ${TEST_RUNNER};
-
-assert_availability_binary md5sum;
 
 run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -CCase -DDescription -EEvidence -eExaminer -moptical -Mlogical -NNotes -q -tacquire_optical -u;
 RESULT=$?;

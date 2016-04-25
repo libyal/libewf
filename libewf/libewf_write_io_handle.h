@@ -35,6 +35,7 @@
 #endif
 
 #include "libewf_chunk_data.h"
+#include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
@@ -143,9 +144,9 @@ struct libewf_write_io_handle
 	 */
 	uint32_t maximum_number_of_segments;
 
-	/* The list of chunks written to the current chunks section
+	/* The group of chunks written to the current chunks section
 	 */
-	libfdata_list_t *chunks_list;
+	libewf_chunk_group_t *chunk_group;
 
 	/* The number of bytes written to a section containing chunks
 	 */
@@ -332,5 +333,5 @@ int libewf_write_io_handle_finalize_write_sections_corrections(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_WRITE_IO_HANDLE_H ) */
 

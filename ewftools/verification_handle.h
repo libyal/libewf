@@ -253,6 +253,10 @@ int verification_handle_output_storage_media_buffer_callback(
      storage_media_buffer_t *storage_media_buffer,
      verification_handle_t *verification_handle );
 
+int verification_handle_empty_output_list(
+     verification_handle_t *verification_handle,
+     libcerror_error_t **error );
+
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int verification_handle_verify_input(

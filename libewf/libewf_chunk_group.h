@@ -25,13 +25,10 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_libbfio.h"
+#include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
-#include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_section.h"
-
-#include "ewf_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -41,21 +38,14 @@ typedef struct libewf_chunk_group libewf_chunk_group_t;
 
 struct libewf_chunk_group
 {
-	/* The previous last chunk that was filled
+	/* The chunks list
 	 */
-	int previous_last_chunk_filled;
-
-	/* The last chunk that was filled
-	 */
-	int last_chunk_filled;
-
-	/* The last chunk that was compared
-	 */
-	int last_chunk_compared;
+	libfdata_list_t *chunks_list;
 };
 
 int libewf_chunk_group_initialize(
      libewf_chunk_group_t **chunk_group,
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libewf_chunk_group_free(
@@ -67,8 +57,12 @@ int libewf_chunk_group_clone(
      libewf_chunk_group_t *source_chunk_group,
      libcerror_error_t **error );
 
+int libewf_chunk_group_empty(
+     libewf_chunk_group_t *chunk_group,
+     libcerror_error_t **error );
+
 int libewf_chunk_group_fill_v1(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -81,7 +75,7 @@ int libewf_chunk_group_fill_v1(
      libcerror_error_t **error );
 
 int libewf_chunk_group_fill_v2(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -93,7 +87,7 @@ int libewf_chunk_group_fill_v2(
      libcerror_error_t **error );
 
 int libewf_chunk_group_correct_v1(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -106,7 +100,7 @@ int libewf_chunk_group_correct_v1(
      libcerror_error_t **error );
 
 int libewf_chunk_group_generate_table_entries_data(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      uint8_t format_version,
      uint8_t *table_entries_data,
@@ -119,5 +113,5 @@ int libewf_chunk_group_generate_table_entries_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CHUNK_GROUP_H ) */
 

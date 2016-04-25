@@ -125,6 +125,18 @@ struct libewf_segment_file
 	 */
 	uint64_t number_of_chunks;
 
+	/* The previous last chunk that was filled
+	 */
+	int64_t previous_last_chunk_filled;
+
+	/* The last chunk that was filled
+	 */
+	int64_t last_chunk_filled;
+
+	/* The last chunk that was compared
+	 */
+	int64_t last_chunk_compared;
+
 	/* Flags
 	 */
 	uint8_t flags;
@@ -182,7 +194,6 @@ ssize_t libewf_segment_file_read_table_section(
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          size32_t chunk_size,
-         libewf_chunk_group_t *chunk_group,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_read_table2_section(
@@ -190,7 +201,6 @@ ssize_t libewf_segment_file_read_table2_section(
          libewf_section_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
-         libewf_chunk_group_t *chunk_group,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_read_volume_section(
@@ -404,12 +414,12 @@ int libewf_segment_file_get_chunk_group_by_offset(
      off64_t offset,
      int *chunk_group_index,
      off64_t *chunk_group_data_offset,
-     libfdata_list_t **chunks_list,
+     libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SEGMENT_FILE_H ) */
 

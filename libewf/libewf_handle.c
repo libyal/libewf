@@ -26,7 +26,6 @@
 #include "libewf_analytical_data.h"
 #include "libewf_case_data.h"
 #include "libewf_chunk_data.h"
-#include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_compression.h"
 #include "libewf_data_chunk.h"
@@ -1616,7 +1615,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
      int file_io_pool_entry,
      libcerror_error_t **error )
 {
-	libewf_chunk_group_t *chunk_group         = NULL;
 	libewf_header_sections_t *header_sections = NULL;
 	libewf_section_t *section                 = NULL;
 	libfcache_cache_t *sections_cache         = NULL;
@@ -2065,19 +2063,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					 */
 					if( segment_file->number_of_chunks == 0 )
 					{
-						if( libewf_chunk_group_initialize(
-						     &chunk_group,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-							 "%s: unable to create chunk group.",
-							 function );
-
-							goto on_error;
-						}
 						read_table_sections = 1;
 					}
 					if( read_table_sections != 0 )
@@ -2088,7 +2073,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 							      file_io_pool,
 							      file_io_pool_entry,
 							      internal_handle->media_values->chunk_size,
-							      chunk_group,
 							      error );
 					}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2383,12 +2367,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					 function );
 
 					goto on_error;
-
-/* TODO part of error tolerability changes
-					chunk_group->previous_last_chunk_filled = 0;
-					chunk_group->last_chunk_filled          = 0;
-					chunk_group->last_chunk_compared        = 0;
-*/
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
 				known_section = 1;
@@ -2597,7 +2575,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 						      section,
 						      file_io_pool,
 						      file_io_pool_entry,
-						      chunk_group,
 						      error );
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2895,22 +2872,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 			internal_handle->media_values->number_of_sectors += 1;
 		}
 	}
-	if( chunk_group != NULL )
-	{
-		if( libewf_chunk_group_free(
-		     &chunk_group,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunk group.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( libewf_header_sections_free(
 	     &header_sections,
 	     error ) != 1 )
@@ -2944,12 +2905,6 @@ on_error:
 	{
 		memory_free(
 		 string_data );
-	}
-	if( chunk_group != NULL )
-	{
-		libewf_chunk_group_free(
-		 &chunk_group,
-		 NULL );
 	}
 	if( header_sections != NULL )
 	{

@@ -125,21 +125,16 @@ int libewf_write_io_handle_initialize(
 
 		return( -1 );
 	}
-	if( libfdata_list_initialize(
-	     &( *write_io_handle )->chunks_list,
+	if( libewf_chunk_group_initialize(
+	     &( ( *write_io_handle )->chunk_group ),
 	     NULL,
-	     NULL,
-	     NULL,
-	     NULL,
-	     NULL,
-	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunks list.",
+		 "%s: unable to create chunk group.",
 		 function );
 
 		goto on_error;
@@ -214,15 +209,15 @@ int libewf_write_io_handle_free(
 			memory_free(
 			 ( *write_io_handle )->compressed_zero_byte_empty_block );
 		}
-		if( libfdata_list_free(
-		     &( ( *write_io_handle )->chunks_list ),
+		if( libewf_chunk_group_free(
+		     &( ( *write_io_handle )->chunk_group ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunks list.",
+			 "%s: unable to free chunk group.",
 			 function );
 
 			result = -1;
@@ -442,16 +437,16 @@ int libewf_write_io_handle_clone(
 
 		( *destination_write_io_handle )->table_entries_data_size = source_write_io_handle->table_entries_data_size;
 	}
-	if( libfdata_list_clone(
-	     &( ( *destination_write_io_handle )->chunks_list ),
-	     source_write_io_handle->chunks_list,
+	if( libewf_chunk_group_clone(
+	     &( ( *destination_write_io_handle )->chunk_group ),
+	     source_write_io_handle->chunk_group,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination chunks list.",
+		 "%s: unable to create destination chunk group.",
 		 function );
 
 		goto on_error;
@@ -2774,7 +2769,7 @@ ssize_t libewf_write_io_handle_write_chunks_section_end(
 	                  - write_io_handle->number_of_chunks_written_to_section;
 
 	if( libewf_chunk_group_generate_table_entries_data(
-	     write_io_handle->chunks_list,
+	     write_io_handle->chunk_group,
 	     first_chunk_index,
 	     segment_file->major_version,
 	     write_io_handle->table_entries_data,
@@ -2819,15 +2814,15 @@ ssize_t libewf_write_io_handle_write_chunks_section_end(
 
 		return( -1 );
 	}
-	if( libfdata_list_empty(
-	     write_io_handle->chunks_list,
+	if( libewf_chunk_group_empty(
+	     write_io_handle->chunk_group,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to empty chunks list.",
+		 "%s: unable to empty chunk group.",
 		 function );
 
 		return( -1 );
@@ -3322,7 +3317,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 /* TODO re-implement using set by index instead of append ? */
 	if( libfdata_list_append_element(
-	     write_io_handle->chunks_list,
+	     write_io_handle->chunk_group->chunks_list,
 	     &element_index,
 	     file_io_pool_entry,
 	     chunk_offset,

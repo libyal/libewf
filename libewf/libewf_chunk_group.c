@@ -24,8 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_chunk_data.h"
 #include "libewf_chunk_group.h"
 #include "libewf_definitions.h"
+#include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libfcache.h"
@@ -40,6 +42,7 @@
  */
 int libewf_chunk_group_initialize(
      libewf_chunk_group_t **chunk_group,
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_group_initialize";
@@ -92,12 +95,32 @@ int libewf_chunk_group_initialize(
 		 "%s: unable to clear chunk group.",
 		 function );
 
+		memory_free(
+		 *chunk_group );
+
+		*chunk_group = NULL;
+
+		return( -1 );
+	}
+	if( libfdata_list_initialize(
+	     &( ( *chunk_group )->chunks_list ),
+	     (intptr_t *) io_handle,
+	     NULL,
+	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_chunk_data_read_element_data,
+	     NULL,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunks list.",
+		 function );
+
 		goto on_error;
 	}
-	( *chunk_group )->previous_last_chunk_filled = -1;
-	( *chunk_group )->last_chunk_filled          = -1;
-	( *chunk_group )->last_chunk_compared        = -1;
-
 	return( 1 );
 
 on_error:
@@ -119,6 +142,7 @@ int libewf_chunk_group_free(
      libcerror_error_t **error )
 {
         static char *function = "libewf_chunk_group_free";
+	int result            = 1;
 
 	if( chunk_group == NULL )
 	{
@@ -133,12 +157,25 @@ int libewf_chunk_group_free(
 	}
 	if( *chunk_group != NULL )
 	{
+		if( libfdata_list_free(
+		     &( ( *chunk_group )->chunks_list ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunkse list.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 *chunk_group );
 
 		*chunk_group = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Clones the chunk group
@@ -207,6 +244,7 @@ int libewf_chunk_group_clone(
 
 		goto on_error;
 	}
+/* TODO clone chunks_list */
 	return( 1 );
 
 on_error:
@@ -220,11 +258,47 @@ on_error:
 	return( -1 );
 }
 
+/* Empties a chunk group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_group_empty(
+     libewf_chunk_group_t *chunk_group,
+     libcerror_error_t **error )
+{
+        static char *function = "libewf_chunk_group_empty";
+
+	if( chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_empty(
+	     chunk_group->chunks_list,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+		 "%s: unable to empty chunks list.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Fills the chunks list from the EWF version 1 sector table entries
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_group_fill_v1(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -251,13 +325,13 @@ int libewf_chunk_group_fill_v1(
 	uint8_t overflow               = 0;
 	int element_index              = 0;
 
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks list.",
+		 "%s: invalid chunk group.",
 		 function );
 
 		return( -1 );
@@ -466,7 +540,7 @@ int libewf_chunk_group_fill_v1(
 		}
 #endif
 		if( libfdata_list_append_element_with_mapped_size(
-		     chunks_list,
+		     chunk_group->chunks_list,
 		     &element_index,
 		     file_io_pool_entry,
 		     base_offset + current_offset,
@@ -681,7 +755,7 @@ int libewf_chunk_group_fill_v1(
 	}
 #endif
 	if( libfdata_list_append_element_with_mapped_size(
-	     chunks_list,
+	     chunk_group->chunks_list,
 	     &element_index,
 	     file_io_pool_entry,
 	     last_chunk_data_offset,
@@ -714,7 +788,7 @@ int libewf_chunk_group_fill_v1(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_group_fill_v2(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -734,13 +808,13 @@ int libewf_chunk_group_fill_v2(
 	uint32_t table_entry_index = 0;
 	int element_index          = 0;
 
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks list.",
+		 "%s: invalid chunk group.",
 		 function );
 
 		return( -1 );
@@ -883,7 +957,7 @@ int libewf_chunk_group_fill_v2(
 		table_entry_offset += sizeof( ewf_table_entry_v2_t );
 
 		if( libfdata_list_append_element_with_mapped_size(
-		     chunks_list,
+		     chunk_group->chunks_list,
 		     &element_index,
 		     file_io_pool_entry,
 		     chunk_data_offset,
@@ -920,7 +994,7 @@ int libewf_chunk_group_fill_v2(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_group_correct_v1(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
@@ -951,13 +1025,13 @@ int libewf_chunk_group_correct_v1(
 	uint8_t update_data_range          = 0;
 	int previous_file_io_pool_entry    = 0;
 
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks list.",
+		 "%s: invalid chunk group.",
 		 function );
 
 		return( -1 );
@@ -1164,7 +1238,7 @@ int libewf_chunk_group_correct_v1(
 		}
 #endif
 		if( libfdata_list_get_element_by_index(
-		     chunks_list,
+		     chunk_group->chunks_list,
 		     table_entry_index,
 		     &previous_file_io_pool_entry,
 		     &previous_chunk_data_offset,
@@ -1248,7 +1322,7 @@ int libewf_chunk_group_correct_v1(
 		if( update_data_range != 0 )
 		{
 			if( libfdata_list_set_element_by_index(
-			     chunks_list,
+			     chunk_group->chunks_list,
 			     table_entry_index,
 			     file_io_pool_entry,
 			     base_offset + current_offset,
@@ -1441,7 +1515,7 @@ int libewf_chunk_group_correct_v1(
 	}
 #endif
 	if( libfdata_list_get_element_by_index(
-	     chunks_list,
+	     chunk_group->chunks_list,
 	     table_entry_index,
 	     &previous_file_io_pool_entry,
 	     &previous_chunk_data_offset,
@@ -1525,7 +1599,7 @@ int libewf_chunk_group_correct_v1(
 	if( update_data_range != 0 )
 	{
 		if( libfdata_list_set_element_by_index(
-		     chunks_list,
+		     chunk_group->chunks_list,
 		     table_entry_index,
 		     file_io_pool_entry,
 		     base_offset + current_offset,
@@ -1558,7 +1632,7 @@ int libewf_chunk_group_correct_v1(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_group_generate_table_entries_data(
-     libfdata_list_t *chunks_list,
+     libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
      uint8_t format_version,
      uint8_t *table_entries_data,
@@ -1577,13 +1651,13 @@ int libewf_chunk_group_generate_table_entries_data(
 	uint32_t table_entry_index   = 0;
 	int file_io_pool_entry       = 0;
 
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks list.",
+		 "%s: invalid chunk group.",
 		 function );
 
 		return( -1 );
@@ -1656,7 +1730,7 @@ int libewf_chunk_group_generate_table_entries_data(
 	     table_entry_index++ )
 	{
 		if( libfdata_list_get_element_by_index(
-		     chunks_list,
+		     chunk_group->chunks_list,
 		     table_entry_index,
 		     &file_io_pool_entry,
 		     &chunk_data_offset,

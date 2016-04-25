@@ -1260,10 +1260,22 @@ int ewfacquire_read_input(
 	}
 	if( imaging_handle->output_list != NULL )
 	{
-/* TODO check if output list is empty */
+		if( imaging_handle_empty_output_list(
+		     imaging_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to empty output list.",
+			 function );
+
+			goto on_error;
+		}
 		if( libcdata_list_free(
 		     &( imaging_handle->output_list ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1474,7 +1486,8 @@ int ewfacquire_read_input(
 	return( 1 );
 
 on_error:
-	if( storage_media_buffer != NULL )
+	if( ( imaging_handle->number_of_threads == 0 )
+	 && ( storage_media_buffer != NULL ) )
 	{
 		storage_media_buffer_free(
 		 &storage_media_buffer,
@@ -1506,9 +1519,12 @@ on_error:
 	}
 	if( imaging_handle->output_list != NULL )
 	{
+		imaging_handle_empty_output_list(
+		 imaging_handle,
+		 NULL );
 		libcdata_list_free(
 		 &( imaging_handle->output_list ),
-		 (int (*)(intptr_t **, libcerror_error_t **)) &storage_media_buffer_free,
+		 NULL,
 		 NULL );
 	}
 	if( imaging_handle->storage_media_buffer_queue != NULL )

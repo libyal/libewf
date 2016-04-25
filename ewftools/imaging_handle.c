@@ -1811,6 +1811,17 @@ int imaging_handle_output_storage_media_buffer_callback(
 
 			goto on_error;
 		}
+		if( storage_media_buffer == NULL )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
 		if( storage_media_buffer->storage_media_offset != imaging_handle->last_offset_written )
 		{
 			break;
@@ -1964,6 +1975,135 @@ on_error:
 		 &error );
 	}
 	return( -1 );
+}
+
+/* Empties the output list
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_empty_output_list(
+     imaging_handle_t *imaging_handle,
+     libcerror_error_t **error )
+{
+	libcdata_list_element_t *element             = NULL;
+	libcdata_list_element_t *next_element        = NULL;
+	storage_media_buffer_t *storage_media_buffer = NULL;
+        static char *function                        = "imaging_handle_empty_output_list";
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_list_get_first_element(
+	     imaging_handle->output_list,
+	     &element,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve first element.",
+		 function );
+
+		return( -1 );
+	}
+	while( element != NULL )
+	{
+		if( libcdata_list_element_get_value(
+		     element,
+		     (intptr_t **) &storage_media_buffer,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value from list element.",
+			 function );
+
+			return( -1 );
+		}
+		if( storage_media_buffer == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+		if( storage_media_buffer_queue_release_buffer(
+		     imaging_handle->storage_media_buffer_queue,
+		     storage_media_buffer,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to release storage media buffer onto queue.",
+			 function );
+
+			return( -1 );
+		}
+		storage_media_buffer = NULL;
+
+		if( libcdata_list_element_get_next_element(
+		     element,
+		     &next_element,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next list element.",
+			 function );
+
+			return( -1 );
+		}
+		if( libcdata_list_remove_element(
+		     imaging_handle->output_list,
+		     element,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to remove list element from output list.",
+			 function );
+
+			return( -1 );
+		}
+		/* The output list no longer manages the list element and the storage media buffer it contains
+		 */
+		if( libcdata_list_element_free(
+		     &element,
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free list element.",
+			 function );
+
+			return( -1 );
+		}
+		element = next_element;
+	}
+	return( 1 );
 }
 
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */

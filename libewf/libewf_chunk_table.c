@@ -25,6 +25,7 @@
 #include <types.h>
 
 #include "libewf_chunk_data.h"
+#include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
 #include "libewf_definitions.h"
 #include "libewf_io_handle.h"
@@ -486,7 +487,7 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
      libewf_segment_file_t **segment_file,
      int *chunk_groups_list_index,
      off64_t *chunk_group_data_offset,
-     libfdata_list_t **chunks_list,
+     libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_get_segment_file_chunk_group_by_offset";
@@ -558,13 +559,13 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
 
 		return( -1 );
 	}
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks list.",
+		 "%s: invalid chunk groups.",
 		 function );
 
 		return( -1 );
@@ -599,7 +600,7 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
 			  *segment_file_data_offset,
 			  chunk_groups_list_index,
 			  chunk_group_data_offset,
-			  chunks_list,
+			  chunk_group,
 			  error );
 
 		if( result == -1 )
@@ -618,13 +619,13 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
 	}
 	if( result != 0 )
 	{
-		if( *chunks_list == NULL )
+		if( *chunk_group == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing chunks list: %d.",
+			 "%s: missing chunk group: %d.",
 			 function,
 			 *chunk_groups_list_index );
 
@@ -646,8 +647,8 @@ int libewf_chunk_table_chunk_exists_for_offset(
      off64_t offset,
      libcerror_error_t **error )
 {
+	libewf_chunk_group_t *chunk_group           = NULL;
 	libewf_segment_file_t *segment_file         = NULL;
-	libfdata_list_t *chunks_list                = NULL;
 	libfdata_list_element_t *chunk_list_element = NULL;
 	static char *function                       = "libewf_chunk_table_chunk_exists_for_offset";
 	off64_t chunk_data_offset                   = 0;
@@ -680,7 +681,7 @@ int libewf_chunk_table_chunk_exists_for_offset(
 	          &segment_file,
 		  &chunk_groups_list_index,
 		  &chunk_group_data_offset,
-		  &chunks_list,
+		  &chunk_group,
 	          error );
 
 	if( result == -1 )
@@ -697,20 +698,20 @@ int libewf_chunk_table_chunk_exists_for_offset(
 	}
 	if( result != 0 )
 	{
-		if( chunks_list == NULL )
+		if( chunk_group == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing chunks list: %d.",
+			 "%s: missing chunks group: %d.",
 			 function,
 			 chunk_groups_list_index );
 
 			return( -1 );
 		}
 		result = libfdata_list_get_list_element_at_offset(
-			  chunks_list,
+			  chunk_group->chunks_list,
 			  chunk_group_data_offset,
 			  &chunks_list_index,
 			  &chunk_data_offset,
@@ -755,8 +756,8 @@ int libewf_chunk_table_get_chunk_data_by_offset(
      libcerror_error_t **error )
 {
 	libewf_chunk_data_t *corrupted_chunk_data = NULL;
+	libewf_chunk_group_t *chunk_group         = NULL;
 	libewf_segment_file_t *segment_file       = NULL;
-	libfdata_list_t *chunks_list              = NULL;
 	static char *function                     = "libewf_chunk_table_get_chunk_data_by_offset";
 	off64_t chunk_offset                      = 0;
 	off64_t chunk_group_data_offset           = 0;
@@ -835,7 +836,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		  &segment_file,
 		  &chunk_groups_list_index,
 		  &chunk_group_data_offset,
-		  &chunks_list,
+		  &chunk_group,
 		  error );
 
 	if( result == -1 )
@@ -852,20 +853,20 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 	}
 	if( result != 0 )
 	{
-		if( chunks_list == NULL )
+		if( chunk_group == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing chunks list: %d.",
+			 "%s: missing chunk group: %d.",
 			 function,
 			 chunk_groups_list_index );
 
 			goto on_error;
 		}
 		result = libfdata_list_get_element_value_at_offset(
-			  chunks_list,
+			  chunk_group->chunks_list,
 			  (intptr_t *) file_io_pool,
 			  chunks_cache,
 			  chunk_group_data_offset,
@@ -1058,8 +1059,8 @@ int libewf_chunk_table_set_chunk_data_by_offset(
      libewf_chunk_data_t *chunk_data,
      libcerror_error_t **error )
 {
+	libewf_chunk_group_t *chunk_group   = NULL;
 	libewf_segment_file_t *segment_file = NULL;
-	libfdata_list_t *chunks_list        = NULL;
 	static char *function               = "libewf_chunk_table_set_chunk_data_by_offset";
 	off64_t chunk_group_data_offset     = 0;
 	off64_t segment_file_data_offset    = 0;
@@ -1100,7 +1101,7 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 		  &segment_file,
 		  &chunk_groups_list_index,
 		  &chunk_group_data_offset,
-		  &chunks_list,
+		  &chunk_group,
 		  error );
 
 	if( result != 1 )
@@ -1115,20 +1116,20 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 
 		return( -1 );
 	}
-	if( chunks_list == NULL )
+	if( chunk_group == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunks list: %d.",
+		 "%s: missing chunk group: %d.",
 		 function,
 		 chunk_groups_list_index );
 
 		return( -1 );
 	}
 	result = libfdata_list_set_element_value_at_offset(
-		  chunks_list,
+		  chunk_group->chunks_list,
 		  (intptr_t *) file_io_pool,
 		  chunks_cache,
 		  chunk_group_data_offset,

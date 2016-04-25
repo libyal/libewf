@@ -35,7 +35,7 @@ test_callback()
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && run_test_with_input_and_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} < "${INPUT_FILE_FULL_PATH}" | sed '1,2d' > "${TEST_LOG}");
+	(cd ${TMPDIR} && run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "" ${ARGUMENTS[@]} < "${INPUT_FILE_FULL_PATH}" | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
@@ -54,7 +54,7 @@ test_callback()
 	fi
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		${VERIFY_TOOL} -q ${TMPDIR}/acquirestream.* > /dev/null;
+		run_test_with_input_and_arguments "${VERIFY_TOOL}" ${TMPDIR}/acquirestream.* -q > /dev/null;
 		local RESULT=$?;
 	fi
 	return ${RESULT};
@@ -108,8 +108,6 @@ then
 fi
 
 source ${TEST_RUNNER};
-
-assert_availability_binary md5sum;
 
 run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -CCase -DDescription -EEvidence -eExaminer -mremovable -Mlogical -NNotes -q -tacquirestream;
 RESULT=$?;

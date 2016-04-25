@@ -33,12 +33,17 @@ test_callback()
 	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
 	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
 
-	(cd ${TMPDIR} && run_test_with_input_and_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${INPUT_FILE_FULL_PATH}" > /dev/null 2>&1);
+	(cd ${TMPDIR} && run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "${INPUT_FILE_FULL_PATH}" ${ARGUMENTS[@]});
 	local RESULT=$?;
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && find export -type f -exec md5sum {} \; | sort -k2 > "${TEST_LOG}");
+	if test "${PLATFORM}" = "Darwin";
+	then
+		(cd ${TMPDIR} && find export -type f -exec md5 {} \; | sort -k2 > "${TEST_LOG}");
+	else
+		(cd ${TMPDIR} && find export -type f -exec md5sum {} \; | sort -k2 > "${TEST_LOG}");
+	fi
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
 	local STORED_TEST_RESULTS="${TEST_SET_DIRECTORY}/${TEST_LOG}.gz";
@@ -90,9 +95,18 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
+PLATFORM=`uname -s`;
+
 source ${TEST_RUNNER};
 
-assert_availability_binary md5sum;
+assert_availability_binary find;
+
+if test "${PLATFORM}" = "Darwin";
+then
+	assert_availability_binary md5;
+else
+	assert_availability_binary md5sum;
+fi
 
 run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -ffiles -q -texport -u;
 RESULT=$?;

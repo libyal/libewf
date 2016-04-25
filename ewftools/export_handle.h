@@ -430,7 +430,7 @@ int export_handle_set_process_buffer_size(
      libcerror_error_t **error );
 
 int export_handle_set_number_of_threads(
-     export_handle_t *verification_handle,
+     export_handle_t *export_handle,
      const libcstring_system_character_t *string,
      libcerror_error_t **error );
 
@@ -482,6 +482,10 @@ int export_handle_process_storage_media_buffer_callback(
 int export_handle_output_storage_media_buffer_callback(
      storage_media_buffer_t *storage_media_buffer,
      export_handle_t *export_handle );
+
+int export_handle_empty_output_list(
+     export_handle_t *export_handle,
+     libcerror_error_t **error );
 
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 

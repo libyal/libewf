@@ -351,6 +351,10 @@ int imaging_handle_output_storage_media_buffer_callback(
      storage_media_buffer_t *storage_media_buffer,
      imaging_handle_t *imaging_handle );
 
+int imaging_handle_empty_output_list(
+     imaging_handle_t *imaging_handle,
+     libcerror_error_t **error );
+
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
 int imaging_handle_get_chunk_size(

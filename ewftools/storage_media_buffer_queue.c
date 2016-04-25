@@ -204,7 +204,7 @@ int storage_media_buffer_queue_grab_buffer(
 	if( libcthreads_queue_pop(
 	     queue,
 	     (intptr_t **) buffer,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -231,7 +231,7 @@ int storage_media_buffer_queue_release_buffer(
 	if( libcthreads_queue_push(
 	     queue,
 	     (intptr_t *) buffer,
-	     error ) == -1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160423
+# Version: 20160425
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -327,7 +327,7 @@ run_test_with_arguments()
 	shift 1;
 	local ARGUMENTS=$@;
 
-	if ! test -f ${TEST_EXECUTABLE};
+	if ! test -f "${TEST_EXECUTABLE}";
 	then
 		echo "Missing test executable: ${TEST_EXECUTABLE}";
 		echo "";
@@ -522,7 +522,7 @@ run_test_with_input_and_arguments()
 	shift 2;
 	local ARGUMENTS=$@;
 
-	if ! test -f ${TEST_EXECUTABLE};
+	if ! test -f "${TEST_EXECUTABLE}";
 	then
 		echo "Missing test executable: ${TEST_EXECUTABLE}";
 		echo "";
@@ -870,7 +870,7 @@ run_test_on_input_directory()
 		return ${EXIT_FAILURE};
 	fi
 
-	if ! test -f ${TEST_EXECUTABLE};
+	if ! test -f "${TEST_EXECUTABLE}";
 	then
 		echo "Missing test executable: ${TEST_EXECUTABLE}";
 		echo "";

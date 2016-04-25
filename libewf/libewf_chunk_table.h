@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_chunk_group.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
@@ -105,7 +106,7 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
      libewf_segment_file_t **segment_file,
      int *chunk_groups_list_index,
      off64_t *chunk_group_data_offset,
-     libfdata_list_t **chunks_list,
+     libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error );
 
 int libewf_chunk_table_chunk_exists_for_offset(
@@ -146,5 +147,5 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CHUNK_TABLE_H ) */
 

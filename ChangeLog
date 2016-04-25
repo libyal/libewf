@@ -1,6 +1,8 @@
 TODO
 * fix issue with test_ewfexport.sh
-* multi threaded tool support - handle abort paths
+* merge chunks list and chunk group
+  - move chunk list access into chunk group
+  - throttle maximum chunk group size
 
 * refactor libewf_internal_data_chunk_set_chunk_data not to clone ?
 * ewfacquire error when both secondary output and resume are set
@@ -479,6 +481,10 @@ Closed:
   - having more than 65000 segment files is a bit overkill,
     also the naming schema does not support this without creating odd names
     for now not adding support for this, unless there is a good reason to do so
+
+20160424
+* worked on tests
+* worked on chunk group
 
 20160411
 * worked on tests

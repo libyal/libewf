@@ -1770,7 +1770,7 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
 
 	/* Only optimize for data larger than the alignment
 	 */
-	if( data_size > ( 2 * sizeof( libewf_aligned_t ) ) )
+	if( data_size > ( sizeof( libewf_aligned_t ) + sizeof( libewf_aligned_t ) ) )
 	{
 		/* Align the data start
 		 */
@@ -1780,9 +1780,9 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
 			{
 				return( 0 );
 			}
-			data_start += 1;
-			data_index += 1;
-			data_size  -= 1;
+			data_start++;
+			data_index++;
+			data_size--;
 		}
 		/* Align the data index
 		 */
@@ -1792,21 +1792,22 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
 			{
 				return( 0 );
 			}
-			data_index += 1;
-			data_size  -= 1;
+			data_index++;
+			data_size--;
 		}
 		aligned_data_start = (libewf_aligned_t *) data_start;
 		aligned_data_index = (libewf_aligned_t *) data_index;
 
-		while( data_size > sizeof( libewf_aligned_t ) )
+		while( data_size > ( sizeof( libewf_aligned_t ) + sizeof( libewf_aligned_t ) ) )
 		{
 			if( *aligned_data_start != *aligned_data_index )
 			{
 				return( 0 );
 			}
-			aligned_data_start += 1;
-			aligned_data_index += 1;
-			data_size          -= sizeof( libewf_aligned_t );
+			aligned_data_start++;
+			aligned_data_index++;
+
+			data_size -= sizeof( libewf_aligned_t );
 		}
 		data_start = (uint8_t *) aligned_data_start;
 		data_index = (uint8_t *) aligned_data_index;
@@ -1817,9 +1818,9 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
 		{
 			return( 0 );
 		}
-		data_start += 1;
-		data_index += 1;
-		data_size  -= 1;
+		data_start++;
+		data_index++;
+		data_size--;
 	}
 	byte_stream_copy_to_uint64_little_endian(
 	 data,
