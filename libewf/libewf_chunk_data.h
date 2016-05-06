@@ -83,7 +83,6 @@ struct libewf_chunk_data
 	 */
 	uint8_t flags;
 
-/* TODO chunk data rewrite */
 	/* The chunk IO flags
 	 */
 	int8_t chunk_io_flags;
@@ -124,40 +123,9 @@ int libewf_chunk_data_pack(
      uint8_t pack_flags,
      libcerror_error_t **error );
 
-int libewf_chunk_data_pack_buffer(
-     uint8_t *data,
-     size_t data_size,
-     uint8_t *compressed_data,
-     size_t *compressed_data_offset,
-     size_t *compressed_data_size,
-     uint32_t chunk_size,
-     size_t chunk_data_size,
-     size_t *chunk_padding_size,
-     uint16_t compression_method,
-     int8_t compression_level,
-     uint32_t *range_flags,
-     uint32_t *chunk_checksum,
-     int8_t *chunk_io_flags,
-     const uint8_t *compressed_zero_byte_empty_block,
-     size_t compressed_zero_byte_empty_block_size,
-     uint8_t pack_flags,
-     libcerror_error_t **error );
-
 int libewf_chunk_data_unpack(
      libewf_chunk_data_t *chunk_data,
      libewf_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-int libewf_chunk_data_unpack_buffer(
-     uint8_t *data,
-     size_t *data_size,
-     const uint8_t *compressed_data,
-     size_t compressed_data_size,
-     uint32_t chunk_size,
-     uint16_t compression_method,
-     uint32_t range_flags,
-     uint32_t chunk_checksum,
-     int8_t chunk_io_flags,
      libcerror_error_t **error );
 
 int libewf_chunk_data_check_for_empty_block(

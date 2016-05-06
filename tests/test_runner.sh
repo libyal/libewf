@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20160425
+# Version: 20160426
 #
 # When CHECK_WITH_GDB is set to a non-empty value the test executable
 # is run with gdb, otherwise it is run without.
@@ -443,6 +443,16 @@ run_test_with_arguments()
 					RESULT=${EXIT_FAILURE};
 				fi
 			fi
+			# Detect valgrind warnings.
+			local NUMBER_OF_LINES=`wc -l ${VALGRIND_LOG} | awk '{ print $1 }'`;
+
+			if test ${NUMBER_OF_LINES} -ne 15 && test ${NUMBER_OF_LINES} -ne 22;
+			then
+				echo "Unsupported number of lines: ${NUMBER_OF_LINES}";
+				cat ${VALGRIND_LOG};
+
+				RESULT=${EXIT_FAILURE};
+			fi
 		fi
 		rm -f ${VALGRIND_LOG};
 
@@ -637,6 +647,16 @@ run_test_with_input_and_arguments()
 
 					RESULT=${EXIT_FAILURE};
 				fi
+			fi
+			# Detect valgrind warnings.
+			local NUMBER_OF_LINES=`wc -l ${VALGRIND_LOG} | awk '{ print $1 }'`;
+
+			if test ${NUMBER_OF_LINES} -ne 15 && test ${NUMBER_OF_LINES} -ne 22;
+			then
+				echo "Unsupported number of lines: ${NUMBER_OF_LINES}";
+				cat ${VALGRIND_LOG};
+
+				RESULT=${EXIT_FAILURE};
 			fi
 		fi
 		rm -f ${VALGRIND_LOG};

@@ -1,17 +1,15 @@
 TODO
-* fix issue with test_ewfexport.sh
-* merge chunks list and chunk group
+* be able to handle large chunk tables for version 2
   - move chunk list access into chunk group
   - throttle maximum chunk group size
+* pattern fill chunk support (set chunk table entry, test)
+* complete: libewf_chunk_table_fill_v2
 
 * refactor libewf_internal_data_chunk_set_chunk_data not to clone ?
 * ewfacquire error when both secondary output and resume are set
-* complete: libewf_chunk_table_fill_v2
-* pattern fill chunk support (set chunk table entry, test)
 * pass zero byte empty block compressed data cache as a pointer
   do not copy data to compressed chunk cache
 
-* be able to handle large chunk tables for version 2
 * allow to set the number of values in the queue, thread pools and list
 
 * memory usage of acquisition of Ex01 file? - chunk group size?
@@ -315,7 +313,6 @@ Tools:
 
 Unsorted:
 * libewf:
-  - add unpacked_data_size to chunk data?
   - empty caches on close
 
 * check if empty block check or equiv is always done (except for no compression).
@@ -485,6 +482,7 @@ Closed:
 20160424
 * worked on tests
 * worked on chunk group
+* refactored pack and unpack functions
 
 20160411
 * worked on tests
