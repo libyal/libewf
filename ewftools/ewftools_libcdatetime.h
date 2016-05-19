@@ -38,7 +38,7 @@
 /* If libtool DLL support is enabled set LIBCDATETIME_DLL_IMPORT
  * before including libcdatetime.h
  */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBCDATETIME_DLL_IMPORT
 #endif
 
