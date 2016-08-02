@@ -23,6 +23,7 @@
 #include <memory.h>
 
 #include "libewf_libcerror.h"
+#include "libewf_libcstring.h"
 #include "libewf_hash_sections.h"
 #include "libewf_hash_values.h"
 
