@@ -203,9 +203,6 @@ AC_DEFUN([AX_LIBHMAC_CHECK_LOCAL],
  ac_cv_libhmac_sha256=no
  ac_cv_libhmac_sha512=no
 
- dnl Check for Windows crypto API support
- AX_WINCRYPT_CHECK_LIB
-
  AS_IF(
   [test "x$ac_cv_wincrypt" != xno],
   [AX_WINCRYPT_CHECK_MD5
@@ -277,6 +274,9 @@ AC_DEFUN([AX_LIBHMAC_CHECK_ENABLE],
   [search for libhmac in includedir and libdir or in the specified DIR, or no if to use local version],
   [auto-detect],
   [DIR])
+
+ dnl Check for Windows crypto API support
+ AX_WINCRYPT_CHECK_LIB
 
  dnl Check for a shared library version
  AX_LIBHMAC_CHECK_LIB
