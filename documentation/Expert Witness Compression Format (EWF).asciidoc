@@ -1134,7 +1134,7 @@ Adler-32 of all the previous data within the additional volume section data.
 [NOTE]
 EnCase requires for media that contains no partition table that the is physical 
 media flag is not set and vice versa. Other tools like FTK check the actual
-storagee media data.
+storage media data.
 
 ==== EnCase 5 to 7 (EWF-L01)
 The EWF-L01 format uses the EnCase 5 (EWF-E01) volume section specification. However:

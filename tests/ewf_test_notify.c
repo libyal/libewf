@@ -1,5 +1,5 @@
 /*
- * Library get version test program
+ * Library notification functions test program
  *
  * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,36 +25,67 @@
 #include <stdlib.h>
 #endif
 
-#include "ewf_test_libcstring.h"
+#include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-/* Tests retrieving the library version
+/* Tests the libewf_notify_set_verbose function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_get_version(
+int ewf_test_notify_set_verbose(
      void )
 {
-	const char *version_string = NULL;
-	int result                 = 0;
-
-	version_string = libewf_get_version();
-
-	result = libcstring_narrow_string_compare(
-	          version_string,
-	          LIBEWF_VERSION_STRING,
-	          9 );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
+	/* Test invocation of function only
+	 */
+	libewf_notify_set_verbose(
 	 0 );
 
 	return( 1 );
+}
 
-on_error:
-	return( 0 );
+/* Tests the libewf_notify_set_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_notify_set_stream(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libewf_notify_set_stream(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libewf_notify_stream_open function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_notify_stream_open(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libewf_notify_stream_open(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libewf_notify_stream_close function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_notify_stream_close(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libewf_notify_stream_close(
+	 NULL );
+
+	return( 1 );
 }
 
 /* The main program
@@ -73,8 +104,20 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	EWF_TEST_RUN(
-	 "libewf_get_version",
-	 ewf_test_get_version() )
+	 "libewf_notify_set_verbose",
+	 ewf_test_notify_set_verbose() )
+
+	EWF_TEST_RUN(
+	 "libewf_notify_set_stream",
+	 ewf_test_notify_set_stream() )
+
+	EWF_TEST_RUN(
+	 "libewf_notify_stream_open",
+	 ewf_test_notify_stream_open() )
+
+	EWF_TEST_RUN(
+	 "libewf_notify_stream_close",
+	 ewf_test_notify_stream_close() )
 
 	return( EXIT_SUCCESS );
 

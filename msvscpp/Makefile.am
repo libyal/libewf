@@ -2,6 +2,7 @@ MSVSCPP_FILES = \
 	bzip2/bzip2.vcproj \
 	dokan/dokan.vcproj \
 	ewf.net/ewf.net.vcproj \
+	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_get_version/ewf_test_get_version.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle_get_values/ewf_test_handle_get_values.vcproj \
@@ -47,17 +48,8 @@ MSVSCPP_FILES = \
 	zlib/zlib.vcproj \
 	libewf.sln
 
-SCRIPT_FILES = \
-	scripts/vs2008_x64.sh \
-	scripts/vs2008_x64_sln.sed \
-	scripts/vs2008_x64_vcproj.sed \
-	scripts/vs2010_x64.sh \
-	scripts/vs2010_x64_sln.sed \
-	scripts/vs2010_x64_vcxproj.sed
-
 EXTRA_DIST = \
-	$(MSVSCPP_FILES) \
-	$(SCRIPT_FILES)
+	$(MSVSCPP_FILES)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

@@ -65,6 +65,7 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	ewf_test_error \
 	ewf_test_get_version \
 	ewf_test_glob \
 	ewf_test_handle_get_values \
@@ -76,10 +77,22 @@ check_PROGRAMS = \
 	ewf_test_write \
 	ewf_test_write_chunk
 
+ewf_test_error_SOURCES = \
+	ewf_test_error.c \
+	ewf_test_libcstring.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_error_LDADD = \
+	../libewf/libewf.la \
+	@LIBCSTRING_LIBADD@
+
 ewf_test_get_version_SOURCES = \
 	ewf_test_get_version.c \
 	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
+	ewf_test_macros.h \
 	ewf_test_unused.h
 
 ewf_test_get_version_LDADD = \
