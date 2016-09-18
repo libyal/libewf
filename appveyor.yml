@@ -26,3 +26,6 @@ before_build:
 build:
   project: vs2010\libewf.sln
 
+test_script:
+  - ps: .\runtests.ps1
+
