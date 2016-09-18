@@ -484,5 +484,5 @@ int libewf_handle_set_utf16_hash_value(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_METADATA_H ) */
 

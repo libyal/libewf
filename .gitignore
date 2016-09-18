@@ -132,7 +132,7 @@ stamp-h[1-9]
 /tests/ewf_test_error
 /tests/ewf_test_get_version
 /tests/ewf_test_glob
-/tests/ewf_test_handle_get_values
+/tests/ewf_test_handle
 /tests/ewf_test_notify
 /tests/ewf_test_open_close
 /tests/ewf_test_read

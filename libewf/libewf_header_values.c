@@ -7040,6 +7040,17 @@ int libewf_header_values_get_identifier(
 
 		return( -1 );
 	}
+	if( identifier_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfvalue_table_get_value_by_index(
 	     header_values,
 	     (int) index,

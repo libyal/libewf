@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_handle_get_values"
-	ProjectGUID="{D3E39DD7-28BD-4A43-A244-DFB2EE4D10FF}"
-	RootNamespace="ewf_test_handle_get_values"
+	Name="ewf_test_handle"
+	ProjectGUID="{520E350C-05C5-41D6-9113-EB7D62DB5024}"
+	RootNamespace="ewf_test_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_handle_get_values.c"
+				RelativePath="..\..\tests\ewf_test_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -202,7 +206,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_unused.h"
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 		</Filter>

@@ -370,6 +370,7 @@ int libewf_handle_set_segment_filename(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBEWF_EXTERN \
 int libewf_handle_get_segment_filename_size_wide(
      libewf_handle_t *handle,
@@ -389,7 +390,8 @@ int libewf_handle_set_segment_filename_wide(
      const wchar_t *filename,
      size_t filename_length,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBEWF_EXTERN \
 int libewf_handle_get_maximum_segment_size(
@@ -417,6 +419,7 @@ int libewf_handle_get_filename(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBEWF_EXTERN \
 int libewf_handle_get_filename_size_wide(
      libewf_handle_t *handle,
@@ -429,7 +432,8 @@ int libewf_handle_get_filename_wide(
      wchar_t *filename,
      size_t filename_size,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 int libewf_internal_handle_get_file_io_handle(
      libewf_internal_handle_t *internal_handle,
@@ -494,5 +498,5 @@ int libewf_handle_get_file_entry_by_utf16_path(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_INTERNAL_HANDLE_H ) */
 

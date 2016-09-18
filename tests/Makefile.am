@@ -23,6 +23,7 @@ endif
 
 TESTS = \
 	test_api_functions.sh \
+	test_api_types.sh \
 	test_glob.sh \
 	test_write_functions.sh \
 	test_ewfverify.sh \
@@ -46,6 +47,7 @@ check_SCRIPTS = \
 	pyewf_test_read.py \
 	pyewf_test_seek.py \
 	test_api_functions.sh \
+	test_api_types.sh \
 	test_ewfacquire.sh \
 	test_ewfacquire_device.sh \
 	test_ewfacquire_optical.sh \
@@ -68,7 +70,7 @@ check_PROGRAMS = \
 	ewf_test_error \
 	ewf_test_get_version \
 	ewf_test_glob \
-	ewf_test_handle_get_values \
+	ewf_test_handle \
 	ewf_test_open_close \
 	ewf_test_read \
 	ewf_test_read_chunk \
@@ -110,15 +112,15 @@ ewf_test_glob_LDADD = \
 	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@
 
-ewf_test_handle_get_values_SOURCES = \
-	ewf_test_handle_get_values.c \
+ewf_test_handle_SOURCES = \
+	ewf_test_handle.c \
 	ewf_test_libcerror.h \
 	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
-	ewf_test_unused.h
+	ewf_test_memory.c ewf_test_memory.h
 
-ewf_test_handle_get_values_LDADD = \
+ewf_test_handle_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
