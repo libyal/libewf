@@ -90,6 +90,8 @@ fi
 
 source ${TEST_RUNNER};
 
+RESULT=${EXIT_IGNORE};
+
 for TEST_TYPE in ${TEST_TYPES};
 do
 	test_api_type "${TEST_TYPE}";
