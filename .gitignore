@@ -130,7 +130,6 @@ stamp-h[1-9]
 /ewftools/ewfrecover
 /ewftools/ewfverify
 /tests/ewf_test_error
-/tests/ewf_test_get_version
 /tests/ewf_test_glob
 /tests/ewf_test_handle
 /tests/ewf_test_notify
@@ -138,6 +137,7 @@ stamp-h[1-9]
 /tests/ewf_test_read
 /tests/ewf_test_read_chunk
 /tests/ewf_test_seek
+/tests/ewf_test_support
 /tests/ewf_test_truncate
 /tests/ewf_test_write
 /tests/ewf_test_write_chunk

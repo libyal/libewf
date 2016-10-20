@@ -68,13 +68,13 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	ewf_test_error \
-	ewf_test_get_version \
 	ewf_test_glob \
 	ewf_test_handle \
 	ewf_test_open_close \
 	ewf_test_read \
 	ewf_test_read_chunk \
 	ewf_test_seek \
+	ewf_test_support \
 	ewf_test_truncate \
 	ewf_test_write \
 	ewf_test_write_chunk
@@ -87,17 +87,6 @@ ewf_test_error_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_error_LDADD = \
-	../libewf/libewf.la \
-	@LIBCSTRING_LIBADD@
-
-ewf_test_get_version_SOURCES = \
-	ewf_test_get_version.c \
-	ewf_test_libcstring.h \
-	ewf_test_libewf.h \
-	ewf_test_macros.h \
-	ewf_test_unused.h
-
-ewf_test_get_version_LDADD = \
 	../libewf/libewf.la \
 	@LIBCSTRING_LIBADD@
 
@@ -200,6 +189,17 @@ ewf_test_seek_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@
+
+ewf_test_support_SOURCES = \
+	ewf_test_libcstring.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_support.c \
+	ewf_test_unused.h
+
+ewf_test_support_LDADD = \
+	../libewf/libewf.la \
+	@LIBCSTRING_LIBADD@
 
 ewf_test_truncate_SOURCES = \
 	ewf_test_libcerror.h \

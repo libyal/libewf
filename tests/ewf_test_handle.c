@@ -73,13 +73,8 @@ int ewf_test_handle_open_source(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	source_length = libcstring_wide_string_length(
+	source_length = libcstring_system_string_length(
 	                 source );
-#else
-	source_length = libcstring_narrow_string_length(
-	                 source );
-#endif
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide(
@@ -117,7 +112,7 @@ int ewf_test_handle_open_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input handle.",
+		 "%s: unable to initialize handle.",
 		 function );
 
 		goto on_error;
@@ -175,9 +170,6 @@ int ewf_test_handle_open_source(
 on_error:
 	if( *handle != NULL )
 	{
-		libewf_handle_close(
-		 *handle,
-		 NULL );
 		libewf_handle_free(
 		 handle,
 		 NULL );
@@ -467,13 +459,8 @@ int ewf_test_handle_open(
 
 	/* Initialize test
 	 */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	source_length = libcstring_wide_string_length(
+	source_length = libcstring_system_string_length(
 	                 source );
-#else
-	source_length = libcstring_narrow_string_length(
-	                 source );
-#endif
 
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide(
@@ -616,9 +603,6 @@ on_error:
 	}
 	if( handle != NULL )
 	{
-		libewf_handle_close(
-		 handle,
-		 NULL );
 		libewf_handle_free(
 		 &handle,
 		 NULL );

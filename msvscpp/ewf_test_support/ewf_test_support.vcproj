@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_get_version"
-	ProjectGUID="{D8B88712-B4B3-458F-8313-BC91EC3B025D}"
-	RootNamespace="ewf_test_get_version"
+	Name="ewf_test_support"
+	ProjectGUID="{6534D372-4928-4E84-A7B7-A2B3E0B95637}"
+	RootNamespace="ewf_test_support"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_get_version.c"
+				RelativePath="..\..\tests\ewf_test_support.c"
 				>
 			</File>
 		</Filter>
