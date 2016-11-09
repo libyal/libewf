@@ -21,7 +21,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_analytical_data.h"
 #include "libewf_case_data.h"
@@ -42,7 +44,6 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libcthreads.h"
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
@@ -986,7 +987,7 @@ int libewf_handle_open(
 		     filename_index < number_of_filenames;
 		     filename_index++ )
 		{
-			filename_length = libcstring_narrow_string_length(
+			filename_length = narrow_string_length(
 					   filenames[ filename_index ] );
 
 			/* Make sure there is more to the filename than the extension
@@ -1112,7 +1113,7 @@ int libewf_handle_open(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = libcstring_narrow_string_length(
+			filename_length = narrow_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -1138,7 +1139,7 @@ int libewf_handle_open(
 	{
 		/* Get the basename and store it in the segment tables
 		 */
-		filename_length = libcstring_narrow_string_length(
+		filename_length = narrow_string_length(
 				   filenames[ 0 ] );
 
 		/* Set segment table basename
@@ -1352,7 +1353,7 @@ int libewf_handle_open_wide(
 		     filename_index < number_of_filenames;
 		     filename_index++ )
 		{
-			filename_length = libcstring_wide_string_length(
+			filename_length = wide_string_length(
 					   filenames[ filename_index ] );
 
 			/* Make sure there is more to the filename than the extension
@@ -1478,7 +1479,7 @@ int libewf_handle_open_wide(
 		 */
 		if( first_segment_filename != NULL )
 		{
-			filename_length = libcstring_wide_string_length(
+			filename_length = wide_string_length(
 					   first_segment_filename );
 
 			/* Set segment table basename
@@ -1504,7 +1505,7 @@ int libewf_handle_open_wide(
 	{
 		/* Get the basename and store it in the segment tables
 		 */
-		filename_length = libcstring_wide_string_length(
+		filename_length = wide_string_length(
 				   filenames[ 0 ] );
 
 		/* Set segment table basename
@@ -6903,7 +6904,7 @@ int libewf_handle_set_maximum_number_of_open_handles(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set maximum number of open handles in file IO handle.",
+			 "%s: unable to set maximum number of open handles in file IO pool.",
 			 function );
 		}
 	}

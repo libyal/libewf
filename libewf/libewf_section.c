@@ -22,6 +22,7 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #include "libewf_checksum.h"
@@ -36,7 +37,6 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libhmac.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
@@ -590,7 +590,7 @@ ssize_t libewf_section_descriptor_read(
 		}
 		section->type_string[ 16 ] = 0;
 
-		section->type_string_length = libcstring_narrow_string_length(
+		section->type_string_length = narrow_string_length(
 		                               (char *) section->type_string );
 
 		byte_stream_copy_to_uint64_little_endian(

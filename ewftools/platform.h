@@ -26,14 +26,13 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 int platform_get_operating_system(
-     libcstring_system_character_t *operating_system_string,
+     system_character_t *operating_system_string,
      size_t operating_system_string_size,
      libcerror_error_t **error );
 

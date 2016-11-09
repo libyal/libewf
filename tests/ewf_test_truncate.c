@@ -20,6 +20,10 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
+#include <system_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -29,12 +33,11 @@
 
 #include "ewf_test_libcfile.h"
 #include "ewf_test_libcnotify.h"
-#include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
@@ -61,7 +64,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 argv[ 1 ]  );
 
 	if( libcsystem_string_decimal_copy_to_64_bit(
@@ -86,7 +89,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcfile_file_open_wide(
 	     file,
 	     argv[ 2 ],
@@ -102,7 +105,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 "Unable to open file: %" PRIs_SYSTEM ".\n",
 		 argv[ 2 ] );
 
 		goto on_error;

@@ -28,7 +28,6 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
-#include "libewf_libcstring.h"
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_segment_file.h"
@@ -43,7 +42,7 @@ struct libewf_segment_table
 {
 	/* The basename
 	 */
-	libcstring_system_character_t *basename;
+	system_character_t *basename;
 
 	/* The basename size
 	 */

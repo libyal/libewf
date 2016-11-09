@@ -20,6 +20,8 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -108,7 +110,7 @@ int ewf_test_error_backtrace_sprint(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc EWF_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
@@ -123,23 +125,23 @@ int main(
 
 	EWF_TEST_RUN(
 	 "libewf_error_free",
-	 ewf_test_error_free() )
+	 ewf_test_error_free );
 
 	EWF_TEST_RUN(
 	 "libewf_error_fprint",
-	 ewf_test_error_fprint() )
+	 ewf_test_error_fprint );
 
 	EWF_TEST_RUN(
 	 "libewf_error_sprint",
-	 ewf_test_error_sprint() )
+	 ewf_test_error_sprint );
 
 	EWF_TEST_RUN(
 	 "libewf_error_backtrace_fprint",
-	 ewf_test_error_backtrace_fprint() )
+	 ewf_test_error_backtrace_fprint );
 
 	EWF_TEST_RUN(
 	 "libewf_error_backtrace_sprint",
-	 ewf_test_error_backtrace_sprint() )
+	 ewf_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 

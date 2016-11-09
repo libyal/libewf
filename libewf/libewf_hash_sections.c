@@ -21,9 +21,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 
 #include "libewf_libcerror.h"
-#include "libewf_libcstring.h"
 #include "libewf_hash_sections.h"
 #include "libewf_hash_values.h"
 
@@ -278,7 +278,7 @@ int libewf_hash_sections_set_digest_from_hash_values(
 		return( -1 );
 	}
 	if( ( identifier_length == 3 )
-	 && ( libcstring_narrow_string_compare(
+	 && ( narrow_string_compare(
 	       (char *) identifier,
 	       "MD5",
 	       identifier_length ) == 0 ) )
@@ -317,7 +317,7 @@ int libewf_hash_sections_set_digest_from_hash_values(
 		}
 	}
 	else if( ( identifier_length == 4 )
-	      && ( libcstring_narrow_string_compare(
+	      && ( narrow_string_compare(
 		    (char *) identifier,
 		    "SHA1",
 		    identifier_length ) == 0 ) )

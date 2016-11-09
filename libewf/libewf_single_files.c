@@ -21,13 +21,13 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #include "libewf_definitions.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
@@ -1654,7 +1654,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				if( libcstring_narrow_string_copy(
+				if( narrow_string_copy(
 				     single_file_entry->name,
 				     value_string,
 				     value_string_size - 1 ) == NULL )

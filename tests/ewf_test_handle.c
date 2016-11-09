@@ -21,13 +21,16 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <narrow_string.h>
+#include <system_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
@@ -42,14 +45,14 @@
  */
 int ewf_test_handle_open_source(
      libewf_handle_t **handle,
-     const libcstring_system_character_t *source,
+     const system_character_t *source,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t **filenames = NULL;
-	static char *function                     = "ewf_test_handle_open_source";
-	size_t source_length                      = 0;
-	int number_of_filenames                   = 0;
-	int result                                = 0;
+	system_character_t **filenames = NULL;
+	static char *function          = "ewf_test_handle_open_source";
+	size_t source_length           = 0;
+	int number_of_filenames        = 0;
+	int result                     = 0;
 
 	if( handle == NULL )
 	{
@@ -73,10 +76,10 @@ int ewf_test_handle_open_source(
 
 		return( -1 );
 	}
-	source_length = libcstring_system_string_length(
+	source_length = system_string_length(
 	                 source );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide(
 	          source,
 	          source_length,
@@ -117,7 +120,7 @@ int ewf_test_handle_open_source(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
 	          *handle,
 	          (wchar_t * const *) filenames,
@@ -143,7 +146,7 @@ int ewf_test_handle_open_source(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide_free(
 	          filenames,
 	          number_of_filenames,
@@ -176,7 +179,7 @@ on_error:
 	}
 	if( filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		libewf_glob_wide_free(
 		 filenames,
 		 number_of_filenames,
@@ -448,21 +451,21 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_handle_open(
-     const libcstring_system_character_t *source )
+     const system_character_t *source )
 {
-	libcerror_error_t *error                  = NULL;
-	libcstring_system_character_t **filenames = NULL;
-	libewf_handle_t *handle                   = NULL;
-	size_t source_length                      = 0;
-	int number_of_filenames                   = 0;
-	int result                                = 0;
+	libcerror_error_t *error       = NULL;
+	libewf_handle_t *handle        = NULL;
+	system_character_t **filenames = NULL;
+	size_t source_length           = 0;
+	int number_of_filenames        = 0;
+	int result                     = 0;
 
 	/* Initialize test
 	 */
-	source_length = libcstring_system_string_length(
+	source_length = system_string_length(
 	                 source );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide(
 	          source,
 	          source_length,
@@ -516,7 +519,7 @@ int ewf_test_handle_open(
 
 	/* Test open
 	 */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
 	          handle,
 	          (wchar_t * const *) filenames,
@@ -572,7 +575,7 @@ int ewf_test_handle_open(
          "error",
          error );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide_free(
 	          filenames,
 	          number_of_filenames,
@@ -609,7 +612,7 @@ on_error:
 	}
 	if( filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		libewf_glob_wide_free(
 		 filenames,
 		 number_of_filenames,
@@ -624,11 +627,11 @@ on_error:
 	return( 0 );
 }
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 
 /* TODO split open and open_wide */
 
-#endif /* defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER ) */
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 /* Tests the libewf_handle_get_maximum_segment_size functions
  * Returns 1 if successful or 0 if not
@@ -4747,7 +4750,7 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc,
      wchar_t * const argv[] )
@@ -4757,24 +4760,24 @@ int main(
      char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
-	libcstring_system_character_t *source = NULL;
-	libewf_handle_t *handle               = NULL;
-	libcstring_system_integer_t option    = 0;
-	int result                            = 0;
+	libcerror_error_t *error   = NULL;
+	libewf_handle_t *handle    = NULL;
+	system_character_t *source = NULL;
+	system_integer_t option    = 0;
+	int result                 = 0;
 
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
@@ -4794,11 +4797,11 @@ int main(
 
 	EWF_TEST_RUN(
 	 "libewf_handle_initialize",
-	 ewf_test_handle_initialize() )
+	 ewf_test_handle_initialize );
 
 	EWF_TEST_RUN(
 	 "libewf_handle_free",
-	 ewf_test_handle_free() )
+	 ewf_test_handle_free );
 
 	/* TODO add test for libewf_handle_clone */
 	/* TODO add test for libewf_handle_signal_abort */

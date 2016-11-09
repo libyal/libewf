@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -41,7 +42,6 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "export_handle.h"
@@ -130,7 +130,7 @@ void ewfrecover_signal_handler(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
@@ -139,32 +139,28 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t acquiry_operating_system[ 32 ];
+	system_character_t acquiry_operating_system[ 32 ];
 
-	libcstring_system_character_t * const *source_filenames   = NULL;
-
-	libcerror_error_t *error                                  = NULL;
+	system_character_t * const *source_filenames   = NULL;
+	libcerror_error_t *error                       = NULL;
+	log_handle_t *log_handle                       = NULL;
+	system_character_t *acquiry_software_version   = NULL;
+	system_character_t *log_filename               = NULL;
+	system_character_t *option_header_codepage     = NULL;
+	system_character_t *option_process_buffer_size = NULL;
+	system_character_t *option_target_path         = NULL;
+	system_character_t *program                    = _SYSTEM_STRING( "ewfrecover" );
+	system_integer_t option                        = 0;
+	uint8_t calculate_md5                          = 1;
+	uint8_t print_status_information               = 1;
+	uint8_t use_chunk_data_functions               = 0;
+	uint8_t verbose                                = 0;
+	int number_of_filenames                        = 0;
+	int result                                     = 1;
 
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                   = NULL;
+	libcsystem_glob_t *glob                        = NULL;
 #endif
-
-	libcstring_system_character_t *acquiry_software_version   = NULL;
-	libcstring_system_character_t *log_filename               = NULL;
-	libcstring_system_character_t *option_header_codepage     = NULL;
-	libcstring_system_character_t *option_process_buffer_size = NULL;
-	libcstring_system_character_t *option_target_path         = NULL;
-	libcstring_system_character_t *program                    = _LIBCSTRING_SYSTEM_STRING( "ewfrecover" );
-
-	log_handle_t *log_handle                                  = NULL;
-
-	libcstring_system_integer_t option                        = 0;
-	uint8_t calculate_md5                                     = 1;
-	uint8_t print_status_information                          = 1;
-	uint8_t use_chunk_data_functions                          = 0;
-	uint8_t verbose                                           = 0;
-	int number_of_filenames                                   = 0;
-	int result                                                = 1;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -226,11 +222,11 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:f:hl:p:qt:vVx" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "A:f:hl:p:qt:vVx" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				ewfoutput_version_fprint(
 				 stderr,
@@ -238,7 +234,7 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -246,12 +242,12 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 
-			case (libcstring_system_integer_t) 'A':
+			case (system_integer_t) 'A':
 				option_header_codepage = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				ewfoutput_version_fprint(
 				 stderr,
 				 program );
@@ -261,32 +257,32 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'l':
+			case (system_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'p':
+			case (system_integer_t) 'p':
 				option_process_buffer_size = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'q':
+			case (system_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (libcstring_system_integer_t) 't':
+			case (system_integer_t) 't':
 				option_target_path = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_version_fprint(
 				 stderr,
 				 program );
@@ -296,7 +292,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'x':
+			case (system_integer_t) 'x':
 				use_chunk_data_functions = 1;
 
 				break;
@@ -358,7 +354,7 @@ int main( int argc, char * const argv[] )
 	if( libcsystem_glob_get_results(
 	     glob,
 	     &number_of_filenames,
-	     (libcstring_system_character_t ***) &source_filenames,
+	     (system_character_t ***) &source_filenames,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -523,7 +519,7 @@ int main( int argc, char * const argv[] )
 		 */
 		if( export_handle_set_string(
 		     ewfrecover_export_handle,
-		     _LIBCSTRING_SYSTEM_STRING( "recover" ),
+		     _SYSTEM_STRING( "recover" ),
 		     &( ewfrecover_export_handle->target_path ),
 		     &( ewfrecover_export_handle->target_path_size ),
 		     &error ) != 1 )
@@ -601,7 +597,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 "Unable to open log file: %" PRIs_SYSTEM ".\n",
 			 log_filename );
 
 			goto on_error;
@@ -634,7 +630,7 @@ int main( int argc, char * const argv[] )
 
 		acquiry_operating_system[ 0 ] = 0;
 	}
-	acquiry_software_version = _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING );
+	acquiry_software_version = _SYSTEM_STRING( LIBEWF_VERSION_STRING );
 
 	if( export_handle_set_output_values(
 	     ewfrecover_export_handle,
@@ -677,7 +673,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to close log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 "Unable to close log file: %" PRIs_SYSTEM ".\n",
 			 log_filename );
 
 			goto on_error;
@@ -730,7 +726,7 @@ on_abort:
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 "%" PRIs_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );
@@ -739,14 +735,14 @@ on_abort:
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
+		 "%" PRIs_SYSTEM ": FAILURE\n",
 		 program );
 
 		return( EXIT_FAILURE );
 	}
 	fprintf(
 	 stdout,
-	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 "%" PRIs_SYSTEM ": SUCCESS\n",
 	 program );
 
 	return( EXIT_SUCCESS );

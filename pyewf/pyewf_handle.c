@@ -22,7 +22,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -35,7 +37,6 @@
 #include "pyewf_integer.h"
 #include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_metadata.h"
 #include "pyewf_python.h"
@@ -705,7 +706,7 @@ PyObject *pyewf_handle_open(
            PyObject *arguments,
            PyObject *keywords )
 {
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	wchar_t **filenames              = NULL;
 	wchar_t *filename                = NULL;
 	const char *errors               = NULL;
@@ -824,7 +825,7 @@ PyObject *pyewf_handle_open(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	filenames = (wchar_t **) PyMem_Malloc(
 	                          sizeof( wchar_t * ) * number_of_filenames );
 #else
@@ -840,7 +841,7 @@ PyObject *pyewf_handle_open(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( memory_set(
 	     filenames,
 	     0,
@@ -917,20 +918,20 @@ PyObject *pyewf_handle_open(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			else
 			{
 				is_unicode_string = 0;
 			}
 #endif
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		else
 		{
 			is_unicode_string = 1;
 		}
 #endif
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( is_unicode_string != 0 )
 		{
 			filename = (wchar_t *) PyUnicode_AsUnicode(
@@ -970,7 +971,7 @@ PyObject *pyewf_handle_open(
 			filename = (wchar_t *) PyUnicode_AsUnicode(
 			                        filename_string_object );
 		}
-		filename_length = libcstring_wide_string_length(
+		filename_length = wide_string_length(
 		                   filename );
 #else
 		/* A Unicode string object can be converted into UFT-8 formatted narrow string
@@ -982,11 +983,11 @@ PyObject *pyewf_handle_open(
 		filename = PyString_AsString(
 		            string_object );
 #endif
-		filename_length = libcstring_narrow_string_length(
+		filename_length = narrow_string_length(
 		                   filename );
 #endif
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filenames[ filename_index ] = (wchar_t *) PyMem_Malloc(
 		                                           sizeof( wchar_t ) * ( filename_length + 1 ) );
 #else
@@ -1003,13 +1004,13 @@ PyObject *pyewf_handle_open(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		if( libcstring_wide_string_copy(
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		if( wide_string_copy(
 		     filenames[ filename_index ],
 		     filename,
 		     filename_length ) == NULL )
 #else
-		if( libcstring_narrow_string_copy(
+		if( narrow_string_copy(
 		     filenames[ filename_index ],
 		     filename,
 		     filename_length ) == NULL )
@@ -1041,7 +1042,7 @@ PyObject *pyewf_handle_open(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
 	          pyewf_handle->handle,
 	          filenames,

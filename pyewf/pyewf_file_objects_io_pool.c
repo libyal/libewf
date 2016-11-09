@@ -27,7 +27,6 @@
 #include "pyewf_integer.h"
 #include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_python.h"
 
 /* Initializes the file objects IO pool

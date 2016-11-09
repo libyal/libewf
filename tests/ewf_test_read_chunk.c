@@ -21,6 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -29,7 +33,6 @@
 #include <stdio.h>
 
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcstring.h"
 #include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 
@@ -600,34 +603,34 @@ int ewf_test_read_chunk_from_handle(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcstring_system_character_t **filenames = NULL;
-	libcstring_system_character_t *source     = NULL;
-	libcerror_error_t *error                  = NULL;
-	libewf_handle_t *handle                   = NULL;
-	libcstring_system_integer_t option        = 0;
-	size64_t media_size                       = 0;
-	size32_t chunk_size                       = 0;
-	size_t string_length                      = 0;
-	int number_of_filenames                   = 0;
+	libcerror_error_t *error       = NULL;
+	libewf_handle_t *handle        = NULL;
+	system_character_t **filenames = NULL;
+	system_character_t *source     = NULL;
+	system_integer_t option        = 0;
+	size64_t media_size            = 0;
+	size32_t chunk_size            = 0;
+	size_t string_length           = 0;
+	int number_of_filenames        = 0;
 
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
@@ -651,8 +654,8 @@ int main( int argc, char * const argv[] )
 	 NULL );
 #endif
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	string_length = libcstring_wide_string_length(
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	string_length = wide_string_length(
 	                 source );
 
 	if( libewf_glob_wide(
@@ -663,7 +666,7 @@ int main( int argc, char * const argv[] )
 	     &number_of_filenames,
 	     &error ) != 1 )
 #else
-	string_length = libcstring_narrow_string_length(
+	string_length = narrow_string_length(
 	                 source );
 
 	if( libewf_glob(
@@ -709,7 +712,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     handle,
 	     filenames,
@@ -827,7 +830,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_glob_wide_free(
 	     filenames,
 	     number_of_filenames,
@@ -867,7 +870,7 @@ on_error:
 	}
 	if( filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		libewf_glob_wide_free(
 		 filenames,
 		 number_of_filenames,

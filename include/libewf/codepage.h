@@ -118,5 +118,5 @@ enum LIBEWF_CODEPAGES
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CODEPAGE_H ) */
 

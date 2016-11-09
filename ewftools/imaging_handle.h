@@ -28,7 +28,6 @@
 
 #include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
@@ -45,11 +44,11 @@ struct imaging_handle
 {
 	/* The user input buffer
 	 */
-	libcstring_system_character_t *input_buffer;
+	system_character_t *input_buffer;
 
 	/* The target filename
 	 */
-	libcstring_system_character_t *target_filename;
+	system_character_t *target_filename;
 
 	/* The target filename size
 	 */
@@ -57,7 +56,7 @@ struct imaging_handle
 
 	/* The secondary target filename
 	 */
-	libcstring_system_character_t *secondary_target_filename;
+	system_character_t *secondary_target_filename;
 
 	/* The secondary target filename size
 	 */
@@ -69,7 +68,7 @@ struct imaging_handle
 
 	/* The case number
 	 */
-	libcstring_system_character_t *case_number;
+	system_character_t *case_number;
 
 	/* The case number size
 	 */
@@ -77,7 +76,7 @@ struct imaging_handle
 
 	/* The description
 	 */
-	libcstring_system_character_t *description;
+	system_character_t *description;
 
 	/* The description size
 	 */
@@ -85,7 +84,7 @@ struct imaging_handle
 
 	/* The evidence number
 	 */
-	libcstring_system_character_t *evidence_number;
+	system_character_t *evidence_number;
 
 	/* The evidence number size
 	 */
@@ -93,7 +92,7 @@ struct imaging_handle
 
 	/* The examiner name
 	 */
-	libcstring_system_character_t *examiner_name;
+	system_character_t *examiner_name;
 
 	/* The examiner name size
 	 */
@@ -101,7 +100,7 @@ struct imaging_handle
 
 	/* The notes
 	 */
-	libcstring_system_character_t *notes;
+	system_character_t *notes;
 
 	/* The notes size
 	 */
@@ -169,7 +168,7 @@ struct imaging_handle
 
 	/* The calculated MD5 digest hash string
 	 */
-	libcstring_system_character_t *calculated_md5_hash_string;
+	system_character_t *calculated_md5_hash_string;
 
 	/* Value to indicate if the SHA1 digest hash should be calculated
 	 */
@@ -185,7 +184,7 @@ struct imaging_handle
 
 	/* The calculated SHA1 digest hash string
 	 */
-	libcstring_system_character_t *calculated_sha1_hash_string;
+	system_character_t *calculated_sha1_hash_string;
 
 	/* Value to indicate if the SHA256 digest hash should be calculated
 	 */
@@ -201,7 +200,7 @@ struct imaging_handle
 
 	/* The calculated SHA256 digest hash string
 	 */
-	libcstring_system_character_t *calculated_sha256_hash_string;
+	system_character_t *calculated_sha256_hash_string;
 
 	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
 	 */
@@ -280,24 +279,24 @@ int imaging_handle_signal_abort(
 
 int imaging_handle_check_write_access(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int imaging_handle_open_output(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      uint8_t resume,
      libcerror_error_t **error );
 
 int imaging_handle_open_secondary_output(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      uint8_t resume,
      libcerror_error_t **error );
 
 int imaging_handle_open_output_resume(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      off64_t *resume_acquiry_offset,
      libcerror_error_t **error );
 
@@ -364,64 +363,64 @@ int imaging_handle_get_chunk_size(
 
 int imaging_handle_prompt_for_string(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *request_string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_compression_method(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_compression_level(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_format(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_media_type(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_media_flags(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_bytes_per_sector(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_sector_error_granularity(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_maximum_segment_size(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_acquiry_offset(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_prompt_for_acquiry_size(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int imaging_handle_get_output_values(
@@ -430,94 +429,94 @@ int imaging_handle_get_output_values(
 
 int imaging_handle_set_string(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int imaging_handle_set_compression_values(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_format(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_media_type(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_media_flags(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_bytes_per_sector(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_sectors_per_chunk(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_sector_error_granularity(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_maximum_segment_size(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_acquiry_offset(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_acquiry_size(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_header_codepage(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_process_buffer_size(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_number_of_threads(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_additional_digest_types(
      imaging_handle_t *imaging_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
-     libcstring_system_character_t *acquiry_software,
-     libcstring_system_character_t *acquiry_software_version,
-     libcstring_system_character_t *model,
-     libcstring_system_character_t *serial_number,
+     system_character_t *acquiry_software,
+     system_character_t *acquiry_software_version,
+     system_character_t *model,
+     system_character_t *serial_number,
      libcerror_error_t **error );
 
 int imaging_handle_get_header_value(
      imaging_handle_t *imaging_handle,
      const uint8_t *identifier,
      size_t identifier_size,
-     libcstring_system_character_t **header_value,
+     system_character_t **header_value,
      size_t *header_value_size,
      libcerror_error_t **error );
 
@@ -525,14 +524,14 @@ int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
      const uint8_t *identifier,
      size_t identifier_length,
-     const libcstring_system_character_t *header_value,
+     const system_character_t *header_value,
      libcerror_error_t **error );
 
 int imaging_handle_set_hash_value(
      imaging_handle_t *imaging_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libcstring_system_character_t *hash_value,
+     system_character_t *hash_value,
      size_t hash_value_length,
      libcerror_error_t **error );
 

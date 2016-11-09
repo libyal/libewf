@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_ERRNO_H ) || defined( WINAPI )
 #include <errno.h>
@@ -38,7 +41,6 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
@@ -56,10 +58,10 @@ int ewfacquirestream_abort                        = 0;
 void usage_fprint(
       FILE *stream )
 {
-	libcstring_system_character_t default_segment_file_size_string[ 16 ];
-	libcstring_system_character_t minimum_segment_file_size_string[ 16 ];
-	libcstring_system_character_t maximum_32bit_segment_file_size_string[ 16 ];
-	libcstring_system_character_t maximum_64bit_segment_file_size_string[ 16 ];
+	system_character_t default_segment_file_size_string[ 16 ];
+	system_character_t minimum_segment_file_size_string[ 16 ];
+	system_character_t maximum_32bit_segment_file_size_string[ 16 ];
+	system_character_t maximum_64bit_segment_file_size_string[ 16 ];
 
 	int result = 0;
 
@@ -163,9 +165,9 @@ void usage_fprint(
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs_LIBCSTRING_SYSTEM ")\n"
-		                 "\t    (minimum is %" PRIs_LIBCSTRING_SYSTEM ", maximum is %" PRIs_LIBCSTRING_SYSTEM " for encase6\n"
-		                 "\t    and later formats and %" PRIs_LIBCSTRING_SYSTEM " for other formats)\n",
+		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs_SYSTEM ")\n"
+		                 "\t    (minimum is %" PRIs_SYSTEM ", maximum is %" PRIs_SYSTEM " for encase6\n"
+		                 "\t    and later formats and %" PRIs_SYSTEM " for other formats)\n",
 		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
@@ -666,9 +668,9 @@ int ewfacquirestream_read_input(
         }
 	if( process_status_initialize(
 	     &( imaging_handle->process_status ),
-	     _LIBCSTRING_SYSTEM_STRING( "Acquiry" ),
-	     _LIBCSTRING_SYSTEM_STRING( "acquired" ),
-	     _LIBCSTRING_SYSTEM_STRING( "Written" ),
+	     _SYSTEM_STRING( "Acquiry" ),
+	     _SYSTEM_STRING( "acquired" ),
+	     _SYSTEM_STRING( "Written" ),
 	     stdout,
 	     print_status_information,
 	     error ) != 1 )
@@ -1180,49 +1182,46 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error                                        = NULL;
-
-	libcstring_system_character_t *log_filename                     = NULL;
-	libcstring_system_character_t *option_additional_digest_types   = NULL;
-	libcstring_system_character_t *option_bytes_per_sector          = NULL;
-	libcstring_system_character_t *option_case_number               = NULL;
-	libcstring_system_character_t *option_compression_values        = NULL;
-	libcstring_system_character_t *option_description               = NULL;
-	libcstring_system_character_t *option_examiner_name             = NULL;
-	libcstring_system_character_t *option_evidence_number           = NULL;
-	libcstring_system_character_t *option_format                    = NULL;
-	libcstring_system_character_t *option_header_codepage           = NULL;
-	libcstring_system_character_t *option_maximum_segment_size      = NULL;
-	libcstring_system_character_t *option_media_flags               = NULL;
-	libcstring_system_character_t *option_media_type                = NULL;
-	libcstring_system_character_t *option_notes                     = NULL;
-	libcstring_system_character_t *option_number_of_jobs            = NULL;
-	libcstring_system_character_t *option_offset                    = NULL;
-	libcstring_system_character_t *option_process_buffer_size       = NULL;
-        libcstring_system_character_t *option_secondary_target_filename = NULL;
-        libcstring_system_character_t *option_sectors_per_chunk         = NULL;
-	libcstring_system_character_t *option_size                      = NULL;
-        libcstring_system_character_t *option_target_filename           = NULL;
-	libcstring_system_character_t *program                          = _LIBCSTRING_SYSTEM_STRING( "ewfacquirestream" );
-
-	log_handle_t *log_handle                                        = NULL;
-
-	libcstring_system_integer_t option                              = 0;
-	size_t string_length                                            = 0;
-	uint8_t calculate_md5                                           = 1;
-	uint8_t print_status_information                                = 1;
-	uint8_t read_error_retries                                      = 2;
-	uint8_t resume_acquiry                                          = 0;
-	uint8_t swap_byte_pairs                                         = 0;
-	uint8_t use_chunk_data_functions                                = 0;
-	uint8_t verbose                                                 = 0;
-	int result                                                      = 0;
+	libcerror_error_t *error                             = NULL;
+	log_handle_t *log_handle                             = NULL;
+	system_character_t *log_filename                     = NULL;
+	system_character_t *option_additional_digest_types   = NULL;
+	system_character_t *option_bytes_per_sector          = NULL;
+	system_character_t *option_case_number               = NULL;
+	system_character_t *option_compression_values        = NULL;
+	system_character_t *option_description               = NULL;
+	system_character_t *option_evidence_number           = NULL;
+	system_character_t *option_examiner_name             = NULL;
+	system_character_t *option_format                    = NULL;
+	system_character_t *option_header_codepage           = NULL;
+	system_character_t *option_maximum_segment_size      = NULL;
+	system_character_t *option_media_flags               = NULL;
+	system_character_t *option_media_type                = NULL;
+	system_character_t *option_notes                     = NULL;
+	system_character_t *option_number_of_jobs            = NULL;
+	system_character_t *option_offset                    = NULL;
+	system_character_t *option_process_buffer_size       = NULL;
+        system_character_t *option_secondary_target_filename = NULL;
+        system_character_t *option_sectors_per_chunk         = NULL;
+	system_character_t *option_size                      = NULL;
+        system_character_t *option_target_filename           = NULL;
+	system_character_t *program                          = _SYSTEM_STRING( "ewfacquirestream" );
+	system_integer_t option                              = 0;
+	size_t string_length                                 = 0;
+	uint8_t calculate_md5                                = 1;
+	uint8_t print_status_information                     = 1;
+	uint8_t read_error_retries                           = 2;
+	uint8_t resume_acquiry                               = 0;
+	uint8_t swap_byte_pairs                              = 0;
+	uint8_t use_chunk_data_functions                     = 0;
+	uint8_t verbose                                      = 0;
+	int result                                           = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -1284,11 +1283,11 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hj:l:m:M:N:o:p:P:qsS:t:vVx2:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hj:l:m:M:N:o:p:P:qsS:t:vVx2:" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				ewfoutput_version_fprint(
 				 stdout,
@@ -1296,7 +1295,7 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -1304,57 +1303,57 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 
-			case (libcstring_system_integer_t) 'A':
+			case (system_integer_t) 'A':
 				option_header_codepage = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'b':
+			case (system_integer_t) 'b':
 				option_sectors_per_chunk = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'B':
+			case (system_integer_t) 'B':
 				option_size = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'c':
+			case (system_integer_t) 'c':
 				option_compression_values = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'C':
+			case (system_integer_t) 'C':
 				option_case_number = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'd':
+			case (system_integer_t) 'd':
 				option_additional_digest_types = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'D':
+			case (system_integer_t) 'D':
 				option_description = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'e':
+			case (system_integer_t) 'e':
 				option_examiner_name = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'E':
+			case (system_integer_t) 'E':
 				option_evidence_number = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'f':
+			case (system_integer_t) 'f':
 				option_format = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				ewfoutput_version_fprint(
 				 stdout,
 				 program );
@@ -1364,72 +1363,72 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'j':
+			case (system_integer_t) 'j':
 				option_number_of_jobs = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'l':
+			case (system_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'm':
+			case (system_integer_t) 'm':
 				option_media_type = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'M':
+			case (system_integer_t) 'M':
 				option_media_flags = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'N':
+			case (system_integer_t) 'N':
 				option_notes = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'o':
+			case (system_integer_t) 'o':
 				option_offset = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'p':
+			case (system_integer_t) 'p':
 				option_process_buffer_size = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'P':
+			case (system_integer_t) 'P':
 				option_bytes_per_sector = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'q':
+			case (system_integer_t) 'q':
 				print_status_information = 0;
 
 				break;
 
-			case (libcstring_system_integer_t) 's':
+			case (system_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'S':
+			case (system_integer_t) 'S':
 				option_maximum_segment_size = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 't':
+			case (system_integer_t) 't':
 				option_target_filename = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_version_fprint(
 				 stdout,
 				 program );
@@ -1439,12 +1438,12 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'x':
+			case (system_integer_t) 'x':
 				use_chunk_data_functions = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) '2':
+			case (system_integer_t) '2':
 				option_secondary_target_filename = optarg;
 
 				break;
@@ -1468,13 +1467,13 @@ int main( int argc, char * const argv[] )
 	if( ( option_target_filename != NULL )
 	 && ( option_secondary_target_filename != NULL ) )
 	{
-		string_length = libcstring_system_string_length(
+		string_length = system_string_length(
 				 option_secondary_target_filename );
 
-		if( libcstring_system_string_length(
+		if( system_string_length(
 		     option_target_filename ) == string_length )
 		{
-			if( libcstring_system_string_compare(
+			if( system_string_compare(
 			     option_target_filename,
 			     option_secondary_target_filename,
 			     string_length ) == 0 )
@@ -1543,7 +1542,7 @@ int main( int argc, char * const argv[] )
 		 */
 		if( imaging_handle_set_string(
 		     ewfacquirestream_imaging_handle,
-		     _LIBCSTRING_SYSTEM_STRING( "image" ),
+		     _SYSTEM_STRING( "image" ),
 		     &( ewfacquirestream_imaging_handle->target_filename ),
 		     &( ewfacquirestream_imaging_handle->target_filename_size ),
 		     &error ) != 1 )
@@ -1611,7 +1610,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_case_number == NULL )
 	{
-		option_case_number = _LIBCSTRING_SYSTEM_STRING( "case_number" );
+		option_case_number = _SYSTEM_STRING( "case_number" );
 	}
 	if( imaging_handle_set_string(
 	     ewfacquirestream_imaging_handle,
@@ -1628,7 +1627,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_description == NULL )
 	{
-		option_description = _LIBCSTRING_SYSTEM_STRING( "description" );
+		option_description = _SYSTEM_STRING( "description" );
 	}
 	if( imaging_handle_set_string(
 	     ewfacquirestream_imaging_handle,
@@ -1645,7 +1644,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_evidence_number == NULL )
 	{
-		option_evidence_number = _LIBCSTRING_SYSTEM_STRING( "evidence_number" );
+		option_evidence_number = _SYSTEM_STRING( "evidence_number" );
 	}
 	if( imaging_handle_set_string(
 	     ewfacquirestream_imaging_handle,
@@ -1662,7 +1661,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_examiner_name == NULL )
 	{
-		option_examiner_name = _LIBCSTRING_SYSTEM_STRING( "examiner_name" );
+		option_examiner_name = _SYSTEM_STRING( "examiner_name" );
 	}
 	if( imaging_handle_set_string(
 	     ewfacquirestream_imaging_handle,
@@ -1679,7 +1678,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_notes == NULL )
 	{
-		option_notes = _LIBCSTRING_SYSTEM_STRING( "notes" );
+		option_notes = _SYSTEM_STRING( "notes" );
 	}
 	if( imaging_handle_set_string(
 	     ewfacquirestream_imaging_handle,
@@ -2022,7 +2021,7 @@ int main( int argc, char * const argv[] )
 	if( imaging_handle_set_output_values(
 	     ewfacquirestream_imaging_handle,
 	     program,
-	     _LIBCSTRING_SYSTEM_STRING( LIBEWF_VERSION_STRING ),
+	     _SYSTEM_STRING( LIBEWF_VERSION_STRING ),
 	     NULL,
 	     NULL,
 	     &error ) != 1 )
@@ -2065,7 +2064,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to open log file: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+			 "Unable to open log file: %" PRIs_SYSTEM ".\n",
 			 log_filename );
 
 			goto on_error;
@@ -2151,7 +2150,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 "%" PRIs_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );
@@ -2160,14 +2159,14 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": FAILURE\n",
+		 "%" PRIs_SYSTEM ": FAILURE\n",
 		 program );
 
 		return( EXIT_FAILURE );
 	}
 	fprintf(
 	 stdout,
-	 "%" PRIs_LIBCSTRING_SYSTEM ": SUCCESS\n",
+	 "%" PRIs_SYSTEM ": SUCCESS\n",
 	 program );
 
 	return( EXIT_SUCCESS );

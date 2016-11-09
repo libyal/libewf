@@ -28,7 +28,6 @@
 #include "digest_hash.h"
 #include "ewftools_libcdata.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
@@ -54,11 +53,11 @@ struct export_handle
 {
 	/* The user input buffer
 	 */
-	libcstring_system_character_t *input_buffer;
+	system_character_t *input_buffer;
 
 	/* The target path
 	 */
-	libcstring_system_character_t *target_path;
+	system_character_t *target_path;
 
 	/* The target path size
 	 */
@@ -118,7 +117,7 @@ struct export_handle
 
 	/* The calculated MD5 digest hash string
 	 */
-	libcstring_system_character_t *calculated_md5_hash_string;
+	system_character_t *calculated_md5_hash_string;
 
 	/* Value to indicate if the SHA1 digest hash should be calculated
 	 */
@@ -134,7 +133,7 @@ struct export_handle
 
 	/* The calculated SHA1 digest hash string
 	 */
-	libcstring_system_character_t *calculated_sha1_hash_string;
+	system_character_t *calculated_sha1_hash_string;
 
 	/* Value to indicate if the SHA256 digest hash should be calculated
 	 */
@@ -150,7 +149,7 @@ struct export_handle
 
 	/* The calculated SHA256 digest hash string
 	 */
-	libcstring_system_character_t *calculated_sha256_hash_string;
+	system_character_t *calculated_sha256_hash_string;
 
 	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
 	 */
@@ -270,18 +269,18 @@ int export_handle_set_maximum_number_of_open_handles(
 
 int export_handle_check_write_access(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int export_handle_open_input(
      export_handle_t *export_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
 int export_handle_open_output(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int export_handle_close(
@@ -342,108 +341,108 @@ int export_handle_get_output_chunk_size(
 
 int export_handle_prompt_for_string(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *request_string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_compression_method(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_compression_level(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_output_format(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_sectors_per_chunk(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_maximum_segment_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_export_offset(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_prompt_for_export_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int export_handle_set_string(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int export_handle_set_compression_values(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_output_format(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_sectors_per_chunk(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_maximum_segment_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_export_offset(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_export_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_header_codepage(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_process_buffer_size(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_number_of_threads(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_additional_digest_types(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_set_output_values(
      export_handle_t *export_handle,
-     libcstring_system_character_t *acquiry_operating_system,
-     libcstring_system_character_t *acquiry_software,
-     libcstring_system_character_t *acquiry_software_version,
+     system_character_t *acquiry_operating_system,
+     system_character_t *acquiry_software,
+     system_character_t *acquiry_software_version,
      uint8_t zero_chunk_on_error,
      uint8_t copy_input_values,
      libcerror_error_t **error );
@@ -452,7 +451,7 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     libcstring_system_character_t *hash_value,
+     system_character_t *hash_value,
      size_t hash_value_length,
      libcerror_error_t **error );
 
@@ -498,7 +497,7 @@ int export_handle_export_input(
 
 int export_handle_export_single_files(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *export_path,
+     const system_character_t *export_path,
      uint8_t print_status_information,
      log_handle_t *log_handle,
      libcerror_error_t **error );
@@ -506,7 +505,7 @@ int export_handle_export_single_files(
 int export_handle_export_file_entry(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *export_path,
+     const system_character_t *export_path,
      size_t export_path_size,
      size_t file_entry_path_index,
      log_handle_t *log_handle,
@@ -515,13 +514,13 @@ int export_handle_export_file_entry(
 int export_handle_export_file_entry_data(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *export_path,
+     const system_character_t *export_path,
      libcerror_error_t **error );
 
 int export_handle_export_file_entry_sub_file_entries(
      export_handle_t *export_handle,
      libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *export_path,
+     const system_character_t *export_path,
      size_t export_path_size,
      size_t file_entry_path_index,
      log_handle_t *log_handle,

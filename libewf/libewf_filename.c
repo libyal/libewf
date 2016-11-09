@@ -21,12 +21,14 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
 #include "libewf_libcerror.h"
-#include "libewf_libcstring.h"
 
 /* Sets the extension for a certain segment file
  * Using the format specific naming schema
@@ -452,9 +454,9 @@ int libewf_filename_set_extension_wide(
  * Returns 1 if successful or -1 on error
  */
 int libewf_filename_create(
-     libcstring_system_character_t **filename,
+     system_character_t **filename,
      size_t *filename_size,
-     libcstring_system_character_t *basename,
+     system_character_t *basename,
      size_t basename_length,
      uint32_t segment_number,
      uint32_t maximum_number_of_segments,
@@ -521,7 +523,7 @@ int libewf_filename_create(
 		 */
 		*filename_size = basename_length + 5;
 	}
-	*filename = libcstring_system_string_allocate(
+	*filename = system_string_allocate(
 	             *filename_size );
 
 	if( *filename == NULL )
@@ -535,7 +537,7 @@ int libewf_filename_create(
 
 		goto on_error;
 	}
-	if( libcstring_system_string_copy(
+	if( system_string_copy(
 	     *filename,
 	     basename,
 	     basename_length ) == NULL )
@@ -549,9 +551,9 @@ int libewf_filename_create(
 
 		goto on_error;
 	}
-	( *filename )[ basename_length++ ] = (libcstring_system_character_t) '.';
+	( *filename )[ basename_length++ ] = (system_character_t) '.';
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_filename_set_extension_wide(
 	     *filename,
 	     *filename_size,

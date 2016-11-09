@@ -3,7 +3,6 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	include \
 	common \
-	libcstring \
 	libcerror \
 	libcthreads \
 	libcdata \
@@ -87,7 +86,6 @@ lib: library
 
 library:
 	(cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcstring && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcerror && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcthreads && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcdata && $(MAKE) $(AM_MAKEFLAGS))
@@ -122,7 +120,6 @@ distclean: clean
 	done && test -z "$$fail"
 
 splint:
-	(cd $(srcdir)/libcstring && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcerror && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcthreads && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcdata && $(MAKE) splint $(AM_MAKEFLAGS))

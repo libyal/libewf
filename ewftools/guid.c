@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <byte_stream.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( WINAPI )
 #include <rpcdce.h>
@@ -31,7 +34,6 @@
 #endif
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "guid.h"
 
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
@@ -161,7 +163,7 @@ int guid_to_string(
      uint8_t *guid,
      size_t guid_size,
      int byte_order,
-     libcstring_system_character_t *string,
+     system_character_t *string,
      size_t string_size,
      libcerror_error_t **error )
 {
@@ -251,25 +253,25 @@ int guid_to_string(
 	 */
 	if( byte_order == _BYTE_STREAM_ENDIAN_BIG )
 	{
-		print_count = libcstring_system_string_sprintf(
+		print_count = system_string_sprintf(
 			       string,
 			       string_size,
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 ),
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 ),
 			       guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ],
 			       guid[ 4 ], guid[ 5 ],
 			       guid[ 6 ], guid[ 7 ],
@@ -278,25 +280,25 @@ int guid_to_string(
 	}
 	else if( byte_order == _BYTE_STREAM_ENDIAN_LITTLE )
 	{
-		print_count = libcstring_system_string_sprintf(
+		print_count = system_string_sprintf(
 			       string,
 			       string_size,
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "-%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 )
-			       _LIBCSTRING_SYSTEM_STRING( "%.2" ) _LIBCSTRING_SYSTEM_STRING( PRIx8 ),
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "-%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 )
+			       _SYSTEM_STRING( "%.2" ) _SYSTEM_STRING( PRIx8 ),
 			       guid[ 3 ], guid[ 2 ], guid[ 1 ], guid[ 0 ],
 			       guid[ 5 ], guid[ 4 ],
 			       guid[ 7 ], guid[ 6 ],

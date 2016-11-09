@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -36,7 +39,6 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 
@@ -110,30 +112,27 @@ void ewfdebug_signal_handler(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
+	system_character_t * const *source_filenames = NULL;
+	libcerror_error_t *error                     = NULL;
+	system_character_t **ewf_filenames           = NULL;
+	system_character_t *option_header_codepage   = NULL;
+	system_character_t *program                  = _SYSTEM_STRING( "ewfdebug" );
+	system_integer_t option                      = 0;
+	size_t first_filename_length                 = 0;
+	uint8_t verbose                              = 0;
+	int header_codepage                          = LIBEWF_CODEPAGE_ASCII;
+	int number_of_filenames                      = 0;
+	int result                                   = 0;
+
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                 = NULL;
+	libcsystem_glob_t *glob                      = NULL;
 #endif
-
-	libcerror_error_t *error                                = NULL;
-
-	libcstring_system_character_t * const *source_filenames = NULL;
-	libcstring_system_character_t **ewf_filenames           = NULL;
-
-	libcstring_system_character_t *option_header_codepage   = NULL;
-	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfdebug" );
-
-	libcstring_system_integer_t option                      = 0;
-	size_t first_filename_length                            = 0;
-	uint8_t verbose                                         = 0;
-	int number_of_filenames                                 = 0;
-	int header_codepage                                     = LIBEWF_CODEPAGE_ASCII;
-	int result                                              = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -168,11 +167,11 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 			   argc,
 			   argv,
-			   _LIBCSTRING_SYSTEM_STRING( "A:hqvV" ) ) ) != (libcstring_system_integer_t) -1 )
+			   _SYSTEM_STRING( "A:hqvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				ewfoutput_version_fprint(
 				 stdout,
@@ -180,7 +179,7 @@ int main( int argc, char * const argv[] )
 
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -188,12 +187,12 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libcstring_system_integer_t) 'A':
+			case (system_integer_t) 'A':
 				option_header_codepage = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				ewfoutput_version_fprint(
 				 stdout,
 				 program );
@@ -203,15 +202,15 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'q':
+			case (system_integer_t) 'q':
 				break;
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_version_fprint(
 				 stdout,
 				 program );
@@ -310,7 +309,7 @@ int main( int argc, char * const argv[] )
 	if( libcsystem_glob_get_results(
 	     glob,
 	     &number_of_filenames,
-	     (libcstring_system_character_t ***) &source_filenames,
+	     (system_character_t ***) &source_filenames,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -326,10 +325,10 @@ int main( int argc, char * const argv[] )
 
 	if( number_of_filenames == 1 )
 	{
-		first_filename_length = libcstring_system_string_length(
+		first_filename_length = system_string_length(
 		                         source_filenames[ 0 ] );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     source_filenames[ 0 ],
 		     first_filename_length,
@@ -353,7 +352,7 @@ int main( int argc, char * const argv[] )
 
 			goto on_error;
 		}
-		source_filenames = (libcstring_system_character_t * const *) ewf_filenames;
+		source_filenames = (system_character_t * const *) ewf_filenames;
 	}
 	if( libewf_handle_initialize(
 	     &ewfdebug_input_handle,
@@ -365,7 +364,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_open_wide(
 	          ewfdebug_input_handle,
 	          source_filenames,
@@ -460,7 +459,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM ": ABORTED\n",
+		 "%" PRIs_SYSTEM ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

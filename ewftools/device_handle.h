@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libodraw.h"
 #include "ewftools_libsmdev.h"
 #include "ewftools_libsmraw.h"
@@ -78,7 +77,7 @@ struct device_handle
 {
 	/* The user input buffer
 	 */
-	libcstring_system_character_t *input_buffer;
+	system_character_t *input_buffer;
 
 	/* The device handle type
 	 */
@@ -86,7 +85,7 @@ struct device_handle
 
 	/* The TOC filename
 	 */
-	libcstring_system_character_t *toc_filename;
+	system_character_t *toc_filename;
 
 	/* The TOC filename size
 	 */
@@ -134,25 +133,25 @@ int device_handle_signal_abort(
 
 int device_handle_open_input(
      device_handle_t *device_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
 int device_handle_open_smdev_input(
      device_handle_t *device_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
 int device_handle_open_odraw_input(
      device_handle_t *device_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
 int device_handle_open_smraw_input(
      device_handle_t *device_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
@@ -175,19 +174,19 @@ off64_t device_handle_seek_offset(
 
 int device_handle_prompt_for_string(
      device_handle_t *device_handle,
-     const libcstring_system_character_t *request_string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *request_string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int device_handle_prompt_for_number_of_error_retries(
      device_handle_t *device_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int device_handle_prompt_for_zero_buffer_on_error(
      device_handle_t *device_handle,
-     const libcstring_system_character_t *request_string,
+     const system_character_t *request_string,
      libcerror_error_t **error );
 
 int device_handle_get_type(
@@ -214,7 +213,7 @@ int device_handle_get_information_value(
      device_handle_t *device_handle,
      const uint8_t *information_value_identifier,
      size_t information_value_identifier_length,
-     libcstring_system_character_t *information_value,
+     system_character_t *information_value,
      size_t information_value_size,
      libcerror_error_t **error );
 
@@ -245,14 +244,14 @@ int device_handle_get_track(
 
 int device_handle_set_string(
      device_handle_t *device_handle,
-     const libcstring_system_character_t *string,
-     libcstring_system_character_t **internal_string,
+     const system_character_t *string,
+     system_character_t **internal_string,
      size_t *internal_string_size,
      libcerror_error_t **error );
 
 int device_handle_set_number_of_error_retries(
      device_handle_t *device_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int device_handle_set_error_values(

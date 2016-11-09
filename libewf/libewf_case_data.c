@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #include "libewf_case_data.h"
@@ -28,7 +29,6 @@
 #include "libewf_header_values.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_media_values.h"
@@ -545,7 +545,7 @@ int libewf_case_data_generate_utf8_string(
 		{
 			/* Make sure to determine the actual length of the date time values string
 			 */
-			acquiry_date_string_length = libcstring_narrow_string_length(
+			acquiry_date_string_length = narrow_string_length(
 			                              (char *) generated_acquiry_date );
 		}
 	}
@@ -611,7 +611,7 @@ int libewf_case_data_generate_utf8_string(
 		{
 			/* Make sure to determine the actual length of the date time values string
 			 */
-			 system_date_string_length = libcstring_narrow_string_length(
+			 system_date_string_length = narrow_string_length(
 			                              (char *) generated_system_date );
 		}
 	}
@@ -997,7 +997,7 @@ int libewf_case_data_generate_utf8_string(
 	}
 	else
 	{
-		if( libcstring_narrow_string_copy(
+		if( narrow_string_copy(
 		     (char *) &( ( *utf8_string )[ utf8_string_index ] ),
 		     (char *) generated_acquiry_date,
 		     acquiry_date_string_length ) == NULL )
@@ -1047,7 +1047,7 @@ int libewf_case_data_generate_utf8_string(
 	}
 	else
 	{
-		if( libcstring_narrow_string_copy(
+		if( narrow_string_copy(
 		     (char *) &( ( *utf8_string )[ utf8_string_index ] ),
 		     (char *) generated_system_date,
 		     system_date_string_length ) == NULL )
@@ -1825,7 +1825,7 @@ int libewf_case_data_parse_string(
 					if( date_time_values_string != NULL )
 					{
 						value_string      = date_time_values_string;
-						value_string_size = 1 + libcstring_narrow_string_length(
+						value_string_size = 1 + narrow_string_length(
 						                         (char *) date_time_values_string );
 
 						identifier      = (uint8_t *) "acquiry_date";
@@ -2018,7 +2018,7 @@ int libewf_case_data_parse_string(
 					if( date_time_values_string != NULL )
 					{
 						value_string      = date_time_values_string;
-						value_string_size = 1 + libcstring_narrow_string_length(
+						value_string_size = 1 + narrow_string_length(
 						                         (char *) date_time_values_string );
 
 						identifier      = (uint8_t *) "system_date";

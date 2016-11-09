@@ -22,6 +22,7 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #if defined( HAVE_ZLIB ) || defined( ZLIB_DLL )
@@ -41,7 +42,6 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libfvalue.h"
@@ -87,7 +87,7 @@ void ewfoutput_copyright_fprint(
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      const libcstring_system_character_t *program )
+      const system_character_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -109,7 +109,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs_LIBCSTRING_SYSTEM " %s\n\n",
+	 "%" PRIs_SYSTEM " %s\n\n",
 	 program,
 	 LIBEWF_VERSION_STRING );
 }
@@ -118,7 +118,7 @@ void ewfoutput_version_fprint(
  */
 void ewfoutput_version_detailed_fprint(
       FILE *stream,
-      const libcstring_system_character_t *program )
+      const system_character_t *program )
 {
 	static char *function = "ewfoutput_version_detailed_fprint";
 
@@ -140,7 +140,7 @@ void ewfoutput_version_detailed_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs_LIBCSTRING_SYSTEM " %s (libewf %s",
+	 "%" PRIs_SYSTEM " %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );

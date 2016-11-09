@@ -1,5 +1,5 @@
 /*
- * The internal libcstring header
+ * The internal libclocale header
  *
  * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,33 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFTOOLS_LIBCSTRING_H )
-#define _EWFTOOLS_LIBCSTRING_H
+#if !defined( _EWF_TEST_LIBCLOCALE_H )
+#define _EWF_TEST_LIBCLOCALE_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBCSTRING for local use of libcstring
+/* Define HAVE_LOCAL_LIBCLOCALE for local use of libclocale
  */
-#if defined( HAVE_LOCAL_LIBCSTRING )
+#if defined( HAVE_LOCAL_LIBCLOCALE )
 
-#include <libcstring_definitions.h>
-#include <libcstring_narrow_string.h>
-#include <libcstring_system_string.h>
-#include <libcstring_types.h>
-#include <libcstring_wide_string.h>
+#include <libclocale_codepage.h>
+#include <libclocale_definitions.h>
+#include <libclocale_locale.h>
+#include <libclocale_support.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBCSTRING_DLL_IMPORT
- * before including libcstring.h
+/* If libtool DLL support is enabled set LIBCLOCALE_DLL_IMPORT
+ * before including libclocale.h
  */
-#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
-#define LIBCSTRING_DLL_IMPORT
+#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#define LIBCLOCALE_DLL_IMPORT
 #endif
 
-#include <libcstring.h>
+#include <libclocale.h>
 
-#endif /* defined( HAVE_LOCAL_LIBCSTRING ) */
+#endif /* defined( HAVE_LOCAL_LIBCLOCALE ) */
 
-#endif /* !defined( _EWFTOOLS_LIBCSTRING_H ) */
+#endif /* !defined( _EWF_TEST_LIBCLOCALE_H ) */
 

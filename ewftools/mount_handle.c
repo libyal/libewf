@@ -21,10 +21,12 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 #include "mount_handle.h"
 
@@ -258,7 +260,7 @@ int mount_handle_set_maximum_number_of_open_handles(
  */
 int mount_handle_set_format(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function = "mount_handle_set_format";
@@ -276,14 +278,14 @@ int mount_handle_set_format(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
 	if( string_length == 3 )
 	{
-		if( libcstring_system_string_compare(
+		if( system_string_compare(
 		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "raw" ),
+		     _SYSTEM_STRING( "raw" ),
 		     3 ) == 0 )
 		{
 			mount_handle->input_format = MOUNT_HANDLE_INPUT_FORMAT_RAW;
@@ -292,9 +294,9 @@ int mount_handle_set_format(
 	}
 	else if( string_length == 5 )
 	{
-		if( libcstring_system_string_compare(
+		if( system_string_compare(
 		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "files" ),
+		     _SYSTEM_STRING( "files" ),
 		     5 ) == 0 )
 		{
 			mount_handle->input_format = MOUNT_HANDLE_INPUT_FORMAT_FILES;
@@ -309,13 +311,13 @@ int mount_handle_set_format(
  */
 int mount_handle_open_input(
      mount_handle_t *mount_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t **libewf_filenames = NULL;
-	static char *function                            = "mount_handle_open_input";
-	size_t first_filename_length                     = 0;
+	system_character_t **libewf_filenames = NULL;
+	static char *function                 = "mount_handle_open_input";
+	size_t first_filename_length          = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -352,10 +354,10 @@ int mount_handle_open_input(
 	}
 	if( number_of_filenames == 1 )
 	{
-		first_filename_length = libcstring_system_string_length(
+		first_filename_length = system_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -382,9 +384,9 @@ int mount_handle_open_input(
 
 			return( -1 );
 		}
-		filenames = (libcstring_system_character_t * const *) libewf_filenames;
+		filenames = (system_character_t * const *) libewf_filenames;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     mount_handle->input_handle,
 	     filenames,
@@ -409,7 +411,7 @@ int mount_handle_open_input(
 
 		if( libewf_filenames != NULL )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			libewf_glob_wide_free(
 			 libewf_filenames,
 			 number_of_filenames,
@@ -425,7 +427,7 @@ int mount_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide_free(
 		     libewf_filenames,
 		     number_of_filenames,
@@ -631,16 +633,16 @@ int mount_handle_get_media_size(
  */
 int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *path,
+     const system_character_t *path,
      size_t path_length,
-     libcstring_system_character_t path_separator,
+     system_character_t path_separator,
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *ewf_path = NULL;
-	static char *function                   = "mount_handle_get_file_entry_by_path";
-	size_t path_index                       = 0;
-	int result                              = 0;
+	system_character_t *ewf_path = NULL;
+	static char *function        = "mount_handle_get_file_entry_by_path";
+	size_t path_index            = 0;
+	int result                   = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -686,7 +688,7 @@ int mount_handle_get_file_entry_by_path(
 
 		return( -1 );
 	}
-	ewf_path = libcstring_system_string_allocate(
+	ewf_path = system_string_allocate(
 	            path_length + 1 );
 
 	if( ewf_path == NULL )
@@ -700,7 +702,7 @@ int mount_handle_get_file_entry_by_path(
 
 		goto on_error;
 	}
-	if( libcstring_system_string_copy(
+	if( system_string_copy(
 	     ewf_path,
 	     path,
 	     path_length ) == NULL )
@@ -716,23 +718,23 @@ int mount_handle_get_file_entry_by_path(
 	}
 	ewf_path[ path_length ] = 0;
 
-	if( path_separator == (libcstring_system_character_t) '/' )
+	if( path_separator == (system_character_t) '/' )
 	{
 		for( path_index = 0;
 		     path_index < path_length;
 		     path_index++ )
 		{
-			if( ewf_path[ path_index ] == (libcstring_system_character_t) '/' )
+			if( ewf_path[ path_index ] == (system_character_t) '/' )
 			{
-				ewf_path[ path_index ] = (libcstring_system_character_t) '\\';
+				ewf_path[ path_index ] = (system_character_t) '\\';
 			}
-			else if( ewf_path[ path_index ] == (libcstring_system_character_t) '\\' )
+			else if( ewf_path[ path_index ] == (system_character_t) '\\' )
 			{
-				ewf_path[ path_index ] = (libcstring_system_character_t) '/';
+				ewf_path[ path_index ] = (system_character_t) '/';
 			}
 		}
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_file_entry_by_utf16_path(
 		  mount_handle->input_handle,
 		  (uint16_t *) ewf_path,

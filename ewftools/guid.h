@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -52,7 +51,7 @@ int guid_to_string(
      uint8_t *guid,
      size_t guid_size,
      int byte_order,
-     libcstring_system_character_t *string,
+     system_character_t *string,
      size_t string_size,
      libcerror_error_t **error );
 

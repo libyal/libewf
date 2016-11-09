@@ -27,7 +27,6 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 
 #if defined( __cplusplus )
@@ -84,7 +83,7 @@ int info_handle_set_maximum_number_of_open_handles(
 
 int info_handle_open_input(
      info_handle_t *info_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
@@ -94,17 +93,17 @@ int info_handle_close(
 
 int info_handle_set_output_format(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int info_handle_set_date_format(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int info_handle_set_header_codepage(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int info_handle_section_header_fprint(
@@ -124,7 +123,7 @@ int info_handle_section_value_string_fprint(
      size_t identifier_length,
      const char *description,
      size_t description_length,
-     const libcstring_system_character_t *value_string,
+     const system_character_t *value_string,
      libcerror_error_t **error );
 
 int info_handle_section_value_32bit_fprint(

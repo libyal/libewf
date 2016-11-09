@@ -21,10 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #include "libewf_libcerror.h"
-#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
@@ -635,7 +635,7 @@ int libewf_single_file_entry_get_utf8_name(
 
 			return( -1 );
 		}
-		if( libcstring_narrow_string_copy(
+		if( narrow_string_copy(
 		     (char *) utf8_string,
 		     (char *) single_file_entry->name,
 		     single_file_entry->name_size ) == NULL )

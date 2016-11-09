@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #if defined( HAVE_SYS_UTSNAME_H )
@@ -27,7 +28,6 @@
 #endif
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "platform.h"
 
@@ -39,7 +39,7 @@
  * Returns 1 if successful or -1 on error
  */
 int platform_get_operating_system(
-     libcstring_system_character_t *operating_system_string,
+     system_character_t *operating_system_string,
      size_t operating_system_string_size,
      libcerror_error_t **error )
 {
@@ -171,7 +171,7 @@ int platform_get_operating_system(
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
 
-	operating_system_length = libcstring_narrow_string_length(
+	operating_system_length = narrow_string_length(
 	                           operating_system );
 
 	if( operating_system_string_size < ( operating_system_length + 1 ) )

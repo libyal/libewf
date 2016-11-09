@@ -2,7 +2,6 @@ if HAVE_PYTHON
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -29,7 +28,6 @@ pyewf_la_SOURCES = \
 	pyewf_libbfio.h \
 	pyewf_libcerror.h \
 	pyewf_libclocale.h \
-	pyewf_libcstring.h \
 	pyewf_libewf.h \
 	pyewf_media_flags.c pyewf_media_flags.h \
 	pyewf_media_types.c pyewf_media_types.h \
@@ -38,7 +36,6 @@ pyewf_la_SOURCES = \
 	pyewf_unused.h
 
 pyewf_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCDATA_LIBADD@ \

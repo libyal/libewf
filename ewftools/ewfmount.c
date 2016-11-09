@@ -22,7 +22,10 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_ERRNO_H )
 #include <errno.h>
@@ -73,7 +76,6 @@
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "mount_handle.h"
@@ -195,7 +197,7 @@ int ewfmount_fuse_open(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
@@ -204,7 +206,7 @@ int ewfmount_fuse_open(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -240,7 +242,7 @@ int ewfmount_fuse_open(
 	{
 		if( ( path_length <= ewfmount_fuse_path_prefix_length )
 		 || ( path_length > ( ewfmount_fuse_path_prefix_length + 3 ) )
-		 || ( libcstring_narrow_string_compare(
+		 || ( narrow_string_compare(
 		       path,
 		       ewfmount_fuse_path_prefix,
 		       ewfmount_fuse_path_prefix_length ) != 0 ) )
@@ -348,7 +350,7 @@ int ewfmount_fuse_read(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
@@ -357,7 +359,7 @@ int ewfmount_fuse_read(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -429,7 +431,7 @@ int ewfmount_fuse_read(
 	{
 		if( ( path_length <= ewfmount_fuse_path_prefix_length )
 		 || ( path_length > ( ewfmount_fuse_path_prefix_length + 3 ) )
-		 || ( libcstring_narrow_string_compare(
+		 || ( narrow_string_compare(
 		       path,
 		       ewfmount_fuse_path_prefix,
 		       ewfmount_fuse_path_prefix_length ) != 0 ) )
@@ -574,7 +576,7 @@ int ewfmount_fuse_readdir(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
@@ -583,7 +585,7 @@ int ewfmount_fuse_readdir(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -617,7 +619,7 @@ int ewfmount_fuse_readdir(
 
 			goto on_error;
 		}
-		if( libcstring_narrow_string_copy(
+		if( narrow_string_copy(
 		     ewfmount_fuse_path,
 		     ewfmount_fuse_path_prefix,
 		     ewfmount_fuse_path_prefix_length ) == NULL )
@@ -738,7 +740,7 @@ int ewfmount_fuse_readdir(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libewf_file_entry_get_utf16_name_size(
 				  sub_file_entry,
 				  &name_size,
@@ -764,7 +766,7 @@ int ewfmount_fuse_readdir(
 			}
 			if( name_size > 0 )
 			{
-				name = libcstring_system_string_allocate(
+				name = system_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -780,7 +782,7 @@ int ewfmount_fuse_readdir(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libewf_file_entry_get_utf16_name(
 					  sub_file_entry,
 					  (uint16_t *) name,
@@ -812,9 +814,9 @@ int ewfmount_fuse_readdir(
 				     name_index < name_size;
 				     name_index++ )
 				{
-					if( name[ name_index ] == (libcstring_system_character_t) '/' )
+					if( name[ name_index ] == (system_character_t) '/' )
 					{
-						 name[ name_index ] = (libcstring_system_character_t) '\\';
+						 name[ name_index ] = (system_character_t) '\\';
 					}
 				}
 				if( filler(
@@ -1005,7 +1007,7 @@ int ewfmount_fuse_getattr(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -1024,7 +1026,7 @@ int ewfmount_fuse_getattr(
 		          ewfmount_mount_handle,
 		          path,
 		          path_length,
-		          (libcstring_system_character_t) '/',
+		          (system_character_t) '/',
 		          &file_entry,
 		          &error );
 
@@ -1180,7 +1182,7 @@ int ewfmount_fuse_getattr(
 		if( ( path_length > ewfmount_fuse_path_prefix_length )
 		 && ( path_length <= ( ewfmount_fuse_path_prefix_length + 3 ) ) )
 		{
-			if( libcstring_narrow_string_compare(
+			if( narrow_string_compare(
 			     path,
 			     ewfmount_fuse_path_prefix,
 			     ewfmount_fuse_path_prefix_length ) == 0 )
@@ -1423,7 +1425,7 @@ int __stdcall ewfmount_dokan_CreateFile(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -1449,7 +1451,7 @@ int __stdcall ewfmount_dokan_CreateFile(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -1485,7 +1487,7 @@ int __stdcall ewfmount_dokan_CreateFile(
 	{
 		if( ( path_length <= ewfmount_dokan_path_prefix_length )
 		 || ( path_length > ( ewfmount_dokan_path_prefix_length + 3 ) )
-		 || ( libcstring_wide_string_compare(
+		 || ( wide_string_compare(
 		       path,
 		       ewfmount_dokan_path_prefix,
 		       ewfmount_dokan_path_prefix_length ) != 0 ) )
@@ -1550,7 +1552,7 @@ int __stdcall ewfmount_dokan_OpenDirectory(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -1576,7 +1578,7 @@ int __stdcall ewfmount_dokan_OpenDirectory(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -1741,7 +1743,7 @@ int __stdcall ewfmount_dokan_ReadFile(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
@@ -1750,7 +1752,7 @@ int __stdcall ewfmount_dokan_ReadFile(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -1822,7 +1824,7 @@ int __stdcall ewfmount_dokan_ReadFile(
 	{
 		if( ( path_length <= ewfmount_dokan_path_prefix_length )
 		 || ( path_length > ( ewfmount_dokan_path_prefix_length + 3 ) )
-		 || ( libcstring_wide_string_compare(
+		 || ( wide_string_compare(
 		       path,
 		       ewfmount_dokan_path_prefix,
 		       ewfmount_dokan_path_prefix_length ) != 0 ) )
@@ -1985,7 +1987,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( ewfmount_mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
@@ -1994,7 +1996,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -2028,7 +2030,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 			goto on_error;
 		}
-		if( libcstring_wide_string_copy(
+		if( wide_string_copy(
 		     ewfmount_dokan_path,
 		     ewfmount_dokan_path_prefix,
 		     ewfmount_dokan_path_prefix_length ) == NULL )
@@ -2091,7 +2093,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	if( libcstring_wide_string_copy(
+	if( wide_string_copy(
 	     find_data.cFileName,
 	     L".",
 	     1 ) == NULL )
@@ -2107,7 +2109,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	if( libcstring_wide_string_copy(
+	if( wide_string_copy(
 	     find_data.cAlternateFileName,
 	     L".",
 	     1 ) == NULL )
@@ -2161,7 +2163,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	if( libcstring_wide_string_copy(
+	if( wide_string_copy(
 	     find_data.cFileName,
 	     L"..",
 	     2 ) == NULL )
@@ -2177,7 +2179,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	if( libcstring_wide_string_copy(
+	if( wide_string_copy(
 	     find_data.cAlternateFileName,
 	     L"..",
 	     2 ) == NULL )
@@ -2275,7 +2277,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 			}
 			if( name_size > 0 )
 			{
-				name = libcstring_wide_string_allocate(
+				name = wide_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -2327,7 +2329,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 					goto on_error;
 				}
 /* TODO Check bounds MAX_PATH */
-				if( libcstring_wide_string_copy(
+				if( wide_string_copy(
 				     find_data.cFileName,
 				     name,
 				     name_size - 1 ) == NULL )
@@ -2344,7 +2346,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 					goto on_error;
 				}
 /* TODO check max of 14
-				if( libcstring_wide_string_copy(
+				if( wide_string_copy(
 				     find_data.cAlternateFileName,
 				     name,
 				     name_size - 1 ) == NULL )
@@ -2586,7 +2588,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 				goto on_error;
 			}
-			if( libcstring_wide_string_copy(
+			if( wide_string_copy(
 			     find_data.cFileName,
 			     &( ewfmount_dokan_path[ 1 ] ),
 			     string_index - 2 ) == NULL )
@@ -2602,7 +2604,7 @@ int __stdcall ewfmount_dokan_FindFiles(
 
 				goto on_error;
 			}
-			if( libcstring_wide_string_copy(
+			if( wide_string_copy(
 			     find_data.cAlternateFileName,
 			     &( ewfmount_dokan_path[ 1 ] ),
 			     string_index - 2 ) == NULL )
@@ -2718,7 +2720,7 @@ int __stdcall ewfmount_dokan_GetFileInformation(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -2750,7 +2752,7 @@ int __stdcall ewfmount_dokan_GetFileInformation(
 		     ewfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &file_entry,
 		     &error ) != 1 )
 		{
@@ -2877,7 +2879,7 @@ int __stdcall ewfmount_dokan_GetFileInformation(
 	{
 		if( ( path_length <= ewfmount_dokan_path_prefix_length )
 		 || ( path_length > ( ewfmount_dokan_path_prefix_length + 3 ) )
-		 || ( libcstring_wide_string_compare(
+		 || ( wide_string_compare(
 		       path,
 		       ewfmount_dokan_path_prefix,
 		       ewfmount_dokan_path_prefix_length ) != 0 ) )
@@ -3077,7 +3079,7 @@ int __stdcall ewfmount_dokan_Unmount(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
@@ -3086,28 +3088,28 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_GETRLIMIT )
 	struct rlimit limit_data;
 #endif
-	libcstring_system_character_t * const *source_filenames = NULL;
+	system_character_t * const *source_filenames = NULL;
 
-	libewf_error_t *error                                   = NULL;
-	libcstring_system_character_t *mount_point              = NULL;
-	libcstring_system_character_t *option_extended_options  = NULL;
-	libcstring_system_character_t *option_format            = NULL;
-	libcstring_system_character_t *program                  = _LIBCSTRING_SYSTEM_STRING( "ewfmount" );
-	libcstring_system_integer_t option                      = 0;
-	int number_of_filenames                                 = 0;
-	int result                                              = 0;
-	int verbose                                             = 0;
+	libewf_error_t *error                        = NULL;
+	system_character_t *mount_point              = NULL;
+	system_character_t *option_extended_options  = NULL;
+	system_character_t *option_format            = NULL;
+	system_character_t *program                  = _SYSTEM_STRING( "ewfmount" );
+	system_integer_t option                      = 0;
+	int number_of_filenames                      = 0;
+	int result                                   = 0;
+	int verbose                                  = 0;
 
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                                 = NULL;
+	libcsystem_glob_t *glob                      = NULL;
 #endif
 
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
 
-	struct fuse_args ewfmount_fuse_arguments                = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *ewfmount_fuse_channel                 = NULL;
-	struct fuse *ewfmount_fuse_handle                       = NULL;
+	struct fuse_args ewfmount_fuse_arguments     = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *ewfmount_fuse_channel      = NULL;
+	struct fuse *ewfmount_fuse_handle            = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS ewfmount_dokan_operations;
@@ -3147,15 +3149,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "f:hvVX:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "f:hvVX:" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -3163,29 +3165,29 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libcstring_system_integer_t) 'f':
+			case (system_integer_t) 'f':
 				option_format = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'X':
+			case (system_integer_t) 'X':
 				option_extended_options = optarg;
 
 				break;
@@ -3250,7 +3252,7 @@ int main( int argc, char * const argv[] )
 	if( libcsystem_glob_get_results(
 	     glob,
 	     &number_of_filenames,
-	     (libcstring_system_character_t ***) &source_filenames,
+	     (system_character_t ***) &source_filenames,
 	     &error ) != 1 )
 	{
 		fprintf(

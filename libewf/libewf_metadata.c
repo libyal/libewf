@@ -33,7 +33,6 @@
 #include "libewf_libcthreads.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libfvalue.h"
 #include "libewf_metadata.h"
 #include "libewf_sector_range.h"

@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "byte_size_string.h"
 #include "digest_hash.h"
@@ -32,7 +35,6 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcpath.h"
 #include "ewftools_libcsplit.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
@@ -145,7 +147,7 @@ int verification_handle_initialize(
 #endif
 	if( calculate_md5 != 0 )
 	{
-		( *verification_handle )->calculated_md5_hash_string = libcstring_system_string_allocate(
+		( *verification_handle )->calculated_md5_hash_string = system_string_allocate(
 									33 );
 
 		if( ( *verification_handle )->calculated_md5_hash_string == NULL )
@@ -160,7 +162,7 @@ int verification_handle_initialize(
 			goto on_error;
 		}
 	}
-	( *verification_handle )->stored_md5_hash_string = libcstring_system_string_allocate(
+	( *verification_handle )->stored_md5_hash_string = system_string_allocate(
 							    33 );
 
 	if( ( *verification_handle )->stored_md5_hash_string == NULL )
@@ -174,7 +176,7 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-	( *verification_handle )->stored_sha1_hash_string = libcstring_system_string_allocate(
+	( *verification_handle )->stored_sha1_hash_string = system_string_allocate(
 							     41 );
 
 	if( ( *verification_handle )->stored_sha1_hash_string == NULL )
@@ -188,7 +190,7 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-	( *verification_handle )->stored_sha256_hash_string = libcstring_system_string_allocate(
+	( *verification_handle )->stored_sha256_hash_string = system_string_allocate(
 							       65 );
 
 	if( ( *verification_handle )->stored_sha256_hash_string == NULL )
@@ -456,13 +458,13 @@ int verification_handle_set_maximum_number_of_open_handles(
  */
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t **libewf_filenames = NULL;
-	static char *function                            = "verification_handle_open_input";
-	size_t first_filename_length                     = 0;
+	system_character_t **libewf_filenames = NULL;
+	static char *function                 = "verification_handle_open_input";
+	size_t first_filename_length          = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -499,10 +501,10 @@ int verification_handle_open_input(
 	}
 	if( number_of_filenames == 1 )
 	{
-		first_filename_length = libcstring_system_string_length(
+		first_filename_length = system_string_length(
 		                         filenames[ 0 ] );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
 		     first_filename_length,
@@ -529,7 +531,7 @@ int verification_handle_open_input(
 
 			goto on_error;
 		}
-		filenames = (libcstring_system_character_t * const *) libewf_filenames;
+		filenames = (system_character_t * const *) libewf_filenames;
 	}
 	if( verification_handle->header_codepage != LIBEWF_CODEPAGE_ASCII )
 	{
@@ -548,7 +550,7 @@ int verification_handle_open_input(
 			goto on_error;
 		}
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
 	     verification_handle->input_handle,
 	     filenames,
@@ -575,7 +577,7 @@ int verification_handle_open_input(
 	}
 	if( libewf_filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide_free(
 		     libewf_filenames,
 		     number_of_filenames,
@@ -631,7 +633,7 @@ int verification_handle_open_input(
 on_error:
 	if( libewf_filenames != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		libewf_glob_wide_free(
 		 libewf_filenames,
 		 number_of_filenames,
@@ -1783,9 +1785,9 @@ int verification_handle_verify_input(
 	}
 	if( process_status_initialize(
 	     &( verification_handle->process_status ),
-	     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
-	     _LIBCSTRING_SYSTEM_STRING( "verified" ),
-	     _LIBCSTRING_SYSTEM_STRING( "Read" ),
+	     _SYSTEM_STRING( "Verify" ),
+	     _SYSTEM_STRING( "verified" ),
+	     _SYSTEM_STRING( "Read" ),
 	     verification_handle->notify_stream,
 	     print_status_information,
 	     error ) != 1 )
@@ -2300,7 +2302,7 @@ int verification_handle_verify_input(
 	if( ( verification_handle->calculate_md5 != 0 )
 	 && ( verification_handle->stored_md5_hash_available != 0 ) )
 	{
-		md5_hash_compare = libcstring_system_string_compare(
+		md5_hash_compare = system_string_compare(
 		                    verification_handle->stored_md5_hash_string,
 		                    verification_handle->calculated_md5_hash_string,
 		                    33 );
@@ -2308,7 +2310,7 @@ int verification_handle_verify_input(
 	if( ( verification_handle->calculate_sha1 != 0 )
 	 && ( verification_handle->stored_sha1_hash_available != 0 ) )
 	{
-		sha1_hash_compare = libcstring_system_string_compare(
+		sha1_hash_compare = system_string_compare(
 		                     verification_handle->stored_sha1_hash_string,
 		                     verification_handle->calculated_sha1_hash_string,
 		                     41 );
@@ -2316,7 +2318,7 @@ int verification_handle_verify_input(
 	if( ( verification_handle->calculate_sha256 != 0 )
 	 && ( verification_handle->stored_sha256_hash_available != 0 ) )
 	{
-		sha256_hash_compare = libcstring_system_string_compare(
+		sha256_hash_compare = system_string_compare(
 		                       verification_handle->stored_sha256_hash_string,
 		                       verification_handle->calculated_sha256_hash_string,
 		                       65 );
@@ -2426,9 +2428,9 @@ int verification_handle_verify_single_files(
 	}
 	if( process_status_initialize(
 	     &( verification_handle->process_status ),
-	     _LIBCSTRING_SYSTEM_STRING( "Verify" ),
-	     _LIBCSTRING_SYSTEM_STRING( "verified" ),
-	     _LIBCSTRING_SYSTEM_STRING( "Read" ),
+	     _SYSTEM_STRING( "Verify" ),
+	     _SYSTEM_STRING( "verified" ),
+	     _SYSTEM_STRING( "Read" ),
 	     verification_handle->notify_stream,
 	     print_status_information,
 	     error ) != 1 )
@@ -2458,7 +2460,7 @@ int verification_handle_verify_single_files(
 	result = verification_handle_verify_file_entry(
 	          verification_handle,
 	          file_entry,
-	          _LIBCSTRING_SYSTEM_STRING( "" ),
+	          _SYSTEM_STRING( "" ),
 	          0,
 	          log_handle,
 	          error );
@@ -2563,27 +2565,27 @@ on_error:
 int verification_handle_verify_file_entry(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *file_entry_path,
+     const system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *name        = NULL;
-	libcstring_system_character_t *target_path = NULL;
-	uint8_t *file_entry_data                   = NULL;
-	static char *function                      = "verification_handle_verify_file_entry";
-	size64_t file_entry_data_size              = 0;
-	size_t name_size                           = 0;
-	size_t process_buffer_size                 = 0;
-	size_t read_size                           = 0;
-	size_t target_path_size                    = 0;
-	ssize_t read_count                         = 0;
-	uint8_t file_entry_type                    = 0;
-	int md5_hash_compare                       = 0;
-	int result                                 = 0;
-	int return_value                           = 0;
-	int sha1_hash_compare                      = 0;
-	int sha256_hash_compare                    = 0;
+	system_character_t *name        = NULL;
+	system_character_t *target_path = NULL;
+	uint8_t *file_entry_data        = NULL;
+	static char *function           = "verification_handle_verify_file_entry";
+	size64_t file_entry_data_size   = 0;
+	size_t name_size                = 0;
+	size_t process_buffer_size      = 0;
+	size_t read_size                = 0;
+	size_t target_path_size         = 0;
+	ssize_t read_count              = 0;
+	uint8_t file_entry_type         = 0;
+	int md5_hash_compare            = 0;
+	int result                      = 0;
+	int return_value                = 0;
+	int sha1_hash_compare           = 0;
+	int sha256_hash_compare         = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -2629,7 +2631,7 @@ int verification_handle_verify_file_entry(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_file_entry_get_utf16_name_size(
 		  file_entry,
 		  &name_size,
@@ -2653,7 +2655,7 @@ int verification_handle_verify_file_entry(
 	}
 	if( name_size > 0 )
 	{
-		name = libcstring_system_string_allocate(
+		name = system_string_allocate(
 			name_size );
 
 		if( name == NULL )
@@ -2667,7 +2669,7 @@ int verification_handle_verify_file_entry(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_file_entry_get_utf16_name(
 			  file_entry,
 			  (uint16_t *) name,
@@ -2694,7 +2696,7 @@ int verification_handle_verify_file_entry(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libcpath_path_join_wide(
 		     &target_path,
 		     &target_path_size,
@@ -2731,7 +2733,7 @@ int verification_handle_verify_file_entry(
 	}
 	else
 	{
-		target_path      = (libcstring_system_character_t *) file_entry_path;
+		target_path      = (system_character_t *) file_entry_path;
 		target_path_size = file_entry_path_length + 1;
 	}
 	if( libewf_file_entry_get_type(
@@ -2754,14 +2756,14 @@ int verification_handle_verify_file_entry(
 	{
 		fprintf(
 		 verification_handle->notify_stream,
-		 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Single file: %" PRIs_SYSTEM "\n",
 		 target_path );
 
 		if( log_handle != NULL )
 		{
 			log_handle_printf(
 			 log_handle,
-			 "Single file: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Single file: %" PRIs_SYSTEM "\n",
 			 target_path );
 		}
 		if( libewf_file_entry_get_size(
@@ -2954,7 +2956,7 @@ int verification_handle_verify_file_entry(
 			if( ( verification_handle->calculate_md5 != 0 )
 			 && ( verification_handle->stored_md5_hash_available != 0 ) )
 			{
-				md5_hash_compare = libcstring_system_string_compare(
+				md5_hash_compare = system_string_compare(
 						    verification_handle->stored_md5_hash_string,
 						    verification_handle->calculated_md5_hash_string,
 						    33 );
@@ -2962,7 +2964,7 @@ int verification_handle_verify_file_entry(
 			if( ( verification_handle->calculate_sha1 != 0 )
 			 && ( verification_handle->stored_sha1_hash_available != 0 ) )
 			{
-				sha1_hash_compare = libcstring_system_string_compare(
+				sha1_hash_compare = system_string_compare(
 						     verification_handle->stored_sha1_hash_string,
 						     verification_handle->calculated_sha1_hash_string,
 						     41 );
@@ -2970,7 +2972,7 @@ int verification_handle_verify_file_entry(
 			if( ( verification_handle->calculate_sha256 != 0 )
 			 && ( verification_handle->stored_sha256_hash_available != 0 ) )
 			{
-				sha256_hash_compare = libcstring_system_string_compare(
+				sha256_hash_compare = system_string_compare(
 						       verification_handle->stored_sha256_hash_string,
 						       verification_handle->calculated_sha256_hash_string,
 						       65 );
@@ -3051,7 +3053,7 @@ on_error:
 int verification_handle_verify_sub_file_entries(
      verification_handle_t *verification_handle,
      libewf_file_entry_t *file_entry,
-     const libcstring_system_character_t *file_entry_path,
+     const system_character_t *file_entry_path,
      size_t file_entry_path_length,
      log_handle_t *log_handle,
      libcerror_error_t **error )
@@ -3253,7 +3255,7 @@ int verification_handle_get_integrity_hash_from_input(
 		return( -1 );
 	}
 #else
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_utf16_hash_value(
 		  verification_handle->input_handle,
 		  (uint8_t *) "MD5",
@@ -3283,7 +3285,7 @@ int verification_handle_get_integrity_hash_from_input(
 	}
 	verification_handle->stored_md5_hash_available = result;
 #endif
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_utf16_hash_value(
 		  verification_handle->input_handle,
 		  (uint8_t *) "SHA1",
@@ -3313,7 +3315,7 @@ int verification_handle_get_integrity_hash_from_input(
 	}
 	verification_handle->stored_sha1_hash_available = result;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_utf16_hash_value(
 		  verification_handle->input_handle,
 		  (uint8_t *) "SHA256",
@@ -3379,7 +3381,7 @@ int verification_handle_get_integrity_hash_from_file_entry(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_file_entry_get_utf16_hash_value_md5(
 		  file_entry,
 		  (uint16_t *) verification_handle->stored_md5_hash_string,
@@ -3417,7 +3419,7 @@ int verification_handle_get_integrity_hash_from_file_entry(
  */
 int verification_handle_set_header_codepage(
      verification_handle_t *verification_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_set_header_codepage";
@@ -3478,7 +3480,7 @@ int verification_handle_set_header_codepage(
  */
 int verification_handle_set_format(
      verification_handle_t *verification_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_set_format";
@@ -3496,14 +3498,14 @@ int verification_handle_set_format(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
 	if( string_length == 3 )
 	{
-		if( libcstring_system_string_compare(
+		if( system_string_compare(
 		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "raw" ),
+		     _SYSTEM_STRING( "raw" ),
 		     3 ) == 0 )
 		{
 			verification_handle->input_format = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
@@ -3512,9 +3514,9 @@ int verification_handle_set_format(
 	}
 	else if( string_length == 5 )
 	{
-		if( libcstring_system_string_compare(
+		if( system_string_compare(
 		     string,
-		     _LIBCSTRING_SYSTEM_STRING( "files" ),
+		     _SYSTEM_STRING( "files" ),
 		     5 ) == 0 )
 		{
 			verification_handle->input_format = VERIFICATION_HANDLE_INPUT_FORMAT_FILES;
@@ -3529,7 +3531,7 @@ int verification_handle_set_format(
  */
 int verification_handle_set_process_buffer_size(
      verification_handle_t *verification_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function  = "verification_handle_set_process_buffer_size";
@@ -3548,7 +3550,7 @@ int verification_handle_set_process_buffer_size(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
 	result = byte_size_string_convert(
@@ -3587,7 +3589,7 @@ int verification_handle_set_process_buffer_size(
  */
 int verification_handle_set_number_of_threads(
      verification_handle_t *verification_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function      = "verification_handle_set_number_of_threads";
@@ -3606,12 +3608,12 @@ int verification_handle_set_number_of_threads(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
-	if( string[ 0 ] != (libcstring_system_character_t) '-' )
+	if( string[ 0 ] != (system_character_t) '-' )
 	{
-		string_length = libcstring_system_string_length(
+		string_length = system_string_length(
 				 string );
 
 		if( libcsystem_string_decimal_copy_to_64_bit(
@@ -3648,10 +3650,10 @@ int verification_handle_set_number_of_threads(
  */
 int verification_handle_set_additional_digest_types(
      verification_handle_t *verification_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *string_segment    = NULL;
+	system_character_t *string_segment               = NULL;
 	static char *function                            = "verification_handle_set_additional_digest_types";
 	size_t string_length                             = 0;
 	size_t string_segment_size                       = 0;
@@ -3661,7 +3663,7 @@ int verification_handle_set_additional_digest_types(
 	int result                                       = 0;
 	int segment_index                                = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	libcsplit_wide_split_string_t *string_elements   = NULL;
 #else
 	libcsplit_narrow_split_string_t *string_elements = NULL;
@@ -3678,10 +3680,10 @@ int verification_handle_set_additional_digest_types(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcsplit_wide_string_split(
 	     string,
 	     string_length + 1,
@@ -3706,7 +3708,7 @@ int verification_handle_set_additional_digest_types(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcsplit_wide_split_string_get_number_of_segments(
 	     string_elements,
 	     &number_of_segments,
@@ -3731,7 +3733,7 @@ int verification_handle_set_additional_digest_types(
 	     segment_index < number_of_segments;
 	     segment_index++ )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libcsplit_wide_split_string_get_segment_by_index(
 		     string_elements,
 		     segment_index,
@@ -3771,16 +3773,16 @@ int verification_handle_set_additional_digest_types(
 		}
 		if( string_segment_size == 5 )
 		{
-			if( libcstring_system_string_compare(
+			if( system_string_compare(
 			     string_segment,
-			     _LIBCSTRING_SYSTEM_STRING( "sha1" ),
+			     _SYSTEM_STRING( "sha1" ),
 			     4 ) == 0 )
 			{
 				calculate_sha1 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA1" ),
+			          _SYSTEM_STRING( "SHA1" ),
 			          4 ) == 0 )
 			{
 				calculate_sha1 = 1;
@@ -3788,30 +3790,30 @@ int verification_handle_set_additional_digest_types(
 		}
 		else if( string_segment_size == 6 )
 		{
-			if( libcstring_system_string_compare(
+			if( system_string_compare(
 			     string_segment,
-			     _LIBCSTRING_SYSTEM_STRING( "sha-1" ),
+			     _SYSTEM_STRING( "sha-1" ),
 			     5 ) == 0 )
 			{
 				calculate_sha1 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "sha_1" ),
+			          _SYSTEM_STRING( "sha_1" ),
 			          5 ) == 0 )
 			{
 				calculate_sha1 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA-1" ),
+			          _SYSTEM_STRING( "SHA-1" ),
 			          5 ) == 0 )
 			{
 				calculate_sha1 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA_1" ),
+			          _SYSTEM_STRING( "SHA_1" ),
 			          5 ) == 0 )
 			{
 				calculate_sha1 = 1;
@@ -3819,16 +3821,16 @@ int verification_handle_set_additional_digest_types(
 		}
 		else if( string_segment_size == 7 )
 		{
-			if( libcstring_system_string_compare(
+			if( system_string_compare(
 			     string_segment,
-			     _LIBCSTRING_SYSTEM_STRING( "sha256" ),
+			     _SYSTEM_STRING( "sha256" ),
 			     6 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA256" ),
+			          _SYSTEM_STRING( "SHA256" ),
 			          6 ) == 0 )
 			{
 				calculate_sha256 = 1;
@@ -3836,30 +3838,30 @@ int verification_handle_set_additional_digest_types(
 		}
 		else if( string_segment_size == 8 )
 		{
-			if( libcstring_system_string_compare(
+			if( system_string_compare(
 			     string_segment,
-			     _LIBCSTRING_SYSTEM_STRING( "sha-256" ),
+			     _SYSTEM_STRING( "sha-256" ),
 			     7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "sha_256" ),
+			          _SYSTEM_STRING( "sha_256" ),
 			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA-256" ),
+			          _SYSTEM_STRING( "SHA-256" ),
 			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
 			}
-			else if( libcstring_system_string_compare(
+			else if( system_string_compare(
 			          string_segment,
-			          _LIBCSTRING_SYSTEM_STRING( "SHA_256" ),
+			          _SYSTEM_STRING( "SHA_256" ),
 			          7 ) == 0 )
 			{
 				calculate_sha256 = 1;
@@ -3869,7 +3871,7 @@ int verification_handle_set_additional_digest_types(
 	if( ( calculate_sha1 != 0 )
 	 && ( verification_handle->calculate_sha1 == 0 ) )
 	{
-		verification_handle->calculated_sha1_hash_string = libcstring_system_string_allocate(
+		verification_handle->calculated_sha1_hash_string = system_string_allocate(
 		                                                    41 );
 
 		if( verification_handle->calculated_sha1_hash_string == NULL )
@@ -3888,7 +3890,7 @@ int verification_handle_set_additional_digest_types(
 	if( ( calculate_sha256 != 0 )
 	 && ( verification_handle->calculate_sha256 == 0 ) )
 	{
-		verification_handle->calculated_sha256_hash_string = libcstring_system_string_allocate(
+		verification_handle->calculated_sha256_hash_string = system_string_allocate(
 		                                                      65 );
 
 		if( verification_handle->calculated_sha256_hash_string == NULL )
@@ -3904,7 +3906,7 @@ int verification_handle_set_additional_digest_types(
 		}
 		verification_handle->calculate_sha256 = 1;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libcsplit_wide_split_string_free(
 	     &string_elements,
 	     error ) != 1 )
@@ -3928,7 +3930,7 @@ int verification_handle_set_additional_digest_types(
 on_error:
 	if( string_elements != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		libcsplit_wide_split_string_free(
 		 &string_elements,
 		 NULL );
@@ -4086,12 +4088,12 @@ int verification_handle_hash_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "MD5 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "MD5 hash stored in file:\t\t%" PRIs_SYSTEM "\n",
 			 verification_handle->stored_md5_hash_string );
 		}
 		fprintf(
 		 stream,
-		 "MD5 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
 		 verification_handle->calculated_md5_hash_string );
 	}
 	if( verification_handle->calculate_sha1 != 0 )
@@ -4106,12 +4108,12 @@ int verification_handle_hash_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "SHA1 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "SHA1 hash stored in file:\t\t%" PRIs_SYSTEM "\n",
 			 verification_handle->stored_sha1_hash_string );
 		}
 		fprintf(
 		 stream,
-		 "SHA1 hash calculated over data:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
 		 verification_handle->calculated_sha1_hash_string );
 	}
 	if( verification_handle->calculate_sha256 != 0 )
@@ -4126,12 +4128,12 @@ int verification_handle_hash_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "SHA256 hash stored in file:\t\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "SHA256 hash stored in file:\t\t%" PRIs_SYSTEM "\n",
 			 verification_handle->stored_sha256_hash_string );
 		}
 		fprintf(
 		 stream,
-		 "SHA256 hash calculated over data:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "SHA256 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 		 verification_handle->calculated_sha256_hash_string );
 	}
 	return( 1 );
@@ -4146,7 +4148,7 @@ int verification_handle_additional_hash_values_fprint(
      libcerror_error_t **error )
 {
 	char hash_value_identifier[ VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE ];
-	libcstring_system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
+	system_character_t hash_value[ VERIFICATION_HANDLE_VALUE_SIZE ];
 
 	static char *function             = "verification_handle_additional_hash_values_fprint";
 	size_t hash_value_identifier_size = VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE;
@@ -4251,7 +4253,7 @@ int verification_handle_additional_hash_values_fprint(
 		{
 			if( hash_value_identifier_size == 4 )
 			{
-				if( libcstring_narrow_string_compare(
+				if( narrow_string_compare(
 				     hash_value_identifier,
 				     "MD5",
 				     3 ) == 0 )
@@ -4264,7 +4266,7 @@ int verification_handle_additional_hash_values_fprint(
 		{
 			if( hash_value_identifier_size == 5 )
 			{
-				if( libcstring_narrow_string_compare(
+				if( narrow_string_compare(
 				     hash_value_identifier,
 				     "SHA1",
 				     4 ) == 0 )
@@ -4277,7 +4279,7 @@ int verification_handle_additional_hash_values_fprint(
 		{
 			if( hash_value_identifier_size == 7 )
 			{
-				if( libcstring_narrow_string_compare(
+				if( narrow_string_compare(
 				     hash_value_identifier,
 				     "SHA256",
 				     6 ) == 0 )
@@ -4286,7 +4288,7 @@ int verification_handle_additional_hash_values_fprint(
 				}
 			}
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_handle_get_utf16_hash_value(
 		     verification_handle->input_handle,
 		     (uint8_t *) hash_value_identifier,
@@ -4326,7 +4328,7 @@ int verification_handle_additional_hash_values_fprint(
 			}
 			fprintf(
 			 stream,
-			 "%s:\t%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s:\t%" PRIs_SYSTEM "\n",
 			 hash_value_identifier,
 			 hash_value );
 		}
@@ -4342,18 +4344,18 @@ int verification_handle_checksum_errors_fprint(
      FILE *stream,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *filename      = NULL;
-	libcstring_system_character_t *last_filename = NULL;
-	static char *function                        = "verification_handle_checksum_errors_fprint";
-	size_t filename_size                         = 0;
-	size_t last_filename_size                    = 0;
-	uint64_t start_sector                        = 0;
-	uint64_t last_sector                         = 0;
-	uint64_t number_of_sectors                   = 0;
-	uint32_t number_of_errors                    = 0;
-	uint32_t error_index                         = 0;
-	int result                                   = 0;
-	int return_value                             = 1;
+	system_character_t *filename      = NULL;
+	system_character_t *last_filename = NULL;
+	static char *function             = "verification_handle_checksum_errors_fprint";
+	size_t filename_size              = 0;
+	size_t last_filename_size         = 0;
+	uint64_t last_sector              = 0;
+	uint64_t number_of_sectors        = 0;
+	uint64_t start_sector             = 0;
+	uint32_t error_index              = 0;
+	uint32_t number_of_errors         = 0;
+	int result                        = 0;
+	int return_value                  = 1;
 
 	if( verification_handle == NULL )
 	{
@@ -4461,7 +4463,7 @@ int verification_handle_checksum_errors_fprint(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result= libewf_handle_get_filename_size_wide(
 				         verification_handle->input_handle,
 				         &filename_size,
@@ -4485,7 +4487,7 @@ int verification_handle_checksum_errors_fprint(
 				}
 				else if( result != 0 )
 				{
-					filename = libcstring_system_string_allocate(
+					filename = system_string_allocate(
 					            filename_size );
 
 					if( filename == NULL )
@@ -4499,7 +4501,7 @@ int verification_handle_checksum_errors_fprint(
 
 						goto on_error;
 					}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 					if( libewf_handle_get_filename_wide(
 					     verification_handle->input_handle,
 					     filename,

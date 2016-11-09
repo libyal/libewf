@@ -21,7 +21,9 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -35,7 +37,6 @@
 #include "pyewf_file_object_io_handle.h"
 #include "pyewf_handle.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_media_flags.h"
 #include "pyewf_media_types.h"
@@ -118,7 +119,7 @@ PyObject *pyewf_get_version(
 
 	Py_END_ALLOW_THREADS
 
-	version_string_length = libcstring_narrow_string_length(
+	version_string_length = narrow_string_length(
 	                         version_string );
 
 	/* Pass the string length to PyUnicode_DecodeUTF8
@@ -146,7 +147,7 @@ PyObject *pyewf_check_file_signature(
 	const char *filename_narrow  = NULL;
 	int result                   = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	const wchar_t *filename_wide = NULL;
 #else
 	PyObject *utf8_string_object = NULL;
@@ -187,7 +188,7 @@ PyObject *pyewf_check_file_signature(
 	{
 		PyErr_Clear();
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
 		Py_BEGIN_ALLOW_THREADS
@@ -447,7 +448,7 @@ PyObject *pyewf_glob(
 	int number_of_filenames          = 0;
 	int result                       = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	wchar_t **filenames_wide         = NULL;
 	const wchar_t *filename_wide     = NULL;
 #else
@@ -489,11 +490,11 @@ PyObject *pyewf_glob(
 	{
 		PyErr_Clear();
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
 
-		filename_length = libcstring_wide_string_length(
+		filename_length = wide_string_length(
 		                   filename_wide );
 
 		Py_BEGIN_ALLOW_THREADS
@@ -562,15 +563,15 @@ PyObject *pyewf_glob(
 		     filename_index < number_of_filenames;
 		     filename_index++ )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			filename_length = libcstring_wide_string_length(
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			filename_length = wide_string_length(
 					   filenames_wide[ filename_index ] );
 
 			filename_string_object = PyUnicode_FromWideChar(
 						  filenames_wide[ filename_index ],
 						  filename_length );
 #else
-			filename_length = libcstring_narrow_string_length(
+			filename_length = narrow_string_length(
 			                   filenames_narrow[ filename_index ] );
 
 			/* Pass the string length to PyUnicode_DecodeUTF8
@@ -609,7 +610,7 @@ PyObject *pyewf_glob(
 		}
 		Py_BEGIN_ALLOW_THREADS
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_glob_wide_free(
 			  filenames_wide,
 			  number_of_filenames,
@@ -669,7 +670,7 @@ PyObject *pyewf_glob(
 		filename_narrow = PyString_AsString(
 				   string_object );
 #endif
-		filename_length = libcstring_narrow_string_length(
+		filename_length = narrow_string_length(
 		                   filename_narrow );
 
 		Py_BEGIN_ALLOW_THREADS
@@ -704,7 +705,7 @@ PyObject *pyewf_glob(
 		     filename_index < number_of_filenames;
 		     filename_index++ )
 		{
-			filename_length = libcstring_narrow_string_length(
+			filename_length = narrow_string_length(
 					   filenames_narrow[ filename_index ] );
 
 			filename_string_object = PyUnicode_Decode(
@@ -789,7 +790,7 @@ on_error:
 
 		Py_END_ALLOW_THREADS
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( filenames_wide != NULL )
 	{
 		Py_BEGIN_ALLOW_THREADS

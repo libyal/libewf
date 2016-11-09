@@ -27,7 +27,6 @@
 #include <types.h>
 
 #include "libewf_libcerror.h"
-#include "libewf_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -56,9 +55,9 @@ int libewf_filename_set_extension_wide(
 #endif
 
 int libewf_filename_create(
-     libcstring_system_character_t **filename,
+     system_character_t **filename,
      size_t *filename_size,
-     libcstring_system_character_t *basename,
+     system_character_t *basename,
      size_t basename_length,
      uint32_t segment_number,
      uint32_t maximum_number_of_segments,

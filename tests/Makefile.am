@@ -1,7 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
@@ -81,32 +80,29 @@ check_PROGRAMS = \
 
 ewf_test_error_SOURCES = \
 	ewf_test_error.c \
-	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
 	ewf_test_unused.h
 
 ewf_test_error_LDADD = \
-	../libewf/libewf.la \
-	@LIBCSTRING_LIBADD@
+	../libewf/libewf.la
 
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c \
-	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_unused.h
 
 ewf_test_glob_LDADD = \
 	../libewf/libewf.la \
-	@LIBCSTRING_LIBADD@ \
 	@PTHREAD_LIBADD@
 
 ewf_test_handle_SOURCES = \
 	ewf_test_handle.c \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
+	ewf_test_libcclocal.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
+	ewf_test_libuna.h \
 	ewf_test_memory.c ewf_test_memory.h
 
 ewf_test_handle_LDADD = \
@@ -114,15 +110,13 @@ ewf_test_handle_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_open_close_SOURCES = \
 	ewf_test_libewf.h \
 	ewf_test_libcerror.h \
 	ewf_test_libcnotify.h \
-	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_open_close.c \
 	ewf_test_unused.h
@@ -133,13 +127,11 @@ ewf_test_open_close_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_read_SOURCES = \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libcthreads.h \
 	ewf_test_libewf.h \
@@ -152,13 +144,11 @@ ewf_test_read_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCTHREADS_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_read_chunk_SOURCES = \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_read_chunk.c \
@@ -169,13 +159,11 @@ ewf_test_read_chunk_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_seek_SOURCES = \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
 	ewf_test_seek.c \
@@ -186,26 +174,30 @@ ewf_test_seek_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_support_SOURCES = \
-	ewf_test_libcstring.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcclocal.h \
+	ewf_test_libcsystem.h \
 	ewf_test_libewf.h \
+	ewf_test_libuna.h \
 	ewf_test_macros.h \
 	ewf_test_support.c \
 	ewf_test_unused.h
 
 ewf_test_support_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCSTRING_LIBADD@
+	@LIBCERROR_LIBADD@
 
 ewf_test_truncate_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libcfile.h \
 	ewf_test_libcnotify.h \
-	ewf_test_libcstring.h \
 	ewf_test_libcsystem.h \
 	ewf_test_truncate.c \
 	ewf_test_unused.h
@@ -216,13 +208,11 @@ ewf_test_truncate_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_write_SOURCES = \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_unused.h \
 	ewf_test_write.c
@@ -232,13 +222,11 @@ ewf_test_write_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_libcerror.h \
-	ewf_test_libcstring.h \
 	ewf_test_libewf.h \
 	ewf_test_libcsystem.h \
 	ewf_test_unused.h \
@@ -249,8 +237,7 @@ ewf_test_write_chunk_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
+	@LIBCERROR_LIBADD@
 	@PTHREAD_LIBADD@
 
 MAINTAINERCLEANFILES = \

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library API type testing script
 #
-# Version: 20160327
+# Version: 20161105
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -11,59 +11,45 @@ TEST_PREFIX=`dirname ${PWD}`;
 TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\).*$/\1/'`;
 
 TEST_PROFILE="lib${TEST_PREFIX}";
-TEST_TYPES="";
-TEST_TYPES_WITH_INPUT="handle";
+TEST_TYPES="data_chunk file_entry handle";
+TEST_TYPES_WITH_INPUT="";
 OPTION_SETS="";
 
 TEST_TOOL_DIRECTORY=".";
 INPUT_DIRECTORY="input";
-INPUT_GLOB="*.[ELels]*01";
+INPUT_GLOB="*";
 
 test_api_type()
 {
 	local TEST_TYPE=$1;
 
-	local TEST_TOOL="${TEST_PREFIX}_test_${TEST_TYPE}";
-	local TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+	local TEST_DESCRIPTION="Testing API type: ${TEST_TYPE}";
+	local TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_PREFIX}_test_${TEST_TYPE}";
 
 	if ! test -x "${TEST_EXECUTABLE}";
 	then
-		TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+		TEST_EXECUTABLE="${TEST_EXECUTABLE}.exe";
 	fi
 
-	if ! test -x "${TEST_EXECUTABLE}";
-	then
-		echo "Missing test executable: ${TEST_EXECUTABLE}";
-
-		exit ${EXIT_FAILURE};
-	fi
-	echo "Testing API type: lib${TEST_PREFIX}_${TEST_TYPE}_t";
-
-	run_test_with_arguments ${TEST_EXECUTABLE};
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}";
 	local RESULT=$?;
-
-	echo "";
 
 	return ${RESULT};
 }
 
 test_api_type_with_input()
 {
-	local TEST_PROFILE=$1;
-	local TEST_TYPE=$2;
-	local OPTION_SETS=$3;
-	local INPUT_DIRECTORY=$4;
-	local INPUT_GLOB=$5;
+	local TEST_TYPE=$1;
 
-	local TEST_TOOL="${TEST_PREFIX}_test_${TEST_TYPE}";
-	local TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+	local TEST_DESCRIPTION="Testing API type: ${TEST_TYPE}";
+	local TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_PREFIX}_test_${TEST_TYPE}";
 
 	if ! test -x "${TEST_EXECUTABLE}";
 	then
-		TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+		TEST_EXECUTABLE="${TEST_EXECUTABLE}.exe";
 	fi
 
-	run_test_on_input_directory "${TEST_PROFILE}" "${TEST_FUNCTION}" "default" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
+	run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "default" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
 	local RESULT=$?;
 
 	return ${RESULT};
@@ -110,7 +96,7 @@ fi
 
 for TEST_TYPE in ${TEST_TYPES_WITH_INPUT};
 do
-	test_api_type_with_input "${TEST_PROFILE}" "${TEST_TYPE}" "${OPTION_SETS}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}";
+	test_api_type_with_input "${TEST_TYPE}";
 	RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};

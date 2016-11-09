@@ -28,7 +28,6 @@
 #include "pyewf_integer.h"
 #include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_python.h"
 
 /* Creates a file object IO handle

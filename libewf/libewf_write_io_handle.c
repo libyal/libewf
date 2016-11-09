@@ -22,6 +22,7 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #if defined( TIME_WITH_SYS_TIME )
@@ -2299,11 +2300,11 @@ int libewf_write_io_handle_create_segment_file(
      libewf_segment_file_t **segment_file,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle        = NULL;
-	libcstring_system_character_t *filename = NULL;
-	static char *function                   = "libewf_write_io_handle_create_segment_file";
-	size_t filename_size                    = 0;
-	int bfio_access_flags                   = 0;
+	libbfio_handle_t *file_io_handle = NULL;
+	system_character_t *filename     = NULL;
+	static char *function            = "libewf_write_io_handle_create_segment_file";
+	size_t filename_size             = 0;
+	int bfio_access_flags            = 0;
 
 	if( segment_table == NULL )
 	{
@@ -2396,7 +2397,7 @@ int libewf_write_io_handle_create_segment_file(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: creating segment file: %" PRIu32 " with filename: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 "%s: creating segment file: %" PRIu32 " with filename: %" PRIs_SYSTEM ".\n",
 		 function,
 		 segment_number,
 		 filename );
@@ -2415,7 +2416,7 @@ int libewf_write_io_handle_create_segment_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,

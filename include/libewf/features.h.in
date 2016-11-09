@@ -22,12 +22,14 @@
 #if !defined( _LIBEWF_FEATURES_H )
 #define _LIBEWF_FEATURES_H
 
-#if defined( WINAPI ) || @HAVE_WIDE_CHARACTER_TYPE@
-#define LIBEWF_HAVE_WIDE_CHARACTER_TYPE		1
-
-/* Old definition kept for compatibility (for now)
+/* The libewf type support features
  */
-#define LIBEWF_WIDE_CHARACTER_TYPE		1
+#if defined( WINAPI ) || @HAVE_WIDE_CHARACTER_TYPE@
+#define LIBEWF_HAVE_WIDE_CHARACTER_TYPE	1
+#endif
+
+#if defined( WINAPI ) || @HAVE_MULTI_THREAD_SUPPORT@
+#define LIBEWF_HAVE_MULTI_THREAD_SUPPORT	1
 #endif
 
 #if defined( HAVE_LIBBFIO ) || ( !defined( WINAPI ) && @HAVE_LIBBFIO@ )
@@ -44,5 +46,5 @@
 #endif
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_FEATURES_H ) */
 

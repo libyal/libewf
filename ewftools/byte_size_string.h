@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -39,14 +38,14 @@ enum BYTE_SIZE_STRING_UNITS
 };
 
 int byte_size_string_create(
-     libcstring_system_character_t *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units,
      libcerror_error_t **error );
 
 int byte_size_string_create_with_decimal_point(
-     libcstring_system_character_t *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units,
@@ -54,13 +53,13 @@ int byte_size_string_create_with_decimal_point(
      libcerror_error_t **error );
 
 int byte_size_string_convert(
-     const libcstring_system_character_t *byte_size_string,
+     const system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size,
      libcerror_error_t **error );
 
 int byte_size_string_convert_with_decimal_point(
-     const libcstring_system_character_t *byte_size_string,
+     const system_character_t *byte_size_string,
      size_t byte_size_string_length,
      int decimal_point,
      uint64_t *size,

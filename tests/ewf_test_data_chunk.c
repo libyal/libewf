@@ -1,5 +1,5 @@
 /*
- * Library notification functions test program
+ * Library data_chunk type testing program
  *
  * Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,66 +27,48 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
+#include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
-/* Tests the libewf_notify_set_verbose function
+/* Tests the libewf_data_chunk_free function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_notify_set_verbose(
+int ewf_test_data_chunk_free(
      void )
 {
-	/* Test invocation of function only
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
 	 */
-	libewf_notify_set_verbose(
-	 0 );
+	result = libewf_data_chunk_free(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        EWF_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
-}
 
-/* Tests the libewf_notify_set_stream function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_notify_set_stream(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libewf_notify_set_stream(
-	 NULL,
-	 NULL );
-
-	return( 1 );
-}
-
-/* Tests the libewf_notify_stream_open function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_notify_stream_open(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libewf_notify_stream_open(
-	 NULL,
-	 NULL );
-
-	return( 1 );
-}
-
-/* Tests the libewf_notify_stream_close function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_notify_stream_close(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libewf_notify_stream_close(
-	 NULL );
-
-	return( 1 );
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
 /* The main program
@@ -105,20 +87,8 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	EWF_TEST_RUN(
-	 "libewf_notify_set_verbose",
-	 ewf_test_notify_set_verbose )
-
-	EWF_TEST_RUN(
-	 "libewf_notify_set_stream",
-	 ewf_test_notify_set_stream )
-
-	EWF_TEST_RUN(
-	 "libewf_notify_stream_open",
-	 ewf_test_notify_stream_open )
-
-	EWF_TEST_RUN(
-	 "libewf_notify_stream_close",
-	 ewf_test_notify_stream_close )
+	 "libewf_data_chunk_free",
+	 ewf_test_data_chunk_free );
 
 	return( EXIT_SUCCESS );
 

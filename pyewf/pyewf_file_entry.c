@@ -33,7 +33,6 @@
 #include "pyewf_handle.h"
 #include "pyewf_integer.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
 #include "pyewf_unused.h"

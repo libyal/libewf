@@ -27,7 +27,6 @@
 #include <types.h>
 
 #include "ewftools_libcerror.h"
-#include "ewftools_libcstring.h"
 #include "ewftools_libewf.h"
 
 #if defined( __cplusplus )
@@ -80,12 +79,12 @@ int mount_handle_set_maximum_number_of_open_handles(
 
 int mount_handle_set_format(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int mount_handle_open_input(
      mount_handle_t *mount_handle,
-     libcstring_system_character_t * const * filenames,
+     system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error );
 
@@ -112,9 +111,9 @@ int mount_handle_get_media_size(
 
 int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
-     const libcstring_system_character_t *path,
+     const system_character_t *path,
      size_t path_length,
-     libcstring_system_character_t path_separator,
+     system_character_t path_separator,
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error );
 

@@ -29,7 +29,6 @@
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
-#include "libewf_libcstring.h"
 #include "libewf_libcthreads.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"

@@ -27,7 +27,6 @@
 
 #include "pyewf_libbfio.h"
 #include "pyewf_libcerror.h"
-#include "pyewf_libcstring.h"
 #include "pyewf_python.h"
 
 #if defined( __cplusplus )
