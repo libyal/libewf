@@ -2,7 +2,7 @@
 #
 # Python-bindings get version test program
 #
-# Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #

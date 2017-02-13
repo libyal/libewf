@@ -124,7 +124,7 @@ rm -rf %{buildroot}
 %{_libdir}/python3*/site-packages/*.la
 %{_libdir}/python3*/site-packages/*.so
 
-### Exclude expirimental files ###
+### Exclude debug tool ###
 %exclude %{_bindir}/ewfdebug
 
 %changelog
