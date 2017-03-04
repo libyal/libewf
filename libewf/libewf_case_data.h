@@ -80,5 +80,5 @@ int libewf_case_data_parse(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CASE_DATA_H ) */
 

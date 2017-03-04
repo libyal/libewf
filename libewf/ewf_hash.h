@@ -99,5 +99,5 @@ struct ewf_sha1_hash
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_HASH_H ) */
 

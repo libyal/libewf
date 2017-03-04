@@ -99,5 +99,5 @@ int libewf_header_sections_parse(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_HEADER_SECTIONS_H ) */
 

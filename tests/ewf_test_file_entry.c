@@ -1,5 +1,5 @@
 /*
- * Library file_entry type testing program
+ * Library file_entry type test program
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,8 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
+
+#include "../libewf/libewf_file_entry.h"
 
 /* Tests the libewf_file_entry_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +73,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +92,75 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libewf_file_entry_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	EWF_TEST_RUN(
 	 "libewf_file_entry_free",
 	 ewf_test_file_entry_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libewf_file_entry_get_type */
+
+	/* TODO: add tests for libewf_file_entry_get_flags */
+
+	/* TODO: add tests for libewf_file_entry_get_media_data_offset */
+
+	/* TODO: add tests for libewf_file_entry_get_media_data_size */
+
+	/* TODO: add tests for libewf_file_entry_get_duplicate_media_data_offset */
+
+	/* TODO: add tests for libewf_file_entry_get_utf8_name_size */
+
+	/* TODO: add tests for libewf_file_entry_get_utf8_name */
+
+	/* TODO: add tests for libewf_file_entry_get_utf16_name_size */
+
+	/* TODO: add tests for libewf_file_entry_get_utf16_name */
+
+	/* TODO: add tests for libewf_file_entry_get_size */
+
+	/* TODO: add tests for libewf_file_entry_get_creation_time */
+
+	/* TODO: add tests for libewf_file_entry_get_modification_time */
+
+	/* TODO: add tests for libewf_file_entry_get_access_time */
+
+	/* TODO: add tests for libewf_file_entry_get_entry_modification_time */
+
+	/* TODO: add tests for libewf_file_entry_get_utf8_hash_value_md5 */
+
+	/* TODO: add tests for libewf_file_entry_get_utf16_hash_value_md5 */
+
+	/* TODO: add tests for libewf_file_entry_get_utf8_hash_value_sha1 */
+
+	/* TODO: add tests for libewf_file_entry_get_utf16_hash_value_sha1 */
+
+	/* TODO: add tests for libewf_file_entry_read_buffer */
+
+	/* TODO: add tests for libewf_file_entry_read_buffer_at_offset */
+
+	/* TODO: add tests for libewf_file_entry_seek_offset */
+
+	/* TODO: add tests for libewf_file_entry_get_offset */
+
+	/* TODO: add tests for libewf_file_entry_get_number_of_sub_file_entries */
+
+	/* TODO: add tests for libewf_file_entry_get_sub_file_entry */
+
+	/* TODO: add tests for libewf_file_entry_get_sub_file_entry_by_utf8_name */
+
+	/* TODO: add tests for libewf_file_entry_get_sub_file_entry_by_utf8_path */
+
+	/* TODO: add tests for libewf_file_entry_get_sub_file_entry_by_utf16_name */
+
+	/* TODO: add tests for libewf_file_entry_get_sub_file_entry_by_utf16_path */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

@@ -40,5 +40,5 @@ int libewf_analytical_data_parse(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_ANALYTICAL_DATA_H ) */
 

@@ -181,5 +181,5 @@ int libewf_chunk_data_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CHUNK_DATA_H ) */
 

@@ -156,5 +156,5 @@ int libewf_date_time_values_copy_to_utf16_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_DATE_TIME_VALUES_H ) */
 

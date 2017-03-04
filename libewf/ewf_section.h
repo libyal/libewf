@@ -114,5 +114,5 @@ struct ewf_section_descriptor_v2
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_SECTION_H ) */
 

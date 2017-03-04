@@ -124,5 +124,5 @@ int libewf_glob_wide_free(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SUPPORT_H ) */
 

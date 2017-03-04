@@ -196,5 +196,5 @@ int libewf_segment_table_append_segment_by_segment_file(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SEGMENT_TABLE_H ) */
 

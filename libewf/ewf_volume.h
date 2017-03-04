@@ -220,5 +220,5 @@ struct ewf_volume_smart
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_VOLUME_H ) */
 

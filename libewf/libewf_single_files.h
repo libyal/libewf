@@ -113,5 +113,5 @@ int libewf_single_files_parse_file_entry_offset_values(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SINGLE_FILES_H ) */
 

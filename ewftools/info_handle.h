@@ -238,5 +238,5 @@ int dfxml_execution_environment_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _INFO_HANDLE_H ) */
 

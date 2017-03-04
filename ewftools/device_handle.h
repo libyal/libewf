@@ -295,5 +295,5 @@ int device_handle_tracks_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _DEVICE_HANDLE_H ) */
 

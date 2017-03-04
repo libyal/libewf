@@ -34,13 +34,15 @@
 #include "device_handle.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
-#include "ewfoutput.h"
+#include "ewftools_getopt.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
+#include "ewftools_output.h"
+#include "ewftools_signal.h"
+#include "ewftools_unused.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
 #include "process_status.h"
@@ -210,12 +212,12 @@ void ewfacquire_usage_fprint(
 /* Signal handler for ewfacquire
  */
 void ewfacquire_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      ewftools_signal_t signal EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "ewfacquire_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	EWFTOOLS_UNREFERENCED_PARAMETER( signal )
 
 	ewfacquire_abort = 1;
 
@@ -253,8 +255,13 @@ void ewfacquire_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -1609,7 +1616,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_initialize(
+	if( ewftools_output_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
@@ -1619,11 +1626,11 @@ int main( int argc, char * const argv[] )
 
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
-	while( ( option = libcsystem_getopt(
+	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:g:hj:l:m:M:N:o:p:P:qr:RsS:t:T:uvVwx2:" ) ) ) != (system_integer_t) -1 )
@@ -2076,7 +2083,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			if( libcsystem_signal_attach(
+			if( ewftools_signal_attach(
 			     ewfacquire_signal_handler,
 			     &error ) != 1 )
 			{
@@ -2105,7 +2112,7 @@ int main( int argc, char * const argv[] )
 
 				resume_acquiry = 0;
 			}
-			if( libcsystem_signal_detach(
+			if( ewftools_signal_detach(
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -2648,7 +2655,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( resume_acquiry != 0 )
 		{
-			if( libcsystem_signal_attach(
+			if( ewftools_signal_attach(
 			     ewfacquire_signal_handler,
 			     &error ) != 1 )
 			{
@@ -2677,7 +2684,7 @@ int main( int argc, char * const argv[] )
 
 				resume_acquiry = 0;
 			}
-			if( libcsystem_signal_detach(
+			if( ewftools_signal_detach(
 			     &error ) != 1 )
 			{
 				fprintf(
@@ -3226,7 +3233,7 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-	if( libcsystem_signal_attach(
+	if( ewftools_signal_attach(
 	     ewfacquire_signal_handler,
 	     &error ) != 1 )
 	{
@@ -3309,7 +3316,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 on_abort:
-	if( libcsystem_signal_detach(
+	if( ewftools_signal_detach(
 	     &error ) != 1 )
 	{
 		fprintf(

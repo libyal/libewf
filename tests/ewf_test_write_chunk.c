@@ -32,9 +32,119 @@
 
 #include <stdio.h>
 
+#include "ewf_test_getopt.h"
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
+
+/* Copies a string of a decimal value to a 64-bit value
+ * Returns 1 if successful or -1 on error
+ */
+int ewf_test_system_string_decimal_copy_to_64_bit(
+     const system_character_t *string,
+     size_t string_size,
+     uint64_t *value_64bit,
+     libcerror_error_t **error )
+{
+	static char *function              = "ewf_test_system_string_decimal_copy_to_64_bit";
+	size_t string_index                = 0;
+	system_character_t character_value = 0;
+	uint8_t maximum_string_index       = 20;
+	int8_t sign                        = 1;
+
+	if( string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_64bit == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value 64-bit.",
+		 function );
+
+		return( -1 );
+	}
+	*value_64bit = 0;
+
+	if( string[ string_index ] == (system_character_t) '-' )
+	{
+		string_index++;
+		maximum_string_index++;
+
+		sign = -1;
+	}
+	else if( string[ string_index ] == (system_character_t) '+' )
+	{
+		string_index++;
+		maximum_string_index++;
+	}
+	while( string_index < string_size )
+	{
+		if( string[ string_index ] == 0 )
+		{
+			break;
+		}
+		if( string_index > (size_t) maximum_string_index )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
+			 "%s: string too large.",
+			 function );
+
+			return( -1 );
+		}
+		*value_64bit *= 10;
+
+		if( ( string[ string_index ] >= (system_character_t) '0' )
+		 && ( string[ string_index ] <= (system_character_t) '9' ) )
+		{
+			character_value = (system_character_t) ( string[ string_index ] - (system_character_t) '0' );
+		}
+		else
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported character value: %" PRIc_SYSTEM " at index: %d.",
+			 function,
+			 string[ string_index ],
+			 string_index );
+
+			return( -1 );
+		}
+		*value_64bit += character_value;
+
+		string_index++;
+	}
+	if( sign == -1 )
+	{
+		*value_64bit *= (uint64_t) -1;
+	}
+	return( 1 );
+}
 
 /* Tests writing data of media size to EWF file(s) with a maximum segment size
  * Return 1 if successful, 0 if not or -1 on error
@@ -345,7 +455,7 @@ int main( int argc, char * const argv[] )
 	uint8_t compression_flags                       = 0;
 	int8_t compression_level                        = LIBEWF_COMPRESSION_NONE;
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "b:B:c:S:" ) ) ) != (system_integer_t) -1 )
@@ -395,7 +505,7 @@ int main( int argc, char * const argv[] )
 		string_length = system_string_length(
 				 option_chunk_size );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewf_test_system_string_decimal_copy_to_64_bit(
 		     option_chunk_size,
 		     string_length + 1,
 		     &chunk_size,
@@ -455,7 +565,7 @@ int main( int argc, char * const argv[] )
 		string_length = system_string_length(
 				 option_maximum_segment_size );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewf_test_system_string_decimal_copy_to_64_bit(
 		     option_maximum_segment_size,
 		     string_length + 1,
 		     &maximum_segment_size,
@@ -473,7 +583,7 @@ int main( int argc, char * const argv[] )
 		string_length = system_string_length(
 				 option_media_size );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewf_test_system_string_decimal_copy_to_64_bit(
 		     option_media_size,
 		     string_length + 1,
 		     &media_size,

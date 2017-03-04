@@ -52,5 +52,5 @@ int libewf_decompress_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_COMPRESS_H ) */
 

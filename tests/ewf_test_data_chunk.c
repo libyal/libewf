@@ -1,5 +1,5 @@
 /*
- * Library data_chunk type testing program
+ * Library data_chunk type test program
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,8 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
+
+#include "../libewf/libewf_data_chunk.h"
 
 /* Tests the libewf_data_chunk_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +73,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +92,23 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libewf_data_chunk_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	EWF_TEST_RUN(
 	 "libewf_data_chunk_free",
 	 ewf_test_data_chunk_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libewf_data_chunk_read_buffer */
+
+	/* TODO: add tests for libewf_data_chunk_write_buffer */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

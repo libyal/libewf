@@ -69,5 +69,5 @@ int libewf_filename_create(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_FILENAME_H ) */
 

@@ -38,9 +38,9 @@
 #include <libewf/extern.h>
 
 #else
-#define LIBEWF_EXTERN	extern
+#define LIBEWF_EXTERN	/* extern */
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 
 #endif /* !defined( _LIBEWF_INTERNAL_EXTERN_H ) */
 

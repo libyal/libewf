@@ -51,5 +51,5 @@ int libewf_checksum_calculate_adler32(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_CHECKSUM_H ) */
 

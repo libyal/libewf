@@ -19,7 +19,6 @@ AM_CPPFLAGS = \
 	@LIBODRAW_CPPFLAGS@ \
 	@LIBSMDEV_CPPFLAGS@ \
 	@LIBSMRAW_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
@@ -44,7 +43,8 @@ ewfacquire_SOURCES = \
 	ewfacquire.c \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_i18n.h \
 	ewftools_libbfio.h \
 	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
@@ -54,7 +54,6 @@ ewfacquire_SOURCES = \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
 	ewftools_libcsplit.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -63,6 +62,10 @@ ewfacquire_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -82,7 +85,6 @@ ewfacquire_LDADD = \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
@@ -104,7 +106,8 @@ ewfacquirestream_SOURCES = \
 	ewfacquirestream.c \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_i18n.h \
 	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
@@ -113,7 +116,6 @@ ewfacquirestream_SOURCES = \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
 	ewftools_libcsplit.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -122,6 +124,10 @@ ewfacquirestream_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	guid.c guid.h \
 	imaging_handle.c imaging_handle.h \
 	log_handle.c log_handle.h \
@@ -135,7 +141,6 @@ ewfacquirestream_LDADD = \
 	@LIBHMAC_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
@@ -153,21 +158,25 @@ ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
-	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
-	ewftools_libuna.h
+	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h
 
 ewfdebug_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCNOTIFY_LIBADD@ \
@@ -181,7 +190,9 @@ ewfexport_SOURCES = \
 	ewfcommon.h \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
@@ -190,7 +201,6 @@ ewfexport_SOURCES = \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
 	ewftools_libcsplit.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -199,6 +209,10 @@ ewfexport_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	log_handle.c log_handle.h \
@@ -216,7 +230,6 @@ ewfexport_LDADD = \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
@@ -237,12 +250,13 @@ ewfinfo_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfinfo.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
 	ewftools_libcsplit.h \
-	ewftools_libcsystem.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
@@ -250,13 +264,16 @@ ewfinfo_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	guid.c guid.h \
 	info_handle.c info_handle.h \
 	platform.c platform.h
 
 ewfinfo_LDADD = \
 	@LIBUUID_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -270,11 +287,12 @@ ewfmount_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfmount.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -283,6 +301,10 @@ ewfmount_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	guid.c guid.h \
 	mount_handle.c mount_handle.h \
 	platform.c platform.h
@@ -290,7 +312,6 @@ ewfmount_SOURCES = \
 ewfmount_LDADD = \
 	@LIBFUSE_LIBADD@ \
 	@LIBUUID_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -306,7 +327,9 @@ ewfrecover_SOURCES = \
 	ewfcommon.h \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libbfio.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
@@ -314,7 +337,6 @@ ewfrecover_SOURCES = \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
 	ewftools_libcpath.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -323,6 +345,10 @@ ewfrecover_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	export_handle.c export_handle.h \
 	guid.c guid.h \
 	log_handle.c log_handle.h \
@@ -340,7 +366,6 @@ ewfrecover_LDADD = \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
@@ -361,14 +386,15 @@ ewfverify_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
-	ewfoutput.c ewfoutput.h \
+	ewftools_getopt.c ewftools_getopt.h \
+	ewftools_glob.c ewftools_glob.h \
+	ewftools_i18n.h \
 	ewftools_libbfio.h \
 	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libclocale.h \
 	ewftools_libcnotify.h \
-	ewftools_libcsystem.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
 	ewftools_libfvalue.h \
@@ -377,6 +403,10 @@ ewfverify_SOURCES = \
 	ewftools_libsmdev.h \
 	ewftools_libsmraw.h \
 	ewftools_libuna.h \
+	ewftools_output.c ewftools_output.h \
+	ewftools_signal.c ewftools_signal.h \
+	ewftools_system_string.c ewftools_system_string.h \
+	ewftools_unused.h \
 	ewfverify.c \
 	log_handle.c log_handle.h \
 	process_status.c process_status.h \
@@ -388,7 +418,6 @@ ewfverify_LDADD = \
 	@LIBHMAC_LIBADD@ \
 	@LIBCRYPTO_LIBADD@ \
 	@LIBDL_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \

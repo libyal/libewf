@@ -144,5 +144,5 @@ int libewf_hash_values_set_utf16_value(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_HASH_VALUES_H ) */
 

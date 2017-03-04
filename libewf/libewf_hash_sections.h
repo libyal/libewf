@@ -113,5 +113,5 @@ int libewf_hash_sections_set_digest_from_hash_values(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_HASH_SECTIONS_H ) */
 

@@ -69,5 +69,5 @@ int byte_size_string_convert_with_decimal_point(
 }
 #endif
 
-#endif
+#endif /* !defined( _BYTE_SIZE_STRING_H ) */
 

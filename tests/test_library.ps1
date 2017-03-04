@@ -1,6 +1,6 @@
-# Library API type testing script
+# Tests C library functions and types.
 #
-# Version: 20161107
+# Version: 20170115
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -10,17 +10,17 @@ $TestPrefix = Split-Path -path ${Pwd}.Path -parent
 $TestPrefix = Split-Path -path ${TestPrefix} -leaf
 $TestPrefix = ${TestPrefix}.Substring(3)
 
-$TestTypes = "data_chunk file_entry handle"
-$TestTypes = ${TestTypes} -split " "
+$LibraryTests = "chunk_data chunk_group chunk_table data_chunk deflate_bit_stream deflate_huffman_table error file_entry hash_sections header_sections io_handle media_values notify read_io_handle section sector_range segment_file segment_table single_file_entry single_files write_io_handle"
+$LibraryTestsWithInput = "handle support"
 
 $TestToolDirectory = "..\msvscpp\Release"
 
-Function TestAPIType
+Function RunTest
 {
 	param( [string]$TestType )
 
-	$TestDescription = "Testing API type: ${TestType}"
-	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestType}.exe"
+	$TestDescription = "Testing: ${TestName}"
+	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestName}.exe"
 
 	$Output = Invoke-Expression ${TestExecutable}
 	$Result = ${LastExitCode}
@@ -55,9 +55,20 @@ If (-Not (Test-Path ${TestToolDirectory}))
 
 $Result = ${ExitIgnore}
 
-Foreach (${TestType} in ${TestTypes})
+Foreach (${TestName} in ${LibraryTests} -split " ")
 {
-	$Result = TestAPIType ${TestType}
+	$Result = RunTest ${TestName}
+
+	If (${Result} -ne ${ExitSuccess})
+	{
+		Break
+	}
+}
+
+Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
+{
+	# TODO: add RunTestWithInput
+	$Result = RunTest ${TestName}
 
 	If (${Result} -ne ${ExitSuccess})
 	{

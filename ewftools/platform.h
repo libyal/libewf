@@ -40,5 +40,5 @@ int platform_get_operating_system(
 }
 #endif
 
-#endif
+#endif /* !defined( _PLATFORM_H ) */
 

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20161109],
+ [20170227],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -118,8 +118,8 @@ AX_LIBCAES_CHECK_ENABLE
 dnl Check for library function support
 AX_LIBEWF_CHECK_LOCAL
 
-dnl Check for enabling libcsystem for cross-platform C generic system functions
-AX_LIBCSYSTEM_CHECK_ENABLE
+dnl Check for ewftools function support
+AX_EWFTOOLS_CHECK_LOCAL
 
 dnl Check for enabling GUID/UUID support
 AX_LIBUUID_CHECK_ENABLE
@@ -172,29 +172,6 @@ AS_IF(
 
 dnl Check for test function support
 AX_TESTS_CHECK_LOCAL
-
-dnl Check if DLL support is needed
-AS_IF(
- [test "x$enable_shared" = xyes],
- [AS_CASE(
-  [$host],
-  [*cygwin* | *mingw*],
-  [AC_DEFINE(
-   [HAVE_DLLMAIN],
-   [1],
-   [Define to 1 to enable the DllMain function.])
-  AC_SUBST(
-   [HAVE_DLLMAIN],
-   [1])
-
-  AS_IF(
-   [test "x$ac_cv_enable_static_executables" = xno],
-   [AC_SUBST(
-    [LIBEWF_DLL_IMPORT],
-    ["-DLIBEWF_DLL_IMPORT"])
-   ])
-  ])
- ])
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
@@ -250,7 +227,6 @@ AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([libodraw/Makefile])
 AC_CONFIG_FILES([libsmdev/Makefile])
 AC_CONFIG_FILES([libsmraw/Makefile])
-AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([ewf.net/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
@@ -310,7 +286,6 @@ Building:
    libodraw support:                         $ac_cv_libodraw
    libsmdev support:                         $ac_cv_libsmdev
    libsmraw support:                         $ac_cv_libsmraw
-   libcsystem support:                       $ac_cv_libcsystem
    GUID/UUID support:                        $ac_cv_libuuid
    FUSE support:                             $ac_cv_libfuse
 

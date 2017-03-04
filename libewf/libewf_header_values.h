@@ -359,5 +359,5 @@ int libewf_header_values_set_utf16_value(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_HEADER_VALUES_H ) */
 

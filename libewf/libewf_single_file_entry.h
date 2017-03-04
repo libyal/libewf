@@ -218,5 +218,5 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SINGLE_FILE_ENTRY_H ) */
 

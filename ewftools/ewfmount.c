@@ -72,12 +72,15 @@
 #include <dokan.h>
 #endif
 
-#include "ewfoutput.h"
+#include "ewftools_getopt.h"
+#include "ewftools_glob.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
+#include "ewftools_output.h"
+#include "ewftools_signal.h"
+#include "ewftools_unused.h"
 #include "mount_handle.h"
 
 mount_handle_t *ewfmount_mount_handle = NULL;
@@ -113,12 +116,12 @@ void usage_fprint(
 /* Signal handler for ewfmount
  */
 void ewfmount_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      ewftools_signal_t signal EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "ewfmount_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	EWFTOOLS_UNREFERENCED_PARAMETER( signal )
 
 	ewfmount_abort = 1;
 
@@ -140,8 +143,13 @@ void ewfmount_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -300,7 +308,7 @@ int ewfmount_fuse_read(
      char *buffer,
      size_t size,
      off_t offset,
-     struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+     struct fuse_file_info *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
@@ -540,8 +548,8 @@ int ewfmount_fuse_readdir(
      const char *path,
      void *buffer,
      fuse_fill_dir_t filler,
-     off_t offset LIBCSYSTEM_ATTRIBUTE_UNUSED,
-     struct fuse_file_info *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+     off_t offset EWFTOOLS_ATTRIBUTE_UNUSED,
+     struct fuse_file_info *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	char ewfmount_fuse_path[ 10 ];
 
@@ -560,8 +568,8 @@ int ewfmount_fuse_readdir(
 	int sub_file_entry_index            = 0;
 	int string_index                    = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( offset )
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( offset )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -1303,12 +1311,12 @@ on_error:
 /* Cleans up when fuse is done
  */
 void ewfmount_fuse_destroy(
-      void *private_data LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      void *private_data EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "ewfmount_fuse_destroy";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( private_data )
+	EWFTOOLS_UNREFERENCED_PARAMETER( private_data )
 
 	if( ewfmount_mount_handle != NULL )
 	{
@@ -1350,9 +1358,9 @@ static size_t ewfmount_dokan_path_prefix_length = 4;
 int __stdcall ewfmount_dokan_CreateFile(
                const wchar_t *path,
                DWORD desired_access,
-               DWORD share_mode LIBCSYSTEM_ATTRIBUTE_UNUSED,
+               DWORD share_mode EWFTOOLS_ATTRIBUTE_UNUSED,
                DWORD creation_disposition,
-               DWORD attribute_flags LIBCSYSTEM_ATTRIBUTE_UNUSED,
+               DWORD attribute_flags EWFTOOLS_ATTRIBUTE_UNUSED,
                DOKAN_FILE_INFO *file_info )
 {
 	libcerror_error_t *error        = NULL;
@@ -1361,8 +1369,8 @@ int __stdcall ewfmount_dokan_CreateFile(
 	size_t path_length              = 0;
 	int result                      = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( share_mode )
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( attribute_flags )
+	EWFTOOLS_UNREFERENCED_PARAMETER( share_mode )
+	EWFTOOLS_UNREFERENCED_PARAMETER( attribute_flags )
 
 	if( path == NULL )
 	{
@@ -1529,7 +1537,7 @@ on_error:
  */
 int __stdcall ewfmount_dokan_OpenDirectory(
                const wchar_t *path,
-               DOKAN_FILE_INFO *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+               DOKAN_FILE_INFO *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
@@ -1537,7 +1545,7 @@ int __stdcall ewfmount_dokan_OpenDirectory(
 	size_t path_length              = 0;
 	int result                      = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -1648,13 +1656,13 @@ on_error:
  */
 int __stdcall ewfmount_dokan_CloseFile(
                const wchar_t *path,
-               DOKAN_FILE_INFO *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+               DOKAN_FILE_INFO *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "ewfmount_dokan_CloseFile";
 	int result               = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -1691,7 +1699,7 @@ int __stdcall ewfmount_dokan_ReadFile(
                DWORD number_of_bytes_to_read,
                DWORD *number_of_bytes_read,
                LONGLONG offset,
-               DOKAN_FILE_INFO *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+               DOKAN_FILE_INFO *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error        = NULL;
 	libewf_file_entry_t *file_entry = NULL;
@@ -1702,7 +1710,7 @@ int __stdcall ewfmount_dokan_ReadFile(
 	int result                      = 0;
 	int string_index                = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	if( path == NULL )
 	{
@@ -2980,13 +2988,13 @@ int __stdcall ewfmount_dokan_GetVolumeInformation(
                DWORD *file_system_flags,
                wchar_t *file_system_name,
                DWORD file_system_name_size,
-               DOKAN_FILE_INFO *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+               DOKAN_FILE_INFO *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function    = "ewfmount_dokan_GetVolumeInformation";
 	int result               = 0;
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	if( ( volume_name != NULL )
 	 && ( volume_name_size > (DWORD) ( sizeof( wchar_t ) * 4 ) ) )
@@ -3066,11 +3074,11 @@ on_error:
  * Returns 0 if successful or a negative error code otherwise
  */
 int __stdcall ewfmount_dokan_Unmount(
-               DOKAN_FILE_INFO *file_info LIBCSYSTEM_ATTRIBUTE_UNUSED )
+               DOKAN_FILE_INFO *file_info EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	static char *function = "ewfmount_dokan_Unmount";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( file_info )
+	EWFTOOLS_UNREFERENCED_PARAMETER( file_info )
 
 	return( 0 );
 }
@@ -3101,7 +3109,7 @@ int main( int argc, char * const argv[] )
 	int verbose                                  = 0;
 
 #if !defined( HAVE_GLOB_H )
-	libcsystem_glob_t *glob                      = NULL;
+	ewftools_glob_t *glob                      = NULL;
 #endif
 
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
@@ -3132,13 +3140,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-        if( libcsystem_initialize(
+        if( ewftools_output_initialize(
              _IONBF,
              &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
@@ -3146,7 +3154,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "f:hvVX:" ) ) ) != (system_integer_t) -1 )
@@ -3227,7 +3235,7 @@ int main( int argc, char * const argv[] )
 	 verbose );
 
 #if !defined( HAVE_GLOB_H )
-	if( libcsystem_glob_initialize(
+	if( ewftools_glob_initialize(
 	     &glob,
 	     &error ) != 1 )
 	{
@@ -3237,7 +3245,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_glob_resolve(
+	if( ewftools_glob_resolve(
 	     glob,
 	     &( argv[ optind ] ),
 	     argc - optind - 1,
@@ -3249,7 +3257,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_glob_get_results(
+	if( ewftools_glob_get_results(
 	     glob,
 	     &number_of_filenames,
 	     (system_character_t ***) &source_filenames,

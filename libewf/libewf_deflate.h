@@ -138,5 +138,5 @@ int libewf_deflate_decompress(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_DEFLATE_COMPRESSION_H ) */
 

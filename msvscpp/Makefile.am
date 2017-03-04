@@ -6,9 +6,6 @@ MSVSCPP_FILES = \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
 	ewf_test_open_close/ewf_test_open_close.vcproj \
-	ewf_test_read/ewf_test_read.vcproj \
-	ewf_test_read_chunk/ewf_test_read_chunk.vcproj \
-	ewf_test_seek/ewf_test_seek.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
 	ewf_test_write/ewf_test_write.vcproj \
@@ -31,7 +28,6 @@ MSVSCPP_FILES = \
 	libcnotify/libcnotify.vcproj \
 	libcpath/libcpath.vcproj \
 	libcsplit/libcsplit.vcproj \
-	libcsystem/libcsystem.vcproj \
 	libcthreads/libcthreads.vcproj \
 	libewf/libewf.vcproj \
 	libfcache/libfcache.vcproj \

@@ -280,5 +280,5 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_INTERNAL_FILE_ENTRY_H ) */
 

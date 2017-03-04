@@ -150,5 +150,5 @@ int ewfinput_get_fixed_string_variable(
 }
 #endif
 
-#endif
+#endif /* !defined( _EWFINPUT_H ) */
 

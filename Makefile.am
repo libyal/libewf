@@ -24,7 +24,6 @@ SUBDIRS = \
 	libodraw \
 	libsmdev \
 	libsmraw \
-	libcsystem \
 	ewftools \
 	ewf.net \
 	pyewf \
@@ -141,7 +140,6 @@ splint:
 	(cd $(srcdir)/libodraw && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmdev && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/pyewf && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))

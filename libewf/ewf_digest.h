@@ -59,5 +59,5 @@ struct ewf_digest
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_DIGEST_H ) */
 

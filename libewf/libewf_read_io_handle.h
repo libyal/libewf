@@ -84,5 +84,5 @@ int libewf_read_io_handle_clone(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_READ_IO_HANDLE_H ) */
 

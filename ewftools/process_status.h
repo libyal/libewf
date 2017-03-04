@@ -27,7 +27,6 @@
 
 #include "ewftools_libcdatetime.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcsystem.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -140,5 +139,5 @@ void process_status_bytes_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _PROCESS_STATUS_H ) */
 

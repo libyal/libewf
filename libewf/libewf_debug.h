@@ -62,5 +62,5 @@ int libewf_debug_utf16_stream_print(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_DEBUG_H ) */
 

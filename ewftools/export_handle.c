@@ -26,6 +26,10 @@
 #include <types.h>
 #include <wide_string.h>
 
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
 #if defined( WINAPI )
 #include <rpcdce.h>
 
@@ -42,10 +46,10 @@
 #include "ewftools_libcnotify.h"
 #include "ewftools_libcpath.h"
 #include "ewftools_libcsplit.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libsmraw.h"
 #include "ewftools_libhmac.h"
+#include "ewftools_system_string.h"
 #include "export_handle.h"
 #include "guid.h"
 #include "process_status.h"
@@ -1147,10 +1151,17 @@ ssize_t export_handle_write_storage_media_buffer(
 		}
 		if( export_handle->use_stdout != 0 )
 		{
-			write_count = libcsystem_file_io_write(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+			write_count = _write(
 			               1,
 				       storage_media_buffer->raw_buffer,
 				       write_size );
+#else
+			write_count = write(
+			               1,
+				       storage_media_buffer->raw_buffer,
+				       write_size );
+#endif
 		}
 		else
 		{
@@ -2969,7 +2980,7 @@ int export_handle_set_export_offset(
 		string_length = system_string_length(
 				 string );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewftools_system_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &( export_handle->export_offset ),
@@ -3028,7 +3039,7 @@ int export_handle_set_export_size(
 		string_length = system_string_length(
 				 string );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewftools_system_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &( export_handle->export_size ),
@@ -3181,7 +3192,7 @@ int export_handle_set_number_of_threads(
 		string_length = system_string_length(
 				 string );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewftools_system_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &number_of_threads,

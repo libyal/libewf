@@ -160,5 +160,5 @@ struct ewf_data
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_DATA_H ) */
 

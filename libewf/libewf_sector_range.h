@@ -77,5 +77,5 @@ int libewf_sector_range_set(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SECTOR_RANGE_H ) */
 

@@ -1,10 +1,10 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20160912
+# Version: 20161212
 
 GIT_URL_PREFIX="https://github.com/libyal";
-LOCAL_LIBS="libbfio libcaes libcdata libcdatetime libcerror libcfile libclocale libcnotify libcpath libcsplit libcsystem libcthreads libfcache libfdata libfguid libfvalue libhmac libodraw libsmdev libsmraw libuna";
+LOCAL_LIBS="libbfio libcaes libcdata libcdatetime libcerror libcfile libclocale libcnotify libcpath libcsplit libcthreads libfcache libfdata libfguid libfvalue libhmac libodraw libsmdev libsmraw libuna";
 
 OLDIFS=$IFS;
 IFS=" ";
@@ -81,10 +81,16 @@ endif
 	sed -i'~' "/${LOCAL_LIB}_definitions.h.in/d" ${LOCAL_LIB_MAKEFILE_AM};
 	sed -i'~' "/${LOCAL_LIB}.rc/d" ${LOCAL_LIB_MAKEFILE_AM};
 
-	if test ${LOCAL_LIB} = "libodraw";
+	if test ${LOCAL_LIB} = "libfplist";
+	then
+		# TODO: make this more generic to strip the last \\
+		sed -i'~' 's/libfplist_xml_scanner.c \\/libfplist_xml_scanner.c/' ${LOCAL_LIB_MAKEFILE_AM};
+
+	elif test ${LOCAL_LIB} = "libodraw";
 	then
 		# TODO: make this more generic to strip the last \\
 		sed -i'~' 's/libodraw_cue_scanner.c \\/libodraw_cue_scanner.c/' ${LOCAL_LIB_MAKEFILE_AM};
+
 	else
 		sed -i'~' '/EXTRA_DIST = /,/^$/d' ${LOCAL_LIB_MAKEFILE_AM};
 	fi
@@ -104,15 +110,6 @@ SED_SCRIPT="/^$/ {
 
 	# Make the necessary changes to libcfile/Makefile.am
 	if test ${LOCAL_LIB} = "libcfile";
-	then
-		if ! test -f "m4/libuna.m4";
-		then
-			sed -i'~' 's?@LIBUNA_CPPFLAGS@?-I$(top_srcdir)/libuna?' ${LOCAL_LIB_MAKEFILE_AM};
-		fi
-	fi
-
-	# Make the necessary changes to libcsystem/Makefile.am
-	if test ${LOCAL_LIB} = "libcsystem";
 	then
 		if ! test -f "m4/libuna.m4";
 		then

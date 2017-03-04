@@ -131,5 +131,5 @@ struct ewf_table_entry_v2
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_TABLE_H ) */
 

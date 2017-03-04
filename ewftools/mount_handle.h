@@ -126,5 +126,5 @@ int mount_handle_get_number_of_input_handles(
 }
 #endif
 
-#endif
+#endif /* !defined( _MOUNT_HANDLE_H ) */
 

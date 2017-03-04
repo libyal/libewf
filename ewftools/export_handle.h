@@ -540,5 +540,5 @@ int export_handle_checksum_errors_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _EXPORT_HANDLE_H ) */
 

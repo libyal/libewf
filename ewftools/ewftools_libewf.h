@@ -27,11 +27,11 @@
 /* If Cygwin libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBEWF_H ) */
 

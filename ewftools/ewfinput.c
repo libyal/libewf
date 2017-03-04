@@ -38,8 +38,8 @@
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewftools_libcerror.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
+#include "ewftools_system_string.h"
 
 /* Input selection defintions
  */
@@ -1436,7 +1436,7 @@ int ewfinput_get_size_variable(
 
 				return( 0 );
 			}
-			if( libcsystem_string_decimal_copy_to_64_bit(
+			if( ewftools_system_string_decimal_copy_to_64_bit(
 			     input_buffer,
 			     input_length,
 			     size_variable,

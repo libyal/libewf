@@ -61,5 +61,5 @@ int libewf_date_time_localtime(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_DATE_TIME_H ) */
 

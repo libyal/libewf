@@ -59,5 +59,5 @@ int guid_to_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _GUID_H ) */
 

@@ -42,5 +42,5 @@ int digest_hash_copy_to_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _DIGEST_HASH_H ) */
 

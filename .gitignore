@@ -134,10 +134,6 @@ stamp-h[1-9]
 /tests/ewf_test_glob
 /tests/ewf_test_handle
 /tests/ewf_test_notify
-/tests/ewf_test_open_close
-/tests/ewf_test_read
-/tests/ewf_test_read_chunk
-/tests/ewf_test_seek
 /tests/ewf_test_support
 /tests/ewf_test_truncate
 /tests/ewf_test_write
@@ -159,7 +155,6 @@ stamp-h[1-9]
 /libcnotify
 /libcpath
 /libcsplit
-/libcsystem
 /libcthreads
 /libfcache
 /libfdata

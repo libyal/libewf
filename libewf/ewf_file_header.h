@@ -102,5 +102,5 @@ struct ewf_file_header_v2
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_FILE_HEADER_H ) */
 

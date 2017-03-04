@@ -105,5 +105,5 @@ int libewf_media_values_calculate_chunk_size(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_MEDIA_VALUES_H ) */
 

@@ -114,5 +114,5 @@ struct ewf_error_entry_v2
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_ERROR2_H ) */
 

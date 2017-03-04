@@ -1,5 +1,5 @@
 /*
- * Output functions
+ * The unused definition
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,32 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFOUTPUT_H )
-#define _EWFOUTPUT_H
+#if !defined( _EWFTOOLS_UNUSED_H )
+#define _EWFTOOLS_UNUSED_H
 
 #include <common.h>
-#include <file_stream.h>
-#include <types.h>
 
+#if !defined( EWFTOOLS_ATTRIBUTE_UNUSED )
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
+#if defined( __GNUC__ ) && __GNUC__ >= 3
+#define EWFTOOLS_ATTRIBUTE_UNUSED	__attribute__ ((__unused__))
 
-void ewfoutput_copyright_fprint(
-      FILE *stream );
+#else
+#define EWFTOOLS_ATTRIBUTE_UNUSED
 
-void ewfoutput_version_fprint(
-      FILE *stream,
-      const system_character_t *program );
+#endif /* defined( __GNUC__ ) && __GNUC__ >= 3 */
 
-void ewfoutput_version_detailed_fprint(
-      FILE *stream,
-      const system_character_t *program );
+#endif /* !defined( EWFTOOLS_ATTRIBUTE_UNUSED ) */
 
-#if defined( __cplusplus )
-}
-#endif
+#if defined( _MSC_VER )
+#define EWFTOOLS_UNREFERENCED_PARAMETER( parameter ) \
+	UNREFERENCED_PARAMETER( parameter );
 
-#endif
+#else
+#define EWFTOOLS_UNREFERENCED_PARAMETER( parameter ) \
+	/* parameter */
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* !defined( _EWFTOOLS_UNUSED_H ) */
 

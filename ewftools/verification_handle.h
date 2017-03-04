@@ -350,5 +350,5 @@ int verification_handle_checksum_errors_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _VERIFICATION_HANDLE_H ) */
 

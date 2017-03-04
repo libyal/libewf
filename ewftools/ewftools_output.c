@@ -37,12 +37,11 @@
 #include <uuid/uuid.h>
 #endif
 
-#include "ewfoutput.h"
+#include "ewftools_i18n.h"
 #include "ewftools_libbfio.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libfvalue.h"
 #include "ewftools_libhmac.h"
@@ -50,6 +49,65 @@
 #include "ewftools_libsmdev.h"
 #include "ewftools_libsmraw.h"
 #include "ewftools_libuna.h"
+#include "ewftools_output.h"
+
+/* Initializes output settings
+ * Returns 1 if successful or -1 on error
+ */
+int ewftools_output_initialize(
+     int stdio_mode,
+     libcerror_error_t **error )
+{
+	static char *function = "ewftools_output_initialize";
+
+	if( ( stdio_mode != _IOFBF )
+	 && ( stdio_mode != _IOLBF )
+	 && ( stdio_mode != _IONBF ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported standard IO mode.",
+		 function );
+
+		return( -1 );
+	}
+#if !defined( __BORLANDC__ )
+	if( setvbuf(
+	     stdout,
+	     NULL,
+	     stdio_mode,
+	     0 ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set IO mode of stdout.",
+		 function );
+
+		return( -1 );
+	}
+	if( setvbuf(
+	     stderr,
+	     NULL,
+	     stdio_mode,
+	     0 ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set IO mode of stderr.",
+		 function );
+
+		return( -1 );
+	}
+#endif /* !defined( __BORLANDC__ ) */
+
+	return( 1 );
+}
 
 /* Prints the executable version information
  */
@@ -172,11 +230,6 @@ void ewfoutput_version_detailed_fprint(
 	 ", zlib %s",
 	 ZLIB_VERSION );
 #endif
-
-	fprintf(
-	 stream,
-	 ", libsystem %s",
-	 LIBCSYSTEM_VERSION_STRING );
 
 #if defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC )
 	fprintf(

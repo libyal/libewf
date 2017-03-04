@@ -31,11 +31,11 @@
 #define LIBEWF_VERSION_STRING					"@VERSION@"
 
 /* The access flags definitions
- * bit 1	set to 1 for read access
- * bit 2	set to 1 for write access
- * bit 3-4	not used
+ * bit 1							set to 1 for read access
+ * bit 2							set to 1 for write access
+ * bit 3-4							not used
  * bit 5        set to 1 to resume write
- * bit 6-8	not used
+ * bit 6-8							not used
  */
 enum LIBEWF_ACCESS_FLAGS
 {
@@ -112,13 +112,13 @@ enum LIBEWF_COMPRESSION_LEVELS
 };
 
 /* The compression flags
- * bit 1	set to 1 for empty block compression
+ * bit 1							set to 1 for empty block compression
  *              detects empty blocks and stored them compressed, the compression
  *              is only done once
- * bit 2	set to 1 for pattern fill compression
+ * bit 2							set to 1 for pattern fill compression
  *              this implies empty block compression using the pattern fill method
  *              used internally only
- * bit 3-8	not used
+ * bit 3-8							not used
  */
 enum LIBEWF_COMPRESSION_FLAGS
 {

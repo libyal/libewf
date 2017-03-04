@@ -65,5 +65,5 @@ int libewf_device_information_parse(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_DEVICE_INFORMATION_H ) */
 

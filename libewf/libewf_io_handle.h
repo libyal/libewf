@@ -109,5 +109,5 @@ int libewf_io_handle_clone(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_IO_HANDLE_H ) */
 

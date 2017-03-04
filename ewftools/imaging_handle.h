@@ -574,5 +574,5 @@ int imaging_handle_print_hashes(
 }
 #endif
 
-#endif
+#endif /* !defined( _IMAGING_HANDLE_H ) */
 

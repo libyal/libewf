@@ -37,13 +37,15 @@
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
-#include "ewfoutput.h"
+#include "ewftools_getopt.h"
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libcnotify.h"
-#include "ewftools_libcsystem.h"
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
+#include "ewftools_output.h"
+#include "ewftools_signal.h"
+#include "ewftools_unused.h"
 #include "imaging_handle.h"
 #include "log_handle.h"
 #include "process_status.h"
@@ -194,12 +196,12 @@ void usage_fprint(
 /* Signal handler for ewfacquire
  */
 void ewfacquirestream_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      ewftools_signal_t signal EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "ewfacquirestream_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	EWFTOOLS_UNREFERENCED_PARAMETER( signal )
 
 	ewfacquirestream_abort = 1;
 
@@ -221,8 +223,13 @@ void ewfacquirestream_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -343,11 +350,17 @@ ssize_t ewfacquirestream_read_chunk(
 				 input_read_size );
 			}
 #endif
-			input_read_count = libcsystem_file_io_read(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+			input_read_count = _read(
 			                    input_file_descriptor,
 			                    &( ( storage_media_buffer->raw_buffer )[ buffer_offset ] ),
 			                    input_read_size );
-
+#else
+			input_read_count = read(
+			                    input_file_descriptor,
+			                    &( ( storage_media_buffer->raw_buffer )[ buffer_offset ] ),
+			                    input_read_size );
+#endif
 			if( input_read_count < 0 )
 			{
 				if( ( errno == ESPIPE )
@@ -1239,7 +1252,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_initialize(
+	if( ewftools_output_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
@@ -1249,7 +1262,7 @@ int main( int argc, char * const argv[] )
 
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
@@ -1280,7 +1293,7 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-	while( ( option = libcsystem_getopt(
+	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "A:b:B:c:C:d:D:e:E:f:hj:l:m:M:N:o:p:P:qsS:t:vVx2:" ) ) ) != (system_integer_t) -1 )
@@ -2032,7 +2045,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_signal_attach(
+	if( ewftools_signal_attach(
 	     ewfacquirestream_signal_handler,
 	     &error ) != 1 )
 	{
@@ -2114,7 +2127,7 @@ int main( int argc, char * const argv[] )
 			goto on_error;
 		}
 	}
-	if( libcsystem_signal_detach(
+	if( ewftools_signal_detach(
 	     &error ) != 1 )
 	{
 		fprintf(

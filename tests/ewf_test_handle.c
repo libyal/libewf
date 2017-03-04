@@ -1,5 +1,5 @@
 /*
- * Library handle type testing program
+ * Library handle type test program
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -30,8 +30,8 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_getopt.h"
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcsystem.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
@@ -4766,7 +4766,7 @@ int main(
 	system_integer_t option    = 0;
 	int result                 = 0;
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = ewf_test_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )

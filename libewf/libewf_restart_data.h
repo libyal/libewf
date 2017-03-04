@@ -40,5 +40,5 @@ int libewf_restart_data_parse(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_RESTART_DATA_H ) */
 

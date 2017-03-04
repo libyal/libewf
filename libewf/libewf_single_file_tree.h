@@ -53,5 +53,5 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SINGLE_FILE_TREE_H ) */
 

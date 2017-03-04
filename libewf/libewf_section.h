@@ -407,5 +407,5 @@ ssize_t libewf_section_volume_s01_write(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBEWF_SECTION_H ) */
 

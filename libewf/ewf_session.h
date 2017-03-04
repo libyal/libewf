@@ -121,5 +121,5 @@ struct ewf_session_entry_v2
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_SESSION_H ) */
 

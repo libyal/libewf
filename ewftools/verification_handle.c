@@ -38,6 +38,7 @@
 #include "ewftools_libcthreads.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libhmac.h"
+#include "ewftools_system_string.h"
 #include "log_handle.h"
 #include "process_status.h"
 #include "storage_media_buffer.h"
@@ -3616,7 +3617,7 @@ int verification_handle_set_number_of_threads(
 		string_length = system_string_length(
 				 string );
 
-		if( libcsystem_string_decimal_copy_to_64_bit(
+		if( ewftools_system_string_decimal_copy_to_64_bit(
 		     string,
 		     string_length + 1,
 		     &number_of_threads,
