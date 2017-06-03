@@ -5,7 +5,6 @@ MSVSCPP_FILES = \
 	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
-	ewf_test_open_close/ewf_test_open_close.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
 	ewf_test_write/ewf_test_write.vcproj \

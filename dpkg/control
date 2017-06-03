@@ -1,10 +1,10 @@
 Source: libewf
-Section: libs
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev, zlib1g-dev, libssl-dev, libfuse-dev, python-all-dev, python3-all-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, pkg-config, zlib1g-dev, libssl-dev, libfuse-dev, python-dev, python3-dev
 Standards-Version: 3.9.5
-Homepage: https://github.com/libyal/libewf/
+Section: libs
+Homepage: https://github.com/libyal/libewf
 
 Package: libewf
 Architecture: any
@@ -12,9 +12,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: libewf-dbg
 Description: Library to access the Expert Witness Compression Format (EWF)
  libewf is a library to access the Expert Witness Compression Format (EWF).
- libewf allows you to read media information of EWF files in the SMART (EWF-S01)
- format and the EnCase (EWF-E01, EWF-L01, EWF2-Ex01 and EWF2-Lx01) formats.
- Supports files created by EnCase 1 to 7, linen 5 to 7 and FTK Imager.
 
 Package: libewf2
 Section: libs
@@ -22,9 +19,6 @@ Architecture: any
 Depends: libewf (= ${binary:Version}), ${misc:Depends}
 Description: Library to access the Expert Witness Compression Format (EWF)
  libewf is a library to access the Expert Witness Compression Format (EWF).
- libewf allows you to read media information of EWF files in the SMART (EWF-S01)
- format and the EnCase (EWF-E01, EWF-L01, EWF2-Ex01 and EWF2-Lx01) formats.
- Supports files created by EnCase 1 to 7, linen 5 to 7 and FTK Imager.
 
 Package: libewf-dbg
 Architecture: any
@@ -46,6 +40,13 @@ Architecture: any
 Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading and writing EWF files
  Several tools for reading and writing EWF files.
+
+Package: libewf-tools-dbg
+Section: debug
+Architecture: any
+Depends: libewf-tools (= ${binary:Version}), ${misc:Depends}
+Description: Debugging symbols for libewf-tools
+ Debugging symbols for libewf-tools.
 
 Package: libewf-python
 Section: python

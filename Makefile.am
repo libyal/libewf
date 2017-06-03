@@ -40,13 +40,12 @@ DPKG_FILES = \
 	dpkg/compat \
 	dpkg/control \
 	dpkg/copyright \
-	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libewf.docs \
-	dpkg/libewf-dev.docs \
-	dpkg/libewf-python.docs \
-	dpkg/libewf-python3.docs \
-	dpkg/libewf-tools.docs \
+	dpkg/libewf.install \
+	dpkg/libewf-dev.install \
+	dpkg/libewf-python.install \
+	dpkg/libewf-python3.install \
+	dpkg/libewf-tools.install \
 	dpkg/source/format
 
 GETTEXT_FILES = \

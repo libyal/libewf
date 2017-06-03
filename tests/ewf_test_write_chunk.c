@@ -455,7 +455,7 @@ int main( int argc, char * const argv[] )
 	uint8_t compression_flags                       = 0;
 	int8_t compression_level                        = LIBEWF_COMPRESSION_NONE;
 
-	while( ( option = ewftools_getopt(
+	while( ( option = ewf_test_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "b:B:c:S:" ) ) ) != (system_integer_t) -1 )

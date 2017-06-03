@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20170227],
+ [20170603],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -246,7 +246,6 @@ AC_CONFIG_FILES([libewf/libewf_definitions.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([common/types.h])
 AC_CONFIG_FILES([dpkg/changelog])
-AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([ewf.net/ewf.net.rc])
 AC_CONFIG_FILES([libewf/libewf.rc])
 AC_CONFIG_FILES([libewf.pc])

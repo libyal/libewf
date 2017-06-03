@@ -73,7 +73,6 @@ check_PROGRAMS = \
 	ewf_test_error \
 	ewf_test_glob \
 	ewf_test_handle \
-	ewf_test_open_close \
 	ewf_test_support \
 	ewf_test_truncate \
 	ewf_test_write \
@@ -108,22 +107,6 @@ ewf_test_handle_SOURCES = \
 
 ewf_test_handle_LDADD = \
 	@LIBUNA_LIBADD@ \
-	@LIBCLOCALE_LIBADD@ \
-	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
-	@PTHREAD_LIBADD@
-
-ewf_test_open_close_SOURCES = \
-	ewf_test_getopt.c ewf_test_getopt.h \
-	ewf_test_libewf.h \
-	ewf_test_libcerror.h \
-	ewf_test_libcnotify.h \
-	ewf_test_open_close.c \
-	ewf_test_unused.h
-
-ewf_test_open_close_LDADD = \
-	@LIBUNA_LIBADD@ \
-	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
