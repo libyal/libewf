@@ -564,6 +564,8 @@ int ewf_test_handle_open_source(
 	          number_of_filenames,
 	          error );
 #endif
+	filenames = NULL;
+
 	if( result != 1 )
 	{
 		libcerror_error_set(
@@ -1000,6 +1002,8 @@ int ewf_test_handle_open(
 	          number_of_filenames,
 	          &error );
 
+	filenames = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -1400,6 +1404,8 @@ int ewf_test_handle_open_close(
 	          number_of_filenames,
 	          &error );
 #endif
+
+	filenames = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
