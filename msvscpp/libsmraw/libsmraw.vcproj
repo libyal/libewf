@@ -171,10 +171,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmraw\libsmraw_metadata.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmraw\libsmraw_notify.c"
 				>
 			</File>
@@ -250,10 +246,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmraw\libsmraw_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmraw\libsmraw_metadata.h"
 				>
 			</File>
 			<File

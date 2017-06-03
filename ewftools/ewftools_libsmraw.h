@@ -27,7 +27,6 @@
 #if defined( HAVE_LOCAL_LIBSMRAW )
 #include <libsmraw_definitions.h>
 #include <libsmraw_handle.h>
-#include <libsmraw_metadata.h>
 #include <libsmraw_support.h>
 #include <libsmraw_types.h>
 

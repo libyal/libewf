@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_support"
-	ProjectGUID="{6534D372-4928-4E84-A7B7-A2B3E0B95637}"
-	RootNamespace="ewf_test_support"
+	Name="ewf_test_io_handle"
+	ProjectGUID="{25722671-ED99-4CA8-90CB-CF972A4686C4}"
+	RootNamespace="ewf_test_io_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_getopt.c"
+				RelativePath="..\..\tests\ewf_test_io_handle.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_support.c"
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -190,23 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_getopt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libbfio.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\ewf_test_libcerror.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libclocale.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libcnotify.h"
 				>
 			</File>
 			<File
@@ -214,11 +198,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libuna.h"
+				RelativePath="..\..\tests\ewf_test_macros.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_macros.h"
+				RelativePath="..\..\tests\ewf_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_unused.h"
 				>
 			</File>
 		</Filter>

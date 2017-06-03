@@ -198,11 +198,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libcclocal.h"
+				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libcerror.h"
+				RelativePath="..\..\tests\ewf_test_libclocale.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_libcnotify.h"
 				>
 			</File>
 			<File
@@ -211,6 +215,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_macros.h"
 				>
 			</File>
 			<File
