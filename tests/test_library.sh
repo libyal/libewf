@@ -11,7 +11,7 @@ TEST_PREFIX=`dirname ${PWD}`;
 TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\).*$/\1/'`;
 
 TEST_PROFILE="lib${TEST_PREFIX}";
-LIBRARY_TESTS="chunk_data chunk_group chunk_table data_chunk deflate_bit_stream deflate_huffman_table error file_entry hash_sections header_sections io_handle media_values notify read_io_handle section sector_range segment_file segment_table single_file_entry single_files write_io_handle";
+LIBRARY_TESTS="chunk_data chunk_group chunk_table data_chunk error file_entry hash_sections header_sections io_handle media_values notify read_io_handle section sector_range segment_file segment_table single_file_entry single_files write_io_handle";
 LIBRARY_TESTS_WITH_INPUT="handle support";
 OPTION_SETS="";
 

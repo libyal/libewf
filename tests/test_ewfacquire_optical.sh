@@ -36,7 +36,9 @@ test_callback()
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 
-	(cd ${TMPDIR} && run_test_with_arguments "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} -T"${INPUT_FILE_FULL_PATH}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
+	TEST_DESCRIPTION="";
+
+	(cd ${TMPDIR} && run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} -T"${INPUT_FILE_FULL_PATH}" ${INPUT_BASENAME}*.[Ii][Ss][Oo] | sed '1,2d' > "${TEST_LOG}");
 	local RESULT=$?;
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";

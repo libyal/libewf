@@ -42,20 +42,14 @@ test_api_write_function()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	run_test_with_arguments ${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${TMPDIR}/write";
+	TEST_DESCRIPTION="Testing write function: lib${TEST_PREFIX}_${TEST_FUNCTION}";
+
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${TMPDIR}/write";
 
 	RESULT=$?;
 
 	rm -rf ${TMPDIR};
 
-	echo -n "Testing write function: lib${TEST_PREFIX}_${TEST_FUNCTION}";
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		echo " (FAIL)";
-	else
-		echo " (PASS)";
-	fi
 	return ${RESULT};
 }
 

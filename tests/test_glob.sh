@@ -62,7 +62,9 @@ test_glob_sequence2()
 
 	touch ${FILENAMES};
 
-	run_test_with_arguments ${TEST_EXECUTABLE} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
+	TEST_DESCRIPTION="";
+
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
@@ -231,7 +233,9 @@ test_glob_sequence3()
 
 	touch ${FILENAMES};
 
-	run_test_with_arguments ${TEST_EXECUTABLE} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
+	TEST_DESCRIPTION="";
+
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
@@ -367,7 +371,9 @@ test_glob_sequence4()
 
 	touch ${FILENAMES};
 
-	run_test_with_arguments ${TEST_EXECUTABLE} ${TMPDIR}/${BASENAME} > ${TMPDIR}/output;
+	TEST_DESCRIPTION="";
+
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 

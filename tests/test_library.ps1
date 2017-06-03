@@ -10,7 +10,7 @@ $TestPrefix = Split-Path -path ${Pwd}.Path -parent
 $TestPrefix = Split-Path -path ${TestPrefix} -leaf
 $TestPrefix = ${TestPrefix}.Substring(3)
 
-$LibraryTests = "chunk_data chunk_group chunk_table data_chunk deflate_bit_stream deflate_huffman_table error file_entry hash_sections header_sections io_handle media_values notify read_io_handle section sector_range segment_file segment_table single_file_entry single_files write_io_handle"
+$LibraryTests = "chunk_data chunk_group chunk_table data_chunk error file_entry hash_sections header_sections io_handle media_values notify read_io_handle section sector_range segment_file segment_table single_file_entry single_files write_io_handle"
 $LibraryTestsWithInput = "handle support"
 
 $TestToolDirectory = "..\msvscpp\Release"
