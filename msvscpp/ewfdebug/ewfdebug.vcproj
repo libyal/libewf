@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_find.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_getopt.h"
 				>
 			</File>

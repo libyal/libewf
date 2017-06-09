@@ -158,6 +158,7 @@ ewfdebug_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	ewfdebug.c \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
@@ -190,6 +191,7 @@ ewfexport_SOURCES = \
 	ewfcommon.h \
 	ewfexport.c \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
@@ -250,6 +252,7 @@ ewfinfo_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfinfo.c \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
@@ -287,6 +290,7 @@ ewfmount_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfmount.c \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
@@ -327,6 +331,7 @@ ewfrecover_SOURCES = \
 	ewfcommon.h \
 	ewfrecover.c \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
@@ -386,6 +391,7 @@ ewfverify_SOURCES = \
 	digest_hash.c digest_hash.h \
 	ewfcommon.h \
 	ewfinput.c ewfinput.h \
+	ewftools_find.h \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
