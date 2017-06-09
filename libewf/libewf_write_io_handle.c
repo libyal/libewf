@@ -96,7 +96,7 @@ int libewf_write_io_handle_initialize(
 	*write_io_handle = memory_allocate_structure(
 	                    libewf_write_io_handle_t );
 
-	if( write_io_handle == NULL )
+	if( *write_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,

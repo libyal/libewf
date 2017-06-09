@@ -63,7 +63,7 @@ int libewf_io_handle_initialize(
 	*io_handle = memory_allocate_structure(
 	              libewf_io_handle_t );
 
-	if( io_handle == NULL )
+	if( *io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
