@@ -137,6 +137,7 @@ Other small corrections.
 Updated the information regarding Logicube products and the data section checksum behavior.
 | 0.0.79 | J.B. Metz | August 2015 | Switched to asciidoc format.
 | 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
+| 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
 |===
 
 :numbered:
@@ -2821,25 +2822,79 @@ What about:
 * the SMART logs
 
 === AD encryption
-The container probably consists of a 512 byte header followed by the encrypted data.
+The AccessData encryption format is a single-file encryption method often used to
+encrypt AccessData and EnCase forensic images.  The input file (which can be
+anything) is encrypted with AES using a user-supplied password or public key
+and a header is prepended onto the resulting ciphertext to allow for decryption
+with the same password or corresponding private key.
 
-[cols="1,1,1,5",options="header"]
+The container consists of a header followed by the encrypted data.  The header is
+padded out to the nearest 512-byte boundary (typically it is just 512 bytes); all
+header values are in little-endian order.  AccessData has provided a https://support.accessdata.com/hc/en-us/article_attachments/201953867/AD1___Image_Encryption_Technical_White_Paper.pdf[whitepaper]
+with some generally useful format information.
+
+==== Header
+The header format is:
+
+[cols="1,1,5",options="header"]
 |===
-| Offset | Size | Value | Description
-| 0 | 8 | | File signature +
+| Offset | Size | Description
+| 0 | 8 | File signature: 
 "ADCRYPT\x00"
-| 8 | 4 | 0x01 | [yellow-background]*Unknown (Version)*
-| 12 | 4 | 0x0200 | Data offset
-| 16 | 8 | | [yellow-background]*Unknown (0x0000ffffffffffff)*
-| 24 | 4 | 0x03 | [yellow-background]*Unknown*
-| 28 | 4 | 0x02 | [yellow-background]*Unknown*
-| 32 | 4 | | [yellow-background]*Unknown*
-| 36 | 4 | 0x10 | [yellow-background]*Unknown*
-| 40 | 4 | 0x20 | [yellow-background]*Unknown*
-| 44 | 4 | 0x40 | [yellow-background]*Unknown*
-| 58 | 112 | | [yellow-background]*Unknown key data*
-| 170 | 342 | | [yellow-background]*Unknown (empty data)*
+| 8 | 4 | Version - 0x01000000
+| 12 | 4 | Header length (= offset of first encrypted data byte)
+| 16 | 2 | Number of passwords (or -1 if unknown/unset)
+| 18 | 2 | Number of raw keys (or -1 if unknown/unset)
+| 20 | 2 | Number of certificates (or -1 if unknown/unset)
+| 22 | 2 | Reserved (must be 0x0000)
+| 24 | 4 | Encryption algorithm: 1=AES-128, 2=AES-192, 3=AES-256
+| 28 | 4 | Hash algorithm: 1=SHA-256, 2=SHA-512
+| 32 | 4 | PBKDF2 iteration count (**I**)
+| 36 | 4 | Salt length (**S**)
+| 40 | 4 | Key length (**K**)
+| 44 | 4 | HMAC length (**H**)
+| 48 | S | Encrypted salt (**ESALT**)
+| 48 + S | K | Encrypted key (**EKEY**)
+| 48 + S + K | H | HMAC of encrypted key (**HMAC**)
 |===
+
+The header is then padded with null bytes to the following 512-byte boundary,
+after which follows the encrypted file.
+
+Although the encryption protocol has some configurable settings, most (if not
+all) files will use the defaults: AES-256 for encryption, SHA-512 for hashing,
+4000 iterations of PBKDF2.
+
+==== Protocol
+
+All AES encryption steps use AES in CTR mode with an IV of all null bytes and
+a simple incrementing little-endian counter starting at 0.
+
+The encryption protocol is as follows:
+
+* Generate a random encryption key FKEY of length K
+* Encrypt the target file with the specified AES version and key FKEY
+* Generate a random salt SALT
+* Generate a new encryption key PKEY from the user password hashed with the
+  specified hash algorithm (or the empty string, if there is no user password):
+  `PKEY = PBKDF2(hash(user_pw) || '', SALT, I, K)`
+* Encrypt FKEY using the specified AES version and key PKEY to generate EKEY
+* If the user supplied a public key, use it to encrypt SALT and generate ESALT,
+  otherwise ESALT = SALT
+* Compute an HMAC of the encrypted key EKEY with PKEY using the specified hash
+  algorithm
+
+The decryption procedure is thus:
+
+* If using a private key, decrypt the encrypted salt ESALT to get the original
+  SALT (if no key, SALT = ESALT)
+* Regenerate the encryption key PKEY from the user password hashed with the
+  specified hash algorithm (or the empty string, if there is no user password):
+  `PKEY = PBKDF2(hash(user_pw) || '', SALT, I, K)`
+* Optionally verify the HMAC of EKEY using PKEY and the specified hash algorithm,
+  comparing it with the header HMAC
+* Decrypt the encrypted key using AES with PKEY to get FKEY
+* Decrypt the file ciphertext using AES with FKEY
 
 === Header
 [yellow-background]*All test headers consist of the where spaces are actually 
