@@ -2825,7 +2825,7 @@ header values are in little-endian order.
 
 The AD crypt header is 512 bytes in size and consists of:
 
-[cols="1,1,5",options="header"]
+[cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | "ADCRYPT\x00" | File signature
