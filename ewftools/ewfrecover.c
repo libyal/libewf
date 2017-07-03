@@ -36,6 +36,10 @@
 #include <glob.h>
 #endif
 
+#if defined( HAVE_FCNTL_H )
+#include <fcntl.h>
+#endif
+
 #include "ewfcommon.h"
 #include "ewfinput.h"
 #include "ewftools_getopt.h"

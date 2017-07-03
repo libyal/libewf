@@ -34,6 +34,10 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_FCNTL_H )
+#include <fcntl.h>
+#endif
+
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfinput.h"
