@@ -64,13 +64,13 @@ int ewf_test_single_file_entry_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "single_file_entry",
-         single_file_entry );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "single_file_entry",
+	 single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_single_file_entry_free(
 	          &single_file_entry,
@@ -81,13 +81,13 @@ int ewf_test_single_file_entry_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "single_file_entry",
-         single_file_entry );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "single_file_entry",
+	 single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int ewf_test_single_file_entry_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int ewf_test_single_file_entry_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int ewf_test_single_file_entry_free(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -292,13 +292,13 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "source_single_file_entry",
-         source_single_file_entry );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "source_single_file_entry",
+	 source_single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -312,13 +312,13 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "destination_single_file_entry",
-         destination_single_file_entry );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_single_file_entry",
+	 destination_single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_single_file_entry_free(
 	          &destination_single_file_entry,
@@ -329,13 +329,13 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_single_file_entry",
-         destination_single_file_entry );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_single_file_entry",
+	 destination_single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_single_file_entry_clone(
 	          &destination_single_file_entry,
@@ -347,13 +347,13 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_single_file_entry",
-         destination_single_file_entry );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_single_file_entry",
+	 destination_single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -367,9 +367,9 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -385,13 +385,13 @@ int ewf_test_single_file_entry_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "source_single_file_entry",
-         source_single_file_entry );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "source_single_file_entry",
+	 source_single_file_entry );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

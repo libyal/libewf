@@ -64,13 +64,13 @@ int ewf_test_section_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "section",
-         section );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "section",
+	 section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_section_free(
 	          &section,
@@ -81,13 +81,13 @@ int ewf_test_section_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "section",
-         section );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "section",
+	 section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int ewf_test_section_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int ewf_test_section_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int ewf_test_section_free(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -292,13 +292,13 @@ int ewf_test_section_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "source_section",
-         source_section );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "source_section",
+	 source_section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -312,13 +312,13 @@ int ewf_test_section_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "destination_section",
-         destination_section );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_section",
+	 destination_section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_section_free(
 	          &destination_section,
@@ -329,13 +329,13 @@ int ewf_test_section_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_section",
-         destination_section );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_section",
+	 destination_section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_section_clone(
 	          &destination_section,
@@ -347,13 +347,13 @@ int ewf_test_section_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_section",
-         destination_section );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_section",
+	 destination_section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -367,9 +367,9 @@ int ewf_test_section_clone(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -385,13 +385,13 @@ int ewf_test_section_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "source_section",
-         source_section );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "source_section",
+	 source_section );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

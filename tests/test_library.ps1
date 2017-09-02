@@ -1,6 +1,6 @@
 # Tests C library functions and types.
 #
-# Version: 20170807
+# Version: 20170902
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -76,6 +76,14 @@ If (-Not (Test-Path ${TestToolDirectory}))
 }
 If (-Not (Test-Path ${TestToolDirectory}))
 {
+	$TestToolDirectory = "..\vs2017\Release"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
+	$TestToolDirectory = "..\vs2017\VSDebug"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
 	Write-Host "Missing test tool directory." -foreground Red
 
 	Exit ${ExitFailure}
@@ -85,6 +93,11 @@ $Result = ${ExitIgnore}
 
 Foreach (${TestName} in ${LibraryTests} -split " ")
 {
+	# Split will return an array of a single empty string when LibraryTests is empty.
+	If (-Not (${TestName}))
+	{
+		Continue
+	}
 	$Result = RunTest ${TestName}
 
 	If (${Result} -ne ${ExitSuccess})
@@ -95,6 +108,11 @@ Foreach (${TestName} in ${LibraryTests} -split " ")
 
 Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 {
+	# Split will return an array of a single empty string when LibraryTestsWithInput is empty.
+	If (-Not (${TestName}))
+	{
+		Continue
+	}
 	# TODO: add RunTestWithInput
 	$Result = RunTest ${TestName}
 

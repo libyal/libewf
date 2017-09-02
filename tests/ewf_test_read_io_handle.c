@@ -64,13 +64,13 @@ int ewf_test_read_io_handle_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "read_io_handle",
-         read_io_handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "read_io_handle",
+	 read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_read_io_handle_free(
 	          &read_io_handle,
@@ -81,13 +81,13 @@ int ewf_test_read_io_handle_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "read_io_handle",
-         read_io_handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "read_io_handle",
+	 read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int ewf_test_read_io_handle_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int ewf_test_read_io_handle_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int ewf_test_read_io_handle_free(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -292,13 +292,13 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "source_read_io_handle",
-         source_read_io_handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "source_read_io_handle",
+	 source_read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -312,13 +312,13 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "destination_read_io_handle",
-         destination_read_io_handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_read_io_handle",
+	 destination_read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_read_io_handle_free(
 	          &destination_read_io_handle,
@@ -329,13 +329,13 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_read_io_handle",
-         destination_read_io_handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_read_io_handle",
+	 destination_read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_read_io_handle_clone(
 	          &destination_read_io_handle,
@@ -347,13 +347,13 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "destination_read_io_handle",
-         destination_read_io_handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_read_io_handle",
+	 destination_read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -367,9 +367,9 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -385,13 +385,13 @@ int ewf_test_read_io_handle_clone(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "source_read_io_handle",
-         source_read_io_handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "source_read_io_handle",
+	 source_read_io_handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

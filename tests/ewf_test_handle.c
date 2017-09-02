@@ -680,13 +680,13 @@ int ewf_test_handle_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_free(
 	          &handle,
@@ -697,13 +697,13 @@ int ewf_test_handle_initialize(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -716,9 +716,9 @@ int ewf_test_handle_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -734,9 +734,9 @@ int ewf_test_handle_initialize(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -868,9 +868,9 @@ int ewf_test_handle_free(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -917,18 +917,18 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "filenames",
-         filenames );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "filenames",
+	 filenames );
 
-        EWF_TEST_ASSERT_GREATER_THAN_INT(
-         "number_of_filenames",
-         number_of_filenames,
+	EWF_TEST_ASSERT_GREATER_THAN_INT(
+	 "number_of_filenames",
+	 number_of_filenames,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_initialize(
 	          &handle,
@@ -939,13 +939,13 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test open
 	 */
@@ -961,9 +961,9 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Clean up
 	 */
@@ -976,9 +976,9 @@ int ewf_test_handle_open(
 	 result,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_free(
 	          &handle,
@@ -989,13 +989,13 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_glob_free(
 	          filenames,
@@ -1009,9 +1009,9 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -1070,18 +1070,18 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "filenames",
-         filenames );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "filenames",
+	 filenames );
 
-        EWF_TEST_ASSERT_GREATER_THAN_INT(
-         "number_of_filenames",
-         number_of_filenames,
+	EWF_TEST_ASSERT_GREATER_THAN_INT(
+	 "number_of_filenames",
+	 number_of_filenames,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_initialize(
 	          &handle,
@@ -1092,13 +1092,13 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test open
 	 */
@@ -1114,9 +1114,9 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Clean up
 	 */
@@ -1129,9 +1129,9 @@ int ewf_test_handle_open(
 	 result,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_free(
 	          &handle,
@@ -1142,13 +1142,13 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_glob_wide_free(
 	          filenames,
@@ -1160,9 +1160,9 @@ int ewf_test_handle_open(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -1210,9 +1210,9 @@ int ewf_test_handle_close(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -1269,13 +1269,13 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "filenames",
-         filenames );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "filenames",
+	 filenames );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_initialize(
 	          &handle,
@@ -1286,13 +1286,13 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test open and close
 	 */
@@ -1317,9 +1317,9 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_close(
 	          handle,
@@ -1330,9 +1330,9 @@ int ewf_test_handle_open_close(
 	 result,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test open and close a second time to validate clean up on close
 	 */
@@ -1357,9 +1357,9 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libewf_handle_close(
 	          handle,
@@ -1370,9 +1370,9 @@ int ewf_test_handle_open_close(
 	 result,
 	 0 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Clean up
 	 */
@@ -1385,13 +1385,13 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "handle",
-         handle );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "handle",
+	 handle );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_glob_wide_free(
@@ -1412,9 +1412,9 @@ int ewf_test_handle_open_close(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -1467,9 +1467,9 @@ int ewf_test_handle_signal_abort(
 	 result,
 	 1 );
 
-        EWF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -1482,9 +1482,9 @@ int ewf_test_handle_signal_abort(
 	 result,
 	 -1 );
 
-        EWF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
