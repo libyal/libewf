@@ -2,7 +2,7 @@
 #
 # Python-bindings read testing program
 #
-# Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2008-2017, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
@@ -18,6 +18,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from __future__ import print_function
 import argparse
@@ -41,20 +42,21 @@ def get_whence_string(whence):
 
 
 def pyewf_test_seek_offset_and_read_buffer(
-    ewf_file, input_offset, input_whence, input_size,
-    expected_offset, expected_size):
-  """Tests seeking an offset and reading a buffer."""
-  description = (
-      "Testing reading buffer at offset: {0:d}, whence: {1:s} of size: {2:d}"
-      "\t").format(input_offset, get_whence_string(input_whence), input_size)
-  print(description, end="")
+    ewf_handle, input_offset, input_whence, input_size, expected_offset,
+    expected_size):
 
-  error_string = None
+  print(
+      ("Testing reading buffer at offset: {0:d}, whence: {1:s} and "
+       "size: {2:d}\t").format(
+          input_offset, get_whence_string(input_whence), input_size),
+      end="")
+
+  error_string = ""
   result = True
   try:
-    ewf_file.seek(input_offset, input_whence)
+    ewf_handle.seek(input_offset, input_whence)
 
-    result_offset = ewf_file.get_offset()
+    result_offset = ewf_handle.get_offset()
     if expected_offset != result_offset:
       result = False
 
@@ -65,7 +67,7 @@ def pyewf_test_seek_offset_and_read_buffer(
         if input_size < read_size:
           read_size = input_size
 
-        data = ewf_file.read(size=read_size)
+        data = ewf_handle.read(size=read_size)
         data_size = len(data)
 
         input_size -= data_size
@@ -79,7 +81,7 @@ def pyewf_test_seek_offset_and_read_buffer(
         result = False
 
   except Exception as exception:
-    error_string = str(exception)
+    print(str(exception))
     if expected_offset != -1:
       result = False
 
@@ -94,15 +96,12 @@ def pyewf_test_seek_offset_and_read_buffer(
 
 
 def pyewf_test_read_buffer_at_offset(
-    ewf_file, input_offset, input_size,
-    expected_offset, expected_size):
-  """Tests reading a buffer at a specific offset."""
-  description = (
-      "Testing reading buffer at offset: {0:d} and size: {1:d}"
-      "\t").format(input_offset, input_size)
-  print(description, end="")
+    ewf_handle, input_offset, input_size, expected_offset, expected_size):
 
-  error_string = None
+  print("Testing reading buffer at offset: {0:d} and size: {1:d}\t".format(
+      input_offset, input_size), end="")
+
+  error_string = ""
   result = True
   try:
     result_size = 0
@@ -111,7 +110,7 @@ def pyewf_test_read_buffer_at_offset(
       if input_size < read_size:
         read_size = input_size
 
-      data = ewf_file.read_buffer_at_offset(read_size, input_offset)
+      data = ewf_handle.read_buffer_at_offset(read_size, input_offset)
       data_size = len(data)
 
       input_offset += data_size
@@ -130,7 +129,7 @@ def pyewf_test_read_buffer_at_offset(
       result = False
 
   except Exception as exception:
-    error_string = str(exception)
+    print(str(exception))
     if expected_offset != -1:
       result = False
 
@@ -144,90 +143,91 @@ def pyewf_test_read_buffer_at_offset(
   return result
 
 
-def pyewf_test_read(ewf_file):
-  """Tests the read function."""
-  file_size = ewf_file.size
+def pyewf_test_read(ewf_handle):
+  media_size = ewf_handle.media_size
 
   # Case 0: test full read
 
-  # Test: offset: 0 size: <file_size>
-  # Expected result: offset: 0 size: <file_size>
+  # Test: offset: 0 size: <media_size>
+  # Expected result: offset: 0 size: <media_size>
   read_offset = 0
-  read_size = file_size
+  read_size = media_size
 
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_file, read_offset, os.SEEK_SET, read_size,
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
       read_offset, read_size):
     return False
 
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_file, read_offset, os.SEEK_SET, read_size,
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
       read_offset, read_size):
     return False
 
   # Case 1: test buffer at offset read
 
-  # Test: offset: <file_size / 7> size: <file_size / 2>
-  # Expected result: offset: <file_size / 7> size: <file_size / 2>
-  read_offset, _ = divmod(file_size, 7)
-  read_size, _ = divmod(file_size, 2)
+  # Test: offset: <media_size / 7> size: <media_size / 2>
+  # Expected result: offset: <media_size / 7> size: <media_size / 2>
+  read_offset, _ = divmod(media_size, 7)
+  read_size, _ = divmod(media_size, 2)
 
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_file, read_offset, os.SEEK_SET, read_size,
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
       read_offset, read_size):
     return False
 
   if not pyewf_test_seek_offset_and_read_buffer(
-      ewf_file, read_offset, os.SEEK_SET, read_size,
+      ewf_handle, read_offset, os.SEEK_SET, read_size,
       read_offset, read_size):
     return False
 
   # Case 2: test read beyond media size
 
-  if file_size < 1024:
-    # Test: offset: <file_size - 1024> size: 4096
+  if media_size < 1024:
+    # Test: offset: <media_size - 1024> size: 4096
     # Expected result: offset: -1 size: <undetermined>
-    read_offset = file_size - 1024
+    read_offset = media_size - 1024
     read_size = 4096
 
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_file, read_offset, os.SEEK_SET, read_size, -1, -1):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_file, read_offset, os.SEEK_SET, read_size, -1, -1):
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
   else:
-    # Test: offset: <file_size - 1024> size: 4096
-    # Expected result: offset: <file_size - 1024> size: 1024
-    read_offset = file_size - 1024
+    # Test: offset: <media_size - 1024> size: 4096
+    # Expected result: offset: <media_size - 1024> size: 1024
+    read_offset = media_size - 1024
     read_size = 4096
 
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_file, read_offset, os.SEEK_SET, read_size,
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
         read_offset, 1024):
       return False
 
     if not pyewf_test_seek_offset_and_read_buffer(
-        ewf_file, read_offset, os.SEEK_SET, read_size,
+        ewf_handle, read_offset, os.SEEK_SET, read_size,
         read_offset, 1024):
       return False
 
   # Case 3: test buffer at offset read
 
-  # Test: offset: <file_size / 7> size: <file_size / 2>
-  # Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
-  read_offset, _ = divmod(file_size, 7)
-  read_size, _ = divmod(file_size, 2)
+  # Test: offset: <media_size / 7> size: <media_size / 2>
+  # Expected result: offset: < ( media_size / 7 ) + ( media_size / 2 ) > size: <media_size / 2>
+  read_offset, _ = divmod(media_size, 7)
+  read_size, _ = divmod(media_size, 2)
 
   if not pyewf_test_read_buffer_at_offset(
-      ewf_file, read_offset, read_size,
+      ewf_handle, read_offset, read_size,
       read_offset + read_size, read_size):
     return False
 
   if not pyewf_test_read_buffer_at_offset(
-      ewf_file, read_offset, read_size,
+      ewf_handle, read_offset, read_size,
       read_offset + read_size, read_size):
     return False
 
@@ -235,39 +235,41 @@ def pyewf_test_read(ewf_file):
 
 
 def pyewf_test_read_file(filename):
-  """Tests the read function with a file."""
-  ewf_file = pyewf.file()
+  filenames = pyewf.glob(filename)
+  ewf_handle = pyewf.handle()
 
-  ewf_file.open(filename, "r")
-  result = pyewf_test_read(ewf_file)
-  ewf_file.close()
+  ewf_handle.open(filenames, "r")
+  result = pyewf_test_read(ewf_handle)
+  ewf_handle.close()
 
   return result
 
 
 def pyewf_test_read_file_object(filename):
-  """Tests the read function with a file-like object."""
-  file_object = open(filename, "rb")
-  ewf_file = pyewf.file()
+  filenames = pyewf.glob(filename)
+  file_objects = []
+  for filename in filenames:
+    file_object = open(filename, "rb")
+    file_objects.append(file_object)
 
-  ewf_file.open_file_object(file_object, "r")
-  result = pyewf_test_read(ewf_file)
-  ewf_file.close()
+  ewf_handle = pyewf.handle()
+  ewf_handle.open_file_objects(file_objects, "r")
+
+  result = pyewf_test_read(ewf_handle)
+  ewf_handle.close()
 
   return result
 
 
 def pyewf_test_read_file_no_open(filename):
-  """Tests the read function with a file without open."""
-  description = "Testing read of without open:\t"
-  print(description, end="")
+  print("Testing read of offset without open:\t", end="")
 
-  ewf_file = pyewf.file()
+  ewf_handle = pyewf.handle()
 
-  error_string = None
+  error_string = ""
   result = False
   try:
-    ewf_file.read(size=4096)
+    ewf_handle.read(size=4096)
   except Exception as exception:
     error_string = str(exception)
     result = True
@@ -283,8 +285,8 @@ def pyewf_test_read_file_no_open(filename):
 
 
 def main():
-  args_parser = argparse.ArgumentParser(
-      description="Tests read.")
+  args_parser = argparse.ArgumentParser(description=(
+      "Tests read."))
 
   args_parser.add_argument(
       "source", nargs="?", action="store", metavar="FILENAME",
@@ -316,3 +318,4 @@ if __name__ == "__main__":
     sys.exit(1)
   else:
     sys.exit(0)
+

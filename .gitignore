@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20161030
+# Version: 20170916
 
 # Generic auto-generated build files
 *~
@@ -15,16 +15,16 @@
 *.lo
 *.log
 *.loT
-*.Plo
-*.Po
 *.o
 *.obj
+*.Plo
+*.Po
 *.so
 *.so.[0-9][0-9]*
 *.so.[0-9][0-9]*.[0-9][0-9]*.[0-9][0-9]*
 *.swp
-*.trs
 *.Tpo
+*.trs
 .deps
 .libs
 INSTALL
@@ -53,9 +53,6 @@ stamp-h[1-9]
 /install-sh
 /libtool
 /ltmain.sh
-/missing
-/test-driver
-/ylwrap
 /m4/codeset.m4
 /m4/extern-inline.m4
 /m4/fcntl-o.m4
@@ -68,8 +65,8 @@ stamp-h[1-9]
 /m4/intldir.m4
 /m4/intlmacosx.m4
 /m4/intmax.m4
-/m4/inttypes-pri.m4
 /m4/inttypes_h.m4
+/m4/inttypes-pri.m4
 /m4/lcmessage.m4
 /m4/lib-ld.m4
 /m4/lib-link.m4
@@ -77,14 +74,14 @@ stamp-h[1-9]
 /m4/libtool.m4
 /m4/lock.m4
 /m4/longlong.m4
+/m4/lt~obsolete.m4
 /m4/ltoptions.m4
 /m4/ltsugar.m4
 /m4/ltversion.m4
-/m4/lt~obsolete.m4
 /m4/nls.m4
 /m4/po.m4
-/m4/progtest.m4
 /m4/printf-posix.m4
+/m4/progtest.m4
 /m4/size_max.m4
 /m4/stdint_h.m4
 /m4/threadlib.m4
@@ -93,6 +90,7 @@ stamp-h[1-9]
 /m4/wchar_t.m4
 /m4/wint_t.m4
 /m4/xsize.m4
+/missing
 /po/boldquot.sed
 /po/en@boldquot.header
 /po/en@quot.header
@@ -100,15 +98,15 @@ stamp-h[1-9]
 /po/Makefile.in.in
 /po/Makevars
 /po/Makevars.template
-/po/Rules-quot
 /po/POTFILES
 /po/quot.sed
 /po/remove-potcdate.sed
 /po/remove-potcdate.sin
+/po/Rules-quot
+/test-driver
+/ylwrap
 
 # Project specific files
-/libewf.pc
-/libewf.spec
 /common/config.h
 /common/config.h.in
 /common/types.h
@@ -117,10 +115,13 @@ stamp-h[1-9]
 /include/libewf/definitions.h
 /include/libewf/features.h
 /include/libewf/types.h
+/libewf.pc
+/libewf.spec
 /libewf/libewf.rc
 /libewf/libewf_definitions.h
 /pyewf-python[23]/*.[ch]
 /ewf.net/ewf.net.rc
+/ewftools/*.exe
 /ewftools/ewfacquire
 /ewftools/ewfacquirestream
 /ewftools/ewfdebug
@@ -129,6 +130,7 @@ stamp-h[1-9]
 /ewftools/ewfmount
 /ewftools/ewfrecover
 /ewftools/ewfverify
+/tests/*.exe
 /tests/ewf_test_chunk_data
 /tests/ewf_test_chunk_group
 /tests/ewf_test_chunk_table
@@ -155,9 +157,6 @@ stamp-h[1-9]
 /tests/ewf_test_write_chunk
 /tests/ewf_test_write_io_handle
 /tests/input
-/tests/input_raw
-/tests/input_raw_more
-/tests/input_raw_optical
 /tests/tmp*
 
 # Local library dependencies specific files

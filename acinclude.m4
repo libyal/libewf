@@ -1,3 +1,7 @@
+dnl Checks for required headers and functions
+dnl
+dnl Version: 20170918
+
 dnl Function to determine the host operating system
 AC_DEFUN([AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM],
   [ac_libewf_determine_operating_system_target_string="$target";
@@ -88,14 +92,6 @@ AC_DEFUN([AX_EWFTOOLS_CHECK_LOCAL],
   [dnl Headers used in ewftools
   AC_CHECK_HEADERS([signal.h sys/signal.h unistd.h])
 
-  dnl Headers included in ewftools/ewftools_glob.h
-  AC_CHECK_HEADERS([errno.h glob.h])
-
-  AS_IF(
-    [test "x$ac_cv_header_glob_h" = xno],
-    [AC_CHECK_HEADERS([io.h])
-  ])
-
   dnl Functions used in ewftools
   AC_CHECK_FUNCS([close getopt setvbuf])
 
@@ -104,6 +100,27 @@ AC_DEFUN([AX_EWFTOOLS_CHECK_LOCAL],
    [AC_MSG_FAILURE(
      [Missing function: close],
      [1])
+  ])
+
+  dnl Check for the host operation system will be used as a fall back in the ewftools
+  AX_LIBEWF_CHECK_HOST_OPERATING_SYSTEM
+
+  dnl Headers included in ewftools/ewftools_glob.h
+  AC_CHECK_HEADERS([errno.h glob.h])
+
+  AS_IF(
+    [test "x$ac_cv_header_glob_h" = xno],
+    [AC_CHECK_HEADERS([io.h])
+  ])
+
+  dnl Headers included in ewftools/log_handle.c
+  AC_CHECK_HEADERS([stdarg.h varargs.h])
+
+  AS_IF(
+    [test "x$ac_cv_header_stdarg_h" != xyes && test "x$ac_cv_header_varargs_h" != xyes],
+    [AC_MSG_FAILURE(
+      [Missing headers: stdarg.h and varargs.h],
+      [1])
   ])
 
   dnl Check if tools should be build as static executables
