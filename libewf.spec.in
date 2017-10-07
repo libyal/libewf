@@ -41,7 +41,6 @@ BuildRequires: byacc flex @ax_libcdatetime_spec_build_requires@ @ax_libfuse_spec
 
 %description tools
 Several tools for reading and writing EWF files.
-It contains tools to acquire, export, query and verify EWF files.
 
 %package python
 Summary: Python 2 bindings for libewf
