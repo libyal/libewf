@@ -288,9 +288,16 @@ int libewf_chunk_table_clone(
 		 "%s: unable to copy source to destination chunk table.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *destination_chunk_table );
+
+		*destination_chunk_table = NULL;
+
+		return( -1 );
 	}
-	( *destination_chunk_table )->checksum_errors = NULL;
+/* TODO: clonse corrupted_chunks_list */
+	( *destination_chunk_table )->corrupted_chunks_list = NULL;
+	( *destination_chunk_table )->checksum_errors       = NULL;
 
 	if( libcdata_range_list_clone(
 	     &( ( *destination_chunk_table )->checksum_errors ),

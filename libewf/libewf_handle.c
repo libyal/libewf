@@ -3392,6 +3392,7 @@ int libewf_internal_handle_open_file_io_pool(
 	{
 		if( libewf_write_io_handle_initialize(
 		     &( internal_handle->write_io_handle ),
+		     internal_handle->io_handle,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

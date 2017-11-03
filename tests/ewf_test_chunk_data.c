@@ -35,7 +35,7 @@
 
 #include "../libewf/libewf_chunk_data.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_chunk_data_free function
  * Returns 1 if successful or 0 if not
@@ -75,7 +75,155 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+/* Tests the libewf_chunk_data_clone function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_data_clone(
+     void )
+{
+	libcerror_error_t *error                    = NULL;
+	libewf_chunk_data_t *destination_chunk_data = NULL;
+	libewf_chunk_data_t *source_chunk_data      = NULL;
+	int result                                  = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_chunk_data_initialize(
+	          &source_chunk_data,
+	          4096,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "source_chunk_data",
+	 source_chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_chunk_data_clone(
+	          &destination_chunk_data,
+	          source_chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_chunk_data",
+	 destination_chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_data_free(
+	          &destination_chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_chunk_data",
+	 destination_chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_data_clone(
+	          &destination_chunk_data,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "destination_chunk_data",
+	 destination_chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_data_clone(
+	          NULL,
+	          source_chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_data_free(
+	          &source_chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "source_chunk_data",
+	 source_chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( destination_chunk_data != NULL )
+	{
+		libewf_chunk_data_free(
+		 &destination_chunk_data,
+		 NULL );
+	}
+	if( source_chunk_data != NULL )
+	{
+		libewf_chunk_data_free(
+		 &source_chunk_data,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -92,7 +240,7 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	/* TODO: add tests for libewf_chunk_data_initialize */
 
@@ -100,7 +248,9 @@ int main(
 	 "libewf_chunk_data_free",
 	 ewf_test_chunk_data_free );
 
-	/* TODO: add tests for libewf_chunk_data_clone */
+	EWF_TEST_RUN(
+	 "libewf_chunk_data_clone",
+	 ewf_test_chunk_data_clone );
 
 	/* TODO: add tests for libewf_chunk_data_read_buffer */
 
@@ -124,7 +274,7 @@ int main(
 
 	/* TODO: add tests for libewf_chunk_data_read_element_data */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

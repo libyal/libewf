@@ -69,6 +69,17 @@ int libewf_chunk_group_initialize(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	*chunk_group = memory_allocate_structure(
 	                libewf_chunk_group_t );
 
@@ -242,9 +253,16 @@ int libewf_chunk_group_clone(
 		 "%s: unable to copy source to destination chunk group.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *destination_chunk_group );
+
+		*destination_chunk_group = NULL;
+
+		return( -1 );
 	}
 /* TODO clone chunks_list */
+	( *destination_chunk_group )->chunks_list = NULL;
+
 	return( 1 );
 
 on_error:

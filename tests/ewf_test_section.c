@@ -35,7 +35,7 @@
 
 #include "../libewf/libewf_section.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_section_initialize function
  * Returns 1 if successful or 0 if not
@@ -416,7 +416,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -433,7 +433,7 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
 	 "libewf_section_initialize",
@@ -443,11 +443,11 @@ int main(
 	 "libewf_section_free",
 	 ewf_test_section_free );
 
-	/* TODO: add tests for libewf_section_test_zero */
-
 	EWF_TEST_RUN(
 	 "libewf_section_clone",
 	 ewf_test_section_clone );
+
+	/* TODO: add tests for libewf_section_test_zero */
 
 	/* TODO: add tests for libewf_section_get_data_offset */
 
@@ -507,7 +507,7 @@ int main(
 
 	/* TODO: add tests for libewf_section_volume_s01_write */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

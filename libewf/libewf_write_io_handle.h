@@ -37,6 +37,7 @@
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_group.h"
 #include "libewf_chunk_table.h"
+#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcdata.h"
@@ -211,6 +212,7 @@ struct libewf_write_io_handle
 
 int libewf_write_io_handle_initialize(
      libewf_write_io_handle_t **write_io_handle,
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libewf_write_io_handle_free(

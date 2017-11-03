@@ -35,7 +35,7 @@
 
 #include "../libewf/libewf_single_file_entry.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_single_file_entry_initialize function
  * Returns 1 if successful or 0 if not
@@ -1238,9 +1238,9 @@ int ewf_test_single_file_entry_get_utf8_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1256,9 +1256,9 @@ int ewf_test_single_file_entry_get_utf8_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1274,9 +1274,9 @@ int ewf_test_single_file_entry_get_utf8_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1524,9 +1524,9 @@ int ewf_test_single_file_entry_get_utf16_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1542,9 +1542,9 @@ int ewf_test_single_file_entry_get_utf16_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1560,9 +1560,9 @@ int ewf_test_single_file_entry_get_utf16_name(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2302,9 +2302,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2320,9 +2320,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2338,9 +2338,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2465,9 +2465,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2483,9 +2483,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2501,9 +2501,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2628,9 +2628,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2646,9 +2646,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2664,9 +2664,9 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2791,9 +2791,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2809,9 +2809,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2827,9 +2827,9 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 		 result,
 		 -1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2870,7 +2870,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -2887,7 +2887,7 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
 	 "libewf_single_file_entry_initialize",
@@ -2973,7 +2973,7 @@ int main(
 	 "libewf_single_file_entry_get_utf16_hash_value_sha1",
 	 ewf_test_single_file_entry_get_utf16_hash_value_sha1 );
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

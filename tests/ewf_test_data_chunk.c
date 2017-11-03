@@ -73,10 +73,6 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ )
-
-#endif /* defined( __GNUC__ ) */
-
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -92,23 +88,19 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	/* TODO: add tests for libewf_data_chunk_initialize */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	EWF_TEST_RUN(
 	 "libewf_data_chunk_free",
 	 ewf_test_data_chunk_free );
 
-#if defined( __GNUC__ )
-
 	/* TODO: add tests for libewf_data_chunk_read_buffer */
 
 	/* TODO: add tests for libewf_data_chunk_write_buffer */
-
-#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

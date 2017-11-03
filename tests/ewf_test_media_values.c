@@ -35,7 +35,7 @@
 
 #include "../libewf/libewf_media_values.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_media_values_initialize function
  * Returns 1 if successful or 0 if not
@@ -270,6 +270,104 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_media_values_clear function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_media_values_clear(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_media_values_t *media_values = NULL;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_media_values_clear(
+	          media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_media_values_clear(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_media_values_clone function
  * Returns 1 if successful or 0 if not
  */
@@ -416,105 +514,7 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libewf_media_values_clear function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_media_values_clear(
-     void )
-{
-	libcerror_error_t *error            = NULL;
-	libewf_media_values_t *media_values = NULL;
-	int result                          = 0;
-
-	/* Initialize test
-	 */
-	result = libewf_media_values_initialize(
-	          &media_values,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "media_values",
-	 media_values );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	result = libewf_media_values_clear(
-	          media_values,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_media_values_clear(
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_media_values_free(
-	          &media_values,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "media_values",
-	 media_values );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( media_values != NULL )
-	{
-		libewf_media_values_free(
-		 &media_values,
-		 NULL );
-	}
-	return( 0 );
-}
-
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -531,7 +531,7 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
 	 "libewf_media_values_initialize",
@@ -542,16 +542,16 @@ int main(
 	 ewf_test_media_values_free );
 
 	EWF_TEST_RUN(
-	 "libewf_media_values_clone",
-	 ewf_test_media_values_clone );
-
-	EWF_TEST_RUN(
 	 "libewf_media_values_clear",
 	 ewf_test_media_values_clear );
 
+	EWF_TEST_RUN(
+	 "libewf_media_values_clone",
+	 ewf_test_media_values_clone );
+
 	/* TODO: add tests for libewf_media_values_calculate_chunk_size */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

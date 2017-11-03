@@ -42,6 +42,7 @@
 #include "libewf_filename.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
+#include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
@@ -67,6 +68,7 @@
  */
 int libewf_write_io_handle_initialize(
      libewf_write_io_handle_t **write_io_handle,
+     libewf_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_write_io_handle_initialize";
@@ -89,6 +91,17 @@ int libewf_write_io_handle_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid write IO handle value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -128,7 +141,7 @@ int libewf_write_io_handle_initialize(
 	}
 	if( libewf_chunk_group_initialize(
 	     &( ( *write_io_handle )->chunk_group ),
-	     NULL,
+	     io_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
