@@ -43,5 +43,5 @@ int pyewf_file_objects_pool_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_FILE_OBJECTS_IO_POOL_H ) */
 

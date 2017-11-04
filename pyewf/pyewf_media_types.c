@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf_libewf.h"
 #include "pyewf_media_types.h"
+#include "pyewf_libewf.h"
 #include "pyewf_python.h"
 #include "pyewf_unused.h"
 
@@ -73,7 +73,7 @@ PyTypeObject pyewf_media_types_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyewf media_types object (wraps LIBEWF_MEDIA_TYPES)",
+	"pyewf media types object (wraps LIBEWF_MEDIA_TYPES)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -233,39 +233,39 @@ on_error:
 PyObject *pyewf_media_types_new(
            void )
 {
-	pyewf_media_types_t *pyewf_media_types = NULL;
-	static char *function                  = "pyewf_media_types_new";
+	pyewf_media_types_t *definitions_object = NULL;
+	static char *function                   = "pyewf_media_types_new";
 
-	pyewf_media_types = PyObject_New(
-	                     struct pyewf_media_types,
-	                     &pyewf_media_types_type_object );
+	definitions_object = PyObject_New(
+	                      struct pyewf_media_types,
+	                      &pyewf_media_types_type_object );
 
-	if( pyewf_media_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize media types.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyewf_media_types_init(
-	     pyewf_media_types ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize media types.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyewf_media_types );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyewf_media_types != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyewf_media_types );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -274,15 +274,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyewf_media_types_init(
-     pyewf_media_types_t *pyewf_media_types )
+     pyewf_media_types_t *definitions_object )
 {
 	static char *function = "pyewf_media_types_init";
 
-	if( pyewf_media_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid media types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -293,22 +293,22 @@ int pyewf_media_types_init(
 /* Frees a media types object
  */
 void pyewf_media_types_free(
-      pyewf_media_types_t *pyewf_media_types )
+      pyewf_media_types_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyewf_media_types_free";
 
-	if( pyewf_media_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid media types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyewf_media_types );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -329,6 +329,6 @@ void pyewf_media_types_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyewf_media_types );
+	 (PyObject*) definitions_object );
 }
 

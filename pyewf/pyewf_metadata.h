@@ -113,5 +113,5 @@ PyObject *pyewf_handle_get_hash_values(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_METADATA_H ) */
 

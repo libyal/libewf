@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyewf_handle.h"
 #include "pyewf_libcerror.h"
 #include "pyewf_libewf.h"
 #include "pyewf_python.h"
@@ -48,7 +47,7 @@ struct pyewf_file_entry
 
 	/* The handle object
 	 */
-	pyewf_handle_t *handle_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyewf_file_entry_object_methods[];
@@ -56,7 +55,7 @@ extern PyTypeObject pyewf_file_entry_type_object;
 
 PyObject *pyewf_file_entry_new(
            libewf_file_entry_t *file_entry,
-           pyewf_handle_t *handle_object );
+           PyObject *parent_object );
 
 int pyewf_file_entry_init(
      pyewf_file_entry_t *pyewf_file_entry );
@@ -136,7 +135,7 @@ PyObject *pyewf_file_entry_get_number_of_sub_file_entries(
            PyObject *arguments );
 
 PyObject *pyewf_file_entry_get_sub_file_entry_by_index(
-           pyewf_file_entry_t *pyewf_file_entry,
+           PyObject *pyewf_file_entry,
            int sub_file_entry_index );
 
 PyObject *pyewf_file_entry_get_sub_file_entry(
@@ -152,5 +151,5 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_FILE_ENTRY_H ) */
 

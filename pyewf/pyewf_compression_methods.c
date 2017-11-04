@@ -205,39 +205,39 @@ on_error:
 PyObject *pyewf_compression_methods_new(
            void )
 {
-	pyewf_compression_methods_t *pyewf_compression_methods = NULL;
-	static char *function                                  = "pyewf_compression_methods_new";
+	pyewf_compression_methods_t *definitions_object = NULL;
+	static char *function                           = "pyewf_compression_methods_new";
 
-	pyewf_compression_methods = PyObject_New(
-	                             struct pyewf_compression_methods,
-	                             &pyewf_compression_methods_type_object );
+	definitions_object = PyObject_New(
+	                      struct pyewf_compression_methods,
+	                      &pyewf_compression_methods_type_object );
 
-	if( pyewf_compression_methods == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize compression methods.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyewf_compression_methods_init(
-	     pyewf_compression_methods ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize compression methods.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyewf_compression_methods );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyewf_compression_methods != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyewf_compression_methods );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -246,15 +246,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyewf_compression_methods_init(
-     pyewf_compression_methods_t *pyewf_compression_methods )
+     pyewf_compression_methods_t *definitions_object )
 {
 	static char *function = "pyewf_compression_methods_init";
 
-	if( pyewf_compression_methods == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid compression methods.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -265,22 +265,22 @@ int pyewf_compression_methods_init(
 /* Frees a compression methods object
  */
 void pyewf_compression_methods_free(
-      pyewf_compression_methods_t *pyewf_compression_methods )
+      pyewf_compression_methods_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyewf_compression_methods_free";
 
-	if( pyewf_compression_methods == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid compression methods.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyewf_compression_methods );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -301,6 +301,6 @@ void pyewf_compression_methods_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyewf_compression_methods );
+	 (PyObject*) definitions_object );
 }
 

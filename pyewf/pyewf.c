@@ -528,6 +528,9 @@ PyObject *pyewf_glob(
 		filename_narrow = PyString_AsString(
 				   utf8_string_object );
 #endif
+		filename_length = narrow_string_length(
+		                   filename_narrow );
+
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libewf_glob(

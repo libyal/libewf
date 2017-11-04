@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf_libewf.h"
 #include "pyewf_media_flags.h"
+#include "pyewf_libewf.h"
 #include "pyewf_python.h"
 #include "pyewf_unused.h"
 
@@ -73,7 +73,7 @@ PyTypeObject pyewf_media_flags_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyewf media_flags object (wraps LIBEWF_MEDIA_FLAGS)",
+	"pyewf media flags object (wraps LIBEWF_MEDIA_FLAGS)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -205,39 +205,39 @@ on_error:
 PyObject *pyewf_media_flags_new(
            void )
 {
-	pyewf_media_flags_t *pyewf_media_flags = NULL;
-	static char *function                  = "pyewf_media_flags_new";
+	pyewf_media_flags_t *definitions_object = NULL;
+	static char *function                   = "pyewf_media_flags_new";
 
-	pyewf_media_flags = PyObject_New(
-	                     struct pyewf_media_flags,
-	                     &pyewf_media_flags_type_object );
+	definitions_object = PyObject_New(
+	                      struct pyewf_media_flags,
+	                      &pyewf_media_flags_type_object );
 
-	if( pyewf_media_flags == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize media flags.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyewf_media_flags_init(
-	     pyewf_media_flags ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize media flags.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyewf_media_flags );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyewf_media_flags != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyewf_media_flags );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -246,15 +246,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyewf_media_flags_init(
-     pyewf_media_flags_t *pyewf_media_flags )
+     pyewf_media_flags_t *definitions_object )
 {
 	static char *function = "pyewf_media_flags_init";
 
-	if( pyewf_media_flags == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid media flags.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -265,22 +265,22 @@ int pyewf_media_flags_init(
 /* Frees a media flags object
  */
 void pyewf_media_flags_free(
-      pyewf_media_flags_t *pyewf_media_flags )
+      pyewf_media_flags_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyewf_media_flags_free";
 
-	if( pyewf_media_flags == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid media flags.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyewf_media_flags );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -301,6 +301,6 @@ void pyewf_media_flags_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyewf_media_flags );
+	 (PyObject*) definitions_object );
 }
 

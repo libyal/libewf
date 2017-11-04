@@ -63,5 +63,5 @@ PyMODINIT_FUNC initpyewf(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_H ) */
 

@@ -50,14 +50,14 @@ PyObject *pyewf_media_types_new(
            void );
 
 int pyewf_media_types_init(
-     pyewf_media_types_t *pyewf_media_types );
+     pyewf_media_types_t *definitions_object );
 
 void pyewf_media_types_free(
-      pyewf_media_types_t *pyewf_media_types );
+      pyewf_media_types_t *definitions_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYEWF_MEDIA_TYPES_H ) */
 

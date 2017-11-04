@@ -1,5 +1,5 @@
 /*
- * Python object definition of the file entries sequence and iterator
+ * Python object definition of the sequence and iterator object of file entries
  *
  * Copyright (C) 2008-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -97,7 +97,7 @@ PyTypeObject pyewf_file_entries_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"internal pyewf file entries sequence and iterator object",
+	"pyewf internal sequence and iterator object of file entries",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -154,72 +154,72 @@ PyTypeObject pyewf_file_entries_type_object = {
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entries_new(
-           pyewf_file_entry_t *file_entry_object,
-           PyObject* (*get_sub_file_entry_by_index)(
-                        pyewf_file_entry_t *file_entry_object,
-                        int sub_file_entry_index ),
-           int number_of_sub_file_entries )
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items )
 {
-	pyewf_file_entries_t *pyewf_file_entries = NULL;
-	static char *function                    = "pyewf_file_entries_new";
+	pyewf_file_entries_t *file_entries_object = NULL;
+	static char *function                     = "pyewf_file_entries_new";
 
-	if( file_entry_object == NULL )
+	if( parent_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file enry object.",
+		 "%s: invalid parent object.",
 		 function );
 
 		return( NULL );
 	}
-	if( get_sub_file_entry_by_index == NULL )
+	if( get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid get sub file entry by index function.",
+		 "%s: invalid get item by index function.",
 		 function );
 
 		return( NULL );
 	}
 	/* Make sure the file entries values are initialized
 	 */
-	pyewf_file_entries = PyObject_New(
-	                      struct pyewf_file_entries,
-	                      &pyewf_file_entries_type_object );
+	file_entries_object = PyObject_New(
+	                       struct pyewf_file_entries,
+	                       &pyewf_file_entries_type_object );
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize file entries.",
+		 "%s: unable to create file entries object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyewf_file_entries_init(
-	     pyewf_file_entries ) != 0 )
+	     file_entries_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize file entries.",
+		 "%s: unable to initialize file entries object.",
 		 function );
 
 		goto on_error;
 	}
-	pyewf_file_entries->file_entry_object           = file_entry_object;
-	pyewf_file_entries->get_sub_file_entry_by_index = get_sub_file_entry_by_index;
-	pyewf_file_entries->number_of_sub_file_entries  = number_of_sub_file_entries;
+	file_entries_object->parent_object     = parent_object;
+	file_entries_object->get_item_by_index = get_item_by_index;
+	file_entries_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) pyewf_file_entries->file_entry_object );
+	 (PyObject *) file_entries_object->parent_object );
 
-	return( (PyObject *) pyewf_file_entries );
+	return( (PyObject *) file_entries_object );
 
 on_error:
-	if( pyewf_file_entries != NULL )
+	if( file_entries_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyewf_file_entries );
+		 (PyObject *) file_entries_object );
 	}
 	return( NULL );
 }
@@ -228,25 +228,25 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyewf_file_entries_init(
-     pyewf_file_entries_t *pyewf_file_entries )
+     pyewf_file_entries_t *file_entries_object )
 {
 	static char *function = "pyewf_file_entries_init";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the file entries values are initialized
 	 */
-	pyewf_file_entries->file_entry_object           = NULL;
-	pyewf_file_entries->get_sub_file_entry_by_index = NULL;
-	pyewf_file_entries->sub_file_entry_index        = 0;
-	pyewf_file_entries->number_of_sub_file_entries  = 0;
+	file_entries_object->parent_object     = NULL;
+	file_entries_object->get_item_by_index = NULL;
+	file_entries_object->current_index     = 0;
+	file_entries_object->number_of_items   = 0;
 
 	return( 0 );
 }
@@ -254,22 +254,22 @@ int pyewf_file_entries_init(
 /* Frees a file entries object
  */
 void pyewf_file_entries_free(
-      pyewf_file_entries_t *pyewf_file_entries )
+      pyewf_file_entries_t *file_entries_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyewf_file_entries_free";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyewf_file_entries );
+	           file_entries_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +289,72 @@ void pyewf_file_entries_free(
 
 		return;
 	}
-	if( pyewf_file_entries->file_entry_object != NULL )
+	if( file_entries_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyewf_file_entries->file_entry_object );
+		 (PyObject *) file_entries_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyewf_file_entries );
+	 (PyObject*) file_entries_object );
 }
 
 /* The file entries len() function
  */
 Py_ssize_t pyewf_file_entries_len(
-            pyewf_file_entries_t *pyewf_file_entries )
+            pyewf_file_entries_t *file_entries_object )
 {
 	static char *function = "pyewf_file_entries_len";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) pyewf_file_entries->number_of_sub_file_entries );
+	return( (Py_ssize_t) file_entries_object->number_of_items );
 }
 
 /* The file entries getitem() function
  */
 PyObject *pyewf_file_entries_getitem(
-           pyewf_file_entries_t *pyewf_file_entries,
+           pyewf_file_entries_t *file_entries_object,
            Py_ssize_t item_index )
 {
 	PyObject *file_entry_object = NULL;
 	static char *function       = "pyewf_file_entries_getitem";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->get_sub_file_entry_by_index == NULL )
+	if( file_entries_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - missing get sub file entry by index function.",
+		 "%s: invalid file entries object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->number_of_sub_file_entries < 0 )
+	if( file_entries_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - invalid number of sub file entries.",
+		 "%s: invalid file entries object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) pyewf_file_entries->number_of_sub_file_entries ) )
+	 || ( item_index >= (Py_ssize_t) file_entries_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +363,8 @@ PyObject *pyewf_file_entries_getitem(
 
 		return( NULL );
 	}
-	file_entry_object = pyewf_file_entries->get_sub_file_entry_by_index(
-	                     pyewf_file_entries->file_entry_object,
+	file_entry_object = file_entries_object->get_item_by_index(
+	                     file_entries_object->parent_object,
 	                     (int) item_index );
 
 	return( file_entry_object );
@@ -373,83 +373,83 @@ PyObject *pyewf_file_entries_getitem(
 /* The file entries iter() function
  */
 PyObject *pyewf_file_entries_iter(
-           pyewf_file_entries_t *pyewf_file_entries )
+           pyewf_file_entries_t *file_entries_object )
 {
 	static char *function = "pyewf_file_entries_iter";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) pyewf_file_entries );
+	 (PyObject *) file_entries_object );
 
-	return( (PyObject *) pyewf_file_entries );
+	return( (PyObject *) file_entries_object );
 }
 
 /* The file entries iternext() function
  */
 PyObject *pyewf_file_entries_iternext(
-           pyewf_file_entries_t *pyewf_file_entries )
+           pyewf_file_entries_t *file_entries_object )
 {
 	PyObject *file_entry_object = NULL;
 	static char *function       = "pyewf_file_entries_iternext";
 
-	if( pyewf_file_entries == NULL )
+	if( file_entries_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries.",
+		 "%s: invalid file entries object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->get_sub_file_entry_by_index == NULL )
+	if( file_entries_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - missing get sub file entry by index function.",
+		 "%s: invalid file entries object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->sub_file_entry_index < 0 )
+	if( file_entries_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - invalid sub file entry index.",
+		 "%s: invalid file entries object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->number_of_sub_file_entries < 0 )
+	if( file_entries_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries - invalid number of sub file entries.",
+		 "%s: invalid file entries object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyewf_file_entries->sub_file_entry_index >= pyewf_file_entries->number_of_sub_file_entries )
+	if( file_entries_object->current_index >= file_entries_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	file_entry_object = pyewf_file_entries->get_sub_file_entry_by_index(
-	                     pyewf_file_entries->file_entry_object,
-	                     pyewf_file_entries->sub_file_entry_index );
+	file_entry_object = file_entries_object->get_item_by_index(
+	                     file_entries_object->parent_object,
+	                     file_entries_object->current_index );
 
 	if( file_entry_object != NULL )
 	{
-		pyewf_file_entries->sub_file_entry_index++;
+		file_entries_object->current_index++;
 	}
 	return( file_entry_object );
 }
