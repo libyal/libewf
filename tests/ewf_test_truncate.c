@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 
+#include "ewf_test_libcerror.h"
 #include "ewf_test_libcfile.h"
 #include "ewf_test_libcnotify.h"
 

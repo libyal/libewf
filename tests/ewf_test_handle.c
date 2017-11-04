@@ -2555,10 +2555,10 @@ on_error:
 int ewf_test_handle_get_file_io_handle(
      libewf_handle_t *handle )
 {
-	libcerror_error_t *error        = NULL;
-	libbfio_handle_t file_io_handle = 0;
-	int file_io_handle_is_set       = 0;
-	int result                      = 0;
+	libcerror_error_t *error         = NULL;
+	libbfio_handle_t *file_io_handle = 0;
+	int file_io_handle_is_set        = 0;
+	int result                       = 0;
 
 	/* Test regular cases
 	 */
@@ -3186,5 +3186,6 @@ on_error:
 		 NULL );
 #endif
 	}
+	return( EXIT_FAILURE );
 }
 

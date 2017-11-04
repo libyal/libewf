@@ -171,8 +171,7 @@ ewf_test_glob_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_glob_LDADD = \
-	../libewf/libewf.la \
-	@PTHREAD_LIBADD@
+	../libewf/libewf.la
 
 ewf_test_handle_SOURCES = \
 	ewf_test_functions.c ewf_test_functions.h \
@@ -189,14 +188,17 @@ ewf_test_handle_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_handle_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCTHREADS_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@PTHREAD_LIBADD@
+	@LIBCERROR_LIBADD@
 
 ewf_test_hash_sections_SOURCES = \
 	ewf_test_hash_sections.c \
@@ -378,7 +380,6 @@ ewf_test_truncate_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@
-	@PTHREAD_LIBADD@
 
 ewf_test_write_SOURCES = \
 	ewf_test_getopt.c ewf_test_getopt.h \
@@ -392,7 +393,6 @@ ewf_test_write_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
-	@PTHREAD_LIBADD@
 
 ewf_test_write_chunk_SOURCES = \
 	ewf_test_getopt.c ewf_test_getopt.h \
@@ -406,7 +406,6 @@ ewf_test_write_chunk_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
-	@PTHREAD_LIBADD@
 
 ewf_test_write_io_handle_SOURCES = \
 	ewf_test_libcerror.h \
