@@ -226,18 +226,19 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-if test ${HAVE_WITH_ZLIB} -eq 0;
-then
+# TODO: disabled for now.
+# if test ${HAVE_WITH_ZLIB} -eq 0;
+# then
 	# Test "./configure && make && make check" with fallback zlib implementation.
-
-	run_configure_make_check "--with-zlib=no";
-	RESULT=$?;
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-fi
+#
+# 	run_configure_make_check "--with-zlib=no";
+# 	RESULT=$?;
+#
+# 	if test ${RESULT} -ne ${EXIT_SUCCESS};
+# 	then
+# 		exit ${EXIT_FAILURE};
+# 	fi
+# fi
 
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then
@@ -268,7 +269,7 @@ then
 	PYTHON2=`which python2 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON2} && test -x ${PYTHON2};
+	if test -n "${PYTHON2}" && test -x ${PYTHON2};
 	then
 		export PYTHON_VERSION=2;
 
@@ -299,7 +300,7 @@ then
 	PYTHON3=`which python3 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON3} && test -x ${PYTHON3};
+	if test -n "${PYTHON3}" && test -x ${PYTHON3};
 	then
 		export PYTHON_VERSION=3;
 
