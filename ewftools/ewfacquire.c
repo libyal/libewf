@@ -30,6 +30,10 @@
 #include <stdlib.h>
 #endif
 
+#if defined( HAVE_IO_H ) || defined( WINAPI )
+#include <io.h>
+#endif
+
 #include "byte_size_string.h"
 #include "device_handle.h"
 #include "ewfcommon.h"

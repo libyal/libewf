@@ -32,12 +32,16 @@
 #include <sys/resource.h>
 #endif
 
-#if defined( HAVE_GLOB_H )
-#include <glob.h>
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
+#include <fcntl.h>
 #endif
 
-#if defined( HAVE_FCNTL_H )
-#include <fcntl.h>
+#if defined( HAVE_IO_H ) || defined( WINAPI )
+#include <io.h>
+#endif
+
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
 #endif
 
 #include "byte_size_string.h"

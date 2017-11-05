@@ -27,18 +27,6 @@
 #include <types.h>
 #include <wide_string.h>
 
-#if defined( HAVE_ERRNO_H )
-#include <errno.h>
-#endif
-
-#if defined( HAVE_UNISTD_H )
-#include <unistd.h>
-#endif
-
-#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
-#include <stdlib.h>
-#endif
-
 #if defined( HAVE_SYS_RESOURCE_H )
 #include <sys/resource.h>
 #endif
@@ -52,6 +40,22 @@
 #else
 #include <time.h>
 #endif
+#endif
+
+#if defined( HAVE_ERRNO_H ) || defined( WINAPI )
+#include <errno.h>
+#endif
+
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
+#endif
+
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
+
+#if defined( HAVE_IO_H ) || defined( WINAPI )
+#include <io.h>
 #endif
 
 #if defined( HAVE_GLOB_H )

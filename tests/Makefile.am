@@ -465,8 +465,7 @@ ewf_test_write_SOURCES = \
 	ewf_test_write.c
 
 ewf_test_write_LDADD = \
-	@LIBUNA_LIBADD@ \
-	@LIBCLOCALE_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -478,8 +477,7 @@ ewf_test_write_chunk_SOURCES = \
 	ewf_test_write_chunk.c
 
 ewf_test_write_chunk_LDADD = \
-	@LIBUNA_LIBADD@ \
-	@LIBCLOCALE_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
