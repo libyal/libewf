@@ -2737,6 +2737,1332 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_handle_get_sectors_per_chunk function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_sectors_per_chunk(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error     = NULL;
+	uint32_t sectors_per_chunk   = 0;
+	int result                   = 0;
+	int sectors_per_chunk_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_sectors_per_chunk(
+	          handle,
+	          &sectors_per_chunk,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	sectors_per_chunk_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_sectors_per_chunk(
+	          NULL,
+	          &sectors_per_chunk,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( sectors_per_chunk_is_set != 0 )
+	{
+		result = libewf_handle_get_sectors_per_chunk(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_bytes_per_sector function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_bytes_per_sector(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error    = NULL;
+	uint32_t bytes_per_sector   = 0;
+	int bytes_per_sector_is_set = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_bytes_per_sector(
+	          handle,
+	          &bytes_per_sector,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	bytes_per_sector_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_bytes_per_sector(
+	          NULL,
+	          &bytes_per_sector,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( bytes_per_sector_is_set != 0 )
+	{
+		result = libewf_handle_get_bytes_per_sector(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_sectors function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_sectors(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error     = NULL;
+	uint64_t number_of_sectors   = 0;
+	int number_of_sectors_is_set = 0;
+	int result                   = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_sectors(
+	          handle,
+	          &number_of_sectors,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_sectors_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_sectors(
+	          NULL,
+	          &number_of_sectors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_sectors_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_sectors(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_chunk_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_chunk_size(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	size32_t chunk_size      = 0;
+	int chunk_size_is_set    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_chunk_size(
+	          handle,
+	          &chunk_size,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	chunk_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_chunk_size(
+	          NULL,
+	          &chunk_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( chunk_size_is_set != 0 )
+	{
+		result = libewf_handle_get_chunk_size(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_error_granularity function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_error_granularity(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error     = NULL;
+	uint32_t error_granularity   = 0;
+	int error_granularity_is_set = 0;
+	int result                   = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_error_granularity(
+	          handle,
+	          &error_granularity,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	error_granularity_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_error_granularity(
+	          NULL,
+	          &error_granularity,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( error_granularity_is_set != 0 )
+	{
+		result = libewf_handle_get_error_granularity(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_compression_method function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_compression_method(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error      = NULL;
+	uint16_t compression_method   = 0;
+	int compression_method_is_set = 0;
+	int result                    = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_compression_method(
+	          handle,
+	          &compression_method,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	compression_method_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_compression_method(
+	          NULL,
+	          &compression_method,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( compression_method_is_set != 0 )
+	{
+		result = libewf_handle_get_compression_method(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_media_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_media_size(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	size64_t media_size      = 0;
+	int media_size_is_set    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_media_size(
+	          handle,
+	          &media_size,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	media_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_media_size(
+	          NULL,
+	          &media_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( media_size_is_set != 0 )
+	{
+		result = libewf_handle_get_media_size(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_media_type function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_media_type(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t media_type       = 0;
+	int media_type_is_set    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_media_type(
+	          handle,
+	          &media_type,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	media_type_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_media_type(
+	          NULL,
+	          &media_type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( media_type_is_set != 0 )
+	{
+		result = libewf_handle_get_media_type(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_media_flags function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_media_flags(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t media_flags      = 0;
+	int media_flags_is_set   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_media_flags(
+	          handle,
+	          &media_flags,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	media_flags_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_media_flags(
+	          NULL,
+	          &media_flags,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( media_flags_is_set != 0 )
+	{
+		result = libewf_handle_get_media_flags(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_format function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_format(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t format           = 0;
+	int format_is_set        = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_format(
+	          handle,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	format_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_format(
+	          NULL,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( format_is_set != 0 )
+	{
+		result = libewf_handle_get_format(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_acquiry_errors function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_acquiry_errors(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error            = NULL;
+	uint32_t number_of_acquiry_errors   = 0;
+	int number_of_acquiry_errors_is_set = 0;
+	int result                          = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_acquiry_errors(
+	          handle,
+	          &number_of_acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_acquiry_errors_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_acquiry_errors(
+	          NULL,
+	          &number_of_acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_acquiry_errors_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_acquiry_errors(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_checksum_errors function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_checksum_errors(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error             = NULL;
+	uint32_t number_of_checksum_errors   = 0;
+	int number_of_checksum_errors_is_set = 0;
+	int result                           = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_checksum_errors(
+	          handle,
+	          &number_of_checksum_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_checksum_errors_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_checksum_errors(
+	          NULL,
+	          &number_of_checksum_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_checksum_errors_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_checksum_errors(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_sessions function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_sessions(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error      = NULL;
+	uint32_t number_of_sessions   = 0;
+	int number_of_sessions_is_set = 0;
+	int result                    = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_sessions(
+	          handle,
+	          &number_of_sessions,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_sessions_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_sessions(
+	          NULL,
+	          &number_of_sessions,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_sessions_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_sessions(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_tracks function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_tracks(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error    = NULL;
+	uint32_t number_of_tracks   = 0;
+	int number_of_tracks_is_set = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_tracks(
+	          handle,
+	          &number_of_tracks,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_tracks_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_tracks(
+	          NULL,
+	          &number_of_tracks,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_tracks_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_tracks(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_header_values_date_format function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_header_values_date_format(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error             = NULL;
+	int header_values_date_format        = 0;
+	int header_values_date_format_is_set = 0;
+	int result                           = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_header_values_date_format(
+	          handle,
+	          &header_values_date_format,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	header_values_date_format_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_header_values_date_format(
+	          NULL,
+	          &header_values_date_format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( header_values_date_format_is_set != 0 )
+	{
+		result = libewf_handle_get_header_values_date_format(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_header_values function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_header_values(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error           = NULL;
+	uint32_t number_of_header_values   = 0;
+	int number_of_header_values_is_set = 0;
+	int result                         = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_header_values(
+	          handle,
+	          &number_of_header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_header_values_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_header_values(
+	          NULL,
+	          &number_of_header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_header_values_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_header_values(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_handle_get_number_of_hash_values function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_handle_get_number_of_hash_values(
+     libewf_handle_t *handle )
+{
+	libcerror_error_t *error         = NULL;
+	uint32_t number_of_hash_values   = 0;
+	int number_of_hash_values_is_set = 0;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_handle_get_number_of_hash_values(
+	          handle,
+	          &number_of_hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_hash_values_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libewf_handle_get_number_of_hash_values(
+	          NULL,
+	          &number_of_hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_hash_values_is_set != 0 )
+	{
+		result = libewf_handle_get_number_of_hash_values(
+		          handle,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -2797,6 +4123,8 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_handle_free",
 	 ewf_test_handle_free );
+
+	/* TODO: add tests for libewf_handle_clone */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
@@ -2951,7 +4279,7 @@ int main(
 		 ewf_test_handle_open_close,
 		 source );
 
-		/* Initialize test
+		/* Initialize handle for tests
 		 */
 		result = ewf_test_handle_open_source(
 		          &handle,
@@ -2963,22 +4291,18 @@ int main(
 		 result,
 		 1 );
 
-	        EWF_TEST_ASSERT_IS_NOT_NULL(
-	         "handle",
-	         handle );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "handle",
+		 handle );
 
-	        EWF_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
-
-		/* TODO: add tests for libewf_handle_clone */
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
 		EWF_TEST_RUN_WITH_ARGS(
 		 "libewf_handle_signal_abort",
 		 ewf_test_handle_signal_abort,
 		 handle );
-
-		/* TODO: add tests for libewf_handle_open_file_io_pool */
 
 		EWF_TEST_RUN_WITH_ARGS(
 		 "libewf_handle_read_buffer",
@@ -3064,9 +4388,9 @@ int main(
 		 ewf_test_handle_get_filename_size_wide,
 		 handle );
 
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
 		/* TODO: add tests for libewf_handle_get_filename_wide */
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 		EWF_TEST_RUN_WITH_ARGS(
 		 "libewf_handle_get_file_io_handle",
@@ -3081,6 +4405,185 @@ int main(
 		/* TODO: add tests for libewf_handle_get_file_entry_by_utf8_path */
 
 		/* TODO: add tests for libewf_handle_get_file_entry_by_utf16_path */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_sectors_per_chunk",
+		 ewf_test_handle_get_sectors_per_chunk,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_sectors_per_chunk */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_bytes_per_sector",
+		 ewf_test_handle_get_bytes_per_sector,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_bytes_per_sector */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_sectors",
+		 ewf_test_handle_get_number_of_sectors,
+		 handle );
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_chunk_size",
+		 ewf_test_handle_get_chunk_size,
+		 handle );
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_error_granularity",
+		 ewf_test_handle_get_error_granularity,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_error_granularity */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_compression_method",
+		 ewf_test_handle_get_compression_method,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_compression_method */
+
+		/* TODO: add tests for libewf_handle_get_compression_values */
+
+		/* TODO: add tests for libewf_handle_set_compression_values */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_media_size",
+		 ewf_test_handle_get_media_size,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_media_size */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_media_type",
+		 ewf_test_handle_get_media_type,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_media_type */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_media_flags",
+		 ewf_test_handle_get_media_flags,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_media_flags */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_format",
+		 ewf_test_handle_get_format,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_format */
+
+		/* TODO: add tests for libewf_handle_get_segment_file_version */
+
+		/* TODO: add tests for libewf_handle_get_segment_file_set_identifier */
+
+		/* TODO: add tests for libewf_handle_set_segment_file_set_identifier */
+
+		/* TODO: add tests for libewf_handle_get_md5_hash */
+
+		/* TODO: add tests for libewf_handle_set_md5_hash */
+
+		/* TODO: add tests for libewf_handle_get_sha1_hash */
+
+		/* TODO: add tests for libewf_handle_set_sha1_hash */
+
+		/* TODO: add tests for libewf_handle_set_read_zero_chunk_on_error */
+
+		/* TODO: add tests for libewf_handle_copy_media_values */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_acquiry_errors",
+		 ewf_test_handle_get_number_of_acquiry_errors,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_acquiry_error */
+
+		/* TODO: add tests for libewf_handle_append_acquiry_error */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_checksum_errors",
+		 ewf_test_handle_get_number_of_checksum_errors,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_checksum_error */
+
+		/* TODO: add tests for libewf_handle_append_checksum_error */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_sessions",
+		 ewf_test_handle_get_number_of_sessions,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_session */
+
+		/* TODO: add tests for libewf_handle_append_session */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_tracks",
+		 ewf_test_handle_get_number_of_tracks,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_track */
+
+		/* TODO: add tests for libewf_handle_append_track */
+
+		/* TODO: add tests for libewf_handle_get_header_codepage */
+
+		/* TODO: add tests for libewf_handle_set_header_codepage */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_header_values_date_format",
+		 ewf_test_handle_get_header_values_date_format,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_set_header_values_date_format */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_header_values",
+		 ewf_test_handle_get_number_of_header_values,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_header_value_identifier_size */
+
+		/* TODO: add tests for libewf_handle_get_header_value_identifier */
+
+		/* TODO: add tests for libewf_handle_get_utf8_header_value_size */
+
+		/* TODO: add tests for libewf_handle_get_utf8_header_value */
+
+		/* TODO: add tests for libewf_handle_set_utf8_header_value */
+
+		/* TODO: add tests for libewf_handle_get_utf16_header_value_size */
+
+		/* TODO: add tests for libewf_handle_get_utf16_header_value */
+
+		/* TODO: add tests for libewf_handle_set_utf16_header_value */
+
+		/* TODO: add tests for libewf_handle_copy_header_values */
+
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_get_number_of_hash_values",
+		 ewf_test_handle_get_number_of_hash_values,
+		 handle );
+
+		/* TODO: add tests for libewf_handle_get_hash_value_identifier_size */
+
+		/* TODO: add tests for libewf_handle_get_hash_value_identifier */
+
+		/* TODO: add tests for libewf_handle_get_utf8_hash_value_size */
+
+		/* TODO: add tests for libewf_handle_get_utf8_hash_value */
+
+		/* TODO: add tests for libewf_handle_set_utf8_hash_value */
+
+		/* TODO: add tests for libewf_handle_get_utf16_hash_value_size */
+
+		/* TODO: add tests for libewf_handle_get_utf16_hash_value */
+
+		/* TODO: add tests for libewf_handle_set_utf16_hash_value */
 
 		/* Clean up
 		 */
