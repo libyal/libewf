@@ -14,7 +14,9 @@ MSVSCPP_FILES = \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
 	ewf_test_hash_sections/ewf_test_hash_sections.vcproj \
+	ewf_test_hash_values/ewf_test_hash_values.vcproj \
 	ewf_test_header_sections/ewf_test_header_sections.vcproj \
+	ewf_test_header_values/ewf_test_header_values.vcproj \
 	ewf_test_io_handle/ewf_test_io_handle.vcproj \
 	ewf_test_media_values/ewf_test_media_values.vcproj \
 	ewf_test_notify/ewf_test_notify.vcproj \

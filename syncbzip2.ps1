@@ -31,6 +31,8 @@ Function ExtractTarGz($Filename)
 	$Filename = ${Filename}.TrimEnd(".gz")
 
 	$Output = Invoke-Expression -Command "& '${SevenZip}' -y x ${Filename} 2>&1"
+
+	Remove-Item -Path ${Filename} -Force
 }
 
 $Version = "1.0.6"
@@ -50,6 +52,8 @@ If (Test-Path ${ExtractedPath})
 	Remove-Item -Path ${ExtractedPath} -Force -Recurse
 }
 ExtractTarGz -Filename ${Filename}
+
+Remove-Item -Path ${Filename} -Force
 
 If (Test-Path ${DestinationPath})
 {

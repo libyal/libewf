@@ -337,7 +337,7 @@ int ewf_test_media_values_clear(
 
 	/* Test libewf_media_values_clear with memset failing
 	 */
-	ewf_test_memset_attempts_before_fail = 1;
+	ewf_test_memset_attempts_before_fail = 0;
 
 	result = libewf_media_values_clear(
 	          media_values,
@@ -528,7 +528,7 @@ int ewf_test_media_values_clone(
 
 	/* Test libewf_media_values_clone with malloc failing
 	 */
-	ewf_test_malloc_attempts_before_fail = 1;
+	ewf_test_malloc_attempts_before_fail = 0;
 
 	result = libewf_media_values_clone(
 	          &destination_media_values,
@@ -567,7 +567,7 @@ int ewf_test_media_values_clone(
 
 	/* Test libewf_media_values_clone with memcpy failing
 	 */
-	ewf_test_memcpy_attempts_before_fail = 1;
+	ewf_test_memcpy_attempts_before_fail = 0;
 
 	result = libewf_media_values_clone(
 	          &destination_media_values,
