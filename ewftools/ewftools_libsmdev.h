@@ -25,16 +25,24 @@
 #include <common.h>
 
 #if defined( HAVE_LOCAL_LIBSMDEV )
+
 #include <libsmdev_definitions.h>
 #include <libsmdev_handle.h>
-#include <libsmdev_metadata.h>
 #include <libsmdev_support.h>
 #include <libsmdev_types.h>
 
 #else
+
+/* If libtool DLL support is enabled set LIBSMDEV_DLL_IMPORT
+ * before including libcerror.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
+#define LIBSMDEV_DLL_IMPORT
+#endif
+
 #include <libsmdev.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBSMDEV ) */
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBSMDEV_H ) */
 

@@ -7120,7 +7120,7 @@ int export_handle_checksum_errors_fprint(
 					{
 						fprintf(
 						 stream,
-						 " %s",
+						 " %" PRIs_SYSTEM "",
 						 filename );
 
 						last_filename      = filename;
@@ -7134,7 +7134,7 @@ int export_handle_checksum_errors_fprint(
 					{
 						fprintf(
 						 stream,
-						 ", %s",
+						 ", %" PRIs_SYSTEM "",
 						 filename );
 
 						memory_free(

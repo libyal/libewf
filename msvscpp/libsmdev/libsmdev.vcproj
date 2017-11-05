@@ -167,10 +167,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libsmdev\libsmdev_metadata.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libsmdev\libsmdev_notify.c"
 				>
 			</File>
@@ -258,10 +254,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libsmdev\libsmdev_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libsmdev\libsmdev_metadata.h"
 				>
 			</File>
 			<File

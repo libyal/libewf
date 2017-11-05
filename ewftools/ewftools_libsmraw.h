@@ -25,15 +25,24 @@
 #include <common.h>
 
 #if defined( HAVE_LOCAL_LIBSMRAW )
+
 #include <libsmraw_definitions.h>
 #include <libsmraw_handle.h>
 #include <libsmraw_support.h>
 #include <libsmraw_types.h>
 
 #else
+
+/* If libtool DLL support is enabled set LIBSMRAW_DLL_IMPORT
+ * before including libcerror.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
+#define LIBSMRAW_DLL_IMPORT
+#endif
+
 #include <libsmraw.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBSMRAW ) */
 
-#endif
+#endif /* !defined( _EWFTOOLS_LIBSMRAW_H ) */
 

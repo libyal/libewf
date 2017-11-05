@@ -261,6 +261,10 @@ ewf_test_hash_values_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_hash_values_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -286,6 +290,10 @@ ewf_test_header_values_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_header_values_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

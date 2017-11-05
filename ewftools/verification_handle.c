@@ -4529,7 +4529,7 @@ int verification_handle_checksum_errors_fprint(
 					{
 						fprintf(
 						 stream,
-						 " %s",
+						 " %" PRIs_SYSTEM "",
 						 filename );
 
 						last_filename      = filename;
@@ -4543,7 +4543,7 @@ int verification_handle_checksum_errors_fprint(
 					{
 						fprintf(
 						 stream,
-						 ", %s",
+						 ", %" PRIs_SYSTEM "",
 						 filename );
 
 						memory_free(

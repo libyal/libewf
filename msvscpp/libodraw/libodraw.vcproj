@@ -183,10 +183,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libodraw\libodraw_metadata.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libodraw\libodraw_notify.c"
 				>
 			</File>
@@ -274,10 +270,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libodraw\libodraw_libuna.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libodraw\libodraw_metadata.h"
 				>
 			</File>
 			<File
