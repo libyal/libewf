@@ -1350,7 +1350,7 @@ on_error:
 /* Parses an UTF-8 encoded case data string
  * Returns 1 if successful or -1 on error
  */
-int libewf_case_data_parse_string(
+int libewf_case_data_parse_utf8_string(
      const uint8_t *utf8_string,
      size_t utf8_string_size,
      libewf_media_values_t *media_values,
@@ -1367,7 +1367,7 @@ int libewf_case_data_parse_string(
 	uint8_t *line_string                  = NULL;
 	uint8_t *type_string                  = NULL;
 	uint8_t *value_string                 = NULL;
-	static char *function                 = "libewf_case_data_parse_string";
+	static char *function                 = "libewf_case_data_parse_utf8_string";
 	size_t date_time_values_string_size   = 0;
 	size_t identifier_size                = 0;
 	size_t line_string_size               = 0;
@@ -2308,7 +2308,7 @@ int libewf_case_data_parse(
 		 utf8_string );
 	}
 #endif
-	if( libewf_case_data_parse_string(
+	if( libewf_case_data_parse_utf8_string(
 	     utf8_string,
 	     utf8_string_size,
 	     media_values,

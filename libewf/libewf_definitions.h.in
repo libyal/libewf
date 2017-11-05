@@ -426,5 +426,12 @@ enum LIBEWF_PACK_FLAGS
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS			8
 #define LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS			4
 
-#endif
+enum LIBEWF_HASH_VALUES_INDEXES
+{
+	/* Value to indicate the number of hash values
+	 */
+	LIBEWF_HASH_VALUES_DEFAULT_NUMBER
+};
+
+#endif /* !defined( _LIBEWF_INTERNAL_DEFINITIONS_H ) */
 

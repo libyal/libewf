@@ -70,10 +70,13 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	ewf_test_analytical_data \
+	ewf_test_case_data \
 	ewf_test_chunk_data \
 	ewf_test_chunk_group \
 	ewf_test_chunk_table \
 	ewf_test_data_chunk \
+	ewf_test_device_information \
 	ewf_test_error \
 	ewf_test_file_entry \
 	ewf_test_glob \
@@ -84,6 +87,7 @@ check_PROGRAMS = \
 	ewf_test_media_values \
 	ewf_test_notify \
 	ewf_test_read_io_handle \
+	ewf_test_restart_data \
 	ewf_test_section \
 	ewf_test_sector_range \
 	ewf_test_segment_file \
@@ -95,6 +99,28 @@ check_PROGRAMS = \
 	ewf_test_write \
 	ewf_test_write_chunk \
 	ewf_test_write_io_handle
+
+ewf_test_analytical_data_SOURCES = \
+	ewf_test_analytical_data.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_analytical_data_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_case_data_SOURCES = \
+	ewf_test_case_data.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_case_data_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
 
 ewf_test_chunk_data_SOURCES = \
 	ewf_test_chunk_data.c \
@@ -141,6 +167,17 @@ ewf_test_data_chunk_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_data_chunk_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_device_information_SOURCES = \
+	ewf_test_device_information.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_device_information_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -266,6 +303,17 @@ ewf_test_read_io_handle_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_read_io_handle_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_restart_data_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_restart_data.c \
+	ewf_test_unused.h
+
+ewf_test_restart_data_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

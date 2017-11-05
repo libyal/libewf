@@ -277,17 +277,6 @@ int libewf_media_values_calculate_chunk_size(
 
 		return( -1 );
 	}	
-	if( media_values->number_of_chunks > (uint64_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid number of chunks value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
 		libcerror_error_set(

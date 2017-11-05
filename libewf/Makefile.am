@@ -75,7 +75,6 @@ libewf_la_SOURCES = \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
 	libewf_media_values.c libewf_media_values.h \
-	libewf_metadata.c libewf_metadata.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_restart_data.c libewf_restart_data.h \

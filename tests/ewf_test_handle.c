@@ -37,6 +37,7 @@
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
+#include "ewf_test_unused.h"
 
 #include "../libewf/libewf_handle.h"
 
@@ -2547,8 +2548,6 @@ on_error:
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-#if defined( LIBEWF_HAVE_BFIO )
-
 /* Tests the libewf_handle_get_file_io_handle function
  * Returns 1 if successful or 0 if not
  */
@@ -2626,8 +2625,6 @@ on_error:
 	}
 	return( 0 );
 }
-
-#endif /* defined( LIBEWF_HAVE_BFIO ) */
 
 /* Tests the libewf_handle_get_root_file_entry function
  * Returns 1 if successful or 0 if not
@@ -2940,11 +2937,10 @@ int main(
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-#if defined( LIBEWF_HAVE_BFIO )
-
-		/* TODO add test for libewf_handle_open_file_io_handle */
-
-#endif /* defined( LIBEWF_HAVE_BFIO ) */
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_open_file_io_pool",
+		 ewf_test_handle_open_file_io_pool,
+		 source );
 
 		EWF_TEST_RUN(
 		 "libewf_handle_close",
@@ -2989,7 +2985,10 @@ int main(
 		 ewf_test_handle_read_buffer,
 		 handle );
 
-		/* TODO: add tests for libewf_handle_read_buffer_at_offset */
+		EWF_TEST_RUN_WITH_ARGS(
+		 "libewf_handle_read_buffer_at_offset",
+		 ewf_test_handle_read_buffer_at_offset,
+		 handle );
 
 		/* TODO: add tests for libewf_handle_write_buffer */
 
@@ -3069,14 +3068,10 @@ int main(
 
 		/* TODO: add tests for libewf_handle_get_filename_wide */
 
-#if defined( LIBEWF_HAVE_BFIO )
-
 		EWF_TEST_RUN_WITH_ARGS(
 		 "libewf_handle_get_file_io_handle",
 		 ewf_test_handle_get_file_io_handle,
 		 handle );
-
-#endif /* defined( LIBEWF_HAVE_BFIO ) */
 
 		EWF_TEST_RUN_WITH_ARGS(
 		 "libewf_handle_get_root_file_entry",
