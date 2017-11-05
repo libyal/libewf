@@ -43,13 +43,15 @@
 #include "pyewf_unused.h"
 
 #if !defined( LIBEWF_HAVE_BFIO )
+
 LIBEWF_EXTERN \
 int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
      int access_flags,
      libewf_error_t **error );
-#endif
+
+#endif /* !defined( LIBEWF_HAVE_BFIO ) */
 
 PyMethodDef pyewf_handle_object_methods[] = {
 
@@ -707,23 +709,24 @@ PyObject *pyewf_handle_open(
            PyObject *keywords )
 {
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wchar_t **filenames              = NULL;
 	wchar_t *filename                = NULL;
+	wchar_t **filenames              = NULL;
 	const char *errors               = NULL;
 	char *narrow_string              = NULL;
 	size_t narrow_string_size        = 0;
 	int is_unicode_string            = 0;
 #else
-	char **filenames                 = NULL;
 	char *filename                   = NULL;
+	char **filenames                 = NULL;
 #endif
 	PyObject *filename_string_object = NULL;
 	PyObject *sequence_object        = NULL;
 	PyObject *string_object          = NULL;
+	PyObject *utf8_string_object     = NULL;
 	libcerror_error_t *error         = NULL;
-	char *mode                       = NULL;
-	static char *keyword_list[]      = { "filenames", "mode", NULL };
 	static char *function            = "pyewf_handle_open";
+	static char *keyword_list[]      = { "filenames", "mode", NULL };
+	char *mode                       = NULL;
 	Py_ssize_t sequence_size         = 0;
 	size_t filename_length           = 0;
 	int access_flags                 = 0;
@@ -976,16 +979,29 @@ PyObject *pyewf_handle_open(
 #else
 		/* A Unicode string object can be converted into UFT-8 formatted narrow string
 		 */
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
+		{
+			pyewf_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert unicode string to UTF-8.",
+			 function );
+
+			goto on_error;
+		}
 #if PY_MAJOR_VERSION >= 3
 		filename = PyBytes_AsString(
-		            string_object );
+		            utf8_string_object );
 #else
 		filename = PyString_AsString(
-		            string_object );
+		            utf8_string_object );
 #endif
 		filename_length = narrow_string_length(
 		                   filename );
-#endif
+
+#endif /* #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filenames[ filename_index ] = (wchar_t *) PyMem_Malloc(
@@ -1026,6 +1042,13 @@ PyObject *pyewf_handle_open(
 		}
 		( filenames[ filename_index ] )[ filename_length ] = 0;
 
+		if( utf8_string_object != NULL )
+		{
+			Py_DecRef(
+			 utf8_string_object );
+
+			utf8_string_object = NULL;
+		}
 		if( filename_string_object != NULL )
 		{
 			Py_DecRef(
@@ -1872,7 +1895,7 @@ PyObject *pyewf_handle_get_root_file_entry(
 	}
 	file_entry_object = pyewf_file_entry_new(
 	                     root_file_entry,
-	                     pyewf_handle );
+	                     (PyObject *) pyewf_handle );
 
 	if( file_entry_object == NULL )
 	{

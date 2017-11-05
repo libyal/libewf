@@ -228,7 +228,9 @@ PyObject *pyewf_check_file_signature(
 
 		Py_DecRef(
 		 utf8_string_object );
-#endif
+
+#endif /* #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 		if( result == -1 )
 		{
 			pyewf_error_raise(
