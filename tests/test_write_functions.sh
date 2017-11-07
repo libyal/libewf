@@ -1,20 +1,14 @@
 #!/bin/bash
 # Library API write functions testing script
 #
-# Version: 20160403
+# Version: 20171107
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
-
-TEST_PROFILE="lib${TEST_PREFIX}";
 TEST_FUNCTIONS="write write_chunk";
 OPTION_SETS="";
-
-TEST_TOOL_DIRECTORY=".";
 
 test_api_write_function()
 { 
@@ -22,13 +16,13 @@ test_api_write_function()
 	shift 1;
 	local ARGUMENTS=$@;
 
-	local TEST_TOOL="${TEST_PREFIX}_test_${TEST_FUNCTION}";
+	local TEST_TOOL="ewf_test_${TEST_FUNCTION}";
 
-	local TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+	local TEST_EXECUTABLE="./${TEST_TOOL}";
 
 	if ! test -x "${TEST_EXECUTABLE}";
 	then
-		TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+		TEST_EXECUTABLE="./${TEST_TOOL}.exe";
 	fi
 
 	if ! test -x "${TEST_EXECUTABLE}";
@@ -42,9 +36,15 @@ test_api_write_function()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	TEST_DESCRIPTION="Testing write function: lib${TEST_PREFIX}_${TEST_FUNCTION}";
+	TEST_DESCRIPTION="Testing write function: libewf_${TEST_FUNCTION}";
 
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${TMPDIR}/write";
+	if test "${OSTYPE}" = "msys";
+	then
+		OUTPUT_FILE="${TMPDIR}\\write";
+	else
+		OUTPUT_FILE="${TMPDIR}/write";
+	fi
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${OUTPUT_FILE}";
 
 	RESULT=$?;
 
@@ -124,7 +124,7 @@ source ${TEST_RUNNER};
 
 for TEST_FUNCTION in ${TEST_FUNCTIONS};
 do
-	test_write "${TEST_PROFILE}" "${TEST_FUNCTION}" "${OPTION_SETS}";
+	test_write "libewf" "${TEST_FUNCTION}" "${OPTION_SETS}";
 	RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};

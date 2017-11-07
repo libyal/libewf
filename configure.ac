@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20171104],
+ [20171107],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -315,6 +315,5 @@ Features:
    Python version 3 (pyewf) support:         $ac_cv_enable_python3
    Verbose output:                           $ac_cv_enable_verbose_output
    Debug output:                             $ac_cv_enable_debug_output
-   Version 1 API compatibility:              $ac_cv_enable_v1_api
 ]);
 
