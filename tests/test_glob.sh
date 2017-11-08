@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library glob testing script
 #
-# Version: 20160327
+# Version: 20171108
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -56,6 +56,12 @@ test_glob_sequence2()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
+	if test "${OSTYPE}" = "msys";
+	then
+		TEST_PATH="${TMPDIR}\\${BASENAME}";
+	else
+		TEST_PATH="${TMPDIR}/${BASENAME}";
+	fi
 	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 
 	echo ${FILENAMES} > ${TMPDIR}/input;
@@ -64,7 +70,7 @@ test_glob_sequence2()
 
 	TEST_DESCRIPTION="";
 
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
@@ -227,6 +233,12 @@ test_glob_sequence3()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
+	if test "${OSTYPE}" = "msys";
+	then
+		TEST_PATH="${TMPDIR}\\${BASENAME}";
+	else
+		TEST_PATH="${TMPDIR}/${BASENAME}";
+	fi
 	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 
 	echo ${FILENAMES} > ${TMPDIR}/input;
@@ -235,7 +247,7 @@ test_glob_sequence3()
 
 	TEST_DESCRIPTION="";
 
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
@@ -365,6 +377,12 @@ test_glob_sequence4()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
+	if test "${OSTYPE}" = "msys";
+	then
+		TEST_PATH="${TMPDIR}\\${BASENAME}";
+	else
+		TEST_PATH="${TMPDIR}/${BASENAME}";
+	fi
 	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 
 	echo ${FILENAMES} > ${TMPDIR}/input;
@@ -373,7 +391,7 @@ test_glob_sequence4()
 
 	TEST_DESCRIPTION="";
 
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TMPDIR}/${BASENAME}" > ${TMPDIR}/output;
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
