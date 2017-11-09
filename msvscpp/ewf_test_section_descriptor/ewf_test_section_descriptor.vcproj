@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_section"
-	ProjectGUID="{750C1FF3-1F39-4B0E-8EAE-1A8F9CF3881F}"
-	RootNamespace="ewf_test_section"
+	Name="ewf_test_section_descriptor"
+	ProjectGUID="{92F5212D-C2CF-44C6-85F3-92530392134C}"
+	RootNamespace="ewf_test_section_descriptor"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -180,7 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_section.c"
+				RelativePath="..\..\tests\ewf_test_section_descriptor.c"
 				>
 			</File>
 		</Filter>

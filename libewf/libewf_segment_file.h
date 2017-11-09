@@ -37,6 +37,7 @@
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_group.h"
 #include "libewf_hash_sections.h"
+#include "libewf_header_sections.h"
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
@@ -45,7 +46,7 @@
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
 #include "libewf_media_values.h"
-#include "libewf_section.h"
+#include "libewf_section_descriptor.h"
 #include "libewf_single_files.h"
 
 #include "ewf_data.h"
@@ -166,7 +167,7 @@ int libewf_segment_file_get_section_by_index(
      int section_index,
      libbfio_pool_t *file_io_pool,
      libfcache_cache_t *sections_cache,
-     libewf_section_t **section,
+     libewf_section_descriptor_t **section,
      libcerror_error_t **error );
 
 ssize_t libewf_segment_file_read_file_header(
@@ -190,7 +191,7 @@ off64_t libewf_segment_file_seek_offset(
 
 ssize_t libewf_segment_file_read_table_section(
          libewf_segment_file_t *segment_file,
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          size32_t chunk_size,
@@ -198,14 +199,14 @@ ssize_t libewf_segment_file_read_table_section(
 
 ssize_t libewf_segment_file_read_table2_section(
          libewf_segment_file_t *segment_file,
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libcerror_error_t **error );
 
 ssize_t libewf_segment_file_read_volume_section(
          libewf_segment_file_t *segment_file,
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          libewf_media_values_t *media_values,

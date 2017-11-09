@@ -79,6 +79,7 @@ libewf_la_SOURCES = \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
+	libewf_section_descriptor.c libewf_section_descriptor.h \
 	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \

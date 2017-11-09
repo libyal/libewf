@@ -40,6 +40,7 @@
 #include "libewf_libhmac.h"
 #include "libewf_media_values.h"
 #include "libewf_section.h"
+#include "libewf_section_descriptor.h"
 #include "libewf_sector_range.h"
 #include "libewf_single_files.h"
 #include "libewf_unused.h"
@@ -99,206 +100,24 @@ int libewf_section_test_zero(
 	return( 1 );
 }
 
-/* Creates a section
- * Make sure the value section is referencing, is set to NULL
- * Returns 1 if successful or -1 on error
- */
-int libewf_section_initialize(
-     libewf_section_t **section,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_section_initialize";
-
-	if( section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	if( *section != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid section value already set.",
-		 function );
-
-		return( -1 );
-	}
-	*section = memory_allocate_structure(
-	            libewf_section_t );
-
-	if( *section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create section.",
-		 function );
-
-		goto on_error;
-	}
-	if( memory_set(
-	     *section,
-	     0,
-	     sizeof( libewf_section_t ) ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear section.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( *section != NULL )
-	{
-		memory_free(
-		 *section );
-
-		*section = NULL;
-	}
-	return( -1 );
-}
-
-/* Frees a section
- * Returns 1 if successful or -1 on error
- */
-int libewf_section_free(
-     libewf_section_t **section,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_section_free";
-
-	if( section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
-		 function );
-
-		return( -1 );
-	}
-	if( *section != NULL )
-	{
-		memory_free(
-		 *section );
-
-		*section = NULL;
-	}
-	return( 1 );
-}
-
-/* Clones the section
- * Returns 1 if successful or -1 on error
- */
-int libewf_section_clone(
-     libewf_section_t **destination_section,
-     libewf_section_t *source_section,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_section_clone";
-
-	if( destination_section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid destination section.",
-		 function );
-
-		return( -1 );
-	}
-	if( *destination_section != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid destination section value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( source_section == NULL )
-	{
-		*destination_section = NULL;
-
-		return( 1 );
-	}
-	*destination_section = memory_allocate_structure(
-	                        libewf_section_t );
-
-	if( *destination_section == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create destination section.",
-		 function );
-
-		goto on_error;
-	}
-	if( memory_copy(
-	     *destination_section,
-	     source_section,
-	     sizeof( libewf_section_t ) ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy source to destination section.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( *destination_section != NULL )
-	{
-		memory_free(
-		 *destination_section );
-
-		*destination_section = NULL;
-	}
-	return( -1 );
-}
-
 /* Retrieves the section data offset
  * Returns 1 if successful, 0 if the section contains no data or -1 on error
  */
 int libewf_section_get_data_offset(
-     libewf_section_t *section,
+     libewf_section_descriptor_t *section_descriptor,
      uint8_t format_version,
      off64_t *data_offset,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_section_get_data_offset";
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -314,17 +133,17 @@ int libewf_section_get_data_offset(
 
 		return( -1 );
 	}
-	if( section->data_size == 0 )
+	if( section_descriptor->data_size == 0 )
 	{
 		return( 0 );
 	}
 	if( format_version == 1 )
 	{
-		*data_offset = section->start_offset + sizeof( ewf_section_descriptor_v1_t );
+		*data_offset = section_descriptor->start_offset + sizeof( ewf_section_descriptor_v1_t );
 	}
 	else
 	{
-		*data_offset = section->start_offset;
+		*data_offset = section_descriptor->start_offset;
 	}
 	return( 1 );
 }
@@ -333,7 +152,7 @@ int libewf_section_get_data_offset(
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_set_values(
-     libewf_section_t *section,
+     libewf_section_descriptor_t *section_descriptor,
      uint32_t type,
      const uint8_t *type_string,
      size_t type_string_length,
@@ -345,13 +164,13 @@ int libewf_section_set_values(
 {
 	static char *function = "libewf_section_set_values";
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -405,7 +224,7 @@ int libewf_section_set_values(
 			return( -1 );
 		}
 		if( memory_copy(
-		     section->type_string,
+		     section_descriptor->type_string,
 		     type_string,
 		     type_string_length ) == NULL )
 		{
@@ -418,14 +237,14 @@ int libewf_section_set_values(
 
 			return( -1 );
 		}
-		section->type_string[ type_string_length ] = 0;
+		section_descriptor->type_string[ type_string_length ] = 0;
 
-		section->type_string_length = type_string_length;
+		section_descriptor->type_string_length = type_string_length;
 	}
 	else
 	{
 		if( memory_set(
-		     section->type_string,
+		     section_descriptor->type_string,
 		     0,
 		     17 ) == NULL )
 		{
@@ -438,14 +257,14 @@ int libewf_section_set_values(
 
 			return( -1 );
 		}
-		section->type_string_length = 0;
+		section_descriptor->type_string_length = 0;
 	}
-	section->type         = type;
-	section->start_offset = section_offset;
-	section->end_offset   = (off64_t) ( section_offset + section_size );
-	section->size         = section_size;
-	section->data_size    = data_size;
-	section->padding_size = padding_size;
+	section_descriptor->type         = type;
+	section_descriptor->start_offset = section_offset;
+	section_descriptor->end_offset   = (off64_t) ( section_offset + section_size );
+	section_descriptor->size         = section_size;
+	section_descriptor->data_size    = data_size;
+	section_descriptor->padding_size = padding_size;
 
 	return( 1 );
 }
@@ -454,7 +273,7 @@ int libewf_section_set_values(
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_descriptor_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          off64_t file_offset,
@@ -469,13 +288,13 @@ ssize_t libewf_section_descriptor_read(
 	uint32_t section_descriptor_size    = 0;
 	uint32_t stored_checksum            = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -575,7 +394,7 @@ ssize_t libewf_section_descriptor_read(
 	if( format_version == 1 )
 	{
 		if( memory_copy(
-		     section->type_string,
+		     section_descriptor->type_string,
 		     ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->type_string,
 		     16 ) == NULL )
 		{
@@ -588,18 +407,18 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		section->type_string[ 16 ] = 0;
+		section_descriptor->type_string[ 16 ] = 0;
 
-		section->type_string_length = narrow_string_length(
-		                               (char *) section->type_string );
+		section_descriptor->type_string_length = narrow_string_length(
+		                                          (char *) section_descriptor->type_string );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->size,
-		 section->size );
+		 section_descriptor->size );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->next_offset,
-		 section->end_offset );
+		 section_descriptor->end_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->checksum,
@@ -609,23 +428,23 @@ ssize_t libewf_section_descriptor_read(
 	{
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
-		 section->type );
+		 section_descriptor->type );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
-		 section->data_flags );
+		 section_descriptor->data_flags );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
-		 section->start_offset );
+		 section_descriptor->start_offset );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_size,
-		 section->data_size );
+		 section_descriptor->data_size );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->padding_size,
-		 section->padding_size );
+		 section_descriptor->padding_size );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->descriptor_size,
@@ -636,7 +455,7 @@ ssize_t libewf_section_descriptor_read(
 		 stored_checksum );
 
 		if( memory_copy(
-		     section->data_integrity_hash,
+		     section_descriptor->data_integrity_hash,
 		     ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_integrity_hash,
 		     16 ) == NULL )
 		{
@@ -658,17 +477,17 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 "%s: type string\t\t\t\t: %s\n",
 			 function,
-			 (char *) section->type_string );
+			 (char *) section_descriptor->type_string );
 
 			libcnotify_printf(
 			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section->end_offset );
+			 section_descriptor->end_offset );
 
 			libcnotify_printf(
 			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 section->size );
+			 section_descriptor->size );
 
 			libcnotify_printf(
 			 "%s: padding:\n",
@@ -683,30 +502,30 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
 			 function,
-			 section->type );
+			 section_descriptor->type );
 			libewf_debug_print_section_type(
-			 section->type );
+			 section_descriptor->type );
 			libcnotify_printf(
 			 ")\n" );
 
 			libcnotify_printf(
 			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
-			 section->data_flags );
+			 section_descriptor->data_flags );
 			libewf_debug_print_section_data_flags(
-			 section->data_flags );
+			 section_descriptor->data_flags );
 			libcnotify_printf(
 			 "\n" );
 
 			libcnotify_printf(
 			 "%s: previous offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section->start_offset );
+			 section_descriptor->start_offset );
 
 			libcnotify_printf(
 			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 section->data_size );
+			 section_descriptor->data_size );
 
 			libcnotify_printf(
 			 "%s: section descriptor size\t\t\t: %" PRIu32 "\n",
@@ -716,7 +535,7 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
 			 function,
-			 section->padding_size );
+			 section_descriptor->padding_size );
 
 			libcnotify_printf(
 			 "%s: data integrity hash:\n",
@@ -779,8 +598,8 @@ ssize_t libewf_section_descriptor_read(
 
 	if( format_version == 1 )
 	{
-		if( ( section->end_offset < file_offset )
-		 || ( section->end_offset > (off64_t) INT64_MAX ) )
+		if( ( section_descriptor->end_offset < file_offset )
+		 || ( section_descriptor->end_offset > (off64_t) INT64_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -791,9 +610,9 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		if( ( section->size != 0 )
-		 && ( ( section->size < (size64_t) sizeof( ewf_section_descriptor_v1_t ) )
-		  ||  ( section->size > (size64_t) INT64_MAX ) ) )
+		if( ( section_descriptor->size != 0 )
+		 && ( ( section_descriptor->size < (size64_t) sizeof( ewf_section_descriptor_v1_t ) )
+		  ||  ( section_descriptor->size > (size64_t) INT64_MAX ) ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -804,27 +623,27 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		section->start_offset = file_offset;
+		section_descriptor->start_offset = file_offset;
 
 		/* Some versions of EWF1 do not set the section size
-		 * The next and done section, which point back to themselves, are not corrected
+		 * The next and done section_descriptor, which point back to themselves, are not corrected
 		 */
-		if( ( section->size == 0 )
-		 && ( section->end_offset != section->start_offset ) )
+		if( ( section_descriptor->size == 0 )
+		 && ( section_descriptor->end_offset != section_descriptor->start_offset ) )
 		{
-			section->size = section->end_offset - section->start_offset;
+			section_descriptor->size = section_descriptor->end_offset - section_descriptor->start_offset;
 		}
-		if( section->size != 0 )
+		if( section_descriptor->size != 0 )
 		{
-			section->data_size = section->size - sizeof( ewf_section_descriptor_v1_t );
+			section_descriptor->data_size = section_descriptor->size - sizeof( ewf_section_descriptor_v1_t );
 		}
 	}
 	else if( format_version == 2 )
 	{
-		if( ( section->start_offset < 0 )
-		 || ( ( section->start_offset != 0 )
-		  &&  ( section->start_offset < (off64_t) sizeof( ewf_file_header_v2_t ) ) )
-		 || ( section->start_offset >= file_offset ) )
+		if( ( section_descriptor->start_offset < 0 )
+		 || ( ( section_descriptor->start_offset != 0 )
+		  &&  ( section_descriptor->start_offset < (off64_t) sizeof( ewf_file_header_v2_t ) ) )
+		 || ( section_descriptor->start_offset >= file_offset ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -835,18 +654,18 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		if( section->start_offset == 0 )
+		if( section_descriptor->start_offset == 0 )
 		{
-			section->start_offset = sizeof( ewf_file_header_v2_t );
+			section_descriptor->start_offset = sizeof( ewf_file_header_v2_t );
 		}
 		else
 		{
-			section->start_offset += sizeof( ewf_section_descriptor_v2_t );
+			section_descriptor->start_offset += sizeof( ewf_section_descriptor_v2_t );
 		}
-		section->end_offset = file_offset + sizeof( ewf_section_descriptor_v2_t );
-		section->size       = (size64_t) ( section->end_offset - section->start_offset );
+		section_descriptor->end_offset = file_offset + sizeof( ewf_section_descriptor_v2_t );
+		section_descriptor->size       = (size64_t) ( section_descriptor->end_offset - section_descriptor->start_offset );
 
-		if( section->data_size > section->size )
+		if( section_descriptor->data_size > section_descriptor->size )
 		{
 			libcerror_error_set(
 			 error,
@@ -857,7 +676,7 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		if( section->padding_size > section->data_size )
+		if( section_descriptor->padding_size > section_descriptor->data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -871,85 +690,85 @@ ssize_t libewf_section_descriptor_read(
 	}
 	if( format_version == 1 )
 	{
-		section->type = 0;
+		section_descriptor->type = 0;
 
-		if( section->type_string_length == 4 )
+		if( section_descriptor->type_string_length == 4 )
 		{
 			if( memory_compare(
-			     section->type_string,
+			     section_descriptor->type_string,
 			     "done",
 			     4 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_DONE;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_DONE;
 			}
 			else if( memory_compare(
-			          section->type_string,
+			          section_descriptor->type_string,
 			          "hash",
 			          4 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_MD5_HASH;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_MD5_HASH;
 			}
 			else if( memory_compare(
-			          section->type_string,
+			          section_descriptor->type_string,
 			          "next",
 			          4 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_NEXT;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_NEXT;
 			}
 		}
-		else if( section->type_string_length == 5 )
+		else if( section_descriptor->type_string_length == 5 )
 		{
 			if( memory_compare(
-			     section->type_string,
+			     section_descriptor->type_string,
 			     "ltree",
 			     5 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA;
 			}
 			else if( memory_compare(
-			          section->type_string,
+			          section_descriptor->type_string,
 			          "table",
 			          5 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_SECTOR_TABLE;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_SECTOR_TABLE;
 			}
 		}
-		else if( section->type_string_length == 6 )
+		else if( section_descriptor->type_string_length == 6 )
 		{
 			if( memory_compare(
-			     section->type_string,
+			     section_descriptor->type_string,
 			     "error2",
 			     6 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_ERROR_TABLE;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_ERROR_TABLE;
 			}
 		}
-		else if( section->type_string_length == 7 )
+		else if( section_descriptor->type_string_length == 7 )
 		{
 			if( memory_compare(
-			     section->type_string,
+			     section_descriptor->type_string,
 			     "sectors",
 			     7 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_SECTOR_DATA;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_SECTOR_DATA;
 			}
 			else if( memory_compare(
-			          section->type_string,
+			          section_descriptor->type_string,
 			          "session",
 			          7 ) == 0 )
 			{
-				section->type = LIBEWF_SECTION_TYPE_SESSION_TABLE;
+				section_descriptor->type = LIBEWF_SECTION_TYPE_SESSION_TABLE;
 			}
 		}
-		if( section->size != 0 )
+		if( section_descriptor->size != 0 )
 		{
 			/* Make sure to check if the section next value is sane
 			 * the end offset of the next and done sections point back at themselves
 			 */
-			if( section->end_offset == section->start_offset )
+			if( section_descriptor->end_offset == section_descriptor->start_offset )
 			{
-				if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
-				 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+				if( ( section_descriptor->type != LIBEWF_SECTION_TYPE_DONE )
+				 && ( section_descriptor->type != LIBEWF_SECTION_TYPE_NEXT ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -957,12 +776,12 @@ ssize_t libewf_section_descriptor_read(
 					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
 					 function,
-					 section->end_offset,
-					 section->start_offset );
+					 section_descriptor->end_offset,
+					 section_descriptor->start_offset );
 
 					goto on_error;
 				}
-				if( section->size != sizeof( ewf_section_descriptor_v1_t ) )
+				if( section_descriptor->size != sizeof( ewf_section_descriptor_v1_t ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -976,9 +795,9 @@ ssize_t libewf_section_descriptor_read(
 			}
 			else
 			{
-				file_offset += (off64_t) section->size;
+				file_offset += (off64_t) section_descriptor->size;
 
-				if( section->end_offset != file_offset )
+				if( section_descriptor->end_offset != file_offset )
 				{
 					libcerror_error_set(
 					 error,
@@ -986,7 +805,7 @@ ssize_t libewf_section_descriptor_read(
 					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
 					 function,
-					 section->end_offset,
+					 section_descriptor->end_offset,
 					 file_offset );
 
 					goto on_error;
@@ -998,10 +817,10 @@ ssize_t libewf_section_descriptor_read(
 			/* Make sure to check if the section next value is sane
 			 * the end offset of the next and done sections point back at themselves
 			 */
-			if( section->end_offset == section->start_offset )
+			if( section_descriptor->end_offset == section_descriptor->start_offset )
 			{
-				if( ( section->type != LIBEWF_SECTION_TYPE_DONE )
-				 && ( section->type != LIBEWF_SECTION_TYPE_NEXT ) )
+				if( ( section_descriptor->type != LIBEWF_SECTION_TYPE_DONE )
+				 && ( section_descriptor->type != LIBEWF_SECTION_TYPE_NEXT ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1009,18 +828,18 @@ ssize_t libewf_section_descriptor_read(
 					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 					 "%s: mismatch in next section offset (stored: %" PRIi64 ", calculated: %" PRIi64 ").",
 					 function,
-					 section->end_offset,
-					 section->start_offset );
+					 section_descriptor->end_offset,
+					 section_descriptor->start_offset );
 
 					goto on_error;
 				}
-				section->size = (size64_t) sizeof( ewf_section_descriptor_v1_t );
+				section_descriptor->size = (size64_t) sizeof( ewf_section_descriptor_v1_t );
 			}
 			else
 			{
 				file_offset += (off64_t) sizeof( ewf_section_descriptor_v1_t );
 
-				if( section->end_offset < file_offset )
+				if( section_descriptor->end_offset < file_offset )
 				{
 					libcerror_error_set(
 					 error,
@@ -1031,7 +850,7 @@ ssize_t libewf_section_descriptor_read(
 
 					goto on_error;
 				}
-				section->size = (size64_t) ( section->end_offset - section->start_offset );
+				section_descriptor->size = (size64_t) ( section_descriptor->end_offset - section_descriptor->start_offset );
 			}
 		}
 	}
@@ -1064,7 +883,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_descriptor_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -1077,13 +896,13 @@ ssize_t libewf_section_descriptor_write(
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -1139,8 +958,8 @@ ssize_t libewf_section_descriptor_write(
 	{
 		if( memory_copy(
 		     ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->type_string,
-		     section->type_string,
-		     section->type_string_length ) == NULL )
+		     section_descriptor->type_string,
+		     section_descriptor->type_string_length ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -1153,21 +972,21 @@ ssize_t libewf_section_descriptor_write(
 		}
 		byte_stream_copy_from_uint64_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->size,
-		 section->size );
+		 section_descriptor->size );
 
 		byte_stream_copy_from_uint64_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->next_offset,
-		 section->end_offset );
+		 section_descriptor->end_offset );
 	}
 	else if( format_version == 2 )
 	{
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
-		 section->type );
+		 section_descriptor->type );
 
-		if( section->start_offset > (off64_t) sizeof( ewf_section_descriptor_v2_t ) )
+		if( section_descriptor->start_offset > (off64_t) sizeof( ewf_section_descriptor_v2_t ) )
 		{
-			previous_offset = section->start_offset - sizeof( ewf_section_descriptor_v2_t );
+			previous_offset = section_descriptor->start_offset - sizeof( ewf_section_descriptor_v2_t );
 		}
 		byte_stream_copy_from_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
@@ -1175,11 +994,11 @@ ssize_t libewf_section_descriptor_write(
 
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
-		 section->data_flags );
+		 section_descriptor->data_flags );
 
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_size,
-		 section->data_size );
+		 section_descriptor->data_size );
 
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->descriptor_size,
@@ -1187,11 +1006,11 @@ ssize_t libewf_section_descriptor_write(
 
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->padding_size,
-		 section->padding_size );
+		 section_descriptor->padding_size );
 
 		if( memory_copy(
 		     ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_integrity_hash,
-		     section->data_integrity_hash,
+		     section_descriptor->data_integrity_hash,
 		     16 ) == NULL )
 		{
 			libcerror_error_set(
@@ -1252,17 +1071,17 @@ ssize_t libewf_section_descriptor_write(
 			libcnotify_printf(
 			 "%s: type string\t\t\t\t: %s\n",
 			 function,
-			 (char *) section->type_string );
+			 (char *) section_descriptor->type_string );
 
 			libcnotify_printf(
 			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section->end_offset );
+			 section_descriptor->end_offset );
 
 			libcnotify_printf(
 			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 section->size );
+			 section_descriptor->size );
 
 			libcnotify_printf(
 			 "%s: padding:\n",
@@ -1277,18 +1096,18 @@ ssize_t libewf_section_descriptor_write(
 			libcnotify_printf(
 			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
 			 function,
-			 section->type );
+			 section_descriptor->type );
 			libewf_debug_print_section_type(
-			 section->type );
+			 section_descriptor->type );
 			libcnotify_printf(
 			 ")\n" );
 
 			libcnotify_printf(
 			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
-			 section->data_flags );
+			 section_descriptor->data_flags );
 			libewf_debug_print_section_data_flags(
-			 section->data_flags );
+			 section_descriptor->data_flags );
 			libcnotify_printf(
 			 "\n" );
 
@@ -1300,7 +1119,7 @@ ssize_t libewf_section_descriptor_write(
 			libcnotify_printf(
 			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
 			 function,
-			 section->data_size );
+			 section_descriptor->data_size );
 
 			libcnotify_printf(
 			 "%s: section descriptor size\t\t: %" PRIzd "\n",
@@ -1310,7 +1129,7 @@ ssize_t libewf_section_descriptor_write(
 			libcnotify_printf(
 			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
 			 function,
-			 section->padding_size );
+			 section_descriptor->padding_size );
 
 			libcnotify_printf(
 			 "%s: data integrity hash:\n",
@@ -1374,7 +1193,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_read_data(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -1387,18 +1206,18 @@ ssize_t libewf_section_read_data(
 	static char *function = "libewf_section_read_data";
 	ssize_t read_count    = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
 	}
-	if( section->data_size > (size64_t) SSIZE_MAX )
+	if( section_descriptor->data_size > (size64_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
@@ -1453,7 +1272,7 @@ ssize_t libewf_section_read_data(
 
 		return( -1 );
 	}
-	*section_data_size = (size_t) section->data_size;
+	*section_data_size = (size_t) section_descriptor->data_size;
 
 	*section_data = (uint8_t *) memory_allocate(
 	                             sizeof( uint8_t ) * *section_data_size );
@@ -1487,7 +1306,7 @@ ssize_t libewf_section_read_data(
 
 		goto on_error;
 	}
-	if( ( section->data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
+	if( ( section_descriptor->data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
 	{
 		if( libhmac_md5_calculate(
 		     *section_data,
@@ -1518,7 +1337,7 @@ ssize_t libewf_section_read_data(
 		}
 #endif
 		if( memory_compare(
-		     section->data_integrity_hash,
+		     section_descriptor->data_integrity_hash,
 		     calculated_md5_hash,
 		     16 ) != 0 )
 		{
@@ -1532,7 +1351,7 @@ ssize_t libewf_section_read_data(
 			goto on_error;
 		}
 	}
-	if( ( section->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
+	if( ( section_descriptor->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1575,7 +1394,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_write_data(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -1586,13 +1405,13 @@ ssize_t libewf_section_write_data(
 	static char *function = "libewf_section_write_data";
 	ssize_t write_count   = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -1609,7 +1428,7 @@ ssize_t libewf_section_write_data(
 		return( -1 );
 	}
 /* TODO MD5 hash */
-	if( ( section->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
+	if( ( section_descriptor->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
 	{
 /* TODO encrypt */
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1626,12 +1445,12 @@ ssize_t libewf_section_write_data(
 #endif
 		return( 0 );
 	}
-	if( ( section->data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
+	if( ( section_descriptor->data_flags & LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH ) != 0 )
 	{
 		if( libhmac_md5_calculate(
 		     section_data,
 		     section_data_size,
-		     section->data_integrity_hash,
+		     section_descriptor->data_integrity_hash,
 		     16,
 		     error ) != 1 )
 		{
@@ -1651,7 +1470,7 @@ ssize_t libewf_section_write_data(
 			 "%s: calculated MD5 hash:\n",
 			 function );
 			libcnotify_print_data(
-			 section->data_integrity_hash,
+			 section_descriptor->data_integrity_hash,
 			 16,
 			 0 );
 		}
@@ -1686,7 +1505,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_compressed_string_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -1703,13 +1522,13 @@ ssize_t libewf_section_compressed_string_read(
 	uint8_t number_of_attempts = 0;
 	int result                 = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -1748,7 +1567,7 @@ ssize_t libewf_section_compressed_string_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -1903,7 +1722,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_write_compressed_string(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -1930,13 +1749,13 @@ ssize_t libewf_section_write_compressed_string(
 	ssize_t write_count                 = 0;
 	int result                          = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -2150,7 +1969,7 @@ ssize_t libewf_section_write_compressed_string(
 		}
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     type,
 	     type_string,
 	     type_string_length,
@@ -2172,7 +1991,7 @@ ssize_t libewf_section_write_compressed_string(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -2204,7 +2023,7 @@ ssize_t libewf_section_write_compressed_string(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -2233,7 +2052,7 @@ ssize_t libewf_section_write_compressed_string(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -2267,7 +2086,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_data_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -2291,13 +2110,13 @@ ssize_t libewf_section_data_read(
 	uint32_t value_32bit         = 0;
 #endif
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -2336,7 +2155,7 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -2770,7 +2589,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_data_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -2784,13 +2603,13 @@ ssize_t libewf_section_data_write(
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -2840,7 +2659,7 @@ ssize_t libewf_section_data_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     0,
 	     (uint8_t *) "data",
 	     4,
@@ -2860,7 +2679,7 @@ ssize_t libewf_section_data_write(
 		return( -1 );
 	}
 	write_count = libewf_section_descriptor_write(
-	               section,
+	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -2890,7 +2709,7 @@ ssize_t libewf_section_data_write(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create data.",
+			 "%s: unable to create cached data section.",
 			 function );
 
 			return( -1 );
@@ -3048,7 +2867,7 @@ ssize_t libewf_section_data_write(
 		 calculated_checksum );
 	}
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -3076,7 +2895,7 @@ ssize_t libewf_section_data_write(
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_digest_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -3091,13 +2910,13 @@ ssize_t libewf_section_digest_read(
 	uint32_t stored_checksum     = 0;
 	int result                   = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -3114,7 +2933,7 @@ ssize_t libewf_section_digest_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -3334,7 +3153,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_digest_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -3349,13 +3168,13 @@ ssize_t libewf_section_digest_write(
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -3372,7 +3191,7 @@ ssize_t libewf_section_digest_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     0,
 	     (uint8_t *) "digest",
 	     6,
@@ -3392,7 +3211,7 @@ ssize_t libewf_section_digest_write(
 		return( -1 );
 	}
 	write_count = libewf_section_descriptor_write(
-	               section,
+	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -3500,7 +3319,7 @@ ssize_t libewf_section_digest_write(
 	 calculated_checksum );
 
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -3528,7 +3347,7 @@ ssize_t libewf_section_digest_write(
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_error_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -3553,13 +3372,13 @@ ssize_t libewf_section_error_read(
 	uint32_t number_of_sectors     = 0;
 	uint32_t stored_checksum       = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -3599,7 +3418,7 @@ ssize_t libewf_section_error_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -4017,7 +3836,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_error_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -4046,13 +3865,13 @@ ssize_t libewf_section_error_write(
 	int entry_index                     = 0;
 	int number_of_entries               = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -4115,7 +3934,7 @@ ssize_t libewf_section_error_write(
 	                  + error_footer_data_size;
 
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_ERROR_TABLE,
 	     (uint8_t *) "error2",
 	     6,
@@ -4137,7 +3956,7 @@ ssize_t libewf_section_error_write(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -4412,7 +4231,7 @@ ssize_t libewf_section_error_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -4441,7 +4260,7 @@ ssize_t libewf_section_error_write(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -4475,7 +4294,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_md5_hash_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -4492,13 +4311,13 @@ ssize_t libewf_section_md5_hash_read(
 	uint32_t stored_checksum     = 0;
 	int result                   = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -4534,7 +4353,7 @@ ssize_t libewf_section_md5_hash_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -4735,7 +4554,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_md5_hash_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -4753,13 +4572,13 @@ ssize_t libewf_section_md5_hash_write(
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -4798,7 +4617,7 @@ ssize_t libewf_section_md5_hash_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_MD5_HASH,
 	     (uint8_t *) "hash",
 	     4,
@@ -4820,7 +4639,7 @@ ssize_t libewf_section_md5_hash_write(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -4974,7 +4793,7 @@ ssize_t libewf_section_md5_hash_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -5003,7 +4822,7 @@ ssize_t libewf_section_md5_hash_write(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -5037,7 +4856,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_sha1_hash_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -5053,13 +4872,13 @@ ssize_t libewf_section_sha1_hash_read(
 	uint32_t stored_checksum     = 0;
 	int result                   = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -5078,7 +4897,7 @@ ssize_t libewf_section_sha1_hash_read(
 	sha1_hash_data_size = sizeof( ewf_sha1_hash_t );
 
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -5251,7 +5070,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_sha1_hash_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -5269,13 +5088,13 @@ ssize_t libewf_section_sha1_hash_write(
 	ssize_t write_count                 = 0;
 	uint32_t calculated_checksum        = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -5309,7 +5128,7 @@ ssize_t libewf_section_sha1_hash_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SHA1_HASH,
 	     NULL,
 	     0,
@@ -5435,7 +5254,7 @@ ssize_t libewf_section_sha1_hash_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -5462,7 +5281,7 @@ ssize_t libewf_section_sha1_hash_write(
 	section_data = NULL;
 
 	write_count = libewf_section_descriptor_write(
-		       section,
+		       section_descriptor,
 		       file_io_pool,
 		       file_io_pool_entry,
 		       format_version,
@@ -5498,7 +5317,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_ltree_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -5521,13 +5340,13 @@ ssize_t libewf_section_ltree_read(
 	size_t trailing_data_size    = 0;
 #endif
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -5578,7 +5397,7 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -5838,7 +5657,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_ltree_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -5859,13 +5678,13 @@ ssize_t libewf_section_ltree_write(
 	uint32_t calculated_checksum        = 0;
 	uint32_t section_padding_size       = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -5949,7 +5768,7 @@ ssize_t libewf_section_ltree_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SINGLE_FILES_DATA,
 	     (uint8_t *) "ltree",
 	     5,
@@ -5971,7 +5790,7 @@ ssize_t libewf_section_ltree_write(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -6136,10 +5955,10 @@ ssize_t libewf_section_ltree_write(
 	}
 	else if( format_version == 2 )
 	{
-		section->data_flags |= LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH;
+		section_descriptor->data_flags |= LIBEWF_SECTION_DATA_FLAGS_HAS_INTEGRITY_HASH;
 	}
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -6163,7 +5982,7 @@ ssize_t libewf_section_ltree_write(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -6190,7 +6009,7 @@ ssize_t libewf_section_ltree_write(
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_sectors_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -6203,13 +6022,13 @@ ssize_t libewf_section_sectors_write(
 	size_t section_descriptor_data_size = 0;
 	ssize_t write_count                 = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -6234,7 +6053,7 @@ ssize_t libewf_section_sectors_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SECTOR_DATA,
 	     (uint8_t *) "sectors",
 	     7,
@@ -6254,7 +6073,7 @@ ssize_t libewf_section_sectors_write(
 		return( -1 );
 	}
 	write_count = libewf_section_descriptor_write(
-	               section,
+	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               format_version,
@@ -6278,7 +6097,7 @@ ssize_t libewf_section_sectors_write(
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_session_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -6312,13 +6131,13 @@ ssize_t libewf_section_session_read(
 	uint32_t stored_checksum            = 0;
 	int entry_index                     = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -6369,7 +6188,7 @@ ssize_t libewf_section_session_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -7106,7 +6925,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_session_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -7145,13 +6964,13 @@ ssize_t libewf_section_session_write(
 	int session_index                   = 0;
 	int track_index                     = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -7384,7 +7203,7 @@ ssize_t libewf_section_session_write(
 	                  + session_footer_data_size;
 
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SESSION_TABLE,
 	     (uint8_t *) "session",
 	     7,
@@ -7406,7 +7225,7 @@ ssize_t libewf_section_session_write(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -7781,7 +7600,7 @@ ssize_t libewf_section_session_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -7810,7 +7629,7 @@ ssize_t libewf_section_session_write(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -7846,7 +7665,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_table_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -7876,13 +7695,13 @@ ssize_t libewf_section_table_read(
 	uint32_t value_32bit          = 0;
 #endif
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -8046,7 +7865,7 @@ ssize_t libewf_section_table_read(
 	}
 	else
 	{
-		*section_data_size = (size_t) section->data_size;
+		*section_data_size = (size_t) section_descriptor->data_size;
 	}
 /* TODO add support for table with chunk data */
 
@@ -8082,7 +7901,7 @@ ssize_t libewf_section_table_read(
 
 		goto on_error;
 	}
-	if( ( section->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
+	if( ( section_descriptor->data_flags & LIBEWF_SECTION_DATA_FLAGS_IS_ENCRYPTED ) != 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -8519,7 +8338,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_table_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -8551,13 +8370,13 @@ ssize_t libewf_section_table_write(
 	uint32_t calculated_checksum        = 0;
 	uint32_t section_padding_size       = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -8686,7 +8505,7 @@ ssize_t libewf_section_table_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SECTOR_TABLE,
 	     type_string,
 	     type_string_length,
@@ -8708,7 +8527,7 @@ ssize_t libewf_section_table_write(
 	if( format_version == 1 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -8884,7 +8703,7 @@ ssize_t libewf_section_table_write(
 #endif
 	}
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -8908,7 +8727,7 @@ ssize_t libewf_section_table_write(
 	if( format_version == 2 )
 	{
 		write_count = libewf_section_descriptor_write(
-			       section,
+			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       format_version,
@@ -8934,7 +8753,7 @@ ssize_t libewf_section_table_write(
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -8952,13 +8771,13 @@ ssize_t libewf_section_volume_e01_read(
 	uint32_t value_32bit         = 0;
 #endif
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -8986,7 +8805,7 @@ ssize_t libewf_section_volume_e01_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -9290,7 +9109,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -9304,13 +9123,13 @@ ssize_t libewf_section_volume_e01_write(
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -9349,7 +9168,7 @@ ssize_t libewf_section_volume_e01_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     0,
 	     (uint8_t *) "volume",
 	     6,
@@ -9369,7 +9188,7 @@ ssize_t libewf_section_volume_e01_write(
 		goto on_error;
 	}
 	write_count = libewf_section_descriptor_write(
-	               section,
+	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -9553,7 +9372,7 @@ ssize_t libewf_section_volume_e01_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -9592,7 +9411,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_s01_read(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -9606,13 +9425,13 @@ ssize_t libewf_section_volume_s01_read(
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -9640,7 +9459,7 @@ ssize_t libewf_section_volume_s01_read(
 		return( -1 );
 	}
 	read_count = libewf_section_read_data(
-	              section,
+	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
@@ -9839,7 +9658,7 @@ on_error:
  * Returns the number of bytes written or -1 on error
  */
 ssize_t libewf_section_volume_s01_write(
-         libewf_section_t *section,
+         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -9853,13 +9672,13 @@ ssize_t libewf_section_volume_s01_write(
 	ssize_t write_count          = 0;
 	uint32_t calculated_checksum = 0;
 
-	if( section == NULL )
+	if( section_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.",
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -9898,7 +9717,7 @@ ssize_t libewf_section_volume_s01_write(
 		return( -1 );
 	}
 	if( libewf_section_set_values(
-	     section,
+	     section_descriptor,
 	     0,
 	     (uint8_t *) "volume",
 	     6,
@@ -9918,7 +9737,7 @@ ssize_t libewf_section_volume_s01_write(
 		goto on_error;
 	}
 	write_count = libewf_section_descriptor_write(
-	               section,
+	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
 	               1,
@@ -10061,7 +9880,7 @@ ssize_t libewf_section_volume_s01_write(
 	}
 #endif
 	write_count = libewf_section_write_data(
-	               section,
+	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,

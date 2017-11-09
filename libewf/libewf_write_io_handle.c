@@ -916,25 +916,25 @@ int libewf_write_io_handle_initialize_resume(
      off64_t *current_offset,
      libcerror_error_t **error )
 {
-	libewf_section_t *previous_section       = NULL;
-	libewf_section_t *section                = NULL;
-	libewf_segment_file_t *segment_file      = NULL;
-	libfcache_cache_t *sections_cache        = NULL;
-	static char *function                    = "libewf_write_io_handle_initialize_resume";
-	size64_t segment_file_size               = 0;
-	size64_t storage_media_size              = 0;
-	size64_t unusable_storage_media_size     = 0;
-	uint64_t unusable_number_of_chunks       = 0;
-	uint32_t number_of_segments              = 0;
-	uint32_t segment_number                  = 0;
-	uint8_t backtrack_to_last_chunks_section = 0;
-	uint8_t reopen_segment_file              = 0;
-	int file_io_pool_entry                   = 0;
-	int number_of_sections                   = 0;
-	int previous_section_index               = 0;
-	int result                               = 0;
-	int section_index                        = 0;
-	int supported_section                    = 0;
+	libewf_section_descriptor_t *previous_section = NULL;
+	libewf_section_descriptor_t *section          = NULL;
+	libewf_segment_file_t *segment_file           = NULL;
+	libfcache_cache_t *sections_cache             = NULL;
+	static char *function                         = "libewf_write_io_handle_initialize_resume";
+	size64_t segment_file_size                    = 0;
+	size64_t storage_media_size                   = 0;
+	size64_t unusable_storage_media_size          = 0;
+	uint64_t unusable_number_of_chunks            = 0;
+	uint32_t number_of_segments                   = 0;
+	uint32_t segment_number                       = 0;
+	uint8_t backtrack_to_last_chunks_section      = 0;
+	uint8_t reopen_segment_file                   = 0;
+	int file_io_pool_entry                        = 0;
+	int number_of_sections                        = 0;
+	int previous_section_index                    = 0;
+	int result                                    = 0;
+	int section_index                             = 0;
+	int supported_section                         = 0;
 
 	if( write_io_handle == NULL )
 	{

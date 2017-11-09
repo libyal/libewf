@@ -284,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_section_descriptor.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_sector_range.c"
 				>
 			</File>
@@ -531,6 +535,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_section.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_section_descriptor.h"
 				>
 			</File>
 			<File

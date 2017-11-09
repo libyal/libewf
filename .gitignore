@@ -137,6 +137,7 @@ stamp-h[1-9]
 /tests/ewf_test_chunk_group
 /tests/ewf_test_chunk_table
 /tests/ewf_test_data_chunk
+/tests/ewf_test_deflate
 /tests/ewf_test_device_information
 /tests/ewf_test_error
 /tests/ewf_test_file_entry
@@ -151,7 +152,7 @@ stamp-h[1-9]
 /tests/ewf_test_notify
 /tests/ewf_test_read_io_handle
 /tests/ewf_test_restart_data
-/tests/ewf_test_section
+/tests/ewf_test_section_descriptor
 /tests/ewf_test_sector_range
 /tests/ewf_test_segment_file
 /tests/ewf_test_segment_table

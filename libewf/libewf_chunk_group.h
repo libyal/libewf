@@ -28,7 +28,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfdata.h"
-#include "libewf_section.h"
+#include "libewf_section_descriptor.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -66,7 +66,7 @@ int libewf_chunk_group_fill_v1(
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
-     libewf_section_t *table_section,
+     libewf_section_descriptor_t *table_section,
      off64_t base_offset,
      uint32_t number_of_offsets,
      const uint8_t *table_entries_data,
@@ -79,7 +79,7 @@ int libewf_chunk_group_fill_v2(
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
-     libewf_section_t *table_section,
+     libewf_section_descriptor_t *table_section,
      uint32_t number_of_offsets,
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
@@ -91,7 +91,7 @@ int libewf_chunk_group_correct_v1(
      uint64_t chunk_index,
      size32_t chunk_size,
      int file_io_pool_entry,
-     libewf_section_t *table_section,
+     libewf_section_descriptor_t *table_section,
      off64_t base_offset,
      uint32_t number_of_offsets,
      const uint8_t *table_entries_data,

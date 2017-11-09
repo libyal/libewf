@@ -51,6 +51,8 @@
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
 #include "libewf_restart_data.h"
+#include "libewf_section.h"
+#include "libewf_section_descriptor.h"
 #include "libewf_sector_range.h"
 #include "libewf_segment_file.h"
 #include "libewf_single_file_entry.h"
@@ -1618,21 +1620,21 @@ int libewf_internal_handle_open_read_segment_file_section_data(
      libcerror_error_t **error )
 {
 	libewf_header_sections_t *header_sections = NULL;
-	libewf_section_t *section                 = NULL;
+	libewf_section_descriptor_t *section      = NULL;
 	libfcache_cache_t *sections_cache         = NULL;
 	uint8_t *string_data                      = NULL;
 	static char *function                     = "libewf_internal_handle_open_read_segment_file_section_data";
-	off64_t section_data_offset               = 0;
 	size_t string_data_size                   = 0;
 	ssize_t read_count                        = 0;
-	int initialize_chunk_values               = 0;
+	off64_t section_data_offset               = 0;
 	int header_section_found                  = 0;
+	int initialize_chunk_values               = 0;
 	int number_of_sections                    = 0;
+	int read_table_sections                   = 0;
+	int result                                = 0;
 	int section_index                         = 0;
 	int set_identifier_change                 = 0;
 	int single_files_section_found            = 0;
-	int read_table_sections                   = 0;
-	int result                                = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	int known_section                         = 0;

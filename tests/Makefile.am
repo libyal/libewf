@@ -76,6 +76,7 @@ check_PROGRAMS = \
 	ewf_test_chunk_group \
 	ewf_test_chunk_table \
 	ewf_test_data_chunk \
+	ewf_test_deflate \
 	ewf_test_device_information \
 	ewf_test_error \
 	ewf_test_file_entry \
@@ -90,7 +91,7 @@ check_PROGRAMS = \
 	ewf_test_notify \
 	ewf_test_read_io_handle \
 	ewf_test_restart_data \
-	ewf_test_section \
+	ewf_test_section_descriptor \
 	ewf_test_sector_range \
 	ewf_test_segment_file \
 	ewf_test_segment_table \
@@ -169,6 +170,19 @@ ewf_test_data_chunk_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_data_chunk_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_deflate_SOURCES = \
+	ewf_test_deflate.c \
+	ewf_test_libcerror.h \
+	ewf_test_libcnotify.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_deflate_LDADD = \
+	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -353,15 +367,15 @@ ewf_test_restart_data_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
-ewf_test_section_SOURCES = \
+ewf_test_section_descriptor_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
 	ewf_test_memory.c ewf_test_memory.h \
-	ewf_test_section.c \
+	ewf_test_section_descriptor.c \
 	ewf_test_unused.h
 
-ewf_test_section_LDADD = \
+ewf_test_section_descriptor_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
