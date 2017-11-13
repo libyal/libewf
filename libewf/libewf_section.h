@@ -311,40 +311,6 @@ ssize_t libewf_section_table_write(
          size64_t chunks_data_size,
          libcerror_error_t **error );
 
-ssize_t libewf_section_volume_e01_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_media_values_t *media_values,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_volume_e01_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_media_values_t *media_values,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_volume_s01_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_media_values_t *media_values,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_volume_s01_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_media_values_t *media_values,
-         libcerror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

@@ -56,6 +56,7 @@
 #include "libewf_segment_table.h"
 #include "libewf_single_files.h"
 #include "libewf_unused.h"
+#include "libewf_volume_section.h"
 
 #include "ewf_file_header.h"
 #include "ewf_section.h"
@@ -1665,7 +1666,7 @@ ssize_t libewf_segment_file_read_volume_section(
 	}
 	if( section_descriptor->data_size == (size64_t) sizeof( ewf_volume_t ) )
 	{
-		read_count = libewf_section_volume_e01_read(
+		read_count = libewf_volume_section_e01_read(
 		              section_descriptor,
 		              segment_file->io_handle,
 		              file_io_pool,
@@ -1687,7 +1688,7 @@ ssize_t libewf_segment_file_read_volume_section(
 	}
 	else if( section_descriptor->data_size == (size64_t) sizeof( ewf_volume_smart_t ) )
 	{
-		read_count = libewf_section_volume_s01_read(
+		read_count = libewf_volume_section_s01_read(
 		              section_descriptor,
 		              segment_file->io_handle,
 		              file_io_pool,
@@ -3151,7 +3152,7 @@ ssize_t libewf_segment_file_write_start(
 
 			if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 			{
-				write_count = libewf_section_volume_e01_write(
+				write_count = libewf_volume_section_e01_write(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -3162,7 +3163,7 @@ ssize_t libewf_segment_file_write_start(
 			}
 			else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 			{
-				write_count = libewf_section_volume_s01_write(
+				write_count = libewf_volume_section_s01_write(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -5684,7 +5685,7 @@ int libewf_segment_file_write_sections_correction(
 
 				if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 				{
-					write_count = libewf_section_volume_e01_write(
+					write_count = libewf_volume_section_e01_write(
 						       section_descriptor,
 						       segment_file->io_handle,
 						       file_io_pool,
@@ -5695,7 +5696,7 @@ int libewf_segment_file_write_sections_correction(
 				}
 				else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 				{
-					write_count = libewf_section_volume_s01_write(
+					write_count = libewf_volume_section_s01_write(
 						       section_descriptor,
 						       segment_file->io_handle,
 						       file_io_pool,

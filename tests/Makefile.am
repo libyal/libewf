@@ -99,6 +99,7 @@ check_PROGRAMS = \
 	ewf_test_single_files \
 	ewf_test_support \
 	ewf_test_truncate \
+	ewf_test_volume_section \
 	ewf_test_write \
 	ewf_test_write_chunk \
 	ewf_test_write_io_handle
@@ -477,6 +478,17 @@ ewf_test_truncate_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
+ewf_test_volume_section_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h \
+	ewf_test_volume_section.c
+
+ewf_test_volume_section_LDADD = \
+	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
 ewf_test_write_SOURCES = \

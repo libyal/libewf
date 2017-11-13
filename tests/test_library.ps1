@@ -6,7 +6,7 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$LibraryTests = "analytical_data case_data chunk_data chunk_group chunk_table data_chunk deflate device_information error file_entry hash_sections hash_values header_sections header_values io_handle media_values notify read_io_handle restart_data section_descriptor sector_range segment_file segment_table single_file_entry single_files write_io_handle"
+$LibraryTests = "analytical_data case_data chunk_data chunk_group chunk_table data_chunk deflate device_information error file_entry hash_sections hash_values header_sections header_values io_handle media_values notify read_io_handle restart_data section_descriptor sector_range segment_file segment_table single_file_entry single_files volume_section write_io_handle"
 $LibraryTestsWithInput = "handle support"
 
 Function GetTestToolDirectory

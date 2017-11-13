@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-LIBRARY_TESTS="analytical_data case_data chunk_data chunk_group chunk_table data_chunk deflate device_information error file_entry hash_sections hash_values header_sections header_values io_handle media_values notify read_io_handle restart_data section_descriptor sector_range segment_file segment_table single_file_entry single_files write_io_handle";
+LIBRARY_TESTS="analytical_data case_data chunk_data chunk_group chunk_table data_chunk deflate device_information error file_entry hash_sections hash_values header_sections header_values io_handle media_values notify read_io_handle restart_data section_descriptor sector_range segment_file segment_table single_file_entry single_files volume_section write_io_handle";
 LIBRARY_TESTS_WITH_INPUT="handle support";
 OPTION_SETS="";
 

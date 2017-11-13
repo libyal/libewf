@@ -31,6 +31,7 @@ MSVSCPP_FILES = \
 	ewf_test_single_files/ewf_test_single_files.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
+	ewf_test_volume_section/ewf_test_volume_section.vcproj \
 	ewf_test_write/ewf_test_write.vcproj \
 	ewf_test_write_chunk/ewf_test_write_chunk.vcproj \
 	ewf_test_write_io_handle/ewf_test_write_io_handle.vcproj \

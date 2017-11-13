@@ -316,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_volume_section.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_write_io_handle.c"
 				>
 			</File>
@@ -575,6 +579,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_unused.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_volume_section.h"
 				>
 			</File>
 			<File
