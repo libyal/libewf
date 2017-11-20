@@ -1,5 +1,5 @@
 /*
- * Library analytical_data type test program
+ * Library analytical_data functions test program
  *
  * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
  *

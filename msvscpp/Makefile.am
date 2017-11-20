@@ -8,6 +8,7 @@ MSVSCPP_FILES = \
 	ewf_test_chunk_group/ewf_test_chunk_group.vcproj \
 	ewf_test_chunk_table/ewf_test_chunk_table.vcproj \
 	ewf_test_data_chunk/ewf_test_data_chunk.vcproj \
+	ewf_test_date_time_values/ewf_test_date_time_values.vcproj \
 	ewf_test_deflate/ewf_test_deflate.vcproj \
 	ewf_test_device_information/ewf_test_device_information.vcproj \
 	ewf_test_error/ewf_test_error.vcproj \

@@ -76,6 +76,7 @@ check_PROGRAMS = \
 	ewf_test_chunk_group \
 	ewf_test_chunk_table \
 	ewf_test_data_chunk \
+	ewf_test_date_time_values \
 	ewf_test_deflate \
 	ewf_test_device_information \
 	ewf_test_error \
@@ -171,6 +172,17 @@ ewf_test_data_chunk_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_data_chunk_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_date_time_values_SOURCES = \
+	ewf_test_date_time_values.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_date_time_values_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
