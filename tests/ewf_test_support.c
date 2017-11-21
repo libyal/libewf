@@ -920,7 +920,7 @@ on_error:
 int ewf_test_glob_wide(
      const system_character_t *source )
 {
-	char wide_source[ 256 ];
+	wchar_t wide_source[ 256 ];
 
 	libcerror_error_t *error  = NULL;
 	wchar_t **filenames       = NULL;
@@ -1129,7 +1129,7 @@ int ewf_test_glob_wide_free(
 	libcerror_error_wide_free(
 	 &error );
 
-	result = libewf_glob_free(
+	result = libewf_glob_wide_free(
 	          (wchar_t **) 0x12345678,
 	          -1,
 	          &error );

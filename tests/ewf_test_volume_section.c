@@ -113,6 +113,8 @@ uint8_t ewf_test_volume_section_s01_data1[ 94 ] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x53, 0x4d, 0x41, 0x52, 0x54, 0x43, 0x02, 0x1d, 0x3f };
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 /* Tests the libewf_volume_section_e01_read_data function
  * Returns 1 if successful or 0 if not
  */
@@ -555,6 +557,8 @@ on_error:
 	return( 0 );
 }
 
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -570,6 +574,8 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 	EWF_TEST_RUN(
 	 "libewf_volume_section_e01_read_data",
 	 ewf_test_volume_section_e01_read_data );
@@ -577,6 +583,8 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_volume_section_s01_read_data",
 	 ewf_test_volume_section_s01_read_data );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
