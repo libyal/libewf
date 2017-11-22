@@ -701,7 +701,7 @@ int ewf_test_glob(
 	 error );
 
 	narrow_source_length = narrow_string_length(
-	                        source );
+	                        narrow_source );
 
 	/* Test glob
 	 */
@@ -946,7 +946,7 @@ int ewf_test_glob_wide(
 	 error );
 
 	wide_source_length = wide_string_length(
-	                     source );
+	                      wide_source );
 
 	/* Test glob
 	 */
