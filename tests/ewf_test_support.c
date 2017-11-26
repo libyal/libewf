@@ -1126,7 +1126,7 @@ int ewf_test_glob_wide_free(
 	 "error",
 	 error );
 
-	libcerror_error_wide_free(
+	libcerror_error_free(
 	 &error );
 
 	result = libewf_glob_wide_free(
