@@ -30,8 +30,8 @@ test_callback()
 	shift 5;
 	local ARGUMENTS=$@;
 
-	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
-	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
+	TEST_EXECUTABLE=$( readlink_f "${TEST_EXECUTABLE}" );
+	INPUT_FILE_FULL_PATH=$( readlink_f "${INPUT_FILE}" );
 
 	local TEST_LOG="${TEST_OUTPUT}.log";
 

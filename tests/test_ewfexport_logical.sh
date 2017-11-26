@@ -30,8 +30,8 @@ test_callback()
 	shift 5;
 	local ARGUMENTS=$@;
 
-	TEST_EXECUTABLE=`readlink -f ${TEST_EXECUTABLE}`;
-	INPUT_FILE_FULL_PATH=`readlink -f "${INPUT_FILE}"`;
+	TEST_EXECUTABLE=$( readlink_f "${TEST_EXECUTABLE}" );
+	INPUT_FILE_FULL_PATH=$( readlink_f "${INPUT_FILE}" );
 
 	(cd ${TMPDIR} && run_test_with_input_and_arguments "${TEST_EXECUTABLE}" "${INPUT_FILE_FULL_PATH}" ${ARGUMENTS[@]});
 	local RESULT=$?;
