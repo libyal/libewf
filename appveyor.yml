@@ -108,7 +108,7 @@ test_script:
 - ps: if ($env:TARGET -eq "vs2017") {
     .\runtests.ps1 }
 - cmd: if [%TARGET%]==[cygwin] (
-    C:\cygwin\bin\bash -e -l -c "cd libewf && export CHECK_WITH_STRACE=1 && ./runtests.sh" )
+    C:\cygwin\bin\bash -e -l -c "cd libewf && ./runtests.sh" )
 - cmd: if [%TARGET%]==[cygwin64] (
     C:\cygwin64\bin\bash -e -l -c "cd libewf && ./runtests.sh" )
 - cmd: if [%TARGET%]==[mingw] (
