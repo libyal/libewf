@@ -1,5 +1,5 @@
 /*
- * Section reading/writing functions
+ * Volume section functions
  *
  * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -56,17 +56,6 @@ int libewf_volume_section_e01_read_data(
 	uint32_t value_32bit         = 0;
 #endif
 
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -96,6 +85,17 @@ int libewf_volume_section_e01_read_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -402,29 +402,27 @@ ssize_t libewf_volume_section_e01_read(
 
 		goto on_error;
 	}
-	else if( read_count == 0 )
+	else if( read_count != 0 )
 	{
-		return( 0 );
-	}
-	if( libewf_volume_section_e01_read_data(
-	     section_data,
-	     section_data_size,
-	     io_handle,
-	     media_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read EWF-E01 volume section.",
-		 function );
+		if( libewf_volume_section_e01_read_data(
+		     section_data,
+		     section_data_size,
+		     io_handle,
+		     media_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read EWF-E01 volume section.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		memory_free(
+		 section_data );
 	}
-	memory_free(
-	 section_data );
-
 	return( read_count );
 
 on_error:
@@ -752,17 +750,6 @@ int libewf_volume_section_s01_read_data(
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
 
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -792,6 +779,17 @@ int libewf_volume_section_s01_read_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );

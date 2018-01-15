@@ -35,6 +35,7 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
+#include "libewf_digest_section.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
 #include "libewf_hash_sections.h"
@@ -2489,7 +2490,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					}
 				}
 #endif
-				read_count = libewf_section_digest_read(
+				read_count = libewf_digest_section_read(
 					      section,
 				              internal_handle->io_handle,
 					      file_io_pool,

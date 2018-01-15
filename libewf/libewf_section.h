@@ -144,23 +144,6 @@ ssize_t libewf_section_data_write(
          ewf_data_t **cached_data_section,
          libcerror_error_t **error );
 
-ssize_t libewf_section_digest_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_digest_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
 ssize_t libewf_section_error_read(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,

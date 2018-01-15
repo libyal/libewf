@@ -51,6 +51,7 @@ libewf_la_SOURCES = \
 	libewf_definitions.h \
 	libewf_deflate.c libewf_deflate.h \
 	libewf_device_information.c libewf_device_information.h \
+	libewf_digest_section.c libewf_digest_section.h \
 	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \

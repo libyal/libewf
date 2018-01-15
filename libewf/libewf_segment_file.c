@@ -39,6 +39,7 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
+#include "libewf_digest_section.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_io_handle.h"
@@ -4241,7 +4242,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 				goto on_error;
 			}
-			write_count = libewf_section_digest_write(
+			write_count = libewf_digest_section_write(
 				       section_descriptor,
 				       segment_file->io_handle,
 				       file_io_pool,
