@@ -230,19 +230,18 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-# TODO: disabled for now.
-# if test ${HAVE_WITH_ZLIB} -eq 0;
-# then
+if test ${HAVE_WITH_ZLIB} -eq 0;
+then
 	# Test "./configure && make && make check" with fallback zlib implementation.
-#
-# 	run_configure_make_check "--with-zlib=no";
-# 	RESULT=$?;
-#
-# 	if test ${RESULT} -ne ${EXIT_SUCCESS};
-# 	then
-# 		exit ${EXIT_FAILURE};
-# 	fi
-# fi
+
+	run_configure_make_check "--with-zlib=no";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+fi
 
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then

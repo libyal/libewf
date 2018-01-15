@@ -1,7 +1,7 @@
 /*
  * Compression handling functions
  *
- * Copyright (C) 2006-2017, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -181,7 +181,7 @@ int libewf_compress_data(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-			 	"%s: unable to write compressed data: target buffer too small.\n",
+				 "%s: unable to write compressed data: target buffer too small.\n",
 				 function );
 			}
 #endif
