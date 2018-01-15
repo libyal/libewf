@@ -79,6 +79,7 @@ check_PROGRAMS = \
 	ewf_test_date_time_values \
 	ewf_test_deflate \
 	ewf_test_device_information \
+	ewf_test_digest_section \
 	ewf_test_error \
 	ewf_test_file_entry \
 	ewf_test_glob \
@@ -207,6 +208,17 @@ ewf_test_device_information_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_device_information_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_digest_section_SOURCES = \
+	ewf_test_digest_section.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_digest_section_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
