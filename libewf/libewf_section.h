@@ -163,43 +163,6 @@ ssize_t libewf_section_error_write(
          libcdata_range_list_t *acquiry_errors,
          libcerror_error_t **error );
 
-ssize_t libewf_section_md5_hash_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_md5_hash_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         off64_t section_offset,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_sha1_hash_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_sha1_hash_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         off64_t section_offset,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error );
-
 ssize_t libewf_section_ltree_read(
          libewf_section_descriptor_t *section_descriptor,
           libewf_io_handle_t *io_handle,

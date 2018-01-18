@@ -51,10 +51,12 @@
 #include "libewf_libfdata.h"
 #include "libewf_libfguid.h"
 #include "libewf_libfvalue.h"
+#include "libewf_md5_hash_section.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
+#include "libewf_sha1_hash_section.h"
 #include "libewf_single_files.h"
 #include "libewf_unused.h"
 #include "libewf_volume_section.h"
@@ -4315,7 +4317,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 			goto on_error;
 		}
-		write_count = libewf_section_md5_hash_write(
+		write_count = libewf_md5_hash_section_write(
 			       section_descriptor,
 			       segment_file->io_handle,
 			       file_io_pool,
@@ -4405,7 +4407,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 				goto on_error;
 			}
-			write_count = libewf_section_sha1_hash_write(
+			write_count = libewf_sha1_hash_section_write(
 				       section_descriptor,
 				       segment_file->io_handle,
 				       file_io_pool,

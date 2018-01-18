@@ -11,6 +11,7 @@ MSVSCPP_FILES = \
 	ewf_test_date_time_values/ewf_test_date_time_values.vcproj \
 	ewf_test_deflate/ewf_test_deflate.vcproj \
 	ewf_test_device_information/ewf_test_device_information.vcproj \
+	ewf_test_digest_section/ewf_test_digest_section.vcproj \
 	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_file_entry/ewf_test_file_entry.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \

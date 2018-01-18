@@ -51,11 +51,13 @@
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
+#include "libewf_md5_hash_section.h"
 #include "libewf_restart_data.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
 #include "libewf_sector_range.h"
 #include "libewf_segment_file.h"
+#include "libewf_sha1_hash_section.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
 #include "libewf_single_files.h"
@@ -2146,7 +2148,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_MD5_HASH:
-					read_count = libewf_section_md5_hash_read(
+					read_count = libewf_md5_hash_section_read(
 						      section,
 						      internal_handle->io_handle,
 						      file_io_pool,
@@ -2161,7 +2163,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_SHA1_HASH:
-					read_count = libewf_section_sha1_hash_read(
+					read_count = libewf_sha1_hash_section_read(
 						      section,
 						      internal_handle->io_handle,
 						      file_io_pool,

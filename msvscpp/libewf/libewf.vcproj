@@ -268,6 +268,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_md5_hash_section.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_media_values.c"
 				>
 			</File>
@@ -301,6 +305,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_segment_table.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_sha1_hash_section.c"
 				>
 			</File>
 			<File
@@ -530,6 +538,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_md5_hash_section.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_media_values.h"
 				>
 			</File>
@@ -563,6 +575,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_segment_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_sha1_hash_section.h"
 				>
 			</File>
 			<File

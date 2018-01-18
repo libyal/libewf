@@ -75,6 +75,7 @@ libewf_la_SOURCES = \
 	libewf_libfguid.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
+	libewf_md5_hash_section.c libewf_md5_hash_section.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
@@ -84,6 +85,7 @@ libewf_la_SOURCES = \
 	libewf_sector_range.c libewf_sector_range.h \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \
+	libewf_sha1_hash_section.c libewf_sha1_hash_section.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
