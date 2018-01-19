@@ -1,5 +1,5 @@
 /*
- * MD5 hash section functions
+ * SHA1 hash section functions
  *
  * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,7 +25,6 @@
 #include <narrow_string.h>
 #include <types.h>
 
-#include "libewf_md5_hash_section.h"
 #include "libewf_checksum.h"
 #include "libewf_definitions.h"
 #include "libewf_hash_sections.h"
@@ -35,6 +34,7 @@
 #include "libewf_libcnotify.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
+#include "libewf_sha1_hash_section.h"
 
 #include "ewf_hash.h"
 

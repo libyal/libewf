@@ -53,6 +53,7 @@ libewf_la_SOURCES = \
 	libewf_device_information.c libewf_device_information.h \
 	libewf_digest_section.c libewf_digest_section.h \
 	libewf_error.c libewf_error.h \
+	libewf_error2_section.c libewf_error2_section.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \
 	libewf_file_entry.c libewf_file_entry.h \
@@ -75,6 +76,7 @@ libewf_la_SOURCES = \
 	libewf_libfguid.h \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
+	libewf_ltree_section.c libewf_ltree_section.h \
 	libewf_md5_hash_section.c libewf_md5_hash_section.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_notify.c libewf_notify.h \
