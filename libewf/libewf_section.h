@@ -154,28 +154,6 @@ ssize_t libewf_section_sectors_write(
          uint32_t chunks_padding_size,
          libcerror_error_t **error );
 
-ssize_t libewf_section_session_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         libewf_media_values_t *media_values,
-         libcdata_array_t *sessions,
-         libcdata_array_t *tracks,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_session_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         off64_t section_offset,
-         libcdata_array_t *sessions,
-         libcdata_array_t *tracks,
-         libcerror_error_t **error );
-
 ssize_t libewf_section_table_read(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,

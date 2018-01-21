@@ -51,7 +51,7 @@
 int ewf_test_date_time_values_copy_from_timestamp(
      void )
 {
-	uint8_t *string[ 32 ];
+	uint8_t string[ 32 ];
 
 	libcerror_error_t *error = NULL;
 	time_t timestamp         = 0;

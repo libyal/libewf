@@ -316,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_session_section.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_sha1_hash_section.c"
 				>
 			</File>
@@ -591,6 +595,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_segment_table.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_session_section.h"
 				>
 			</File>
 			<File

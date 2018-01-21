@@ -32,6 +32,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
+#include "libewf_libhmac.h"
 #include "libewf_ltree_section.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
