@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 int libewf_section_test_zero(
-     uint8_t *buffer,
+     const uint8_t *buffer,
      size_t buffer_size,
      libcerror_error_t **error );
 

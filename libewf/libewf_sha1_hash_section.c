@@ -41,6 +41,177 @@
 /* Reads a version 2 SHA1 hash section
  * Returns the number of bytes read or -1 on error
  */
+int libewf_sha1_hash_section_read_data(
+     const uint8_t *data,
+     size_t data_size,
+     libewf_hash_sections_t *hash_sections,
+     libcerror_error_t **error )
+{
+	static char *function        = "libewf_sha1_hash_section_read_data";
+	uint32_t calculated_checksum = 0;
+	uint32_t stored_checksum     = 0;
+	int result                   = 0;
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size != (size_t) sizeof( ewf_sha1_hash_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_sections == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash sections.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: SHA1 hash data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 0 );
+	}
+#endif
+	byte_stream_copy_to_uint32_little_endian(
+	 ( (ewf_sha1_hash_t *) data )->checksum,
+	 stored_checksum );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: SHA1 hash:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 20,
+		 0 );
+
+		libcnotify_printf(
+		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 stored_checksum );
+
+		libcnotify_printf(
+		 "%s: padding:\n",
+		 function );
+		libcnotify_print_data(
+		 ( (ewf_sha1_hash_t *) data )->padding,
+		 8,
+		 0 );
+	}
+#endif
+	data_size -= 8;
+
+	if( libewf_checksum_calculate_adler32(
+	     &calculated_checksum,
+	     data,
+	     data_size - 4,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to calculate checksum.",
+		 function );
+
+		return( -1 );
+	}
+	if( stored_checksum != calculated_checksum )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_INPUT,
+		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
+		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
+		 function,
+		 stored_checksum,
+		 calculated_checksum );
+
+		return( -1 );
+	}
+	result = libewf_section_test_zero(
+		  data,
+		  20,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if SHA1 hash is empty.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		if( memory_copy(
+		     hash_sections->sha1_hash,
+		     data,
+		     20 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set SHA1 hash in hash sections.",
+			 function );
+
+			return( -1 );
+		}
+		hash_sections->sha1_hash_set = 1;
+	}
+	else
+	{
+		hash_sections->sha1_hash_set = 0;
+	}
+	return( 1 );
+}
+
+/* Reads a version 2 SHA1 hash section
+ * Returns the number of bytes read or -1 on error
+ */
 ssize_t libewf_sha1_hash_section_read(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
@@ -49,14 +220,10 @@ ssize_t libewf_sha1_hash_section_read(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error )
 {
-	uint8_t *section_data        = NULL;
-	static char *function        = "libewf_sha1_hash_section_read";
-	size_t section_data_size     = 0;
-	size_t sha1_hash_data_size   = 0;
-	ssize_t read_count           = 0;
-	uint32_t calculated_checksum = 0;
-	uint32_t stored_checksum     = 0;
-	int result                   = 0;
+	uint8_t *section_data    = NULL;
+	static char *function    = "libewf_sha1_hash_section_read";
+	size_t section_data_size = 0;
+	ssize_t read_count       = 0;
 
 	if( section_descriptor == NULL )
 	{
@@ -80,8 +247,6 @@ ssize_t libewf_sha1_hash_section_read(
 
 		return( -1 );
 	}
-	sha1_hash_data_size = sizeof( ewf_sha1_hash_t );
-
 	read_count = libewf_section_read_data(
 	              section_descriptor,
 	              io_handle,
@@ -102,141 +267,23 @@ ssize_t libewf_sha1_hash_section_read(
 
 		goto on_error;
 	}
-	else if( read_count == 0 )
+	else if( read_count != 0 )
 	{
-		return( 0 );
-	}
-	if( section_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing section data.",
-		 function );
-
-		goto on_error;
-	}
-	if( section_data_size != sha1_hash_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section data size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-	 	 "%s: SHA1 hash data:\n",
-		 function );
-		libcnotify_print_data(
-		 section_data,
-		 sha1_hash_data_size,
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (ewf_sha1_hash_t *) section_data )->checksum,
-	 stored_checksum );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: SHA1 hash:\n",
-		 function );
-		libcnotify_print_data(
-		 section_data,
-		 20,
-		 0 );
-
-		libcnotify_printf(
-		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 stored_checksum );
-
-		libcnotify_printf(
-		 "%s: padding:\n",
-		 function );
-		libcnotify_print_data(
-		 ( (ewf_sha1_hash_t *) section_data )->padding,
-		 8,
-		 0 );
-	}
-#endif
-	sha1_hash_data_size -= 8;
-
-	if( libewf_checksum_calculate_adler32(
-	     &calculated_checksum,
-	     section_data,
-	     sha1_hash_data_size - 4,
-	     1,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to calculate checksum.",
-		 function );
-
-		goto on_error;
-	}
-	if( stored_checksum != calculated_checksum )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_INPUT,
-		 LIBCERROR_INPUT_ERROR_CHECKSUM_MISMATCH,
-		 "%s: checksum does not match (stored: 0x%08" PRIx32 ", calculated: 0x%08" PRIx32 ").",
-		 function,
-		 stored_checksum,
-		 calculated_checksum );
-
-		goto on_error;
-	}
-	result = libewf_section_test_zero(
-		  section_data,
-		  20,
-		  error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if SHA1 hash is empty.",
-		 function );
-
-		goto on_error;
-	}
-	else if( result == 0 )
-	{
-		if( memory_copy(
-		     hash_sections->sha1_hash,
+		if( libewf_sha1_hash_section_read_data(
 		     section_data,
-		     20 ) == NULL )
+		     section_data_size,
+		     hash_sections,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set SHA1 hash in hash sections.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section data.",
 			 function );
 
 			goto on_error;
 		}
-		hash_sections->sha1_hash_set = 1;
-	}
-	else
-	{
-		hash_sections->sha1_hash_set = 0;
 	}
 	memory_free(
 	 section_data );

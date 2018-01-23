@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_checksum.h"
+#include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_hash_sections.h"
 #include "libewf_io_handle.h"
