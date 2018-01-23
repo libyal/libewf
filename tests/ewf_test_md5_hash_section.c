@@ -1,5 +1,5 @@
 /*
- * Library digest section functions test program
+ * Library MD5 hash section functions test program
  *
  * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,23 +32,20 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-#include "../libewf/libewf_digest_section.h"
+#include "../libewf/libewf_md5_hash_section.h"
 #include "../libewf/libewf_hash_sections.h"
 #include "../libewf/libewf_section_descriptor.h"
 
-uint8_t ewf_test_digest_section_data1[ 80 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x5c, 0x17, 0x4b, 0xf2, 0x89, 0xe5, 0xa0, 0xea, 0xdd, 0xef, 0x71, 0x9c, 0x59, 0x59, 0xaf, 0xfc,
-	0x1d, 0xff, 0x8d, 0x23, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xab, 0x0b, 0x46, 0x4d };
+uint8_t ewf_test_md5_hash_section_data1[ 32 ] = {
+	0x18, 0x01, 0x74, 0x48, 0x43, 0xf5, 0x66, 0xc6, 0x2a, 0x60, 0x45, 0xc9, 0x26, 0x65, 0x1a, 0xf7,
+	0x6e, 0x06, 0xa9, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-/* Tests the libewf_digest_section_read_data function
+/* Tests the libewf_md5_hash_section_read_data function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_digest_section_read_data(
+int ewf_test_md5_hash_section_read_data(
      void )
 {
 	libcerror_error_t *error              = NULL;
@@ -76,9 +73,10 @@ int ewf_test_digest_section_read_data(
 
 	/* Test regular cases
 	 */
-	result = libewf_digest_section_read_data(
-	          ewf_test_digest_section_data1,
-	          80,
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          32,
+	          2,
 	          hash_sections,
 	          &error );
 
@@ -93,9 +91,10 @@ int ewf_test_digest_section_read_data(
 
 	/* Test error cases
 	 */
-	result = libewf_digest_section_read_data(
+	result = libewf_md5_hash_section_read_data(
 	          NULL,
-	          80,
+	          32,
+	          2,
 	          hash_sections,
 	          &error );
 
@@ -111,9 +110,10 @@ int ewf_test_digest_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_digest_section_read_data(
-	          ewf_test_digest_section_data1,
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
 	          (size_t) SSIZE_MAX + 1,
+	          2,
 	          hash_sections,
 	          &error );
 
@@ -129,8 +129,28 @@ int ewf_test_digest_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_digest_section_read_data(
-	          ewf_test_digest_section_data1,
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          0,
+	          2,
+	          hash_sections,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          32,
 	          0,
 	          hash_sections,
 	          &error );
@@ -147,9 +167,10 @@ int ewf_test_digest_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_digest_section_read_data(
-	          ewf_test_digest_section_data1,
-	          80,
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          32,
+	          2,
 	          NULL,
 	          &error );
 
@@ -221,8 +242,8 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
-	 "libewf_digest_section_read_data",
-	 ewf_test_digest_section_read_data );
+	 "libewf_md5_hash_section_read_data",
+	 ewf_test_md5_hash_section_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

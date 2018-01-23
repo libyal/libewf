@@ -89,6 +89,7 @@ check_PROGRAMS = \
 	ewf_test_header_sections \
 	ewf_test_header_values \
 	ewf_test_io_handle \
+	ewf_test_md5_hash_section \
 	ewf_test_media_values \
 	ewf_test_notify \
 	ewf_test_read_io_handle \
@@ -345,6 +346,17 @@ ewf_test_io_handle_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_io_handle_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_md5_hash_section_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_md5_hash_section.c \
+	ewf_test_unused.h
+
+ewf_test_md5_hash_section_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
