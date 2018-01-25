@@ -231,6 +231,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewf_test_segment_table", "e
 		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewf_test_sha1_hash_section", "ewf_test_sha1_hash_section\ewf_test_sha1_hash_section.vcproj", "{95A82B1C-93C5-4262-9225-F74188637153}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41C2387C-9D7F-42B9-9998-3430FBC95AE7} = {41C2387C-9D7F-42B9-9998-3430FBC95AE7}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewf_test_single_file_entry", "ewf_test_single_file_entry\ewf_test_single_file_entry.vcproj", "{5CBBD684-6803-4B07-B2D3-A2E2C73F7E0D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{41C2387C-9D7F-42B9-9998-3430FBC95AE7} = {41C2387C-9D7F-42B9-9998-3430FBC95AE7}
@@ -704,6 +710,10 @@ Global
 		{9A1A4D83-E000-4139-AC16-FE448AA34250}.Release|Win32.Build.0 = Release|Win32
 		{9A1A4D83-E000-4139-AC16-FE448AA34250}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{9A1A4D83-E000-4139-AC16-FE448AA34250}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{95A82B1C-93C5-4262-9225-F74188637153}.Release|Win32.ActiveCfg = Release|Win32
+		{95A82B1C-93C5-4262-9225-F74188637153}.Release|Win32.Build.0 = Release|Win32
+		{95A82B1C-93C5-4262-9225-F74188637153}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{95A82B1C-93C5-4262-9225-F74188637153}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{5CBBD684-6803-4B07-B2D3-A2E2C73F7E0D}.Release|Win32.ActiveCfg = Release|Win32
 		{5CBBD684-6803-4B07-B2D3-A2E2C73F7E0D}.Release|Win32.Build.0 = Release|Win32
 		{5CBBD684-6803-4B07-B2D3-A2E2C73F7E0D}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
