@@ -29,11 +29,21 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
+#include "libewf_media_values.h"
 #include "libewf_section_descriptor.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+int libewf_session_section_read_data(
+     const uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libewf_media_values_t *media_values,
+     libcdata_array_t *sessions,
+     libcdata_array_t *tracks,
+     libcerror_error_t **error );
 
 ssize_t libewf_section_session_read(
          libewf_section_descriptor_t *section_descriptor,

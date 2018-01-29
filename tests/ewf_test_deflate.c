@@ -221,6 +221,8 @@ int ewf_test_deflate_decompress(
 	size_t uncompressed_data_size = 7640;
 	int result                    = 0;
 
+	/* Test regular cases
+	 */
 	result = libewf_deflate_decompress(
 	          ewf_test_deflate_compressed_byte_stream,
 	          2627,
@@ -239,6 +241,8 @@ int ewf_test_deflate_decompress(
 	 "uncompressed_data_size",
 	 uncompressed_data_size,
 	 (size_t) 7640 );
+
+/* TODO: test uncompressed data too small */
 
 	/* Test error cases
 	 */

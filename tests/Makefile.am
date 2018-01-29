@@ -98,6 +98,7 @@ check_PROGRAMS = \
 	ewf_test_sector_range \
 	ewf_test_segment_file \
 	ewf_test_segment_table \
+	ewf_test_session_section \
 	ewf_test_sha1_hash_section \
 	ewf_test_single_file_entry \
 	ewf_test_single_files \
@@ -450,6 +451,17 @@ ewf_test_segment_table_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_segment_table_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_session_section_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_session_section.c \
+	ewf_test_unused.h
+
+ewf_test_session_section_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

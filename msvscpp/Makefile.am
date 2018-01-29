@@ -30,6 +30,7 @@ MSVSCPP_FILES = \
 	ewf_test_sector_range/ewf_test_sector_range.vcproj \
 	ewf_test_segment_file/ewf_test_segment_file.vcproj \
 	ewf_test_segment_table/ewf_test_segment_table.vcproj \
+	ewf_test_session_section/ewf_test_session_section.vcproj \
 	ewf_test_sha1_hash_section/ewf_test_sha1_hash_section.vcproj \
 	ewf_test_single_file_entry/ewf_test_single_file_entry.vcproj \
 	ewf_test_single_files/ewf_test_single_files.vcproj \
