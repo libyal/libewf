@@ -53,8 +53,8 @@ int libewf_session_section_read_data(
      libcerror_error_t **error )
 {
 	libewf_sector_range_t *sector_range = NULL;
-	uint8_t *session_data               = NULL;
-	uint8_t *session_entry_data         = NULL;
+	const uint8_t *session_data         = NULL;
+	const uint8_t *session_entry_data   = NULL;
 	static char *function               = "libewf_session_section_read_data";
 	size_t session_entries_data_size    = 0;
 	size_t session_entry_data_size      = 0;
@@ -129,7 +129,7 @@ int libewf_session_section_read_data(
 		 "%s: invalid data size value out of bounds - insufficient space for header.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( media_values == NULL )
 	{
@@ -819,6 +819,7 @@ on_error:
 		 &sector_range,
 		 NULL );
 	}
+/* TODO clear sessions and tracks */
 	return( -1 );
 }
 
@@ -873,31 +874,29 @@ ssize_t libewf_section_session_read(
 
 		goto on_error;
 	}
-	else if( read_count == 0 )
+	else if( read_count != 0 )
 	{
-		return( 0 );
-	}
-	if( libewf_session_section_read_data(
-	     section_data,
-	     section_data_size,
-	     format_version,
-	     media_values,
-	     sessions,
-	     tracks,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section data.",
-		 function );
+		if( libewf_session_section_read_data(
+		     section_data,
+		     section_data_size,
+		     format_version,
+		     media_values,
+		     sessions,
+		     tracks,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section data.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		memory_free(
+		 section_data );
 	}
-	memory_free(
-	 section_data );
-
 	return( read_count );
 
 on_error:

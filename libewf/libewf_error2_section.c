@@ -42,50 +42,45 @@
 /* Reads a version 1 error2 section or version 2 error table section
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_section_error_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         libcdata_range_list_t *acquiry_errors,
-         libcerror_error_t **error )
+int libewf_error2_section_read_data(
+     const uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libcdata_range_list_t *acquiry_errors,
+     libcerror_error_t **error )
 {
-	uint8_t *error_data            = NULL;
-	uint8_t *error_entry_data      = NULL;
-	uint8_t *section_data          = NULL;
-	static char *function          = "libewf_section_error_read";
-	size_t error_entry_data_size   = 0;
-	size_t error_entries_data_size = 0;
-	size_t error_footer_data_size  = 0;
-	size_t error_header_data_size  = 0;
-	size_t section_data_size       = 0;
-	ssize_t read_count             = 0;
-	uint64_t start_sector          = 0;
-	uint32_t calculated_checksum   = 0;
-	uint32_t entry_index           = 0;
-	uint32_t number_of_entries     = 0;
-	uint32_t number_of_sectors     = 0;
-	uint32_t stored_checksum       = 0;
+	const uint8_t *error_data       = NULL;
+	const uint8_t *error_entry_data = NULL;
+	static char *function           = "libewf_error2_section_read_data";
+	size_t error_entries_data_size  = 0;
+	size_t error_entry_data_size    = 0;
+	size_t error_footer_data_size   = 0;
+	size_t error_header_data_size   = 0;
+	uint64_t start_sector           = 0;
+	uint32_t calculated_checksum    = 0;
+	uint32_t entry_index            = 0;
+	uint32_t number_of_entries      = 0;
+	uint32_t number_of_sectors      = 0;
+	uint32_t stored_checksum        = 0;
 
-	if( section_descriptor == NULL )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section descriptor.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing data.",
 		 function );
 
 		return( -1 );
 	}
-	if( acquiry_errors == NULL )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid acquiry errors.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -113,53 +108,18 @@ ssize_t libewf_section_error_read(
 
 		return( -1 );
 	}
-	read_count = libewf_section_read_data(
-	              section_descriptor,
-	              io_handle,
-	              file_io_pool,
-	              file_io_pool_entry,
-	              &section_data,
-	              &section_data_size,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section data.",
-		 function );
-
-		goto on_error;
-	}
-	else if( read_count == 0 )
-	{
-		return( 0 );
-	}
-	if( section_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing section data.",
-		 function );
-
-		goto on_error;
-	}
-	if( section_data_size < error_header_data_size )
+	if( data_size < error_header_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid section size value out of bounds - insufficient space for header.",
+		 "%s: invalid data size value out of bounds - insufficient space for header.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	error_data = section_data;
+	error_data = data;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -259,14 +219,14 @@ ssize_t libewf_section_error_read(
 		 "%s: unable to calculate header checksum.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( format_version == 2 )
 	{
 		error_header_data_size += 12;
 	}
-	error_data        += error_header_data_size;
-	section_data_size -= error_header_data_size;
+	error_data += error_header_data_size;
+	data_size  -= error_header_data_size;
 
 	if( stored_checksum!= calculated_checksum )
 	{
@@ -298,7 +258,7 @@ ssize_t libewf_section_error_read(
 
 			goto on_error;
 		}
-		if( section_data_size < error_entries_data_size )
+		if( data_size < error_entries_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -335,12 +295,12 @@ ssize_t libewf_section_error_read(
 			 "%s: unable to calculate entries checksum.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
-		error_data        += error_entries_data_size;
-		section_data_size -= error_entries_data_size;
+		error_data += error_entries_data_size;
+		data_size  -= error_entries_data_size;
 
-		if( section_data_size < error_footer_data_size )
+		if( data_size < error_footer_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -380,8 +340,8 @@ ssize_t libewf_section_error_read(
 			}
 		}
 #endif
-		error_data        += error_footer_data_size;
-		section_data_size -= error_footer_data_size;
+		error_data += error_footer_data_size;
+		data_size  -= error_footer_data_size;
 
 		if( stored_checksum != calculated_checksum )
 		{
@@ -399,7 +359,7 @@ ssize_t libewf_section_error_read(
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			if( section_data_size > 0 )
+			if( data_size > 0 )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
 				libcnotify_printf(
@@ -407,7 +367,7 @@ ssize_t libewf_section_error_read(
 				 function );
 				libcnotify_print_data(
 				 error_data,
-				 section_data_size,
+				 data_size,
 				 0 );
 
 #elif defined( HAVE_VERBOSE_OUTPUT )
@@ -514,9 +474,93 @@ ssize_t libewf_section_error_read(
 		 function );
 	}
 #endif
-	memory_free(
-	 section_data );
+	return( 1 );
 
+on_error:
+/* TODO clear acquiry_errors */
+	return( -1 );
+}
+
+/* Reads a version 1 error2 section or version 2 error table section
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libewf_section_error_read(
+         libewf_section_descriptor_t *section_descriptor,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         uint8_t format_version,
+         libcdata_range_list_t *acquiry_errors,
+         libcerror_error_t **error )
+{
+	uint8_t *section_data    = NULL;
+	static char *function    = "libewf_section_error_read";
+	size_t section_data_size = 0;
+	ssize_t read_count       = 0;
+
+	if( section_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( acquiry_errors == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid acquiry errors.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_section_read_data(
+	              section_descriptor,
+	              io_handle,
+	              file_io_pool,
+	              file_io_pool_entry,
+	              &section_data,
+	              &section_data_size,
+	              error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read section data.",
+		 function );
+
+		goto on_error;
+	}
+	else if( read_count != 0 )
+	{
+		if( libewf_error2_section_read_data(
+		     section_data,
+		     section_data_size,
+		     format_version,
+		     acquiry_errors,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read section data.",
+			 function );
+
+			goto on_error;
+		}
+		memory_free(
+		 section_data );
+	}
 	return( read_count );
 
 on_error:

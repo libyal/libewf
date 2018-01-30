@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library glob testing script
 #
-# Version: 20171108
+# Version: 20180130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -418,6 +418,15 @@ test_glob_sequence4()
 
 if ! test -z ${SKIP_LIBRARY_TESTS};
 then
+	exit ${EXIT_IGNORE};
+fi
+
+OPERATING_SYSTEM=`uname -o 2> /dev/null`;
+
+if test "${OPERATING_SYSTEM}" = "Cygwin";
+then
+	# The glob tests run very slow on Cygwin.
+
 	exit ${EXIT_IGNORE};
 fi
 

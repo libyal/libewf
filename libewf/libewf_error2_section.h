@@ -35,6 +35,13 @@
 extern "C" {
 #endif
 
+int libewf_error2_section_read_data(
+     const uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libcdata_range_list_t *acquiry_errors,
+     libcerror_error_t **error );
+
 ssize_t libewf_section_error_read(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,

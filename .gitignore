@@ -142,6 +142,7 @@ stamp-h[1-9]
 /tests/ewf_test_device_information
 /tests/ewf_test_digest_section
 /tests/ewf_test_error
+/tests/ewf_test_error2_section
 /tests/ewf_test_file_entry
 /tests/ewf_test_glob
 /tests/ewf_test_handle
