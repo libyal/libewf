@@ -244,6 +244,7 @@ ewf_test_error2_section_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_error2_section_LDADD = \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -476,6 +477,7 @@ ewf_test_session_section_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_session_section_LDADD = \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
