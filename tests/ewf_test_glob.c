@@ -22,6 +22,7 @@
 #include <common.h>
 #include <narrow_string.h>
 #include <types.h>
+#include <system_string.h>
 #include <wide_string.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -41,13 +42,15 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wchar_t **filenames     = NULL;
+	wchar_t **filenames        = NULL;
 #else
-	char **filenames        = NULL;
+	char **filenames           = NULL;
 #endif
-	libewf_error_t *error   = NULL;
-	int number_of_filenames = 0;
-	int filename_iterator   = 0;
+	libewf_error_t *error      = NULL;
+	system_character_t *source = NULL;
+	size_t string_length       = 0;
+	int filename_index         = 0;
+	int number_of_filenames    = 0;
 
 	if( argc < 2 )
 	{
@@ -57,20 +60,23 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	source = argv[ 1 ];
+
+	string_length = system_string_length(
+	                 source );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_glob_wide(
-	     argv[ 1 ],
-	     wide_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,
 	     &error ) != 1 )
 #else
 	if( libewf_glob(
-	     argv[ 1 ],
-	     narrow_string_length(
-	      argv[ 1 ] ),
+	     source,
+	     string_length,
 	     LIBEWF_FORMAT_UNKNOWN,
 	     &filenames,
 	     &number_of_filenames,
@@ -99,22 +105,22 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	for( filename_iterator = 0;
-	     filename_iterator < number_of_filenames;
-	     filename_iterator++ )
+	for( filename_index = 0;
+	     filename_index < number_of_filenames;
+	     filename_index++ )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		fprintf(
 		 stdout,
 		 "%ls",
-		 filenames[ filename_iterator ] );
+		 filenames[ filename_index ] );
 #else
 		fprintf(
 		 stdout,
 		 "%s",
-		 filenames[ filename_iterator ] );
+		 filenames[ filename_index ] );
 #endif
-		if( filename_iterator == ( number_of_filenames - 1 ) )
+		if( filename_index == ( number_of_filenames - 1 ) )
 		{
 			fprintf(
 			 stdout,

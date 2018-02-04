@@ -1,19 +1,11 @@
 #!/bin/bash
 # Library glob testing script
 #
-# Version: 20180130
+# Version: 20180204
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
-
-TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
-
-TEST_PROFILE="lib${TEST_PREFIX}";
-
-TEST_TOOL_DIRECTORY=".";
-TEST_TOOL="${TEST_PREFIX}_test_glob";
 
 chr()
 {
@@ -59,11 +51,11 @@ test_glob_sequence2()
 	if test "${OSTYPE}" = "msys";
 	then
 		TEST_PATH="${TMPDIR}\\${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
 	else
 		TEST_PATH="${TMPDIR}/${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 	fi
-	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-
 	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
@@ -76,6 +68,8 @@ test_glob_sequence2()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
+		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
@@ -236,11 +230,11 @@ test_glob_sequence3()
 	if test "${OSTYPE}" = "msys";
 	then
 		TEST_PATH="${TMPDIR}\\${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
 	else
 		TEST_PATH="${TMPDIR}/${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 	fi
-	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-
 	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
@@ -253,6 +247,8 @@ test_glob_sequence3()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
+		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
@@ -380,11 +376,11 @@ test_glob_sequence4()
 	if test "${OSTYPE}" = "msys";
 	then
 		TEST_PATH="${TMPDIR}\\${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
 	else
 		TEST_PATH="${TMPDIR}/${BASENAME}";
+		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
 	fi
-	FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-
 	echo ${FILENAMES} > ${TMPDIR}/input;
 
 	touch ${FILENAMES};
@@ -397,6 +393,8 @@ test_glob_sequence4()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
+		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
 			RESULT=${EXIT_FAILURE};
@@ -430,11 +428,11 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+TEST_EXECUTABLE="./ewf_test_glob";
 
 if ! test -x "${TEST_EXECUTABLE}";
 then
-	TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+	TEST_EXECUTABLE="ewf_test_glob.exe";
 fi
 
 if ! test -x "${TEST_EXECUTABLE}";
