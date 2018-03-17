@@ -1,7 +1,7 @@
 #!/bin/bash
 # Library glob testing script
 #
-# Version: 20180204
+# Version: 20180317
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -68,7 +68,7 @@ test_glob_sequence2()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
 
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
@@ -247,7 +247,7 @@ test_glob_sequence3()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
 
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
@@ -393,7 +393,7 @@ test_glob_sequence4()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n' -i ${TMPDIR}/output;
+		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
 
 		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
 		then
