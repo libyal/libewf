@@ -421,9 +421,9 @@ fi
 
 OPERATING_SYSTEM=`uname -o 2> /dev/null`;
 
-if test "${OPERATING_SYSTEM}" = "Cygwin";
+if test "${OPERATING_SYSTEM}" = "Cygwin" || test "${OPERATING_SYSTEM}" = "Msys";
 then
-	# The glob tests run very slow on Cygwin.
+	# The glob tests run very slow on Cygwin and Msys.
 
 	exit ${EXIT_IGNORE};
 fi

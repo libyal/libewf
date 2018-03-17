@@ -2774,7 +2774,8 @@ int info_handle_media_information_fprint(
 		}
 		else
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
+/* TODO remove conditional compile after tests are fixed */
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( TODO )
 			if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 			{
 				fprintf(
@@ -2914,7 +2915,8 @@ int info_handle_media_information_fprint(
 				result = -1;
 			}
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
+/* TODO remove conditional compile after tests are fixed */
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( TODO )
 		if( libewf_handle_get_chunk_size(
 		     info_handle->input_handle,
 		     &value_32bit,
