@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20180317],
+ [20180403],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -48,10 +48,10 @@ AX_COMMON_CHECK_ENABLE_WINAPI
 dnl Check if wide character type should be enabled
 AX_COMMON_CHECK_ENABLE_WIDE_CHARACTER_TYPE
 
-dnl Check if libewf should be build with verbose output
+dnl Check if verbose output should be enabled
 AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
 
-dnl Check if libewf should be build with debug output
+dnl Check if debug output should be enabled
 AX_COMMON_CHECK_ENABLE_DEBUG_OUTPUT
 
 dnl Check for type definitions
@@ -105,7 +105,7 @@ AX_LIBFGUID_CHECK_ENABLE
 dnl Check if libfvalue or required headers and functions are available
 AX_LIBFVALUE_CHECK_ENABLE
 
-dnl Check for zlib compression support
+dnl Check if zlib or required headers and functions are available
 AX_ZLIB_CHECK_ENABLE
 AX_ZLIB_CHECK_ADLER32
 AX_ZLIB_CHECK_COMPRESS2

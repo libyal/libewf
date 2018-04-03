@@ -389,13 +389,15 @@ ewf_test_media_values_LDADD = \
 	@LIBCERROR_LIBADD@
 
 ewf_test_notify_SOURCES = \
+	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
 	ewf_test_notify.c \
 	ewf_test_unused.h
 
 ewf_test_notify_LDADD = \
-	../libewf/libewf.la
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
 
 ewf_test_read_io_handle_SOURCES = \
 	ewf_test_libcerror.h \
@@ -526,6 +528,7 @@ ewf_test_support_SOURCES = \
 	ewf_test_libewf.h \
 	ewf_test_libuna.h \
 	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_support.c \
 	ewf_test_unused.h
 
