@@ -2821,6 +2821,10 @@ The container consists of a header followed by the encrypted data. The header is
 padded out to the nearest 512-byte boundary (typically it is just 512 bytes); all
 header values are in little-endian order.
 
+For multi-part archives, only the first part has the AD crypt header; all
+subsequent parts only contain ciphertext and are encrypted with the same key BUT
+with a different initial value for the AES counter (`{PART_INDEX}<<64`).
+
 ==== AD crypt header
 
 The AD crypt header is 512 bytes in size and consists of:
@@ -2859,7 +2863,8 @@ all) files will use the defaults: AES-256 for encryption, SHA-512 for hashing,
 ==== Encryption
 
 All AES encryption steps use AES in CTR mode with an IV of all null bytes and
-a simple incrementing little-endian counter starting at 0.
+a simple incrementing little-endian counter starting at `{PART_INDEX}<<64` (e.g.
+`0` for .E01, `1<<64` for .E02, ...).
 
 The encryption protocol is as follows:
 
