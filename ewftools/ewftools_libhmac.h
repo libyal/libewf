@@ -1,5 +1,5 @@
 /*
- * The internal libhmac header
+ * The libhmac header wrapper
  *
  * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *

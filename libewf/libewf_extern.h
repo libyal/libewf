@@ -37,8 +37,11 @@
 
 #include <libewf/extern.h>
 
+#define LIBEWF_EXTERN_VARIABLE	LIBEWF_EXTERN
+
 #else
-#define LIBEWF_EXTERN	/* extern */
+#define LIBEWF_EXTERN		/* extern */
+#define LIBEWF_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

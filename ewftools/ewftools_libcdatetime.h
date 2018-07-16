@@ -1,5 +1,5 @@
 /*
- * The internal libcdatetime header
+ * The libcdatetime header wrapper
  *
  * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
  *

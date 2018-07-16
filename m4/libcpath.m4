@@ -1,6 +1,6 @@
 dnl Checks for libcpath or required headers and functions
 dnl
-dnl Version: 20170904
+dnl Version: 20180716
 
 dnl Function to detect if libcpath is available
 dnl ac_libcpath_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBCPATH_CHECK_LIB],
       [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
       [PKG_CHECK_MODULES(
         [libcpath],
-        [libcpath >= 20120701],
+        [libcpath >= 20180716],
         [ac_cv_libcpath=yes],
         [ac_cv_libcpath=check])
       ])
@@ -40,7 +40,7 @@ AC_DEFUN([AX_LIBCPATH_CHECK_LIB],
            [[#include <libcpath/features.h>]],
            [[#if !defined( LIBCPATH_HAVE_WIDE_CHARACTER_TYPE ) || ( LIBCPATH_HAVE_WIDE_CHARACTER_TYPE != 1 )
 #error LIBCPATH_HAVE_WIDE_CHARACTER_TYPE not defined
-##endif]] )],
+#endif]] )],
          [ac_cv_header_libcpath_features_h_have_wide_character_type=yes],
          [ac_cv_header_libcpath_features_h_have_wide_character_type=no])
        AC_LANG_POP(C)],
@@ -91,22 +91,22 @@ AC_DEFUN([AX_LIBCPATH_CHECK_LIB],
           [ac_cv_libcpath=no])
         AC_CHECK_LIB(
           cpath,
+          libcpath_path_get_sanitized_filename,
+          [ac_cv_libcpath_dummy=yes],
+          [ac_cv_libcpath=no])
+        AC_CHECK_LIB(
+          cpath,
+          libcpath_path_get_sanitized_path,
+          [ac_cv_libcpath_dummy=yes],
+          [ac_cv_libcpath=no])
+        AC_CHECK_LIB(
+          cpath,
           libcpath_path_join,
           [ac_cv_libcpath_dummy=yes],
           [ac_cv_libcpath=no])
         AC_CHECK_LIB(
           cpath,
           libcpath_path_make_directory,
-          [ac_cv_libcpath_dummy=yes],
-          [ac_cv_libcpath=no])
-        AC_CHECK_LIB(
-          cpath,
-          libcpath_path_sanitize,
-          [ac_cv_libcpath_dummy=yes],
-          [ac_cv_libcpath=no])
-        AC_CHECK_LIB(
-          cpath,
-          libcpath_path_sanitize_filename,
           [ac_cv_libcpath_dummy=yes],
           [ac_cv_libcpath=no])
 
@@ -129,22 +129,22 @@ AC_DEFUN([AX_LIBCPATH_CHECK_LIB],
             [ac_cv_libcpath=no])
           AC_CHECK_LIB(
             cpath,
+            libcpath_path_get_sanitized_filename_wide,
+            [ac_cv_libcpath_dummy=yes],
+            [ac_cv_libcpath=no])
+          AC_CHECK_LIB(
+            cpath,
+            libcpath_path_get_sanitized_path_wide,
+            [ac_cv_libcpath_dummy=yes],
+            [ac_cv_libcpath=no])
+          AC_CHECK_LIB(
+            cpath,
             libcpath_path_join_wide,
             [ac_cv_libcpath_dummy=yes],
             [ac_cv_libcpath=no])
           AC_CHECK_LIB(
             cpath,
             libcpath_path_make_directory_wide,
-            [ac_cv_libcpath_dummy=yes],
-            [ac_cv_libcpath=no])
-          AC_CHECK_LIB(
-            cpath,
-            libcpath_path_sanitize_wide,
-            [ac_cv_libcpath_dummy=yes],
-            [ac_cv_libcpath=no])
-          AC_CHECK_LIB(
-            cpath,
-            libcpath_path_sanitize_filename_wide,
             [ac_cv_libcpath_dummy=yes],
             [ac_cv_libcpath=no])
           ])
