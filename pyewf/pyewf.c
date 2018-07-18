@@ -900,7 +900,7 @@ PyMODINIT_FUNC initpyewf(
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject * ) &pyewf_handle_type_object );
+	 (PyObject *) &pyewf_handle_type_object );
 
 	handle_type_object = &pyewf_handle_type_object;
 
