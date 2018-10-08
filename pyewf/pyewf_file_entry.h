@@ -147,9 +147,12 @@ PyObject *pyewf_file_entry_get_sub_file_entries(
            pyewf_file_entry_t *pyewf_file_entry,
            PyObject *arguments );
 
+PyObject *pyewf_file_entry_get_file_type(
+          pyewf_file_entry_t *pyewf_file_entry,
+          PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif
 
 #endif /* !defined( _PYEWF_FILE_ENTRY_H ) */
-
