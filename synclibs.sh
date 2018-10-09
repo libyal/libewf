@@ -65,7 +65,7 @@ SED_SCRIPT="/AM_CPPFLAGS = / {
 if HAVE_LOCAL_${LOCAL_LIB_UPPER}
 }
 
-/lib_LTLIBRARIES/ {
+/lib_LTLIBRARIES = / {
 	s/lib_LTLIBRARIES/noinst_LTLIBRARIES/
 }
 
@@ -103,6 +103,7 @@ endif
 	sed -i'~' -f ${LOCAL_LIB}-$$.sed ${LOCAL_LIB_MAKEFILE_AM};
 	rm -f ${LOCAL_LIB}-$$.sed;
 
+	sed -i'~' "/AM_CPPFLAGS = /,/noinst_LTLIBRARIES = / { N; s/\\\\\\n.@${LOCAL_LIB_UPPER}_DLL_EXPORT@//; P; D; }" ${LOCAL_LIB_MAKEFILE_AM};
 	sed -i'~' "/${LOCAL_LIB}_definitions.h.in/d" ${LOCAL_LIB_MAKEFILE_AM};
 	sed -i'~' "/${LOCAL_LIB}.rc/d" ${LOCAL_LIB_MAKEFILE_AM};
 
@@ -176,4 +177,3 @@ done
 IFS=$OLDIFS;
 
 exit ${EXIT_SUCCESS};
-
