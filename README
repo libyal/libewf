@@ -5,6 +5,10 @@ Project information:
 * Status: experimental
 * Licence: LGPLv3+
 
+* Forked by Peter Theobald from libyal/libewf.
+     I encountered a corrupt E01 file. ewfexport quit with an error. ewfrecover refused to run because the file 'wasn't corrupt'
+     This fork modifies ewfrecover to that it reports the 'not corrupt' but makes the export anyway.
+
 Read or write supported EWF formats:
 
 * SMART .s01 (EWF-S01)
