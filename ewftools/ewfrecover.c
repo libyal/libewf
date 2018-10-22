@@ -478,7 +478,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to determine if EWF file(s) are corrupted.\n" );
 
-		/* goto on_error; */
+		/* goto on_error; ** continue even if we cant detect the corruption */
 	}
 	else if( result == 0 )
 	{
@@ -486,7 +486,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "EWF file(s) are not corrupted.\n" );
 
-		/* goto on_error; */
+		/* goto on_error; ** continue even if we cant detect the corruption */
 	}
 	ewfrecover_export_handle->output_format = EXPORT_HANDLE_OUTPUT_FORMAT_EWF;
 	ewfrecover_export_handle->export_size   = ewfrecover_export_handle->input_media_size;
