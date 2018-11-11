@@ -15,7 +15,8 @@ AM_CFLAGS = \
 	@LIBUNA_CPPFLAGS@ \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
-	@LIBBFIO_CPPFLAGS@
+	@LIBBFIO_CPPFLAGS@ \
+	@LIBEWF_DLL_IMPORT@
 
 am_pyewf_la_rpath = -rpath $(pyexecdir2)
 

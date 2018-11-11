@@ -2028,29 +2028,29 @@ int export_handle_prompt_for_output_format(
      const system_character_t *request_string,
      libcerror_error_t **error )
 {
+	system_character_t *format_types[ 17 ] = {
+		_SYSTEM_STRING( "raw" ),
+		_SYSTEM_STRING( "files" ),
+		_SYSTEM_STRING( "ewf" ),
+		_SYSTEM_STRING( "smart" ),
+		_SYSTEM_STRING( "ftk" ),
+		_SYSTEM_STRING( "encase1" ),
+		_SYSTEM_STRING( "encase2" ),
+		_SYSTEM_STRING( "encase3" ),
+		_SYSTEM_STRING( "encase4" ),
+		_SYSTEM_STRING( "encase5" ),
+		_SYSTEM_STRING( "encase6" ),
+		_SYSTEM_STRING( "encase7" ),
+		_SYSTEM_STRING( "encase7-v2" ),
+		_SYSTEM_STRING( "linen5" ),
+		_SYSTEM_STRING( "linen6" ),
+		_SYSTEM_STRING( "linen7" ),
+		_SYSTEM_STRING( "ewfx" ) };
+
 	system_character_t *fixed_string_variable = NULL;
 	static char *function                     = "export_handle_prompt_for_output_format";
 	size_t fixed_string_variable_length       = 0;
 	int result                                = 0;
-
-	system_character_t *format_types[ 17 ]    = \
-	{ _SYSTEM_STRING( "raw" ),
-	  _SYSTEM_STRING( "files" ),
-	  _SYSTEM_STRING( "ewf" ),
-	  _SYSTEM_STRING( "smart" ),
-	  _SYSTEM_STRING( "ftk" ),
-	  _SYSTEM_STRING( "encase1" ),
-	  _SYSTEM_STRING( "encase2" ),
-	  _SYSTEM_STRING( "encase3" ),
-	  _SYSTEM_STRING( "encase4" ),
-	  _SYSTEM_STRING( "encase5" ),
-	  _SYSTEM_STRING( "encase6" ),
-	  _SYSTEM_STRING( "encase7" ),
-	  _SYSTEM_STRING( "encase7-v2" ),
-	  _SYSTEM_STRING( "linen5" ),
-	  _SYSTEM_STRING( "linen6" ),
-	  _SYSTEM_STRING( "linen7" ),
-	  _SYSTEM_STRING( "ewfx" ) };
 
 	if( export_handle == NULL )
 	{

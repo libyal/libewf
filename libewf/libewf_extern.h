@@ -28,13 +28,6 @@
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
-#endif
-
 #include <libewf/extern.h>
 
 #define LIBEWF_EXTERN_VARIABLE	LIBEWF_EXTERN

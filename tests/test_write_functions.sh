@@ -14,7 +14,7 @@ test_api_write_function()
 { 
 	local TEST_FUNCTION=$1;
 	shift 1;
-	local ARGUMENTS=$@;
+	local ARGUMENTS=("$@");
 
 	local TEST_TOOL="ewf_test_${TEST_FUNCTION}";
 

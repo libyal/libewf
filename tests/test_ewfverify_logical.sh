@@ -1,23 +1,15 @@
 #!/bin/bash
 # Verify tool testing script
 #
-# Version: 20160328
+# Version: 20181111
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
-TEST_SUFFIX="verify_logical";
-
-TEST_PROFILE="${TEST_PREFIX}${TEST_SUFFIX}";
-TEST_DESCRIPTION="${TEST_PREFIX}${TEST_SUFFIX}";
 OPTION_SETS="";
+OPTIONS=(-ffiles -q);
 
-TEST_TOOL_DIRECTORY="../${TEST_PREFIX}tools";
-TEST_TOOL="${TEST_PREFIX}verify";
-INPUT_DIRECTORY="input";
 INPUT_GLOB="*.[Ll]*01";
 
 if ! test -z ${SKIP_TOOLS_TESTS};
@@ -25,11 +17,11 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}";
+TEST_EXECUTABLE="../ewftools/ewfverify";
 
 if ! test -x "${TEST_EXECUTABLE}";
 then
-	TEST_EXECUTABLE="${TEST_TOOL_DIRECTORY}/${TEST_TOOL}.exe";
+	TEST_EXECUTABLE="../ewftools/ewfverify.exe";
 fi
 
 if ! test -x "${TEST_EXECUTABLE}";
@@ -55,8 +47,77 @@ fi
 
 source ${TEST_RUNNER};
 
-run_test_on_input_directory "${TEST_PROFILE}" "${TEST_DESCRIPTION}" "with_stdout_reference" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_DIRECTORY}" "${INPUT_GLOB}" -ffiles -q;
-RESULT=$?;
+if ! test -d "input";
+then
+	echo "Test input directory: input not found.";
+
+	return ${EXIT_IGNORE};
+fi
+RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
+
+if test ${RESULT} -eq ${EXIT_SUCCESS};
+then
+	echo "No files or directories found in the test input directory: input";
+
+	return ${EXIT_IGNORE};
+fi
+
+TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "ewfverify");
+
+IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
+
+RESULT=${EXIT_SUCCESS};
+
+for TEST_SET_INPUT_DIRECTORY in input/*;
+do
+	if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
+	then
+		continue;
+	fi
+	if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
+	then
+		continue;
+	fi
+
+	TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+
+	OLDIFS=${IFS};
+
+	# IFS="\n"; is not supported by all platforms.
+	IFS="
+";
+
+	if test -f "${TEST_SET_DIRECTORY}/files";
+	then
+		for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
+		do
+			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfverify_logical" "with_stdout_reference" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+			RESULT=$?;
+
+			if test ${RESULT} -ne ${EXIT_SUCCESS};
+			then
+				break;
+			fi
+		done
+	else
+		for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
+		do
+			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfverify_logical" "with_stdout_reference" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+			RESULT=$?;
+
+			if test ${RESULT} -ne ${EXIT_SUCCESS};
+			then
+				break;
+			fi
+		done
+	fi
+	IFS=${OLDIFS};
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		break;
+	fi
+done
 
 exit ${RESULT};
 
