@@ -209,10 +209,6 @@ echo "${CONFIGURE_HELP}" | grep -- '--enable-debug-output' > /dev/null;
 
 HAVE_ENABLE_DEBUG_OUTPUT=$?;
 
-echo "${CONFIGURE_HELP}" | grep -- '--with-zlib' > /dev/null;
-
-HAVE_WITH_ZLIB=$?;
-
 echo "${CONFIGURE_HELP}" | grep -- '--with-openssl' > /dev/null;
 
 HAVE_WITH_OPENSSL=$?;
@@ -247,19 +243,6 @@ then
 	# Test "./configure && make && make check" with verbose and debug output.
 
 	run_configure_make_check "--enable-verbose-output --enable-debug-output";
-	RESULT=$?;
-
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		exit ${EXIT_FAILURE};
-	fi
-fi
-
-if test ${HAVE_WITH_ZLIB} -eq 0;
-then
-	# Test "./configure && make && make check" with fallback zlib implementation.
-
-	run_configure_make_check "--with-zlib=no";
 	RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -411,10 +394,6 @@ if test ${HAVE_ENABLE_WIDE_CHARACTER_TYPE} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --enable-wide-character-type";
 fi
-if test ${HAVE_WITH_ZLIB} -eq 0;
-then
-	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-zlib=no";
-fi
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-openssl=no";
@@ -440,10 +419,6 @@ CONFIGURE_OPTIONS="--enable-shared=no";
 if test ${HAVE_ENABLE_WIDE_CHARACTER_TYPE} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --enable-wide-character-type";
-fi
-if test ${HAVE_WITH_ZLIB} -eq 0;
-then
-	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-zlib=no";
 fi
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then

@@ -41,7 +41,6 @@
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcdata.h"
-#include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
 #include "libewf_io_handle.h"

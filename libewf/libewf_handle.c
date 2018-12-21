@@ -1761,7 +1761,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 		if( libfdata_list_get_element_value_by_index(
 		     segment_file->sections_list,
 		     (intptr_t *) file_io_pool,
-		     sections_cache,
+		     (libfdata_cache_t *) sections_cache,
 		     segment_file->device_information_section_index,
 		     (intptr_t **) &section,
 		     0,
@@ -1881,7 +1881,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 		if( libfdata_list_get_element_value_by_index(
 		     segment_file->sections_list,
 		     (intptr_t *) file_io_pool,
-		     sections_cache,
+		     (libfdata_cache_t *) sections_cache,
 		     section_index,
 		     (intptr_t **) &section,
 		     0,

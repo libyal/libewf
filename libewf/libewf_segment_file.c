@@ -155,7 +155,7 @@ int libewf_segment_file_initialize(
 	     (intptr_t *) *segment_file,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_section_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_section_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -174,7 +174,7 @@ int libewf_segment_file_initialize(
 	     (intptr_t *) *segment_file,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_chunk_group_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_chunk_group_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -471,7 +471,7 @@ int libewf_segment_file_get_section_by_index(
 	if( libfdata_list_get_element_value_by_index(
 	     segment_file->sections_list,
 	     (intptr_t *) file_io_pool,
-	     sections_cache,
+	     (libfdata_cache_t *) sections_cache,
 	     section_index,
 	     (intptr_t **) section_descriptor,
 	     0,
@@ -5159,7 +5159,7 @@ int libewf_segment_file_reopen(
 	if( libfdata_list_get_element_value_by_index(
 	     segment_file->sections_list,
 	     (intptr_t *) file_io_pool,
-	     sections_cache,
+	     (libfdata_cache_t *) sections_cache,
 	     last_section_index,
 	     (intptr_t **) &last_section,
 	     0,
@@ -5450,7 +5450,7 @@ int libewf_segment_file_write_sections_correction(
 		if( libfdata_list_get_element_value_by_index(
 		     segment_file->sections_list,
 		     (intptr_t *) file_io_pool,
-		     sections_cache,
+		     (libfdata_cache_t *) sections_cache,
 		     section_index,
 		     (intptr_t **) &section_descriptor,
 		     0,
@@ -5892,7 +5892,7 @@ int libewf_segment_file_read_element_data(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,
-     libfcache_cache_t *segment_file_cache,
+     libfdata_cache_t *segment_file_cache,
      int file_io_pool_entry,
      off64_t segment_file_offset,
      size64_t segment_file_size,
@@ -6255,7 +6255,7 @@ int libewf_segment_file_read_element_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section descriptor. cache.",
+			 "%s: unable to create section descriptor cache.",
 			 function );
 
 			goto on_error;
@@ -6267,7 +6267,7 @@ int libewf_segment_file_read_element_data(
 			if( libfdata_list_get_element_value_by_index(
 			     segment_file->sections_list,
 			     (intptr_t *) file_io_pool,
-			     sections_cache,
+			     (libfdata_cache_t *) sections_cache,
 			     section_index,
 			     (intptr_t **) &section_descriptor,
 			     0,
@@ -6434,7 +6434,7 @@ int libewf_segment_file_read_element_data(
 	if( libfdata_list_element_set_element_value(
 	     element,
 	     (intptr_t *) file_io_pool,
-	     segment_file_cache,
+	     (libfdata_cache_t *) segment_file_cache,
 	     (intptr_t *) segment_file,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,
 	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
@@ -6481,7 +6481,7 @@ int libewf_segment_file_read_section_element_data(
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int file_io_pool_entry,
      off64_t section_data_offset,
      size64_t section_data_size LIBEWF_ATTRIBUTE_UNUSED,
@@ -6581,7 +6581,7 @@ int libewf_segment_file_read_chunk_group_element_data(
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int file_io_pool_entry,
      off64_t chunk_group_data_offset,
      size64_t chunk_group_data_size,
@@ -6970,7 +6970,7 @@ int libewf_segment_file_get_chunk_group_by_offset(
 	result = libfdata_list_get_element_value_at_offset(
 		  segment_file->chunk_groups_list,
 		  (intptr_t *) file_io_pool,
-		  chunk_groups_cache,
+		  (libfdata_cache_t *) chunk_groups_cache,
 		  offset,
 		  chunk_group_index,
 		  chunk_group_data_offset,

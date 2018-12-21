@@ -9,7 +9,7 @@ $ExitIgnore = 77
 $LibraryTests = "analytical_data case_data chunk_data chunk_group chunk_table data_chunk deflate device_information digest_section error error2_section file_entry hash_sections hash_values header_sections header_values io_handle md5_hash_section media_values notify read_io_handle restart_data section_descriptor sector_range segment_file segment_table session_section sha1_hash_section single_file_entry single_files volume_section write_io_handle"
 $LibraryTestsWithInput = "handle support"
 
-$InputGlob = "*"
+$InputGlob = "*.[Ees]*01"
 
 Function GetTestProfileDirectory
 {

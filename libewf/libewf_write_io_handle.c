@@ -1210,7 +1210,7 @@ int libewf_write_io_handle_initialize_resume(
 			if( libfdata_list_get_element_value_by_index(
 			     segment_file->sections_list,
 			     (intptr_t *) file_io_pool,
-			     sections_cache,
+			     (libfdata_cache_t *) sections_cache,
 			     section_index,
 			     (intptr_t **) &section,
 			     0,
@@ -1326,7 +1326,7 @@ int libewf_write_io_handle_initialize_resume(
 			if( libfdata_list_get_element_value_by_index(
 			     segment_file->sections_list,
 			     (intptr_t *) file_io_pool,
-			     sections_cache,
+			     (libfdata_cache_t *) sections_cache,
 			     previous_section_index,
 			     (intptr_t **) &previous_section,
 			     0,
@@ -1394,7 +1394,7 @@ int libewf_write_io_handle_initialize_resume(
 			if( libfdata_list_get_element_value_by_index(
 			     segment_file->sections_list,
 			     (intptr_t *) file_io_pool,
-			     sections_cache,
+			     (libfdata_cache_t *) sections_cache,
 			     previous_section_index,
 			     (intptr_t **) &previous_section,
 			     0,
@@ -1442,7 +1442,7 @@ int libewf_write_io_handle_initialize_resume(
 			if( libfdata_list_get_element_value_by_index(
 			     segment_file->sections_list,
 			     (intptr_t *) file_io_pool,
-			     sections_cache,
+			     (libfdata_cache_t *) sections_cache,
 			     previous_section_index,
 			     (intptr_t **) &previous_section,
 			     0,

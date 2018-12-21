@@ -986,7 +986,6 @@ run_test_with_input_and_arguments()
 
 		if test -n "${CHECK_WITH_STDERR}";
 		then
-			echo "${TEST_EXECUTABLE} ${ARGUMENTS[@]} '${INPUT_FILE}'";
 			${TEST_EXECUTABLE} ${ARGUMENTS[@]} "${INPUT_FILE}";
 			RESULT=$?;
 		else

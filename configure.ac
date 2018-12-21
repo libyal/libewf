@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20181111],
+ [20181221],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -41,6 +41,9 @@ AC_C_VOLATILE
 
 dnl Check for large file support
 AC_SYS_LARGEFILE
+
+dnl Check if shared library support should be disabled
+AX_COMMON_CHECK_DISABLE_SHARED_LIBS
 
 dnl Check if WINAPI support should be enabled
 AX_COMMON_CHECK_ENABLE_WINAPI
@@ -125,10 +128,7 @@ dnl Check if libewf required headers and functions are available
 AX_LIBEWF_CHECK_LOCAL
 
 dnl Check if libewf Python bindings (pyewf) required headers and functions are available
-AX_PYTHON_CHECK_PYPREFIX
 AX_PYTHON_CHECK_ENABLE
-AX_PYTHON2_CHECK_ENABLE
-AX_PYTHON3_CHECK_ENABLE
 
 AS_IF(
   [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno],
@@ -142,10 +142,6 @@ AS_IF(
       [1])
     ])
   ])
-
-AM_CONDITIONAL(
-  HAVE_PYTHON_TESTS,
-  [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno])
 
 dnl Check if libodraw or required headers and functions are available
 AX_LIBODRAW_CHECK_ENABLE

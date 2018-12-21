@@ -28,7 +28,6 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
-#include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 
 #if defined( __cplusplus )
@@ -169,7 +168,7 @@ int libewf_chunk_data_read_element_data(
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int file_io_pool_entry,
      off64_t chunk_data_offset,
      size64_t chunk_data_size,

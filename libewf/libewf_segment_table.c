@@ -120,7 +120,7 @@ int libewf_segment_table_initialize(
 	     (intptr_t *) io_handle,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libewf_segment_file_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -1732,7 +1732,7 @@ int libewf_segment_table_get_segment_file_by_index(
 	if( libfdata_list_get_element_value_by_index(
 	     segment_table->segment_files_list,
 	     (intptr_t *) file_io_pool,
-	     segment_table->segment_files_cache,
+	     (libfdata_cache_t *) segment_table->segment_files_cache,
 	     (int) segment_number,
 	     (intptr_t **) segment_file,
 	     0,
@@ -1792,7 +1792,7 @@ int libewf_segment_table_get_segment_file_at_offset(
 	result = libfdata_list_get_element_value_at_offset(
 	          segment_table->segment_files_list,
 	          (intptr_t *) file_io_pool,
-	          segment_table->segment_files_cache,
+	          (libfdata_cache_t *) segment_table->segment_files_cache,
 	          offset,
 	          &segment_files_list_index,
 	          segment_file_data_offset,
@@ -1874,7 +1874,7 @@ int libewf_segment_table_set_segment_file_by_index(
 	if( libfdata_list_set_element_value_by_index(
 	     segment_table->segment_files_list,
 	     (intptr_t *) file_io_pool,
-	     segment_table->segment_files_cache,
+	     (libfdata_cache_t *) segment_table->segment_files_cache,
 	     (int) segment_number,
 	     (intptr_t *) segment_file,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_segment_file_free,

@@ -875,7 +875,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		result = libfdata_list_get_element_value_at_offset(
 			  chunk_group->chunks_list,
 			  (intptr_t *) file_io_pool,
-			  chunks_cache,
+			  (libfdata_cache_t *) chunks_cache,
 			  chunk_group_data_offset,
 			  &chunks_list_index,
 			  chunk_data_offset,
@@ -977,7 +977,7 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 
 		if( libfdata_list_cache_element_value(
 		     chunk_table->corrupted_chunks_list,
-		     chunks_cache,
+		     (libfdata_cache_t *) chunks_cache,
 		     (int) chunk_index,
 		     (int) segment_number,
 		     chunk_offset,
@@ -1138,7 +1138,7 @@ int libewf_chunk_table_set_chunk_data_by_offset(
 	result = libfdata_list_set_element_value_at_offset(
 		  chunk_group->chunks_list,
 		  (intptr_t *) file_io_pool,
-		  chunks_cache,
+		  (libfdata_cache_t *) chunks_cache,
 		  chunk_group_data_offset,
 		  (intptr_t *) chunk_data,
 		  (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
