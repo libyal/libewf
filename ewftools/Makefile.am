@@ -109,6 +109,7 @@ ewfacquirestream_SOURCES = \
 	ewftools_getopt.c ewftools_getopt.h \
 	ewftools_i18n.h \
 	ewftools_libbfio.h \
+	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
@@ -196,6 +197,7 @@ ewfexport_SOURCES = \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
 	ewftools_libbfio.h \
+	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \
@@ -336,6 +338,7 @@ ewfrecover_SOURCES = \
 	ewftools_glob.c ewftools_glob.h \
 	ewftools_i18n.h \
 	ewftools_libbfio.h \
+	ewftools_libcdata.h \
 	ewftools_libcdatetime.h \
 	ewftools_libcerror.h \
 	ewftools_libcfile.h \

@@ -1,7 +1,7 @@
 /*
  * Support functions of libewf .net managed wrapper
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

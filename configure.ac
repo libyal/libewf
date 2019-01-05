@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20181221],
+ [20190105],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -295,7 +295,6 @@ Building:
    SHA1 support:                             $ac_cv_libhmac_sha1
    SHA256 support:                           $ac_cv_libhmac_sha256
    libcaes support:                          $ac_cv_libcaes
-   AES support:                              $ac_cv_libcaes_aes
    libodraw support:                         $ac_cv_libodraw
    libsmdev support:                         $ac_cv_libsmdev
    libsmraw support:                         $ac_cv_libsmraw

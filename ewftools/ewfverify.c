@@ -1,7 +1,7 @@
 /*
  * Verifies the integrity of the media data within the EWF file
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -396,6 +396,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_number_of_jobs != NULL )
 	{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
 		result = verification_handle_set_number_of_threads(
 			  ewfverify_verification_handle,
 			  option_number_of_jobs,
@@ -412,17 +413,21 @@ int main( int argc, char * const argv[] )
 		else if( ( result == 0 )
 		      || ( ewfverify_verification_handle->number_of_threads > (int) 32 ) )
 		{
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
 			ewfverify_verification_handle->number_of_threads = 4;
-#else
-			ewfverify_verification_handle->number_of_threads = 0;
-#endif
 
 			fprintf(
 			 stderr,
 			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
 			 ewfverify_verification_handle->number_of_threads );
 		}
+#else
+		ewfverify_verification_handle->number_of_threads = 0;
+
+		fprintf(
+		 stderr,
+		 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+		 ewfverify_verification_handle->number_of_threads );
+#endif
 	}
 	if( option_additional_digest_types != NULL )
 	{

@@ -1,7 +1,7 @@
 /*
  * Export handle
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -199,9 +199,11 @@ int export_handle_initialize(
 	( *export_handle )->sectors_per_chunk        = 64;
 	( *export_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 	( *export_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *export_handle )->number_of_threads        = 4;
 	( *export_handle )->notify_stream            = EXPORT_HANDLE_NOTIFY_STREAM;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	( *export_handle )->number_of_threads        = 4;
+#endif
 	return( 1 );
 
 on_error:
@@ -5113,7 +5115,7 @@ int export_handle_export_input(
 	if( export_handle->number_of_threads != 0 )
 	{
 		libcerror_error_set(
-		 &error,
+		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: multi-threading not supported.",

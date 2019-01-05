@@ -9,14 +9,9 @@ Homepage: https://github.com/libyal/libewf
 Package: libewf
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libewf2
+Replaces: libewf2
 Suggests: libewf-dbg
-Description: Library to access the Expert Witness Compression Format (EWF)
- libewf is a library to access the Expert Witness Compression Format (EWF).
-
-Package: libewf2
-Section: libs
-Architecture: any
-Depends: libewf (= ${binary:Version}), ${misc:Depends}
 Description: Library to access the Expert Witness Compression Format (EWF)
  libewf is a library to access the Expert Witness Compression Format (EWF).
 
@@ -38,6 +33,8 @@ Package: libewf-tools
 Section: utils
 Architecture: any
 Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libewf-utils
+Replaces: libewf-utils
 Description: Several tools for reading and writing EWF files
  Several tools for reading and writing EWF files.
 
@@ -52,6 +49,8 @@ Package: libewf-python
 Section: python
 Architecture: any
 Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python-libewf
+Replaces: python-libewf
 Suggests: libewf-python-dbg
 Description: Python 2 bindings for libewf
  Python 2 bindings for libewf.
@@ -67,6 +66,8 @@ Package: libewf-python3
 Section: python
 Architecture: any
 Depends: libewf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python3-libewf
+Replaces: python3-libewf
 Suggests: libewf-python3-dbg
 Description: Python 3 bindings for libewf
  Python 3 bindings for libewf.

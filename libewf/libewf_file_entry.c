@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -109,7 +109,7 @@ int libewf_file_entry_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to intialize read/write lock.",
+		 "%s: unable to initialize read/write lock.",
 		 function );
 
 		goto on_error;

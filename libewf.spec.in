@@ -11,10 +11,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc @ax_bzip2_spec_build_requires@ @ax_libbfio_spec_build_requires@ @ax_libcaes_spec_build_requires@ @ax_libcdata_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcfile_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcpath_spec_build_requires@ @ax_libcrypto_spec_build_requires@ @ax_libcsplit_spec_build_requires@ @ax_libcthreads_spec_build_requires@ @ax_libfcache_spec_build_requires@ @ax_libfdata_spec_build_requires@ @ax_libfguid_spec_build_requires@ @ax_libfvalue_spec_build_requires@ @ax_libhmac_spec_build_requires@ @ax_libuna_spec_build_requires@ @ax_zlib_spec_build_requires@
 
 %description -n libewf
-libewf is a library to access the Expert Witness Compression Format (EWF).
-libewf allows you to read media information of EWF files in the SMART (EWF-S01)
-format and the EnCase (EWF-E01, EWF-L01, EWF2-Ex01 and EWF2-Lx01) formats.
-Supports files created by EnCase 1 to 7, linen 5 to 7 and FTK Imager.
+Library to access the Expert Witness Compression Format (EWF)
 
 %package -n libewf-static
 Summary: Library to access the Expert Witness Compression Format (EWF)
@@ -56,11 +53,11 @@ Python 3 bindings for libewf
 %package -n libewf-tools
 Summary: Several tools for reading and writing EWF files
 Group: Applications/System
-Requires: libewf = %{version}-%{release} @ax_libcdatetime_spec_requires@ @ax_libfuse_spec_requires@ @ax_libodraw_spec_requires@ @ax_libsmdev_spec_requires@ @ax_libsmraw_spec_requires@ @ax_libuuid_spec_requires@
-BuildRequires: byacc flex @ax_libcdatetime_spec_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libodraw_spec_build_requires@ @ax_libsmdev_spec_build_requires@ @ax_libsmraw_spec_build_requires@ @ax_libuuid_spec_build_requires@
+Requires: libewf = %{version}-%{release} @ax_libcdatetime_spec_requires@ @ax_libcrypto_spec_requires@ @ax_libfuse_spec_requires@ @ax_libodraw_spec_requires@ @ax_libsmdev_spec_requires@ @ax_libsmraw_spec_requires@ @ax_libuuid_spec_requires@
+@libewf_spec_tools_build_requires@ byacc flex @ax_libcdatetime_spec_build_requires@ @ax_libcrypto_spec_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libodraw_spec_build_requires@ @ax_libsmdev_spec_build_requires@ @ax_libsmraw_spec_build_requires@ @ax_libuuid_spec_build_requires@
 
 %description -n libewf-tools
-Several tools for reading and writing EWF files.
+Several tools for reading and writing EWF files
 
 %prep
 %setup -q
@@ -95,7 +92,7 @@ rm -rf %{buildroot}
 %files -n libewf-devel
 %defattr(644,root,root,755)
 %license COPYING
-%doc AUTHORS README ChangeLog
+%doc AUTHORS README
 %{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libewf.pc
@@ -122,16 +119,10 @@ rm -rf %{buildroot}
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
-%attr(755,root,root) %{_bindir}/ewfacquire
-%attr(755,root,root) %{_bindir}/ewfacquirestream
-%attr(755,root,root) %{_bindir}/ewfexport
-%attr(755,root,root) %{_bindir}/ewfinfo
-%attr(755,root,root) %{_bindir}/ewfmount
-%attr(755,root,root) %{_bindir}/ewfrecover
-%attr(755,root,root) %{_bindir}/ewfverify
+%attr(755,root,root) %{_bindir}/*
 %{_mandir}/man1/*
 
-### Exclude debug tool ###
+# Exclude ewfdebug tool
 %exclude %{_bindir}/ewfdebug
 
 %changelog

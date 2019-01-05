@@ -1,7 +1,7 @@
 /*
  * Imaging handle
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -192,9 +192,11 @@ int imaging_handle_initialize(
 	( *imaging_handle )->maximum_segment_size     = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	( *imaging_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 	( *imaging_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
-	( *imaging_handle )->number_of_threads        = 4;
 	( *imaging_handle )->notify_stream            = IMAGING_HANDLE_NOTIFY_STREAM;
 
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	( *imaging_handle )->number_of_threads        = 4;
+#endif
 	return( 1 );
 
 on_error:

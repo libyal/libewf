@@ -1,7 +1,7 @@
 /*
  * Export media data from EWF files to a file
  *
- * Copyright (C) 2006-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -874,6 +874,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( option_number_of_jobs != NULL )
 	{
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
 		result = export_handle_set_number_of_threads(
 			  ewfexport_export_handle,
 			  option_number_of_jobs,
@@ -890,17 +891,21 @@ int main( int argc, char * const argv[] )
 		else if( ( result == 0 )
 		      || ( ewfexport_export_handle->number_of_threads > (int) 32 ) )
 		{
-#if defined( HAVE_MULTI_THREAD_SUPPORT )
 			ewfexport_export_handle->number_of_threads = 4;
-#else
-			ewfexport_export_handle->number_of_threads = 0;
-#endif
 
 			fprintf(
 			 stderr,
 			 "Unsupported number of jobs (threads) defaulting to: %d.\n",
 			 ewfexport_export_handle->number_of_threads );
 		}
+#else
+		ewfexport_export_handle->number_of_threads = 0;
+
+		fprintf(
+		 stderr,
+		 "Unsupported number of jobs (threads) defaulting to: %d.\n",
+		 ewfexport_export_handle->number_of_threads );
+#endif
 	}
 	if( option_additional_digest_types != NULL )
 	{

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script that runs the tests
 #
-# Version: 20180905
+# Version: 20190103
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -84,7 +84,7 @@ run_configure_make_check_with_asan()
 		return ${EXIT_SUCCESS};
 	fi
 	# Using libasan is platform dependent.
-	if test ${LIBASAN} != "/lib64/libasan.so.4";
+	if test ${LIBASAN} != "/lib64/libasan.so.4" && test ${LIBASAN} != "/lib64/libasan.so.5";
 	then
 		return ${EXIT_SUCCESS};
 	fi
@@ -209,6 +209,14 @@ echo "${CONFIGURE_HELP}" | grep -- '--enable-debug-output' > /dev/null;
 
 HAVE_ENABLE_DEBUG_OUTPUT=$?;
 
+echo "${CONFIGURE_HELP}" | grep -- '--with-pthread' > /dev/null;
+
+HAVE_WITH_PTHREAD=$?;
+
+echo "${CONFIGURE_HELP}" | grep -- '--with-zlib' > /dev/null;
+
+HAVE_WITH_ZLIB=$?;
+
 echo "${CONFIGURE_HELP}" | grep -- '--with-openssl' > /dev/null;
 
 HAVE_WITH_OPENSSL=$?;
@@ -250,6 +258,32 @@ then
 		exit ${EXIT_FAILURE};
 	fi
 fi
+
+if test ${HAVE_WITH_PTHREAD} -eq 0;
+then
+	# Test "./configure && make && make check" without multi-threading support.
+
+	run_configure_make_check "--with-pthread=no";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${EXIT_FAILURE};
+	fi
+fi
+
+# if test ${HAVE_WITH_ZLIB} -eq 0;
+# then
+	# Test "./configure && make && make check" with fallback zlib implementation.
+
+# 	run_configure_make_check "--with-zlib=no";
+# 	RESULT=$?;
+
+# 	if test ${RESULT} -ne ${EXIT_SUCCESS};
+# 	then
+# 		exit ${EXIT_FAILURE};
+# 	fi
+# fi
 
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then
@@ -394,6 +428,10 @@ if test ${HAVE_ENABLE_WIDE_CHARACTER_TYPE} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --enable-wide-character-type";
 fi
+# if test ${HAVE_WITH_ZLIB} -eq 0;
+# then
+# 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-zlib=no";
+# fi
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-openssl=no";
@@ -420,6 +458,10 @@ if test ${HAVE_ENABLE_WIDE_CHARACTER_TYPE} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --enable-wide-character-type";
 fi
+# if test ${HAVE_WITH_ZLIB} -eq 0;
+# then
+# 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-zlib=no";
+# fi
 if test ${HAVE_WITH_OPENSSL} -eq 0;
 then
 	CONFIGURE_OPTIONS="${CONFIGURE_OPTIONS} --with-openssl=no";
