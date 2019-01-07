@@ -111,7 +111,7 @@ int ewftools_output_initialize(
 
 /* Prints the executable version information
  */
-void ewfoutput_copyright_fprint(
+void ewftools_output_copyright_fprint(
       FILE *stream )
 {
 	if( stream == NULL )
@@ -143,11 +143,11 @@ void ewfoutput_copyright_fprint(
 
 /* Prints the version information to a stream
  */
-void ewfoutput_version_fprint(
+void ewftools_output_version_fprint(
       FILE *stream,
       const system_character_t *program )
 {
-	static char *function = "ewfoutput_version_fprint";
+	static char *function = "ewftools_output_version_fprint";
 
 	if( stream == NULL )
 	{
@@ -174,11 +174,11 @@ void ewfoutput_version_fprint(
 
 /* Prints the detailed version information to a stream
  */
-void ewfoutput_version_detailed_fprint(
+void ewftools_output_version_detailed_fprint(
       FILE *stream,
       const system_character_t *program )
 {
-	static char *function = "ewfoutput_version_detailed_fprint";
+	static char *function = "ewftools_output_version_detailed_fprint";
 
 	if( stream == NULL )
 	{

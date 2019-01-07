@@ -1627,7 +1627,7 @@ int main( int argc, char * const argv[] )
 	     _IONBF,
 	     &error ) != 1 )
 	{
-		ewfoutput_version_fprint(
+		ewftools_output_version_fprint(
 		 stdout,
 		 program );
 
@@ -1646,7 +1646,7 @@ int main( int argc, char * const argv[] )
 		{
 			case (system_integer_t) '?':
 			default:
-				ewfoutput_version_fprint(
+				ewftools_output_version_fprint(
 				 stdout,
 				 program );
 
@@ -1716,7 +1716,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'h':
-				ewfoutput_version_fprint(
+				ewftools_output_version_fprint(
 				 stdout,
 				 program );
 
@@ -1811,11 +1811,11 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'V':
-				ewfoutput_version_fprint(
+				ewftools_output_version_fprint(
 				 stdout,
 				 program );
 
-				ewfoutput_copyright_fprint(
+				ewftools_output_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
@@ -1838,7 +1838,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
-		ewfoutput_version_fprint(
+		ewftools_output_version_fprint(
 		 stdout,
 		 program );
 
@@ -1851,7 +1851,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	ewfoutput_version_fprint(
+	ewftools_output_version_fprint(
 	 stdout,
 	 program );
 

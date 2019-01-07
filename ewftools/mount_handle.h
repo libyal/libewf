@@ -28,6 +28,8 @@
 
 #include "ewftools_libcerror.h"
 #include "ewftools_libewf.h"
+#include "mount_file_entry.h"
+#include "mount_file_system.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -43,17 +45,17 @@ typedef struct mount_handle mount_handle_t;
 
 struct mount_handle
 {
+	/* The file system
+	 */
+	mount_file_system_t *file_system;
+
 	/* The input format
 	 */
 	uint8_t input_format;
 
-	/* The libewf input handle
+	/* The maximum number of open handles
 	 */
-	libewf_handle_t *input_handle;
-
-	/* The libewf root file entry
-	 */
-	libewf_file_entry_t *root_file_entry;
+	int maximum_number_of_open_handles;
 
 	/* The notification output stream
 	 */
@@ -72,17 +74,23 @@ int mount_handle_signal_abort(
      mount_handle_t *mount_handle,
      libcerror_error_t **error );
 
-int mount_handle_set_maximum_number_of_open_handles(
-     mount_handle_t *mount_handle,
-     int maximum_number_of_open_handles,
-     libcerror_error_t **error );
-
 int mount_handle_set_format(
      mount_handle_t *mount_handle,
      const system_character_t *string,
      libcerror_error_t **error );
 
-int mount_handle_open_input(
+int mount_handle_set_maximum_number_of_open_handles(
+     mount_handle_t *mount_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error );
+
+int mount_handle_set_path_prefix(
+     mount_handle_t *mount_handle,
+     const system_character_t *path_prefix,
+     size_t path_prefix_size,
+     libcerror_error_t **error );
+
+int mount_handle_open(
      mount_handle_t *mount_handle,
      system_character_t * const * filenames,
      int number_of_filenames,
@@ -92,34 +100,10 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error );
 
-ssize_t mount_handle_read_buffer(
-         mount_handle_t *mount_handle,
-         uint8_t *buffer,
-         size_t size,
-         libcerror_error_t **error );
-
-off64_t mount_handle_seek_offset(
-         mount_handle_t *mount_handle,
-         off64_t offset,
-         int whence,
-         libcerror_error_t **error );
-
-int mount_handle_get_media_size(
-     mount_handle_t *mount_handle,
-     size64_t *size,
-     libcerror_error_t **error );
-
 int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
      const system_character_t *path,
-     size_t path_length,
-     system_character_t path_separator,
-     libewf_file_entry_t **file_entry,
-     libcerror_error_t **error );
-
-int mount_handle_get_number_of_input_handles(
-     mount_handle_t *mount_handle,
-     int *number_of_input_handles,
+     mount_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

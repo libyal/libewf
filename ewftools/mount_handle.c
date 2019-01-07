@@ -27,7 +27,10 @@
 #include <wide_string.h>
 
 #include "ewftools_libcerror.h"
+#include "ewftools_libcpath.h"
 #include "ewftools_libewf.h"
+#include "mount_file_entry.h"
+#include "mount_file_system.h"
 #include "mount_handle.h"
 
 /* Creates a mount handle
@@ -90,15 +93,15 @@ int mount_handle_initialize(
 
 		goto on_error;
 	}
-	if( libewf_handle_initialize(
-	     &( ( *mount_handle )->input_handle ),
+	if( mount_file_system_initialize(
+	     &( ( *mount_handle )->file_system ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input handle.",
+		 "%s: unable to initialize file system.",
 		 function );
 
 		goto on_error;
@@ -141,31 +144,15 @@ int mount_handle_free(
 	}
 	if( *mount_handle != NULL )
 	{
-		if( ( *mount_handle )->root_file_entry != NULL )
-		{
-			if( libewf_file_entry_free(
-			     &( ( *mount_handle )->root_file_entry ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free root file entry.",
-				 function );
-
-				result = -1;
-			}
-		}
-		if( libewf_handle_free(
-		     &( ( *mount_handle )->input_handle ),
+		if( mount_file_system_free(
+		     &( ( *mount_handle )->file_system ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input handle.",
+			 "%s: unable to free file system.",
 			 function );
 
 			result = -1;
@@ -198,56 +185,15 @@ int mount_handle_signal_abort(
 
 		return( -1 );
 	}
-	if( mount_handle->input_handle != NULL )
-	{
-		if( libewf_handle_signal_abort(
-		     mount_handle->input_handle,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to signal input handle to abort.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-/* Sets the maximum number of (concurrent) open file handles
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_set_maximum_number_of_open_handles(
-     mount_handle_t *mount_handle,
-     int maximum_number_of_open_handles,
-     libcerror_error_t **error )
-{
-	static char *function = "mount_handle_set_maximum_number_of_open_handles";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_handle_set_maximum_number_of_open_handles(
-	     mount_handle->input_handle,
-	     maximum_number_of_open_handles,
+	if( mount_file_system_signal_abort(
+	     mount_handle->file_system,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set maximum number of open handles in input handle.",
+		 "%s: unable to signal file system to abort.",
 		 function );
 
 		return( -1 );
@@ -306,18 +252,85 @@ int mount_handle_set_format(
 	return( result );
 }
 
-/* Opens the input of the mount handle
+/* Sets the maximum number of (concurrent) open file handles
  * Returns 1 if successful or -1 on error
  */
-int mount_handle_open_input(
+int mount_handle_set_maximum_number_of_open_handles(
+     mount_handle_t *mount_handle,
+     int maximum_number_of_open_handles,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_handle_set_maximum_number_of_open_handles";
+
+	if( mount_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	mount_handle->maximum_number_of_open_handles = maximum_number_of_open_handles;
+
+	return( 1 );
+}
+
+/* Sets the path prefix
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_set_path_prefix(
+     mount_handle_t *mount_handle,
+     const system_character_t *path_prefix,
+     size_t path_prefix_size,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_handle_set_path_prefix";
+
+	if( mount_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid mount handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( mount_file_system_set_path_prefix(
+	     mount_handle->file_system,
+	     path_prefix,
+	     path_prefix_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set path prefix.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Opens the mount handle
+ * Returns 1 if successful or -1 on error
+ */
+int mount_handle_open(
      mount_handle_t *mount_handle,
      system_character_t * const * filenames,
      int number_of_filenames,
      libcerror_error_t **error )
 {
-	system_character_t **libewf_filenames = NULL;
-	static char *function                 = "mount_handle_open_input";
-	size_t first_filename_length          = 0;
+	libewf_handle_t *ewf_handle            = NULL;
+	system_character_t **globbed_filenames = NULL;
+	static char *function                  = "mount_handle_open";
+	size_t filename_length                 = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -354,23 +367,23 @@ int mount_handle_open_input(
 	}
 	if( number_of_filenames == 1 )
 	{
-		first_filename_length = system_string_length(
-		                         filenames[ 0 ] );
+		filename_length = system_string_length(
+		                   filenames[ 0 ] );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide(
 		     filenames[ 0 ],
-		     first_filename_length,
+		     filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
-		     &libewf_filenames,
+		     &globbed_filenames,
 		     &number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob(
 		     filenames[ 0 ],
-		     first_filename_length,
+		     filename_length,
 		     LIBEWF_FORMAT_UNKNOWN,
-		     &libewf_filenames,
+		     &globbed_filenames,
 		     &number_of_filenames,
 		     error ) != 1 )
 #endif
@@ -382,20 +395,47 @@ int mount_handle_open_input(
 			 "%s: unable to resolve filename(s).",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
-		filenames = (system_character_t * const *) libewf_filenames;
+		filenames = (system_character_t * const *) globbed_filenames;
+	}
+	if( libewf_handle_initialize(
+	     &ewf_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_handle_set_maximum_number_of_open_handles(
+	     ewf_handle,
+	     mount_handle->maximum_number_of_open_handles,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set maximum number of open handles in handle.",
+		 function );
+
+		goto on_error;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libewf_handle_open_wide(
-	     mount_handle->input_handle,
+	     ewf_handle,
 	     filenames,
 	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
 	if( libewf_handle_open(
-	     mount_handle->input_handle,
+	     ewf_handle,
 	     filenames,
 	     number_of_filenames,
 	     LIBEWF_OPEN_READ,
@@ -409,32 +449,32 @@ int mount_handle_open_input(
 		 "%s: unable to open file(s).",
 		 function );
 
-		if( libewf_filenames != NULL )
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			libewf_glob_wide_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#else
-			libewf_glob_free(
-			 libewf_filenames,
-			 number_of_filenames,
-			 NULL );
-#endif
-		}
-		return( -1 );
+		goto on_error;
 	}
-	if( libewf_filenames != NULL )
+	if( mount_file_system_set_handle(
+	     mount_handle->file_system,
+	     ewf_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set handle in file system.",
+		 function );
+
+		goto on_error;
+	}
+	if( globbed_filenames != NULL )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( libewf_glob_wide_free(
-		     libewf_filenames,
+		     globbed_filenames,
 		     number_of_filenames,
 		     error ) != 1 )
 #else
 		if( libewf_glob_free(
-		     libewf_filenames,
+		     globbed_filenames,
 		     number_of_filenames,
 		     error ) != 1 )
 #endif
@@ -446,27 +486,33 @@ int mount_handle_open_input(
 			 "%s: unable to free globbed filenames.",
 			 function );
 
-			return( -1 );
-		}
-	}
-	if( mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
-	{
-		if( libewf_handle_get_root_file_entry(
-		     mount_handle->input_handle,
-		     &( mount_handle->root_file_entry ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve root file entry.",
-			 function );
-
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( ewf_handle != NULL )
+	{
+		libewf_handle_free(
+		 &ewf_handle,
+		 NULL );
+	}
+	if( globbed_filenames != NULL )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 globbed_filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 globbed_filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+	}
+	return( -1 );
 }
 
 /* Closes the mount handle
@@ -476,7 +522,8 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	static char *function = "mount_handle_close";
+	libewf_handle_t *ewf_handle = NULL;
+	static char *function       = "mount_handle_close";
 
 	if( mount_handle == NULL )
 	{
@@ -489,160 +536,92 @@ int mount_handle_close(
 
 		return( -1 );
 	}
-	if( libewf_handle_close(
-	     mount_handle->input_handle,
-	     error ) != 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input handle.",
-		 function );
-
-		return( -1 );
-	}
-	return( 0 );
-}
-
-/* Read a buffer from the input handle
- * Return the number of bytes read if successful or -1 on error
- */
-ssize_t mount_handle_read_buffer(
-         mount_handle_t *mount_handle,
-         uint8_t *buffer,
-         size_t size,
-         libcerror_error_t **error )
-{
-	static char *function = "mount_handle_read_buffer";
-	ssize_t read_count    = 0;
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_handle_read_buffer(
-	              mount_handle->input_handle,
-	              buffer,
-	              size,
-	              error );
-
-	if( read_count == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer from input handle.",
-		 function );
-
-		return( -1 );
-	}
-	return( read_count );
-}
-
-/* Seeks a specific offset from the input handle
- * Return the offset if successful or -1 on error
- */
-off64_t mount_handle_seek_offset(
-         mount_handle_t *mount_handle,
-         off64_t offset,
-         int whence,
-         libcerror_error_t **error )
-{
-	static char *function = "mount_handle_seek_offset";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	offset = libewf_handle_seek_offset(
-	          mount_handle->input_handle,
-	          offset,
-	          whence,
-	          error );
-
-	if( offset == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in input handle.",
-		 function );
-
-		return( -1 );
-	}
-	return( offset );
-}
-
-/* Retrieves the media size of the input handle
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_get_media_size(
-     mount_handle_t *mount_handle,
-     size64_t *size,
-     libcerror_error_t **error )
-{
-	static char *function = "mount_handle_get_media_size";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_handle_get_media_size(
-	     mount_handle->input_handle,
-	     size,
+	if( mount_file_system_get_handle(
+	     mount_handle->file_system,
+	     &ewf_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size from input handle.",
+		 "%s: unable to retrieve handle from file system.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	return( 1 );
+	if( mount_file_system_set_handle(
+	     mount_handle->file_system,
+	     NULL,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set handle in file system.",
+		 function );
+
+		ewf_handle = NULL;
+
+		goto on_error;
+	}
+	if( libewf_handle_close(
+	     ewf_handle,
+	     error ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_handle_free(
+	     &ewf_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free handle.",
+		 function );
+
+		goto on_error;
+	}
+	return( 0 );
+
+on_error:
+	if( ewf_handle != NULL )
+	{
+		libewf_handle_free(
+		 &ewf_handle,
+		 NULL );
+	}
+	return( -1 );
 }
 
-/* Retrieves the file entry of a specific path
+/* Retrieves a file entry for a specific path
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int mount_handle_get_file_entry_by_path(
      mount_handle_t *mount_handle,
      const system_character_t *path,
-     size_t path_length,
-     system_character_t path_separator,
-     libewf_file_entry_t **file_entry,
+     mount_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	system_character_t *ewf_path = NULL;
-	static char *function        = "mount_handle_get_file_entry_by_path";
-	size_t path_index            = 0;
-	int result                   = 0;
+	libewf_file_entry_t *ewf_file_entry = NULL;
+	libewf_handle_t *ewf_handle         = NULL;
+	const system_character_t *filename  = NULL;
+	static char *function               = "mount_handle_get_file_entry_by_path";
+	size_t filename_length              = 0;
+	size_t path_index                   = 0;
+	size_t path_length                  = 0;
+	int file_entry_type                 = 0;
+	int result                          = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -666,148 +645,122 @@ int mount_handle_get_file_entry_by_path(
 
 		return( -1 );
 	}
+	path_length = system_string_length(
+	               path );
+
 	if( path_length == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid path length.",
-		 function );
-
-		return( -1 );
-	}
-	if( path[ 0 ] != path_separator )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported path.",
-		 function );
-
-		return( -1 );
-	}
-	ewf_path = system_string_allocate(
-	            path_length + 1 );
-
-	if( ewf_path == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create EWF path.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid path length value out of bounds.",
 		 function );
 
 		goto on_error;
 	}
-	if( system_string_copy(
-	     ewf_path,
-	     path,
-	     path_length ) == NULL )
+	if( ( path_length >= 2 )
+	 && ( path[ path_length - 1 ] == LIBCPATH_SEPARATOR ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy EWF path.",
-		 function );
-
-		goto on_error;
+		path_length--;
 	}
-	ewf_path[ path_length ] = 0;
+	path_index = path_length;
 
-	if( path_separator == (system_character_t) '/' )
+	while( path_index > 0 )
 	{
-		for( path_index = 0;
-		     path_index < path_length;
-		     path_index++ )
+		if( path[ path_index ] == LIBCPATH_SEPARATOR )
 		{
-			if( ewf_path[ path_index ] == (system_character_t) '/' )
-			{
-				ewf_path[ path_index ] = (system_character_t) '\\';
-			}
-			else if( ewf_path[ path_index ] == (system_character_t) '\\' )
-			{
-				ewf_path[ path_index ] = (system_character_t) '/';
-			}
+			break;
+		}
+		path_index--;
+	}
+	/* Ignore the name of the root item
+	 */
+	if( path_length == 0 )
+	{
+		filename        = _SYSTEM_STRING( "" );
+		filename_length = 0;
+	}
+	else
+	{
+		filename        = &( path[ path_index + 1 ] );
+		filename_length = path_length - ( path_index + 1 );
+	}
+	if( mount_handle->input_format == MOUNT_HANDLE_INPUT_FORMAT_FILES )
+	{
+		result = mount_file_system_get_file_entry_by_path(
+		          mount_handle->file_system,
+		          path,
+		          path_length,
+		          &ewf_file_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry.",
+			 function );
+
+			goto on_error;
+		}
+		file_entry_type = MOUNT_FILE_ENTRY_TYPE_FILE_ENTRY;
+	}
+	else
+	{
+		result = mount_file_system_get_handle_by_path(
+			  mount_handle->file_system,
+			  path,
+			  path_length,
+			  &ewf_handle,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve handle.",
+			 function );
+
+			goto on_error;
+		}
+		file_entry_type = MOUNT_FILE_ENTRY_TYPE_HANDLE;
+	}
+	if( result != 0 )
+	{
+		if( mount_file_entry_initialize(
+		     file_entry,
+		     mount_handle->file_system,
+		     filename,
+		     filename_length,
+		     file_entry_type,
+		     ewf_handle,
+		     ewf_file_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize file entry.",
+			 function );
+
+			goto on_error;
 		}
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libewf_handle_get_file_entry_by_utf16_path(
-		  mount_handle->input_handle,
-		  (uint16_t *) ewf_path,
-		  path_length,
-		  file_entry,
-		  error );
-#else
-	result = libewf_handle_get_file_entry_by_utf8_path(
-		  mount_handle->input_handle,
-		  (uint8_t *) ewf_path,
-		  path_length,
-		  file_entry,
-		  error );
-#endif
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 ewf_path );
-
 	return( result );
 
 on_error:
-	if( ewf_path != NULL )
+	if( ewf_file_entry != NULL )
 	{
-		memory_free(
-		 ewf_path );
+		libewf_file_entry_free(
+		 &ewf_file_entry,
+		 NULL );
 	}
 	return( -1 );
-}
-
-/* Retrieves the number of input handles
- * Returns 1 if successful or -1 on error
- */
-int mount_handle_get_number_of_input_handles(
-     mount_handle_t *mount_handle,
-     int *number_of_input_handles,
-     libcerror_error_t **error )
-{
-	static char *function = "mount_handle_get_number_of_input_handles";
-
-	if( mount_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mount handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( number_of_input_handles == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid number of input handles.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_input_handles = 1;
-
-	return( 1 );
 }
 

@@ -71,22 +71,22 @@ struct libewf_single_file_entry
 	/* The creation date and time
 	 * stored as a Unix timestamp
 	 */
-	uint32_t creation_time;
+	int32_t creation_time;
 
 	/* The last modification date and time
 	 * stored as a Unix timestamp
 	 */
-	uint32_t modification_time;
+	int32_t modification_time;
 
 	/* The last access date and time
 	 * stored as a Unix timestamp
 	 */
-	uint32_t access_time;
+	int32_t access_time;
 
 	/* The last (file system) entry modification date and time
 	 * stored as a Unix timestamp
 	 */
-	uint32_t entry_modification_time;
+	int32_t entry_modification_time;
 
 	/* The MD5 digest hash
 	 */
@@ -172,22 +172,22 @@ int libewf_single_file_entry_get_size(
 
 int libewf_single_file_entry_get_creation_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint32_t *creation_time,
+     int32_t *creation_time,
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_modification_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint32_t *modification_time,
+     int32_t *modification_time,
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_access_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint32_t *access_time,
+     int32_t *access_time,
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_entry_modification_time(
      libewf_single_file_entry_t *single_file_entry,
-     uint32_t *entry_modification_time,
+     int32_t *entry_modification_time,
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_utf8_hash_value_md5(

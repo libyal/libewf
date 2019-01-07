@@ -41,7 +41,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 {
 	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf8_name";
 	int number_of_sub_nodes = 0;
-	int result              = 0;
+	int result              = LIBUNA_COMPARE_GREATER;
 	int sub_node_index      = 0;
 
 	if( node == NULL )
@@ -157,7 +157,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}
@@ -206,7 +206,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 {
 	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf16_name";
 	int number_of_sub_nodes = 0;
-	int result              = 0;
+	int result              = LIBUNA_COMPARE_GREATER;
 	int sub_node_index      = 0;
 
 	if( node == NULL )
@@ -322,7 +322,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}

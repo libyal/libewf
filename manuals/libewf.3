@@ -1,4 +1,4 @@
-.Dd September 18, 2016
+.Dd January  8, 2019
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -309,13 +309,13 @@ File entry functions
 .Ft int
 .Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry, size64_t *size, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_creation_time "libewf_file_entry_t *file_entry, uint32_t *creation_time, libewf_error_t **error"
+.Fn libewf_file_entry_get_creation_time "libewf_file_entry_t *file_entry, int32_t *posix_time, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_modification_time "libewf_file_entry_t *file_entry, uint32_t *modification_time, libewf_error_t **error"
+.Fn libewf_file_entry_get_modification_time "libewf_file_entry_t *file_entry, int32_t *posix_time, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_access_time "libewf_file_entry_t *file_entry, uint32_t *access_time, libewf_error_t **error"
+.Fn libewf_file_entry_get_access_time "libewf_file_entry_t *file_entry, int32_t *posix_time, libewf_error_t **error"
 .Ft int
-.Fn libewf_file_entry_get_entry_modification_time "libewf_file_entry_t *file_entry, uint32_t *entry_modification_time, libewf_error_t **error"
+.Fn libewf_file_entry_get_entry_modification_time "libewf_file_entry_t *file_entry, int32_t *posix_time, libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry, uint8_t *utf8_string, size_t utf8_string_size, libewf_error_t **error"
 .Ft int

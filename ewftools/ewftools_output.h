@@ -36,14 +36,14 @@ int ewftools_output_initialize(
      int stdio_mode,
      libcerror_error_t **error );
 
-void ewfoutput_copyright_fprint(
+void ewftools_output_copyright_fprint(
       FILE *stream );
 
-void ewfoutput_version_fprint(
+void ewftools_output_version_fprint(
       FILE *stream,
       const system_character_t *program );
 
-void ewfoutput_version_detailed_fprint(
+void ewftools_output_version_detailed_fprint(
       FILE *stream,
       const system_character_t *program );
 

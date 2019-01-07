@@ -1377,7 +1377,7 @@ int libewf_single_files_parse_file_entry(
 				     value_string_size,
 				     &value_64bit,
 				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1389,7 +1389,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->access_time = (uint32_t) value_64bit;
+				single_file_entry->access_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1440,7 +1440,7 @@ int libewf_single_files_parse_file_entry(
 				     value_string_size,
 				     &value_64bit,
 				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1452,7 +1452,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->creation_time = (uint32_t) value_64bit;
+				single_file_entry->creation_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
@@ -1587,7 +1587,7 @@ int libewf_single_files_parse_file_entry(
 				     value_string_size,
 				     &value_64bit,
 				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1599,7 +1599,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->entry_modification_time = (uint32_t) value_64bit;
+				single_file_entry->entry_modification_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
@@ -1619,7 +1619,7 @@ int libewf_single_files_parse_file_entry(
 				     value_string_size,
 				     &value_64bit,
 				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1631,7 +1631,7 @@ int libewf_single_files_parse_file_entry(
 
 					goto on_error;
 				}
-				single_file_entry->modification_time = (uint32_t) value_64bit;
+				single_file_entry->modification_time = (int32_t) value_64bit;
 			}
 		}
 		else if( type_string_size == 2 )

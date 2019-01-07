@@ -1134,7 +1134,7 @@ on_error:
  */
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
-     uint32_t *creation_time,
+     int32_t *creation_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1228,7 +1228,7 @@ on_error:
  */
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
-     uint32_t *modification_time,
+     int32_t *modification_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1322,7 +1322,7 @@ on_error:
  */
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
-     uint32_t *access_time,
+     int32_t *access_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1411,12 +1411,12 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the (file system entry) modification date and time
+/* Retrieves the (file system) entry modification date and time
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
-     uint32_t *entry_modification_time,
+     int32_t *entry_modification_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;

@@ -1,6 +1,5 @@
 MSVSCPP_FILES = \
 	bzip2/bzip2.vcproj \
-	dokan/dokan.vcproj \
 	ewf.net/ewf.net.vcproj \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \

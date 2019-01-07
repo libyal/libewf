@@ -206,7 +206,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	ewfoutput_version_fprint(
+	ewftools_output_version_fprint(
 	 stdout,
 	 program );
 
@@ -276,7 +276,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'V':
-				ewfoutput_copyright_fprint(
+				ewftools_output_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );

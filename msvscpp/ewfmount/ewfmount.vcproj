@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
+				AdditionalDependencies="..\..\..\dokan\msvscpp\$(ConfigurationName)\dokan.lib rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				SubSystem="1"
@@ -135,7 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
+				AdditionalDependencies="..\..\..\dokan\msvscpp\$(ConfigurationName)\dokan.lib rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -218,6 +218,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\mount_dokan.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_file_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_file_system.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_fuse.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\mount_handle.c"
 				>
 			</File>
@@ -272,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libcpath.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_libcthreads.h"
 				>
 			</File>
@@ -321,6 +341,22 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\guid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_dokan.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_file_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_file_system.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_fuse.h"
 				>
 			</File>
 			<File

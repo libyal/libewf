@@ -284,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewftools_libcdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewftools_libcdatetime.h"
 				>
 			</File>

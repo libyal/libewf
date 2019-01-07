@@ -68,6 +68,39 @@ matrix:
     dist: xenial
     sudo: required
     group: edge
+  - name: "Linux with gcc without OpenSSL"
+    env:
+    - CONFIGURE_OPTIONS="--with-openssl=no"
+    - CFLAGS="--coverage"
+    - LDFLAGS="--coverage"
+    - TARGET="linux-gcc-no-openssl"
+    compiler: gcc
+    os: linux
+    dist: xenial
+    sudo: required
+    group: edge
+  - name: "Linux with gcc with OpenSSL EVP"
+    env:
+    - CONFIGURE_OPTIONS="--enable-openssl-evp-cipher=yes --enable-openssl-evp-md=yes"
+    - CFLAGS="--coverage"
+    - LDFLAGS="--coverage"
+    - TARGET="linux-gcc-openssl-evp"
+    compiler: gcc
+    os: linux
+    dist: xenial
+    sudo: required
+    group: edge
+  - name: "Linux with gcc with OpenSSL non-EVP"
+    env:
+    - CONFIGURE_OPTIONS="--enable-openssl-evp-cipher=no --enable-openssl-evp-md=no"
+    - CFLAGS="--coverage"
+    - LDFLAGS="--coverage"
+    - TARGET="linux-gcc-openssl"
+    compiler: gcc
+    os: linux
+    dist: xenial
+    sudo: required
+    group: edge
   - name: "Linux with gcc and Python module"
     env:
     - CONFIGURE_OPTIONS="--enable-python"
@@ -201,6 +234,7 @@ before_install:
       sudo apt-get update && sudo apt-get --fix-missing -o Dpkg::Options::="--force-confold" upgrade -y --allow-unauthenticated && sudo apt-get install -y autopoint zlib1g-dev libssl-dev libfuse-dev;
     elif test ${TRAVIS_OS_NAME} = "osx"; then
       brew update && brew install gettext gnu-sed && brew link --force gettext;
+      brew tap homebrew/cask && brew cask install osxfuse;
     fi
   - if test ${TARGET} = "coverity"; then
       echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-;
