@@ -159,7 +159,7 @@ int main( int argc, char * const argv[] )
 	char info_option                             = 'a';
 
 #if !defined( HAVE_GLOB_H )
-	ewftools_glob_t *glob                      = NULL;
+	ewftools_glob_t *glob                        = NULL;
 #endif
 
 	libcnotify_stream_set(

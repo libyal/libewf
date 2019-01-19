@@ -447,6 +447,7 @@ int libewf_chunk_table_append_checksum_error(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_chunk_table_append_checksum_error";
+	int result            = 0;
 
 	if( chunk_table == NULL )
 	{
@@ -459,14 +460,16 @@ int libewf_chunk_table_append_checksum_error(
 
 		return( -1 );
 	}
-	if( libcdata_range_list_insert_range(
-	     chunk_table->checksum_errors,
-	     start_sector,
-	     number_of_sectors,
-	     NULL,
-	     NULL,
-	     NULL,
-	     error ) != 1 )
+	result = libcdata_range_list_insert_range(
+	          chunk_table->checksum_errors,
+	          start_sector,
+	          number_of_sectors,
+	          NULL,
+	          NULL,
+	          NULL,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1018,14 +1021,16 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 		{
 			number_of_sectors = (uint64_t) media_values->number_of_sectors - start_sector;
 		}
-		if( libcdata_range_list_insert_range(
-		     chunk_table->checksum_errors,
-		     start_sector,
-		     number_of_sectors,
-		     NULL,
-		     NULL,
-		     NULL,
-		     error ) != 1 )
+		result = libcdata_range_list_insert_range(
+		          chunk_table->checksum_errors,
+		          start_sector,
+		          number_of_sectors,
+		          NULL,
+		          NULL,
+		          NULL,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,

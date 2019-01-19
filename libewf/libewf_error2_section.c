@@ -62,6 +62,7 @@ int libewf_error2_section_read_data(
 	uint32_t number_of_entries      = 0;
 	uint32_t number_of_sectors      = 0;
 	uint32_t stored_checksum        = 0;
+	int result                      = 0;
 
 	if( data == NULL )
 	{
@@ -445,14 +446,16 @@ int libewf_error2_section_read_data(
 				}
 			}
 #endif
-			if( libcdata_range_list_insert_range(
-			     acquiry_errors,
-			     start_sector,
-			     (uint64_t) number_of_sectors,
-			     NULL,
-			     NULL,
-			     NULL,
-			     error ) != 1 )
+			result = libcdata_range_list_insert_range(
+			          acquiry_errors,
+			          start_sector,
+			          (uint64_t) number_of_sectors,
+			          NULL,
+			          NULL,
+			          NULL,
+			          error );
+
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
