@@ -30,6 +30,7 @@ endif
 
 TESTS = \
 	test_library.sh \
+	test_manpage.sh \
 	test_glob.sh \
 	test_write_functions.sh \
 	test_ewfinfo.sh \
@@ -62,6 +63,7 @@ check_SCRIPTS = \
 	test_ewfverify.sh \
 	test_glob.sh \
 	test_library.sh \
+	test_manpage.sh \
 	test_python_module.sh \
 	test_runner.sh \
 	test_write_functions.sh

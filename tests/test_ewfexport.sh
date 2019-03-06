@@ -1,7 +1,7 @@
 #!/bin/bash
 # Export tool testing script
 #
-# Version: 20181111
+# Version: 20190223
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -120,17 +120,17 @@ fi
 
 if ! test -d "input";
 then
-	echo "Test input directory: input not found.";
+	echo "Test input directory not found.";
 
-	return ${EXIT_IGNORE};
+	exit ${EXIT_IGNORE};
 fi
 RESULT=`ls input/* | tr ' ' '\n' | wc -l`;
 
 if test ${RESULT} -eq ${EXIT_SUCCESS};
 then
-	echo "No files or directories found in the test input directory: input";
+	echo "No files or directories found in the test input directory";
 
-	return ${EXIT_IGNORE};
+	exit ${EXIT_IGNORE};
 fi
 
 TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "ewfexport");
