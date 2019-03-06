@@ -362,7 +362,7 @@ ssize_t ewfacquirestream_read_chunk(
 			input_read_count = _read(
 			                    input_file_descriptor,
 			                    &( ( storage_media_buffer->raw_buffer )[ buffer_offset ] ),
-			                    input_read_size );
+			                    (unsigned int) input_read_size );
 #else
 			input_read_count = read(
 			                    input_file_descriptor,
@@ -607,7 +607,7 @@ int ewfacquirestream_read_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( imaging_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( imaging_handle->process_thread_pool ),

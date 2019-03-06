@@ -206,7 +206,7 @@ System::DateTime^ DateTime::FromFiletime( System::UInt64 filetime )
 /* Creates a new datetime object from a POSIX time
  * Returns a DateTime object if successful or nullptr on error
  */
-System::DateTime^ DateTime::FromPOSIXTime( System::UInt32 posix_time )
+System::DateTime^ DateTime::FromPOSIXTime( System::Int32 posix_time )
 {
 	System::DateTime^ date_time_object = nullptr;
 	System::String^ error_string       = nullptr;
@@ -265,7 +265,7 @@ System::DateTime^ DateTime::FromPOSIXTime( System::UInt32 posix_time )
 		{
 			days_in_year = 365;
 		}
-		if( posix_time <= (System::UInt64) days_in_year )
+		if( posix_time <= days_in_year )
 		{
 			break;
 		}
@@ -325,7 +325,7 @@ System::DateTime^ DateTime::FromPOSIXTime( System::UInt32 posix_time )
 			throw gcnew System::Exception(
 				     error_string );
 		}
-		if( posix_time <= (System::UInt64) days_in_month )
+		if( posix_time <= days_in_month )
 		{
 			break;
 		}
@@ -335,7 +335,7 @@ System::DateTime^ DateTime::FromPOSIXTime( System::UInt32 posix_time )
 	}
 	/* Determine the day
 	 */
-	day = (System::Int32) posix_time;
+	day = posix_time;
 
 	date_time_object = gcnew System::DateTime(
 	                          year,

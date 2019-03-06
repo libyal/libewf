@@ -1527,7 +1527,7 @@ int mount_file_system_get_filename_from_name(
 			safe_filename[ filename_index++ ] = escape_character;
 			safe_filename[ filename_index++ ] = (system_character_t) 'x';
 
-			hex_digit = unicode_character >> 4;
+			hex_digit = (system_character_t) ( unicode_character >> 4 );
 
 			if( hex_digit <= 0x09 )
 			{

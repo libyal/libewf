@@ -40,7 +40,7 @@ public ref class DateTime sealed
         public:
 		static System::DateTime^ FromFiletime( System::UInt64 filetime );
 
-		static System::DateTime^ FromPOSIXTime( System::UInt32 posix_time );
+		static System::DateTime^ FromPOSIXTime( System::Int32 posix_time );
 };
 
 } // namespace EWF
@@ -49,5 +49,5 @@ public ref class DateTime sealed
 }
 #endif
 
-#endif
+#endif /* !defined( _EWF_NET_DATETIME_H ) */
 

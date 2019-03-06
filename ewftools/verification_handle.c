@@ -1703,7 +1703,7 @@ int verification_handle_verify_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( verification_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( verification_handle->process_thread_pool ),

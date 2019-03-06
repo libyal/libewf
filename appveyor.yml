@@ -157,6 +157,7 @@ install:
 - ps: .\syncwinflexbison.ps1
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     .\synczlib.ps1 }
+- cmd: git clone https://github.com/joachimmetz/bzip2.git ..\bzip2
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     If ($env:TARGET -eq "vs2017") {
       .\syncdokan.ps1 }

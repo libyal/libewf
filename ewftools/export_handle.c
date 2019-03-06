@@ -1161,7 +1161,7 @@ ssize_t export_handle_write_storage_media_buffer(
 			write_count = _write(
 			               1,
 				       storage_media_buffer->raw_buffer,
-				       write_size );
+				       (unsigned int) write_size );
 #else
 			write_count = write(
 			               1,
@@ -5210,7 +5210,7 @@ int export_handle_export_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( export_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( export_handle->input_process_thread_pool ),
