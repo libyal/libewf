@@ -1,42 +1,48 @@
-dnl Checks for libuuid required headers and functions
+dnl Functions for libuuid
 dnl
-dnl Version: 20190306
+dnl Version: 20190308
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],
-  [dnl Check if parameters were provided
-  AS_IF(
-    [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xno && test "x$ac_cv_with_libuuid" != xauto-detect],
-    [AS_IF(
-      [test -d "$ac_cv_with_libuuid"],
-      [CFLAGS="$CFLAGS -I${ac_cv_with_libuuid}/include"
-      LDFLAGS="$LDFLAGS -L${ac_cv_with_libuuid}/lib"],
-      [AC_MSG_WARN([no such directory: $ac_cv_with_libuuid])
-      ])
-    ])
-
-  AS_IF(
-    [test "x$ac_cv_with_libuuid" = xno],
+  [AS_IF(
+    [test "x$ac_cv_enable_shared_libs" = xno || test "x$ac_cv_with_libuuid" = xno],
     [ac_cv_libuuid=no],
-    [AS_IF(
-      [test "x$ac_cv_enable_winapi" = xyes],
-      [ac_cv_libuuid=librpcrt4
-      ac_cv_libuuid_LIBADD=-lrpcrt4],
-      [ac_cv_libuuid=no])
+    [ac_cv_libuuid=check
+    dnl Check if the directory provided as parameter exists
+    AS_IF(
+      [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xauto-detect],
+      [AS_IF(
+        [test -d "$ac_cv_with_libuuid"],
+        [CFLAGS="$CFLAGS -I${ac_cv_with_libuuid}/include"
+        LDFLAGS="$LDFLAGS -L${ac_cv_with_libuuid}/lib"],
+        [AC_MSG_FAILURE(
+          [no such directory: $ac_cv_with_libuuid],
+          [1])
+        ])
+      ],
+      [AS_IF(
+        [test "x$ac_cv_enable_winapi" = xyes],
+        [ac_cv_libuuid=librpcrt4
+        ac_cv_libuuid_LIBADD=-lrpcrt4],
+        [dnl Check for a pkg-config file
+        AS_IF(
+          [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+          [PKG_CHECK_MODULES(
+            [uuid],
+            [uuid >= 2.20],
+            [ac_cv_libuuid=libuuid],
+            [ac_cv_libuuid=check])
+          ])
+        AS_IF(
+          [test "x$ac_cv_libuuid" = xlibuuid],
+          [ac_cv_libuuid_CPPFLAGS="$pkg_cv_libuuid_CFLAGS"
+          ac_cv_libuuid_LIBADD="$pkg_cv_libuuid_LIBS"])
+        ])
+      ])
 
     AS_IF(
-      [test "x$ac_cv_libuuid" = xno],
-      [dnl Check for a pkg-config file
-      AS_IF(
-        [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
-        [PKG_CHECK_MODULES(
-          [uuid],
-          [uuid >= 2.20],
-          [ac_cv_libuuid=libuuid],
-          [ac_cv_libuuid=no])
-        ])
-
-      AS_IF(
+      [test "x$ac_cv_libuuid" = xcheck],
+      [AS_IF(
         [test "x$ac_cv_libuuid" = xuuid],
         [ac_cv_libuuid_CPPFLAGS="$pkg_cv_uuid_CFLAGS"
         ac_cv_libuuid_LIBADD="$pkg_cv_uuid_LIBS"],

@@ -1,6 +1,6 @@
 dnl Checks for libsmdev required headers and functions
 dnl
-dnl Version: 20181215
+dnl Version: 20190308
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -8,7 +8,8 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
   [AS_IF(
     [test "x$ac_cv_enable_shared_libs" = xno || test "x$ac_cv_with_libsmdev" = xno],
     [ac_cv_libsmdev=no],
-    [dnl Check if the directory provided as parameter exists
+    [ac_cv_libsmdev=check
+    dnl Check if the directory provided as parameter exists
     AS_IF(
       [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect],
       [AS_IF(
@@ -19,7 +20,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
           [no such directory: $ac_cv_with_libsmdev],
           [1])
         ])
-        ac_cv_libsmdev=check],
+      ],
       [dnl Check for a pkg-config file
       AS_IF(
         [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],

@@ -1,6 +1,6 @@
 dnl Checks for libcerror required headers and functions
 dnl
-dnl Version: 20181117
+dnl Version: 20190308
 
 dnl Function to detect if libcerror is available
 dnl ac_libcerror_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -19,7 +19,7 @@ AC_DEFUN([AX_LIBCERROR_CHECK_LIB],
           [no such directory: $ac_cv_with_libcerror],
           [1])
         ])
-        ac_cv_libcerror=check],
+      ac_cv_libcerror=check],
       [dnl Check for a pkg-config file
       AS_IF(
         [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
