@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	ewf_test_chunk_data \
 	ewf_test_chunk_group \
 	ewf_test_chunk_table \
+	ewf_test_compression \
 	ewf_test_data_chunk \
 	ewf_test_date_time_values \
 	ewf_test_deflate \
@@ -117,6 +118,7 @@ ewf_test_analytical_data_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_analytical_data_LDADD = \
@@ -127,7 +129,9 @@ ewf_test_case_data_SOURCES = \
 	ewf_test_case_data.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_case_data_LDADD = \
@@ -167,6 +171,17 @@ ewf_test_chunk_table_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_chunk_table_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_compression_SOURCES = \
+	ewf_test_compression.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_compression_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -210,7 +225,9 @@ ewf_test_device_information_SOURCES = \
 	ewf_test_device_information.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_device_information_LDADD = \

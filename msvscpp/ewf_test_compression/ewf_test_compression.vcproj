@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_analytical_data"
-	ProjectGUID="{687DCBE9-BB3B-4E28-BB3B-1B8C2CF38E77}"
-	RootNamespace="ewf_test_analytical_data"
+	Name="ewf_test_compression"
+	ProjectGUID="{66EDA7DD-5F3F-4D6A-874E-E9C7C22560DF}"
+	RootNamespace="ewf_test_compression"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_analytical_data.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_compression.c"
 				>
 			</File>
 		</Filter>
@@ -199,10 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

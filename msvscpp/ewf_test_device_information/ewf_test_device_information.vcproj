@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\ewf_test_libfvalue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
 				>
 			</File>

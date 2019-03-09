@@ -1390,6 +1390,28 @@ int libewf_case_data_parse_utf8_string(
 
 		return( -1 );
 	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( header_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header values.",
+		 function );
+
+		return( -1 );
+	}
 	if( format == NULL )
 	{
 		libcerror_error_set(

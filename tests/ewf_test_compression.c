@@ -1,7 +1,7 @@
 /*
- * Library DEFLATE decompression testing program
+ * Library compression functions test program
  *
- * Copyright (C) 2008-2019, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <memory.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -29,18 +28,13 @@
 #endif
 
 #include "ewf_test_libcerror.h"
-#include "ewf_test_libcnotify.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-#include "../libewf/libewf_deflate.h"
+#include "../libewf/libewf_compression.h"
 
-/* Define to make ewf_test_deflate generate verbose output
-#define EWF_TEST_DEFLATE
- */
-
-uint8_t ewf_test_deflate_compressed_byte_stream[ 2627 ] = {
+uint8_t ewf_test_compression_deflate_compressed_byte_stream[ 2627 ] = {
 	0x78, 0xda, 0xbd, 0x59, 0x6d, 0x8f, 0xdb, 0xb8, 0x11, 0xfe, 0x7c, 0xfa, 0x15, 0xc4, 0x7e, 0xb9,
 	0x5d, 0xc0, 0x75, 0x5e, 0x7b, 0x45, 0x0f, 0x45, 0x81, 0xed, 0xde, 0x26, 0xdd, 0x62, 0x2f, 0x0d,
 	0xb2, 0x97, 0x16, 0xfd, 0x48, 0x4b, 0xb4, 0xcd, 0x46, 0x12, 0x5d, 0x52, 0x5a, 0xc7, 0xfd, 0xf5,
@@ -207,7 +201,7 @@ uint8_t ewf_test_deflate_compressed_byte_stream[ 2627 ] = {
 	0x7d, 0x8a, 0x87, 0xf9, 0x9d, 0x74, 0x33, 0x0e, 0x79, 0xc5, 0xf8, 0x73, 0xcd, 0xff, 0x00, 0x30,
 	0x4a, 0x56, 0xa4 };
 
-uint8_t ewf_test_deflate_uncompressed_byte_stream[ 7640 ] = {
+uint8_t ewf_test_compression_uncompressed_byte_stream[ 7640 ] = {
 	0x09, 0x09, 0x20, 0x20, 0x20, 0x47, 0x4e, 0x55, 0x20, 0x4c, 0x45, 0x53, 0x53, 0x45, 0x52, 0x20,
 	0x47, 0x45, 0x4e, 0x45, 0x52, 0x41, 0x4c, 0x20, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x43, 0x20, 0x4c,
 	0x49, 0x43, 0x45, 0x4e, 0x53, 0x45, 0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -689,706 +683,35 @@ uint8_t ewf_test_deflate_uncompressed_byte_stream[ 7640 ] = {
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-/* Tests the libewf_deflate_bit_stream_get_value function
+/* Tests the libewf_compress_data function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_deflate_bit_stream_get_value(
+int ewf_test_compress_data(
      void )
 {
-	libewf_deflate_bit_stream_t bit_stream;
-
-	libcerror_error_t *error = NULL;
-	uint32_t value_32bit     = 0;
-	int result               = 0;
-
-	/* Initialize test
-	 */
-        bit_stream.byte_stream        = ewf_test_deflate_compressed_byte_stream;
-        bit_stream.byte_stream_size   = 2627;
-        bit_stream.byte_stream_offset = 0;
-        bit_stream.bit_buffer         = 0;
-        bit_stream.bit_buffer_size    = 0;
-
-	/* Test regular cases
-	 */
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          0,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_32bit",
-	 value_32bit,
-	 (uint32_t) 0x00000000UL );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	EWF_TEST_ASSERT_EQUAL_SIZE(
-	 "bit_stream.byte_stream_offset",
-	 bit_stream.byte_stream_offset,
-	 (size_t) 0 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "bit_stream.bit_buffer",
-	 bit_stream.bit_buffer,
-	 (uint32_t) 0x00000000UL );
-
-	EWF_TEST_ASSERT_EQUAL_UINT8(
-	 "bit_stream.bit_buffer_size",
-	 bit_stream.bit_buffer_size,
-	 (uint8_t) 0 );
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          4,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_32bit",
-	 value_32bit,
-	 (uint32_t) 0x00000008UL );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	EWF_TEST_ASSERT_EQUAL_SIZE(
-	 "bit_stream.byte_stream_offset",
-	 bit_stream.byte_stream_offset,
-	 (size_t) 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "bit_stream.bit_buffer",
-	 bit_stream.bit_buffer,
-	 (uint32_t) 0x00000007UL );
-
-	EWF_TEST_ASSERT_EQUAL_UINT8(
-	 "bit_stream.bit_buffer_size",
-	 bit_stream.bit_buffer_size,
-	 (uint8_t) 4 );
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          12,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_32bit",
-	 value_32bit,
-	 (uint32_t) 0x00000da7UL );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	EWF_TEST_ASSERT_EQUAL_SIZE(
-	 "bit_stream.byte_stream_offset",
-	 bit_stream.byte_stream_offset,
-	 (size_t) 2 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "bit_stream.bit_buffer",
-	 bit_stream.bit_buffer,
-	 (uint32_t) 0x00000000UL );
-
-	EWF_TEST_ASSERT_EQUAL_UINT8(
-	 "bit_stream.bit_buffer_size",
-	 bit_stream.bit_buffer_size,
-	 (uint8_t) 0 );
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          32,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_32bit",
-	 value_32bit,
-	 (uint32_t) 0x8f6d59bdUL );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	EWF_TEST_ASSERT_EQUAL_SIZE(
-	 "bit_stream.byte_stream_offset",
-	 bit_stream.byte_stream_offset,
-	 (size_t) 6 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "bit_stream.bit_buffer",
-	 bit_stream.bit_buffer,
-	 (uint32_t) 0x00000000UL );
-
-	EWF_TEST_ASSERT_EQUAL_UINT8(
-	 "bit_stream.bit_buffer_size",
-	 bit_stream.bit_buffer_size,
-	 (uint8_t) 0 );
-
-	/* Test error cases
-	 */
-	result = libewf_deflate_bit_stream_get_value(
-	          NULL,
-	          32,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          64,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          32,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	bit_stream.byte_stream_offset = 2627;
-        bit_stream.bit_buffer_size    = 0;
-
-	result = libewf_deflate_bit_stream_get_value(
-	          &bit_stream,
-	          32,
-	          &value_32bit,
-	          &error );
-
-	bit_stream.byte_stream_offset = 0;
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_huffman_table_construct function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_huffman_table_construct(
-     void )
-{
-	uint16_t code_size_array[ 318 ];
-
-	libewf_deflate_huffman_table_t table;
-
-	libcerror_error_t *error        = NULL;
-	uint16_t symbol                 = 0;
-	int result                      = 0;
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_memset_fail_tests = 2;
-	int test_number                 = 0;
-#endif
-
-	/* Initialize test
-	 */
-	for( symbol = 0;
-	     symbol < 318;
-	     symbol++ )
-	{
-		if( symbol < 144 )
-		{
-			code_size_array[ symbol ] = 8;
-		}
-		else if( symbol < 256 )
-		{
-			code_size_array[ symbol ] = 9;
-		}
-		else if( symbol < 280 )
-		{
-			code_size_array[ symbol ] = 7;
-		}
-		else if( symbol < 288 )
-		{
-			code_size_array[ symbol ] = 8;
-		}
-		else
-		{
-			code_size_array[ symbol ] = 5;
-		}
-	}
-	/* Test regular cases
-	 */
-	result = libewf_deflate_huffman_table_construct(
-	          &table,
-	          code_size_array,
-	          288,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_deflate_huffman_table_construct(
-	          NULL,
-	          code_size_array,
-	          288,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_huffman_table_construct(
-	          &table,
-	          NULL,
-	          288,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_huffman_table_construct(
-	          &table,
-	          code_size_array,
-	          -1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-
-	for( test_number = 0;
-	     test_number < number_of_memset_fail_tests;
-	     test_number++ )
-	{
-		/* Test libewf_write_io_handle_initialize with memset failing
-		 */
-		ewf_test_memset_attempts_before_fail = test_number;
-
-		result = libewf_deflate_huffman_table_construct(
-		          &table,
-		          code_size_array,
-		          288,
-		          &error );
-
-		if( ewf_test_memset_attempts_before_fail != -1 )
-		{
-			ewf_test_memset_attempts_before_fail = -1;
-		}
-		else
-		{
-			EWF_TEST_ASSERT_EQUAL_INT(
-			 "result",
-			 result,
-			 -1 );
-
-			EWF_TEST_ASSERT_IS_NOT_NULL(
-			 "error",
-			 error );
-
-			libcerror_error_free(
-			 &error );
-		}
-	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
-
-	/* TODO test errornous data */
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_bit_stream_get_huffman_encoded_value function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_bit_stream_get_huffman_encoded_value(
-     void )
-{
-	libewf_deflate_bit_stream_t bit_stream;
-	libewf_deflate_huffman_table_t distances_table;
-	libewf_deflate_huffman_table_t literals_table;
-
-	libcerror_error_t *error = NULL;
-	uint32_t value_32bit     = 0;
-	int result               = 0;
-
-	/* Initialize test
-	 */
-        bit_stream.byte_stream        = ewf_test_deflate_compressed_byte_stream;
-        bit_stream.byte_stream_size   = 2627;
-        bit_stream.byte_stream_offset = 2;
-        bit_stream.bit_buffer         = 0;
-        bit_stream.bit_buffer_size    = 0;
-
-	result = libewf_deflate_initialize_fixed_huffman_tables(
-	          &literals_table,
-	          &distances_table,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	value_32bit = 0;
-
-	result = libewf_deflate_bit_stream_get_huffman_encoded_value(
-	          &bit_stream,
-	          &literals_table,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_32bit",
-	 value_32bit,
-	 (uint32_t) 141 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	value_32bit = 0;
-
-	result = libewf_deflate_bit_stream_get_huffman_encoded_value(
-	          NULL,
-	          &literals_table,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_bit_stream_get_huffman_encoded_value(
-	          &bit_stream,
-	          NULL,
-	          &value_32bit,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_bit_stream_get_huffman_encoded_value(
-	          &bit_stream,
-	          &literals_table,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-        bit_stream.byte_stream_offset = 2627;
-        bit_stream.bit_buffer_size    = 0;
-
-	result = libewf_deflate_bit_stream_get_huffman_encoded_value(
-	          &bit_stream,
-	          &literals_table,
-	          &value_32bit,
-	          &error );
-
-        bit_stream.byte_stream_offset = 2;
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_initialize_dynamic_huffman_tables function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_initialize_dynamic_huffman_tables(
-     void )
-{
-	libewf_deflate_bit_stream_t bit_stream;
-	libewf_deflate_huffman_table_t distances_table;
-	libewf_deflate_huffman_table_t literals_table;
-
-	libcerror_error_t *error        = NULL;
-	int result                      = 0;
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_memset_fail_tests = 6;
-	int test_number                 = 0;
+	uint8_t compressed_data[ 4096 ];
+
+	libcerror_error_t *error    = NULL;
+	size_t compressed_data_size = 0;
+	int result                  = 0;
+
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL )
+	size_t maximum_data_size    = (size_t) ULONG_MAX;
+#else
+	size_t maximum_data_size    = (size_t) SSIZE_MAX;
 #endif
 
 	/* Test regular cases
 	 */
+	compressed_data_size = 4096;
 
-	/* Test error cases
-	 */
-	result = libewf_deflate_initialize_dynamic_huffman_tables(
-	          NULL,
-	          &literals_table,
-	          &distances_table,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_initialize_dynamic_huffman_tables(
-	          &bit_stream,
-	          NULL,
-	          &distances_table,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_initialize_dynamic_huffman_tables(
-	          &bit_stream,
-	          &literals_table,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-
-	for( test_number = 0;
-	     test_number < number_of_memset_fail_tests;
-	     test_number++ )
-	{
-		/* Test libewf_write_io_handle_initialize with memset failing
-		 */
-		ewf_test_memset_attempts_before_fail = test_number;
-
-		result = libewf_deflate_initialize_dynamic_huffman_tables(
-		          &bit_stream,
-		          &literals_table,
-		          &distances_table,
-		          &error );
-
-		if( ewf_test_memset_attempts_before_fail != -1 )
-		{
-			ewf_test_memset_attempts_before_fail = -1;
-		}
-		else
-		{
-			EWF_TEST_ASSERT_EQUAL_INT(
-			 "result",
-			 result,
-			 -1 );
-
-			EWF_TEST_ASSERT_IS_NOT_NULL(
-			 "error",
-			 error );
-
-			libcerror_error_free(
-			 &error );
-		}
-	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_initialize_fixed_huffman_tables function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_initialize_fixed_huffman_tables(
-     void )
-{
-	libewf_deflate_huffman_table_t distances_table;
-	libewf_deflate_huffman_table_t literals_table;
-
-	libcerror_error_t *error        = NULL;
-	int result                      = 0;
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_memset_fail_tests = 4;
-	int test_number                 = 0;
-#endif
-
-	/* Test regular cases
-	 */
-	result = libewf_deflate_initialize_fixed_huffman_tables(
-	          &literals_table,
-	          &distances_table,
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1400,11 +723,19 @@ int ewf_test_deflate_initialize_fixed_huffman_tables(
 	 "error",
 	 error );
 
+/* TODO add bzip2 compression method data test */
+
 	/* Test error cases
 	 */
-	result = libewf_deflate_initialize_fixed_huffman_tables(
+	compressed_data_size = 4096;
+
+	result = libewf_compress_data(
 	          NULL,
-	          &distances_table,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1419,9 +750,13 @@ int ewf_test_deflate_initialize_fixed_huffman_tables(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_deflate_initialize_fixed_huffman_tables(
-	          &literals_table,
+	result = libewf_compress_data(
+	          compressed_data,
 	          NULL,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1436,316 +771,152 @@ int ewf_test_deflate_initialize_fixed_huffman_tables(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_MEMORY )
+	compressed_data_size = maximum_data_size + 1;
 
-	for( test_number = 0;
-	     test_number < number_of_memset_fail_tests;
-	     test_number++ )
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
+	          &error );
+
+	compressed_data_size = 4096;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_NONE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          99,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          7640,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          NULL,
+	          7640,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_byte_stream,
+	          maximum_data_size + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
 	{
-		/* Test libewf_write_io_handle_initialize with memset failing
-		 */
-		ewf_test_memset_attempts_before_fail = test_number;
-
-		result = libewf_deflate_initialize_fixed_huffman_tables(
-		          &literals_table,
-		          &distances_table,
-		          &error );
-
-		if( ewf_test_memset_attempts_before_fail != -1 )
-		{
-			ewf_test_memset_attempts_before_fail = -1;
-		}
-		else
-		{
-			EWF_TEST_ASSERT_EQUAL_INT(
-			 "result",
-			 result,
-			 -1 );
-
-			EWF_TEST_ASSERT_IS_NOT_NULL(
-			 "error",
-			 error );
-
-			libcerror_error_free(
-			 &error );
-		}
+		libcerror_error_free(
+		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
-
-	return( 1 );
-
-on_error:
 	return( 0 );
 }
 
-/* Tests the libewf_deflate_decode_huffman function
+/* Tests the libewf_decompress_data function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_deflate_decode_huffman(
-     void )
-{
-	uint8_t uncompressed_data[ 8192 ];
-
-	libewf_deflate_bit_stream_t bit_stream;
-	libewf_deflate_huffman_table_t distances_table;
-	libewf_deflate_huffman_table_t literals_table;
-
-	libcerror_error_t *error        = NULL;
-	size_t uncompressed_data_offset = 0;
-	int result                      = 0;
-
-	/* Test regular cases
-	 */
-
-	/* Test error cases
-	 */
-	result = libewf_deflate_decode_huffman(
-	          NULL,
-	          &literals_table,
-	          &distances_table,
-	          uncompressed_data,
-	          8192,
-	          &uncompressed_data_offset,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_decode_huffman(
-	          &bit_stream,
-	          NULL,
-	          &distances_table,
-	          uncompressed_data,
-	          8192,
-	          &uncompressed_data_offset,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_decode_huffman(
-	          &bit_stream,
-	          &literals_table,
-	          NULL,
-	          uncompressed_data,
-	          8192,
-	          &uncompressed_data_offset,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_decode_huffman(
-	          &bit_stream,
-	          &literals_table,
-	          &distances_table,
-	          NULL,
-	          8192,
-	          &uncompressed_data_offset,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_decode_huffman(
-	          &bit_stream,
-	          &literals_table,
-	          &distances_table,
-	          uncompressed_data,
-	          (size_t) SSIZE_MAX + 1,
-	          &uncompressed_data_offset,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_decode_huffman(
-	          &bit_stream,
-	          &literals_table,
-	          &distances_table,
-	          uncompressed_data,
-	          8192,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_calculate_adler32 function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_calculate_adler32(
-     void )
-{
-	libcerror_error_t *error = NULL;
-	uint32_t checksum        = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libewf_deflate_calculate_adler32(
-	          &checksum,
-	          ewf_test_deflate_uncompressed_byte_stream,
-	          7640,
-	          1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_EQUAL_UINT32(
-	 "checksum",
-	 checksum,
-	 (uint32_t) 0x304a56a4UL );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_deflate_calculate_adler32(
-	          NULL,
-	          ewf_test_deflate_uncompressed_byte_stream,
-	          7640,
-	          1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_calculate_adler32(
-	          &checksum,
-	          NULL,
-	          7640,
-	          1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_deflate_calculate_adler32(
-	          &checksum,
-	          ewf_test_deflate_uncompressed_byte_stream,
-	          (size_t) SSIZE_MAX + 1,
-	          1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	return( 0 );
-}
-
-/* Tests the libewf_deflate_decompress function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_deflate_decompress(
+int ewf_test_decompress_data(
      void )
 {
 	uint8_t uncompressed_data[ 8192 ];
 
 	libcerror_error_t *error      = NULL;
-	size_t uncompressed_data_size = 7640;
+	size_t uncompressed_data_size = 0;
 	int result                    = 0;
+
+#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL )
+	size_t maximum_data_size      = (size_t) ULONG_MAX;
+#else
+	size_t maximum_data_size      = (size_t) SSIZE_MAX;
+#endif
 
 	/* Test regular cases
 	 */
-	result = libewf_deflate_decompress(
-	          ewf_test_deflate_compressed_byte_stream,
+	uncompressed_data_size = 8196;
+
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
 	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
 	          &uncompressed_data_size,
 	          &error );
@@ -1755,22 +926,20 @@ int ewf_test_deflate_decompress(
 	 result,
 	 1 );
 
-	EWF_TEST_ASSERT_EQUAL_SIZE(
-	 "uncompressed_data_size",
-	 uncompressed_data_size,
-	 (size_t) 7640 );
-
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-/* TODO: test uncompressed data too small */
+/* TODO add bzip2 compression method data test */
 
 	/* Test error cases
 	 */
-	result = libewf_deflate_decompress(
+	uncompressed_data_size = 8196;
+
+	result = libewf_decompress_data(
 	          NULL,
 	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
 	          &uncompressed_data_size,
 	          &error );
@@ -1787,9 +956,10 @@ int ewf_test_deflate_decompress(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_deflate_decompress(
-	          ewf_test_deflate_compressed_byte_stream,
-	          (size_t) SSIZE_MAX + 1,
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
+	          maximum_data_size + 1,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
 	          &uncompressed_data_size,
 	          &error );
@@ -1806,9 +976,30 @@ int ewf_test_deflate_decompress(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_deflate_decompress(
-	          ewf_test_deflate_compressed_byte_stream,
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
 	          2627,
+	          LIBEWF_COMPRESSION_METHOD_NONE,
+	          uncompressed_data,
+	          &uncompressed_data_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          NULL,
 	          &uncompressed_data_size,
 	          &error );
@@ -1825,12 +1016,37 @@ int ewf_test_deflate_decompress(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_deflate_decompress(
-	          ewf_test_deflate_compressed_byte_stream,
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
 	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
 	          NULL,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	uncompressed_data_size = maximum_data_size + 1;
+
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_byte_stream,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          uncompressed_data,
+	          &uncompressed_data_size,
+	          &error );
+
+	uncompressed_data_size = 8192;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1847,6 +1063,11 @@ int ewf_test_deflate_decompress(
 	return( 1 );
 
 on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
 	return( 0 );
 }
 
@@ -1867,48 +1088,15 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#define EWF_TEST_DEFLATE
-#if defined( HAVE_DEBUG_OUTPUT ) && defined( EWF_TEST_DEFLATE )
-	libcnotify_verbose_set(
-	 1 );
-	libcnotify_stream_set(
-	 stderr,
-	 NULL );
-#endif
-
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
-	 "libewf_deflate_bit_stream_get_value",
-	 ewf_test_deflate_bit_stream_get_value );
+	 "libewf_compress_data",
+	 ewf_test_compress_data );
 
 	EWF_TEST_RUN(
-	 "libewf_deflate_huffman_table_construct",
-	 ewf_test_deflate_huffman_table_construct );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_bit_stream_get_huffman_encoded_value",
-	 ewf_test_deflate_bit_stream_get_huffman_encoded_value );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_initialize_dynamic_huffman_tables",
-	 ewf_test_deflate_initialize_dynamic_huffman_tables );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_initialize_fixed_huffman_tables",
-	 ewf_test_deflate_initialize_fixed_huffman_tables );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_decode_huffman",
-	 ewf_test_deflate_decode_huffman );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_calculate_adler32",
-	 ewf_test_deflate_calculate_adler32 );
-
-	EWF_TEST_RUN(
-	 "libewf_deflate_decompress",
-	 ewf_test_deflate_decompress );
+	 "libewf_decompress_data",
+	 ewf_test_decompress_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

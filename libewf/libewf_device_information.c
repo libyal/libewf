@@ -872,6 +872,28 @@ int libewf_device_information_parse_utf8_string(
 
 		return( -1 );
 	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( header_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header values.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfvalue_utf8_string_split(
 	     utf8_string,
 	     utf8_string_size,

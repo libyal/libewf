@@ -137,6 +137,7 @@ stamp-h[1-9]
 /tests/ewf_test_chunk_data
 /tests/ewf_test_chunk_group
 /tests/ewf_test_chunk_table
+/tests/ewf_test_compression
 /tests/ewf_test_data_chunk
 /tests/ewf_test_date_time_values
 /tests/ewf_test_deflate

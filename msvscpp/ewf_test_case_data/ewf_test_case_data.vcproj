@@ -179,6 +179,10 @@
 				RelativePath="..\..\tests\ewf_test_case_data.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -194,7 +198,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\ewf_test_libfvalue.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

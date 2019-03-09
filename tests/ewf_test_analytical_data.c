@@ -30,9 +30,15 @@
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
+#include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_analytical_data.h"
+
+uint8_t ewf_test_analytical_data1[ 40 ] = {
+	0xff, 0xfe, 0x31, 0x00, 0x0a, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x0a, 0x00,
+	0x74, 0x00, 0x70, 0x00, 0x73, 0x00, 0x0a, 0x00, 0x33, 0x00, 0x32, 0x00, 0x37, 0x00, 0x36, 0x00,
+	0x38, 0x00, 0x30, 0x00, 0x0a, 0x00, 0x0a, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -45,11 +51,27 @@ int ewf_test_analytical_data_parse(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
+	result = libewf_analytical_data_parse(
+	          ewf_test_analytical_data1,
+	          40,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_analytical_data_parse(
 	          NULL,
-	          0,
+	          40,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -63,6 +85,54 @@ int ewf_test_analytical_data_parse(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libewf_analytical_data_parse(
+	          ewf_test_analytical_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_analytical_data_parse with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_analytical_data_parse(
+	          ewf_test_analytical_data1,
+	          40,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	return( 1 );
 
