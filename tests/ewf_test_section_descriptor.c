@@ -113,6 +113,8 @@ int ewf_test_section_descriptor_initialize(
 	          &section_descriptor,
 	          &error );
 
+	section_descriptor = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int ewf_test_section_descriptor_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	section_descriptor = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
@@ -381,6 +381,8 @@ int ewf_test_section_descriptor_clone(
 	          source_section_descriptor,
 	          &error );
 
+	destination_section_descriptor = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -392,8 +394,6 @@ int ewf_test_section_descriptor_clone(
 
 	libcerror_error_free(
 	 &error );
-
-	destination_section_descriptor = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

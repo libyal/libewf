@@ -113,6 +113,8 @@ int ewf_test_header_sections_initialize(
 	          &header_sections,
 	          &error );
 
+	header_sections = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int ewf_test_header_sections_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	header_sections = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

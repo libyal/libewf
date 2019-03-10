@@ -114,6 +114,8 @@ int ewf_test_media_values_initialize(
 	          &media_values,
 	          &error );
 
+	media_values = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -125,8 +127,6 @@ int ewf_test_media_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	media_values = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
@@ -510,6 +510,8 @@ int ewf_test_media_values_clone(
 	          source_media_values,
 	          &error );
 
+	destination_media_values = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -521,8 +523,6 @@ int ewf_test_media_values_clone(
 
 	libcerror_error_free(
 	 &error );
-
-	destination_media_values = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

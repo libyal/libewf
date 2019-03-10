@@ -136,6 +136,8 @@ int ewf_test_write_io_handle_initialize(
 	          io_handle,
 	          &error );
 
+	write_io_handle = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -147,8 +149,6 @@ int ewf_test_write_io_handle_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	write_io_handle = NULL;
 
 	result = libewf_write_io_handle_initialize(
 	          &write_io_handle,

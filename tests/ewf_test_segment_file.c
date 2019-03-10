@@ -136,6 +136,8 @@ int ewf_test_segment_file_initialize(
 	          io_handle,
 	          &error );
 
+	segment_file = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -147,8 +149,6 @@ int ewf_test_segment_file_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	segment_file = NULL;
 
 	result = libewf_segment_file_initialize(
 	          &segment_file,

@@ -113,6 +113,8 @@ int ewf_test_sector_range_initialize(
 	          &sector_range,
 	          &error );
 
+	sector_range = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int ewf_test_sector_range_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	sector_range = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

@@ -261,6 +261,8 @@ int ewf_test_handle_initialize(
 	          &handle,
 	          &error );
 
+	handle = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -272,8 +274,6 @@ int ewf_test_handle_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	handle = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

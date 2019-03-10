@@ -136,6 +136,8 @@ int ewf_test_chunk_table_initialize(
 	          io_handle,
 	          &error );
 
+	chunk_table = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -147,8 +149,6 @@ int ewf_test_chunk_table_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	chunk_table = NULL;
 
 	result = libewf_chunk_table_initialize(
 	          &chunk_table,

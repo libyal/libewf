@@ -1395,9 +1395,13 @@ int libewf_chunk_data_check_for_empty_block(
 
 		return( -1 );
 	}
-	if( data_size <= 1 )
+	if( data_size == 0 )
 	{
 		return( 0 );
+	}
+	else if( data_size == 1 )
+	{
+		return( 1 );
 	}
 	data_start = (uint8_t *) data;
 	data_index = (uint8_t *) data + 1;

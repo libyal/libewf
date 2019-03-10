@@ -113,6 +113,8 @@ int ewf_test_single_files_initialize(
 	          &single_files,
 	          &error );
 
+	single_files = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int ewf_test_single_files_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	single_files = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

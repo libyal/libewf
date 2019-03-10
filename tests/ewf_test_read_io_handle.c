@@ -113,6 +113,8 @@ int ewf_test_read_io_handle_initialize(
 	          &read_io_handle,
 	          &error );
 
+	read_io_handle = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int ewf_test_read_io_handle_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	read_io_handle = NULL;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 

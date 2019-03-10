@@ -49,7 +49,7 @@ int ewf_test_chunk_group_initialize(
 	int result                        = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests   = 1;
+	int number_of_malloc_fail_tests   = 2;
 	int number_of_memset_fail_tests   = 1;
 	int test_number                   = 0;
 #endif
@@ -136,6 +136,8 @@ int ewf_test_chunk_group_initialize(
 	          io_handle,
 	          &error );
 
+	chunk_group = NULL;
+
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -147,8 +149,6 @@ int ewf_test_chunk_group_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	chunk_group = NULL;
 
 	result = libewf_chunk_group_initialize(
 	          &chunk_group,
@@ -489,6 +489,15 @@ int ewf_test_chunk_group_clone(
 	libewf_io_handle_t *io_handle                 = NULL;
 	int result                                    = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests               = 1;
+	int test_number                               = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests               = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_io_handle_initialize(
@@ -599,6 +608,120 @@ int ewf_test_chunk_group_clone(
 
 	libcerror_error_free(
 	 &error );
+
+	destination_chunk_group = (libewf_chunk_group_t *) 0x12345678UL;
+
+	result = libewf_chunk_group_clone(
+	          &destination_chunk_group,
+	          source_chunk_group,
+	          &error );
+
+	destination_chunk_group = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_chunk_group_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		result = libewf_chunk_group_clone(
+		          &destination_chunk_group,
+		          source_chunk_group,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_chunk_group != NULL )
+			{
+				libewf_chunk_group_free(
+				 &destination_chunk_group,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_chunk_group",
+			 destination_chunk_group );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_chunk_group_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
+
+		result = libewf_chunk_group_clone(
+		          &destination_chunk_group,
+		          source_chunk_group,
+		          &error );
+
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
+		{
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_chunk_group != NULL )
+			{
+				libewf_chunk_group_free(
+				 &destination_chunk_group,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_chunk_group",
+			 destination_chunk_group );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
 	 */

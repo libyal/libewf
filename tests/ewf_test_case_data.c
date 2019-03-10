@@ -110,7 +110,32 @@ int ewf_test_case_data_generate_utf8_string(
 
 	/* Test regular cases
 	 */
-/* TODO implement */
+	result = libewf_case_data_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "utf8_string",
+	 utf8_string );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	memory_free(
+	 utf8_string );
+
+	utf8_string = NULL;
 
 	/* Test error cases
 	 */
@@ -122,6 +147,31 @@ int ewf_test_case_data_generate_utf8_string(
 	          0,
 	          LIBEWF_FORMAT_V2_ENCASE7,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	utf8_string = (uint8_t *) 0x12345678UL;
+
+	result = libewf_case_data_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	utf8_string = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -331,7 +381,32 @@ int ewf_test_case_data_generate(
 
 	/* Test regular cases
 	 */
-/* TODO implement */
+	result = libewf_case_data_generate(
+	          &case_data,
+	          &case_data_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "case_data",
+	 case_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	memory_free(
+	 case_data );
+
+	case_data = NULL;
 
 	/* Test error cases
 	 */
@@ -348,6 +423,39 @@ int ewf_test_case_data_generate(
 	 "result",
 	 result,
 	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "case_data",
+	 case_data );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	case_data = (uint8_t *) 0x12345678UL;
+
+	result = libewf_case_data_generate(
+	          &case_data,
+	          &case_data_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	case_data = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "case_data",
+	 case_data );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
@@ -369,6 +477,10 @@ int ewf_test_case_data_generate(
 	 "result",
 	 result,
 	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "case_data",
+	 case_data );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
@@ -392,6 +504,10 @@ int ewf_test_case_data_generate(
 	 "result",
 	 result,
 	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "case_data",
+	 case_data );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
