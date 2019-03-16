@@ -1,5 +1,5 @@
 /*
- * Library to access the Expert Witness Compression Format (EWF)
+ * Library to access the Expert Witness Compression Format (EWF) format
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
