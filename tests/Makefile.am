@@ -134,6 +134,10 @@ ewf_test_case_data_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_case_data_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -230,6 +234,10 @@ ewf_test_device_information_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_device_information_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
