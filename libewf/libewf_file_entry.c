@@ -657,7 +657,7 @@ on_error:
  */
 int libewf_file_entry_get_utf8_name_size(
      libewf_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -708,7 +708,7 @@ int libewf_file_entry_get_utf8_name_size(
 	}
 	if( libewf_single_file_entry_get_utf8_name_size(
 	     single_file_entry,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -752,8 +752,8 @@ on_error:
  */
 int libewf_file_entry_get_utf8_name(
      libewf_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -804,8 +804,8 @@ int libewf_file_entry_get_utf8_name(
 	}
 	if( libewf_single_file_entry_get_utf8_name(
 	     single_file_entry,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -849,7 +849,7 @@ on_error:
  */
 int libewf_file_entry_get_utf16_name_size(
      libewf_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -900,7 +900,7 @@ int libewf_file_entry_get_utf16_name_size(
 	}
 	if( libewf_single_file_entry_get_utf16_name_size(
 	     single_file_entry,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -944,8 +944,8 @@ on_error:
  */
 int libewf_file_entry_get_utf16_name(
      libewf_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -996,8 +996,8 @@ int libewf_file_entry_get_utf16_name(
 	}
 	if( libewf_single_file_entry_get_utf16_name(
 	     single_file_entry,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
