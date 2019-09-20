@@ -2472,7 +2472,7 @@ int ewf_test_single_file_entry_get_permission_id(
 {
 	libcerror_error_t *error = NULL;
 	libewf_single_file_entry_t *single_file_entry = NULL;
-	uint32_t permission_id = 0;
+	int32_t permission_id = 0;
 	int permission_id_is_set = 0;
 	int result = 0;
 
