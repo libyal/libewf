@@ -2399,7 +2399,7 @@ int libewf_file_entry_get_entry_modification_time(
 LIBEWF_EXTERN \
 int libewf_file_entry_get_deleted_time(
      libewf_file_entry_t *file_entry,
-     uint32_t *deleted_time,
+     int32_t *deleted_time,
      libewf_error_t **error );
 
 /* Retrieves the entry source id
