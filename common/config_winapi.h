@@ -48,13 +48,11 @@
  */
 #define HAVE_DLLMAIN			1
 
-/* Enable verbose output
+/* Enable verbose output */
 #define HAVE_VERBOSE_OUTPUT		1
- */
 
-/* Enable debug output
+/* Enable debug output */
 #define HAVE_DEBUG_OUTPUT		1
- */
 
 /* Enable both the narrow and wide character functions
  */

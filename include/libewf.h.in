@@ -1499,6 +1499,673 @@ int libewf_handle_get_file_entry_by_utf16_path(
      libewf_file_entry_t **file_entry,
      libewf_error_t **error );
 
+/* Retrieves the (single) file source for the specific id
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_file_source_by_id(
+	libewf_handle_t *handle,
+	uint32_t source_id,
+	libewf_file_source_t **file_source,
+	libewf_error_t **error);
+
+/* Retrieves the (single) file subject for the specific id
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_file_subject_by_id(
+	libewf_handle_t *handle,
+	uint32_t subject_id,
+	libewf_file_subject_t **file_subject,
+	libewf_error_t **error);
+
+/* Retrieves the (single) file permission for the specific id
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_handle_get_file_permission_by_id(
+	libewf_handle_t *handle,
+	uint32_t permission_id,
+	libewf_file_permission_t **file_permission,
+	libewf_error_t **error);
+	 
+/* -------------------------------------------------------------------------
+ * Source functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a file source
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_source_free(
+	libewf_file_source_t **file_source,
+	libewf_error_t **error);
+ 
+LIBEWF_EXTERN \
+int libewf_file_source_get_type(
+	libewf_file_source_t *file_source,
+	uint8_t *type,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_drive_type(
+	libewf_file_source_t *file_source,
+	uint8_t *drive_type,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_physical_offset(
+	libewf_file_source_t *file_source,
+	off64_t *physical_offset,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_logical_offset(
+	libewf_file_source_t *file_source,
+	off64_t *logical_offset,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_total_size(
+	libewf_file_source_t *file_source,
+	size64_t *total_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_name_size(
+	libewf_file_source_t *file_source,
+	size_t *utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_name(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_name,
+	size_t utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_name_size(
+	libewf_file_source_t *file_source,
+	size_t *utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_name(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_name,
+	size_t utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_serial_number_size(
+	libewf_file_source_t *file_source,
+	size_t *utf8_serial_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_serial_number(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_serial_number,
+	size_t utf8_serial_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_serial_number_size(
+	libewf_file_source_t *file_source,
+	size_t *utf16_serial_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_serial_number(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_serial_number,
+	size_t utf16_serial_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_model_size(
+	libewf_file_source_t *file_source,
+	size_t *utf8_model_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_model(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_model,
+	size_t utf8_model_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_model_size(
+	libewf_file_source_t *file_source,
+	size_t *utf16_model_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_model(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_model,
+	size_t utf16_model_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_manufacturer_size(
+	libewf_file_source_t *file_source,
+	size_t *utf8_manufacturer_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_manufacturer(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_manufacturer,
+	size_t utf8_manufacturer_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_manufacturer_size(
+	libewf_file_source_t *file_source,
+	size_t *utf16_manufacturer_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_manufacturer(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_manufacturer,
+	size_t utf16_manufacturer_size,
+	libewf_error_t **error);
+	
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_evidence_number_size(
+	libewf_file_source_t *file_source,
+	size_t *utf8_evidence_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_evidence_number(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_evidence_number,
+	size_t utf8_evidence_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_evidence_number_size(
+	libewf_file_source_t *file_source,
+	size_t *utf16_evidence_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_evidence_number(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_evidence_number,
+	size_t utf16_evidence_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_acquisition_time(
+     libewf_file_source_t *file_entry,
+     uint32_t *acquisition_time,
+     libewf_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_hash_value_md5(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_hash_value_md5(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_hash_value_sha1(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_hash_value_sha1(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_guid(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_guid(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_primary_guid(
+	libewf_file_source_t *file_source,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_primary_guid(
+	libewf_file_source_t *file_source,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_location_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf8_location_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_location(
+	 libewf_file_source_t *file_source,
+	 uint8_t *utf8_location,
+	 size_t utf8_location_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_location_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf16_location_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_location(
+	 libewf_file_source_t *file_source,
+	 uint16_t *utf16_location,
+	 size_t utf16_location_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_domain_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf8_domain_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_domain(
+	 libewf_file_source_t *file_source,
+	 uint8_t *utf8_domain,
+	 size_t utf8_domain_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_domain_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf16_domain_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_domain(
+	 libewf_file_source_t *file_source,
+	 uint16_t *utf16_domain,
+	 size_t utf16_domain_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_ip_address_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf8_ip_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_ip_address(
+	 libewf_file_source_t *file_source,
+	 uint8_t *utf8_ip_address,
+	 size_t utf8_ip_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_ip_address_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf16_ip_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_ip_address(
+	 libewf_file_source_t *file_source,
+	 uint16_t *utf16_ip_address,
+	 size_t utf16_ip_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_static_ip(
+	 libewf_file_source_t *file_source,
+	 uint8_t *static_ip,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_mac_address_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf8_mac_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf8_mac_address(
+ 	 libewf_file_source_t *file_source,
+ 	 uint8_t *utf8_mac_address,
+ 	 size_t utf8_mac_address_size,
+ 	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_mac_address_size(
+	 libewf_file_source_t *file_source,
+	 size_t *utf16_mac_address_size,
+	 libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_source_get_utf16_mac_address(
+	 libewf_file_source_t *file_source,
+	 uint16_t *utf16_mac_address,
+	 size_t utf16_mac_address_size,
+	 libewf_error_t **error);
+
+	 
+/* -------------------------------------------------------------------------
+ * Subject functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a file subject
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_subject_free(
+	libewf_file_subject_t **file_subject,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_type(
+	libewf_file_subject_t *file_subject,
+	uint8_t *type,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_name_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_name(
+	libewf_file_subject_t *file_subject,
+	uint8_t *utf8_name,
+	size_t utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_name_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_name(
+	libewf_file_subject_t *file_subject,
+	uint16_t *utf16_name,
+	size_t utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_number_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf8_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_number(
+	libewf_file_subject_t *file_subject,
+	uint8_t *utf8_number,
+	size_t utf8_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_number_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf16_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_number(
+	libewf_file_subject_t *file_subject,
+	uint16_t *utf16_number,
+	size_t utf16_number_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_comment_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf8_comment_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_comment(
+	libewf_file_subject_t *file_subject,
+	uint8_t *utf8_comment,
+	size_t utf8_comment_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_comment_size(
+	libewf_file_subject_t *file_subject,
+	size_t *utf16_comment_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_comment(
+	libewf_file_subject_t *file_subject,
+	uint16_t *utf16_comment,
+	size_t utf16_comment_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf8_guid(
+	libewf_file_subject_t *file_subject,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_subject_get_utf16_guid(
+	libewf_file_subject_t *file_subject,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libewf_error_t **error);
+
+/* -------------------------------------------------------------------------
+ * Permission functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a file permission
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_permission_free(
+	libewf_file_permission_t **file_permission,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_props(
+	libewf_file_permission_t *_file_permission,
+	uint32_t *props,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_access_mask(
+	libewf_file_permission_t *_file_permission,
+	uint32_t *access_mask,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_inheritance_flags(
+	libewf_file_permission_t *_file_permission,
+	uint32_t *inheritance_flags,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf8_name_size(
+	libewf_file_permission_t *file_permission,
+	size_t *utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf8_name(
+	libewf_file_permission_t *file_permission,
+	uint8_t *utf8_name,
+	size_t utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf16_name_size(
+	libewf_file_permission_t *file_permission,
+	size_t *utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf16_name(
+	libewf_file_permission_t *file_permission,
+	uint16_t *utf16_name,
+	size_t utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf8_uid_size(
+	libewf_file_permission_t *file_permission,
+	size_t *utf8_uid_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf8_uid(
+	libewf_file_permission_t *file_permission,
+	uint8_t *utf8_uid,
+	size_t utf8_uid_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf16_uid_size(
+	libewf_file_permission_t *file_permission,
+	size_t *utf16_uid_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_utf16_uid(
+	libewf_file_permission_t *file_permission,
+	uint16_t *utf16_uid,
+	size_t utf16_uid_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_number_of_sub_file_permissions(
+     libewf_file_permission_t *file_permission,
+     int *number_of_sub_file_permissions,
+     libewf_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_sub_file_permission(
+     libewf_file_permission_t *file_permission,
+     int sub_file_permission_index,
+     libewf_file_permission_t **sub_file_permission,
+     libewf_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_permission_get_sub_file_permission_by_id(
+     libewf_file_permission_t *file_permission,
+     uint32_t id,
+     libewf_file_permission_t **sub_file_permission,
+     libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Extended Attribute functions
+ * ------------------------------------------------------------------------- */
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_free(
+     libewf_file_extended_attribute_t **file_extended_attribute,
+     libewf_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_type(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	uint8_t *type,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf8_name_size(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	size_t *utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf8_name(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	uint8_t *utf8_name,
+	size_t utf8_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf16_name_size(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	size_t *utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf16_name(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	uint16_t *utf16_name,
+	size_t utf16_name_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf8_value_size(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	size_t *utf8_value_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf8_value(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	uint8_t *utf8_value,
+	size_t utf8_value_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf16_value_size(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	size_t *utf16_value_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_utf16_value(
+	libewf_file_extended_attribute_t *file_extended_attribute,
+	uint16_t *utf16_value,
+	size_t utf16_value_size,
+	libewf_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_number_of_sub_file_extended_attributes(
+     libewf_file_extended_attribute_t *file_extended_attribute,
+     int *number_of_sub_file_extended_attributes,
+     libewf_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_extended_attribute_get_sub_file_extended_attribute(
+     libewf_file_extended_attribute_t *file_extended_attribute,
+     int sub_file_extended_attribute_index,
+     libewf_file_extended_attribute_t **sub_file_extended_attribute,
+     libewf_error_t **error );
+
 /* -------------------------------------------------------------------------
  * Data chunk functions
  * ------------------------------------------------------------------------- */
@@ -1634,6 +2301,48 @@ int libewf_file_entry_get_utf16_name(
      size_t utf16_string_size,
      libewf_error_t **error );
 
+/* Retrieves the UTF-8 encoded short name size
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_short_name_size(
+	libewf_file_entry_t *file_entry,
+	size_t *utf8_short_name_size,
+	libewf_error_t **error);
+
+/* Retrieves the UTF-8 encoded short name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_short_name(
+	libewf_file_entry_t *file_entry,
+	uint8_t *utf8_short_name,
+	size_t utf8_short_name_size,
+	libewf_error_t **error);
+	
+/* Retrieves the UTF-16 encoded short name size
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_short_name_size(
+	libewf_file_entry_t *file_entry,
+	size_t *utf16_short_name_size,
+	libewf_error_t **error);
+
+/* Retrieves the UTF-16 encoded short name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_short_name(
+	libewf_file_entry_t *file_entry,
+	uint16_t *utf16_short_name,
+	size_t utf16_short_name_size,
+	libewf_error_t **error);
+
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */
@@ -1683,6 +2392,61 @@ int libewf_file_entry_get_entry_modification_time(
      int32_t *posix_time,
      libewf_error_t **error );
 
+/* Retrieves the deleted date and time
+ * The date and time is formatted as a POSIX timestamp
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_deleted_time(
+     libewf_file_entry_t *file_entry,
+     uint32_t *deleted_time,
+     libewf_error_t **error );
+
+/* Retrieves the entry source id
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_source_id(
+	libewf_file_entry_t *file_entry,
+	uint32_t *source_id,
+	libewf_error_t **error);	
+
+/* Retrieves the entry subject id
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_subject_id(
+	libewf_file_entry_t *file_entry,
+	uint32_t *subject_id,
+	libewf_error_t **error);
+
+/* Retrieves the entry permission id
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_permission_id(
+	libewf_file_entry_t *file_entry,
+	int32_t *permission_id,
+	libewf_error_t **error);
+	
+/* Retrieves the entry file identifier
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_file_identifier(
+	libewf_file_entry_t *file_entry,
+	uint64_t *file_identifier,
+	libewf_error_t **error);
+
+/* Retrieves the entry record type id
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_record_type(
+	libewf_file_entry_t *file_entry,
+	uint32_t *record_type,
+	libewf_error_t **error);
+
 /* Retrieves the UTF-8 encoded MD5 hash value
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -1718,6 +2482,26 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
  */
 LIBEWF_EXTERN \
 int libewf_file_entry_get_utf16_hash_value_sha1(
+     libewf_file_entry_t *file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded GUID
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf8_guid(
+     libewf_file_entry_t *file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded GUID
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_utf16_guid(
      libewf_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
@@ -1827,6 +2611,12 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      size_t utf16_string_length,
      libewf_file_entry_t **sub_file_entry,
      libewf_error_t **error );
+	 
+LIBEWF_EXTERN \
+int libewf_file_entry_get_root_file_extended_attribute(
+	libewf_file_entry_t *file_entry,
+	libewf_file_extended_attribute_t **root_file_extended_attribute,
+	libewf_error_t **error);
 
 #ifdef __cplusplus
 }

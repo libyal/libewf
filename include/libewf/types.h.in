@@ -203,6 +203,10 @@ typedef int64_t off64_t;
  */
 typedef intptr_t libewf_data_chunk_t;
 typedef intptr_t libewf_file_entry_t;
+typedef intptr_t libewf_file_subject_t;
+typedef intptr_t libewf_file_source_t;
+typedef intptr_t libewf_file_permission_t;
+typedef intptr_t libewf_file_extended_attribute_t;
 typedef intptr_t libewf_handle_t;
 
 #ifdef __cplusplus

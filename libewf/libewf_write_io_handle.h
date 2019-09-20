@@ -132,6 +132,10 @@ struct libewf_write_io_handle
 	 */
 	ssize64_t input_write_count;
 
+	/* The number of bytes of padding for the last sector of streamed data
+	 */
+	ssize64_t input_write_sector_padding;
+
 	/* The maximum segment file size
 	 */
 	size64_t maximum_segment_file_size;

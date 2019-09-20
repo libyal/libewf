@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="bzip2"
 	ProjectGUID="{550F271E-EAF9-4FDE-9865-92EB78088A04}"
 	RootNamespace="bzip2"
@@ -19,7 +19,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -55,19 +55,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				RandomizedBaseAddress="2"
-				DataExecutionPrevention="2"
-				TargetMachine="1"
-				ImportLibrary="$(OutDir)\$(ProjectName).lib"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -79,9 +70,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -89,7 +77,7 @@
 			Name="VSDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -129,20 +117,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="1"
-				TargetMachine="1"
-				ImportLibrary="$(OutDir)\$(ProjectName).lib"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -152,9 +130,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

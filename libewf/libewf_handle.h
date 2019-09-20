@@ -494,6 +494,45 @@ int libewf_handle_get_file_entry_by_utf16_path(
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error );
 
+int libewf_internal_handle_get_file_source_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t source_id,
+	libewf_file_source_t **file_source,
+	libcerror_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_handle_get_file_source_by_id(
+	libewf_handle_t *handle,
+	uint32_t source_id,
+	libewf_file_source_t **file_source,
+	libcerror_error_t **error);
+
+int libewf_internal_handle_get_file_subject_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t subject_id,
+	libewf_file_subject_t **file_subject,
+	libcerror_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_handle_get_file_subject_by_id(
+	libewf_handle_t *handle,
+	uint32_t subject_id,
+	libewf_file_subject_t **file_subject,
+	libcerror_error_t **error);
+
+int libewf_internal_handle_get_file_permission_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t permission_id,
+	libewf_file_permission_t **file_permission,
+	libcerror_error_t **error);
+
+LIBEWF_EXTERN \
+int libewf_handle_get_file_permission_by_id(
+	libewf_handle_t *handle,
+	uint32_t permission_id,
+	libewf_file_permission_t **file_permission,
+	libcerror_error_t **error);
+
 LIBEWF_EXTERN \
 int libewf_handle_get_sectors_per_chunk(
      libewf_handle_t *handle,

@@ -32,6 +32,7 @@
 #include "libewf_libcthreads.h"
 #include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
+#include "libewf_file_extended_attribute.h"
 #include "libewf_types.h"
 
 /* Creates a file entry
@@ -1035,6 +1036,390 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the size of the UTF-8 encoded short_name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf8_short_name_size(
+	libewf_file_entry_t *file_entry,
+	size_t *utf8_short_name_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_utf8_short_name_size";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_utf8_short_name_size(
+		single_file_entry,
+		utf8_short_name_size,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve UTF-8 short_name size.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the UTF-8 encoded short_name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf8_short_name(
+	libewf_file_entry_t *file_entry,
+	uint8_t *utf8_short_name,
+	size_t utf8_short_name_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_utf8_short_name";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_utf8_short_name(
+		single_file_entry,
+		utf8_short_name,
+		utf8_short_name_size,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve UTF-8 short_name.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the size of the UTF-16 encoded short_name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf16_short_name_size(
+	libewf_file_entry_t *file_entry,
+	size_t *utf16_short_name_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_utf16_short_name_size";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_utf16_short_name_size(
+		single_file_entry,
+		utf16_short_name_size,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve UTF-16 short_name size.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the UTF-16 encoded short_name value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_utf16_short_name(
+	libewf_file_entry_t *file_entry,
+	uint16_t *utf16_short_name,
+	size_t utf16_short_name_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_utf16_short_name";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_utf16_short_name(
+		single_file_entry,
+		utf16_short_name,
+		utf16_short_name_size,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve UTF-8 short_name.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */
@@ -1505,6 +1890,570 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the deleted date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_deleted_time(
+	libewf_file_entry_t *file_entry,
+	int32_t *deleted_time,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry = NULL;
+	static char *function = "libewf_file_entry_get_deleted_time";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_deleted_time(
+		single_file_entry,
+		deleted_time,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve deleted time.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the (file system entry) source id
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_source_id(
+	libewf_file_entry_t *file_entry,
+	uint32_t *source_id,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_source_id";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_source_id(
+		single_file_entry,
+		source_id,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve source id.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the (file system entry) subject id
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_subject_id(
+	libewf_file_entry_t *file_entry,
+	uint32_t *subject_id,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_subject_id";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_subject_id(
+		single_file_entry,
+		subject_id,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve subject id.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the (file system entry) permission id
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_permission_id(
+	libewf_file_entry_t *file_entry,
+	int32_t *permission_id,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_permission_id";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_permission_id(
+		single_file_entry,
+		permission_id,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve permission id.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the file identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_file_identifier(
+	libewf_file_entry_t *file_entry,
+	uint64_t *file_identifier,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry = NULL;
+	static char *function = "libewf_file_entry_get_file_identifier";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_file_identifier(
+		single_file_entry,
+		file_identifier,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve file identifier.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the (file system entry) record_type id
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_record_type(
+	libewf_file_entry_t *file_entry,
+	uint32_t *record_type,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_record_type";
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	if (libewf_single_file_entry_get_record_type(
+		single_file_entry,
+		record_type,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve record_type id.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(1);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
 /* Retrieves the UTF-8 encoded MD5 hash value
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -1899,6 +2848,204 @@ on_error:
 	 NULL );
 #endif
 	return( -1 );
+}
+
+/* Retrieves the UTF-8 encoded GUID
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_file_entry_get_utf8_guid(
+	libewf_file_entry_t *file_entry,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_entry_get_utf8_guid";
+	int result = 0;
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf8_guid(
+		single_file_entry,
+		utf8_string,
+		utf8_string_size,
+		error);
+
+	if (result == -1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve GUID.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}
+
+/* Retrieves the UTF-16 encoded GUID
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_file_entry_get_utf16_guid(
+	libewf_file_entry_t *file_entry,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry = NULL;
+	static char *function = "libewf_file_entry_get_utf16_guid";
+	int result = 0;
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+	result = libewf_single_file_entry_get_utf16_guid(
+		single_file_entry,
+		utf16_string,
+		utf16_string_size,
+		error);
+
+	if (result == -1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve GUID.",
+			function);
+
+		goto on_error;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
 }
 
 /* Reads data at the current offset
@@ -3595,3 +4742,136 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the root extended attribute
+ * Returns 1 if successful, 0 if no extended attributes are present or -1 on error
+ */
+int libewf_file_entry_get_root_file_extended_attribute(
+	libewf_file_entry_t *file_entry,
+	libewf_file_extended_attribute_t **root_file_extended_attribute,
+	libcerror_error_t **error)
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_single_file_entry_t *single_file_entry     = NULL;
+	static char *function = "libewf_file_extended_attribute_get_root_file_extended_attribute";
+	int result = 0;
+
+	if (file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file entry.",
+			function);
+
+		return(-1);
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *)file_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	if (libcdata_tree_node_get_value(
+		internal_file_entry->file_entry_tree_node,
+		(intptr_t **)&single_file_entry,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from file entry tree node.",
+			function);
+
+		goto on_error;
+	}
+
+	if (single_file_entry == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: invalid handle - missing single files.",
+			function);
+
+		return(-1);
+	}
+	if (root_file_extended_attribute == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid root file extended_attribute.",
+			function);
+
+		return(-1);
+	}
+	if (*root_file_extended_attribute != NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			"%s: root file extended_attribute value already set.",
+			function);
+
+		return(-1);
+	}
+
+	if (single_file_entry->root_extended_attribute_node != NULL)
+	{
+		result = libewf_file_extended_attribute_initialize(
+			root_file_extended_attribute,
+			internal_file_entry,
+			single_file_entry->root_extended_attribute_node,
+			error);
+
+		if (result != 1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				"%s: unable to create root file extended_attribute.",
+				function);
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
+
+on_error:
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_read(
+		internal_file_entry->read_write_lock,
+		NULL);
+#endif
+	return(-1);
+}

@@ -58,6 +58,10 @@ libewf_la_SOURCES = \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \
 	libewf_file_entry.c libewf_file_entry.h \
+	libewf_file_subject.c libewf_file_subject.h \
+	libewf_file_source.c libewf_file_source.h \
+	libewf_file_permission.c libewf_file_permission.h \
+	libewf_file_extended_attribute.c libewf_extended_attribute.h \
 	libewf_handle.c libewf_handle.h \
 	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \
@@ -93,6 +97,14 @@ libewf_la_SOURCES = \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_entry.c libewf_single_file_entry.h \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
+	libewf_single_file_source.c libewf_single_file_source.h \
+	libewf_single_file_source_tree.c libewf_single_file_source_tree.h \
+	libewf_single_file_subject.c libewf_single_file_subject.h \
+	libewf_single_file_subject_tree.c libewf_single_file_subject_tree.h \
+	libewf_single_file_permission.c libewf_single_file_permission.h \
+	libewf_single_file_permission_tree.c libewf_single_file_permission_tree.h \
+	libewf_single_file_extended_attribute.c libewf_single_file_extended_attribute.h \
+	libewf_single_file_extended_attribute_tree.c libewf_single_file_extended_attribute_tree.h \
 	libewf_support.c libewf_support.h \
 	libewf_types.h \
 	libewf_unused.h \

@@ -38,6 +38,10 @@
 #include "libewf_digest_section.h"
 #include "libewf_error2_section.h"
 #include "libewf_file_entry.h"
+#include "libewf_file_source.h"
+#include "libewf_file_subject.h"
+#include "libewf_file_permission.h"
+#include "libewf_file_extended_attribute.h"
 #include "libewf_handle.h"
 #include "libewf_hash_sections.h"
 #include "libewf_hash_values.h"
@@ -62,7 +66,15 @@
 #include "libewf_session_section.h"
 #include "libewf_sha1_hash_section.h"
 #include "libewf_single_file_entry.h"
+#include "libewf_single_file_source.h"
 #include "libewf_single_file_tree.h"
+#include "libewf_single_file_source_tree.h"
+#include "libewf_single_file_subject.h"
+#include "libewf_single_file_subject_tree.h"
+#include "libewf_single_file_permission.h"
+#include "libewf_single_file_permission_tree.h"
+#include "libewf_single_file_extended_attribute.h"
+#include "libewf_single_file_extended_attribute_tree.h"
 #include "libewf_single_files.h"
 #include "libewf_types.h"
 #include "libewf_unused.h"
@@ -6159,6 +6171,29 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 			return( -1 );
 		}
 		input_data_size = internal_handle->chunk_data->data_size;
+		if (input_data_size % internal_handle->media_values->bytes_per_sector)
+		{
+			internal_handle->write_io_handle->input_write_sector_padding = internal_handle->media_values->bytes_per_sector - (internal_handle->chunk_data->data_size % internal_handle->media_values->bytes_per_sector);
+			
+			// clear the sector padding space 
+			if (memory_set(
+				(internal_handle->chunk_data->data + input_data_size),
+				0,
+				internal_handle->write_io_handle->input_write_sector_padding) == NULL)
+			{
+				libcerror_error_set(
+					error,
+					LIBCERROR_ERROR_DOMAIN_MEMORY,
+					LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					"%s: unable to clear sector padding chunk data.",
+					function);
+
+				return(-1);
+			}
+			internal_handle->chunk_data->data_size += internal_handle->write_io_handle->input_write_sector_padding;
+
+			input_data_size = internal_handle->chunk_data->data_size;
+		}
 
 		if( libewf_chunk_data_pack(
 		     internal_handle->chunk_data,
@@ -6429,6 +6464,7 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 #endif
 		write_count = libewf_segment_file_write_close(
 		               segment_file,
+			           internal_handle->segment_table->segment_files_list,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               internal_handle->write_io_handle->number_of_chunks_written_to_segment_file,
@@ -6463,7 +6499,7 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 		 */
 		internal_handle->media_values->number_of_chunks  = internal_handle->write_io_handle->number_of_chunks_written;
 		internal_handle->media_values->number_of_sectors = (uint64_t) ( internal_handle->write_io_handle->input_write_count / internal_handle->media_values->bytes_per_sector );
-		internal_handle->media_values->media_size        = (size64_t) internal_handle->write_io_handle->input_write_count;
+		internal_handle->media_values->media_size        = (size64_t)internal_handle->write_io_handle->input_write_count - (size64_t)internal_handle->write_io_handle->input_write_sector_padding;
 
 		/* Flush the section write caches
 		 */
@@ -9293,6 +9329,654 @@ int libewf_handle_get_file_entry_by_utf16_path(
 	}
 #endif
 	return( result );
+}
+
+/* Retrieves the (single) file source for the specific id
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns 1 if successful, 0 if no such file source or -1 on error
+ */
+int libewf_internal_handle_get_file_source_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t source_id,
+	libewf_file_source_t **file_source,
+	libcerror_error_t **error)
+{
+	libewf_single_file_source_t *single_file_source     = NULL;
+	libewf_single_file_source_t *sub_single_file_source = NULL;
+	libcdata_tree_node_t *node                          = NULL;
+	libcdata_tree_node_t *sub_node                      = NULL;
+	static char *function                               = "libewf_internal_handle_get_file_source_by_id";
+	int result = 0;
+
+	if (internal_handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: invalid handle - missing single files.",
+			function);
+
+		return(-1);
+	}
+	if (file_source == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file source.",
+			function);
+
+		return(-1);
+	}
+	if (*file_source != NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			"%s: file source value already set.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files->root_file_source_node == NULL)
+	{
+		return(0);
+	}
+	if (libcdata_tree_node_get_value(
+		internal_handle->single_files->root_file_source_node,
+		(intptr_t **)&single_file_source,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from root file source node.",
+			function);
+
+		return(-1);
+	}
+	if (single_file_source == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: missing root file source values.",
+			function);
+
+		return(-1);
+	}
+	node = internal_handle->single_files->root_file_source_node;
+
+	if (single_file_source->id == source_id) 
+	{
+		result = 1;
+	}
+	else
+	{
+		result = libewf_single_file_source_tree_get_sub_node_by_id(
+			node,
+			source_id,
+			&sub_node,
+			&sub_single_file_source,
+			error);
+
+		if (result == -1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				"%s: unable to retrieve single file source sub node by name.",
+				function);
+
+			return(-1);
+		}
+		else if (result == 1)
+		{
+			node = sub_node;
+		}
+	}
+	if (result != 0)
+	{
+		if (libewf_file_source_initialize(
+			file_source,
+			internal_handle,
+			node,
+			error) != 1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				"%s: unable to create file source.",
+				function);
+
+			return(-1);
+		}
+	}
+	return(result);
+}
+
+/* Retrieves the (single) file source for the specific id
+ * Returns 1 if successful, 0 if no such file source or -1 on error
+ */
+int libewf_handle_get_file_source_by_id(
+	libewf_handle_t *handle,
+	uint32_t source_id,
+	libewf_file_source_t **file_source,
+	libcerror_error_t **error)
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_file_source_by_id";
+	int result = 0;
+
+	if (handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	internal_handle = (libewf_internal_handle_t *)handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	result = libewf_internal_handle_get_file_source_by_id(
+		internal_handle,
+		source_id,
+		file_source,
+		error);
+
+	if (result == -1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve file source by id.",
+			function);
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
+}
+
+/* Retrieves the (single) file subject for the specific id
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns 1 if successful, 0 if no such file subject or -1 on error
+ */
+int libewf_internal_handle_get_file_subject_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t subject_id,
+	libewf_file_subject_t **file_subject,
+	libcerror_error_t **error)
+{
+	libewf_single_file_subject_t *single_file_subject     = NULL;
+	libewf_single_file_subject_t *sub_single_file_subject = NULL;
+	libcdata_tree_node_t *node                            = NULL;
+	libcdata_tree_node_t *sub_node                        = NULL;
+	static char *function                                 = "libewf_internal_handle_get_file_subject_by_id";
+	int result                                            = 0;
+
+	if (internal_handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: invalid handle - missing single files.",
+			function);
+
+		return(-1);
+	}
+	if (file_subject == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file subject.",
+			function);
+
+		return(-1);
+	}
+	if (*file_subject != NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			"%s: file subject value already set.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files->root_file_subject_node == NULL)
+	{
+		return(0);
+	}
+	if (libcdata_tree_node_get_value(
+		internal_handle->single_files->root_file_subject_node,
+		(intptr_t **)&single_file_subject,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from root file subject node.",
+			function);
+
+		return(-1);
+	}
+	if (single_file_subject == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: missing root file subject values.",
+			function);
+
+		return(-1);
+	}
+	node = internal_handle->single_files->root_file_subject_node;
+
+	if (single_file_subject->id == subject_id)
+	{
+		result = 1;
+	}
+	else
+	{
+		result = libewf_single_file_subject_tree_get_sub_node_by_id(
+			node,
+			subject_id,
+			&sub_node,
+			&sub_single_file_subject,
+			error);
+
+		if (result == -1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				"%s: unable to retrieve single file subject sub node by name.",
+				function);
+
+			return(-1);
+		}
+		else if (result == 1)
+		{
+			node = sub_node;
+		}
+	}
+	if (result != 0)
+	{
+		if (libewf_file_subject_initialize(
+			file_subject,
+			internal_handle,
+			node,
+			error) != 1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				"%s: unable to create file subject.",
+				function);
+
+			return(-1);
+		}
+	}
+	return(result);
+}
+
+/* Retrieves the (single) file subject for the specific id
+ * Returns 1 if successful, 0 if no such file subject or -1 on error
+ */
+int libewf_handle_get_file_subject_by_id(
+	libewf_handle_t *handle,
+	uint32_t subject_id,
+	libewf_file_subject_t **file_subject,
+	libcerror_error_t **error)
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_file_subject_by_id";
+	int result                                = 0;
+
+	if (handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	internal_handle = (libewf_internal_handle_t *)handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	result = libewf_internal_handle_get_file_subject_by_id(
+		internal_handle,
+		subject_id,
+		file_subject,
+		error);
+
+	if (result == -1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve file subject by id.",
+			function);
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
+}
+
+/* Retrieves the (single) file permission for the specific id
+ * This function is not multi-thread safe acquire write lock before call
+ * Returns 1 if successful, 0 if no such file permission or -1 on error
+ */
+int libewf_internal_handle_get_file_permission_by_id(
+	libewf_internal_handle_t *internal_handle,
+	uint32_t permission_id,
+	libewf_file_permission_t **file_permission,
+	libcerror_error_t **error)
+{
+	libewf_single_file_permission_t *single_file_permission     = NULL;
+	libewf_single_file_permission_t *sub_single_file_permission = NULL;
+	libcdata_tree_node_t *node                                  = NULL;
+	libcdata_tree_node_t *sub_node                              = NULL;
+	static char *function                                       = "libewf_internal_handle_get_file_permission_by_id";
+	int result                                                  = 0;
+
+	if (internal_handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: invalid handle - missing single files.",
+			function);
+
+		return(-1);
+	}
+	if (file_permission == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid file permission.",
+			function);
+
+		return(-1);
+	}
+	if (*file_permission != NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+			"%s: file permission value already set.",
+			function);
+
+		return(-1);
+	}
+	if (internal_handle->single_files->root_file_permission_node == NULL)
+	{
+		return(0);
+	}
+	if (libcdata_tree_node_get_value(
+		internal_handle->single_files->root_file_permission_node,
+		(intptr_t **)&single_file_permission,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve value from root file permission node.",
+			function);
+
+		return(-1);
+	}
+	if (single_file_permission == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			"%s: missing root file permission values.",
+			function);
+
+		return(-1);
+	}
+	node = internal_handle->single_files->root_file_permission_node;
+
+	if (single_file_permission->id == permission_id)
+	{
+		result = 1;
+	}
+	else
+	{
+		result = libewf_single_file_permission_tree_get_sub_node_by_id(
+			node,
+			permission_id,
+			&sub_node,
+			&sub_single_file_permission,
+			error);
+
+		if (result == -1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				"%s: unable to retrieve single file permission sub node by name.",
+				function);
+
+			return(-1);
+		}
+		else if (result == 1)
+		{
+			node = sub_node;
+		}
+	}
+	if (result != 0)
+	{
+		if (libewf_file_permission_initialize(
+			file_permission,
+			internal_handle,
+			node,
+			error) != 1)
+		{
+			libcerror_error_set(
+				error,
+				LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				"%s: unable to create file permission.",
+				function);
+
+			return(-1);
+		}
+	}
+	return(result);
+}
+
+/* Retrieves the (single) file permission for the specific id
+ * Returns 1 if successful, 0 if no such file permission or -1 on error
+ */
+int libewf_handle_get_file_permission_by_id(
+	libewf_handle_t *handle,
+	uint32_t permission_id,
+	libewf_file_permission_t **file_permission,
+	libcerror_error_t **error)
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_handle_get_file_permission_by_utf8_path";
+	int result                                = 0;
+
+	if (handle == NULL)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			"%s: invalid handle.",
+			function);
+
+		return(-1);
+	}
+	internal_handle = (libewf_internal_handle_t *)handle;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_grab_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to grab read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	result = libewf_internal_handle_get_file_permission_by_id(
+		internal_handle,
+		permission_id,
+		file_permission,
+		error);
+
+	if (result == -1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			"%s: unable to retrieve file permission by id.",
+			function);
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if (libcthreads_read_write_lock_release_for_read(
+		internal_handle->read_write_lock,
+		error) != 1)
+	{
+		libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			"%s: unable to release read/write lock for reading.",
+			function);
+
+		return(-1);
+	}
+#endif
+	return(result);
 }
 
 /* Retrieves the number of sectors per chunk

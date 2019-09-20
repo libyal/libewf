@@ -161,6 +161,7 @@ int libewf_write_io_handle_initialize(
 	( *write_io_handle )->remaining_segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	( *write_io_handle )->maximum_chunks_per_section  = LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6;
 	( *write_io_handle )->maximum_number_of_segments  = (uint32_t) 14971;
+	( *write_io_handle )->input_write_sector_padding  = 0;
 
 	return( 1 );
 
@@ -3460,6 +3461,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 				 */
 				write_count = libewf_segment_file_write_close(
 					       segment_file,
+					       segment_table->segment_files_list,
 					       file_io_pool,
 					       file_io_pool_entry,
 					       write_io_handle->number_of_chunks_written_to_segment_file,

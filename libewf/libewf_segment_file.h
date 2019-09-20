@@ -330,6 +330,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_t *segment_file,
+	     libfdata_list_t *segment_files_list,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint64_t number_of_chunks_written_to_segment_file,

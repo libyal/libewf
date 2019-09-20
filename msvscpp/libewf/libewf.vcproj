@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libewf"
 	ProjectGUID="{41C2387C-9D7F-42B9-9998-3430FBC95AE7}"
 	RootNamespace="libewf"
@@ -60,8 +60,8 @@
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
-				TargetMachine="1"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -135,8 +135,8 @@
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="1"
-				TargetMachine="1"
 				ImportLibrary="$(OutDir)\$(ProjectName).lib"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -242,6 +242,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_extended_attribute.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_permission.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_source.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_subject.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_filename.c"
 				>
 			</File>
@@ -323,6 +339,38 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_single_file_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_extended_attribute.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_extended_attribute_tree.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_permission.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_permission_tree.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_source.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_source_tree.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_subject.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_subject_tree.c"
 				>
 			</File>
 			<File
@@ -472,6 +520,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_extended_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_permission.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_source.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_subject.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_filename.h"
 				>
 			</File>
@@ -605,6 +669,38 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_single_file_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_extended_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_extended_attribute_tree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_permission.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_permission_tree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_source.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_source_tree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_subject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_single_file_subject_tree.h"
 				>
 			</File>
 			<File

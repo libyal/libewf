@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_libcdata.h"
 #include "libewf_date_time.h"
 #include "libewf_libcerror.h"
 
@@ -60,6 +61,14 @@ struct libewf_single_file_entry
 	 */
 	size_t name_size;
 
+	/* The short name
+	 */
+	uint8_t *short_name;
+
+	/* The short name size
+	 */
+	size_t short_name_size;
+
 	/* The (file) size
 	 */
 	size64_t size;
@@ -88,6 +97,11 @@ struct libewf_single_file_entry
 	 */
 	int32_t entry_modification_time;
 
+	/* The deleted time
+	 * stored as a Unix timestamp
+	 */
+	int32_t deleted_time;
+	
 	/* The MD5 digest hash
 	 */
 	uint8_t *md5_hash;
@@ -103,6 +117,38 @@ struct libewf_single_file_entry
 	/* The SHA1 digest hash size
 	 */
 	size_t sha1_hash_size;
+
+    /* The (file) GUID
+    */
+    uint8_t *guid;
+
+    /* The (file) GUID size
+    */
+    size_t guid_size;
+
+	/* The id for the file's source
+	 */
+	uint32_t source_id;
+
+	/* The id for the file's subject
+	 */
+	uint32_t subject_id;
+
+	/* The id for the file's permission
+	 */
+	int32_t permission_id;
+
+	/* The file identifier
+	 */
+	uint64_t file_identifier;
+
+	/* The id for the file's record_type
+	 */
+	uint32_t record_type;
+
+	/* The file's extended attribute tree
+	 */
+	libcdata_tree_node_t *root_extended_attribute_node;
 };
 
 int libewf_single_file_entry_initialize(
@@ -165,6 +211,28 @@ int libewf_single_file_entry_get_utf16_name(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
+int libewf_single_file_entry_get_utf8_short_name_size(
+	libewf_single_file_entry_t *single_file_entry,
+	size_t *utf8_string_size,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_utf8_short_name(
+	libewf_single_file_entry_t *single_file_entry,
+	uint8_t *utf8_string,
+	size_t utf8_string_size,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_utf16_short_name_size(
+	libewf_single_file_entry_t *single_file_entry,
+	size_t *utf16_string_size,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_utf16_short_name(
+	libewf_single_file_entry_t *single_file_entry,
+	uint16_t *utf16_string,
+	size_t utf16_string_size,
+	libcerror_error_t **error);
+
 int libewf_single_file_entry_get_size(
      libewf_single_file_entry_t *single_file_entry,
      size64_t *size,
@@ -190,6 +258,36 @@ int libewf_single_file_entry_get_entry_modification_time(
      int32_t *entry_modification_time,
      libcerror_error_t **error );
 
+int libewf_single_file_entry_get_deleted_time(
+	libewf_single_file_entry_t *single_file_entry,
+	int32_t *deleted_time,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_source_id(
+	libewf_single_file_entry_t *single_file_entry,
+	uint32_t *source_id,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_subject_id(
+	libewf_single_file_entry_t *single_file_entry,
+	uint32_t *subject_id,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_permission_id(
+	libewf_single_file_entry_t *single_file_entry,
+	int32_t *permission_id,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_file_identifier(
+	libewf_single_file_entry_t *single_file_entry,
+	uint64_t *file_identifier,
+	libcerror_error_t **error);
+
+int libewf_single_file_entry_get_record_type(
+	libewf_single_file_entry_t *single_file_entry,
+	uint32_t *record_type,
+	libcerror_error_t **error);
+
 int libewf_single_file_entry_get_utf8_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry,
      uint8_t *utf8_string,
@@ -213,6 +311,18 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error );
+
+int libewf_single_file_entry_get_utf8_guid(
+     libewf_single_file_entry_t *single_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error);
+
+int libewf_single_file_entry_get_utf16_guid(
+     libewf_single_file_entry_t *single_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error);
 
 #if defined( __cplusplus )
 }

@@ -59,6 +59,18 @@ struct libewf_single_files
 	/* The single file entry tree
 	 */
 	libcdata_tree_node_t *root_file_entry_node;
+
+	/* The single file source tree
+	 */
+	libcdata_tree_node_t *root_file_source_node;
+
+	/* The single file subject tree
+	 */
+	libcdata_tree_node_t *root_file_subject_node;
+
+	/* The single file permission tree
+	 */
+	libcdata_tree_node_t *root_file_permission_node;
 };
 
 int libewf_single_files_initialize(
@@ -89,6 +101,32 @@ int libewf_single_files_parse_record_values(
      int *line_iterator,
      libcerror_error_t **error );
 
+int libewf_single_files_parse_file_permission(
+	libcdata_tree_node_t *parent_file_permission_node,
+	libfvalue_split_utf8_string_t *lines,
+	int *line_index,
+	libfvalue_split_utf8_string_t *types,
+	uint8_t *format,
+	int tree_level,
+	int id,
+	libcerror_error_t **error);
+
+int libewf_single_files_parse_file_source(
+	libcdata_tree_node_t *parent_file_source_node,
+	libfvalue_split_utf8_string_t *lines,
+	int *line_index,
+	libfvalue_split_utf8_string_t *types,
+	uint8_t *format,
+	libcerror_error_t **error);
+
+int libewf_single_files_parse_file_subject(
+	libcdata_tree_node_t *parent_file_subject_node,
+	libfvalue_split_utf8_string_t *lines,
+	int *line_index,
+	libfvalue_split_utf8_string_t *types,
+	uint8_t *format,
+	libcerror_error_t **error);
+
 int libewf_single_files_parse_file_entry(
      libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *lines,
@@ -108,6 +146,12 @@ int libewf_single_files_parse_file_entry_offset_values(
      const uint8_t *offset_values_string,
      size_t offset_values_string_size,
      libcerror_error_t **error );
+
+int libewf_single_files_parse_extended_attribute(
+	libcdata_tree_node_t *parent_file_extended_attribute_node,
+	 uint8_t *encoded_tree,
+	 size_t encoded_tree_size,
+	 libcerror_error_t **error);
 
 #if defined( __cplusplus )
 }
