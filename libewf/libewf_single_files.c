@@ -1257,7 +1257,69 @@ int libewf_single_files_parse_file_entry(
 			 && ( type_string[ 1 ] == (uint8_t) 'i' )
 			 && ( type_string[ 2 ] == (uint8_t) 'd' ) )
 			{
-			}
+      }
+      else if( ( type_string[0] == (uint8_t) 'm' )
+            && ( type_string[1] == (uint8_t) 'i' )
+            && ( type_string[2] == (uint8_t) 'd' ) )
+      {
+        single_file_entry->guid = (uint8_t *)memory_allocate(
+          sizeof(uint8_t) * value_string_size);
+
+        if (single_file_entry->guid == NULL)
+        {
+          libcerror_error_set(
+            error,
+            LIBCERROR_ERROR_DOMAIN_MEMORY,
+            LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+            "%s: unable to create GUID.",
+            function);
+
+          goto on_error;
+        }
+        zero_values_only = 1;
+
+        for (value_string_index = 0;
+          value_string_index < value_string_size - 1;
+          value_string_index++)
+        {
+          if ((value_string[value_string_index] >= (uint8_t) '0')
+            && (value_string[value_string_index] <= (uint8_t) '9'))
+          {
+            single_file_entry->guid[value_string_index] = value_string[value_string_index];
+          }
+          else if ((value_string[value_string_index] >= (uint8_t) 'A')
+            && (value_string[value_string_index] <= (uint8_t) 'F'))
+          {
+            single_file_entry->guid[value_string_index] = (uint8_t)('a' - 'A') + value_string[value_string_index];
+          }
+          else if ((value_string[value_string_index] >= (uint8_t) 'a')
+            && (value_string[value_string_index] <= (uint8_t) 'f'))
+          {
+            single_file_entry->guid[value_string_index] = value_string[value_string_index];
+          }
+          else
+          {
+            libcerror_error_set(
+              error,
+              LIBCERROR_ERROR_DOMAIN_RUNTIME,
+              LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+              "%s: unsupported character in GUID hash.",
+              function);
+
+            goto on_error;
+          }
+          if (value_string[value_string_index] != (uint8_t) '0')
+          {
+            zero_values_only = 0;
+          }
+        }
+        single_file_entry->guid[value_string_size - 1] = 0;
+
+        if (zero_values_only == 0)
+        {
+          single_file_entry->guid_size = value_string_size;
+        }
+      }
 			else if( ( type_string[ 0 ] == (uint8_t) 'o' )
 			      && ( type_string[ 1 ] == (uint8_t) 'p' )
 			      && ( type_string[ 2 ] == (uint8_t) 'r' ) )
@@ -1315,7 +1377,7 @@ int libewf_single_files_parse_file_entry(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create MD5 hash.",
+					 "%s: unable to create SHA1 hash.",
 					 function );
 
 					goto on_error;
@@ -1347,7 +1409,7 @@ int libewf_single_files_parse_file_entry(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-						 "%s: unsupported character in MD5 hash.",
+						 "%s: unsupported character in SHA1 hash.",
 						 function );
 
 						goto on_error;
@@ -1396,7 +1458,7 @@ int libewf_single_files_parse_file_entry(
 			{
 			}
 			/* Data offset
-			 * consist of: unknown, offset and size
+			 * consist of: count (always 1 for single files), offset and size
 			 */
 			else if( ( type_string[ 0 ] == (uint8_t) 'b' )
 			      && ( type_string[ 1 ] == (uint8_t) 'e' ) )

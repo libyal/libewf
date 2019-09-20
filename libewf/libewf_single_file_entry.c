@@ -28,6 +28,8 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_single_file_entry.h"
+#include "libewf_definitions.h"
+#include "libfguid_definitions.h"
 
 /* Creates a single file entry
  * Make sure the value single_file_entry is referencing, is set to NULL
@@ -142,6 +144,11 @@ int libewf_single_file_entry_free(
 			memory_free(
 			 ( *single_file_entry )->sha1_hash );
 		}
+        if( ( *single_file_entry )->guid != NULL )
+        {
+            memory_free(
+             ( *single_file_entry )->guid );
+        }
 		memory_free(
 		 *single_file_entry );
 
@@ -223,7 +230,8 @@ int libewf_single_file_entry_clone(
 	}
 	( *destination_single_file_entry )->name      = NULL;
 	( *destination_single_file_entry )->md5_hash  = NULL;
-	( *destination_single_file_entry )->sha1_hash = NULL;
+    ( *destination_single_file_entry )->sha1_hash = NULL;
+    ( *destination_single_file_entry )->guid      = NULL;
 
 	if( source_single_file_entry->name != NULL )
 	{
@@ -321,6 +329,38 @@ int libewf_single_file_entry_clone(
 		}
 		( *destination_single_file_entry )->sha1_hash_size = source_single_file_entry->sha1_hash_size;
 	}
+	if( source_single_file_entry->guid != NULL)
+	{
+		( *destination_single_file_entry )->guid = ( uint8_t *)memory_allocate(
+			                                                sizeof( uint8_t ) * source_single_file_entry->guid_size );
+
+		if( ( *destination_single_file_entry )->guid == NULL )
+		{
+			libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_MEMORY,
+			LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			"%s: unable to create destination GUID.",
+			function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+			( *destination_single_file_entry )->guid,
+			source_single_file_entry->guid,
+			source_single_file_entry->guid_size ) == NULL )
+		{
+			libcerror_error_set(
+			error,
+			LIBCERROR_ERROR_DOMAIN_MEMORY,
+			LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			"%s: unable to copy source to destination GUID.",
+			function );
+
+			goto on_error;
+		}
+		( *destination_single_file_entry )->guid_size = source_single_file_entry->guid_size;
+	}
 	return( 1 );
 
 on_error:
@@ -336,6 +376,11 @@ on_error:
 			memory_free(
 			 ( *destination_single_file_entry )->md5_hash );
 		}
+        if( ( *destination_single_file_entry)->guid != NULL )
+        {
+            memory_free(
+             ( *destination_single_file_entry )->guid );
+        }
 		if( ( *destination_single_file_entry )->name != NULL )
 		{
 			memory_free(
@@ -1300,3 +1345,156 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
 	return( 1 );
 }
 
+/* Retrieves the UTF-8 encoded GUID value
+* Returns 1 if successful, 0 if value not present or -1 on error
+*/
+int libewf_single_file_entry_get_utf8_guid(
+  libewf_single_file_entry_t *single_file_entry,
+  uint8_t *utf8_string,
+  size_t utf8_string_size,
+  libcerror_error_t **error)
+{
+  static char *function = "libewf_single_file_entry_get_utf8_guid";
+
+  if (single_file_entry == NULL)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+      "%s: invalid single file entry.",
+      function);
+
+    return(-1);
+  }
+  if (utf8_string == NULL)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+      "%s: invalid UTF-8 string.",
+      function);
+
+    return(-1);
+  }
+  if (utf8_string_size > (size_t)SSIZE_MAX)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+      "%s: invalid UTF-8 string size value exceeds maximum.",
+      function);
+
+    return(-1);
+  }
+  if (utf8_string_size < single_file_entry->guid_size)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+      "%s: UTF-8 string too small.",
+      function);
+
+    return(-1);
+  }
+  if (single_file_entry->guid_size == 0)
+  {
+    return(0);
+  }
+  if (memory_copy(
+    utf8_string,
+    single_file_entry->guid,
+    single_file_entry->guid_size) == NULL)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_MEMORY,
+      LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+      "%s: unable to copy GUID to UTF-8 string.",
+      function);
+
+    return(-1);
+  }
+  return(1);
+}
+
+/* Retrieves the UTF-16 encoded GUID hash value
+* Returns 1 if successful, 0 if value not present or -1 on error
+*/
+int libewf_single_file_entry_get_utf16_guid(
+  libewf_single_file_entry_t *single_file_entry,
+  uint16_t *utf16_string,
+  size_t utf16_string_size,
+  libcerror_error_t **error)
+{
+  static char *function = "libewf_single_file_entry_get_utf16_guid";
+
+  if (single_file_entry == NULL)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+      "%s: invalid single file entry.",
+      function);
+
+    return(-1);
+  }
+  if (utf16_string == NULL)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+      "%s: invalid UTF-16 string.",
+      function);
+
+    return(-1);
+  }
+  if (utf16_string_size > (size_t)SSIZE_MAX)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+      "%s: invalid UTF-16 string size value exceeds maximum.",
+      function);
+
+    return(-1);
+  }
+  if (utf16_string_size < single_file_entry->guid_size)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+      LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+      "%s: UTF-16 string too small.",
+      function);
+
+    return(-1);
+  }
+  if (single_file_entry->guid_size == 0)
+  {
+    return(0);
+  }
+  if (libuna_utf16_string_copy_from_utf8(
+    utf16_string,
+    utf16_string_size,
+    single_file_entry->guid,
+    single_file_entry->guid_size,
+    error) != 1)
+  {
+    libcerror_error_set(
+      error,
+      LIBCERROR_ERROR_DOMAIN_RUNTIME,
+      LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+      "%s: unable to copy GUID to UTF-16 string.",
+      function);
+
+    return(-1);
+  }
+  return(1);
+}
