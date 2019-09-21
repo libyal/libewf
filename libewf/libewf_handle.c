@@ -6464,7 +6464,6 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 #endif
 		write_count = libewf_segment_file_write_close(
 		               segment_file,
-			           internal_handle->segment_table->segment_files_list,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               internal_handle->write_io_handle->number_of_chunks_written_to_segment_file,

@@ -4630,7 +4630,6 @@ on_error:
  */
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_t *segment_file,
-         libfdata_list_t *segment_files_list,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint64_t number_of_chunks_written_to_segment_file,
@@ -4652,10 +4651,6 @@ ssize_t libewf_segment_file_write_close(
 	int number_of_acquiry_errors                    = 0;
 	int number_of_sessions                          = 0;
 	int result                                      = 0;
-	int element_file_index                          = 0;
-	off64_t element_offset                          = 0;
-	size64_t element_size                           = 0;
-	uint32_t element_flags                          = 0;
 
 	if( segment_file == NULL )
 	{
@@ -5099,50 +5094,6 @@ ssize_t libewf_segment_file_write_close(
 		goto on_error;
 	}
 	segment_file->flags &= ~( LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN );
-
-	if ( segment_files_list != NULL ) {
-		/* Update segment_file_size for element in segment_table->segment_files_list. 
-		   This is necessary to ensure that libewf_write_io_handle_finalize_write_sections_corrections()
-		   succeeds for evidence files with >64 segments */
-		if ( libfdata_list_get_element_by_index(
-			segment_files_list,
-			(int) ( segment_file->segment_number - 1 ),
-			&element_file_index,
-			&element_offset,
-			&element_size,
-			&element_flags,
-			error ) != 1 )
-		{
-			libcerror_error_set(
-				error,
-				LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				"%s: unable to retrieve element: %" PRIu32 " from segment files list.",
-				function,
-				segment_file->segment_number - 1 );
-
-			goto on_error;
-		}
-		if ( libfdata_list_set_element_by_index(
-			segment_files_list,
-			(int) ( segment_file->segment_number - 1 ),
-			element_file_index,
-			element_offset,
-			segment_file->current_offset,
-			element_flags,
-			error ) != 1 )
-		{
-			libcerror_error_set(
-				error,
-				LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				"%s: unable to set element: %" PRIu32 " in segment files list.",
-				function,
-				segment_file->segment_number - 1 );
-
-			goto on_error;
-		}
-	}
 
 	return( total_write_count );
 
@@ -5883,7 +5834,6 @@ int libewf_segment_file_write_sections_correction(
 
 		write_count = libewf_segment_file_write_close(
 			       segment_file,
-			       NULL,
 			       file_io_pool,
 			       file_io_pool_entry,
 			       number_of_chunks_written_to_segment_file,
