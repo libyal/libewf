@@ -4860,8 +4860,5 @@ int main(
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
-
-on_error:
-	return( EXIT_FAILURE );
 }
 
