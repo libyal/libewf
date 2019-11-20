@@ -37,7 +37,7 @@ then
 
 		make install DESTDIR=${PWD}/osx-pkg;
 		mkdir -p ${PWD}/osx-pkg/usr/share/doc/libewf;
-		cp AUTHORS COPYING NEWS README ${PWD}/osx-pkg/usr/share/doc/libewf;
+		cp AUTHORS COPYING COPYING.LESSER NEWS README ${PWD}/osx-pkg/usr/share/doc/libewf;
 
 		pkgbuild --root osx-pkg --identifier com.github.libyal.libewf --version ${VERSION} --ownership recommended ../libewf-${VERSION}.pkg;
 	fi
