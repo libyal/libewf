@@ -439,7 +439,7 @@ int libewf_handle_clone(
 
 		return( 1 );
 	}
-	internal_source_handle = (libewf_internal_handle_t *) *source_handle;
+	internal_source_handle = (libewf_internal_handle_t *) source_handle;
 
 	if( internal_source_handle->io_handle == NULL )
 	{
@@ -739,6 +739,8 @@ int libewf_handle_clone(
 	}
 	internal_destination_handle->maximum_number_of_open_handles = internal_source_handle->maximum_number_of_open_handles;
 	internal_destination_handle->date_format                    = internal_source_handle->date_format;
+
+	*destination_handle = (libewf_handle_t *) internal_destination_handle;
 
 	return( 1 );
 
@@ -4331,7 +4333,6 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 	uint64_t chunk_index            = 0;
 	size_t buffer_offset            = 0;
 	size_t read_size                = 0;
-	ssize_t total_read_count        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -4425,6 +4426,8 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 	{
 		return( 0 );
 	}
+	internal_handle->io_handle->abort = 0;
+
 	if( (size64_t) ( internal_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size )
 	{
 		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
@@ -4508,7 +4511,6 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 		}
 		buffer_offset    += read_size;
 		buffer_size      -= read_size;
-		total_read_count += (ssize_t) read_size;
 		chunk_index      += 1;
 
 		internal_handle->current_offset += (off64_t) read_size;
@@ -4524,7 +4526,9 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 		chunk_data        = NULL;
 		chunk_data_offset = 0;
 	}
-	return( total_read_count );
+	internal_handle->io_handle->abort = 0;
+
+	return( (ssize_t) buffer_offset );
 }
 
 /* Reads (media) data at the current offset into a buffer
@@ -4681,25 +4685,28 @@ ssize_t libewf_handle_read_buffer_at_offset(
 		 "%s: unable to seek offset.",
 		 function );
 
-		goto on_error;
+		read_count = -1;
 	}
-	read_count = libewf_internal_handle_read_buffer_from_file_io_pool(
-	              internal_handle,
-	              internal_handle->file_io_pool,
-	              buffer,
-	              buffer_size,
-	              error );
-
-	if( read_count == -1 )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer.",
-		 function );
+		read_count = libewf_internal_handle_read_buffer_from_file_io_pool(
+		              internal_handle,
+		              internal_handle->file_io_pool,
+		              buffer,
+		              buffer_size,
+		              error );
 
-		goto on_error;
+		if( read_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read buffer.",
+			 function );
+
+			read_count = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -4717,14 +4724,6 @@ ssize_t libewf_handle_read_buffer_at_offset(
 	}
 #endif
 	return( read_count );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Writes (media) data at the current offset from a buffer using a Basic File IO (bfio) pool
@@ -4868,6 +4867,8 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 	{
 		return( 0 );
 	}
+	internal_handle->io_handle->abort = 0;
+
 	if( ( internal_handle->media_values->media_size != 0 )
 	 && ( (size64_t) ( internal_handle->current_offset + buffer_size ) >= internal_handle->media_values->media_size ) )
 	{
@@ -5081,6 +5082,8 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 			break;
 		}
 	}
+	internal_handle->io_handle->abort = 0;
+
 	return( (ssize_t) buffer_offset );
 }
 

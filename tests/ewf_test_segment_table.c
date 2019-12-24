@@ -289,15 +289,9 @@ int main(
 	 "libewf_segment_table_free",
 	 ewf_test_segment_table_free );
 
-#if defined( TODO )
-
-/* TODO: fix libewf_segment_table_clone */
-
 	EWF_TEST_RUN(
 	 "libewf_segment_table_clone",
 	 ewf_test_segment_table_clone );
-
-#endif
 
 	/* TODO: add tests for libewf_segment_table_empty */
 

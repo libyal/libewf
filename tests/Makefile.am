@@ -304,8 +304,7 @@ ewf_test_handle_SOURCES = \
 	ewf_test_libewf.h \
 	ewf_test_libuna.h \
 	ewf_test_macros.h \
-	ewf_test_memory.c ewf_test_memory.h \
-	ewf_test_unused.h
+	ewf_test_memory.c ewf_test_memory.h
 
 ewf_test_handle_LDADD = \
 	@LIBBFIO_LIBADD@ \
@@ -472,6 +471,8 @@ ewf_test_sector_range_LDADD = \
 	@LIBCERROR_LIBADD@
 
 ewf_test_segment_file_SOURCES = \
+	ewf_test_functions.c ewf_test_functions.h \
+	ewf_test_libbfio.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
@@ -480,6 +481,14 @@ ewf_test_segment_file_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_segment_file_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

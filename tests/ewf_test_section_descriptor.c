@@ -281,6 +281,15 @@ int ewf_test_section_descriptor_clone(
 	libewf_section_descriptor_t *source_section_descriptor      = NULL;
 	int result                                                  = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests                             = 1;
+	int test_number                                             = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests                             = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_section_descriptor_initialize(
@@ -397,83 +406,95 @@ int ewf_test_section_descriptor_clone(
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
-	/* Test libewf_section_descriptor_clone with malloc failing
-	 */
-	ewf_test_malloc_attempts_before_fail = 0;
-
-	result = libewf_section_descriptor_clone(
-	          &destination_section_descriptor,
-	          source_section_descriptor,
-	          &error );
-
-	if( ewf_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		ewf_test_malloc_attempts_before_fail = -1;
+		/* Test libewf_section_descriptor_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
 
-		if( destination_section_descriptor != NULL )
+		result = libewf_section_descriptor_clone(
+		          &destination_section_descriptor,
+		          source_section_descriptor,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
 		{
-			libewf_section_descriptor_free(
-			 &destination_section_descriptor,
-			 NULL );
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_section_descriptor != NULL )
+			{
+				libewf_section_descriptor_free(
+				 &destination_section_descriptor,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_section_descriptor",
+			 destination_section_descriptor );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
 	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libewf_section_descriptor_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
 
-		EWF_TEST_ASSERT_IS_NULL(
-		 "destination_section_descriptor",
-		 destination_section_descriptor );
+		result = libewf_section_descriptor_clone(
+		          &destination_section_descriptor,
+		          source_section_descriptor,
+		          &error );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-
-	/* Test libewf_section_descriptor_clone with memcpy failing
-	 */
-	ewf_test_memcpy_attempts_before_fail = 0;
-
-	result = libewf_section_descriptor_clone(
-	          &destination_section_descriptor,
-	          source_section_descriptor,
-	          &error );
-
-	if( ewf_test_memcpy_attempts_before_fail != -1 )
-	{
-		ewf_test_memcpy_attempts_before_fail = -1;
-
-		if( destination_section_descriptor != NULL )
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
 		{
-			libewf_section_descriptor_free(
-			 &destination_section_descriptor,
-			 NULL );
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_section_descriptor != NULL )
+			{
+				libewf_section_descriptor_free(
+				 &destination_section_descriptor,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_section_descriptor",
+			 destination_section_descriptor );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
-	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		EWF_TEST_ASSERT_IS_NULL(
-		 "destination_section_descriptor",
-		 destination_section_descriptor );
-
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up

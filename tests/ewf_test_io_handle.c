@@ -332,6 +332,36 @@ int ewf_test_io_handle_clear(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_io_handle_clear with memset failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_io_handle_clear(
+	          io_handle,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_io_handle_free(
@@ -378,6 +408,15 @@ int ewf_test_io_handle_clone(
 	libewf_io_handle_t *destination_io_handle = NULL;
 	libewf_io_handle_t *source_io_handle      = NULL;
 	int result                                = 0;
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests           = 1;
+	int test_number                           = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests           = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Initialize test
 	 */
@@ -471,6 +510,120 @@ int ewf_test_io_handle_clone(
 
 	libcerror_error_free(
 	 &error );
+
+	destination_io_handle = (libewf_io_handle_t *) 0x12345678UL;
+
+	result = libewf_io_handle_clone(
+	          &destination_io_handle,
+	          source_io_handle,
+	          &error );
+
+	destination_io_handle = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_io_handle_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		result = libewf_io_handle_clone(
+		          &destination_io_handle,
+		          source_io_handle,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_io_handle != NULL )
+			{
+				libewf_io_handle_free(
+				 &destination_io_handle,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_io_handle",
+			 destination_io_handle );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_io_handle_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
+
+		result = libewf_io_handle_clone(
+		          &destination_io_handle,
+		          source_io_handle,
+		          &error );
+
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
+		{
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_io_handle != NULL )
+			{
+				libewf_io_handle_free(
+				 &destination_io_handle,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_io_handle",
+			 destination_io_handle );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
 	 */

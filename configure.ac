@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20191216],
+ [20191224],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -115,7 +115,7 @@ AX_ZLIB_CHECK_COMPRESS2
 AX_ZLIB_CHECK_COMPRESSBOUND
 AX_ZLIB_CHECK_UNCOMPRESS
 
-dnl Check for bz2lib compression support
+dnl Check if bz2lib or required headers and functions are available
 AX_BZIP2_CHECK_ENABLE
 
 dnl Check if libhmac or required headers and functions are available
@@ -152,7 +152,7 @@ AX_LIBSMDEV_CHECK_ENABLE
 dnl Check if libsmraw or required headers and functions are available
 AX_LIBSMRAW_CHECK_ENABLE
 
-dnl Check for enabling GUID/UUID support
+dnl Check if libuuid or required headers and functions are available
 AX_LIBUUID_CHECK_ENABLE
 
 dnl Check if libfuse or required headers and functions are available

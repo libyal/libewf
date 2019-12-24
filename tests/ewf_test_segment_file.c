@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_libbfio.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
@@ -349,6 +350,15 @@ int ewf_test_segment_file_clone(
 	libewf_segment_file_t *source_segment_file      = NULL;
 	int result                                      = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests                 = 1;
+	int test_number                                 = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests                 = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_io_handle_initialize(
@@ -459,6 +469,120 @@ int ewf_test_segment_file_clone(
 
 	libcerror_error_free(
 	 &error );
+
+	destination_segment_file = (libewf_segment_file_t *) 0x12345678UL;
+
+	result = libewf_segment_file_clone(
+	          &destination_segment_file,
+	          source_segment_file,
+	          &error );
+
+	destination_segment_file = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_segment_file_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		result = libewf_segment_file_clone(
+		          &destination_segment_file,
+		          source_segment_file,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_segment_file != NULL )
+			{
+				libewf_segment_file_free(
+				 &destination_segment_file,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_segment_file",
+			 destination_segment_file );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_segment_file_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
+
+		result = libewf_segment_file_clone(
+		          &destination_segment_file,
+		          source_segment_file,
+		          &error );
+
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
+		{
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_segment_file != NULL )
+			{
+				libewf_segment_file_free(
+				 &destination_segment_file,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_segment_file",
+			 destination_segment_file );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
 	 */
@@ -535,7 +659,6 @@ int ewf_test_segment_file_get_number_of_sections(
 	libewf_io_handle_t *io_handle       = NULL;
 	libewf_segment_file_t *segment_file = NULL;
 	int number_of_sections              = 0;
-	int number_of_sections_is_set       = 0;
 	int result                          = 0;
 
 	/* Initialize test
@@ -582,16 +705,14 @@ int ewf_test_segment_file_get_number_of_sections(
 	          &number_of_sections,
 	          &error );
 
-	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	number_of_sections_is_set = result;
 
 	/* Test error cases
 	 */
@@ -612,25 +733,23 @@ int ewf_test_segment_file_get_number_of_sections(
 	libcerror_error_free(
 	 &error );
 
-	if( number_of_sections_is_set != 0 )
-	{
-		result = libewf_segment_file_get_number_of_sections(
-		          segment_file,
-		          NULL,
-		          &error );
+	result = libewf_segment_file_get_number_of_sections(
+	          segment_file,
+	          NULL,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libewf_segment_file_free(
@@ -690,6 +809,216 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_segment_file_seek_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_file_seek_offset(
+     void )
+{
+	libbfio_pool_t *file_io_pool        = NULL;
+	libcerror_error_t *error            = NULL;
+	libewf_io_handle_t *io_handle       = NULL;
+	libewf_segment_file_t *segment_file = NULL;
+	off64_t offset                      = 0;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_file_initialize(
+	          &segment_file,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement file IO pool
+	offset = libewf_segment_file_seek_offset(
+	          segment_file,
+	          file_io_pool,
+	          0,
+	          1024,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	offset = libewf_segment_file_seek_offset(
+	          NULL,
+	          file_io_pool,
+	          0,
+	          1024,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libewf_segment_file_seek_offset(
+	          segment_file,
+	          NULL,
+	          0,
+	          1024,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libewf_segment_file_seek_offset(
+	          segment_file,
+	          file_io_pool,
+	          -1,
+	          1024,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	offset = libewf_segment_file_seek_offset(
+	          segment_file,
+	          file_io_pool,
+	          0,
+	          -1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_file_free(
+	          &segment_file,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+	}
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -717,14 +1046,9 @@ int main(
 	 "libewf_segment_file_free",
 	 ewf_test_segment_file_free );
 
-#if defined( TODO )
-
-/* TODO: fix libewf_segment_file_clone */
 	EWF_TEST_RUN(
 	 "libewf_segment_file_clone",
 	 ewf_test_segment_file_clone );
-
-#endif
 
 	EWF_TEST_RUN(
 	 "libewf_segment_file_get_number_of_sections",
@@ -736,7 +1060,9 @@ int main(
 
 	/* TODO: add tests for libewf_segment_file_write_file_header */
 
-	/* TODO: add tests for libewf_segment_file_seek_offset */
+	EWF_TEST_RUN(
+	 "libewf_segment_file_seek_offset",
+	 ewf_test_segment_file_seek_offset );
 
 	/* TODO: add tests for libewf_segment_file_read_table_section */
 

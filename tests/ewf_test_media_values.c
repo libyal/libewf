@@ -410,6 +410,15 @@ int ewf_test_media_values_clone(
 	libewf_media_values_t *source_media_values      = NULL;
 	int result                                      = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests                 = 1;
+	int test_number                                 = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests                 = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_media_values_initialize(
@@ -526,83 +535,95 @@ int ewf_test_media_values_clone(
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
-	/* Test libewf_media_values_clone with malloc failing
-	 */
-	ewf_test_malloc_attempts_before_fail = 0;
-
-	result = libewf_media_values_clone(
-	          &destination_media_values,
-	          source_media_values,
-	          &error );
-
-	if( ewf_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		ewf_test_malloc_attempts_before_fail = -1;
+		/* Test libewf_media_values_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
 
-		if( destination_media_values != NULL )
+		result = libewf_media_values_clone(
+		          &destination_media_values,
+		          source_media_values,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
 		{
-			libewf_media_values_free(
-			 &destination_media_values,
-			 NULL );
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_media_values != NULL )
+			{
+				libewf_media_values_free(
+				 &destination_media_values,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_media_values",
+			 destination_media_values );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
 	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libewf_media_values_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
 
-		EWF_TEST_ASSERT_IS_NULL(
-		 "destination_media_values",
-		 destination_media_values );
+		result = libewf_media_values_clone(
+		          &destination_media_values,
+		          source_media_values,
+		          &error );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-
-	/* Test libewf_media_values_clone with memcpy failing
-	 */
-	ewf_test_memcpy_attempts_before_fail = 0;
-
-	result = libewf_media_values_clone(
-	          &destination_media_values,
-	          source_media_values,
-	          &error );
-
-	if( ewf_test_memcpy_attempts_before_fail != -1 )
-	{
-		ewf_test_memcpy_attempts_before_fail = -1;
-
-		if( destination_media_values != NULL )
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
 		{
-			libewf_media_values_free(
-			 &destination_media_values,
-			 NULL );
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_media_values != NULL )
+			{
+				libewf_media_values_free(
+				 &destination_media_values,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_media_values",
+			 destination_media_values );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
-	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		EWF_TEST_ASSERT_IS_NULL(
-		 "destination_media_values",
-		 destination_media_values );
-
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up

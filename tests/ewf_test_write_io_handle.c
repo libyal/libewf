@@ -349,6 +349,15 @@ int ewf_test_write_io_handle_clone(
 	libewf_write_io_handle_t *source_write_io_handle      = NULL;
 	int result                                            = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests                       = 1;
+	int test_number                                       = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests                       = 1;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_io_handle_initialize(
@@ -460,6 +469,120 @@ int ewf_test_write_io_handle_clone(
 	libcerror_error_free(
 	 &error );
 
+	destination_write_io_handle = (libewf_write_io_handle_t *) 0x12345678UL;
+
+	result = libewf_write_io_handle_clone(
+	          &destination_write_io_handle,
+	          source_write_io_handle,
+	          &error );
+
+	destination_write_io_handle = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_write_io_handle_clone with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		result = libewf_write_io_handle_clone(
+		          &destination_write_io_handle,
+		          source_write_io_handle,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_write_io_handle != NULL )
+			{
+				libewf_write_io_handle_free(
+				 &destination_write_io_handle,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_write_io_handle",
+			 destination_write_io_handle );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_write_io_handle_clone with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
+
+		result = libewf_write_io_handle_clone(
+		          &destination_write_io_handle,
+		          source_write_io_handle,
+		          &error );
+
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
+		{
+			ewf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_write_io_handle != NULL )
+			{
+				libewf_write_io_handle_free(
+				 &destination_write_io_handle,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "destination_write_io_handle",
+			 destination_write_io_handle );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_write_io_handle_free(
@@ -552,15 +675,9 @@ int main(
 	 "libewf_write_io_handle_free",
 	 ewf_test_write_io_handle_free );
 
-#if defined( TODO )
-
-/* TODO: fix libewf_write_io_handle_clone */
-
 	EWF_TEST_RUN(
 	 "libewf_write_io_handle_clone",
 	 ewf_test_write_io_handle_clone );
-
-#endif
 
 	/* TODO: add tests for libewf_write_io_handle_initialize_values */
 

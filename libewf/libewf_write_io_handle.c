@@ -320,6 +320,7 @@ int libewf_write_io_handle_clone(
 	( *destination_write_io_handle )->table_entries_data      = NULL;
 	( *destination_write_io_handle )->table_entries_data_size = 0;
 	( *destination_write_io_handle )->number_of_table_entries = 0;
+	( *destination_write_io_handle )->chunk_group             = NULL;
 
 	if( source_write_io_handle->case_data != NULL )
 	{
