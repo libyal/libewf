@@ -40,6 +40,23 @@ void libewf_debug_print_section_type(
 void libewf_debug_print_section_data_flags(
       uint32_t data_flags );
 
+int libewf_debug_print_guid_value(
+     const char *function_name,
+     const char *value_name,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     int byte_order,
+     uint32_t string_format_flags,
+     libcerror_error_t **error );
+
+int libewf_debug_print_utf16_string_value(
+     const char *function_name,
+     const char *value_name,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     int byte_order,
+     libcerror_error_t **error );
+
 int libewf_debug_byte_stream_print(
      const char *header_string,
      const uint8_t *byte_stream,

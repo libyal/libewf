@@ -159,6 +159,127 @@ int libewf_single_files_free(
 	return( result );
 }
 
+/* Determines the EWF format based on the entry types
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_get_format(
+     libewf_single_files_t *single_files,
+     libfvalue_split_utf8_string_t *types,
+     uint8_t *format,
+     libcerror_error_t **error )
+{
+	uint8_t *type_string    = NULL;
+	static char *function   = "libewf_single_files_get_format";
+	size_t type_string_size = 0;
+	int number_of_types     = 0;
+	int value_index         = 0;
+
+	if( single_files == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( format == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid format.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     types,
+	     &number_of_types,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of types",
+		 function );
+
+		return( -1 );
+	}
+	for( value_index = 0;
+	     value_index < number_of_types;
+	     value_index++ )
+	{
+		if( libfvalue_split_utf8_string_get_segment_by_index(
+		     types,
+		     value_index,
+		     &type_string,
+		     &type_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve type string: %d.",
+			 function,
+			 value_index );
+
+			return( -1 );
+		}
+		if( ( type_string == NULL )
+		 || ( type_string_size < 2 )
+		 || ( type_string[ 0 ] == 0 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing type string: %d.",
+			 function,
+			 value_index );
+
+			return( -1 );
+		}
+		/* Remove trailing carriage return
+		 */
+		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
+		{
+			type_string[ type_string_size - 2 ] = 0;
+
+			type_string_size -= 1;
+		}
+		if( type_string_size == 3 )
+		{
+			/* Data offset
+			 * consist of: unknown, offset and size
+			 */
+			if( ( type_string[ 0 ] == (uint8_t) 'b' )
+			 && ( type_string[ 1 ] == (uint8_t) 'e' ) )
+			{
+				if( value_index == 19 )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE5;
+				}
+				else if( ( value_index == 20 )
+				      || ( value_index == 21 ) )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE6;
+				}
+				else if( value_index == 2 )
+				{
+					*format = LIBEWF_FORMAT_LOGICAL_ENCASE7;
+				}
+			}
+		}
+	}
+	return( 1 );
+}
+
 /* Parse an EWF ltree for the values
  * Returns 1 if successful or -1 on error
  */
@@ -553,6 +674,21 @@ int libewf_single_files_parse_file_entries(
 
 				goto on_error;
 			}
+			if( libewf_single_files_get_format(
+			     single_files,
+			     types,
+			     format,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine format.",
+				 function );
+
+				goto on_error;
+			}
 			if( libcdata_tree_node_initialize(
 			     &( single_files->root_file_entry_node ),
 			     error ) != 1 )
@@ -571,7 +707,6 @@ int libewf_single_files_parse_file_entries(
 			     lines,
 			     &line_index,
 			     types,
-			     format,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -902,7 +1037,7 @@ int libewf_single_files_parse_record_values(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: type: %s with value: %s.\n",
+			 "%s: type: %s with value: %s\n",
 			 function,
 			 (char *) type_string,
 			 (char *) value_string );
@@ -996,27 +1131,16 @@ int libewf_single_files_parse_file_entry(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      libfvalue_split_utf8_string_t *types,
-     uint8_t *format,
      libcerror_error_t **error )
 {
 	libewf_single_file_entry_t *single_file_entry = NULL;
 	libfvalue_split_utf8_string_t *values         = NULL;
 	libcdata_tree_node_t *file_entry_node         = NULL;
 	uint8_t *line_string                          = NULL;
-	uint8_t *type_string                          = NULL;
-	uint8_t *value_string                         = NULL;
 	static char *function                         = "libewf_single_files_parse_file_entry";
 	size_t line_string_size                       = 0;
-	size_t type_string_size                       = 0;
-	size_t value_string_size                      = 0;
-	size_t value_string_index                     = 0;
 	uint64_t number_of_sub_entries                = 0;
-	uint64_t value_64bit                          = 0;
 	int number_of_lines                           = 0;
-	int number_of_types                           = 0;
-	int number_of_values                          = 0;
-	int value_index                               = 0;
-	int zero_values_only                          = 0;
 
 	if( parent_file_entry_node == NULL )
 	{
@@ -1039,31 +1163,6 @@ int libewf_single_files_parse_file_entry(
 		 function );
 
 		return( -1 );
-	}
-	if( format == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid format.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfvalue_split_utf8_string_get_number_of_segments(
-	     types,
-	     &number_of_types,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of types",
-		 function );
-
-		goto on_error;
 	}
 	if( libewf_single_files_parse_file_entry_number_of_sub_entries(
 	     lines,
@@ -1099,47 +1198,6 @@ int libewf_single_files_parse_file_entry(
 	}
 	*line_index += 1;
 
-	if( libfvalue_utf8_string_split(
-	     line_string,
-	     line_string_size,
-	     (uint8_t) '\t',
-	     &values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split entries string into values.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfvalue_split_utf8_string_get_number_of_segments(
-	     values,
-	     &number_of_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of values",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( number_of_types != number_of_values )
-	{
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			"%s: mismatch in number of types and values.\n",
-			 function );
-		}
-	}
-#endif
 	if( libewf_single_file_entry_initialize(
 	     &single_file_entry,
 	     error ) != 1 )
@@ -1153,561 +1211,18 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	for( value_index = 0;
-	     value_index < number_of_types;
-	     value_index++ )
-	{
-		if( libfvalue_split_utf8_string_get_segment_by_index(
-		     types,
-		     value_index,
-		     &type_string,
-		     &type_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve type string: %d.",
-			 function,
-			 value_index );
-
-			goto on_error;
-		}
-		if( ( type_string == NULL )
-		 || ( type_string_size < 2 )
-		 || ( type_string[ 0 ] == 0 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing type string: %d.",
-			 function,
-			 value_index );
-
-			goto on_error;
-		}
-		/* Remove trailing carriage return
-		 */
-		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			type_string[ type_string_size - 2 ] = 0;
-
-			type_string_size -= 1;
-		}
-		if( value_index < number_of_values )
-		{
-			if( libfvalue_split_utf8_string_get_segment_by_index(
-			     values,
-			     value_index,
-			     &value_string,
-			     &value_string_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve value string: %d.",
-				 function,
-				 value_index );
-
-				goto on_error;
-			}
-			if( ( value_string == NULL )
-			 || ( value_string_size < 2 )
-			 || ( value_string[ 0 ] == 0 ) )
-			{
-				value_string      = NULL;
-				value_string_size = 0;
-			}
-			/* Remove trailing carriage return
-			 */
-			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-			{
-				value_string[ value_string_size - 2 ] = 0;
-
-				value_string_size -= 1;
-			}
-		}
-		else
-		{
-			value_string      = NULL;
-			value_string_size = 0;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: type: %s with value: %s.\n",
-			 function,
-			 (char *) type_string,
-			 (char *) value_string );
-		}
-#endif
-		if( value_string == NULL )
-		{
-			/* Ignore empty values
-			 */
-		}
-		else if( type_string_size == 4 )
-		{
-			if( ( type_string[ 0 ] == (uint8_t) 'c' )
-			 && ( type_string[ 1 ] == (uint8_t) 'i' )
-			 && ( type_string[ 2 ] == (uint8_t) 'd' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'o' )
-			      && ( type_string[ 1 ] == (uint8_t) 'p' )
-			      && ( type_string[ 2 ] == (uint8_t) 'r' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     64,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set entry flags.",
-					 function );
-
-					goto on_error;
-				}
-				if( value_64bit > (uint64_t) UINT32_MAX )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-					 "%s: invalid entry flags value exceeds maximum.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->flags = (uint32_t) value_64bit;
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 's' )
-			      && ( type_string[ 1 ] == (uint8_t) 'r' )
-			      && ( type_string[ 2 ] == (uint8_t) 'c' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 's' )
-			      && ( type_string[ 1 ] == (uint8_t) 'u' )
-			      && ( type_string[ 2 ] == (uint8_t) 'b' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 's' )
-			      && ( type_string[ 1 ] == (uint8_t) 'h' )
-			      && ( type_string[ 2 ] == (uint8_t) 'a' ) )
-			{
-				single_file_entry->sha1_hash = (uint8_t *) memory_allocate(
-				                                            sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->sha1_hash == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create MD5 hash.",
-					 function );
-
-					goto on_error;
-				}
-				zero_values_only = 1;
-
-				for( value_string_index = 0;
-				     value_string_index < value_string_size - 1;
-				     value_string_index++ )
-				{
-					if( ( value_string[ value_string_index ] >= (uint8_t) '0' )
-					 && ( value_string[ value_string_index ] <= (uint8_t) '9' ) )
-					{
-						single_file_entry->sha1_hash[ value_string_index ] = value_string[ value_string_index ];
-					}
-					else if( ( value_string[ value_string_index ] >= (uint8_t) 'A' )
-					      && ( value_string[ value_string_index ] <= (uint8_t) 'F' ) )
-					{
-						single_file_entry->sha1_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + value_string[ value_string_index ];
-					}
-					else if( ( value_string[ value_string_index ] >= (uint8_t) 'a' )
-					      && ( value_string[ value_string_index ] <= (uint8_t) 'f' ) )
-					{
-						single_file_entry->sha1_hash[ value_string_index ] = value_string[ value_string_index ];
-					}
-					else
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-						 "%s: unsupported character in MD5 hash.",
-						 function );
-
-						goto on_error;
-					}
-					if( value_string[ value_string_index ] != (uint8_t) '0' )
-					{
-						zero_values_only = 0;
-					}
-				}
-				single_file_entry->sha1_hash[ value_string_size - 1 ] = 0;
-
-				if( zero_values_only == 0 )
-				{
-					single_file_entry->sha1_hash_size = value_string_size;
-				}
-			}
-		}
-		else if( type_string_size == 3 )
-		{
-			/* Access time
-			 */
-			if( ( type_string[ 0 ] == (uint8_t) 'a' )
-			 && ( type_string[ 1 ] == (uint8_t) 'c' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set access time.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->access_time = (int32_t) value_64bit;
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
-			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
-			{
-			}
-			/* Data offset
-			 * consist of: unknown, offset and size
-			 */
-			else if( ( type_string[ 0 ] == (uint8_t) 'b' )
-			      && ( type_string[ 1 ] == (uint8_t) 'e' ) )
-			{
-				if( libewf_single_files_parse_file_entry_offset_values(
-				     single_file_entry,
-				     value_string,
-				     value_string_size,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-					 LIBCERROR_CONVERSION_ERROR_GENERIC,
-					 "%s: unable to parse offset values string.",
-					 function );
-
-					goto on_error;
-				}
-				if( value_index == 19 )
-				{
-					*format = LIBEWF_FORMAT_LOGICAL_ENCASE5;
-				}
-				else if( ( value_index == 20 )
-				      || ( value_index == 21 ) )
-				{
-					*format = LIBEWF_FORMAT_LOGICAL_ENCASE6;
-				}
-				else if( value_index == 2 )
-				{
-					*format = LIBEWF_FORMAT_LOGICAL_ENCASE7;
-				}
-			}
-			/* Creation time
-			 */
-			else if( ( type_string[ 0 ] == (uint8_t) 'c' )
-			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set creation time.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->creation_time = (int32_t) value_64bit;
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
-			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
-			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     64,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set duplicate data offset.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->duplicate_data_offset = (off64_t) value_64bit;
-			}
-			/* MD5 digest hash
-			 */
-			else if( ( type_string[ 0 ] == (uint8_t) 'h' )
-			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
-			{
-				single_file_entry->md5_hash = (uint8_t *) memory_allocate(
-				                                           sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->md5_hash == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create MD5 hash.",
-					 function );
-
-					goto on_error;
-				}
-				zero_values_only = 1;
-
-				for( value_string_index = 0;
-				     value_string_index < value_string_size - 1;
-				     value_string_index++ )
-				{
-					if( ( value_string[ value_string_index ] >= (uint8_t) '0' )
-					 && ( value_string[ value_string_index ] <= (uint8_t) '9' ) )
-					{
-						single_file_entry->md5_hash[ value_string_index ] = value_string[ value_string_index ];
-					}
-					else if( ( value_string[ value_string_index ] >= (uint8_t) 'A' )
-					      && ( value_string[ value_string_index ] <= (uint8_t) 'F' ) )
-					{
-						single_file_entry->md5_hash[ value_string_index ] = (uint8_t) ( 'a' - 'A' ) + value_string[ value_string_index ];
-					}
-					else if( ( value_string[ value_string_index ] >= (uint8_t) 'a' )
-					      && ( value_string[ value_string_index ] <= (uint8_t) 'f' ) )
-					{
-						single_file_entry->md5_hash[ value_string_index ] = value_string[ value_string_index ];
-					}
-					else
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-						 "%s: unsupported character in MD5 hash.",
-						 function );
-
-						goto on_error;
-					}
-					if( value_string[ value_string_index ] != (uint8_t) '0' )
-					{
-						zero_values_only = 0;
-					}
-				}
-				single_file_entry->md5_hash[ value_string_size - 1 ] = 0;
-
-				if( zero_values_only == 0 )
-				{
-					single_file_entry->md5_hash_size = value_string_size;
-				}
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'i' )
-			      && ( type_string[ 1 ] == (uint8_t) 'd' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'j' )
-			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
-			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
-			{
-			}
-			/* Size
-			 */
-			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
-			      && ( type_string[ 1 ] == (uint8_t) 's' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     64,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set size.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->size = (size64_t) value_64bit;
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
-			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set entry modification time.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->entry_modification_time = (int32_t) value_64bit;
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
-			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
-			{
-			}
-			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
-			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
-			{
-			}
-			/* Modification time
-			 */
-			else if( ( type_string[ 0 ] == (uint8_t) 'w' )
-			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
-			{
-				if( libfvalue_utf8_string_copy_to_integer(
-				     value_string,
-				     value_string_size,
-				     &value_64bit,
-				     32,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set modification time.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->modification_time = (int32_t) value_64bit;
-			}
-		}
-		else if( type_string_size == 2 )
-		{
-			/* Name
-			 */
-			if( type_string[ 0 ] == (uint8_t) 'n' )
-			{
-				single_file_entry->name = (uint8_t *) memory_allocate(
-								       sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->name == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create name.",
-					 function );
-
-					goto on_error;
-				}
-				if( narrow_string_copy(
-				     single_file_entry->name,
-				     value_string,
-				     value_string_size - 1 ) == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set name.",
-					 function );
-
-					goto on_error;
-				}
-				single_file_entry->name[ value_string_size - 1 ] = 0;
-
-				single_file_entry->name_size = value_string_size;
-			}
-		}
-		if( type_string_size == 2 )
-		{
-			if( type_string[ 0 ] == (uint8_t) 'p' )
-			{
-				/* p = 1 if directory
-				 * p = empty if file
-				 */
-				if( value_string == NULL )
-				{
-					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
-				}
-				else if( ( value_string_size == 2 )
-				      && ( value_string[ 0 ] == (uint8_t) '1' ) )
-				{
-					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
-				}
-			}
-		}
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
-	if( libfvalue_split_utf8_string_free(
-	     &values,
+	if( libewf_single_file_entry_read_data(
+	     single_file_entry,
+	     types,
+	     line_string,
+	     line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split values.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read single file entry",
 		 function );
 
 		goto on_error;
@@ -1773,7 +1288,6 @@ int libewf_single_files_parse_file_entry(
 		     lines,
 		     line_index,
 		     types,
-		     format,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2028,172 +1542,6 @@ on_error:
 	{
 		libfvalue_split_utf8_string_free(
 		 &values,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Parse a single file entry offset values string for the values
- * Returns 1 if successful or -1 on error
- */
-int libewf_single_files_parse_file_entry_offset_values(
-     libewf_single_file_entry_t *single_file_entry,
-     const uint8_t *offset_values_string,
-     size_t offset_values_string_size,
-     libcerror_error_t **error )
-{
-	libfvalue_split_utf8_string_t *offset_values  = NULL;
-	uint8_t *offset_value_string                  = NULL;
-	static char *function                         = "libewf_single_files_parse_file_entry_offset_values";
-	size_t offset_value_string_size               = 0;
-	uint64_t value_64bit                          = 0;
-	int number_of_offset_values                   = 0;
-
-	if( single_file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfvalue_utf8_string_split(
-	     offset_values_string,
-	     offset_values_string_size,
-	     (uint8_t) ' ',
-	     &offset_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split string into offset values.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfvalue_split_utf8_string_get_number_of_segments(
-	     offset_values,
-	     &number_of_offset_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of offset values",
-		 function );
-
-		goto on_error;
-	}
-	if( ( number_of_offset_values != 1 )
-	 && ( number_of_offset_values != 3 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of offset values.",
-		 function );
-
-		goto on_error;
-	}
-	if( number_of_offset_values == 3 )
-	{
-		if( libfvalue_split_utf8_string_get_segment_by_index(
-		     offset_values,
-		     1,
-		     &offset_value_string,
-		     &offset_value_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve offset value string: 1.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfvalue_utf8_string_copy_to_integer(
-		     offset_value_string,
-		     offset_value_string_size,
-		     &value_64bit,
-		     64,
-		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to set data offset.",
-			 function );
-
-			goto on_error;
-		}
-		single_file_entry->data_offset = (off64_t) value_64bit;
-
-		if( libfvalue_split_utf8_string_get_segment_by_index(
-		     offset_values,
-		     2,
-		     &offset_value_string,
-		     &offset_value_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve offset value string: 2.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfvalue_utf8_string_copy_to_integer(
-		     offset_value_string,
-		     offset_value_string_size,
-		     &value_64bit,
-		     64,
-		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to set data size.",
-			 function );
-
-			goto on_error;
-		}
-		single_file_entry->data_size = (size64_t) value_64bit;
-	}
-	if( libfvalue_split_utf8_string_free(
-	     &offset_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split offset values.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( offset_values != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &offset_values,
 		 NULL );
 	}
 	return( -1 );

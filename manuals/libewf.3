@@ -1,4 +1,4 @@
-.Dd March  9, 2019
+.Dd December 25, 2019
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -342,6 +342,10 @@ File entry functions
 .Fn libewf_file_entry_get_sub_file_entry_by_utf16_name "libewf_file_entry_t *file_entry" "const uint16_t *utf16_string" "size_t utf16_string_length" "libewf_file_entry_t **sub_file_entry" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_sub_file_entry_by_utf16_path "libewf_file_entry_t *file_entry" "const uint16_t *utf16_string" "size_t utf16_string_length" "libewf_file_entry_t **sub_file_entry" "libewf_error_t **error"
+.Pp
+Extended attribute functions
+.Ft int
+.Fn libewf_extended_attribute_free "libewf_extended_attribute_t **extended_attribute" "libewf_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version

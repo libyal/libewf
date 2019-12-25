@@ -14,6 +14,7 @@ MSVSCPP_FILES = \
 	ewf_test_digest_section/ewf_test_digest_section.vcproj \
 	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_error2_section/ewf_test_error2_section.vcproj \
+	ewf_test_extended_attribute/ewf_test_extended_attribute.vcproj \
 	ewf_test_file_entry/ewf_test_file_entry.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
@@ -22,6 +23,9 @@ MSVSCPP_FILES = \
 	ewf_test_header_sections/ewf_test_header_sections.vcproj \
 	ewf_test_header_values/ewf_test_header_values.vcproj \
 	ewf_test_io_handle/ewf_test_io_handle.vcproj \
+	ewf_test_lef_extended_attribute/ewf_test_lef_extended_attribute.vcproj \
+	ewf_test_lef_source/ewf_test_lef_source.vcproj \
+	ewf_test_lef_subject/ewf_test_lef_subject.vcproj \
 	ewf_test_md5_hash_section/ewf_test_md5_hash_section.vcproj \
 	ewf_test_media_values/ewf_test_media_values.vcproj \
 	ewf_test_notify/ewf_test_notify.vcproj \

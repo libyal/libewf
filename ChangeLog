@@ -1,4 +1,6 @@
 TODO
+* rename libewf_single_file_entry.c to libewf_lev_file_entry.c
+
 * be able to handle large chunk tables for version 2
   - move chunk list access into chunk group
   - throttle maximum chunk group size

@@ -147,7 +147,8 @@ int libewf_digest_section_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libewf_checksum_calculate_adler32(
 	     &calculated_checksum,
 	     data,

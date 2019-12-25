@@ -238,6 +238,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_extended_attribute.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_file_entry.c"
 				>
 			</File>
@@ -267,6 +271,18 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_extended_attribute.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_source.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_subject.c"
 				>
 			</File>
 			<File
@@ -464,6 +480,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_extended_attribute.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_extern.h"
 				>
 			</File>
@@ -497,6 +517,18 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_extended_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_source.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_subject.h"
 				>
 			</File>
 			<File

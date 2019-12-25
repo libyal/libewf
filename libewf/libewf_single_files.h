@@ -69,6 +69,12 @@ int libewf_single_files_free(
      libewf_single_files_t **single_files,
      libcerror_error_t **error );
 
+int libewf_single_files_get_format(
+     libewf_single_files_t *single_files,
+     libfvalue_split_utf8_string_t *types,
+     uint8_t *format,
+     libcerror_error_t **error );
+
 int libewf_single_files_parse(
      libewf_single_files_t *single_files,
      size64_t *media_size,
@@ -94,19 +100,12 @@ int libewf_single_files_parse_file_entry(
      libfvalue_split_utf8_string_t *lines,
      int *line_iterator,
      libfvalue_split_utf8_string_t *types,
-     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry_number_of_sub_entries(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      uint64_t *number_of_sub_entries,
-     libcerror_error_t **error );
-
-int libewf_single_files_parse_file_entry_offset_values(
-     libewf_single_file_entry_t *single_file_entry,
-     const uint8_t *offset_values_string,
-     size_t offset_values_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

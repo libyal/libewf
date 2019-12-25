@@ -1828,6 +1828,18 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      libewf_file_entry_t **sub_file_entry,
      libewf_error_t **error );
 
+/* -------------------------------------------------------------------------
+ * Extended attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an extended attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_extended_attribute_free(
+     libewf_extended_attribute_t **extended_attribute,
+     libewf_error_t **error );
+
 #ifdef __cplusplus
 }
 #endif

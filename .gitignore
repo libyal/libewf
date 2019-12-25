@@ -147,6 +147,7 @@ stamp-h[1-9]
 /tests/ewf_test_digest_section
 /tests/ewf_test_error
 /tests/ewf_test_error2_section
+/tests/ewf_test_extended_attribute
 /tests/ewf_test_file_entry
 /tests/ewf_test_glob
 /tests/ewf_test_handle
@@ -155,6 +156,9 @@ stamp-h[1-9]
 /tests/ewf_test_header_sections
 /tests/ewf_test_header_values
 /tests/ewf_test_io_handle
+/tests/ewf_test_lef_extended_attribute
+/tests/ewf_test_lef_source
+/tests/ewf_test_lef_subject
 /tests/ewf_test_md5_hash_section
 /tests/ewf_test_media_values
 /tests/ewf_test_notify

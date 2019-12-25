@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_INTERNAL_FILE_ENTRY_H )
-#define _LIBEWF_INTERNAL_FILE_ENTRY_H
+#if !defined( _LIBEWF_FILE_ENTRY_H )
+#define _LIBEWF_FILE_ENTRY_H
 
 #include <common.h>
 #include <types.h>
@@ -280,5 +280,5 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
 }
 #endif
 
-#endif /* !defined( _LIBEWF_INTERNAL_FILE_ENTRY_H ) */
+#endif /* !defined( _LIBEWF_FILE_ENTRY_H ) */
 

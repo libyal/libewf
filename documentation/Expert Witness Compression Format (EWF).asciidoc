@@ -142,7 +142,7 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.79 | J.B. Metz | August 2015 | Switched to asciidoc format.
 | 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
 | 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
-| 0.0.82 | J.B. Metz | December 2019 | Formatting changes.
+| 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to J. Sylve.
 |===
 
 :numbered:
@@ -468,13 +468,15 @@ contains:
 | 3 | | Identifier for the values in the category
 | 4 | | The data for the different identifiers in the category
 | 5 | | (an empty line)
-| 6 | srce | The name/type of the category provided
+| 6 | srce | The name/type of the category provided +
+See section: <<sources_category1,Sources category>>
 | 7 | |
 | 8 | | Identifier for the values in the category
 | 9 | | The data for the different identifiers in the category
 | 10 | |
 | 11 | | (an empty line)
-| 12 | sub | The name/type of the category provided
+| 12 | sub | The name/type of the category provided +
+See section: <<subjects_category1,Subjects category>>
 | 13 | |
 | 14 | | Identifier for the values in the category
 | 15 | | The data for the different identifiers in the category
@@ -532,7 +534,7 @@ The date values in the header section (not header2) are set to: Thu Jan  1
 00:00:00 1970. Where the time is dependent on the time zone and daylight
 savings.
 
-===== Sources category
+===== [[sources_category1]]Sources category
 
 Line 6 the srce category contains information about sources.
 
@@ -569,7 +571,7 @@ Line 10 contains the values defined by line 8.
 [NOTE]
 The default values of some of these values has changed around EnCase 6.12.
 
-===== Subjects category
+===== [[subjects_category1]]Subjects category
 
 Line 12 the sub category contains information about subjects.
 
@@ -626,10 +628,10 @@ EnCase limits this string to 3000 - 1 characters
 EnCase limits this string to 12 - 1 characters
 | ov | Platform | Free form string +
 EnCase limits this string to 24 - 1 characters
-| m | Acquired date | String containing Unix 32-bit epoch timestamp +
+| m | Acquired date | String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | u
-| System date | String containing Unix 32-bit epoch timestamp +
+| System date | String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | p | Password hash | String containing the password hash. +
 If no password is set it should be simply the character '0'.
@@ -830,13 +832,15 @@ The remainder of the string contains the following information:
 | 3 | | Identifier for the values in the 4th line
 | 4 | | The data for the different identifiers in the 3rd line
 | 5 | | (an empty line)
-| 6 | srce | The name/type of the section provided
+| 6 | srce | The name/type of the section provided +
+See section: <<sources_category2,Sources category>>
 | 7 | |
 | 8 | | Identifier for the values in the section
 | 9 | |
 | 10 | |
 | 11 | | (an empty line)
-| 12 | sub | The name/type of the section provided
+| 12 | sub | The name/type of the section provided +
+See section: <<subjects_category2,Subjects category>>
 | 13 | |
 | 14 | | Identifier for the values in the section
 | 15 | |
@@ -889,7 +893,7 @@ in local time. Where as before both date values were in local time.
 
 For more information see section: <<header_values,Header values>>
 
-===== Sources category
+===== [[sources_category2]]Sources category
 
 Line 6 the srce category contains information about sources
 
@@ -924,7 +928,7 @@ Line 10 contains the values defined by line 8.
 The default values of some of these values has changed around linen 6.19 or
 earlier.
 
-===== Subjects category
+===== [[subjects_category2]]Subjects category
 
 Line 12 the sub category contains information about subjects.
 
@@ -1020,14 +1024,14 @@ String containing a date and time value +
 E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
 In linen: +
-String containing Unix 32-bit epoch timestamp +
+String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | u | System date | In EnCase: +
 String containing a date and time value +
 E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
 In linen: +
-String containing Unix 32-bit epoch timestamp +
+String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | p | Password hash | String containing the password hash. +
 If no password is set it should be simply the character '0'.
@@ -1148,7 +1152,7 @@ Most of the time this value is empty (0x00)
 | 32 | 4 | | The number of sectors of the C:H:S value +
 Most of the time this value is empty (0x00)
 | 36 | 1 | | Media flags +
-See section: Media flags
+See section: <<media_flags,Media flags>>
 | 37 | 3 | 0x00 | [yellow-background]*Unknown (empty values)*
 | 40 | 4 | | PALM volume start sector
 | 44 | 4 | 0x00 | [yellow-background]*Unknown (padding/empty values)*
@@ -1200,7 +1204,7 @@ The EWF-L01 format uses the EnCase 5 (EWF-E01) volume section specification. How
 | | |
 | 0x03 | | An optical disc (CD/DVD/BD)
 | | |
-| 0x0e | | Logical Evidence File (LEV or L01)
+| 0x0e | | Logical Evidence File (LEF or L01)
 | | |
 | 0x10 | | Physical Memory (RAM)
 |===
@@ -1792,7 +1796,8 @@ The ltree data string contains the following information:
 | 3 | | Identifier for the values in the 4th line
 | 4 | | The data for the different identifiers in the 3rd line
 | 5 | | (an empty line)
-| 6 | perm | Information about file permissions
+| 6 | perm | Information about file permissions +
+See section: <<permissions_category3,Permissions category>>
 | 7 | |
 | 8 | | Identifier for the values in the section
 | 9 | |
@@ -1800,7 +1805,8 @@ The ltree data string contains the following information:
 | 11 | |
 | 12 | |
 | 13 | | (an empty line)
-| 14 | srce | Probably the type of information provided (the data source)
+| 14 | srce | Probably the type of information provided (the data source) +
+See section: <<sources_category3,Sources category>>
 | 15 | |
 | 16 | | Identifier for the values in the section
 | 17 | |
@@ -1808,7 +1814,8 @@ The ltree data string contains the following information:
 | 19 | |
 | 20 | |
 | 21 | | (an empty line)
-| 22 | sub | Probably the type of information provided
+| 22 | sub | Probably the type of information provided +
+See section: <<subjects_category3,Subjects category>>
 | 23 | |
 | 24 | | Identifier for the values in the section
 | 25 | |
@@ -1849,7 +1856,7 @@ The size of the logical file data (media data)
 (introduced in EnCase 7)
 |===
 
-==== Permissions category
+==== [[permissions_category3]]Permissions category
 
 The perm category contains information about file permissions.
 
@@ -1874,7 +1881,7 @@ The 8th line consist of the following tab (0x09) separated values.
 
 [yellow-background]*Notes: Property: (2 => allow, empty => owner, 1 => group)*
 
-==== Sources category
+==== [[sources_category3]]Sources category
 
 Line 12 the srce category contains information about sources
 
@@ -1927,10 +1934,10 @@ Seen: "0"
 Seen: "f"
 |===
 
-"Acquire date" is in the form of: "1142163845", which is a Unix epoch time
+"Acquire date" is in the form of: "1142163845", which is a POSIX epoch time
 stamp and represents the date: March 12 2006, 11:44:05.
 
-==== Subjects category
+==== [[subjects_category3]]Subjects category
 
 The 21th line consist of the following tab (0x09) separated values.
 
@@ -1960,19 +1967,21 @@ The 29th line consist of the following tab (0x09) separated values.
 1 => if the single file entry is a directory +
 (null) => if single file entry is a file
 | 2 | n | Name
-| 3 | id | [yellow-background]*Unknown*
+| 3 | id | [yellow-background]*Unknown (file identifier?)*
 | 4 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
-| 5 | src | Possible the source identifier
-| 6 | sub | Possible the subject identifier
-| 7 | cid | [yellow-background]*Unknown*
+| 5 | src | Source identifier +
+The identifier corresponds to an entry in the <<sources_category3,Sources category>>
+| 6 | sub | Subject identifier +
+The identifier corresponds to an entry in the <<subjects_category3,Subjects category>>
+| 7 | cid | [yellow-background]*Unknown (record type)*
 | 8 | jq | [yellow-background]*Unknown*
 | 9 | cr | Creation date
 | 10 | ac | Access date +
 [yellow-background]*(precision is date only)*
 | 11 | wr | (File) modification (last written) date
 | 12 | mo | (File system) entry modification date
-| 13 | dl | [yellow-background]*Unknown*
+| 13 | dl | Deletion date
 | 14 | aq | [yellow-background]*Unknown*
 | 15 | ha | Hash +
 The MD5 hash of the file data
@@ -1985,19 +1994,20 @@ Relative from the start of the media data
 | 19 | po | [yellow-background]*Unknown (Physical Offset?)* +
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
 | 20 | mid | [yellow-background]*Unknown (identifier?)* +
+Contains a GUID/UUID +
 (introduced in EnCase 6.19)
 | 21 | cfi | [yellow-background]*Unknown* +
 (introduced in EnCase 6.14)
 | 22 | be | Binary extents +
-See section: <<binary_extents_value,Binary extents value>>
-| 23 | pm | [yellow-background]*Unknown (permissions index?)* +
-[yellow-background]*-1 has a special meaning?*
+See section: <<binary_extents,Binary extents value>>
+| 23 | pm | Permissions identifier +
+Contains an identifier that corresponds to an entry in the <<permissions_category3,Permissions category>> or -1 if not set
 | 24 | lpt | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
 |===
 
-"Creation date", "Access date" and " Last written date" are in the form of:
-"1142163845", which is a Unix epoch time stamp and represents the date: March
+"Creation date", "Access date" and "Last written date" are in the form of:
+"1142163845", which is a POSIX epoch time stamp and represents the date: March
 12 2006, 11:44:05.
 
 The "ha" value (Hash) consist of a MD5 hash string when file entries are
@@ -2026,18 +2036,19 @@ The 29th line consist of the following tab (0x09) separated values.
 [cols="1,1,5",options="header"]
 |===
 | Identifier number | Character in 29th line | Meaning
-| 1 | mid | [yellow-background]*Unknown (identifier?)*
+| 1 | mid | [yellow-background]*Unknown (identifier?)* +
+Contains a GUID/UUID +
 | 2 | ls | File size +
 The file size specified in bytes +
 If the file size is 0 the data size should be 1
 | 3 | be | Binary extents +
-See section: <<binary_extents_value,Binary extents value>>
-| 4 | id | [yellow-background]*Unknown*
+See section: <<binary_extents,Binary extents value>>
+| 4 | id | [yellow-background]*Unknown (file identifier?)*
 | 5 | cr | Creation date
 | 6 | ac | Access date
 | 7 | wr | (File) modification (last written) date
 | 8 | mo | (File system) entry modification date
-| 9 | dl | [yellow-background]*Unknown*
+| 9 | dl | Deletion date
 | 10 | sig | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
 | 11 | ha | Hash +
@@ -2047,8 +2058,7 @@ Judging by the size this value is assumed to be the SHA1 hash of the file data, 
 (Introduced in EnCase 7)
 | 13 | ent | [yellow-background]*Unknown* +
 (Introduced in EnCase 7.9)
-| 14 | snh | [yellow-background]*Unknown (Short or 8.3 name)* +
-Contains "13 FILENAME.EXT" where the first number is the number of characters in the name? +
+| 14 | snh | Short (or DOS 8.3) name +
 (Introduced in EnCase 7.9)
 | 15 | p | Is parent +
 1 => if the single file entry is a directory +
@@ -2059,15 +2069,17 @@ Relative from the start of the media data
 | 18 | lo | [yellow-background]*Unknown (Logical Offset?)*
 | 19 | po | [yellow-background]*Unknown (Physical Offset?)*
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
-| 20 | pm | [yellow-background]*Unknown (permissions index?)* +
-[yellow-background]*-1 has a special meaning?*
+| 20 | pm | Permissions identifier +
+Contains an identifier that corresponds to an entry in the <<permissions_category3,Permissions category>> or -1 if not set
 | 21 | oes | [yellow-background]*Unknown (Original extents)* +
 (Introduced in EnCase 7)
 | 22 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
-| 23 | src | [yellow-background]*Unknown (Possible the source identifier)*
-| 24 | sub | [yellow-background]*Unknown (Possible the subject identifier)*
-| 25 | cid | [yellow-background]*Unknown*
+| 23 | src | Source identifier +
+The identifier corresponds to an entry in the <<sources_category3,Sources category>>
+| 24 | sub | Subject identifier +
+The identifier corresponds to an entry in the <<subjects_category3,Subjects category>>
+| 25 | cid | [yellow-background]*Unknown (record type)*
 | 26 | jq | [yellow-background]*Unknown*
 | 27 | alt | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
@@ -2077,7 +2089,8 @@ See section: <<file_entry_flags,File entry flags>>
 | 30 | cfi | [yellow-background]*Unknown*
 | 31 | sg | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 32 | ea | [yellow-background]*Unknown* +
+| 32 | ea | Extended attributes +
+See section: <<extended_attributes,Extended attributes value>> +
 (Introduced in EnCase 7.9)
 | 33 | lpt | [yellow-background]*Unknown*
 |===
@@ -2092,26 +2105,6 @@ MD5 hash is not set. The same applies for the "sha" value when it contains
 
 ....
 1 30a555b 30a6000 12011ae00 9008d7 3f 43 1 12011ae00 30a6000 120113 30a6 9008d7 18530
-....
-
-====== Unknonw ea
-
-[yellow-background]*TODO: add some text*
-
-Contains base-16 encoded data:
-....
-0x00000000  00 00 00 00 01 0b 00 00  00 01 00 00 00 41 00 74  .............A.t
-0x00000010  00 74 00 72 00 69 00 62  00 75 00 74 00 65 00 73  .t.r.i.b.u.t.e.s
-0x00000020  00 00 00 00 00 01 00 00  00 01 04 00 00 00 01 00  ................
-0x00000030  00 00 45 00 46 00 53 00  00 00 00 00 01 00 00 00  ..E.F.S.........
-0x00000040  00 0c 00 00 00 02 00 00  00 53 00 65 00 71 00 75  .........S.e.q.u
-0x00000050  00 65 00 6e 00 63 00 65  00 20 00 49 00 44 00 00  .e.n.c.e. .I.D..
-0x00000060  00 31 00 00 00 01 00 00  00 00 18 00 00 00 08 00  .1..............
-0x00000070  00 00 4c 00 6f 00 67 00  69 00 63 00 61 00 6c 00  ..L.o.g.i.c.a.l.
-0x00000080  20 00 73 00 65 00 71 00  75 00 65 00 6e 00 63 00   .s.e.q.u.e.n.c.
-0x00000090  65 00 20 00 6e 00 75 00  6d 00 62 00 65 00 72 00  e. .n.u.m.b.e.r.
-0x000000a0  00 00 31 00 39 00 33 00  31 00 31 00 45 00 44 00  ..1.9.3.1.1.E.D.
-0x000000b0  00 00                                             ..
 ....
 
 ====== Ltree file entries
@@ -2159,9 +2152,10 @@ If the duplicate data offset value is set the single byte in the data is
 ignored and the duplicate data offset refers to the location where the data
 stored.
 
-===== [[binary_extents_value]]Binary extents value
+===== [[binary_extents]]Binary extents value
 
 The binary extents value contains 3 values separated by a space:
+
 ....
 Unknown Offset Size
 ....
@@ -2175,6 +2169,49 @@ Where:
 The offset and size are specified in hexadecimal values.
 
 [yellow-background]*Note: Contains 1 value for the first single file entry.*
+
+===== [[extended_attributes]]Extended attributes value
+
+The extended attributes value contains base-16 encoded data, which consists of:
+
+* Extended attributes header (stored as an extended attribute)
+* One or more extended attributes
+
+====== Extended attributes header
+
+The extended attributes header is 37 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | 0 | [yellow-background]*Unknown (node level?)*
+| 4 | 1 | 1 | [yellow-background]*Unknown (0 => is leaf node, 1 => is branch node?)*
+| 5 | 4 | 11 | Number of characters in name string including the end-of-string character
+| 9 | 4 | 1 | Number of characters in value string including the end-of-string character
+| 13 | 22 | "Attributes\0" | Name string +
+Contains an UTF-16 little-endian encoded string including end-of-string character
+| 35 | 2 | "\0" | Value string +
+Contains an UTF-16 little-endian encoded string including end-of-string character
+|===
+
+====== Extended attribute
+
+An extended attributes is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown (node level?)*
+| 4 | 1 | | [yellow-background]*Unknown (0 => is leaf node, 1 => is branch node?)*
+| 5 | 4 | | Number of characters in name string including the end-of-string character
+| 9 | 4 | | Number of characters in value string including the end-of-string character
+| 13 | ... | | Name string +
+Contains an UTF-16 little-endian encoded string including end-of-string character
+| ... | ... | | Value string +
+Contains an UTF-16 little-endian encoded string including end-of-string character
+|===
+
+[yellow-background]*TODO: complete section*
 
 === Map section
 
@@ -2473,6 +2510,7 @@ Additional sections provided in the EWF-X format are:
 
 The xheader section contains a zlib compressed data (see section:
 3 Compression) containing XML data containing the header values.
+
 ....
 <?xml version="1.0" encoding="UTF-8"?>
 <xheader>
@@ -2492,6 +2530,7 @@ The xheader section contains a zlib compressed data (see section:
 
 The xhash section contains a zlib compressed data (see section:
 <<compression,Compression>>) containing XML data containing the hash values.
+
 ....
 <?xml version="1.0" encoding="UTF-8"?>
 <xhash>
@@ -2552,6 +2591,7 @@ For compression method 8 (Deflate) the compression information contains the
 base-2 logarithm of the LZ77 window size minus 8.
 
 To determine the corresponding window size:
+
 ....
 1 << ( 7 + 8 )
 ....
@@ -2688,6 +2728,7 @@ into the corresponding array of size values (or base size + additional size).
 |===
 
 [yellow-background]*TODO merge with table*
+
 ....
              Extra           Extra               Extra
              Code Bits Dist  Code Bits   Dist     Code Bits Distance
@@ -2714,6 +2755,7 @@ into the corresponding array of size values (or base size + additional size).
 |===
 
 [yellow-background]*TODO merge with table*
+
 ....
                5 Bits: HLIT, # of Literal/Length codes - 257 (257 - 286)
                5 Bits: HDIST, # of Distance codes - 1        (1 - 32)
@@ -2765,6 +2807,7 @@ the Huffman code.
 ==== Decompression
 
 [yellow-background]*TODO add description*
+
 ....
 do
 {
