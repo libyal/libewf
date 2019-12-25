@@ -7,16 +7,18 @@ Expert Witness Compression Format version 2 specification
 :numbered!:
 [abstract]
 == Summary
-In EnCase 7 Guidance Software introduced a version 2 of the Expert Witness 
-Compression Format (EWF). Although at high-level both version 1 and 2 are quite 
+
+In EnCase 7 Guidance Software introduced a version 2 of the Expert Witness
+Compression Format (EWF). Although at high-level both version 1 and 2 are quite
 similar in the details both versions differ significantly.
 
-This document is intended as a working document for the EWF2 specification. 
-Which should allow existing Open Source forensic tooling to be able to process 
+This document is intended as a working document for the EWF2 specification.
+Which should allow existing Open Source forensic tooling to be able to process
 this file type.
 
 [preface]
 == Document information
+
 [cols="1,5"]
 |===
 | Author(s): | Joachim Metz <joachim.metz@gmail.com>
@@ -27,17 +29,19 @@ this file type.
 
 [preface]
 == License
+
 ....
-Copyright (C) 2012-2016, Joachim Metz <joachim.metz@gmail.com>.
-Permission is granted to copy, distribute and/or modify this document under the 
-terms of the GNU Free Documentation License, Version 1.3 or any later version 
-published by the Free Software Foundation; with no Invariant Sections, no 
-Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included 
+Copyright (C) 2012-2019, Joachim Metz <joachim.metz@gmail.com>.
+Permission is granted to copy, distribute and/or modify this document under the
+terms of the GNU Free Documentation License, Version 1.3 or any later version
+published by the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included
 in the section entitled "GNU Free Documentation License".
 ....
 
 [preface]
 == Revision history
+
 [cols="1,1,1,5",options="header"]
 |===
 | Version | Author | Date | Comments
@@ -51,16 +55,18 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.8 | J.B. Metz | September 2012 | Updates regarding bzip2 compression.
 | 0.0.9 | J.B. Metz | August 2015 | Switched to asciidoc format.
 | 0.0.10 | J.B. Metz | April 2016 | Updates regarding single files data.
+| 0.0.11 | J.B. Metz | December 2019 | Formatting changes.
 |===
 
 :numbered:
 == Overview
-In EnCase 7 Guidance Software introduced a version 2 of the Expert Witness 
-Compression Format (EWF). Although at high-level both version 1 and 2 are quite 
+
+In EnCase 7 Guidance Software introduced a version 2 of the Expert Witness
+Compression Format (EWF). Although at high-level both version 1 and 2 are quite
 similar in the details both versions differ significantly.
 
-This document will use EWF2 as the name of the format although Guidance named 
-the format EnCase Evidence File Format Version 2, see `[ENCASE12]`. EWF1 is used 
+This document will use EWF2 as the name of the format although Guidance named
+the format EnCase Evidence File Format Version 2, see `[ENCASE12]`. EWF1 is used
 to indicate version 1 of the format.
 
 There are 2 different versions of EWF2:
@@ -68,17 +74,19 @@ There are 2 different versions of EWF2:
 * EWF2-Ex01; "normal" image files to store disk, volume and memory images.
 * EWF2-Lx01; logical evidence file to store files and directories.
 
-In EWF2 the data is either compressed or non-compressed, EWF2 no longer 
+In EWF2 the data is either compressed or non-compressed, EWF2 no longer
 distinguishes between multiple compression levels.
 
 In EWF2 support was added to encrypt the data and relevant metadata.
 
 === Test version
+
 The following version of programs were used to test the information within this document:
 
 * EnCase 7.04 (Windows)
 
 ==  Segment files
+
 EWF2 stores data in one or more segment files (or segments). Each segment file consists of:
 
 * A file header.
@@ -87,16 +95,18 @@ EWF2 stores data in one or more segment files (or segments). Each segment file c
 EnCase allows for the segment file size to be set at 30 MB at minimum and about 8.8 TB at maximum. Libewf 1 MiB at minimum and about 8 EiB at maximum.
 
 === File header
+
 Each segment file starts with file header, the file header differs for EWF2-Ex01 and EWF2-Lx01.
 
 ==== EWF2-Ex01
+
 The file header is 32 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | | Signature +
-"EVF2\r\n\x81\x00" 
+"EVF2\r\n\x81\x00"
 | 8 | 1 | 2 | Major version
 | 9 | 1 | 1 | Minor version
 | 10 | 2 | | Compression method +
@@ -111,13 +121,14 @@ Contains a little-endian GUID (version 4)
 Version 2.1 is the first version of the EWF2 format. It currently is assumed that EWF1 is considered version 1.0.
 
 ==== EWF2-Lx01
+
 The file header is 32 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | | Signature +
-"LEF2\r\n\x81\x00" 
+"LEF2\r\n\x81\x00"
 | 8 | 1 | 2 | Major version
 | 9 | 1 | 1 | Minor version
 | 10 | 2 | | Compression method +
@@ -139,8 +150,8 @@ Contains a little-endian GUID (version 4)
 | 2 | COMPRESSION_BZIP2 | BZip2 compression
 |===
 
-`[ENCASE12]` states that "COMPRESSION_NONE will be never used", even so EnCase 7 
-does not even seem to supports this compression method and indicates the file 
+`[ENCASE12]` states that "COMPRESSION_NONE will be never used", even so EnCase 7
+does not even seem to supports this compression method and indicates the file
 header is corrupt.
 
 Also see section: <<compression,Compression>>
@@ -149,6 +160,7 @@ Also see section: <<compression,Compression>>
 At the moment EnCase 7 does not appear to provide an option to set the compression method to bzip2
 
 === Segment file extensions
+
 ==== EWF2-Ex01
 
 * The first segment file has the extension '.Ex01'.
@@ -180,14 +192,16 @@ libewf supports extensions up to .EzZZ
 libewf supports extensions up to .LzZZ
 
 == The sections
-The remainder of the segment file consists of sections. Every section ends with 
-data that describes the section this will be referred to as the section 
-descriptor. In contrast to EWF the section descriptor is at the end of the 
-section and the section descriptor points to its previous section so the 
+
+The remainder of the segment file consists of sections. Every section ends with
+data that describes the section this will be referred to as the section
+descriptor. In contrast to EWF the section descriptor is at the end of the
+section and the section descriptor points to its previous section so the
 sections need to be read from back-to-front.
 
 === Section descriptor
-The section descriptor consist of 64 bytes, it contains information about a 
+
+The section descriptor consist of 64 bytes, it contains information about a
 specific section.
 
 [cols="1,1,1,5",options="header"]
@@ -212,11 +226,11 @@ Adler-32 of all the previous data within the section descriptor.
 |===
 
 [NOTE]
-The data size includes the padding size. The padding is not always at the end 
-of the section data, it can also be after a table header followed by more 
+The data size includes the padding size. The padding is not always at the end
+of the section data, it can also be after a table header followed by more
 section data.
 
-The section can contain additional data not defined by the data size. This was 
+The section can contain additional data not defined by the data size. This was
 seen in the sector data section of an EWF2 file that was aborted and restarted.
 
 ==== [[section_types]]Section types
@@ -240,7 +254,7 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 | 0x0000000e | | Final information
 | 0x0000000f | | Done
 | 0x00000010 | | Analytical data
-| | | 
+| | |
 | 0x00000020 | | Single files data +
 [yellow-background]*Not defined by `[ENCASE12]`*
 | 0x00000021 | | Single files unknown table +
@@ -261,6 +275,7 @@ seen in the sector data section of an EWF2 file that was aborted and restarted.
 |===
 
 === Device information
+
 The device information section can be found:
 
 * in every segment file after the file header in EWF2-Ex01
@@ -318,6 +333,7 @@ Set when the memory of an individual process is acquired
 |===
 
 === Case data
+
 The case data section can be found:
 
 * in every segment file after the device information section in EWF2-Ex01
@@ -371,8 +387,8 @@ The value is empty, not 0 when the compression method is no compression +
 |===
 
 [NOTE]
-EnCase 7 only provides the following number of sectors per chunk: 64, 128, 256, 
-512, 1024 which is referred by the application as block size. The thorough 
+EnCase 7 only provides the following number of sectors per chunk: 64, 128, 256,
+512, 1024 which is referred by the application as block size. The thorough
 error granularity in EnCase 7 corresponds to 1 sector.
 
 ==== Write-blocker type
@@ -385,44 +401,46 @@ error granularity in EnCase 7 corresponds to 1 sector.
 |===
 
 === Sector data
-The first sector data section can be found in every segment file after the case 
-data section. Successive sector data sections are found after the sector table 
+
+The first sector data section can be found in every segment file after the case
+data section. Successive sector data sections are found after the sector table
 section.
 
-When encryption is enabled the sector data is encrypted. 
+When encryption is enabled the sector data is encrypted.
 [yellow-background]*TODO verify this.*
 
-The sector data is stored in chunks. `[ENCASE12]` states that each chunk must be 
-stored 16-byte aligned and padded with 0-byte values if necessary. Although it 
+The sector data is stored in chunks. `[ENCASE12]` states that each chunk must be
+stored 16-byte aligned and padded with 0-byte values if necessary. Although it
 can read non 16-byte aligned chunks.
 
-If the sector compression method defined in case data section is set the chunk 
-is compressed and the chunk data flag COMPRESSED is set. The checksum intrinsic 
-to the compression method is used to verify the integrity of the chunk data. 
+If the sector compression method defined in case data section is set the chunk
+is compressed and the chunk data flag COMPRESSED is set. The checksum intrinsic
+to the compression method is used to verify the integrity of the chunk data.
 The chunk data flag CHECKSUMED is not set.
 
-If a chunk is not compressed an Adler32 checksum of the data is stored after 
+If a chunk is not compressed an Adler32 checksum of the data is stored after
 the chunk data and the chunk data flag CHECKSUMED is set.
 
-Pattern fill seems to be a special case of compression and the COMPRESSED flag 
-is set in combination with the PATTERNFILL flag. In EnCase pattern fill is not 
-used when writing files and the compression is set to none. Libewf, when 
-reading files, ignores the PATTERNFILL flag if the corresponding COMPRESSED 
+Pattern fill seems to be a special case of compression and the COMPRESSED flag
+is set in combination with the PATTERNFILL flag. In EnCase pattern fill is not
+used when writing files and the compression is set to none. Libewf, when
+reading files, ignores the PATTERNFILL flag if the corresponding COMPRESSED
 flag is not set.
 
-If the PATTERNFILL flag is set the chunk data size in the sector table entry is 
-set to 0 and the chunk data offset contains a 64-bit pattern to fill the chunk 
+If the PATTERNFILL flag is set the chunk data size in the sector table entry is
+set to 0 and the chunk data offset contains a 64-bit pattern to fill the chunk
 data.
 
 See section: <<compression_methods,Compression methods>>
 
 === Sector table
-The sector table is stored as an array of sector table entries (chunk 
-descriptor or block offset). It defines the location of the chunk data in the 
+
+The sector table is stored as an array of sector table entries (chunk
+descriptor or block offset). It defines the location of the chunk data in the
 segment file.
 
-The sector table section can be found in every segment file after the sector 
-data section. Every sector data section should be followed by a section table 
+The sector table section can be found in every segment file after the sector
+data section. Every sector data section should be followed by a section table
 section.
 
 When encryption is enabled the sector table is encrypted.
@@ -434,6 +452,7 @@ The sector table consists of:
 * the sector table footer
 
 ==== Sector table header
+
 The sector table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -455,6 +474,7 @@ The sector table header should be followed by 12 bytes of alignment padding.
 [yellow-background]*Does EnCase write about 1600 entries per section?*
 
 ==== Sector table entry
+
 A sector table entry is 16 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -478,6 +498,7 @@ A sector table entry is 16 bytes of size and consists of:
 The PATTERNFILL flag should be ignored if the COMPRESSED flag is not set.
 
 ==== Sector table footer
+
 The sector table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -490,13 +511,14 @@ Adler-32 of all the previous data within the sector table entries.
 The sector table footer should be followed by 12 bytes of alignment padding.
 
 === Error table
-The error table is stored as an array of error table entries. It defines the 
+
+The error table is stored as an array of error table entries. It defines the
 sector ranges that could not be read correctly during acquisition.
 
-The error table section is optional, it does not need to be present. If it does 
+The error table section is optional, it does not need to be present. If it does
 it resides in the last segment file before the MD5 hash section.
 
-When encryption is enabled the error table is encrypted. 
+When encryption is enabled the error table is encrypted.
 [yellow-background]*TODO verify this.*
 
 The error table consists of:
@@ -506,6 +528,7 @@ The error table consists of:
 * the error table footer
 
 ==== Error table header
+
 The error table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -522,6 +545,7 @@ The error table header should be followed by 12 bytes of alignment padding.
 [yellow-background]*This differs from what `[ENCASE12]` specifies.*
 
 ==== Error table entry
+
 An error table entry is 16 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -534,6 +558,7 @@ Reserved empty values
 |===
 
 ==== Error table footer
+
 The error table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -546,13 +571,14 @@ Adler-32 of all the previous data within the array of error table entries.
 The error table footer should be followed by 12 bytes of alignment padding.
 
 === Session table
-The session table is stored as an array of session table entries. It defines 
+
+The session table is stored as an array of session table entries. It defines
 the sessions of the optical disc stored in the set of segment files.
 
-The session table section is optional, it does not need to be present. If it 
+The session table section is optional, it does not need to be present. If it
 does it resides in the last segment file before the error table section.
 
-When encryption is enabled the session table is encrypted. 
+When encryption is enabled the session table is encrypted.
 [yellow-background]*TODO verify this.*
 
 The session table consists of:
@@ -562,6 +588,7 @@ The session table consists of:
 * the session table footer
 
 ==== Session table header
+
 The session table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -578,6 +605,7 @@ The session table header should be followed by 12 bytes of alignment padding.
 [yellow-background]*This differs from what `[ENCASE12]` specifies.*
 
 ==== Session table entry
+
 A session table entry is 32 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -589,9 +617,9 @@ A session table entry is 32 bytes of size and consists of:
 Reserved empty values
 |===
 
-[yellow-background]*For a CD the first session sector is stored as 16, although 
-the actual session starts at sector 0. Could this value be overloaded to 
-indicate the size of the reserved space between the start of the session and 
+[yellow-background]*For a CD the first session sector is stored as 16, although
+the actual session starts at sector 0. Could this value be overloaded to
+indicate the size of the reserved space between the start of the session and
 the ISO 9660 volume descriptor.*
 
 ==== Session flags
@@ -602,11 +630,12 @@ the ISO 9660 volume descriptor.*
 | 0x00000001 | | If set the track is an audio track otherwise the track is a data track
 |===
 
-EnCase stores the data of audio tracks of an optical disc as 0-byte data with a 
-sector size of 2048. It is therefore assumed that the format is only to support 
+EnCase stores the data of audio tracks of an optical disc as 0-byte data with a
+sector size of 2048. It is therefore assumed that the format is only to support
 data tracks with a sector size of 2048.
 
 ==== Session table footer
+
 The session table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -619,17 +648,19 @@ Adler-32 of all the previous data within the array of session table entries.
 The session table footer should be followed by 12 bytes of alignment padding.
 
 === Increment data
-The increment data section contains a serialized file object string that 
+
+The increment data section contains a serialized file object string that
 consist of:
 
-[yellow-background]*TODO location in segment files, affected by encryption? 
+[yellow-background]*TODO location in segment files, affected by encryption?
 Need example.*
 
 === MD5 hash
-The MD5 hash section contains the MD5 hash of the data stored in the set of 
+
+The MD5 hash section contains the MD5 hash of the data stored in the set of
 segment files.
 
-The MD5 hash section is optional, it does not need to be present. If it does it 
+The MD5 hash section is optional, it does not need to be present. If it does it
 resides in the last segment file before the SHA1 hash section.
 
 When encryption is enabled the MD5 hash is encrypted.
@@ -647,10 +678,11 @@ Adler-32 of the MD5 hash.
 The MD5 hash data should be followed by 12 bytes of alignment padding.
 
 === SHA1 hash
-The SHA1 hash section contains the SHA1 hash of the data stored in the set of 
+
+The SHA1 hash section contains the SHA1 hash of the data stored in the set of
 segment files.
 
-The SHA1 hash section is optional, it does not need to be present. If it does 
+The SHA1 hash section is optional, it does not need to be present. If it does
 it resides in the last segment file before the analytical data section.
 
 When encryption is enabled the SHA1 hash is encrypted.
@@ -668,16 +700,17 @@ Adler-32 of the SHA1 hash.
 The MD5 hash data should be followed by 8 bytes of alignment padding.
 
 === Restart data
-The restart data section is optional, it does not need to be present. If it 
+
+The restart data section is optional, it does not need to be present. If it
 does it resides in the last segment file before the done section.
 
-[yellow-background]*TODO is the restart data stored after or before the 
+[yellow-background]*TODO is the restart data stored after or before the
 encryption keys?*
 
 [NOTE]
 The "main" and "rl" object tags are not explicitly defined in the string.
 
-The restart data section contains a serialized file object string that consist 
+The restart data section contains a serialized file object string that consist
 of:
 
 [cols="1,1,5",options="header"]
@@ -688,18 +721,18 @@ of:
 | 3 | | Segments of the restart object
 |===
 
-The segments of the restart object likely represent the "tree view" in the 
-evidence view within EnCase. In the example below there are 3 segments, the 
-first segment having a sub object that has "expanded" properties and 
+The segments of the restart object likely represent the "tree view" in the
+evidence view within EnCase. In the example below there are 3 segments, the
+first segment having a sub object that has "expanded" properties and
 containing another sub object that contains the actual restart data.
 
 ....
 1	1
 p	d	sr	sp
 0	1
-			
+
 0	1
-5			
+5
 0	0
 			1216
 ....
@@ -740,18 +773,19 @@ The last sector acquired in the acquisition process
 | 0x08 | STATEINCLUDE | Item is included (green-plated)
 |===
 
-[yellow-background]*According to Guidance Software this value is used to store 
-saved stated. In this context the value should always set to 0 but can contain 
+[yellow-background]*According to Guidance Software this value is used to store
+saved stated. In this context the value should always set to 0 but can contain
 other values in different contexts. EnCase can choose to ignore these values.*
 
 === Encryption keys
-In EWF2 the data and some of the metadata can be encrypted, the encrypted keys 
+
+In EWF2 the data and some of the metadata can be encrypted, the encrypted keys
 section contains information necessary for decrypting the data.
 
-The encryption keys section is optional, it does not need to be present. If it 
+The encryption keys section is optional, it does not need to be present. If it
 does it resides in the last segment file before the done section.
 
-[yellow-background]*TODO is the encryption keys stored after or before the 
+[yellow-background]*TODO is the encryption keys stored after or before the
 restart data?*
 
 The encryption keys is variable of size and consists of:
@@ -769,20 +803,22 @@ Including the padding size
 
 The encryption keys should be followed by 12 bytes of alignment padding.
 
-[yellow-background]*`[ENCASE12]` "Please refer to the document outlining the 
+[yellow-background]*`[ENCASE12]` "Please refer to the document outlining the
 encryption support for Ex01 for further detail." Where is this document?*
 
-[yellow-background]*According to Guidance Software they are not disclosing 
+[yellow-background]*According to Guidance Software they are not disclosing
 information about Ex01 encryption.*
 
 === Memory extents table
-The memory extents table is stored as an array of memory extents table entries. 
+
+The memory extents table is stored as an array of memory extents table entries.
 It defines the extents of memory stored in the set of segment files.
 
 [yellow-background]*TODO location in segment files, affected by encryption?*
 [yellow-background]*TODO does this table also come with a table header and footer?*
 
 ==== Memory extents table entry
+
 A memory extents table entry is 16 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -793,27 +829,31 @@ A memory extents table entry is 16 bytes of size and consists of:
 |===
 
 === Next
-The next section is without data and marks the end of the segment file 
-indicating more segment files are in the set. It should be the last section in 
+
+The next section is without data and marks the end of the segment file
+indicating more segment files are in the set. It should be the last section in
 a segment file, other than the last segment file.
 
 === Final information
+
 [yellow-background]*`[ENCASE12]` defines this section as currently unused.*
 
 [yellow-background]*TODO location in segment files, affected by encryption?*
 
 === Done
-The done section is without data and marks the end of the segment file 
-indicating this is the last segment file in the set. It should be the last 
+
+The done section is without data and marks the end of the segment file
+indicating this is the last segment file in the set. It should be the last
 section in the last segment file.
 
 === Analytical data
-The analytical data section is optional, it does not need to be present. If it 
+
+The analytical data section is optional, it does not need to be present. If it
 does it resides in the last segment file before the restart data section.
 
 When encryption is enabled the analytical data is encrypted.
 
-The analytical data section contains a serialized file object string that 
+The analytical data section contains a serialized file object string that
 consist of:
 
 [cols="1,1,5",options="header"]
@@ -837,19 +877,21 @@ consist of:
 |===
 
 === Single files data
+
 The single files data section is only present in EWF2-Lx01.
 
-[yellow-background]*The single files data section can be found in the last 
-segment file after the last sector table section. TODO what about non-closed 
+[yellow-background]*The single files data section can be found in the last
+segment file after the last sector table section. TODO what about non-closed
 LEF files.*
 
 This section has the section integrity hash set.
 
-The single files data section contains a non-compressed serialized file object 
+The single files data section contains a non-compressed serialized file object
 data which is similar to the EnCase 7 ltree data in EWF-L01. See:
 https://github.com/libyal/libewf/blob/master/documentation/Expert%20Witness%20Compression%20Format%20(EWF).asciidoc[[LIBEWF\]].
 
 === 0x00000021 table
+
 [yellow-background]*TODO add descriptive text*
 
 The 0x00000021 table consists of:
@@ -859,6 +901,7 @@ The 0x00000021 table consists of:
 * the 0x00000021 table footer
 
 ==== 0x00000021 table header
+
 The 0x00000021 table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -873,6 +916,7 @@ Adler-32 of all the previous data within the 0x00000021 table header.
 The 0x00000021 table header should be followed by 12 bytes of alignment padding.
 
 ==== 0x00000021 table entry
+
 An 0x00000021 table entry is 8 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -883,6 +927,7 @@ An 0x00000021 table entry is 8 bytes of size and consists of:
 |===
 
 ==== 0x00000021 table footer
+
 The 0x00000021 table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -895,6 +940,7 @@ Adler-32 of all the previous data within the array of 0x00000021 table entries.
 The 0x00000021 table footer should be followed by 12 bytes of alignment padding.
 
 === Single files MD5 hash table
+
 [yellow-background]*TODO add descriptive text*
 
 The single files MD5 hash table consists of:
@@ -904,6 +950,7 @@ The single files MD5 hash table consists of:
 * the single files MD5 hash table footer
 
 ==== single files MD5 hash table header
+
 The 0x00000021 table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -915,10 +962,11 @@ The 0x00000021 table header is 20 bytes of size and consists of:
 Adler-32 of all the previous data within the single files MD5 hash table header.
 |===
 
-The single files MD5 hash table header should be followed by 12 bytes of 
+The single files MD5 hash table header should be followed by 12 bytes of
 alignment padding.
 
 ==== single files MD5 hash table entry
+
 A single files MD5 hash table entry is 8 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -928,6 +976,7 @@ A single files MD5 hash table entry is 8 bytes of size and consists of:
 |===
 
 ==== single files MD5 hash table footer
+
 The single files MD5 hash table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -940,6 +989,7 @@ Adler-32 of all the previous data within the array of single files MD5 hash tabl
 The single files MD5 hash table footer should be followed by 12 bytes of alignment padding.
 
 === 0x00000023 table
+
 [yellow-background]*TODO add descriptive text*
 
 The 0x00000023 table consists of:
@@ -949,6 +999,7 @@ The 0x00000023 table consists of:
 * the 0x00000023 table footer
 
 ==== 0x00000023 table header
+
 The 0x00000023 table header is 20 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -963,6 +1014,7 @@ Adler-32 of all the previous data within the 0x00000023 table header.
 The 0x00000023 table header should be followed by 12 bytes of alignment padding.
 
 ==== 0x00000023 table entry
+
 An 0x00000023 table entry is 8 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -973,6 +1025,7 @@ An 0x00000023 table entry is 8 bytes of size and consists of:
 |===
 
 ==== 0x00000023 table footer
+
 The 0x00000023 table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -984,12 +1037,13 @@ Adler-32 of all the previous data within the array of 0x00000023 table entries.
 
 The 0x00000023 table footer should be followed by 12 bytes of alignment padding.
 
-[yellow-background]*Note if the number of table entries is odd the alignment 
+[yellow-background]*Note if the number of table entries is odd the alignment
 padding is only 4 bytes.*
 
 == Serialized file object data
-The serialized file object data is stored as a compressed UTF-16 string with 
-byte-order-mark. Commonly the string is encoded in little-endian. The 
+
+The serialized file object data is stored as a compressed UTF-16 string with
+byte-order-mark. Commonly the string is encoded in little-endian. The
 compression method is defined in the file header of the segment file.
 
 The serialized file object data consists of:
@@ -997,7 +1051,7 @@ The serialized file object data consists of:
 * the first line containing the number of objects in the string
 * the object data
 
-The file object serialization format uses the following special character 
+The file object serialization format uses the following special character
 values:
 
 [cols="1,1,5",options="header"]
@@ -1006,16 +1060,17 @@ values:
 | 0x0001 | | Escaped line feed
 | 0x0002 | | Escaped carriage return
 | 0x0003 | | Escaped tab
-| | | 
+| | |
 | 0x0009 | | Value delimiter
 | 0x000a | | Line delimiter
 |===
 
 [NOTE]
-`[ENCASE12]` states line feed (0x000d) as line delimiter this should be line 
+`[ENCASE12]` states line feed (0x000d) as line delimiter this should be line
 feed (0x000a).
 
 === Object
+
 An object consists of multiple lines:
 
 [cols="1,1,5",options="header"]
@@ -1045,6 +1100,7 @@ Contains the number of seconds since Jan 1, 1970 00:00:00 UTC.
 |===
 
 === Sub objects
+
 Sub object are represented using the following value pairs.
 
 [cols="1,1,5",options="header"]
@@ -1068,16 +1124,17 @@ x	y	z
 A	A	A
 0       0
 B	B	B
-0       0 
+0       0
 C	C	C
 ....
 
-For sake of the example the attribute values have been marked with the 
+For sake of the example the attribute values have been marked with the
 identifier of the object.
 
 == [[compression]]Compression
 
 === Bzip2 compression
+
 A "normal" bzip2 compressed block consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1118,14 +1175,16 @@ Contains a CRC-32
 Byte-alignment
 |===
 
-EnCase does not include the values up to the "start of compressed block 
-signature". Also the values including "end of compressed block signature" and 
+EnCase does not include the values up to the "start of compressed block
+signature". Also the values including "end of compressed block signature" and
 after are not included. The data is stored byte-aligned.
 
 [yellow-background]*Is the block size is always set to 9 => 900 kB?*
 
 == Notes
+
 === Encryption
+
 Encryption keys section:
 the data integrity hash is set and the corresponding data flag in the section descriptor
 
@@ -1154,28 +1213,29 @@ EWF2-Ex01, EWF2-Lx01
 how does encase deal with out of order sector table sections?
 
 === .PublicKey file
+
 ....
-00000000  41 43 46 09 0d 0a ff 00  02 00 00 00 65 6b 65 79  |ACF.........ekey| 
-00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000040  00 01 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000050  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000060  00 01 00 00 00 00 00 00  01 00 00 00 40 00 00 00  |............@...| 
-00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000080  00 00 00 00 00 00 00 00  01 00 00 00 b0 03 00 00  |................| 
-00000090  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000a0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000b0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000c0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000d0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-000000f0  00 00 00 00 00 00 00 00  00 00 00 00 91 04 4e e2  |..............N.| 
-00000100  6b 65 79 73 00 00 00 00  01 00 00 00 32 cb 26 1d  |keys........2.&.| 
-00000110  40 01 00 00 00 00 00 00  ab 03 00 00 00 00 00 00  |@...............| 
-00000120  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000130  00 00 00 00 00 00 00 00  00 00 00 00 ed 03 02 c4  |................| 
-00000140  01 9c 11 06 04 00 da 4b  9f d2 22 d1 4b ce 2f 3b  |.......K..".K./;| 
+00000000  41 43 46 09 0d 0a ff 00  02 00 00 00 65 6b 65 79  |ACF.........ekey|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000040  00 01 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000050  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000060  00 01 00 00 00 00 00 00  01 00 00 00 40 00 00 00  |............@...|
+00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000080  00 00 00 00 00 00 00 00  01 00 00 00 b0 03 00 00  |................|
+00000090  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000a0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000b0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000c0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000d0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000f0  00 00 00 00 00 00 00 00  00 00 00 00 91 04 4e e2  |..............N.|
+00000100  6b 65 79 73 00 00 00 00  01 00 00 00 32 cb 26 1d  |keys........2.&.|
+00000110  40 01 00 00 00 00 00 00  ab 03 00 00 00 00 00 00  |@...............|
+00000120  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000130  00 00 00 00 00 00 00 00  00 00 00 00 ed 03 02 c4  |................|
+00000140  01 9c 11 06 04 00 da 4b  9f d2 22 d1 4b ce 2f 3b  |.......K..".K./;|
 ...
 ....
 
@@ -1225,378 +1285,391 @@ how does encase deal with out of order sector table sections?
 
 [appendix]
 == GNU Free Documentation License
+
 Version 1.3, 3 November 2008
-Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc. 
+Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
 <http://fsf.org/>
 
-Everyone is permitted to copy and distribute verbatim copies of this license 
+Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
 
 === 0. PREAMBLE
-The purpose of this License is to make a manual, textbook, or other functional 
-and useful document "free" in the sense of freedom: to assure everyone the 
-effective freedom to copy and redistribute it, with or without modifying it, 
-either commercially or noncommercially. Secondarily, this License preserves for 
-the author and publisher a way to get credit for their work, while not being 
+
+The purpose of this License is to make a manual, textbook, or other functional
+and useful document "free" in the sense of freedom: to assure everyone the
+effective freedom to copy and redistribute it, with or without modifying it,
+either commercially or noncommercially. Secondarily, this License preserves for
+the author and publisher a way to get credit for their work, while not being
 considered responsible for modifications made by others.
 
-This License is a kind of "copyleft", which means that derivative works of the 
-document must themselves be free in the same sense. It complements the GNU 
+This License is a kind of "copyleft", which means that derivative works of the
+document must themselves be free in the same sense. It complements the GNU
 General Public License, which is a copyleft license designed for free software.
 
-We have designed this License in order to use it for manuals for free software, 
-because free software needs free documentation: a free program should come with 
-manuals providing the same freedoms that the software does. But this License is 
-not limited to software manuals; it can be used for any textual work, 
-regardless of subject matter or whether it is published as a printed book. We 
-recommend this License principally for works whose purpose is instruction or 
+We have designed this License in order to use it for manuals for free software,
+because free software needs free documentation: a free program should come with
+manuals providing the same freedoms that the software does. But this License is
+not limited to software manuals; it can be used for any textual work,
+regardless of subject matter or whether it is published as a printed book. We
+recommend this License principally for works whose purpose is instruction or
 reference.
 
 === 1. APPLICABILITY AND DEFINITIONS
-This License applies to any manual or other work, in any medium, that contains 
-a notice placed by the copyright holder saying it can be distributed under the 
-terms of this License. Such a notice grants a world-wide, royalty-free license, 
-unlimited in duration, to use that work under the conditions stated herein. The 
-"Document", below, refers to any such manual or work. Any member of the public 
-is a licensee, and is addressed as "you". You accept the license if you copy, 
+
+This License applies to any manual or other work, in any medium, that contains
+a notice placed by the copyright holder saying it can be distributed under the
+terms of this License. Such a notice grants a world-wide, royalty-free license,
+unlimited in duration, to use that work under the conditions stated herein. The
+"Document", below, refers to any such manual or work. Any member of the public
+is a licensee, and is addressed as "you". You accept the license if you copy,
 modify or distribute the work in a way requiring permission under copyright law.
 
-A "Modified Version" of the Document means any work containing the Document or 
-a portion of it, either copied verbatim, or with modifications and/or 
+A "Modified Version" of the Document means any work containing the Document or
+a portion of it, either copied verbatim, or with modifications and/or
 translated into another language.
 
-A "Secondary Section" is a named appendix or a front-matter section of the 
-Document that deals exclusively with the relationship of the publishers or 
-authors of the Document to the Document's overall subject (or to related 
-matters) and contains nothing that could fall directly within that overall 
-subject. (Thus, if the Document is in part a textbook of mathematics, a 
-Secondary Section may not explain any mathematics.) The relationship could be a 
-matter of historical connection with the subject or with related matters, or of 
+A "Secondary Section" is a named appendix or a front-matter section of the
+Document that deals exclusively with the relationship of the publishers or
+authors of the Document to the Document's overall subject (or to related
+matters) and contains nothing that could fall directly within that overall
+subject. (Thus, if the Document is in part a textbook of mathematics, a
+Secondary Section may not explain any mathematics.) The relationship could be a
+matter of historical connection with the subject or with related matters, or of
 legal, commercial, philosophical, ethical or political position regarding them.
 
-The "Invariant Sections" are certain Secondary Sections whose titles are 
-designated, as being those of Invariant Sections, in the notice that says that 
-the Document is released under this License. If a section does not fit the 
-above definition of Secondary then it is not allowed to be designated as 
-Invariant. The Document may contain zero Invariant Sections. If the Document 
+The "Invariant Sections" are certain Secondary Sections whose titles are
+designated, as being those of Invariant Sections, in the notice that says that
+the Document is released under this License. If a section does not fit the
+above definition of Secondary then it is not allowed to be designated as
+Invariant. The Document may contain zero Invariant Sections. If the Document
 does not identify any Invariant Sections then there are none.
 
-The "Cover Texts" are certain short passages of text that are listed, as 
-Front-Cover Texts or Back-Cover Texts, in the notice that says that the 
-Document is released under this License. A Front-Cover Text may be at most 5 
+The "Cover Texts" are certain short passages of text that are listed, as
+Front-Cover Texts or Back-Cover Texts, in the notice that says that the
+Document is released under this License. A Front-Cover Text may be at most 5
 words, and a Back-Cover Text may be at most 25 words.
 
-A "Transparent" copy of the Document means a machine-readable copy, represented 
-in a format whose specification is available to the general public, that is 
-suitable for revising the document straightforwardly with generic text editors 
-or (for images composed of pixels) generic paint programs or (for drawings) 
-some widely available drawing editor, and that is suitable for input to text 
-formatters or for automatic translation to a variety of formats suitable for 
-input to text formatters. A copy made in an otherwise Transparent file format 
-whose markup, or absence of markup, has been arranged to thwart or discourage 
-subsequent modification by readers is not Transparent. An image format is not 
-Transparent if used for any substantial amount of text. A copy that is not 
+A "Transparent" copy of the Document means a machine-readable copy, represented
+in a format whose specification is available to the general public, that is
+suitable for revising the document straightforwardly with generic text editors
+or (for images composed of pixels) generic paint programs or (for drawings)
+some widely available drawing editor, and that is suitable for input to text
+formatters or for automatic translation to a variety of formats suitable for
+input to text formatters. A copy made in an otherwise Transparent file format
+whose markup, or absence of markup, has been arranged to thwart or discourage
+subsequent modification by readers is not Transparent. An image format is not
+Transparent if used for any substantial amount of text. A copy that is not
 "Transparent" is called "Opaque".
 
-Examples of suitable formats for Transparent copies include plain ASCII without 
-markup, Texinfo input format, LaTeX input format, SGML or XML using a publicly 
-available DTD, and standard-conforming simple HTML, PostScript or PDF designed 
-for human modification. Examples of transparent image formats include PNG, XCF 
-and JPG. Opaque formats include proprietary formats that can be read and edited 
-only by proprietary word processors, SGML or XML for which the DTD and/or 
-processing tools are not generally available, and the machine-generated HTML, 
+Examples of suitable formats for Transparent copies include plain ASCII without
+markup, Texinfo input format, LaTeX input format, SGML or XML using a publicly
+available DTD, and standard-conforming simple HTML, PostScript or PDF designed
+for human modification. Examples of transparent image formats include PNG, XCF
+and JPG. Opaque formats include proprietary formats that can be read and edited
+only by proprietary word processors, SGML or XML for which the DTD and/or
+processing tools are not generally available, and the machine-generated HTML,
 PostScript or PDF produced by some word processors for output purposes only.
 
-The "Title Page" means, for a printed book, the title page itself, plus such 
-following pages as are needed to hold, legibly, the material this License 
-requires to appear in the title page. For works in formats which do not have 
-any title page as such, "Title Page" means the text near the most prominent 
+The "Title Page" means, for a printed book, the title page itself, plus such
+following pages as are needed to hold, legibly, the material this License
+requires to appear in the title page. For works in formats which do not have
+any title page as such, "Title Page" means the text near the most prominent
 appearance of the work's title, preceding the beginning of the body of the text.
 
-The "publisher" means any person or entity that distributes copies of the 
+The "publisher" means any person or entity that distributes copies of the
 Document to the public.
 
-A section "Entitled XYZ" means a named subunit of the Document whose title 
-either is precisely XYZ or contains XYZ in parentheses following text that 
-translates XYZ in another language. (Here XYZ stands for a specific section 
-name mentioned below, such as "Acknowledgements", "Dedications", 
-"Endorsements", or "History".) To "Preserve the Title" of such a section when 
-you modify the Document means that it remains a section "Entitled XYZ" 
+A section "Entitled XYZ" means a named subunit of the Document whose title
+either is precisely XYZ or contains XYZ in parentheses following text that
+translates XYZ in another language. (Here XYZ stands for a specific section
+name mentioned below, such as "Acknowledgements", "Dedications",
+"Endorsements", or "History".) To "Preserve the Title" of such a section when
+you modify the Document means that it remains a section "Entitled XYZ"
 according to this definition.
 
-The Document may include Warranty Disclaimers next to the notice which states 
-that this License applies to the Document. These Warranty Disclaimers are 
-considered to be included by reference in this License, but only as regards 
-disclaiming warranties: any other implication that these Warranty Disclaimers 
+The Document may include Warranty Disclaimers next to the notice which states
+that this License applies to the Document. These Warranty Disclaimers are
+considered to be included by reference in this License, but only as regards
+disclaiming warranties: any other implication that these Warranty Disclaimers
 may have is void and has no effect on the meaning of this License.
 
 === 2. VERBATIM COPYING
-You may copy and distribute the Document in any medium, either commercially or 
-noncommercially, provided that this License, the copyright notices, and the 
-license notice saying this License applies to the Document are reproduced in 
-all copies, and that you add no other conditions whatsoever to those of this 
-License. You may not use technical measures to obstruct or control the reading 
-or further copying of the copies you make or distribute. However, you may 
-accept compensation in exchange for copies. If you distribute a large enough 
+
+You may copy and distribute the Document in any medium, either commercially or
+noncommercially, provided that this License, the copyright notices, and the
+license notice saying this License applies to the Document are reproduced in
+all copies, and that you add no other conditions whatsoever to those of this
+License. You may not use technical measures to obstruct or control the reading
+or further copying of the copies you make or distribute. However, you may
+accept compensation in exchange for copies. If you distribute a large enough
 number of copies you must also follow the conditions in section 3.
 
-You may also lend copies, under the same conditions stated above, and you may 
+You may also lend copies, under the same conditions stated above, and you may
 publicly display copies.
 
 === 3. COPYING IN QUANTITY
-If you publish printed copies (or copies in media that commonly have printed 
-covers) of the Document, numbering more than 100, and the Document's license 
-notice requires Cover Texts, you must enclose the copies in covers that carry, 
-clearly and legibly, all these Cover Texts: Front-Cover Texts on the front 
-cover, and Back-Cover Texts on the back cover. Both covers must also clearly 
-and legibly identify you as the publisher of these copies. The front cover must 
-present the full title with all words of the title equally prominent and 
-visible. You may add other material on the covers in addition. Copying with 
-changes limited to the covers, as long as they preserve the title of the 
-Document and satisfy these conditions, can be treated as verbatim copying in 
+
+If you publish printed copies (or copies in media that commonly have printed
+covers) of the Document, numbering more than 100, and the Document's license
+notice requires Cover Texts, you must enclose the copies in covers that carry,
+clearly and legibly, all these Cover Texts: Front-Cover Texts on the front
+cover, and Back-Cover Texts on the back cover. Both covers must also clearly
+and legibly identify you as the publisher of these copies. The front cover must
+present the full title with all words of the title equally prominent and
+visible. You may add other material on the covers in addition. Copying with
+changes limited to the covers, as long as they preserve the title of the
+Document and satisfy these conditions, can be treated as verbatim copying in
 other respects.
 
-If the required texts for either cover are too voluminous to fit legibly, you 
-should put the first ones listed (as many as fit reasonably) on the actual 
+If the required texts for either cover are too voluminous to fit legibly, you
+should put the first ones listed (as many as fit reasonably) on the actual
 cover, and continue the rest onto adjacent pages.
 
-If you publish or distribute Opaque copies of the Document numbering more than 
-100, you must either include a machine-readable Transparent copy along with 
-each Opaque copy, or state in or with each Opaque copy a computer-network 
-location from which the general network-using public has access to download 
-using public-standard network protocols a complete Transparent copy of the 
-Document, free of added material. If you use the latter option, you must take 
-reasonably prudent steps, when you begin distribution of Opaque copies in 
-quantity, to ensure that this Transparent copy will remain thus accessible at 
-the stated location until at least one year after the last time you distribute 
-an Opaque copy (directly or through your agents or retailers) of that edition 
+If you publish or distribute Opaque copies of the Document numbering more than
+100, you must either include a machine-readable Transparent copy along with
+each Opaque copy, or state in or with each Opaque copy a computer-network
+location from which the general network-using public has access to download
+using public-standard network protocols a complete Transparent copy of the
+Document, free of added material. If you use the latter option, you must take
+reasonably prudent steps, when you begin distribution of Opaque copies in
+quantity, to ensure that this Transparent copy will remain thus accessible at
+the stated location until at least one year after the last time you distribute
+an Opaque copy (directly or through your agents or retailers) of that edition
 to the public.
 
-It is requested, but not required, that you contact the authors of the Document 
-well before redistributing any large number of copies, to give them a chance to 
+It is requested, but not required, that you contact the authors of the Document
+well before redistributing any large number of copies, to give them a chance to
 provide you with an updated version of the Document.
 
 === 4. MODIFICATIONS
-You may copy and distribute a Modified Version of the Document under the 
-conditions of sections 2 and 3 above, provided that you release the Modified 
-Version under precisely this License, with the Modified Version filling the 
-role of the Document, thus licensing distribution and modification of the 
-Modified Version to whoever possesses a copy of it. In addition, you must do 
+
+You may copy and distribute a Modified Version of the Document under the
+conditions of sections 2 and 3 above, provided that you release the Modified
+Version under precisely this License, with the Modified Version filling the
+role of the Document, thus licensing distribution and modification of the
+Modified Version to whoever possesses a copy of it. In addition, you must do
 these things in the Modified Version:
 
-A. Use in the Title Page (and on the covers, if any) a title distinct from that 
-of the Document, and from those of previous versions (which should, if there 
-were any, be listed in the History section of the Document). You may use the 
-same title as a previous version if the original publisher of that version 
-gives permission. 
+A. Use in the Title Page (and on the covers, if any) a title distinct from that
+of the Document, and from those of previous versions (which should, if there
+were any, be listed in the History section of the Document). You may use the
+same title as a previous version if the original publisher of that version
+gives permission.
 
-B. List on the Title Page, as authors, one or more persons or entities 
-responsible for authorship of the modifications in the Modified Version, 
-together with at least five of the principal authors of the Document (all of 
-its principal authors, if it has fewer than five), unless they release you from 
-this requirement. 
+B. List on the Title Page, as authors, one or more persons or entities
+responsible for authorship of the modifications in the Modified Version,
+together with at least five of the principal authors of the Document (all of
+its principal authors, if it has fewer than five), unless they release you from
+this requirement.
 
-C. State on the Title page the name of the publisher of the Modified Version, 
-as the publisher. 
+C. State on the Title page the name of the publisher of the Modified Version,
+as the publisher.
 
-D. Preserve all the copyright notices of the Document. 
+D. Preserve all the copyright notices of the Document.
 
-E. Add an appropriate copyright notice for your modifications adjacent to the 
-other copyright notices. 
+E. Add an appropriate copyright notice for your modifications adjacent to the
+other copyright notices.
 
-F. Include, immediately after the copyright notices, a license notice giving 
-the public permission to use the Modified Version under the terms of this 
-License, in the form shown in the Addendum below. 
+F. Include, immediately after the copyright notices, a license notice giving
+the public permission to use the Modified Version under the terms of this
+License, in the form shown in the Addendum below.
 
-G. Preserve in that license notice the full lists of Invariant Sections and 
-required Cover Texts given in the Document's license notice. 
+G. Preserve in that license notice the full lists of Invariant Sections and
+required Cover Texts given in the Document's license notice.
 
-H. Include an unaltered copy of this License. 
+H. Include an unaltered copy of this License.
 
-I. Preserve the section Entitled "History", Preserve its Title, and add to it 
-an item stating at least the title, year, new authors, and publisher of the 
-Modified Version as given on the Title Page. If there is no section Entitled 
-"History" in the Document, create one stating the title, year, authors, and 
-publisher of the Document as given on its Title Page, then add an item 
-describing the Modified Version as stated in the previous sentence. 
+I. Preserve the section Entitled "History", Preserve its Title, and add to it
+an item stating at least the title, year, new authors, and publisher of the
+Modified Version as given on the Title Page. If there is no section Entitled
+"History" in the Document, create one stating the title, year, authors, and
+publisher of the Document as given on its Title Page, then add an item
+describing the Modified Version as stated in the previous sentence.
 
-J. Preserve the network location, if any, given in the Document for public 
-access to a Transparent copy of the Document, and likewise the network 
-locations given in the Document for previous versions it was based on. These 
-may be placed in the "History" section. You may omit a network location for a 
-work that was published at least four years before the Document itself, or if 
-the original publisher of the version it refers to gives permission. 
+J. Preserve the network location, if any, given in the Document for public
+access to a Transparent copy of the Document, and likewise the network
+locations given in the Document for previous versions it was based on. These
+may be placed in the "History" section. You may omit a network location for a
+work that was published at least four years before the Document itself, or if
+the original publisher of the version it refers to gives permission.
 
-K. For any section Entitled "Acknowledgements" or "Dedications", Preserve the 
-Title of the section, and preserve in the section all the substance and tone of 
-each of the contributor acknowledgements and/or dedications given therein. 
+K. For any section Entitled "Acknowledgements" or "Dedications", Preserve the
+Title of the section, and preserve in the section all the substance and tone of
+each of the contributor acknowledgements and/or dedications given therein.
 
-L. Preserve all the Invariant Sections of the Document, unaltered in their text 
-and in their titles. Section numbers or the equivalent are not considered part 
-of the section titles. 
+L. Preserve all the Invariant Sections of the Document, unaltered in their text
+and in their titles. Section numbers or the equivalent are not considered part
+of the section titles.
 
-M. Delete any section Entitled "Endorsements". Such a section may not be 
-included in the Modified Version. 
+M. Delete any section Entitled "Endorsements". Such a section may not be
+included in the Modified Version.
 
-N. Do not retitle any existing section to be Entitled "Endorsements" or to 
-conflict in title with any Invariant Section. 
+N. Do not retitle any existing section to be Entitled "Endorsements" or to
+conflict in title with any Invariant Section.
 
-O. Preserve any Warranty Disclaimers. 
+O. Preserve any Warranty Disclaimers.
 
-If the Modified Version includes new front-matter sections or appendices that 
-qualify as Secondary Sections and contain no material copied from the Document, 
-you may at your option designate some or all of these sections as invariant. To 
-do this, add their titles to the list of Invariant Sections in the Modified 
-Version's license notice. These titles must be distinct from any other section 
+If the Modified Version includes new front-matter sections or appendices that
+qualify as Secondary Sections and contain no material copied from the Document,
+you may at your option designate some or all of these sections as invariant. To
+do this, add their titles to the list of Invariant Sections in the Modified
+Version's license notice. These titles must be distinct from any other section
 titles.
 
-You may add a section Entitled "Endorsements", provided it contains nothing but 
-endorsements of your Modified Version by various parties—for example, 
-statements of peer review or that the text has been approved by an organization 
+You may add a section Entitled "Endorsements", provided it contains nothing but
+endorsements of your Modified Version by various parties—for example,
+statements of peer review or that the text has been approved by an organization
 as the authoritative definition of a standard.
 
-You may add a passage of up to five words as a Front-Cover Text, and a passage 
-of up to 25 words as a Back-Cover Text, to the end of the list of Cover Texts 
-in the Modified Version. Only one passage of Front-Cover Text and one of 
-Back-Cover Text may be added by (or through arrangements made by) any one 
-entity. If the Document already includes a cover text for the same cover, 
-previously added by you or by arrangement made by the same entity you are 
-acting on behalf of, you may not add another; but you may replace the old one, 
+You may add a passage of up to five words as a Front-Cover Text, and a passage
+of up to 25 words as a Back-Cover Text, to the end of the list of Cover Texts
+in the Modified Version. Only one passage of Front-Cover Text and one of
+Back-Cover Text may be added by (or through arrangements made by) any one
+entity. If the Document already includes a cover text for the same cover,
+previously added by you or by arrangement made by the same entity you are
+acting on behalf of, you may not add another; but you may replace the old one,
 on explicit permission from the previous publisher that added the old one.
 
-The author(s) and publisher(s) of the Document do not by this License give 
-permission to use their names for publicity for or to assert or imply 
+The author(s) and publisher(s) of the Document do not by this License give
+permission to use their names for publicity for or to assert or imply
 endorsement of any Modified Version.
 
 === 5. COMBINING DOCUMENTS
-You may combine the Document with other documents released under this License, 
-under the terms defined in section 4 above for modified versions, provided that 
-you include in the combination all of the Invariant Sections of all of the 
-original documents, unmodified, and list them all as Invariant Sections of your 
-combined work in its license notice, and that you preserve all their Warranty 
+
+You may combine the Document with other documents released under this License,
+under the terms defined in section 4 above for modified versions, provided that
+you include in the combination all of the Invariant Sections of all of the
+original documents, unmodified, and list them all as Invariant Sections of your
+combined work in its license notice, and that you preserve all their Warranty
 Disclaimers.
 
-The combined work need only contain one copy of this License, and multiple 
-identical Invariant Sections may be replaced with a single copy. If there are 
-multiple Invariant Sections with the same name but different contents, make the 
-title of each such section unique by adding at the end of it, in parentheses, 
-the name of the original author or publisher of that section if known, or else 
-a unique number. Make the same adjustment to the section titles in the list of 
+The combined work need only contain one copy of this License, and multiple
+identical Invariant Sections may be replaced with a single copy. If there are
+multiple Invariant Sections with the same name but different contents, make the
+title of each such section unique by adding at the end of it, in parentheses,
+the name of the original author or publisher of that section if known, or else
+a unique number. Make the same adjustment to the section titles in the list of
 Invariant Sections in the license notice of the combined work.
 
-In the combination, you must combine any sections Entitled "History" in the 
-various original documents, forming one section Entitled "History"; likewise 
-combine any sections Entitled "Acknowledgements", and any sections Entitled 
+In the combination, you must combine any sections Entitled "History" in the
+various original documents, forming one section Entitled "History"; likewise
+combine any sections Entitled "Acknowledgements", and any sections Entitled
 "Dedications". You must delete all sections Entitled "Endorsements".
 
 === 6. COLLECTIONS OF DOCUMENTS
-You may make a collection consisting of the Document and other documents 
-released under this License, and replace the individual copies of this License 
-in the various documents with a single copy that is included in the collection, 
-provided that you follow the rules of this License for verbatim copying of each 
+
+You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this License
+in the various documents with a single copy that is included in the collection,
+provided that you follow the rules of this License for verbatim copying of each
 of the documents in all other respects.
 
-You may extract a single document from such a collection, and distribute it 
-individually under this License, provided you insert a copy of this License 
-into the extracted document, and follow this License in all other respects 
+You may extract a single document from such a collection, and distribute it
+individually under this License, provided you insert a copy of this License
+into the extracted document, and follow this License in all other respects
 regarding verbatim copying of that document.
 
 === 7. AGGREGATION WITH INDEPENDENT WORKS
-A compilation of the Document or its derivatives with other separate and 
-independent documents or works, in or on a volume of a storage or distribution 
-medium, is called an "aggregate" if the copyright resulting from the 
-compilation is not used to limit the legal rights of the compilation's users 
-beyond what the individual works permit. When the Document is included in an 
-aggregate, this License does not apply to the other works in the aggregate 
+
+A compilation of the Document or its derivatives with other separate and
+independent documents or works, in or on a volume of a storage or distribution
+medium, is called an "aggregate" if the copyright resulting from the
+compilation is not used to limit the legal rights of the compilation's users
+beyond what the individual works permit. When the Document is included in an
+aggregate, this License does not apply to the other works in the aggregate
 which are not themselves derivative works of the Document.
 
-If the Cover Text requirement of section 3 is applicable to these copies of the 
-Document, then if the Document is less than one half of the entire aggregate, 
-the Document's Cover Texts may be placed on covers that bracket the Document 
-within the aggregate, or the electronic equivalent of covers if the Document is 
-in electronic form. Otherwise they must appear on printed covers that bracket 
+If the Cover Text requirement of section 3 is applicable to these copies of the
+Document, then if the Document is less than one half of the entire aggregate,
+the Document's Cover Texts may be placed on covers that bracket the Document
+within the aggregate, or the electronic equivalent of covers if the Document is
+in electronic form. Otherwise they must appear on printed covers that bracket
 the whole aggregate.
 
 === 8. TRANSLATION
-Translation is considered a kind of modification, so you may distribute 
-translations of the Document under the terms of section 4. Replacing Invariant 
-Sections with translations requires special permission from their copyright 
-holders, but you may include translations of some or all Invariant Sections in 
-addition to the original versions of these Invariant Sections. You may include 
-a translation of this License, and all the license notices in the Document, and 
-any Warranty Disclaimers, provided that you also include the original English 
-version of this License and the original versions of those notices and 
-disclaimers. In case of a disagreement between the translation and the original 
-version of this License or a notice or disclaimer, the original version will 
+
+Translation is considered a kind of modification, so you may distribute
+translations of the Document under the terms of section 4. Replacing Invariant
+Sections with translations requires special permission from their copyright
+holders, but you may include translations of some or all Invariant Sections in
+addition to the original versions of these Invariant Sections. You may include
+a translation of this License, and all the license notices in the Document, and
+any Warranty Disclaimers, provided that you also include the original English
+version of this License and the original versions of those notices and
+disclaimers. In case of a disagreement between the translation and the original
+version of this License or a notice or disclaimer, the original version will
 prevail.
 
-If a section in the Document is Entitled "Acknowledgements", "Dedications", or 
-"History", the requirement (section 4) to Preserve its Title (section 1) will 
+If a section in the Document is Entitled "Acknowledgements", "Dedications", or
+"History", the requirement (section 4) to Preserve its Title (section 1) will
 typically require changing the actual title.
 
 === 9. TERMINATION
-You may not copy, modify, sublicense, or distribute the Document except as 
-expressly provided under this License. Any attempt otherwise to copy, modify, 
-sublicense, or distribute it is void, and will automatically terminate your 
+
+You may not copy, modify, sublicense, or distribute the Document except as
+expressly provided under this License. Any attempt otherwise to copy, modify,
+sublicense, or distribute it is void, and will automatically terminate your
 rights under this License.
 
-However, if you cease all violation of this License, then your license from a 
-particular copyright holder is reinstated (a) provisionally, unless and until 
-the copyright holder explicitly and finally terminates your license, and (b) 
-permanently, if the copyright holder fails to notify you of the violation by 
+However, if you cease all violation of this License, then your license from a
+particular copyright holder is reinstated (a) provisionally, unless and until
+the copyright holder explicitly and finally terminates your license, and (b)
+permanently, if the copyright holder fails to notify you of the violation by
 some reasonable means prior to 60 days after the cessation.
 
-Moreover, your license from a particular copyright holder is reinstated 
-permanently if the copyright holder notifies you of the violation by some 
-reasonable means, this is the first time you have received notice of violation 
-of this License (for any work) from that copyright holder, and you cure the 
+Moreover, your license from a particular copyright holder is reinstated
+permanently if the copyright holder notifies you of the violation by some
+reasonable means, this is the first time you have received notice of violation
+of this License (for any work) from that copyright holder, and you cure the
 violation prior to 30 days after your receipt of the notice.
 
-Termination of your rights under this section does not terminate the licenses 
-of parties who have received copies or rights from you under this License. If 
-your rights have been terminated and not permanently reinstated, receipt of a 
+Termination of your rights under this section does not terminate the licenses
+of parties who have received copies or rights from you under this License. If
+your rights have been terminated and not permanently reinstated, receipt of a
 copy of some or all of the same material does not give you any rights to use it.
 
 === 10. FUTURE REVISIONS OF THIS LICENSE
-The Free Software Foundation may publish new, revised versions of the GNU Free 
-Documentation License from time to time. Such new versions will be similar in 
-spirit to the present version, but may differ in detail to address new problems 
+
+The Free Software Foundation may publish new, revised versions of the GNU Free
+Documentation License from time to time. Such new versions will be similar in
+spirit to the present version, but may differ in detail to address new problems
 or concerns. See http://www.gnu.org/copyleft/.
 
-Each version of the License is given a distinguishing version number. If the 
-Document specifies that a particular numbered version of this License "or any 
-later version" applies to it, you have the option of following the terms and 
-conditions either of that specified version or of any later version that has 
-been published (not as a draft) by the Free Software Foundation. If the 
-Document does not specify a version number of this License, you may choose any 
-version ever published (not as a draft) by the Free Software Foundation. If the 
-Document specifies that a proxy can decide which future versions of this 
-License can be used, that proxy's public statement of acceptance of a version 
+Each version of the License is given a distinguishing version number. If the
+Document specifies that a particular numbered version of this License "or any
+later version" applies to it, you have the option of following the terms and
+conditions either of that specified version or of any later version that has
+been published (not as a draft) by the Free Software Foundation. If the
+Document does not specify a version number of this License, you may choose any
+version ever published (not as a draft) by the Free Software Foundation. If the
+Document specifies that a proxy can decide which future versions of this
+License can be used, that proxy's public statement of acceptance of a version
 permanently authorizes you to choose that version for the Document.
 
 === 11. RELICENSING
-"Massive Multiauthor Collaboration Site" (or "MMC Site") means any World Wide 
-Web server that publishes copyrightable works and also provides prominent 
-facilities for anybody to edit those works. A public wiki that anybody can edit 
-is an example of such a server. A "Massive Multiauthor Collaboration" (or 
-"MMC") contained in the site means any set of copyrightable works thus 
+
+"Massive Multiauthor Collaboration Site" (or "MMC Site") means any World Wide
+Web server that publishes copyrightable works and also provides prominent
+facilities for anybody to edit those works. A public wiki that anybody can edit
+is an example of such a server. A "Massive Multiauthor Collaboration" (or
+"MMC") contained in the site means any set of copyrightable works thus
 published on the MMC site.
 
-"CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0 license 
-published by Creative Commons Corporation, a not-for-profit corporation with a 
-principal place of business in San Francisco, California, as well as future 
+"CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0 license
+published by Creative Commons Corporation, a not-for-profit corporation with a
+principal place of business in San Francisco, California, as well as future
 copyleft versions of that license published by that same organization.
 
-"Incorporate" means to publish or republish a Document, in whole or in part, as 
+"Incorporate" means to publish or republish a Document, in whole or in part, as
 part of another Document.
 
-An MMC is "eligible for relicensing" if it is licensed under this License, and 
-if all works that were first published under this License somewhere other than 
-this MMC, and subsequently incorporated in whole or in part into the MMC, (1) 
-had no cover texts or invariant sections, and (2) were thus incorporated prior 
+An MMC is "eligible for relicensing" if it is licensed under this License, and
+if all works that were first published under this License somewhere other than
+this MMC, and subsequently incorporated in whole or in part into the MMC, (1)
+had no cover texts or invariant sections, and (2) were thus incorporated prior
 to November 1, 2008.
 
-The operator of an MMC Site may republish an MMC contained in the site under 
-CC-BY-SA on the same site at any time before August 1, 2009, provided the MMC 
+The operator of an MMC Site may republish an MMC contained in the site under
+CC-BY-SA on the same site at any time before August 1, 2009, provided the MMC
 is eligible for relicensing.
 

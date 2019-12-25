@@ -7,6 +7,7 @@ Expert Witness Compression Format specification
 :numbered!:
 [abstract]
 == Summary
+
 EWF is short for Expert Witness Compression Format, according to `[ASR02]`. It is
 a file type used to store media images for forensic purposes. It is currently
 widely used in the field of computer forensics in proprietary tooling like
@@ -23,6 +24,7 @@ this file type.
 
 [preface]
 == Document information
+
 [cols="1,5"]
 |===
 | Author(s): | Joachim Metz <joachim.metz@gmail.com>
@@ -33,8 +35,9 @@ this file type.
 
 [preface]
 == License
+
 ....
-Copyright (C) 2006-2016, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -44,6 +47,7 @@ in the section entitled "GNU Free Documentation License".
 
 [preface]
 == Revision history
+
 [cols="1,1,1,5",options="header"]
 |===
 | Version | Author | Date | Comments
@@ -138,10 +142,12 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.79 | J.B. Metz | August 2015 | Switched to asciidoc format.
 | 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
 | 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
+| 0.0.82 | J.B. Metz | December 2019 | Formatting changes.
 |===
 
 :numbered:
 == Overview
+
 The Expert Witness Compression Format (EWF) is used to store media images. It
 allows to store disk and partition images, compressed or non-compressed. EWF
 can store a single image in one or more segment files. Each segment file
@@ -155,6 +161,7 @@ Specifications:
 * A chunk is defined as the sector size (per default 512 bytes) multiplied by the block size, the number of sectors per chunk (block) (per default 64 sectors). The data within the EWF format is stored in little-endian. The terms block and chunk are used intermittently.
 
 === Test version
+
 The following version of programs were used to test the information within this document:
 
 * FTK Imager 2.3, 2.4, 2.51, 2.9, 3.0 (Windows)
@@ -173,6 +180,7 @@ The following version of programs were used to test the information within this 
 EnCase 7 no longer provides the fast and best compression options.
 
 == Segment file
+
 EWF stores data in one or more segment files (or segments). Each segment file
 consists of:
 
@@ -180,6 +188,7 @@ consists of:
 * One or more sections.
 
 === File header
+
 Each segment file starts with a file header.
 
 `[ASR02]` defines that the file header consists of 2 parts, namely:
@@ -188,6 +197,7 @@ Each segment file starts with a file header.
 * fields part
 
 ==== EWF, EWF-E01 and EWF-S01
+
 This is file header is defined by `[ASR02]` and both used by the EWF-E01 and
 EWF-S01 formats.
 
@@ -212,6 +222,7 @@ This means there could only be a maximum of 65535 (0xffff) files, if it is an
 unsigned value.
 
 ==== EWF-L01
+
 This is file header is used by the EWF-L01 format.
 
 The file header is 13 bytes of size and consists
@@ -235,10 +246,12 @@ This means there could only be a maximum of 65535 (0xffff) files, if it is an
 unsigned value.
 
 === Segment file extensions
+
 Both the SMART (EWF-S01) and the EWF-E01 use a different approach for naming
 the segment files.
 
 ==== EWF-S01
+
 The EWF-S01 extension naming has two distinct parts.
 
 * The first segment file has the extension '.s01'.
@@ -256,6 +269,7 @@ The EWF-S01 extension naming has two distinct parts.
 libewf supports extensions up to .zzz
 
 ==== EWF-E01
+
 The EWF-E01 extension naming has two distinct parts.
 
 * The first segment file has the extension '.E01'.
@@ -273,6 +287,7 @@ The EWF-E01 extension naming has two distinct parts.
 libewf supports extensions up to .ZZZ
 
 ==== EWF-L01
+
 The EWF-L01 extension naming has two distinct parts.
 
 * The first segment file has the extension '.L01'.
@@ -290,6 +305,7 @@ The EWF-L01 extension naming has two distinct parts.
 libewf supports extensions up to .ZZZ
 
 === Segment file set identifier GUID
+
 Segment file sets do not have a strict unique identifier. However the
 <<volume_section,volume section>> contains a GUID that can be used for this
 purpose. Where:
@@ -303,6 +319,7 @@ somewhere made between version 6.01 and 6.19.*
 See RFC4122 for more information about the different GUID versions.
 
 == The sections
+
 The remainder of the segment file consists of sections. Every section starts
 with the same data this will be referred to as the section descriptor
 (previously referred to as section start). The section descriptor could also be
@@ -310,6 +327,7 @@ referred as the section header, but this allows for unnecessary confusion with
 the header section.
 
 === Section descriptor
+
 The section descriptor consist of 76 bytes, it contains information about a
 specific section.
 
@@ -337,6 +355,7 @@ but data, probably the memory is not wiped.
 Expert Witness 1.35 (for Windows) does not set the section size.
 
 === Section types
+
 There are multiple section types. `[ASR02]` defines the following:
 
 * Header section
@@ -364,6 +383,7 @@ types were found:
 * Ltypes section
 
 === Header2 section
+
 The header2 section is identified in the section data type field as "header2".
 Some aspects of this section are:
 
@@ -392,6 +412,7 @@ The first 2 bytes of the UTF16 string are the byte order mark (BOM):
 In the next paragraphs the various variants of the header2 section are described.
 
 ==== EnCase 4 (EWF-E01)
+
 In EnCase 4 (EWF-E01) the header2 information consist of 5 lines, and contains
 the equivalent information as the header section.
 
@@ -435,6 +456,7 @@ For more information see section: <<header2_values,Header2 values>>
 The hashing algorithm is the same as for the header section.
 
 ==== EnCase 5 to 7 (EWF-E01)
+
 In EnCase 5 to 7 (EWF-E01) the header2 information consist of 17 lines, and
 contains:
 
@@ -463,6 +485,7 @@ contains:
 The end of line character(s) is a newline (0x0a).
 
 ===== Main category
+
 The 3rd and the 4th line consist of the following tab (0x09) separated values.
 
 [NOTE]
@@ -502,6 +525,7 @@ The extents of the process memory acquired +
 For more information see section: <<header2_values,Header2 values>>
 
 ====== Notes
+
 Both the acquiry and system date are empty in a file created by winen.
 
 The date values in the header section (not header2) are set to: Thu Jan  1
@@ -509,6 +533,7 @@ The date values in the header section (not header2) are set to: Thu Jan  1
 savings.
 
 ===== Sources category
+
 Line 6 the srce category contains information about sources.
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
@@ -545,6 +570,7 @@ Line 10 contains the values defined by line 8.
 The default values of some of these values has changed around EnCase 6.12.
 
 ===== Subjects category
+
 Line 12 the sub category contains information about subjects.
 
 [yellow-background]*TODO describe what a subject is in the context of EnCase.*
@@ -570,6 +596,7 @@ Line 16 contains the values defined by line 14. Note that the default values of
 some of these values has changed around EnCase 6.12.
 
 ==== EnCase 5 to 7 (EWF-L01)
+
 The EnCase 5 to 7 (EWF-E01) header2 section specification also applies to the
 EnCase 5 to 7 (EWF-L01) format. However:
 
@@ -618,6 +645,7 @@ The restrictions were tested with EnCase 7.02.01, older versions could have a
 restriction of 40 characters instead of 3000 characters.
 
 === Header section
+
 The header section is identified in the section data type field as "header".
 Some aspects of this section are:
 
@@ -658,6 +686,7 @@ An additional 5th line is found in FTK Imager, EnCase 1 to 7 (EWF-E01).
 |===
 
 ==== EWF format
+
 Some aspects of this section are:
 
 * `[ASR02]` specifies the end of line character(s) is a newline (0x0a).
@@ -684,6 +713,7 @@ For more information see section: <<header_values,Header values>>
 `[ASR02]` states that the Expert Witness Compression uses 'f', fastest compression.
 
 ==== EnCase 1 (EWF-E01)
+
 Some aspects of this section are:
 
 * The header section is defined only once.
@@ -710,6 +740,7 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values"
 For more information see section: <<header_values,Header values>>
 
 ==== SMART (EWF-S01)
+
 Some aspects of this section are:
 
 * The header section is defined once.
@@ -720,6 +751,7 @@ The SMART format uses the FTK Imager (EWF-E01) specification for this section.
 [yellow-background]*Note that this could be something FTK Imager specific.*
 
 ==== EnCase 2 and 3 (EWF-E01)
+
 Some aspects of this section are:
 
 * The same header section defined twice.
@@ -749,6 +781,7 @@ The platform/operating system used to acquire the media
 For more information see section: <<header_values,Header values>>
 
 ==== EnCase 4 to 7 (EWF-E01)
+
 Some aspects of this section are:
 
 * The header is defined only once.
@@ -777,6 +810,7 @@ The platform/operating system used to acquire the media
 For more information see section: <<header_values,Header values>>
 
 ==== linen 5 to 7 (EWF-E01)
+
 Some aspects of this section are:
 
 * The same header section defined twice.
@@ -813,6 +847,7 @@ The remainder of the string contains the following information:
 The end of line character(s) is a newline (0x0a).
 
 ===== Main category
+
 The 3rd and the 4th line consist of the following tab (0x09) separated values.
 
 [NOTE]
@@ -855,6 +890,7 @@ in local time. Where as before both date values were in local time.
 For more information see section: <<header_values,Header values>>
 
 ===== Sources category
+
 Line 6 the srce category contains information about sources
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
@@ -889,6 +925,7 @@ The default values of some of these values has changed around linen 6.19 or
 earlier.
 
 ===== Subjects category
+
 Line 12 the sub category contains information about subjects.
 
 [yellow-background]*TODO describe what a subject is in the context of EnCase.*
@@ -916,6 +953,7 @@ Line 16 contains the values defined by line 14.
 or earlier.
 
 ==== FTK Imager (EWF-E01)
+
 Some aspects of this section are:
 
 * In FTK Imager (EWF-E01) the same header section defined twice.
@@ -946,6 +984,7 @@ The platform/operating system used to acquire the media
 For more information see section: <<header_values,Header values>>
 
 ==== EnCase 5 to 7 (EWF-L01)
+
 The EnCase 4 to 7 (EWF-E01) header section specification is also used for the
 EnCase 5 to 7 (EWF-L01) format, with the following aspects:
 
@@ -1013,6 +1052,7 @@ restriction of 40 characters instead of 3000 characters.
 |===
 
 ===== Notes
+
 There should not be a tab, carriage return and newline characters within the
 text in the 4th line. Or is there a method to escape these characters?
 `[ASR02]` states that these characters should not be used in the free form
@@ -1026,6 +1066,7 @@ per EnCase version? probably not. The algorithm does not differ in EnCase
 1 to 7. FTK Imager does not bother with a password.
 
 === [[volume_section]]Volume section
+
 The volume section is identified in the section data type field as "volume".
 Some aspects of this section are:
 
@@ -1036,6 +1077,7 @@ Some aspects of this section are:
 In the next paragraphs the various versions of the volume section are described.
 
 ==== EWF specification
+
 The specification according to `[ASR02]`.
 
 The additional volume section data is 94 bytes of size and consists of:
@@ -1072,12 +1114,14 @@ However libewf is restricted at 14295 segment files, due to the extension
 naming schema of the segment files.
 
 ==== SMART (EWF-S01)
+
 The SMART format uses the EWF specification for this section.
 
 In SMART the signature (reverse) value is the string "SMART" (0x53 0x4d 0x41
 0x52 0x54) instead of the file header signature.
 
 ==== FTK Imager, EnCase 1 to 7 and linen 5 to 7 (EWF-E01)
+
 The specification for FTK Imager, EnCase 1 to 7 and linen 5 to 7.
 
 The additional volume section data is 1052 bytes of size and consists of:
@@ -1138,6 +1182,7 @@ media flag is not set and vice versa. Other tools like FTK check the actual
 storage media data.
 
 ==== EnCase 5 to 7 (EWF-L01)
+
 The EWF-L01 format uses the EnCase 5 (EWF-E01) volume section specification. However:
 
 * the volume type contains 0x0e
@@ -1194,6 +1239,7 @@ only shows the Fastbloc.
 |===
 
 === Disk section
+
 The disk section is identified in the section data type field as "disk". Some
 aspects of this section are:
 
@@ -1210,6 +1256,7 @@ old method to differentiate between a partition (volume) image or a physical
 disk image?
 
 === Data section
+
 The data section is identified in the section data type field as "data". Some
 aspects of this section are:
 
@@ -1220,6 +1267,7 @@ aspects of this section are:
 * The data section has data it should should contain the same information as the volume section.
 
 ==== FTK Imager, EnCase 1 to 7 and linen 5 to 7 (EWF-E01)
+
 The additional data section data is 1052 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1275,6 +1323,7 @@ In Logicube products (Talon (firmware predating April 2013) and Forensic
 dossier (before version 3.3.3RC16)) the checksum is not calculated and set to 0.
 
 ==== EnCase 5 to 7 (EWF-L01)
+
 The EWF-L01 format uses the EnCase 5 (EWF-E01) data section specification. However:
 
 * the data type contains 0x0e
@@ -1283,6 +1332,7 @@ The EWF-L01 format uses the EnCase 5 (EWF-E01) data section specification. Howev
 * [yellow-background]*The sectors count, represents some other value because ( sector_size x sector_amount != total_size ) the total size is in the ltree section*
 
 === Sectors section
+
 The sectors section is identified in the section data type field as "sectors".
 Some aspects of this section are:
 
@@ -1296,6 +1346,7 @@ The sectors section contains the actual chunks of media data.
 * The default size of a chunk is 32768 bytes of data (64 standard sectors, with a size of 512 bytes per sector). It is possible in EnCase 5 and 6 and linen 5 and 6 to change the number of sectors per block to 64, 128, 256, 1024, 2048, 4096, 8192, 16384 or 32768. In EnCase 7 and linen 7 this has been reduced to 64, 128, 256, 1024.
 
 ==== Data chunk
+
 The first chunk is often located directly after the section descriptor,
 although the format does not require this.
 
@@ -1319,6 +1370,7 @@ compressed data chunk is part the zlib compressed data format. See section:
 <<compression,Compression>>.
 
 ==== Optical disc images
+
 For a MODE‑1 CD-ROM optical disc image EnCase only seems to support 2048 bytes
 per sector (the data).
 
@@ -1337,6 +1389,7 @@ The raw sector size of a MODE-1 CD-ROM is 2352 bytes of size and consists of:
 [yellow-background]*TODO add information about Mode-2 and Mode-XA*
 
 === Table section
+
 The table section is identified in the section data type field as "table". Some
 aspects of this section are:
 
@@ -1350,6 +1403,7 @@ the offsets in the table entry array are 4 bytes (32 bits) of size.
 In the next paragraphs the various versions of the table section are described.
 
 ==== EWF specification
+
 Some aspects of the table section according to the EWF specification are:
 
 * The first table section resides after the volume section in the first segment file or after the file header in other segment files.
@@ -1362,6 +1416,7 @@ The table section consists of:
 * the data chunks
 
 ===== Table header
+
 The table header is 24 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1378,6 +1433,7 @@ According to `[ASR02]` the table can hold 16375 entries if more entries are
 required an additional table section should be created.
 
 ===== Table entry
+
 The table entry is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1394,6 +1450,7 @@ resides in the same table section within the segment file. The offset contains
 a value relative to the start of the file.
 
 ===== Data chunk
+
 The first chunk is often located directly after the last table entry, although
 the format does not require this.
 
@@ -1409,10 +1466,12 @@ compressed data chunk is part the zlib compressed data format. See section:
 <<compression,Compression>>.
 
 ==== SMART (EWF-S01)
+
 The table section in the SMART (EWF-S01) format is equivalent to that of the
 EWF specification.
 
 ==== EnCase 1 (EWF-E01)
+
 Some aspects of this section are:
 
 * The table section resides after the volume section in the first segment file or after the file header in other segment files.
@@ -1426,6 +1485,7 @@ The table section consists of:
 * the data chunks
 
 ===== Table header
+
 The table header is 24 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1440,6 +1500,7 @@ Adler-32 of all the previous data within the additional volume section data.
 The table can hold 16375 entries if more entries are required an additional table section should be created.
 
 ===== Table entry
+
 The table entry is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1456,6 +1517,7 @@ resides in the same table section within the segment file. The offset contains
 a value relative to the start of the file.
 
 ===== Table footer
+
 The table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1466,6 +1528,7 @@ Adler-32 of the offset array
 |===
 
 ===== Data chunk
+
 The first chunk is often located directly after the table footer, although the
 format does not require this.
 
@@ -1489,6 +1552,7 @@ compressed data chunk is part the zlib compressed data format. See section:
 <<compression,Compression>>
 
 ==== FTK Imager and EnCase 2 to 5 and linen 5 (EWF-E01)
+
 Some aspects of this section are:
 
 * The table section resides after the sectors section.
@@ -1503,6 +1567,7 @@ The table section consists of:
 * the table footer
 
 ===== Table header
+
 The sector table header is 24 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1520,6 +1585,7 @@ FTK 1 cannot. To contain more than 16375 chunks new sectors, table and table2
 sections need to be created after the table2 section.
 
 ===== Table entry
+
 The table entry is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1536,6 +1602,7 @@ resides in the preceding sectors section within the segment file. The offset
 contains a value relative to the start of the file.
 
 ===== Table footer
+
 The table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1546,6 +1613,7 @@ Adler-32 of the offset array
 |===
 
 ==== EnCase 6 to 7 and linen 6 to 7 (EWF-E01)
+
 Some aspects of this section are:
 
 * Every segment file contains its own table section.
@@ -1560,6 +1628,7 @@ The table section consists of:
 * the table footer
 
 ===== Table header
+
 The sector table header is 24 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1577,6 +1646,7 @@ As of EnCase 6 the number of entries is no longer restricted to 16375 entries.
 The new limit seems to be 65534.
 
 ===== Table entry
+
 The table entry is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1601,6 +1671,7 @@ chunks are uncompressed. This allows EnCase 6.7.1 faulty EWF files to be
 converted by libewf.
 
 ===== Table footer
+
 The table footer is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1611,9 +1682,11 @@ Adler-32 of the offset array
 |===
 
 ==== EnCase 6 to 7 (EWF-L01)
+
 The EWF-L01 format uses the EnCase 6 to 7 (EWF-E01) table section specification.
 
 === Table2 section
+
 The table2 section is identified in the section data type field as "table2".
 Some aspects of this section are:
 
@@ -1623,13 +1696,16 @@ Some aspects of this section are:
 * Resides directly after the table section.
 
 ==== FTK Imager and EnCase 2 to 7 and linen 5 to 7 (EWF-E01)
+
 The table2 section contains a mirror copy of the table section. Probably
 intended for recovery purposes.
 
 ==== EnCase 5 to 7 (EWF-L01)
+
 The EWF-L01 format uses the EWF-E01 table2 section specification.
 
 === Next section
+
 The next section is identified in the section data type field as "next". Some
 aspects of this section are:
 
@@ -1640,9 +1716,11 @@ aspects of this section are:
 * It should be the last section in a segment file, other than the last segment file.
 
 ==== SMART (EWF-S01)
+
 It resides after the table or table2 section.
 
 ==== FTK Imager, EnCase and linen (EWF-E01)
+
 It resides after the data section in a single segment file or for multiple
 segment files after the table2 section.
 
@@ -1654,6 +1732,7 @@ FTK imager versions before 2.9 sets the section size to 76. At the moment it is
 unknown in which version this behavior was changed.
 
 === Ltypes section
+
 The ltypes section is identifier in the section data type field as "ltypes".
 Some aspects of this section are:
 
@@ -1671,6 +1750,7 @@ The additional ltypes section data is 6 bytes of size and consists of:
 |===
 
 === Ltree section
+
 The ltree section is identifier in the section data type field as "ltree". Some
 aspects of this section are:
 
@@ -1683,6 +1763,7 @@ The ltree section consists of:
 * ltree data
 
 ==== Ltree header
+
 The ltree header is 6 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1697,6 +1778,7 @@ Adler-32 of all the data within the ltree header where the checksum value itself
 |===
 
 ==== Ltree data
+
 The ltree data string consists of an UTF-16 little-endian encoded string
 without the UTF-16 endian byte order mark.
 
@@ -1744,6 +1826,7 @@ The actual line numbering can vary.
 The end of line character(s) is a newline (0x0a).
 
 ==== Records category
+
 The rec category contains information about records.
 
 The 3rd and the 4th line consist of the following tab (0x09) separated values.
@@ -1767,6 +1850,7 @@ The size of the logical file data (media data)
 |===
 
 ==== Permissions category
+
 The perm category contains information about file permissions.
 
 Line 6 consist of perm
@@ -1791,6 +1875,7 @@ The 8th line consist of the following tab (0x09) separated values.
 [yellow-background]*Notes: Property: (2 => allow, empty => owner, 1 => group)*
 
 ==== Sources category
+
 Line 12 the srce category contains information about sources
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
@@ -1846,6 +1931,7 @@ Seen: "f"
 stamp and represents the date: March 12 2006, 11:44:05.
 
 ==== Subjects category
+
 The 21th line consist of the following tab (0x09) separated values.
 
 [yellow-background]*TODO describe what a subject is in the context of EnCase.*
@@ -1862,7 +1948,9 @@ The 21th line consist of the following tab (0x09) separated values.
 |===
 
 ==== Ltree entries
+
 ===== EnCase 5 and 6 (EWF-L01)
+
 The 29th line consist of the following tab (0x09) separated values.
 
 [cols="1,1,5",options="header"]
@@ -1917,6 +2005,7 @@ hashed. If the "ha" value contains "00000000000000000000000000000000." this
 means the MD5 hash is not set.
 
 ====== Ltree file entries
+
 The ltree entries of files and directories consist of entries starting with: 0
 followed by the number of sub file entries.
 
@@ -1931,6 +2020,7 @@ The entries of files and directories:
 |===
 
 ===== EnCase 7 (EWF-L01)
+
 The 29th line consist of the following tab (0x09) separated values.
 
 [cols="1,1,5",options="header"]
@@ -1997,6 +2087,7 @@ MD5 hash is not set. The same applies for the "sha" value when it contains
 "0000000000000000000000000000000000000000" the SHA1 has is not set.
 
 ====== Original extents
+
 [yellow-background]*TODO: add some text*
 
 ....
@@ -2004,6 +2095,7 @@ MD5 hash is not set. The same applies for the "sha" value when it contains
 ....
 
 ====== Unknonw ea
+
 [yellow-background]*TODO: add some text*
 
 Contains base-16 encoded data:
@@ -2023,6 +2115,7 @@ Contains base-16 encoded data:
 ....
 
 ====== Ltree file entries
+
 The ltree entries of files and directories consist of entries starting with: 26
 followed by the number of sub file entries.
 
@@ -2067,6 +2160,7 @@ ignored and the duplicate data offset refers to the location where the data
 stored.
 
 ===== [[binary_extents_value]]Binary extents value
+
 The binary extents value contains 3 values separated by a space:
 ....
 Unknown Offset Size
@@ -2083,6 +2177,7 @@ The offset and size are specified in hexadecimal values.
 [yellow-background]*Note: Contains 1 value for the first single file entry.*
 
 === Map section
+
 Some aspects of this section are:
 
 * Found in EWF-L01 in of EnCase 7 (First seen in EnCase 7.4.1.10)
@@ -2094,6 +2189,7 @@ The map consists of:
 * map entries array
 
 ==== Map string
+
 The map string consists of an UTF-16 little-endian encoded string without the
 UTF-16 endian byte order mark.
 
@@ -2120,6 +2216,7 @@ The map string contains the following information:
 The number of map entries should match the number of file entries in the ltree.
 
 ==== Map entry
+
 A map entry is 24 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2131,6 +2228,7 @@ A map entry is 24 bytes of size and consists of:
 |===
 
 === Session section
+
 The session section is identifier in the section data type field as "session". Some aspects of this section are:
 
 * It is not defined in the EWF format `[ASR02]`.
@@ -2146,6 +2244,7 @@ The session section data consists of:
 * The session footer
 
 ==== Session header
+
 The session header is 36 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2158,6 +2257,7 @@ Adler-32 of all the previous data within the additional session section data.
 |===
 
 ==== Session entry
+
 A session entry is 32 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2185,6 +2285,7 @@ descriptor.
 |===
 
 ==== Session footer
+
 The session footer is 4 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2195,6 +2296,7 @@ Adler-32 of all the data within the session entries array
 |===
 
 === Error2 section
+
 The error2 section is identifier in the section data type field as "error2".
 Some aspects of this section are:
 
@@ -2216,6 +2318,7 @@ The error2 section data consists of:
 * The error2 footer
 
 ==== Error2 header
+
 The error2 header is 520 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2228,6 +2331,7 @@ Adler-32 of all the previous data within the error2 header data.
 |===
 
 ==== Error2 entry
+
 An error2 entry is 8 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2238,6 +2342,7 @@ An error2 entry is 8 byte of size and consists of:
 |===
 
 ==== Error2 footer
+
 The error2 footer is 4 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2248,6 +2353,7 @@ Adler-32 of all the data within the error2 entries array
 |===
 
 === Digest section
+
 The digest section is identified in the section data type field as "digest".
 Some aspects of this section are:
 
@@ -2268,6 +2374,7 @@ Adler-32 of all the previous data within the additional digest section data.
 |===
 
 === Hash section
+
 The hash section is identified in the section data type field as "hash". Some
 aspects of this section are:
 
@@ -2290,6 +2397,7 @@ Adler-32 of all the previous data within the additional hash section data.
 |===
 
 ==== Notes
+
 Observations regarding the unknown value:
 
 * is zero in SMART
@@ -2306,6 +2414,7 @@ Test with EnCase 4 show that:
 * Does not differentiate for the same media acquired within the same program session, using different formats, but differ for different media and different program sessions
 
 === Done section
+
 The done section is identified in the section data type field as "done". Some
 aspects of this section are:
 
@@ -2316,9 +2425,11 @@ aspects of this section are:
 * It should be the last section in the last segment file.
 
 ==== SMART (EWF-S01)
+
 It resides after the table or table2 section.
 
 ==== FTK Imager, EnCase and linen (EWF-E01)
+
 It resides after the data section in a single segment file or for multiple
 segment files after the table2 section.
 
@@ -2330,6 +2441,7 @@ FTK imager versions before 2.9 sets the section size to 76. At the moment it is
 unknown in which version this behavior was changed.
 
 ==== Incomplete section
+
 The incomplete section is identified in the section data type field as
 "incomplete".
 
@@ -2343,6 +2455,7 @@ image created using remote imaging. The incomplete section contains data but
 currently there is no indication what purpose the data has.
 
 == EWF-X
+
 EWF-X (extended) is an experimental format to enhance the EWF format. EWF-X is
 based on the EWF-E01 format. EWF-X does not limit the table entries to 16375.
 EWF-X is not the same as version 2 of EWF.
@@ -2350,12 +2463,14 @@ EWF-X is not the same as version 2 of EWF.
 [yellow-background]*TODO add note about the table entry limit.*
 
 === Sections
+
 Additional sections provided in the EWF-X format are:
 
 * xheader
 * xhash
 
 ==== Xheader
+
 The xheader section contains a zlib compressed data (see section:
 3 Compression) containing XML data containing the header values.
 ....
@@ -2374,6 +2489,7 @@ The xheader section contains a zlib compressed data (see section:
 ....
 
 ==== Xhash
+
 The xhash section contains a zlib compressed data (see section:
 <<compression,Compression>>) containing XML data containing the hash values.
 ....
@@ -2385,10 +2501,13 @@ The xhash section contains a zlib compressed data (see section:
 ....
 
 === GUID
+
 EWF-X uses a random based version of the GUID
 
 == [[compression]]Compression
+
 === Zlib compressed data
+
 The compressed data is stored in the the zlib compressed data format (RFC1950).
 This format uses big-endian.
 
@@ -2428,6 +2547,7 @@ of 31.
 `[RFC1950]` only defines 8 as a valid compression method.
 
 ==== Compression information - compression method 8 (Deflate)
+
 For compression method 8 (Deflate) the compression information contains the
 base-2 logarithm of the LZ77 window size minus 8.
 
@@ -2452,6 +2572,7 @@ maximum windows size is 32768 bytes.
 |===
 
 === Deflate compression
+
 The deflate compressed data consists of one or more deflate compressed blocks.
 Each block consists of:
 
@@ -2459,6 +2580,7 @@ Each block consists of:
 * block data
 
 ==== Deflate compressed block header
+
 The deflate compressed block header is 3 bits in size and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2496,6 +2618,7 @@ Contains a 1s complement of the uncompressed data size
 The uncompressed data size can range between 0 and 65535 bytes.
 
 ==== Huffman compressed block data
+
 [yellow-background]*TODO add description*
 
 Compressed data blocks consists of 3 types of symbols:
@@ -2640,6 +2763,7 @@ or distance alphabet will not occur in the block, and should not participate in
 the Huffman code.
 
 ==== Decompression
+
 [yellow-background]*TODO add description*
 ....
 do
@@ -2687,6 +2811,7 @@ while( block_header.last_block_flag == 0 );
 ....
 
 === Adler-32 checksum
+
 The checksum algorithm provided by `[ASR02]`, slightly altered for readability.
 The algorithm used is Alder-32 and `[ASR02]` incorrectly refers to it as a CRC.
 
@@ -2723,16 +2848,20 @@ Zlib provides the function adler32 which is an optimized version of the
 algorithm.
 
 == Corruption scenarios
+
 This chapter contains several corruption scenarios that have been encountered
 "in the wild".
 
 === Corrupt uncompressed chunk
+
 [yellow-background]*TODO add description*
 
 === Corrupt compressed chunk
+
 [yellow-background]*TODO add description*
 
 === Corrupt section descriptor
+
 [yellow-background]*TODO add description*
 
 ....
@@ -2753,6 +2882,7 @@ libewf_section_start_read: checksum                  : 0x1ad00464
 ....
 
 === Corrupt table section
+
 [yellow-background]*TODO add description*
 
 [yellow-background]*with and with out table 2*
@@ -2762,15 +2892,19 @@ libewf_section_start_read: checksum                  : 0x1ad00464
 [yellow-background]*entry data*
 
 === Corrupted segment file header
+
 [yellow-background]*TODO add description*
 
 === Partial segment file
+
 [yellow-background]*TODO add description*
 
 === Missing segment file(s)
+
 [yellow-background]*TODO add description*
 
 === Dual image: section size versus offset
+
 The sections descriptors define both the next section offset and the size of
 the section. If an implementation reads only one of the two to determine the
 next section, a dual EWF image can be crafted that consists of two separate
@@ -2781,6 +2915,7 @@ versions only checked the section size and will show one of the two valid
 images.
 
 === Table entries offset overflow
+
 In EnCase 6.7.1 the sectors section can be larger than 2048 MiB. The table
 entries offsets are 31 bit values in EnCase6 the offset in a table entry value
 will actually use the full 32 bit if the 2048 MiB has been exceeded. This
@@ -2791,6 +2926,7 @@ chunks are uncompressed. This allows EnCase 6.7.1 faulty EWF files to be
 converted by libewf.
 
 === Multiple incomplete segment file set identifiers
+
 Although rare it can occur that a set of EWF image files changes its segment
 file set identifier. This was seen in an image created by EnCase 6.13,
 presumably using remote imaging. The image contained 3 different segment file
@@ -2807,6 +2943,7 @@ corrupted. For now a stock libewf does not support reading multiple segment
 files sets from a single image, but this might change in the future.
 
 == AD encryption
+
 As of version 2.8 FTK Imager supports "AD encryption". Although the output file
 uses the EWF extensions the file actually is a AES-256 encrypted container. The
 EWF can be encrypted using a pass-phrase or a certificate.
@@ -2888,16 +3025,19 @@ The decryption procedure is thus:
 * Decrypt the file ciphertext using AES with FKEY
 
 === Notes
+
 [yellow-background]*TODO add description*
 [yellow-background]*metadata (volume, data, headers)*
 
 == Notes
+
 What about:
 
 * PALM volume
 * the SMART logs
 
 === Header
+
 [yellow-background]*All test headers consist of the where spaces are actually
 tabs separated values*
 
@@ -2916,6 +3056,7 @@ p       n       id      nu      co      gu
 ....
 
 === Ltree
+
 When p = 0 n contains a numeric value ([yellow-background]*the number of child entries of the following entry*)
 When p = 1 n contains the name of the directory.
 When p = is empty n contains the name of the file.
@@ -2996,6 +3137,7 @@ http://www.forensicswiki.org/index.php/EnCase
 
 [appendix]
 == GNU Free Documentation License
+
 Version 1.3, 3 November 2008
 Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
 <http://fsf.org/>
@@ -3004,6 +3146,7 @@ Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
 
 === 0. PREAMBLE
+
 The purpose of this License is to make a manual, textbook, or other functional
 and useful document "free" in the sense of freedom: to assure everyone the
 effective freedom to copy and redistribute it, with or without modifying it,
@@ -3024,6 +3167,7 @@ recommend this License principally for works whose purpose is instruction or
 reference.
 
 === 1. APPLICABILITY AND DEFINITIONS
+
 This License applies to any manual or other work, in any medium, that contains
 a notice placed by the copyright holder saying it can be distributed under the
 terms of this License. Such a notice grants a world-wide, royalty-free license,
@@ -3102,6 +3246,7 @@ disclaiming warranties: any other implication that these Warranty Disclaimers
 may have is void and has no effect on the meaning of this License.
 
 === 2. VERBATIM COPYING
+
 You may copy and distribute the Document in any medium, either commercially or
 noncommercially, provided that this License, the copyright notices, and the
 license notice saying this License applies to the Document are reproduced in
@@ -3115,6 +3260,7 @@ You may also lend copies, under the same conditions stated above, and you may
 publicly display copies.
 
 === 3. COPYING IN QUANTITY
+
 If you publish printed copies (or copies in media that commonly have printed
 covers) of the Document, numbering more than 100, and the Document's license
 notice requires Cover Texts, you must enclose the copies in covers that carry,
@@ -3148,6 +3294,7 @@ well before redistributing any large number of copies, to give them a chance to
 provide you with an updated version of the Document.
 
 === 4. MODIFICATIONS
+
 You may copy and distribute a Modified Version of the Document under the
 conditions of sections 2 and 3 above, provided that you release the Modified
 Version under precisely this License, with the Modified Version filling the
@@ -3240,6 +3387,7 @@ permission to use their names for publicity for or to assert or imply
 endorsement of any Modified Version.
 
 === 5. COMBINING DOCUMENTS
+
 You may combine the Document with other documents released under this License,
 under the terms defined in section 4 above for modified versions, provided that
 you include in the combination all of the Invariant Sections of all of the
@@ -3261,6 +3409,7 @@ combine any sections Entitled "Acknowledgements", and any sections Entitled
 "Dedications". You must delete all sections Entitled "Endorsements".
 
 === 6. COLLECTIONS OF DOCUMENTS
+
 You may make a collection consisting of the Document and other documents
 released under this License, and replace the individual copies of this License
 in the various documents with a single copy that is included in the collection,
@@ -3273,6 +3422,7 @@ into the extracted document, and follow this License in all other respects
 regarding verbatim copying of that document.
 
 === 7. AGGREGATION WITH INDEPENDENT WORKS
+
 A compilation of the Document or its derivatives with other separate and
 independent documents or works, in or on a volume of a storage or distribution
 medium, is called an "aggregate" if the copyright resulting from the
@@ -3289,6 +3439,7 @@ in electronic form. Otherwise they must appear on printed covers that bracket
 the whole aggregate.
 
 === 8. TRANSLATION
+
 Translation is considered a kind of modification, so you may distribute
 translations of the Document under the terms of section 4. Replacing Invariant
 Sections with translations requires special permission from their copyright
@@ -3306,6 +3457,7 @@ If a section in the Document is Entitled "Acknowledgements", "Dedications", or
 typically require changing the actual title.
 
 === 9. TERMINATION
+
 You may not copy, modify, sublicense, or distribute the Document except as
 expressly provided under this License. Any attempt otherwise to copy, modify,
 sublicense, or distribute it is void, and will automatically terminate your
@@ -3329,6 +3481,7 @@ your rights have been terminated and not permanently reinstated, receipt of a
 copy of some or all of the same material does not give you any rights to use it.
 
 === 10. FUTURE REVISIONS OF THIS LICENSE
+
 The Free Software Foundation may publish new, revised versions of the GNU Free
 Documentation License from time to time. Such new versions will be similar in
 spirit to the present version, but may differ in detail to address new problems
@@ -3346,6 +3499,7 @@ License can be used, that proxy's public statement of acceptance of a version
 permanently authorizes you to choose that version for the Document.
 
 === 11. RELICENSING
+
 "Massive Multiauthor Collaboration Site" (or "MMC Site") means any World Wide
 Web server that publishes copyrightable works and also provides prominent
 facilities for anybody to edit those works. A public wiki that anybody can edit
