@@ -35,12 +35,12 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_extended_attribute_initialize(
-     libewf_lef_extended_attribute_t **extended_attribute,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_extended_attribute_initialize";
 
-	if( extended_attribute == NULL )
+	if( lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -51,7 +51,7 @@ int libewf_lef_extended_attribute_initialize(
 
 		return( -1 );
 	}
-	if( *extended_attribute != NULL )
+	if( *lef_extended_attribute != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -62,10 +62,10 @@ int libewf_lef_extended_attribute_initialize(
 
 		return( -1 );
 	}
-	*extended_attribute = memory_allocate_structure(
-	                       libewf_lef_extended_attribute_t );
+	*lef_extended_attribute = memory_allocate_structure(
+	                           libewf_lef_extended_attribute_t );
 
-	if( *extended_attribute == NULL )
+	if( *lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -77,7 +77,7 @@ int libewf_lef_extended_attribute_initialize(
 		goto on_error;
 	}
 	if( memory_set(
-	     *extended_attribute,
+	     *lef_extended_attribute,
 	     0,
 	     sizeof( libewf_lef_extended_attribute_t ) ) == NULL )
 	{
@@ -93,12 +93,12 @@ int libewf_lef_extended_attribute_initialize(
 	return( 1 );
 
 on_error:
-	if( *extended_attribute != NULL )
+	if( *lef_extended_attribute != NULL )
 	{
 		memory_free(
-		 *extended_attribute );
+		 *lef_extended_attribute );
 
-		*extended_attribute = NULL;
+		*lef_extended_attribute = NULL;
 	}
 	return( -1 );
 }
@@ -107,12 +107,12 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_extended_attribute_free(
-     libewf_lef_extended_attribute_t **extended_attribute,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_extended_attribute_free";
 
-	if( extended_attribute == NULL )
+	if( lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -123,22 +123,22 @@ int libewf_lef_extended_attribute_free(
 
 		return( -1 );
 	}
-	if( *extended_attribute != NULL )
+	if( *lef_extended_attribute != NULL )
 	{
-		if( ( *extended_attribute )->name != NULL )
+		if( ( *lef_extended_attribute )->name != NULL )
 		{
 			memory_free(
-			 ( *extended_attribute )->name );
+			 ( *lef_extended_attribute )->name );
 		}
-		if( ( *extended_attribute )->value != NULL )
+		if( ( *lef_extended_attribute )->value != NULL )
 		{
 			memory_free(
-			 ( *extended_attribute )->value );
+			 ( *lef_extended_attribute )->value );
 		}
 		memory_free(
-		 *extended_attribute );
+		 *lef_extended_attribute );
 
-		*extended_attribute = NULL;
+		*lef_extended_attribute = NULL;
 	}
 	return( 1 );
 }
@@ -147,13 +147,13 @@ int libewf_lef_extended_attribute_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_extended_attribute_clone(
-     libewf_lef_extended_attribute_t **destination_extended_attribute,
-     libewf_lef_extended_attribute_t *source_extended_attribute,
+     libewf_lef_extended_attribute_t **destination_lef_extended_attribute,
+     libewf_lef_extended_attribute_t *source_lef_extended_attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_extended_attribute_clone";
 
-	if( destination_extended_attribute == NULL )
+	if( destination_lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -164,7 +164,7 @@ int libewf_lef_extended_attribute_clone(
 
 		return( -1 );
 	}
-	if( *destination_extended_attribute != NULL )
+	if( *destination_lef_extended_attribute != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -175,16 +175,16 @@ int libewf_lef_extended_attribute_clone(
 
 		return( -1 );
 	}
-	if( source_extended_attribute == NULL )
+	if( source_lef_extended_attribute == NULL )
 	{
-		*destination_extended_attribute = NULL;
+		*destination_lef_extended_attribute = NULL;
 
 		return( 1 );
 	}
-	*destination_extended_attribute = memory_allocate_structure(
-			                   libewf_lef_extended_attribute_t );
+	*destination_lef_extended_attribute = memory_allocate_structure(
+			                       libewf_lef_extended_attribute_t );
 
-	if( *destination_extended_attribute == NULL )
+	if( *destination_lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -195,15 +195,15 @@ int libewf_lef_extended_attribute_clone(
 
 		goto on_error;
 	}
-	( *destination_extended_attribute )->name  = NULL;
-	( *destination_extended_attribute )->value = NULL;
+	( *destination_lef_extended_attribute )->name  = NULL;
+	( *destination_lef_extended_attribute )->value = NULL;
 
-	if( source_extended_attribute->name != NULL )
+	if( source_lef_extended_attribute->name != NULL )
 	{
-		( *destination_extended_attribute )->name = (uint8_t *) memory_allocate(
-		                                                         sizeof( uint8_t ) * source_extended_attribute->name_size );
+		( *destination_lef_extended_attribute )->name = (uint8_t *) memory_allocate(
+		                                                             sizeof( uint8_t ) * source_lef_extended_attribute->name_size );
 
-		if( ( *destination_extended_attribute )->name == NULL )
+		if( ( *destination_lef_extended_attribute )->name == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -215,9 +215,9 @@ int libewf_lef_extended_attribute_clone(
 			goto on_error;
 		}
 		if( memory_copy(
-		     ( *destination_extended_attribute )->name,
-		     source_extended_attribute->name,
-		     source_extended_attribute->name_size ) == NULL )
+		     ( *destination_lef_extended_attribute )->name,
+		     source_lef_extended_attribute->name,
+		     source_lef_extended_attribute->name_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -228,14 +228,14 @@ int libewf_lef_extended_attribute_clone(
 
 			goto on_error;
 		}
-		( *destination_extended_attribute )->value_size = source_extended_attribute->value_size;
+		( *destination_lef_extended_attribute )->value_size = source_lef_extended_attribute->value_size;
 	}
-	if( source_extended_attribute->value != NULL )
+	if( source_lef_extended_attribute->value != NULL )
 	{
-		( *destination_extended_attribute )->value = (uint8_t *) memory_allocate(
-		                                                          sizeof( uint8_t ) * source_extended_attribute->value_size );
+		( *destination_lef_extended_attribute )->value = (uint8_t *) memory_allocate(
+		                                                              sizeof( uint8_t ) * source_lef_extended_attribute->value_size );
 
-		if( ( *destination_extended_attribute )->value == NULL )
+		if( ( *destination_lef_extended_attribute )->value == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -247,9 +247,9 @@ int libewf_lef_extended_attribute_clone(
 			goto on_error;
 		}
 		if( memory_copy(
-		     ( *destination_extended_attribute )->value,
-		     source_extended_attribute->value,
-		     source_extended_attribute->value_size ) == NULL )
+		     ( *destination_lef_extended_attribute )->value,
+		     source_lef_extended_attribute->value,
+		     source_lef_extended_attribute->value_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -260,17 +260,17 @@ int libewf_lef_extended_attribute_clone(
 
 			goto on_error;
 		}
-		( *destination_extended_attribute )->value_size = source_extended_attribute->value_size;
+		( *destination_lef_extended_attribute )->value_size = source_lef_extended_attribute->value_size;
 	}
 	return( 1 );
 
 on_error:
-	if( *destination_extended_attribute != NULL )
+	if( *destination_lef_extended_attribute != NULL )
 	{
 		memory_free(
-		 *destination_extended_attribute );
+		 *destination_lef_extended_attribute );
 
-		*destination_extended_attribute = NULL;
+		*destination_lef_extended_attribute = NULL;
 	}
 	return( -1 );
 }
@@ -279,7 +279,7 @@ on_error:
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libewf_lef_extended_attribute_read_data(
-         libewf_lef_extended_attribute_t *extended_attribute,
+         libewf_lef_extended_attribute_t *lef_extended_attribute,
          const uint8_t *data,
          size_t data_size,
          libcerror_error_t **error )
@@ -293,7 +293,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	uint32_t value_32bit  = 0;
 #endif
 
-	if( extended_attribute == NULL )
+	if( lef_extended_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -304,7 +304,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 		return( -1 );
 	}
-	if( extended_attribute->name != NULL )
+	if( lef_extended_attribute->name != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -315,7 +315,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 		return( -1 );
 	}
-	if( extended_attribute->value != NULL )
+	if( lef_extended_attribute->value != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -453,10 +453,10 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 	if( name_size > 0 )
 	{
-		extended_attribute->name = (uint8_t *) memory_allocate(
-		                                        sizeof( uint8_t ) * name_size );
+		lef_extended_attribute->name = (uint8_t *) memory_allocate(
+		                                            sizeof( uint8_t ) * name_size );
 
-		if( extended_attribute->name == NULL )
+		if( lef_extended_attribute->name == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -468,7 +468,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 			goto on_error;
 		}
 		if( memory_copy(
-		     extended_attribute->name,
+		     lef_extended_attribute->name,
 		     &( data[ data_offset ] ),
 		     name_size ) == NULL )
 		{
@@ -481,7 +481,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 			goto on_error;
 		}
-		extended_attribute->name_size = name_size;
+		lef_extended_attribute->name_size = name_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -489,8 +489,8 @@ ssize_t libewf_lef_extended_attribute_read_data(
 			if( libewf_debug_print_utf16_string_value(
 			     function,
 			     "name\t\t\t\t",
-			     extended_attribute->name,
-			     extended_attribute->name_size,
+			     lef_extended_attribute->name,
+			     lef_extended_attribute->name_size,
 			     LIBUNA_ENDIAN_LITTLE,
 			     error ) != 1 )
 			{
@@ -509,10 +509,10 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	}
 	if( value_size > 0 )
 	{
-		extended_attribute->value = (uint8_t *) memory_allocate(
-		                                         sizeof( uint8_t ) * value_size );
+		lef_extended_attribute->value = (uint8_t *) memory_allocate(
+		                                             sizeof( uint8_t ) * value_size );
 
-		if( extended_attribute->value == NULL )
+		if( lef_extended_attribute->value == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -524,7 +524,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 			goto on_error;
 		}
 		if( memory_copy(
-		     extended_attribute->value,
+		     lef_extended_attribute->value,
 		     &( data[ data_offset ] ),
 		     value_size ) == NULL )
 		{
@@ -537,7 +537,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 			goto on_error;
 		}
-		extended_attribute->value_size = value_size;
+		lef_extended_attribute->value_size = value_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -545,8 +545,8 @@ ssize_t libewf_lef_extended_attribute_read_data(
 			if( libewf_debug_print_utf16_string_value(
 			     function,
 			     "value\t\t\t\t",
-			     extended_attribute->value,
-			     extended_attribute->value_size,
+			     lef_extended_attribute->value,
+			     lef_extended_attribute->value_size,
 			     LIBUNA_ENDIAN_LITTLE,
 			     error ) != 1 )
 			{
@@ -574,23 +574,23 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	return( (ssize_t) data_offset );
 
 on_error:
-	if( extended_attribute->value != NULL )
+	if( lef_extended_attribute->value != NULL )
 	{
 		memory_free(
-		 extended_attribute->value );
+		 lef_extended_attribute->value );
 
-		extended_attribute->value = NULL;
+		lef_extended_attribute->value = NULL;
 	}
-	extended_attribute->value_size = 0;
+	lef_extended_attribute->value_size = 0;
 
-	if( extended_attribute->name != NULL )
+	if( lef_extended_attribute->name != NULL )
 	{
 		memory_free(
-		 extended_attribute->name );
+		 lef_extended_attribute->name );
 
-		extended_attribute->name = NULL;
+		lef_extended_attribute->name = NULL;
 	}
-	extended_attribute->name_size = 0;
+	lef_extended_attribute->name_size = 0;
 
 	return( -1 );
 }

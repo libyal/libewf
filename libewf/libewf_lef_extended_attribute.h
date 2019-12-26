@@ -53,20 +53,20 @@ struct libewf_lef_extended_attribute
 };
 
 int libewf_lef_extended_attribute_initialize(
-     libewf_lef_extended_attribute_t **extended_attribute,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
      libcerror_error_t **error );
 
 int libewf_lef_extended_attribute_free(
-     libewf_lef_extended_attribute_t **extended_attribute,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
      libcerror_error_t **error );
 
 int libewf_lef_extended_attribute_clone(
-     libewf_lef_extended_attribute_t **destination_extended_attribute,
-     libewf_lef_extended_attribute_t *source_extended_attribute,
+     libewf_lef_extended_attribute_t **destination_lef_extended_attribute,
+     libewf_lef_extended_attribute_t *source_lef_extended_attribute,
      libcerror_error_t **error );
 
 ssize_t libewf_lef_extended_attribute_read_data(
-         libewf_lef_extended_attribute_t *extended_attribute,
+         libewf_lef_extended_attribute_t *lef_extended_attribute,
          const uint8_t *data,
          size_t data_size,
          libcerror_error_t **error );

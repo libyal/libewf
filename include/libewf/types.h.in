@@ -205,6 +205,8 @@ typedef intptr_t libewf_data_chunk_t;
 typedef intptr_t libewf_extended_attribute_t;
 typedef intptr_t libewf_file_entry_t;
 typedef intptr_t libewf_handle_t;
+typedef intptr_t libewf_source_t;
+typedef intptr_t libewf_subject_t;
 
 #ifdef __cplusplus
 }

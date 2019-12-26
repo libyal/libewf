@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_lef_source"
-	ProjectGUID="{C55518C5-75DF-435C-AC90-EE60D7C83016}"
-	RootNamespace="ewf_test_lef_source"
+	Name="ewf_test_serialized_string"
+	ProjectGUID="{B1379BFD-5EE1-4919-BED1-707035E3DC32}"
+	RootNamespace="ewf_test_serialized_string"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_lef_source.c"
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_serialized_string.c"
 				>
 			</File>
 		</Filter>
@@ -195,10 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libewf.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libfvalue.h"
 				>
 			</File>
 			<File

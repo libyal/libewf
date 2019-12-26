@@ -1840,6 +1840,30 @@ int libewf_extended_attribute_free(
      libewf_extended_attribute_t **extended_attribute,
      libewf_error_t **error );
 
+/* -------------------------------------------------------------------------
+ * Source functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a source
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_free(
+     libewf_source_t **source,
+     libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Subject functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a subject
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_subject_free(
+     libewf_subject_t **subject,
+     libewf_error_t **error );
+
 #ifdef __cplusplus
 }
 #endif

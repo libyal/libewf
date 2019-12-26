@@ -283,7 +283,7 @@ The device information section can be found:
 
 When encryption is enabled the device information is encrypted.
 
-The device information section contains a serialized file object string that consist of:
+The device information section contains a serialized object string that consist of:
 
 [cols="1,1,5",options="header"]
 |===
@@ -341,7 +341,7 @@ The case data section can be found:
 
 When encryption is enabled the case data is encrypted.
 
-The case data section contains a serialized file object string that consist of:
+The case data section contains a serialized object string that consist of:
 
 [cols="1,1,5",options="header"]
 |===
@@ -649,8 +649,7 @@ The session table footer should be followed by 12 bytes of alignment padding.
 
 === Increment data
 
-The increment data section contains a serialized file object string that
-consist of:
+The increment data section contains a serialized object string that consist of:
 
 [yellow-background]*TODO location in segment files, affected by encryption?
 Need example.*
@@ -710,8 +709,7 @@ encryption keys?*
 [NOTE]
 The "main" and "rl" object tags are not explicitly defined in the string.
 
-The restart data section contains a serialized file object string that consist
-of:
+The restart data section contains a serialized object string that consist of:
 
 [cols="1,1,5",options="header"]
 |===
@@ -853,8 +851,7 @@ does it resides in the last segment file before the restart data section.
 
 When encryption is enabled the analytical data is encrypted.
 
-The analytical data section contains a serialized file object string that
-consist of:
+The analytical data section contains a serialized object string that consist of:
 
 [cols="1,1,5",options="header"]
 |===
@@ -886,8 +883,8 @@ LEF files.*
 
 This section has the section integrity hash set.
 
-The single files data section contains a non-compressed serialized file object
-data which is similar to the EnCase 7 ltree data in EWF-L01. See:
+The single files data section contains a non-compressed serialized object data
+which is similar to the EnCase 7 ltree data in EWF-L01. See:
 https://github.com/libyal/libewf/blob/master/documentation/Expert%20Witness%20Compression%20Format%20(EWF).asciidoc[[LIBEWF\]].
 
 === 0x00000021 table
@@ -1040,19 +1037,18 @@ The 0x00000023 table footer should be followed by 12 bytes of alignment padding.
 [yellow-background]*Note if the number of table entries is odd the alignment
 padding is only 4 bytes.*
 
-== Serialized file object data
+== Serialized (file) object data
 
-The serialized file object data is stored as a compressed UTF-16 string with
+The serialized object data is stored as a compressed UTF-16 string with
 byte-order-mark. Commonly the string is encoded in little-endian. The
 compression method is defined in the file header of the segment file.
 
-The serialized file object data consists of:
+The serialized object data consists of:
 
 * the first line containing the number of objects in the string
 * the object data
 
-The file object serialization format uses the following special character
-values:
+The object serialization format uses the following special character values:
 
 [cols="1,1,5",options="header"]
 |===

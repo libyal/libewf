@@ -104,6 +104,7 @@ check_PROGRAMS = \
 	ewf_test_sector_range \
 	ewf_test_segment_file \
 	ewf_test_segment_table \
+	ewf_test_serialized_string \
 	ewf_test_session_section \
 	ewf_test_sha1_hash_section \
 	ewf_test_single_file_entry \
@@ -425,11 +426,17 @@ ewf_test_lef_source_SOURCES = \
 	ewf_test_lef_source.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
 	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_lef_source_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -557,6 +564,18 @@ ewf_test_segment_table_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_segment_table_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_serialized_string_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_serialized_string.c \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_serialized_string_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

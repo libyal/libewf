@@ -1,4 +1,4 @@
-.Dd December 25, 2019
+.Dd December 26, 2019
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -346,6 +346,14 @@ File entry functions
 Extended attribute functions
 .Ft int
 .Fn libewf_extended_attribute_free "libewf_extended_attribute_t **extended_attribute" "libewf_error_t **error"
+.Pp
+Source functions
+.Ft int
+.Fn libewf_source_free "libewf_source_t **source" "libewf_error_t **error"
+.Pp
+Subject functions
+.Ft int
+.Fn libewf_subject_free "libewf_subject_t **subject" "libewf_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version

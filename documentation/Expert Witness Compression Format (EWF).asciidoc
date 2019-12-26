@@ -445,8 +445,8 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values.
 The EnCase version used to acquire the media
 | 7 | ov | Platform +
 The platform/operating system used to acquire the media
-| 8 | m | Acquired date
-| 9 | u | System date
+| 8 | m | Acquisition date and time
+| 9 | u | System date and time
 | 10 | p | Password hash
 |===
 
@@ -512,8 +512,8 @@ The EnCase version used to acquire the media +
 EnCase limits this value to 12 characters
 | 10 | ov | Platform +
 The platform/operating system used to acquire the media
-| 11 | m | Acquired date
-| 12 | u | System date
+| 11 | m | Acquisition date and time
+| 12 | u | System date and time
 | 13 | p | Password hash
 | 14 | pid | Process identifier +
 The identifier of the process memory acquired +
@@ -528,7 +528,7 @@ For more information see section: <<header2_values,Header2 values>>
 
 ====== Notes
 
-Both the acquiry and system date are empty in a file created by winen.
+Both the acquiry and system date and time are empty in a file created by winen.
 
 The date values in the header section (not header2) are set to: Thu Jan  1
 00:00:00 1970. Where the time is dependent on the time zone and daylight
@@ -536,7 +536,7 @@ savings.
 
 ===== [[sources_category1]]Sources category
 
-Line 6 the srce category contains information about sources.
+Line 6 the srce category contains information about acquisition sources.
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
 
@@ -550,18 +550,26 @@ the actual values in this category are dependent on the version of EnCase.
 | Identifier number | Character in 8rd line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
-| 4 | ev | [yellow-background]*Unknown (Evidence number)*
-| 5 | tb | [yellow-background]*Unknown (Total bytes)*
-| 6 | lo | [yellow-background]*Unknown (Logical offset)*
-| 7 | po | [yellow-background]*Unknown (Physical offset)*
-| 8 | ah | [yellow-background]*Unknown (Acquire hash)*
-| 9 | sh | [yellow-background]*Unknown* +
+| 3 | id | Identifier +
+Contains an integer identifying the source
+| 4 | ev | Evidence number +
+Contains a string
+| 5 | tb | Total bytes +
+Contains an integer
+| 6 | lo | Logical offset +
+Contains an integer which is -1 when value is not set
+| 7 | po | Physical offset +
+Contains an integer which is -1 when value is not set
+| 8 | ah | [yellow-background]*Unknown (MD5?)* +
+Contains a string
+| 9 | sh | [yellow-background]*Unknown (SHA1?)* +
+Contains a string +
 (introduced in EnCase 6.19)
 | 10 | gu | [yellow-background]*Unknown (GUID)*
 | 11 | pgu | [yellow-background]*Unknown* +
 (introduced in EnCase 7)
-| 12 | aq | [yellow-background]*Unknown (Acquire date)*
+| 12 | aq | Acquisition date and time +
+Contains an integer with a POSIX timestamp
 |===
 
 Line 9 consists of 2 values, namely the values are "0 0".
@@ -586,7 +594,8 @@ The 14th line consist of the following tab (0x09) separated values.
 | Identifier number | Character in 14rd line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 3 | id | Identifier +
+Contains an integer the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
@@ -602,7 +611,7 @@ some of these values has changed around EnCase 6.12.
 The EnCase 5 to 7 (EWF-E01) header2 section specification also applies to the
 EnCase 5 to 7 (EWF-L01) format. However:
 
-* both the acquired date and system date are not set
+* both the acquired and system date and time are not set
 
 ==== [[header2_values]]Header2 values
 
@@ -628,10 +637,10 @@ EnCase limits this string to 3000 - 1 characters
 EnCase limits this string to 12 - 1 characters
 | ov | Platform | Free form string +
 EnCase limits this string to 24 - 1 characters
-| m | Acquired date | String containing POSIX 32-bit epoch timestamp +
+| m | Acquisition date and time | String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | u
-| System date | String containing POSIX 32-bit epoch timestamp +
+| System date and time | String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
 | p | Password hash | String containing the password hash. +
 If no password is set it should be simply the character '0'.
@@ -704,8 +713,8 @@ According to `[ASR02]` the 3rd and the 4th line consist of the following tab
 | 3 | a | Unique description
 | 4 | e | Examiner name
 | 5 | t | Notes
-| 6 | m | Acquired date
-| 7 | u | System date
+| 6 | m | Acquisition date and time
+| 7 | u | System date and time
 | 8 | p | Password hash
 | 9 | r | Compression level
 |===
@@ -733,8 +742,8 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values"
 | 3 | a | Unique description
 | 4 | e | Examiner name
 | 5 | t | Notes
-| 6 | m | Acquired date
-| 7 | u | System date
+| 6 | m | Acquisition date and time
+| 7 | u | System date and time
 | 8 | p | Password hash
 | 9 | r | Compression level
 |===
@@ -774,8 +783,8 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values:
 | 6 | av | Version
 | 7 | ov | Platform +
 The platform/operating system used to acquire the media
-| 8 | m | Acquired date
-| 9 | u | System date
+| 8 | m | Acquisition date and time
+| 9 | u | System date and time
 | 10 | p | Password hash
 | 11 | r | Compression level
 |===
@@ -804,8 +813,8 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values:
 | 6 | av | Version
 | 7 | ov | Platform +
 The platform/operating system used to acquire the media
-| 8 | m | Acquired date
-| 9 | u | System date
+| 8 | m | Acquisition date and time
+| 9 | u | System date and time
 | 10 | p | Password hash
 |===
 
@@ -874,8 +883,8 @@ The actual values in this category are dependent on the version of linen.
 | 9 | av | Version
 | 10 | ov | Platform +
 The platform/operating system used to acquire the media
-| 11 | m | Acquired date
-| 12 | u | System date
+| 11 | m | Acquisition date and time
+| 12 | u | System date and time
 | 13 | p | Password hash
 | 14 | pid | Process identifier +
 The identifier of the process memory acquired +
@@ -888,14 +897,14 @@ The extents of the process memory acquired +
 |===
 
 [NOTE]
-As of linen 6.19 the acquire date (and time) is in UTC and the system date is
-in local time. Where as before both date values were in local time.
+As of linen 6.19 the acquire date and time is in UTC and the system date and
+time is in local time. Where as before both values were in local time.
 
 For more information see section: <<header_values,Header values>>
 
 ===== [[sources_category2]]Sources category
 
-Line 6 the srce category contains information about sources
+Line 6 the srce category contains information about acquisition sources
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
 
@@ -908,16 +917,24 @@ The 8th line consist of the following tab (0x09) separated values.
 | Identifier number | Character in 8rd line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
-| 4 | ev | [yellow-background]*Unknown (Evidence number)*
-| 5 | tb | [yellow-background]*Unknown (Total bytes)*
-| 6 | lo | [yellow-background]*Unknown (Logical offset)*
-| 7 | po | [yellow-background]*Unknown (Physical offset)*
-| 8 | ah | [yellow-background]*Unknown (Acquire hash)*
-| 9 | sh | [yellow-background]*Unknown* +
+| 3 | id | Identifier +
+Contains an integer the source
+| 4 | ev | Evidence number +
+Contains a string
+| 5 | tb | Total bytes +
+Contains an integer
+| 6 | lo | Logical offset +
+Contains an integer which is -1 when value is not set
+| 7 | po | Physical offset +
+Contains an integer which is -1 when value is not set
+| 8 | ah | [yellow-background]*Unknown (MD5?)* +
+Contains a string
+| 9 | sh | [yellow-background]*Unknown (SHA1?)* +
+Contains a string +
 (Introduced in linen 6.19 or earlier)
 | 10 | gu | [yellow-background]*Unknown (GUID)*
-| 11 | aq | [yellow-background]*Unknown (Acquire date)*
+| 11 | aq | Acquisition date and time +
+Contains an integer with a POSIX timestamp
 |===
 
 Line 9 consists of 2 values, namely the values are "0 0".
@@ -943,7 +960,8 @@ The 14th line consist of the following tab (0x09) separated values.
 | Identifier number | Character in 14rd line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 3 | id | Identifier +
+Contains an integer the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
@@ -979,8 +997,8 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values:
 The FTK Imager version used to acquire the media
 | 7 | ov | Platform +
 The platform/operating system used to acquire the media
-| 8 | m | Acquired date
-| 9 | u | System date
+| 8 | m | Acquisition date and time
+| 9 | u | System date and time
 | 10 | p | Password hash
 | 11 | r | char
 |===
@@ -992,8 +1010,8 @@ For more information see section: <<header_values,Header values>>
 The EnCase 4 to 7 (EWF-E01) header section specification is also used for the
 EnCase 5 to 7 (EWF-L01) format, with the following aspects:
 
-* In EnCase 5 both the acquired date and system date are set to 0.
-* In EnCase 6 and 7 both the acquired date and system date are set to Jan 1, 1970 00:00:00 (the time is dependent on the local timezone and daylight savings)
+* In EnCase 5 both the acquired and system date and time are set to 0.
+* In EnCase 6 and 7 both the acquired and system date and time are set to Jan 1, 1970 00:00:00 (the time is dependent on the local timezone and daylight savings)
 
 ==== [[header_values]]Header values
 
@@ -1019,14 +1037,14 @@ EnCase limits this string to 3000 - 1 characters
 EnCase limits this string to 12 - 1 characters
 | ov | Platform | Free form string +
 EnCase limits this string to 24 -1 characters
-| m | Acquired date | In EnCase: +
+| m | Acquisition date and time | In EnCase: +
 String containing a date and time value +
 E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
 In linen: +
 String containing POSIX 32-bit epoch timestamp +
 E.g. "1142163845" which represents the date: March 12 2006, 11:44:05
-| u | System date | In EnCase: +
+| u | Systemdate and time | In EnCase: +
 String containing a date and time value +
 E.g. 2002 3 4 10 19 59", which represents March 4, 2002 10:19:59. +
  +
@@ -1842,7 +1860,7 @@ The 3rd and the 4th line consist of the following tab (0x09) separated values.
 |===
 | Identifier number | Character in 3rd line | Value in 4th line
 | 1 | tb | Total bytes +
-The size of the logical file data (media data)
+Contains an integer with size of the logical file data (media data)
 | 2 | cl | [yellow-background]*Unknown (Clusters?)*
 | 3 | n | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
@@ -1883,7 +1901,7 @@ The 8th line consist of the following tab (0x09) separated values.
 
 ==== [[sources_category3]]Sources category
 
-Line 12 the srce category contains information about sources
+Line 12 the srce category contains information about acquisition sources
 
 [yellow-background]*TODO describe what a source is in the context of EnCase.*
 
@@ -1896,46 +1914,60 @@ The 14th line consist of the following tab (0x09) separated values.
 | Identifier number | Character in 9th line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
-| 4 | ev | [yellow-background]*Unknown (Evidence number)*
-| 5 | do | [yellow-background]*Unknown* +
+| 3 | id | Identifier +
+Contains an integer the source
+| 4 | ev | Evidence number +
+Contains a string
+| 5 | do | Domain +
+Contains a string +
 (introduced in EnCase 7.9)
-| 6 | loc | [yellow-background]*Unknown* +
+| 6 | loc | Location +
+Contains a string +
 (introduced in EnCase 7.9)
-| 7 | se | [yellow-background]*Unknown (Serial number)* +
+| 7 | se | Serial number +
+Contains a string +
 (introduced in EnCase 7.9)
-| 8 | mfr | [yellow-background]*Unknown* +
+| 8 | mfr | Manufacturer +
+Contains a string +
 (introduced in EnCase 7.9)
-| 9 | mo | [yellow-background]*Unknown (Model)* +
+| 9 | mo | Model +
+Contains a string +
 (introduced in EnCase 7.9)
-| 10 | tb | [yellow-background]*Unknown (Total bytes)*
-| 11 | lo | [yellow-background]*Unknown (Logical offset)* +
--1 when not set
-| 12 | po | [yellow-background]*Unknown (Physical offset)* +
--1 when not set
-| 13 | ah | [yellow-background]*Unknown (Acquire hash)*
-| 14 | sh | [yellow-background]*Unknown* +
+| 10 | tb | Total bytes +
+Contains an integer
+| 11 | lo | Logical offset +
+Contains an integer which is -1 when value is not set
+| 12 | po | Physical offset +
+Contains an integer which is -1 when value is not set
+| 13 | ah | [yellow-background]*Unknown (MD5?)* +
+Contains a string
+| 14 | sh | [yellow-background]*Unknown (SHA1?)* +
+Contains a string +
 (introduced in EnCase 6.19)
 | 15 | gu | [yellow-background]*Unknown (GUID)* +
 Contains "0" if not set
 | 16 | pgu | [yellow-background]*Unknown (Physical GUID)* +
 Contains "0" if not set +
 (introduced in EnCase 7)
-| 17 | aq | [yellow-background]*Unknown (Acquire date)*
-| 18 | ip | [yellow-background]*Unknown* +
+| 17 | aq | Acquisition date and time +
+Contains an integer with a POSIX timestamp
+| 18 | ip | IP address +
+Contains a string +
 (introduced in EnCase 7.9)
-| 19 | si | [yellow-background]*Unknown* +
+| 19 | si | [yellow-background]*Unknown (Static IP address?)* +
+[yellow-background]*Contains 1 if static, empty otherwise* +
 (introduced in EnCase 7.9)
-| 20 | ma | [yellow-background]*Unknown* +
-(introduced in EnCase 7.9) +
-Seen: "0"
+| 20 | ma | MAC address +
+Contains a string +
+Seen: "0" +
+(introduced in EnCase 7.9)
 | 21 | dt | [yellow-background]*Unknown* +
-(introduced in EnCase 7.9) +
-Seen: "f"
+Seen: "f" +
+(introduced in EnCase 7.9)
 |===
 
-"Acquire date" is in the form of: "1142163845", which is a POSIX epoch time
-stamp and represents the date: March 12 2006, 11:44:05.
+The acquisition date and time is in the form of: "1142163845", which is a POSIX
+epoch timestamp and represents the date: March 12 2006, 11:44:05.
 
 ==== [[subjects_category3]]Subjects category
 
@@ -1948,7 +1980,8 @@ The 21th line consist of the following tab (0x09) separated values.
 | Identifier number | Character in 15th line | Meaning
 | 1 | p |
 | 2 | n |
-| 3 | id | [yellow-background]*Unknown (Identifier, unique name)*
+| 3 | id | Identifier +
+Contains an integer the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
@@ -1967,22 +2000,24 @@ The 29th line consist of the following tab (0x09) separated values.
 1 => if the single file entry is a directory +
 (null) => if single file entry is a file
 | 2 | n | Name
-| 3 | id | [yellow-background]*Unknown (file identifier?)*
+| 3 | id | Identifier +
+Contains an integer the file entry
 | 4 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
 | 5 | src | Source identifier +
-The identifier corresponds to an entry in the <<sources_category3,Sources category>>
+Contains an integer that corresponds to an identifier in the <<sources_category3,Sources category>>
 | 6 | sub | Subject identifier +
-The identifier corresponds to an entry in the <<subjects_category3,Subjects category>>
+Contains an integer that corresponds to an identifier in the <<subjects_category3,Subjects category>>
 | 7 | cid | [yellow-background]*Unknown (record type)*
 | 8 | jq | [yellow-background]*Unknown*
-| 9 | cr | Creation date
-| 10 | ac | Access date +
+| 9 | cr | Creation date and time
+| 10 | ac | Access date and time +
 [yellow-background]*(precision is date only)*
-| 11 | wr | (File) modification (last written) date
-| 12 | mo | (File system) entry modification date
-| 13 | dl | Deletion date
-| 14 | aq | [yellow-background]*Unknown*
+| 11 | wr | (File) modification (last written) date and time
+| 12 | mo | (File system) entry modification date and time
+| 13 | dl | Deletion date and time
+| 14 | aq | Acquisition date and time +
+Contains an integer with a POSIX timestamp
 | 15 | ha | Hash +
 The MD5 hash of the file data
 | 16 | ls | File size +
@@ -1990,8 +2025,10 @@ The file size specified in bytes +
 If the file size is 0 the data size should be 1
 | 17 | du | Duplicate data offset +
 Relative from the start of the media data
-| 18 | lo | [yellow-background]*Unknown (Logical Offset?)*
-| 19 | po | [yellow-background]*Unknown (Physical Offset?)* +
+| 18 | lo | Logical offset +
+Contains an integer which is -1 when value is not set
+| 19 | po | Physical offset +
+Contains an integer which is -1 when value is not set
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
 | 20 | mid | [yellow-background]*Unknown (identifier?)* +
 Contains a GUID/UUID +
@@ -2001,13 +2038,13 @@ Contains a GUID/UUID +
 | 22 | be | Binary extents +
 See section: <<binary_extents,Binary extents value>>
 | 23 | pm | Permissions identifier +
-Contains an identifier that corresponds to an entry in the <<permissions_category3,Permissions category>> or -1 if not set
+Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set
 | 24 | lpt | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
 |===
 
-"Creation date", "Access date" and "Last written date" are in the form of:
-"1142163845", which is a POSIX epoch time stamp and represents the date: March
+The creation, access and last written date and time are in the form of:
+"1142163845", which is a POSIX epoch timestamp and represents the date: March
 12 2006, 11:44:05.
 
 The "ha" value (Hash) consist of a MD5 hash string when file entries are
@@ -2043,12 +2080,13 @@ The file size specified in bytes +
 If the file size is 0 the data size should be 1
 | 3 | be | Binary extents +
 See section: <<binary_extents,Binary extents value>>
-| 4 | id | [yellow-background]*Unknown (file identifier?)*
-| 5 | cr | Creation date
-| 6 | ac | Access date
-| 7 | wr | (File) modification (last written) date
-| 8 | mo | (File system) entry modification date
-| 9 | dl | Deletion date
+| 4 | id | Identifier +
+Contains an integer the file entry
+| 5 | cr | Creation date and time
+| 6 | ac | Access date and time
+| 7 | wr | (File) modification (last written) date and time
+| 8 | mo | (File system) entry modification date and time
+| 9 | dl | Deletion date and time
 | 10 | sig | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
 | 11 | ha | Hash +
@@ -2066,26 +2104,29 @@ Judging by the size this value is assumed to be the SHA1 hash of the file data, 
 | 16 | n | Name
 | 17 | du | Duplicate data offset +
 Relative from the start of the media data
-| 18 | lo | [yellow-background]*Unknown (Logical Offset?)*
-| 19 | po | [yellow-background]*Unknown (Physical Offset?)*
+| 18 | lo | Logical offset +
+Contains an integer which is -1 when value is not set
+| 19 | po | Physical offset +
+Contains an integer which is -1 when value is not set
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
 | 20 | pm | Permissions identifier +
-Contains an identifier that corresponds to an entry in the <<permissions_category3,Permissions category>> or -1 if not set
+Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set
 | 21 | oes | [yellow-background]*Unknown (Original extents)* +
 (Introduced in EnCase 7)
 | 22 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
 | 23 | src | Source identifier +
-The identifier corresponds to an entry in the <<sources_category3,Sources category>>
+Contains an integer that corresponds to an identifier in the <<sources_category3,Sources category>>
 | 24 | sub | Subject identifier +
-The identifier corresponds to an entry in the <<subjects_category3,Subjects category>>
+Contains an integer that corresponds to an identifier in the <<subjects_category3,Subjects category>>
 | 25 | cid | [yellow-background]*Unknown (record type)*
 | 26 | jq | [yellow-background]*Unknown*
 | 27 | alt | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
 | 28 | ep | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 29 | aq | [yellow-background]*Unknown*
+| 29 | aq | Acquisition date and time +
+Contains an integer with a POSIX timestamp
 | 30 | cfi | [yellow-background]*Unknown*
 | 31 | sg | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)

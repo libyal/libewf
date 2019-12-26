@@ -27,6 +27,7 @@
 
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
+#include "libewf_serialized_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -36,6 +37,10 @@ typedef struct libewf_single_file_entry libewf_single_file_entry_t;
 
 struct libewf_single_file_entry
 {
+	/* The identifier
+	 */
+	uint32_t identifier;
+
 	/* The type
 	 */
 	uint8_t type;
@@ -52,21 +57,13 @@ struct libewf_single_file_entry
 	 */
 	size64_t data_size;
 
-	/* The name
+	/* The name string
 	 */
-	uint8_t *name;
+	libewf_serialized_string_t *name;
 
-	/* The name size
+	/* The short name string
 	 */
-	size_t name_size;
-
-	/* The short name
-	 */
-	uint8_t *short_name;
-
-	/* The short name size
-	 */
-	size_t short_name_size;
+	libewf_serialized_string_t *short_name;
 
 	/* The (file) size
 	 */
@@ -76,15 +73,15 @@ struct libewf_single_file_entry
 	 */
 	off64_t duplicate_data_offset;
 
-	/* The source identifier
+	/* The identifier of the corresponding source
 	 */
 	uint32_t source_identifier;
 
-	/* The subject identifier
+	/* The identifier of the corresponding subject
 	 */
 	uint32_t subject_identifier;
 
-	/* The permissions identifier
+	/* The identifier of the corresponding permissions
 	 */
 	uint32_t permissions_identifier;
 
@@ -117,21 +114,13 @@ struct libewf_single_file_entry
 	 */
 	int32_t deletion_time;
 
-	/* The MD5 digest hash
+	/* The MD5 digest hash string
 	 */
-	uint8_t *md5_hash;
+	libewf_serialized_string_t *md5_hash;
 
-	/* The MD5 digest hash size
+	/* The SHA1 digest hash string
 	 */
-	size_t md5_hash_size;
-
-	/* The SHA1 digest hash
-	 */
-	uint8_t *sha1_hash;
-
-	/* The SHA1 digest hash size
-	 */
-	size_t sha1_hash_size;
+	libewf_serialized_string_t *sha1_hash;
 };
 
 int libewf_single_file_entry_initialize(
@@ -159,15 +148,6 @@ int libewf_single_file_entry_read_extended_attributes(
      size_t data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_read_hexadecimal_string(
-     libewf_single_file_entry_t *single_file_entry,
-     const uint8_t *data,
-     size_t data_size,
-     uint8_t *string,
-     size_t string_size,
-     int *zero_values_only,
-     libcerror_error_t **error );
-
 int libewf_single_file_entry_read_short_name(
      libewf_single_file_entry_t *single_file_entry,
      const uint8_t *data,
@@ -179,6 +159,11 @@ int libewf_single_file_entry_read_data(
      libfvalue_split_utf8_string_t *types,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libewf_single_file_entry_get_identifier(
+     libewf_single_file_entry_t *single_file_entry,
+     uint32_t *identifier,
      libcerror_error_t **error );
 
 int libewf_single_file_entry_get_type(

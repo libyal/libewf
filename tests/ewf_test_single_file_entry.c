@@ -360,7 +360,7 @@ int ewf_test_single_file_entry_initialize(
 	int result                                    = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests               = 1;
+	int number_of_malloc_fail_tests               = 5;
 	int number_of_memset_fail_tests               = 1;
 	int test_number                               = 0;
 #endif
@@ -591,10 +591,11 @@ int ewf_test_single_file_entry_clone(
 	libcerror_error_t *error                                  = NULL;
 	libewf_single_file_entry_t *destination_single_file_entry = NULL;
 	libewf_single_file_entry_t *source_single_file_entry      = NULL;
+	libfvalue_split_utf8_string_t *types                      = NULL;
 	int result                                                = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests                           = 1;
+	int number_of_malloc_fail_tests                           = 5;
 	int test_number                                           = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -616,6 +617,42 @@ int ewf_test_single_file_entry_clone(
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "source_single_file_entry",
 	 source_single_file_entry );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_utf8_string_split(
+	          ewf_test_single_file_entry_types_data1,
+	          107,
+	          (uint8_t) '\t',
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_file_entry_read_data(
+	          source_single_file_entry,
+	          types,
+	          ewf_test_single_file_entry_values_data1,
+	          4796,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -811,6 +848,23 @@ int ewf_test_single_file_entry_clone(
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_single_file_entry_free(
 	          &source_single_file_entry,
 	          &error );
@@ -840,6 +894,12 @@ on_error:
 	{
 		libewf_single_file_entry_free(
 		 &destination_single_file_entry,
+		 NULL );
+	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
 		 NULL );
 	}
 	if( source_single_file_entry != NULL )
@@ -957,6 +1017,26 @@ int ewf_test_single_file_entry_read_binary_extents(
 	          single_file_entry,
 	          &( ewf_test_single_file_entry_values_data1[ 39 ] ),
 	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test unsupported number of offset values
+	 */
+	result = libewf_single_file_entry_read_binary_extents(
+	          single_file_entry,
+	          &( ewf_test_single_file_entry_values_data1[ 39 ] ),
+	          9,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1109,221 +1189,65 @@ int ewf_test_single_file_entry_read_extended_attributes(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_single_file_entry_read_extended_attributes with malloc failing
 	 */
-	result = libewf_single_file_entry_free(
-	          &single_file_entry,
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_single_file_entry_read_extended_attributes(
+	          single_file_entry,
+	          &( ewf_test_single_file_entry_values_data1[ 154 ] ),
+	          4640,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_file_entry",
-	 single_file_entry );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
+	if( ewf_test_malloc_attempts_before_fail != -1 )
 	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
 		libcerror_error_free(
 		 &error );
 	}
-	if( single_file_entry != NULL )
+	/* Test libewf_single_file_entry_read_extended_attributes with malloc failing in libewf_lef_extended_attribute_initialize
+	 */
+	ewf_test_malloc_attempts_before_fail = 1;
+
+	result = libewf_single_file_entry_read_extended_attributes(
+	          single_file_entry,
+	          &( ewf_test_single_file_entry_values_data1[ 154 ] ),
+	          4640,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
 	{
-		libewf_single_file_entry_free(
-		 &single_file_entry,
-		 NULL );
+		ewf_test_malloc_attempts_before_fail = -1;
 	}
-	return( 0 );
-}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-/* Tests the libewf_single_file_entry_read_hexadecimal_string function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_single_file_entry_read_hexadecimal_string(
-     void )
-{
-	uint8_t hexadecimal_string[ 33 ];
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_t *error                      = NULL;
-	libewf_single_file_entry_t *single_file_entry = NULL;
-	int result                                    = 0;
-	int zero_values_only                          = 0;
-
-	/* Initialize test
-	 */
-	result = libewf_single_file_entry_initialize(
-	          &single_file_entry,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_file_entry",
-	 single_file_entry );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          ewf_test_single_file_entry_values_data1,
-	          32,
-	          hexadecimal_string,
-	          33,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          NULL,
-	          ewf_test_single_file_entry_values_data1,
-	          32,
-	          hexadecimal_string,
-	          33,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          NULL,
-	          32,
-	          hexadecimal_string,
-	          33,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          ewf_test_single_file_entry_values_data1,
-	          (size_t) SSIZE_MAX + 1,
-	          hexadecimal_string,
-	          33,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          ewf_test_single_file_entry_values_data1,
-	          32,
-	          NULL,
-	          33,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          ewf_test_single_file_entry_values_data1,
-	          32,
-	          hexadecimal_string,
-	          (size_t) SSIZE_MAX + 1,
-	          &zero_values_only,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_file_entry_read_hexadecimal_string(
-	          single_file_entry,
-	          ewf_test_single_file_entry_values_data1,
-	          32,
-	          hexadecimal_string,
-	          33,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
 	 */
@@ -1528,6 +1452,23 @@ int ewf_test_single_file_entry_read_data(
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_single_file_entry_free(
 	          &single_file_entry,
 	          &error );
@@ -1553,11 +1494,90 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
+		 NULL );
+	}
 	if( single_file_entry != NULL )
 	{
 		libewf_single_file_entry_free(
 		 &single_file_entry,
 		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_single_file_entry_get_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_single_file_entry_get_identifier(
+     libewf_single_file_entry_t *single_file_entry )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t identifier      = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_single_file_entry_get_identifier(
+	          single_file_entry,
+	          &identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_single_file_entry_get_identifier(
+	          NULL,
+	          &identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_single_file_entry_get_identifier(
+	          single_file_entry,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
 	}
 	return( 0 );
 }
@@ -2006,7 +2026,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf8_name(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint8_t utf8_string[ 512 ];
+	uint8_t utf8_string[ 64 ];
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
@@ -2016,7 +2036,7 @@ int ewf_test_single_file_entry_get_utf8_name(
 	result = libewf_single_file_entry_get_utf8_name(
 	          single_file_entry,
 	          utf8_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2033,7 +2053,7 @@ int ewf_test_single_file_entry_get_utf8_name(
 	result = libewf_single_file_entry_get_utf8_name(
 	          NULL,
 	          utf8_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2051,7 +2071,7 @@ int ewf_test_single_file_entry_get_utf8_name(
 	result = libewf_single_file_entry_get_utf8_name(
 	          single_file_entry,
 	          NULL,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2192,7 +2212,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf16_name(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint16_t utf16_string[ 512 ];
+	uint16_t utf16_string[ 64 ];
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
@@ -2202,7 +2222,7 @@ int ewf_test_single_file_entry_get_utf16_name(
 	result = libewf_single_file_entry_get_utf16_name(
 	          single_file_entry,
 	          utf16_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2219,7 +2239,7 @@ int ewf_test_single_file_entry_get_utf16_name(
 	result = libewf_single_file_entry_get_utf16_name(
 	          NULL,
 	          utf16_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2237,7 +2257,7 @@ int ewf_test_single_file_entry_get_utf16_name(
 	result = libewf_single_file_entry_get_utf16_name(
 	          single_file_entry,
 	          NULL,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2378,7 +2398,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf8_short_name(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint8_t utf8_string[ 512 ];
+	uint8_t utf8_string[ 64 ];
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
@@ -2388,7 +2408,7 @@ int ewf_test_single_file_entry_get_utf8_short_name(
 	result = libewf_single_file_entry_get_utf8_short_name(
 	          single_file_entry,
 	          utf8_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2405,7 +2425,7 @@ int ewf_test_single_file_entry_get_utf8_short_name(
 	result = libewf_single_file_entry_get_utf8_short_name(
 	          NULL,
 	          utf8_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2423,7 +2443,7 @@ int ewf_test_single_file_entry_get_utf8_short_name(
 	result = libewf_single_file_entry_get_utf8_short_name(
 	          single_file_entry,
 	          NULL,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2564,7 +2584,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf16_short_name(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint16_t utf16_string[ 512 ];
+	uint16_t utf16_string[ 64 ];
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
@@ -2574,7 +2594,7 @@ int ewf_test_single_file_entry_get_utf16_short_name(
 	result = libewf_single_file_entry_get_utf16_short_name(
 	          single_file_entry,
 	          utf16_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2591,7 +2611,7 @@ int ewf_test_single_file_entry_get_utf16_short_name(
 	result = libewf_single_file_entry_get_utf16_short_name(
 	          NULL,
 	          utf16_string,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2609,7 +2629,7 @@ int ewf_test_single_file_entry_get_utf16_short_name(
 	result = libewf_single_file_entry_get_utf16_short_name(
 	          single_file_entry,
 	          NULL,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3115,7 +3135,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf8_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint8_t utf8_hash_value_md5[ 512 ];
+	uint8_t utf8_hash_value_md5[ 64 ];
 
 	libcerror_error_t *error       = NULL;
 	int result                     = 0;
@@ -3126,7 +3146,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 	result = libewf_single_file_entry_get_utf8_hash_value_md5(
 	          single_file_entry,
 	          utf8_hash_value_md5,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_NOT_EQUAL_INT(
@@ -3145,7 +3165,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 	result = libewf_single_file_entry_get_utf8_hash_value_md5(
 	          NULL,
 	          utf8_hash_value_md5,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3165,7 +3185,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_md5(
 		result = libewf_single_file_entry_get_utf8_hash_value_md5(
 		          single_file_entry,
 		          NULL,
-		          512,
+		          64,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -3233,7 +3253,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf16_hash_value_md5(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint16_t utf16_hash_value_md5[ 512 ];
+	uint16_t utf16_hash_value_md5[ 64 ];
 
 	libcerror_error_t *error        = NULL;
 	int result                      = 0;
@@ -3244,7 +3264,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 	result = libewf_single_file_entry_get_utf16_hash_value_md5(
 	          single_file_entry,
 	          utf16_hash_value_md5,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_NOT_EQUAL_INT(
@@ -3263,7 +3283,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 	result = libewf_single_file_entry_get_utf16_hash_value_md5(
 	          NULL,
 	          utf16_hash_value_md5,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3283,7 +3303,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_md5(
 		result = libewf_single_file_entry_get_utf16_hash_value_md5(
 		          single_file_entry,
 		          NULL,
-		          512,
+		          64,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -3351,7 +3371,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint8_t utf8_hash_value_sha1[ 512 ];
+	uint8_t utf8_hash_value_sha1[ 64 ];
 
 	libcerror_error_t *error        = NULL;
 	int result                      = 0;
@@ -3362,7 +3382,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 	result = libewf_single_file_entry_get_utf8_hash_value_sha1(
 	          single_file_entry,
 	          utf8_hash_value_sha1,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_NOT_EQUAL_INT(
@@ -3381,7 +3401,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 	result = libewf_single_file_entry_get_utf8_hash_value_sha1(
 	          NULL,
 	          utf8_hash_value_sha1,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3401,7 +3421,7 @@ int ewf_test_single_file_entry_get_utf8_hash_value_sha1(
 		result = libewf_single_file_entry_get_utf8_hash_value_sha1(
 		          single_file_entry,
 		          NULL,
-		          512,
+		          64,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -3469,7 +3489,7 @@ on_error:
 int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
      libewf_single_file_entry_t *single_file_entry )
 {
-	uint16_t utf16_hash_value_sha1[ 512 ];
+	uint16_t utf16_hash_value_sha1[ 64 ];
 
 	libcerror_error_t *error         = NULL;
 	int result                       = 0;
@@ -3480,7 +3500,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 	result = libewf_single_file_entry_get_utf16_hash_value_sha1(
 	          single_file_entry,
 	          utf16_hash_value_sha1,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_NOT_EQUAL_INT(
@@ -3499,7 +3519,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 	result = libewf_single_file_entry_get_utf16_hash_value_sha1(
 	          NULL,
 	          utf16_hash_value_sha1,
-	          512,
+	          64,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3519,7 +3539,7 @@ int ewf_test_single_file_entry_get_utf16_hash_value_sha1(
 		result = libewf_single_file_entry_get_utf16_hash_value_sha1(
 		          single_file_entry,
 		          NULL,
-		          512,
+		          64,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -3629,10 +3649,6 @@ int main(
 	 "libewf_single_file_entry_read_extended_attributes",
 	 ewf_test_single_file_entry_read_extended_attributes );
 
-	EWF_TEST_RUN(
-	 "libewf_single_file_entry_read_hexadecimal_string",
-	 ewf_test_single_file_entry_read_hexadecimal_string );
-
 /* TODO add tests for libewf_single_file_entry_read_short_name */
 
 	EWF_TEST_RUN(
@@ -3698,6 +3714,11 @@ int main(
 
 	/* Run tests
 	 */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_single_file_entry_get_identifier",
+	 ewf_test_single_file_entry_get_identifier,
+	 single_file_entry );
+
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_file_entry_get_type",
 	 ewf_test_single_file_entry_get_type,
@@ -3815,6 +3836,23 @@ int main(
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_single_file_entry_free(
 	          &single_file_entry,
 	          &error );
@@ -3843,6 +3881,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
+		 NULL );
 	}
 	if( single_file_entry != NULL )
 	{

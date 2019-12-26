@@ -31,12 +31,12 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_subject_initialize(
-     libewf_lef_subject_t **subject,
+     libewf_lef_subject_t **lef_subject,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_subject_initialize";
 
-	if( subject == NULL )
+	if( lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -47,7 +47,7 @@ int libewf_lef_subject_initialize(
 
 		return( -1 );
 	}
-	if( *subject != NULL )
+	if( *lef_subject != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -58,10 +58,10 @@ int libewf_lef_subject_initialize(
 
 		return( -1 );
 	}
-	*subject = memory_allocate_structure(
-	            libewf_lef_subject_t );
+	*lef_subject = memory_allocate_structure(
+	                libewf_lef_subject_t );
 
-	if( *subject == NULL )
+	if( *lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -73,7 +73,7 @@ int libewf_lef_subject_initialize(
 		goto on_error;
 	}
 	if( memory_set(
-	     *subject,
+	     *lef_subject,
 	     0,
 	     sizeof( libewf_lef_subject_t ) ) == NULL )
 	{
@@ -89,12 +89,12 @@ int libewf_lef_subject_initialize(
 	return( 1 );
 
 on_error:
-	if( *subject != NULL )
+	if( *lef_subject != NULL )
 	{
 		memory_free(
-		 *subject );
+		 *lef_subject );
 
-		*subject = NULL;
+		*lef_subject = NULL;
 	}
 	return( -1 );
 }
@@ -103,12 +103,12 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_subject_free(
-     libewf_lef_subject_t **subject,
+     libewf_lef_subject_t **lef_subject,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_subject_free";
 
-	if( subject == NULL )
+	if( lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -119,12 +119,12 @@ int libewf_lef_subject_free(
 
 		return( -1 );
 	}
-	if( *subject != NULL )
+	if( *lef_subject != NULL )
 	{
 		memory_free(
-		 *subject );
+		 *lef_subject );
 
-		*subject = NULL;
+		*lef_subject = NULL;
 	}
 	return( 1 );
 }
@@ -133,13 +133,13 @@ int libewf_lef_subject_free(
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_subject_clone(
-     libewf_lef_subject_t **destination_subject,
-     libewf_lef_subject_t *source_subject,
+     libewf_lef_subject_t **destination_lef_subject,
+     libewf_lef_subject_t *source_lef_subject,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_subject_clone";
 
-	if( destination_subject == NULL )
+	if( destination_lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -150,7 +150,7 @@ int libewf_lef_subject_clone(
 
 		return( -1 );
 	}
-	if( *destination_subject != NULL )
+	if( *destination_lef_subject != NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -161,16 +161,16 @@ int libewf_lef_subject_clone(
 
 		return( -1 );
 	}
-	if( source_subject == NULL )
+	if( source_lef_subject == NULL )
 	{
-		*destination_subject = NULL;
+		*destination_lef_subject = NULL;
 
 		return( 1 );
 	}
-	*destination_subject = memory_allocate_structure(
-	                        libewf_lef_subject_t );
+	*destination_lef_subject = memory_allocate_structure(
+	                            libewf_lef_subject_t );
 
-	if( *destination_subject == NULL )
+	if( *destination_lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -182,8 +182,8 @@ int libewf_lef_subject_clone(
 		goto on_error;
 	}
 	if( memory_copy(
-	     *destination_subject,
-	     source_subject,
+	     *destination_lef_subject,
+	     source_lef_subject,
 	     sizeof( libewf_lef_subject_t ) ) == NULL )
 	{
 		libcerror_error_set(
@@ -194,9 +194,9 @@ int libewf_lef_subject_clone(
 		 function );
 
 		memory_free(
-		 *destination_subject );
+		 *destination_lef_subject );
 
-		*destination_subject = NULL;
+		*destination_lef_subject = NULL;
 
 		return( -1 );
 	}
@@ -205,12 +205,12 @@ int libewf_lef_subject_clone(
 	return( 1 );
 
 on_error:
-	if( *destination_subject != NULL )
+	if( *destination_lef_subject != NULL )
 	{
 		memory_free(
-		 *destination_subject );
+		 *destination_lef_subject );
 
-		*destination_subject = NULL;
+		*destination_lef_subject = NULL;
 	}
 	return( -1 );
 }
@@ -219,14 +219,14 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_lef_subject_read_data(
-     libewf_lef_subject_t *subject,
+     libewf_lef_subject_t *lef_subject,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_subject_read_data";
 
-	if( subject == NULL )
+	if( lef_subject == NULL )
 	{
 		libcerror_error_set(
 		 error,

@@ -39,10 +39,12 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error )
 {
-	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf8_name";
-	int number_of_sub_nodes = 0;
-	int result              = LIBUNA_COMPARE_GREATER;
-	int sub_node_index      = 0;
+	libcdata_tree_node_t *safe_sub_node                    = NULL;
+	libewf_single_file_entry_t *safe_sub_single_file_entry = NULL;
+	static char *function                                  = "libewf_single_file_tree_get_sub_node_by_utf8_name";
+	int number_of_sub_nodes                                = 0;
+	int result                                             = LIBUNA_COMPARE_GREATER;
+	int sub_node_index                                     = 0;
 
 	if( node == NULL )
 	{
@@ -77,6 +79,9 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 		return( -1 );
 	}
+	*sub_node              = NULL;
+	*sub_single_file_entry = NULL;
+
 	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
 	     &number_of_sub_nodes,
@@ -89,12 +94,12 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 		 "%s: unable to retrieve number of sub nodes.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libcdata_tree_node_get_sub_node_by_index(
 	     node,
 	     0,
-	     sub_node,
+	     &safe_sub_node,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -104,15 +109,15 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 		 "%s: unable to retrieve first sub node.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	for( sub_node_index = 0;
 	     sub_node_index < number_of_sub_nodes;
 	     sub_node_index++ )
 	{
 		if( libcdata_tree_node_get_value(
-		     *sub_node,
-		     (intptr_t **) sub_single_file_entry,
+		     safe_sub_node,
+		     (intptr_t **) &safe_sub_single_file_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -123,9 +128,9 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		if( *sub_single_file_entry == NULL )
+		if( safe_sub_single_file_entry == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -135,35 +140,35 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		if( ( *sub_single_file_entry )->name != NULL )
-		{
-			result = libuna_utf8_string_compare_with_utf8_stream(
-				  utf8_string,
-				  utf8_string_length,
-				  ( *sub_single_file_entry )->name,
-				  (size_t) ( *sub_single_file_entry )->name_size,
-				  error );
-		}
+		result = libewf_serialized_string_compare_with_utf8_string(
+			  safe_sub_single_file_entry->name,
+			  utf8_string,
+			  utf8_string_length,
+			  error );
+
 		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare UTF-8 string.",
+			 "%s: unable to compare name with UTF-8 string.",
 			 function );
 
 			return( -1 );
 		}
 		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
+			*sub_node              = safe_sub_node;
+			*sub_single_file_entry = safe_sub_single_file_entry;
+
 			break;
 		}
 		if( libcdata_tree_node_get_next_node(
-		     *sub_node,
-		     sub_node,
+		     safe_sub_node,
+		     &safe_sub_node,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -174,23 +179,10 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
-	if( sub_node_index >= number_of_sub_nodes )
-	{
-		*sub_node              = NULL;
-		*sub_single_file_entry = NULL;
-
-		return( 0 );
-	}
-	return( 1 );
-
-on_error:
-	*sub_node              = NULL;
-	*sub_single_file_entry = NULL;
-
-	return( -1 );
+	return( 0 );
 }
 
 /* Retrieves the single file entry sub node for the specific UTF-16 formatted name
@@ -204,10 +196,12 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
      libewf_single_file_entry_t **sub_single_file_entry,
      libcerror_error_t **error )
 {
-	static char *function   = "libewf_single_file_tree_get_sub_node_by_utf16_name";
-	int number_of_sub_nodes = 0;
-	int result              = LIBUNA_COMPARE_GREATER;
-	int sub_node_index      = 0;
+	libcdata_tree_node_t *safe_sub_node                    = NULL;
+	libewf_single_file_entry_t *safe_sub_single_file_entry = NULL;
+	static char *function                                  = "libewf_single_file_tree_get_sub_node_by_utf16_name";
+	int number_of_sub_nodes                                = 0;
+	int result                                             = LIBUNA_COMPARE_GREATER;
+	int sub_node_index                                     = 0;
 
 	if( node == NULL )
 	{
@@ -242,6 +236,9 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 		return( -1 );
 	}
+	*sub_node              = NULL;
+	*sub_single_file_entry = NULL;
+
 	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
 	     &number_of_sub_nodes,
@@ -254,12 +251,12 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		 "%s: unable to retrieve number of sub nodes.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libcdata_tree_node_get_sub_node_by_index(
 	     node,
 	     0,
-	     sub_node,
+	     &safe_sub_node,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -269,15 +266,15 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		 "%s: unable to retrieve first sub node.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	for( sub_node_index = 0;
 	     sub_node_index < number_of_sub_nodes;
 	     sub_node_index++ )
 	{
 		if( libcdata_tree_node_get_value(
-		     *sub_node,
-		     (intptr_t **) sub_single_file_entry,
+		     safe_sub_node,
+		     (intptr_t **) &safe_sub_single_file_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -288,9 +285,9 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		if( *sub_single_file_entry == NULL )
+		if( safe_sub_single_file_entry == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -300,17 +297,14 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
-		if( ( *sub_single_file_entry )->name != NULL )
-		{
-			result = libuna_utf16_string_compare_with_utf8_stream(
-				  utf16_string,
-				  utf16_string_length,
-				  ( *sub_single_file_entry )->name,
-				  (size_t) ( *sub_single_file_entry )->name_size,
-				  error );
-		}
+		result = libewf_serialized_string_compare_with_utf16_string(
+			  safe_sub_single_file_entry->name,
+			  utf16_string,
+			  utf16_string_length,
+			  error );
+
 		if( result == -1 )
 		{
 			libcerror_error_set(
@@ -324,11 +318,14 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		}
 		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
+			*sub_node              = safe_sub_node;
+			*sub_single_file_entry = safe_sub_single_file_entry;
+
 			break;
 		}
 		if( libcdata_tree_node_get_next_node(
-		     *sub_node,
-		     sub_node,
+		     safe_sub_node,
+		     &safe_sub_node,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -339,22 +336,9 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 			 function,
 			 sub_node_index );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
-	if( sub_node_index >= number_of_sub_nodes )
-	{
-		*sub_node              = NULL;
-		*sub_single_file_entry = NULL;
-
-		return( 0 );
-	}
-	return( 1 );
-
-on_error:
-	*sub_node              = NULL;
-	*sub_single_file_entry = NULL;
-
-	return( -1 );
+	return( 0 );
 }
 

@@ -21,7 +21,6 @@
 
 #include <common.h>
 #include <memory.h>
-#include <narrow_string.h>
 #include <types.h>
 
 #include "libewf_debug.h"
@@ -32,6 +31,7 @@
 #include "libewf_libfguid.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
+#include "libewf_serialized_string.h"
 #include "libewf_single_file_entry.h"
 
 /* Creates a single file entry
@@ -92,6 +92,63 @@ int libewf_single_file_entry_initialize(
 		 "%s: unable to clear single file entry.",
 		 function );
 
+		memory_free(
+		 *single_file_entry );
+
+		*single_file_entry = NULL;
+
+		return( -1 );
+	}
+	if( libewf_serialized_string_initialize(
+	     &( ( *single_file_entry )->name ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create name string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
+	     &( ( *single_file_entry )->short_name ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create short name string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
+	     &( ( *single_file_entry )->md5_hash ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MD5 hash string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
+	     &( ( *single_file_entry )->sha1_hash ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create SHA1 hash string.",
+		 function );
+
 		goto on_error;
 	}
 	( *single_file_entry )->data_offset           = -1;
@@ -102,6 +159,24 @@ int libewf_single_file_entry_initialize(
 on_error:
 	if( *single_file_entry != NULL )
 	{
+		if( ( *single_file_entry )->md5_hash != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *single_file_entry )->md5_hash ),
+			 NULL );
+		}
+		if( ( *single_file_entry )->short_name != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *single_file_entry )->short_name ),
+			 NULL );
+		}
+		if( ( *single_file_entry )->name != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *single_file_entry )->name ),
+			 NULL );
+		}
 		memory_free(
 		 *single_file_entry );
 
@@ -118,6 +193,7 @@ int libewf_single_file_entry_free(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_free";
+	int result            = 1;
 
 	if( single_file_entry == NULL )
 	{
@@ -134,25 +210,74 @@ int libewf_single_file_entry_free(
 	{
 		if( ( *single_file_entry )->name != NULL )
 		{
-			memory_free(
-			 ( *single_file_entry )->name );
+			if( libewf_serialized_string_free(
+			     &( ( *single_file_entry )->name ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free name string.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *single_file_entry )->short_name != NULL )
+		{
+			if( libewf_serialized_string_free(
+			     &( ( *single_file_entry )->short_name ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free short name string.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( ( *single_file_entry )->md5_hash != NULL )
 		{
-			memory_free(
-			 ( *single_file_entry )->md5_hash );
+			if( libewf_serialized_string_free(
+			     &( ( *single_file_entry )->md5_hash ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free MD5 hash string.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( ( *single_file_entry )->sha1_hash != NULL )
 		{
-			memory_free(
-			 ( *single_file_entry )->sha1_hash );
+			if( libewf_serialized_string_free(
+			     &( ( *single_file_entry )->sha1_hash ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free SHA1 hash string.",
+				 function );
+
+				result = -1;
+			}
 		}
 		memory_free(
 		 *single_file_entry );
 
 		*single_file_entry = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Clones the single file entry
@@ -226,130 +351,75 @@ int libewf_single_file_entry_clone(
 
 		return( -1 );
 	}
-	( *destination_single_file_entry )->name      = NULL;
-	( *destination_single_file_entry )->md5_hash  = NULL;
-	( *destination_single_file_entry )->sha1_hash = NULL;
+	( *destination_single_file_entry )->name       = NULL;
+	( *destination_single_file_entry )->short_name = NULL;
+	( *destination_single_file_entry )->md5_hash   = NULL;
+	( *destination_single_file_entry )->sha1_hash  = NULL;
 
-	if( source_single_file_entry->name != NULL )
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_single_file_entry )->name ),
+	     source_single_file_entry->name,
+	     error ) != 1 )
 	{
-		( *destination_single_file_entry )->name = (uint8_t *) memory_allocate(
-		                                                        sizeof( uint8_t ) * source_single_file_entry->name_size );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination name string.",
+		 function );
 
-		if( ( *destination_single_file_entry )->name == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create destination name.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     ( *destination_single_file_entry )->name,
-		     source_single_file_entry->name,
-		     source_single_file_entry->name_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy source to destination name.",
-			 function );
-
-			goto on_error;
-		}
-		( *destination_single_file_entry )->name_size = source_single_file_entry->name_size;
+		goto on_error;
 	}
-	if( source_single_file_entry->md5_hash != NULL )
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_single_file_entry )->short_name ),
+	     source_single_file_entry->short_name,
+	     error ) != 1 )
 	{
-		( *destination_single_file_entry )->md5_hash = (uint8_t *) memory_allocate(
-		                                                            sizeof( uint8_t ) * source_single_file_entry->md5_hash_size );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination short name string.",
+		 function );
 
-		if( ( *destination_single_file_entry )->md5_hash == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create destination MD5 hash.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     ( *destination_single_file_entry )->md5_hash,
-		     source_single_file_entry->md5_hash,
-		     source_single_file_entry->md5_hash_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy source to destination MD5 hash.",
-			 function );
-
-			goto on_error;
-		}
-		( *destination_single_file_entry )->md5_hash_size = source_single_file_entry->md5_hash_size;
+		goto on_error;
 	}
-	if( source_single_file_entry->sha1_hash != NULL )
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_single_file_entry )->md5_hash ),
+	     source_single_file_entry->md5_hash,
+	     error ) != 1 )
 	{
-		( *destination_single_file_entry )->sha1_hash = (uint8_t *) memory_allocate(
-		                                                             sizeof( uint8_t ) * source_single_file_entry->sha1_hash_size );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination MD5 hash string.",
+		 function );
 
-		if( ( *destination_single_file_entry )->sha1_hash == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create destination SHA1 hash.",
-			 function );
+		goto on_error;
+	}
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_single_file_entry )->sha1_hash ),
+	     source_single_file_entry->sha1_hash,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination SHA1 hash string.",
+		 function );
 
-			goto on_error;
-		}
-		if( memory_copy(
-		     ( *destination_single_file_entry )->sha1_hash,
-		     source_single_file_entry->sha1_hash,
-		     source_single_file_entry->sha1_hash_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy source to destination SHA1 hash.",
-			 function );
-
-			goto on_error;
-		}
-		( *destination_single_file_entry )->sha1_hash_size = source_single_file_entry->sha1_hash_size;
+		goto on_error;
 	}
 	return( 1 );
 
 on_error:
 	if( *destination_single_file_entry != NULL )
 	{
-		if( ( *destination_single_file_entry )->sha1_hash != NULL )
-		{
-			memory_free(
-			 ( *destination_single_file_entry )->sha1_hash );
-		}
-		if( ( *destination_single_file_entry )->md5_hash != NULL )
-		{
-			memory_free(
-			 ( *destination_single_file_entry )->md5_hash );
-		}
-		if( ( *destination_single_file_entry )->name != NULL )
-		{
-			memory_free(
-			 ( *destination_single_file_entry )->name );
-		}
-		memory_free(
-		 *destination_single_file_entry );
-
-		*destination_single_file_entry = NULL;
+		libewf_single_file_entry_free(
+		 destination_single_file_entry,
+		 NULL );
 	}
 	return( -1 );
 }
@@ -715,153 +785,6 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a single file entry hexadecimal string
- * Returns 1 if successful or -1 on error
- */
-int libewf_single_file_entry_read_hexadecimal_string(
-     libewf_single_file_entry_t *single_file_entry,
-     const uint8_t *data,
-     size_t data_size,
-     uint8_t *string,
-     size_t string_size,
-     int *zero_values_only,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_single_file_entry_read_hexadecimal_string";
-	size_t data_offset    = 0;
-	size_t string_index   = 0;
-
-	if( single_file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid string.",
-		 function );
-
-		return( -1 );
-	}
-	if( string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( zero_values_only == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid zero values only.",
-		 function );
-
-		return( -1 );
-	}
-	*zero_values_only = 1;
-
-	for( data_offset = 0;
-	     data_offset < data_size - 1;
-	     data_offset++ )
-	{
-		if( string_index >= string_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: invalid string value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( data[ data_offset ] != (uint8_t) '0' )
-		{
-			*zero_values_only = 0;
-		}
-		if( ( data[ data_offset ] >= (uint8_t) '0' )
-		 && ( data[ data_offset ] <= (uint8_t) '9' ) )
-		{
-			string[ string_index ] = data[ data_offset ];
-		}
-		else if( ( data[ data_offset ] >= (uint8_t) 'A' )
-		      && ( data[ data_offset ] <= (uint8_t) 'F' ) )
-		{
-			string[ string_index ] = (uint8_t) ( 'a' - 'A' ) + data[ data_offset ];
-		}
-		else if( ( data[ data_offset ] >= (uint8_t) 'a' )
-		      && ( data[ data_offset ] <= (uint8_t) 'f' ) )
-		{
-			string[ string_index ] = data[ data_offset ];
-		}
-		else
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character in hexadecimal string.",
-			 function );
-
-			return( -1 );
-		}
-		string_index++;
-	}
-	if( string_index >= string_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid string value too small.",
-		 function );
-
-		return( -1 );
-	}
-	string[ string_index ] = 0;
-
-	return( 1 );
-}
-
 /* Reads a single file entry short name
  * Returns 1 if successful or -1 on error
  */
@@ -909,7 +832,6 @@ int libewf_single_file_entry_read_data(
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
 	int value_index                       = 0;
-	int zero_values_only                  = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -918,39 +840,6 @@ int libewf_single_file_entry_read_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid single file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->name != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid single file entry - name value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->md5_hash != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid single file entry - MD5 hash value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->sha1_hash != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid single file entry - SHA1 hash value already set.",
 		 function );
 
 		return( -1 );
@@ -1053,7 +942,12 @@ int libewf_single_file_entry_read_data(
 
 			type_string_size -= 1;
 		}
-		if( value_index < number_of_values )
+		if( value_index >= number_of_values )
+		{
+			value_string      = NULL;
+			value_string_size = 0;
+		}
+		else
 		{
 			if( libfvalue_split_utf8_string_get_segment_by_index(
 			     values,
@@ -1087,11 +981,6 @@ int libewf_single_file_entry_read_data(
 
 				value_string_size -= 1;
 			}
-		}
-		else
-		{
-			value_string      = NULL;
-			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1255,27 +1144,10 @@ int libewf_single_file_entry_read_data(
 			      && ( type_string[ 1 ] == (uint8_t) 'h' )
 			      && ( type_string[ 2 ] == (uint8_t) 'a' ) )
 			{
-				single_file_entry->sha1_hash = (uint8_t *) memory_allocate(
-				                                            sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->sha1_hash == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create SHA1 hash.",
-					 function );
-
-					goto on_error;
-				}
-				if( libewf_single_file_entry_read_hexadecimal_string(
-				     single_file_entry,
+				if( libewf_serialized_string_read_hexadecimal_data(
+				     single_file_entry->sha1_hash,
 				     value_string,
 				     value_string_size,
-				     single_file_entry->sha1_hash,
-				     value_string_size,
-				     &zero_values_only,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1286,10 +1158,6 @@ int libewf_single_file_entry_read_data(
 					 function );
 
 					goto on_error;
-				}
-				if( zero_values_only == 0 )
-				{
-					single_file_entry->sha1_hash_size = value_string_size;
 				}
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
@@ -1419,7 +1287,7 @@ int libewf_single_file_entry_read_data(
 				     value_string_size,
 				     &value_64bit,
 				     64,
-				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1455,27 +1323,10 @@ int libewf_single_file_entry_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'h' )
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
-				single_file_entry->md5_hash = (uint8_t *) memory_allocate(
-				                                           sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->md5_hash == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create MD5 hash.",
-					 function );
-
-					goto on_error;
-				}
-				if( libewf_single_file_entry_read_hexadecimal_string(
-				     single_file_entry,
+				if( libewf_serialized_string_read_hexadecimal_data(
+				     single_file_entry->md5_hash,
 				     value_string,
 				     value_string_size,
-				     single_file_entry->md5_hash,
-				     value_string_size,
-				     &zero_values_only,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1487,14 +1338,39 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				if( zero_values_only == 0 )
-				{
-					single_file_entry->md5_hash_size = value_string_size;
-				}
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'i' )
 			      && ( type_string[ 1 ] == (uint8_t) 'd' ) )
 			{
+				if( libfvalue_utf8_string_copy_to_integer(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set identifier.",
+					 function );
+
+					goto on_error;
+				}
+				if( value_64bit > (uint64_t) UINT32_MAX )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid identifier value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				single_file_entry->identifier = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'j' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1618,39 +1494,25 @@ int libewf_single_file_entry_read_data(
 		{
 			if( type_string[ 0 ] == (uint8_t) 'n' )
 			{
-				single_file_entry->name = (uint8_t *) memory_allocate(
-								       sizeof( uint8_t ) * value_string_size );
-
-				if( single_file_entry->name == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create name.",
-					 function );
-
-					goto on_error;
-				}
-				if( narrow_string_copy(
+				if( libewf_serialized_string_read_data(
 				     single_file_entry->name,
 				     value_string,
-				     value_string_size - 1 ) == NULL )
+				     value_string_size,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set name.",
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read name string.",
 					 function );
 
 					goto on_error;
 				}
-				single_file_entry->name[ value_string_size - 1 ] = 0;
-
-				single_file_entry->name_size = value_string_size;
 			}
 		}
+		/* Do not ignore empty values
+		 */
 		if( type_string_size == 2 )
 		{
 			if( type_string[ 0 ] == (uint8_t) 'p' )
@@ -1700,6 +1562,43 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Retrieves the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_file_entry_get_identifier(
+     libewf_single_file_entry_t *single_file_entry,
+     uint32_t *identifier,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_single_file_entry_get_identifier";
+
+	if( single_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	*identifier = single_file_entry->identifier;
+
+	return( 1 );
 }
 
 /* Retrieves the type
@@ -1897,6 +1796,7 @@ int libewf_single_file_entry_get_utf8_name_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_name_size";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -1909,19 +1809,22 @@ int libewf_single_file_entry_get_utf8_name_size(
 
 		return( -1 );
 	}
-	if( utf8_string_size == NULL )
+	result = libewf_serialized_string_get_utf8_string_size(
+	          single_file_entry->name,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name UTF-8 string size.",
 		 function );
 
 		return( -1 );
 	}
-	*utf8_string_size = single_file_entry->name_size;
-
 	return( 1 );
 }
 
@@ -1936,6 +1839,7 @@ int libewf_single_file_entry_get_utf8_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_name";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -1948,62 +1852,22 @@ int libewf_single_file_entry_get_utf8_name(
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
+	result = libewf_serialized_string_get_utf8_string(
+	          single_file_entry->name,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy name to UTF-8 string.",
 		 function );
 
 		return( -1 );
-	}
-	if( ( utf8_string_size == 0 )
-	 || ( utf8_string_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid UTF-8 string size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( single_file_entry->name == NULL )
-	 || ( single_file_entry->name_size == 0 ) )
-	{
-		utf8_string[ 0 ] = 0;
-	}
-	else
-	{
-		if( utf8_string_size < single_file_entry->name_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: invalid UTF-8 string size value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( narrow_string_copy(
-		     (char *) utf8_string,
-		     (char *) single_file_entry->name,
-		     single_file_entry->name_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set UTF-8 string.",
-			 function );
-
-			return( -1 );
-		}
-		utf8_string[ single_file_entry->name_size - 1 ] = 0;
 	}
 	return( 1 );
 }
@@ -2018,6 +1882,7 @@ int libewf_single_file_entry_get_utf16_name_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_name_size";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2030,39 +1895,21 @@ int libewf_single_file_entry_get_utf16_name_size(
 
 		return( -1 );
 	}
-	if( ( single_file_entry->name == NULL )
-	 || ( single_file_entry->name_size == 0 ) )
-	{
-		if( utf16_string_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-16 string size.",
-			 function );
+	result = libewf_serialized_string_get_utf16_string_size(
+	          single_file_entry->name,
+	          utf16_string_size,
+	          error );
 
-			return( -1 );
-		}
-		*utf16_string_size = 0;
-	}
-	else
+	if( result == -1 )
 	{
-		if( libuna_utf16_string_size_from_utf8(
-		     single_file_entry->name,
-		     single_file_entry->name_size,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 string size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name UTF-16 string size.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -2078,6 +1925,7 @@ int libewf_single_file_entry_get_utf16_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_name";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2090,52 +1938,22 @@ int libewf_single_file_entry_get_utf16_name(
 
 		return( -1 );
 	}
-	if( utf16_string == NULL )
+	result = libewf_serialized_string_get_utf16_string(
+	          single_file_entry->name,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy name to UTF-16 string.",
 		 function );
 
 		return( -1 );
-	}
-	if( ( utf16_string_size == 0 )
-	 || ( utf16_string_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid UTF-16 string size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( single_file_entry->name == NULL )
-	 || ( single_file_entry->name_size == 0 ) )
-	{
-		utf16_string[ 0 ] = 0;
-	}
-	else
-	{
-		if( libuna_utf16_string_copy_from_utf8(
-		     utf16_string,
-		     utf16_string_size,
-		     single_file_entry->name,
-		     single_file_entry->name_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy name to UTF-16 string.",
-			 function );
-
-			return( -1 );
-		}
 	}
 	return( 1 );
 }
@@ -2150,6 +1968,7 @@ int libewf_single_file_entry_get_utf8_short_name_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_short_name_size";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2162,19 +1981,22 @@ int libewf_single_file_entry_get_utf8_short_name_size(
 
 		return( -1 );
 	}
-	if( utf8_string_size == NULL )
+	result = libewf_serialized_string_get_utf8_string_size(
+	          single_file_entry->short_name,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve short name UTF-8 string size.",
 		 function );
 
 		return( -1 );
 	}
-	*utf8_string_size = single_file_entry->short_name_size;
-
 	return( 1 );
 }
 
@@ -2189,6 +2011,7 @@ int libewf_single_file_entry_get_utf8_short_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_short_name";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2201,62 +2024,22 @@ int libewf_single_file_entry_get_utf8_short_name(
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
+	result = libewf_serialized_string_get_utf8_string(
+	          single_file_entry->short_name,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy short name to UTF-8 string.",
 		 function );
 
 		return( -1 );
-	}
-	if( ( utf8_string_size == 0 )
-	 || ( utf8_string_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid UTF-8 string size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( single_file_entry->short_name == NULL )
-	 || ( single_file_entry->short_name_size == 0 ) )
-	{
-		utf8_string[ 0 ] = 0;
-	}
-	else
-	{
-		if( utf8_string_size < single_file_entry->short_name_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: invalid UTF-8 string size value too small.",
-			 function );
-
-			return( -1 );
-		}
-		if( narrow_string_copy(
-		     (char *) utf8_string,
-		     (char *) single_file_entry->short_name,
-		     single_file_entry->short_name_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set UTF-8 string.",
-			 function );
-
-			return( -1 );
-		}
-		utf8_string[ single_file_entry->short_name_size - 1 ] = 0;
 	}
 	return( 1 );
 }
@@ -2271,6 +2054,7 @@ int libewf_single_file_entry_get_utf16_short_name_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_short_name_size";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2283,39 +2067,21 @@ int libewf_single_file_entry_get_utf16_short_name_size(
 
 		return( -1 );
 	}
-	if( ( single_file_entry->short_name == NULL )
-	 || ( single_file_entry->short_name_size == 0 ) )
-	{
-		if( utf16_string_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-16 string size.",
-			 function );
+	result = libewf_serialized_string_get_utf16_string_size(
+	          single_file_entry->short_name,
+	          utf16_string_size,
+	          error );
 
-			return( -1 );
-		}
-		*utf16_string_size = 0;
-	}
-	else
+	if( result == -1 )
 	{
-		if( libuna_utf16_string_size_from_utf8(
-		     single_file_entry->short_name,
-		     single_file_entry->short_name_size,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 string size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve short name UTF-16 string size.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -2331,6 +2097,7 @@ int libewf_single_file_entry_get_utf16_short_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_short_name";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2343,52 +2110,22 @@ int libewf_single_file_entry_get_utf16_short_name(
 
 		return( -1 );
 	}
-	if( utf16_string == NULL )
+	result = libewf_serialized_string_get_utf16_string(
+	          single_file_entry->short_name,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy short name to UTF-16 string.",
 		 function );
 
 		return( -1 );
-	}
-	if( ( utf16_string_size == 0 )
-	 || ( utf16_string_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid UTF-16 string size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( single_file_entry->short_name == NULL )
-	 || ( single_file_entry->short_name_size == 0 ) )
-	{
-		utf16_string[ 0 ] = 0;
-	}
-	else
-	{
-		if( libuna_utf16_string_copy_from_utf8(
-		     utf16_string,
-		     utf16_string_size,
-		     single_file_entry->short_name,
-		     single_file_entry->short_name_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy short name to UTF-16 string.",
-			 function );
-
-			return( -1 );
-		}
 	}
 	return( 1 );
 }
@@ -2662,6 +2399,7 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_hash_value_md5";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2674,58 +2412,24 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
+	result = libewf_serialized_string_get_utf8_string(
+	          single_file_entry->md5_hash,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
 
-		return( -1 );
-	}
-	if( utf8_string_size > (size_t) SSIZE_MAX )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_size < single_file_entry->md5_hash_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: UTF-8 string too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->md5_hash_size == 0 )
-	{
-		return( 0 );
-	}
-	if( memory_copy(
-	     utf8_string,
-	     single_file_entry->md5_hash,
-	     single_file_entry->md5_hash_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy MD5 hash to UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
@@ -2738,6 +2442,7 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_hash_value_md5";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2750,49 +2455,13 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 
 		return( -1 );
 	}
-	if( utf16_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
-		 function );
+	result = libewf_serialized_string_get_utf16_string(
+	          single_file_entry->md5_hash,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
 
-		return( -1 );
-	}
-	if( utf16_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-16 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string_size < single_file_entry->md5_hash_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: UTF-16 string too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->md5_hash_size == 0 )
-	{
-		return( 0 );
-	}
-	if( libuna_utf16_string_copy_from_utf8(
-	     utf16_string,
-	     utf16_string_size,
-	     single_file_entry->md5_hash,
-	     single_file_entry->md5_hash_size,
-	     error ) != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2803,7 +2472,7 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
@@ -2816,6 +2485,7 @@ int libewf_single_file_entry_get_utf8_hash_value_sha1(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf8_hash_value_sha1";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2828,58 +2498,24 @@ int libewf_single_file_entry_get_utf8_hash_value_sha1(
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
+	result = libewf_serialized_string_get_utf8_string(
+	          single_file_entry->sha1_hash,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
 
-		return( -1 );
-	}
-	if( utf8_string_size > (size_t) SSIZE_MAX )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_size < single_file_entry->sha1_hash_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: UTF-8 string too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->sha1_hash_size == 0 )
-	{
-		return( 0 );
-	}
-	if( memory_copy(
-	     utf8_string,
-	     single_file_entry->sha1_hash,
-	     single_file_entry->sha1_hash_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
 		 "%s: unable to copy SHA1 hash to UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
@@ -2892,6 +2528,7 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_single_file_entry_get_utf16_hash_value_sha1";
+	int result            = 0;
 
 	if( single_file_entry == NULL )
 	{
@@ -2904,49 +2541,13 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
 
 		return( -1 );
 	}
-	if( utf16_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
-		 function );
+	result = libewf_serialized_string_get_utf16_string(
+	          single_file_entry->sha1_hash,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
 
-		return( -1 );
-	}
-	if( utf16_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-16 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string_size < single_file_entry->sha1_hash_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: UTF-16 string too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( single_file_entry->sha1_hash_size == 0 )
-	{
-		return( 0 );
-	}
-	if( libuna_utf16_string_copy_from_utf8(
-	     utf16_string,
-	     utf16_string_size,
-	     single_file_entry->sha1_hash,
-	     single_file_entry->sha1_hash_size,
-	     error ) != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2957,6 +2558,6 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 

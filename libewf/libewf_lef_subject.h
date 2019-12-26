@@ -41,20 +41,20 @@ struct libewf_lef_subject
 };
 
 int libewf_lef_subject_initialize(
-     libewf_lef_subject_t **subject,
+     libewf_lef_subject_t **lef_subject,
      libcerror_error_t **error );
 
 int libewf_lef_subject_free(
-     libewf_lef_subject_t **subject,
+     libewf_lef_subject_t **lef_subject,
      libcerror_error_t **error );
 
 int libewf_lef_subject_clone(
-     libewf_lef_subject_t **destination_subject,
-     libewf_lef_subject_t *source_subject,
+     libewf_lef_subject_t **destination_lef_subject,
+     libewf_lef_subject_t *source_lef_subject,
      libcerror_error_t **error );
 
 int libewf_lef_subject_read_data(
-     libewf_lef_subject_t *subject,
+     libewf_lef_subject_t *lef_subject,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );

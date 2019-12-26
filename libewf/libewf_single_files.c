@@ -993,7 +993,12 @@ int libewf_single_files_parse_record_values(
 
 			type_string_size -= 1;
 		}
-		if( value_index < number_of_values )
+		if( value_index >= number_of_values )
+		{
+			value_string      = NULL;
+			value_string_size = 0;
+		}
+		else
 		{
 			if( libfvalue_split_utf8_string_get_segment_by_index(
 			     values,
@@ -1027,11 +1032,6 @@ int libewf_single_files_parse_record_values(
 
 				value_string_size -= 1;
 			}
-		}
-		else
-		{
-			value_string      = NULL;
-			value_string_size = 0;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )

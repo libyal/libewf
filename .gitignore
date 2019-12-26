@@ -168,6 +168,7 @@ stamp-h[1-9]
 /tests/ewf_test_sector_range
 /tests/ewf_test_segment_file
 /tests/ewf_test_segment_table
+/tests/ewf_test_serialized_string
 /tests/ewf_test_session_section
 /tests/ewf_test_sha1_hash_section
 /tests/ewf_test_single_file_entry
