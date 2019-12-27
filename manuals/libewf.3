@@ -1,4 +1,4 @@
-.Dd December 26, 2019
+.Dd December 27, 2019
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -315,6 +315,8 @@ File entry functions
 .Ft int
 .Fn libewf_file_entry_get_entry_modification_time "libewf_file_entry_t *file_entry" "int32_t *posix_time" "libewf_error_t **error"
 .Ft int
+.Fn libewf_file_entry_get_deletion_time "libewf_file_entry_t *file_entry" "int32_t *posix_time" "libewf_error_t **error"
+.Ft int
 .Fn libewf_file_entry_get_utf8_hash_value_md5 "libewf_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf16_hash_value_md5 "libewf_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
@@ -342,6 +344,14 @@ File entry functions
 .Fn libewf_file_entry_get_sub_file_entry_by_utf16_name "libewf_file_entry_t *file_entry" "const uint16_t *utf16_string" "size_t utf16_string_length" "libewf_file_entry_t **sub_file_entry" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_sub_file_entry_by_utf16_path "libewf_file_entry_t *file_entry" "const uint16_t *utf16_string" "size_t utf16_string_length" "libewf_file_entry_t **sub_file_entry" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_number_of_access_control_entries "libewf_file_entry_t *file_entry" "int *number_of_access_control_entries" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_access_control_entry "libewf_file_entry_t *file_entry" "int access_control_entry_index" "libewf_access_control_entry_t **access_control_entry" "libewf_error_t **error"
+.Pp
+Access control entry functions
+.Ft int
+.Fn libewf_access_control_entry_free "libewf_access_control_entry_t **access_control_entry" "libewf_error_t **error"
 .Pp
 Extended attribute functions
 .Ft int

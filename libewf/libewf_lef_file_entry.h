@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SINGLE_FILE_ENTRY_H )
-#define _LIBEWF_SINGLE_FILE_ENTRY_H
+#if !defined( _LIBEWF_LEF_FILE_ENTRY_H )
+#define _LIBEWF_LEF_FILE_ENTRY_H
 
 #include <common.h>
 #include <types.h>
@@ -33,9 +33,9 @@
 extern "C" {
 #endif
 
-typedef struct libewf_single_file_entry libewf_single_file_entry_t;
+typedef struct libewf_lef_file_entry libewf_lef_file_entry_t;
 
-struct libewf_single_file_entry
+struct libewf_lef_file_entry
 {
 	/* The identifier
 	 */
@@ -123,173 +123,173 @@ struct libewf_single_file_entry
 	libewf_serialized_string_t *sha1_hash;
 };
 
-int libewf_single_file_entry_initialize(
-     libewf_single_file_entry_t **single_file_entry,
+int libewf_lef_file_entry_initialize(
+     libewf_lef_file_entry_t **lef_file_entry,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_free(
-     libewf_single_file_entry_t **single_file_entry,
+int libewf_lef_file_entry_free(
+     libewf_lef_file_entry_t **lef_file_entry,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_clone(
-     libewf_single_file_entry_t **destination_single_file_entry,
-     libewf_single_file_entry_t *source_single_file_entry,
+int libewf_lef_file_entry_clone(
+     libewf_lef_file_entry_t **destination_lef_file_entry,
+     libewf_lef_file_entry_t *source_lef_file_entry,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_read_binary_extents(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_binary_extents(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_read_extended_attributes(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_extended_attributes(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_read_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_read_data(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_data(
+     libewf_lef_file_entry_t *lef_file_entry,
      libfvalue_split_utf8_string_t *types,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_identifier(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_identifier(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *identifier,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_type(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_type(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *type,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_flags(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_flags(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *flags,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_data_offset(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_data_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
      off64_t *data_offset,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_data_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_data_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size64_t *data_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_duplicate_data_offset(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_duplicate_data_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
      off64_t *duplicate_data_offset,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_short_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_short_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_short_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_short_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size64_t *size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_record_type(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_record_type(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *record_type,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_creation_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *creation_time,
+int libewf_lef_file_entry_get_creation_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_modification_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *modification_time,
+int libewf_lef_file_entry_get_modification_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_access_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *access_time,
+int libewf_lef_file_entry_get_access_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_entry_modification_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *entry_modification_time,
+int libewf_lef_file_entry_get_entry_modification_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_deletion_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *deletion_time,
+int libewf_lef_file_entry_get_deletion_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_hash_value_md5(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_hash_value_md5(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_hash_value_md5(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_hash_value_md5(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf8_hash_value_sha1(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_hash_value_sha1(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error );
 
-int libewf_single_file_entry_get_utf16_hash_value_sha1(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_hash_value_sha1(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error );
@@ -298,5 +298,5 @@ int libewf_single_file_entry_get_utf16_hash_value_sha1(
 }
 #endif
 
-#endif /* !defined( _LIBEWF_SINGLE_FILE_ENTRY_H ) */
+#endif /* !defined( _LIBEWF_LEF_FILE_ENTRY_H ) */
 

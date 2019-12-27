@@ -448,7 +448,7 @@ int libewf_segment_table_empty(
 }
 
 /* Retrieves the size of the basename
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_segment_table_get_basename_size(
      libewf_segment_table_t *segment_table,
@@ -545,7 +545,7 @@ int libewf_segment_table_get_basename_size(
 }
 
 /* Retrieves the basename
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
@@ -930,7 +930,7 @@ int libewf_segment_table_set_basename(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the size of the basename
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_segment_table_get_basename_size_wide(
      libewf_segment_table_t *segment_table,
@@ -1026,7 +1026,7 @@ int libewf_segment_table_get_basename_size_wide(
 }
 
 /* Retrieves the basename
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_segment_table_get_basename_wide(
      libewf_segment_table_t *segment_table,

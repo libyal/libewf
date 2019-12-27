@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_lef_subject"
-	ProjectGUID="{9323E14F-0C21-4314-8F3D-62F16E29584C}"
-	RootNamespace="ewf_test_lef_subject"
+	Name="ewf_test_access_control_entry"
+	ProjectGUID="{4A8DB679-9115-4B85-B5D7-D28AFE31F403}"
+	RootNamespace="ewf_test_access_control_entry"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_lef_subject.c"
+				RelativePath="..\..\tests\ewf_test_access_control_entry.c"
 				>
 			</File>
 			<File

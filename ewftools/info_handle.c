@@ -163,6 +163,22 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
+		if( ( *info_handle )->bodyfile_stream != NULL )
+		{
+			if( file_stream_close(
+			     ( *info_handle )->bodyfile_stream ) != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+				 "%s: unable to close bodyfile stream.",
+				 function );
+
+				result = -1;
+			}
+			( *info_handle )->bodyfile_stream = NULL;
+		}
 		if( ( *info_handle )->input_handle != NULL )
 		{
 			if( libewf_handle_free(
@@ -222,6 +238,67 @@ int info_handle_signal_abort(
 
 			return( -1 );
 		}
+	}
+	return( 1 );
+}
+
+/* Sets the bodyfile
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_set_bodyfile(
+     info_handle_t *info_handle,
+     const system_character_t *filename,
+     libcerror_error_t **error )
+{
+	static char *function = "info_handle_set_bodyfile";
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->bodyfile_stream != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid info handle - bodyfile stream value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	info_handle->bodyfile_stream = file_stream_open(
+	                                filename,
+	                                "wb" );
+
+	if( info_handle->bodyfile_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open bodyfile stream.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -747,7 +824,7 @@ int info_handle_section_header_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "%s\n",
+		 "%s:\n",
 		 description );
 	}
 	return( 1 );
@@ -3918,7 +3995,7 @@ int info_handle_single_files_fprint(
 	if( info_handle_file_entry_fprint(
 	     info_handle,
 	     file_entry,
-	     0,
+	     _SYSTEM_STRING( "" ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3966,14 +4043,16 @@ int info_handle_single_files_fprint(
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     int indentation_level,
+     const system_character_t *path,
      libcerror_error_t **error )
 {
 	libewf_file_entry_t *sub_file_entry = NULL;
-	system_character_t *name            = NULL;
+	system_character_t *file_entry_name = NULL;
+	system_character_t *sub_path        = NULL;
 	static char *function               = "info_handle_file_entry_fprint";
-	size_t name_size                    = 0;
-	int indentation_iterator            = 0;
+	size_t file_entry_name_size         = 0;
+	size_t path_length                  = 0;
+	size_t sub_path_size                = 0;
 	int number_of_sub_file_entries      = 0;
 	int result                          = 0;
 	int sub_file_entry_index            = 0;
@@ -4000,21 +4079,35 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
+	if( path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		return( -1 );
+	}
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\t\t\t<file_entry name=\"" );
+		 "\t\t\t<file_entry" );
 	}
+	path_length = system_string_length(
+	               path );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_file_entry_get_utf16_name_size(
 	          file_entry,
-	          &name_size,
+	          &file_entry_name_size,
 	          error );
 #else
 	result = libewf_file_entry_get_utf8_name_size(
 	          file_entry,
-	          &name_size,
+	          &file_entry_name_size,
 	          error );
 #endif
 	if( result != 1 )
@@ -4023,23 +4116,24 @@ int info_handle_file_entry_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the name size.",
+		 "%s: unable to retrieve the file entry name size.",
 		 function );
 
 		goto on_error;
 	}
-	if( name_size > 0 )
+	if( ( result == 1 )
+	 && ( file_entry_name_size > 0 ) )
 	{
-		name = system_string_allocate(
-		        name_size );
+		file_entry_name = system_string_allocate(
+		                   file_entry_name_size );
 
-		if( name == NULL )
+		if( file_entry_name == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create name.",
+			 "%s: unable to create file entry name.",
 			 function );
 
 			goto on_error;
@@ -4047,14 +4141,14 @@ int info_handle_file_entry_fprint(
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_file_entry_get_utf16_name(
 		          file_entry,
-		          (uint16_t *) name,
-		          name_size,
+		          (uint16_t *) file_entry_name,
+		          file_entry_name_size,
 		          error );
 #else
 		result = libewf_file_entry_get_utf8_name(
 		          file_entry,
-		          (uint8_t *) name,
-		          name_size,
+		          (uint8_t *) file_entry_name,
+		          file_entry_name_size,
 		          error );
 #endif
 		if( result != 1 )
@@ -4068,43 +4162,42 @@ int info_handle_file_entry_fprint(
 
 			goto on_error;
 		}
-		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 		{
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t" );
-
-			for( indentation_iterator = 1;
-			     indentation_iterator <= indentation_level;
-			     indentation_iterator++ )
-			{
-				fprintf(
-				 info_handle->notify_stream,
-				 " " );
-			}
+			 " name=\"" );
 		}
 		fprintf(
 		 info_handle->notify_stream,
 		 "%" PRIs_SYSTEM "",
-		 name );
+		 path );
 
-		memory_free(
-		 name );
-
-		name = NULL;
-
+		if( file_entry_name != NULL )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIs_SYSTEM "",
+			 file_entry_name );
+		}
 		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
 			fprintf(
 			 info_handle->notify_stream,
 			 "\n" );
 		}
+		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\"" );
+		}
 	}
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\">\n" );
+		 ">\n" );
 	}
 	if( libewf_file_entry_get_number_of_sub_file_entries(
 	     file_entry,
@@ -4120,55 +4213,119 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	for( sub_file_entry_index = 0;
-	     sub_file_entry_index < number_of_sub_file_entries;
-	     sub_file_entry_index++ )
+	if( number_of_sub_file_entries > 0 )
 	{
-		if( libewf_file_entry_get_sub_file_entry(
-		     file_entry,
-		     sub_file_entry_index,
-		     &sub_file_entry,
-		     error ) != 1 )
+		sub_path_size = path_length + 1;
+
+		if( file_entry_name != NULL )
+		{
+			sub_path_size += file_entry_name_size;
+		}
+		sub_path = system_string_allocate(
+		            sub_path_size );
+
+		if( sub_path == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to free retrieve sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create sub path.",
+			 function );
 
 			goto on_error;
 		}
-		if( info_handle_file_entry_fprint(
-		     info_handle,
-		     sub_file_entry,
-		     indentation_level + 1,
-		     error ) != 1 )
+		if( system_string_copy(
+		     sub_path,
+		     path,
+		     path_length ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy path to sub path.",
+			 function );
 
 			goto on_error;
 		}
-		if( libewf_file_entry_free(
-		     &sub_file_entry,
-		     error ) != 1 )
+		if( file_entry_name != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
+			if( system_string_copy(
+			     &( sub_path[ path_length ] ),
+			     file_entry_name,
+			     file_entry_name_size - 1 ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy file entry name to sub path.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
+			sub_path[ sub_path_size - 2 ] = (system_character_t) LIBEWF_SEPARATOR;
+		}
+		sub_path[ sub_path_size - 1 ] = (system_character_t) 0;
+
+		for( sub_file_entry_index = 0;
+		     sub_file_entry_index < number_of_sub_file_entries;
+		     sub_file_entry_index++ )
+		{
+			if( libewf_file_entry_get_sub_file_entry(
+			     file_entry,
+			     sub_file_entry_index,
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to free retrieve sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+			if( info_handle_file_entry_fprint(
+			     info_handle,
+			     sub_file_entry,
+			     sub_path,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+			if( libewf_file_entry_free(
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+		}
+		if( sub_path != NULL )
+		{
+			memory_free(
+			 sub_path );
+
+			sub_path = NULL;
 		}
 	}
 	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
@@ -4176,6 +4333,13 @@ int info_handle_file_entry_fprint(
 		fprintf(
 		 info_handle->notify_stream,
 		 "\t\t\t</file_entry>\n" );
+	}
+	if( file_entry_name != NULL )
+	{
+		memory_free(
+		 file_entry_name );
+
+		file_entry_name = NULL;
 	}
 	return( 1 );
 
@@ -4186,10 +4350,15 @@ on_error:
 		 &sub_file_entry,
 		 NULL );
 	}
-	if( name != NULL )
+	if( sub_path != NULL )
 	{
 		memory_free(
-		 name );
+		 sub_path );
+	}
+	if( file_entry_name != NULL )
+	{
+		memory_free(
+		 file_entry_name );
 	}
 	return( -1 );
 }

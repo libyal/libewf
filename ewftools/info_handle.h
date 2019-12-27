@@ -59,6 +59,10 @@ struct info_handle
 	 */
 	libewf_handle_t *input_handle;
 
+	/* The bodyfile output stream
+	 */
+	FILE *bodyfile_stream;
+
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
@@ -74,6 +78,11 @@ int info_handle_free(
 
 int info_handle_signal_abort(
      info_handle_t *info_handle,
+     libcerror_error_t **error );
+
+int info_handle_set_bodyfile(
+     info_handle_t *info_handle,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int info_handle_set_maximum_number_of_open_handles(
@@ -215,7 +224,7 @@ int info_handle_single_files_fprint(
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
-     int indentation_level,
+     const system_character_t *path,
      libcerror_error_t **error );
 
 int info_handle_dfxml_header_fprint(

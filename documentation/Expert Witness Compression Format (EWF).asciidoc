@@ -595,7 +595,7 @@ The 14th line consist of the following tab (0x09) separated values.
 | 1 | p |
 | 2 | n |
 | 3 | id | Identifier +
-Contains an integer the subject
+Contains an integer identifying the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
@@ -918,7 +918,7 @@ The 8th line consist of the following tab (0x09) separated values.
 | 1 | p |
 | 2 | n |
 | 3 | id | Identifier +
-Contains an integer the source
+Contains an integer identifying the source
 | 4 | ev | Evidence number +
 Contains a string
 | 5 | tb | Total bytes +
@@ -961,7 +961,7 @@ The 14th line consist of the following tab (0x09) separated values.
 | 1 | p |
 | 2 | n |
 | 3 | id | Identifier +
-Contains an integer the subject
+Contains an integer identifying the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
@@ -1810,55 +1810,36 @@ The ltree data string contains the following information:
 |===
 | Line number | Value | Description
 | 1 | 5 | The number of categories provided
-| 2 | rec | Probably the type of information provided
-| 3 | | Identifier for the values in the 4th line
-| 4 | | The data for the different identifiers in the 3rd line
-| 5 | | (an empty line)
-| 6 | perm | Information about file permissions +
+| 2 | rec | Information about [yellow-background]*unknown* +
+See section: <<records_category3,Records category>>
+| ... | | (an empty line)
+| ... | perm | Information about file permissions +
 See section: <<permissions_category3,Permissions category>>
-| 7 | |
-| 8 | | Identifier for the values in the section
-| 9 | |
-| 10 | |
-| 11 | |
-| 12 | |
-| 13 | | (an empty line)
-| 14 | srce | Probably the type of information provided (the data source) +
+| ... | | (an empty line)
+| ... | srce | Information about acquisition sources +
 See section: <<sources_category3,Sources category>>
-| 15 | |
-| 16 | | Identifier for the values in the section
-| 17 | |
-| 18 | |
-| 19 | |
-| 20 | |
-| 21 | | (an empty line)
-| 22 | sub | Probably the type of information provided +
+| ... | | (an empty line)
+|...22 | sub | Information about [yellow-background]*unknown* +
 See section: <<subjects_category3,Subjects category>>
-| 23 | |
-| 24 | | Identifier for the values in the section
-| 25 | |
-| 26 | | (an empty line)
-| 27 | entry | Information about file entries
-| 28 | |
-| 29 | | Identifier for the values in the section
-| 30 | | The ltree entries of files and directories
+| ... | | (an empty line)
+| ... | entry | Information about file entries +
+See section: <<file_entries_category3,File entries category>>
 | ... | | (an empty line)
 |===
 
-[NOTE]
-The actual line numbering can vary.
-
 The end of line character(s) is a newline (0x0a).
 
-==== Records category
+==== [[records_category3]]Records category
 
 The rec category contains information about records.
 
-The 3rd and the 4th line consist of the following tab (0x09) separated values.
+The 1st line of the category contains the string "rec".
+
+The 2nd line of the category contains tab (0x09) separated type indicators.
 
 [cols="1,1,5",options="header"]
 |===
-| Identifier number | Character in 3rd line | Value in 4th line
+| Identifier number | Type indicator | Description
 | 1 | tb | Total bytes +
 Contains an integer with size of the logical file data (media data)
 | 2 | cl | [yellow-background]*Unknown (Clusters?)*
@@ -1874,48 +1855,163 @@ Contains an integer with size of the logical file data (media data)
 (introduced in EnCase 7)
 |===
 
+The 3rd line of the category consist of the tab (0x09) separated values.
+
 ==== [[permissions_category3]]Permissions category
 
 The perm category contains information about file permissions.
 
-Line 6 consist of perm
+The 1st line of the category contains the string "perm".
 
-Line 7 consists of 2 values.
+The 2nd line consists of the following 2 values:
 
-The 8th line consist of the following tab (0x09) separated values.
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | | The number of permission groups in the category
+| 2 | 1 | [yellow-background]*Unknown*
+|===
+
+The 3rd line of the category contains tab (0x09) separated type indicators. For
+more information see the sections below.
+
+The remaining lines in the category consist of:
+
+* category root entry
+  * zero or more permissions group entries
+    * zero or more permission entries
+
+Each entry consist of 2 lines:
 
 [cols="1,1,5",options="header"]
 |===
-| Identifier number | Character in 8th line | Meaning
-| 1 | p |
-| 2 | n | Name
-| 3 | s | NT security identifier (SID)
-| 4 | pr | Property
-| 5 | nta | [yellow-background]*Unknown (NT permission (ACE)?)*
-| 6 | nti | [yellow-background]*Unknown (Permission?)*
+| Line number | Value | Description
+| 1 | | Number of entries
+| 2 | | Tab (0x09) separated values that correspond to the type indicators.
+
+The 1st line of the category root entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | | The number of permission groups in the category
+|===
+
+The 1st line of the permission group entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | | The number of permissions in the group
+|===
+
+The 1st line of the permission entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | 0 | [yellow-background]*Unknown*
+|===
+
+===== Permission type indicators
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Type indicator | Description
+| 1 | p | Is parent +
+1 => if the entry is a category root or permissions group +
+0 => if the entry is a permission
+| 2 | n | Name +
+Contains a string
+| 3 | s | Security identifier +
+Contains a string with either a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#security-identifier[Windows NT security identifier (SID)] or a POSIX user (uid) or group identifier (gid) in the format " number:" such as " 99:"
+| 4 | pr | Property type +
+See section: <<permission_types,Permission types>>
+| 5 | nta | Access mask +
+Contains an integer with a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#access-rights-flags-access_mask[Windows NT access rights flags (ACCESS_MASK)]
+| 6 | nti | [yellow-background]*Unknown (Windows NT access control entry (ACE) flags?)* +
+Contains an integer with a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#access-control-entry-ace-flags[Windows NT access control entry (ACE) flags] +
+Seen 0x10, which presubly corresponds with INHERITED_ACE?
 | 7 | nts | [yellow-background]*Unknown (Permission?)* +
 (Removed in EnCase 6)
 |===
 
-[yellow-background]*Notes: Property: (2 => allow, empty => owner, 1 => group)*
-
-==== [[sources_category3]]Sources category
-
-Line 12 the srce category contains information about acquisition sources
-
-[yellow-background]*TODO describe what a source is in the context of EnCase.*
-
-Line 13 consists of 2 values, namely the values are "0 1".
-
-The 14th line consist of the following tab (0x09) separated values.
+===== [[permission_types]]Permission types
 
 [cols="1,1,5",options="header"]
 |===
-| Identifier number | Character in 9th line | Meaning
+| Value | Identifier | Description
+| (empty) | | Owner or category root
+| 1 | | Group
+| 2 | | Allow
+3+|
+| 6 | | [yellow-background]*Unknown*
+3+|
+| 10 | | [yellow-background]*Unknown (permissions group?)*
+|===
+
+==== [[sources_category3]]Sources category
+
+The srce category contains information about acquisition sources of the file entries.
+
+[yellow-background]*TODO describe what an acquisition source is in the context of EnCase.*
+
+The 1st line of the category contains the string "srce".
+
+The 2nd line consists of 2 values.
+
+[cols="1,5",options="header"]
+|===
+| Value index | Value | Description
+| 1 | | The number of sources in the category
+| 2 | 1 | [yellow-background]*Unknown*
+
+The 3rd line of the category contains tab (0x09) separated type indicators. For
+more information see the sections below.
+
+The remaining lines in the category consist of:
+
+* category root 
+  * zero or more source entries
+
+Each entry consist of 2 lines:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | | Number of entries
+| 2 | | Tab (0x09) separated values that correspond to the type indicators.
+
+The 1st line of the category root entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | | The number of sources in the category
+|===
+
+The 1st line of the source entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | 0 | [yellow-background]*Unknown*
+|===
+
+===== Source type indicators
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Type indicator | Description
 | 1 | p |
 | 2 | n |
 | 3 | id | Identifier +
-Contains an integer the source
+Contains an integer identifying the source
 | 4 | ev | Evidence number +
 Contains a string
 | 5 | do | Domain +
@@ -1971,37 +2067,139 @@ epoch timestamp and represents the date: March 12 2006, 11:44:05.
 
 ==== [[subjects_category3]]Subjects category
 
-The 21th line consist of the following tab (0x09) separated values.
+The sub category contains information about TODO
 
 [yellow-background]*TODO describe what a subject is in the context of EnCase.*
 
+The 1st line of the category contains the string "sub".
+
+The 2nd line consists of 2 values.
+
+[cols="1,5",options="header"]
+|===
+| Value index | Value | Description
+| 1 | | The number of subjects in the category
+| 2 | 1 | [yellow-background]*Unknown*
+
+The 3rd line of the category contains tab (0x09) separated type indicators. For
+more information see the sections below.
+
+The remaining lines in the category consist of:
+
+* category root 
+  * zero or more subject entries
+
+Each entry consist of 2 lines:
+
 [cols="1,1,5",options="header"]
 |===
-| Identifier number | Character in 15th line | Meaning
+| Line number | Value | Description
+| 1 | | Number of entries
+| 2 | | Tab (0x09) separated values that correspond to the type indicators.
+
+The 1st line of the category root entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | | The number of subject in the category
+|===
+
+The 1st line of the subject entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | 0 | [yellow-background]*Unknown*
+| 2 | 0 | [yellow-background]*Unknown*
+|===
+
+===== Subject type indicators
+
+[cols="1,1,5",options="header"]
+|===
+| Identifier number | Type indicator | Description
 | 1 | p |
 | 2 | n |
 | 3 | id | Identifier +
-Contains an integer the subject
+Contains an integer identifying the subject
 | 4 | nu | [yellow-background]*Unknown (Number)*
 | 5 | co | [yellow-background]*Unknown (Comment)*
 | 6 | gu | [yellow-background]*Unknown (GUID)*
 |===
 
-==== Ltree entries
+==== [[file_entries_category3]]File entries category
 
-===== EnCase 5 and 6 (EWF-L01)
+The entry category contains information about the file entries.
 
-The 29th line consist of the following tab (0x09) separated values.
+The 1st line of the category contains the string "entry".
+
+The 2nd line consists of 2 values.
+
+[cols="1,5",options="header"]
+|===
+| Value index | Value | Description
+| 1 | | The number of file entries in the category or 1 if [yellow-background]*unknown*
+| 2 | 1 | [yellow-background]*Unknown*
+
+The 3rd line of the category contains tab (0x09) separated type indicators. For
+more information see the sections below.
+
+The remaining lines in the category consist of:
+
+* category root 
+  * zero or more file entries
+    * zero or more sub file entries
+      * ...
+
+Each entry consist of 2 lines:
+
+[cols="1,1,5",options="header"]
+|===
+| Line number | Value | Description
+| 1 | | Number of entries
+| 2 | | Tab (0x09) separated values that correspond to the type indicators.
+
+The 1st line of the category root entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | | 0 if not set or 26 if [yellow-background]*Unknown*
+| 2 | | The number of file entries in the category
+|===
+
+....
+0       12
+1                                                                                                               00000000000000000000000000000000                                        00000000000000000000000000000000                0
+       -1      
+
+26      1
+                1 0 0                                                                           1       1       LogicalEntries                  0                                                                                       
+                        
+....
+
+The 1st line of the file entry consists of the following 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | | Number of file entries in the parent file entry or 0 if not set
+| 2 | | The number of sub file entries in the file entry
+|===
+
+===== EnCase 5 and 6 (EWF-L01) file entry type indicators
 
 [cols="1,1,5",options="header"]
 |===
 | Identifier number | Character in 29th line | Meaning
 | 1 | p | Is parent +
-1 => if the single file entry is a directory +
-(null) => if single file entry is a file
+1 => if the entry is a directory +
+(empty) => if the entry is a file
 | 2 | n | Name
 | 3 | id | Identifier +
-Contains an integer the file entry
+Contains an integer identifying the file entry
 | 4 | opr | Flags +
 See section: <<file_entry_flags,File entry flags>>
 | 5 | src | Source identifier +
@@ -2066,9 +2264,7 @@ The entries of files and directories:
 | 3 | | The actual single file entries
 |===
 
-===== EnCase 7 (EWF-L01)
-
-The 29th line consist of the following tab (0x09) separated values.
+===== EnCase 7 (EWF-L01) file entry type indicators
 
 [cols="1,1,5",options="header"]
 |===
@@ -2081,7 +2277,7 @@ If the file size is 0 the data size should be 1
 | 3 | be | Binary extents +
 See section: <<binary_extents,Binary extents value>>
 | 4 | id | Identifier +
-Contains an integer the file entry
+Contains an integer identifying the file entry
 | 5 | cr | Creation date and time
 | 6 | ac | Access date and time
 | 7 | wr | (File) modification (last written) date and time
@@ -2099,8 +2295,8 @@ Judging by the size this value is assumed to be the SHA1 hash of the file data, 
 | 14 | snh | Short (or DOS 8.3) name +
 (Introduced in EnCase 7.9)
 | 15 | p | Is parent +
-1 => if the single file entry is a directory +
-(null) => if single file entry is a file
+1 => if the entry is a directory +
+(empty) => if the entry is a file
 | 16 | n | Name
 | 17 | du | Duplicate data offset +
 Relative from the start of the media data

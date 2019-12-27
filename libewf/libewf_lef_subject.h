@@ -26,6 +26,8 @@
 #include <types.h>
 
 #include "libewf_libcerror.h"
+#include "libewf_libfvalue.h"
+#include "libewf_serialized_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -35,9 +37,13 @@ typedef struct libewf_lef_subject libewf_lef_subject_t;
 
 struct libewf_lef_subject
 {
-	/* Dummy
+	/* The identifier
 	 */
-	int dummy;
+	uint32_t identifier;
+
+	/* The name string
+	 */
+	libewf_serialized_string_t *name;
 };
 
 int libewf_lef_subject_initialize(
@@ -55,8 +61,36 @@ int libewf_lef_subject_clone(
 
 int libewf_lef_subject_read_data(
      libewf_lef_subject_t *lef_subject,
+     libfvalue_split_utf8_string_t *types,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libewf_lef_subject_get_identifier(
+     libewf_lef_subject_t *lef_subject,
+     uint32_t *identifier,
+     libcerror_error_t **error );
+
+int libewf_lef_subject_get_utf8_name_size(
+     libewf_lef_subject_t *lef_subject,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_subject_get_utf8_name(
+     libewf_lef_subject_t *lef_subject,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_subject_get_utf16_name_size(
+     libewf_lef_subject_t *lef_subject,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_subject_get_utf16_name(
+     libewf_lef_subject_t *lef_subject,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

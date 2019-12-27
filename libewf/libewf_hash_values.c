@@ -1349,7 +1349,7 @@ int libewf_hash_values_get_identifier(
 
 /* Retrieves the size of the UTF-8 encoded hash value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_hash_values_get_utf8_value_size(
      libfvalue_table_t *hash_values,
@@ -1447,7 +1447,7 @@ int libewf_hash_values_get_utf8_value_size(
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_hash_values_get_utf8_value(
      libfvalue_table_t *hash_values,
@@ -1680,7 +1680,7 @@ int libewf_hash_values_set_utf8_value(
 
 /* Retrieves the size of the UTF-16 encoded hash value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_hash_values_get_utf16_value_size(
      libfvalue_table_t *hash_values,
@@ -1778,7 +1778,7 @@ int libewf_hash_values_get_utf16_value_size(
 
 /* Retrieves the UTF-16 encoded hash value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_hash_values_get_utf16_value(
      libfvalue_table_t *hash_values,

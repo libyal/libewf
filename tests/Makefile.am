@@ -70,6 +70,7 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	ewf_test_access_control_entry \
 	ewf_test_analytical_data \
 	ewf_test_case_data \
 	ewf_test_chunk_data \
@@ -93,6 +94,8 @@ check_PROGRAMS = \
 	ewf_test_header_values \
 	ewf_test_io_handle \
 	ewf_test_lef_extended_attribute \
+	ewf_test_lef_file_entry \
+	ewf_test_lef_permission \
 	ewf_test_lef_source \
 	ewf_test_lef_subject \
 	ewf_test_md5_hash_section \
@@ -107,7 +110,6 @@ check_PROGRAMS = \
 	ewf_test_serialized_string \
 	ewf_test_session_section \
 	ewf_test_sha1_hash_section \
-	ewf_test_single_file_entry \
 	ewf_test_single_files \
 	ewf_test_support \
 	ewf_test_truncate \
@@ -115,6 +117,24 @@ check_PROGRAMS = \
 	ewf_test_write \
 	ewf_test_write_chunk \
 	ewf_test_write_io_handle
+
+ewf_test_access_control_entry_SOURCES = \
+	ewf_test_access_control_entry.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_access_control_entry_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
 
 ewf_test_analytical_data_SOURCES = \
 	ewf_test_analytical_data.c \
@@ -422,6 +442,42 @@ ewf_test_lef_extended_attribute_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_lef_file_entry_SOURCES = \
+	ewf_test_lef_file_entry.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_lef_file_entry_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_lef_permission_SOURCES = \
+	ewf_test_lef_permission.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_lef_permission_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_lef_source_SOURCES = \
 	ewf_test_lef_source.c \
 	ewf_test_libcerror.h \
@@ -444,11 +500,17 @@ ewf_test_lef_subject_SOURCES = \
 	ewf_test_lef_subject.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
 	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_lef_subject_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -600,24 +662,6 @@ ewf_test_sha1_hash_section_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_sha1_hash_section_LDADD = \
-	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
-
-ewf_test_single_file_entry_SOURCES = \
-	ewf_test_libcerror.h \
-	ewf_test_libewf.h \
-	ewf_test_libfvalue.h \
-	ewf_test_macros.h \
-	ewf_test_memory.c ewf_test_memory.h \
-	ewf_test_single_file_entry.c \
-	ewf_test_unused.h
-
-ewf_test_single_file_entry_LDADD = \
-	@LIBFVALUE_LIBADD@ \
-	@LIBFGUID_LIBADD@ \
-	@LIBUNA_LIBADD@ \
-	@LIBCNOTIFY_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

@@ -15,7 +15,7 @@ if test ${RESULT} -eq 0;
 then
 	if test ${TARGET} = "macos-gcc-python" || test ${TARGET} = "macos-gcc-pkgbuild";
 	then
-		install_name_tool -change /usr/local/lib/libewf.1.dylib ${PWD}/libewf/.libs/libewf.1.dylib ./pyewf/.libs/pyewf.so;
+		install_name_tool -change /usr/local/lib/libewf.3.dylib ${PWD}/libewf/.libs/libewf.3.dylib ./pyewf/.libs/pyewf.so;
 	fi
 	make check CHECK_WITH_STDERR=1;
 	RESULT=$?;

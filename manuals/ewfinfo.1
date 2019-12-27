@@ -1,4 +1,4 @@
-.Dd January 19, 2014
+.Dd December 27, 2019
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -7,9 +7,10 @@
 .Sh SYNOPSIS
 .Nm ewfinfo
 .Op Fl A Ar codepage
+.Op Fl B Ar bodyfile
 .Op Fl d Ar date_format
 .Op Fl f Ar format
-.Op Fl ehimvV
+.Op Fl ehHimvV
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfinfo
@@ -29,6 +30,8 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl A Ar codepage
 the codepage of header section, options: ascii (default), windows-874, windows-932, windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257 or windows-1258
+.It Fl B Ar bodyfile
+output logical files information as a bodyfile
 .It Fl d Ar date_format
 the date format, options: ctime (default), dm (day/month), md (month/day), iso8601
 .It Fl e
@@ -37,6 +40,8 @@ only show EWF read error information
 specify the output format, options: text (default), dfxml
 .It Fl h
 shows this help
+.It Fl H
+shows the logical files hierarchy
 .It Fl i
 only show EWF acquiry information
 .It Fl m
@@ -54,8 +59,8 @@ None
 .Bd -literal
 # ewfinfo \-d dm floppy.E01
 ewfinfo 20120805
-
-Acquiry information
+.sp
+Acquiry information:
         Case number:            1
         Description:            Floppy
         Examiner name:          John D.
@@ -66,25 +71,25 @@ Acquiry information
         Operating system used:  Linux
         Software version used:  20061209
         Password:               N/A
-
-EWF information
+.sp
+EWF information:
 	File format:		EnCase 5
 	Sectors per chunk:	64
 	Error granularity:	64
 	Compression method:	deflate
 	Compression level:	no compression
 	Set identifier:		869910fc-e143-4908-9328-afedf4a7be1e
-
-Media information
+.sp
+Media information:
         Media type:             removable disk
         Is physical:		no
         Bytes per sector:       512
         Number of sectors:      2880
         Media size:             1.4 MiB (1474560 bytes)
 
-Digest hash information
+Digest hash information:
         MD5:                    ae1ce8f5ac079d3ee93f97fe3792bda3
-
+.sp
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.

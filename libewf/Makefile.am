@@ -37,6 +37,7 @@ libewf_la_SOURCES = \
 	ewf_table.h \
 	ewf_volume.h \
 	libewf.c \
+	libewf_access_control_entry.c libewf_access_control_entry.h \
 	libewf_analytical_data.c libewf_analytical_data.h \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
@@ -79,12 +80,15 @@ libewf_la_SOURCES = \
 	libewf_libfvalue.h \
 	libewf_libuna.h \
 	libewf_lef_extended_attribute.c libewf_lef_extended_attribute.h \
+	libewf_lef_file_entry.c libewf_lef_file_entry.h \
+	libewf_lef_permission.c libewf_lef_permission.h \
 	libewf_lef_source.c libewf_lef_source.h \
 	libewf_lef_subject.c libewf_lef_subject.h \
 	libewf_ltree_section.c libewf_ltree_section.h \
 	libewf_md5_hash_section.c libewf_md5_hash_section.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_notify.c libewf_notify.h \
+	libewf_permission_group.c libewf_permission_group.h \
 	libewf_read_io_handle.c libewf_read_io_handle.h \
 	libewf_restart_data.c libewf_restart_data.h \
 	libewf_section.c libewf_section.h \
@@ -96,7 +100,6 @@ libewf_la_SOURCES = \
 	libewf_session_section.c libewf_session_section.h \
 	libewf_sha1_hash_section.c libewf_sha1_hash_section.h \
 	libewf_single_files.c libewf_single_files.h \
-	libewf_single_file_entry.c libewf_single_file_entry.h \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
 	libewf_support.c libewf_support.h \
 	libewf_types.h \

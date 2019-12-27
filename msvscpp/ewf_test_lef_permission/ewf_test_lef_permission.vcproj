@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_single_file_entry"
-	ProjectGUID="{5CBBD684-6803-4B07-B2D3-A2E2C73F7E0D}"
-	RootNamespace="ewf_test_single_file_entry"
+	Name="ewf_test_lef_permission"
+	ProjectGUID="{8C6B4351-C1B9-470F-A1E3-98426A6D8870}"
+	RootNamespace="ewf_test_lef_permission"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_lef_permission.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_single_file_entry.c"
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 		</Filter>

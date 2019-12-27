@@ -34,6 +34,7 @@
 /* The following type definitions hide internal data structures
  */
 #if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
+typedef struct libewf_access_control_entry {}	libewf_access_control_entry_t;
 typedef struct libewf_data_chunk {}		libewf_data_chunk_t;
 typedef struct libewf_extended_attribute {}	libewf_extended_attribute_t;
 typedef struct libewf_file_entry {}		libewf_file_entry_t;
@@ -42,6 +43,7 @@ typedef struct libewf_source {}			libewf_source_t;
 typedef struct libewf_subject {}		libewf_subject_t;
 
 #else
+typedef intptr_t libewf_access_control_entry_t;
 typedef intptr_t libewf_data_chunk_t;
 typedef intptr_t libewf_extended_attribute_t;
 typedef intptr_t libewf_file_entry_t;

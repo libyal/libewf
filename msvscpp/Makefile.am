@@ -1,6 +1,7 @@
 MSVSCPP_FILES = \
 	bzip2/bzip2.vcproj \
 	ewf.net/ewf.net.vcproj \
+	ewf_test_access_control_entry/ewf_test_access_control_entry.vcproj \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_chunk_data/ewf_test_chunk_data.vcproj \
@@ -24,6 +25,8 @@ MSVSCPP_FILES = \
 	ewf_test_header_values/ewf_test_header_values.vcproj \
 	ewf_test_io_handle/ewf_test_io_handle.vcproj \
 	ewf_test_lef_extended_attribute/ewf_test_lef_extended_attribute.vcproj \
+	ewf_test_lef_file_entry/ewf_test_lef_file_entry.vcproj \
+	ewf_test_lef_permission/ewf_test_lef_permission.vcproj \
 	ewf_test_lef_source/ewf_test_lef_source.vcproj \
 	ewf_test_lef_subject/ewf_test_lef_subject.vcproj \
 	ewf_test_md5_hash_section/ewf_test_md5_hash_section.vcproj \
@@ -38,7 +41,6 @@ MSVSCPP_FILES = \
 	ewf_test_serialized_string/ewf_test_serialized_string.vcproj \
 	ewf_test_session_section/ewf_test_session_section.vcproj \
 	ewf_test_sha1_hash_section/ewf_test_sha1_hash_section.vcproj \
-	ewf_test_single_file_entry/ewf_test_single_file_entry.vcproj \
 	ewf_test_single_files/ewf_test_single_files.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \

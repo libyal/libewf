@@ -71,6 +71,50 @@ ssize_t libewf_lef_extended_attribute_read_data(
          size_t data_size,
          libcerror_error_t **error );
 
+int libewf_lef_extended_attribute_get_utf8_name_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf8_name(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf16_name_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf16_name(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf8_value_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf8_value(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf16_value_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_extended_attribute_get_utf16_value(
+     libewf_lef_extended_attribute_t *lef_extended_attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

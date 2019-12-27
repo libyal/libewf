@@ -29,21 +29,22 @@
 
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libfvalue.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_lef_subject.h"
 
-uint8_t ewf_test_lef_subject_data1[ 123 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x41, 0x00, 0x74,
-	0x00, 0x74, 0x00, 0x72, 0x00, 0x69, 0x00, 0x62, 0x00, 0x75, 0x00, 0x74, 0x00, 0x65, 0x00, 0x73,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x00, 0x00, 0x05, 0x00,
-	0x00, 0x00, 0x44, 0x00, 0x6f, 0x00, 0x4e, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x50, 0x00, 0x72, 0x00,
-	0x6f, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x73, 0x00, 0x00, 0x00, 0x74, 0x00, 0x72, 0x00,
-	0x75, 0x00, 0x65, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x05,
-	0x00, 0x00, 0x00, 0x48, 0x00, 0x69, 0x00, 0x64, 0x00, 0x64, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x00,
-	0x00, 0x74, 0x00, 0x72, 0x00, 0x75, 0x00, 0x65, 0x00, 0x00, 0x00 };
+uint8_t ewf_test_lef_subject_types_data1[ 64 ] = {
+	0x70, 0x09, 0x6e, 0x09, 0x69, 0x64, 0x09, 0x65, 0x76, 0x09, 0x64, 0x6f, 0x09, 0x6c, 0x6f, 0x63,
+	0x09, 0x73, 0x65, 0x09, 0x6d, 0x66, 0x72, 0x09, 0x6d, 0x6f, 0x09, 0x74, 0x62, 0x09, 0x6c, 0x6f,
+	0x09, 0x70, 0x6f, 0x09, 0x61, 0x68, 0x09, 0x73, 0x68, 0x09, 0x67, 0x75, 0x09, 0x70, 0x67, 0x75,
+	0x09, 0x61, 0x71, 0x09, 0x69, 0x70, 0x09, 0x73, 0x69, 0x09, 0x6d, 0x61, 0x09, 0x64, 0x74, 0x0d };
+
+uint8_t ewf_test_lef_subject_values_data1[ 26 ] = {
+        0x09, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x2d, 0x31, 0x09, 0x2d, 0x31,
+        0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x0d };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -58,7 +59,7 @@ int ewf_test_lef_subject_initialize(
 	int result                        = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests   = 1;
+	int number_of_malloc_fail_tests   = 2;
 	int number_of_memset_fail_tests   = 1;
 	int test_number                   = 0;
 #endif
@@ -289,10 +290,11 @@ int ewf_test_lef_subject_clone(
 	libcerror_error_t *error                      = NULL;
 	libewf_lef_subject_t *destination_lef_subject = NULL;
 	libewf_lef_subject_t *source_lef_subject      = NULL;
+	libfvalue_split_utf8_string_t *types          = NULL;
 	int result                                    = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests               = 1;
+	int number_of_malloc_fail_tests               = 2;
 	int test_number                               = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -314,6 +316,42 @@ int ewf_test_lef_subject_clone(
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "source_lef_subject",
 	 source_lef_subject );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_utf8_string_split(
+	          ewf_test_lef_subject_types_data1,
+	          64,
+	          (uint8_t) '\t',
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_lef_subject_read_data(
+	          source_lef_subject,
+	          types,
+	          ewf_test_lef_subject_values_data1,
+	          26,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -509,6 +547,23 @@ int ewf_test_lef_subject_clone(
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_lef_subject_free(
 	          &source_lef_subject,
 	          &error );
@@ -540,6 +595,12 @@ on_error:
 		 &destination_lef_subject,
 		 NULL );
 	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
+		 NULL );
+	}
 	if( source_lef_subject != NULL )
 	{
 		libewf_lef_subject_free(
@@ -555,9 +616,10 @@ on_error:
 int ewf_test_lef_subject_read_data(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_lef_subject_t *lef_subject = NULL;
-	int result                        = 0;
+	libcerror_error_t *error             = NULL;
+	libewf_lef_subject_t *lef_subject    = NULL;
+	libfvalue_split_utf8_string_t *types = NULL;
+	int result                           = 0;
 
 	/* Initialize test
 	 */
@@ -578,12 +640,33 @@ int ewf_test_lef_subject_read_data(
 	 "error",
 	 error );
 
+	result = libfvalue_utf8_string_split(
+	          ewf_test_lef_subject_types_data1,
+	          64,
+	          (uint8_t) '\t',
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 	result = libewf_lef_subject_read_data(
 	          lef_subject,
-	          ewf_test_lef_subject_data1,
-	          123,
+	          types,
+	          ewf_test_lef_subject_values_data1,
+	          26,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -595,12 +678,51 @@ int ewf_test_lef_subject_read_data(
 	 "error",
 	 error );
 
+	/* Clean up
+	 */
+	result = libewf_lef_subject_free(
+	          &lef_subject,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "lef_subject",
+	 lef_subject );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_lef_subject_initialize(
+	          &lef_subject,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "lef_subject",
+	 lef_subject );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_lef_subject_read_data(
 	          NULL,
-	          ewf_test_lef_subject_data1,
-	          123,
+	          types,
+	          ewf_test_lef_subject_values_data1,
+	          26,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -618,7 +740,8 @@ int ewf_test_lef_subject_read_data(
 	result = libewf_lef_subject_read_data(
 	          lef_subject,
 	          NULL,
-	          123,
+	          ewf_test_lef_subject_values_data1,
+	          26,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -635,7 +758,27 @@ int ewf_test_lef_subject_read_data(
 
 	result = libewf_lef_subject_read_data(
 	          lef_subject,
-	          ewf_test_lef_subject_data1,
+	          types,
+	          NULL,
+	          26,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_read_data(
+	          lef_subject,
+	          types,
+	          ewf_test_lef_subject_values_data1,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -653,7 +796,8 @@ int ewf_test_lef_subject_read_data(
 
 	result = libewf_lef_subject_read_data(
 	          lef_subject,
-	          ewf_test_lef_subject_data1,
+	          types,
+	          ewf_test_lef_subject_values_data1,
 	          0,
 	          &error );
 
@@ -671,6 +815,23 @@ int ewf_test_lef_subject_read_data(
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_lef_subject_free(
 	          &lef_subject,
 	          &error );
@@ -696,11 +857,462 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
+		 NULL );
+	}
 	if( lef_subject != NULL )
 	{
 		libewf_lef_subject_free(
 		 &lef_subject,
 		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_subject_get_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_subject_get_identifier(
+     libewf_lef_subject_t *lef_subject )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t identifier      = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_subject_get_identifier(
+	          lef_subject,
+	          &identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_subject_get_identifier(
+	          NULL,
+	          &identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_identifier(
+	          lef_subject,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_subject_get_utf8_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_subject_get_utf8_name_size(
+     libewf_lef_subject_t *lef_subject )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_string_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_subject_get_utf8_name_size(
+	          lef_subject,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_subject_get_utf8_name_size(
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf8_name_size(
+	          lef_subject,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_subject_get_utf8_name function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_subject_get_utf8_name(
+     libewf_lef_subject_t *lef_subject )
+{
+	uint8_t utf8_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_subject_get_utf8_name(
+	          lef_subject,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_subject_get_utf8_name(
+	          NULL,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf8_name(
+	          lef_subject,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf8_name(
+	          lef_subject,
+	          utf8_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf8_name(
+	          lef_subject,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_subject_get_utf16_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_subject_get_utf16_name_size(
+     libewf_lef_subject_t *lef_subject )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_string_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_subject_get_utf16_name_size(
+	          lef_subject,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_subject_get_utf16_name_size(
+	          NULL,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf16_name_size(
+	          lef_subject,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_subject_get_utf16_name function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_subject_get_utf16_name(
+     libewf_lef_subject_t *lef_subject )
+{
+	uint16_t utf16_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_subject_get_utf16_name(
+	          lef_subject,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_subject_get_utf16_name(
+	          NULL,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf16_name(
+	          lef_subject,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf16_name(
+	          lef_subject,
+	          utf16_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_subject_get_utf16_name(
+	          lef_subject,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
 	}
 	return( 0 );
 }
@@ -721,9 +1333,10 @@ int main(
 {
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-	libcerror_error_t *error          = NULL;
-	libewf_lef_subject_t *lef_subject = NULL;
-	int result                        = 0;
+	libcerror_error_t *error             = NULL;
+	libewf_lef_subject_t *lef_subject    = NULL;
+	libfvalue_split_utf8_string_t *types = NULL;
+	int result                           = 0;
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
@@ -769,10 +1382,31 @@ int main(
 	 "error",
 	 error );
 
+	result = libfvalue_utf8_string_split(
+	          ewf_test_lef_subject_types_data1,
+	          64,
+	          (uint8_t) '\t',
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_lef_subject_read_data(
 	          lef_subject,
-	          ewf_test_lef_subject_data1,
-	          123,
+	          types,
+	          ewf_test_lef_subject_values_data1,
+	          26,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -786,15 +1420,50 @@ int main(
 
 	/* Run tests
 	 */
-/* TODO implement
 	EWF_TEST_RUN_WITH_ARGS(
-	 "libewf_lef_subject_get_type",
-	 ewf_test_lef_subject_get_type,
+	 "libewf_lef_subject_get_identifier",
+	 ewf_test_lef_subject_get_identifier,
 	 lef_subject );
-*/
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_subject_get_utf8_name_size",
+	 ewf_test_lef_subject_get_utf8_name_size,
+	 lef_subject );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_subject_get_utf8_name",
+	 ewf_test_lef_subject_get_utf8_name,
+	 lef_subject );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_subject_get_utf16_name_size",
+	 ewf_test_lef_subject_get_utf16_name_size,
+	 lef_subject );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_subject_get_utf16_name",
+	 ewf_test_lef_subject_get_utf16_name,
+	 lef_subject );
 
 	/* Clean up
 	 */
+	result = libfvalue_split_utf8_string_free(
+	          &types,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "types",
+	 types );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_lef_subject_free(
 	          &lef_subject,
 	          &error );
@@ -823,6 +1492,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( types != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &types,
+		 NULL );
 	}
 	if( lef_subject != NULL )
 	{

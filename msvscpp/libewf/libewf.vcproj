@@ -174,6 +174,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_access_control_entry.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_analytical_data.c"
 				>
 			</File>
@@ -278,6 +282,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_lef_file_entry.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_permission.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_lef_source.c"
 				>
 			</File>
@@ -299,6 +311,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_permission_group.c"
 				>
 			</File>
 			<File
@@ -339,10 +355,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_sha1_hash_section.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_single_file_entry.c"
 				>
 			</File>
 			<File
@@ -409,6 +421,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\ewf_volume.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_access_control_entry.h"
 				>
 			</File>
 			<File
@@ -528,6 +544,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_lef_file_entry.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_lef_permission.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_lef_source.h"
 				>
 			</File>
@@ -604,6 +628,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_permission_group.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_read_io_handle.h"
 				>
 			</File>
@@ -641,10 +669,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_sha1_hash_section.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_single_file_entry.h"
 				>
 			</File>
 			<File

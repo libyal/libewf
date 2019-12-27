@@ -201,6 +201,7 @@ typedef int64_t off64_t;
 
 /* The following type definitions hide internal data structures
  */
+typedef intptr_t libewf_access_control_entry_t;
 typedef intptr_t libewf_data_chunk_t;
 typedef intptr_t libewf_extended_attribute_t;
 typedef intptr_t libewf_file_entry_t;

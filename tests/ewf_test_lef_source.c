@@ -678,6 +678,44 @@ int ewf_test_lef_source_read_data(
 	 "error",
 	 error );
 
+	/* Clean up
+	 */
+	result = libewf_lef_source_free(
+	          &lef_source,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "lef_source",
+	 lef_source );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_lef_source_initialize(
+	          &lef_source,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "lef_source",
+	 lef_source );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_lef_source_read_data(
@@ -761,6 +799,27 @@ int ewf_test_lef_source_read_data(
 	          types,
 	          ewf_test_lef_source_values_data1,
 	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test number_of_types != number_of_values
+	 */
+	result = libewf_lef_source_read_data(
+	          lef_source,
+	          types,
+	          ewf_test_lef_source_values_data1,
+	          26 - 2,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -4475,6 +4534,79 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_lef_source_get_acquisition_time function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_acquisition_time(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	int32_t acquisition_time    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_acquisition_time(
+	          lef_source,
+	          &acquisition_time,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_acquisition_time(
+	          NULL,
+	          &acquisition_time,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_acquisition_time(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_lef_source_get_utf8_hash_value_md5 function
  * Returns 1 if successful or 0 if not
  */
@@ -4549,7 +4681,7 @@ int ewf_test_lef_source_get_utf8_hash_value_md5(
 		result = libewf_lef_source_get_utf8_hash_value_md5(
 		          lef_source,
 		          utf8_hash_value_md5,
-		          0,
+		          (size_t) SSIZE_MAX + 1,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4567,7 +4699,7 @@ int ewf_test_lef_source_get_utf8_hash_value_md5(
 		result = libewf_lef_source_get_utf8_hash_value_md5(
 		          lef_source,
 		          utf8_hash_value_md5,
-		          (size_t) SSIZE_MAX + 1,
+		          0,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4667,7 +4799,7 @@ int ewf_test_lef_source_get_utf16_hash_value_md5(
 		result = libewf_lef_source_get_utf16_hash_value_md5(
 		          lef_source,
 		          utf16_hash_value_md5,
-		          0,
+		          (size_t) SSIZE_MAX + 1,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4685,7 +4817,7 @@ int ewf_test_lef_source_get_utf16_hash_value_md5(
 		result = libewf_lef_source_get_utf16_hash_value_md5(
 		          lef_source,
 		          utf16_hash_value_md5,
-		          (size_t) SSIZE_MAX + 1,
+		          0,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4785,7 +4917,7 @@ int ewf_test_lef_source_get_utf8_hash_value_sha1(
 		result = libewf_lef_source_get_utf8_hash_value_sha1(
 		          lef_source,
 		          utf8_hash_value_sha1,
-		          0,
+		          (size_t) SSIZE_MAX + 1,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4803,7 +4935,7 @@ int ewf_test_lef_source_get_utf8_hash_value_sha1(
 		result = libewf_lef_source_get_utf8_hash_value_sha1(
 		          lef_source,
 		          utf8_hash_value_sha1,
-		          (size_t) SSIZE_MAX + 1,
+		          0,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4903,7 +5035,7 @@ int ewf_test_lef_source_get_utf16_hash_value_sha1(
 		result = libewf_lef_source_get_utf16_hash_value_sha1(
 		          lef_source,
 		          utf16_hash_value_sha1,
-		          0,
+		          (size_t) SSIZE_MAX + 1,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -4921,7 +5053,7 @@ int ewf_test_lef_source_get_utf16_hash_value_sha1(
 		result = libewf_lef_source_get_utf16_hash_value_sha1(
 		          lef_source,
 		          utf16_hash_value_sha1,
-		          (size_t) SSIZE_MAX + 1,
+		          0,
 		          &error );
 
 		EWF_TEST_ASSERT_EQUAL_INT(
@@ -5248,6 +5380,11 @@ int main(
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_lef_source_get_physical_offset",
 	 ewf_test_lef_source_get_physical_offset,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_acquisition_time",
+	 ewf_test_lef_source_get_acquisition_time,
 	 lef_source );
 
 	EWF_TEST_RUN_WITH_ARGS(

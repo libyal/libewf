@@ -44,6 +44,7 @@
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_io_handle.h"
+#include "libewf_lef_file_entry.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
@@ -61,7 +62,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_session_section.h"
 #include "libewf_sha1_hash_section.h"
-#include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
 #include "libewf_single_files.h"
 #include "libewf_types.h"
@@ -7085,7 +7085,7 @@ int libewf_handle_segment_files_encrypted(
 
 /* Retrieves the segment filename size
  * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_segment_filename_size(
      libewf_handle_t *handle,
@@ -7158,7 +7158,7 @@ int libewf_handle_get_segment_filename_size(
 
 /* Retrieves the segment filename
  * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_segment_filename(
      libewf_handle_t *handle,
@@ -7320,7 +7320,7 @@ int libewf_handle_set_segment_filename(
 
 /* Retrieves the segment filename size
  * The filename size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_segment_filename_size_wide(
      libewf_handle_t *handle,
@@ -7393,7 +7393,7 @@ int libewf_handle_get_segment_filename_size_wide(
 
 /* Retrieves the segment filename
  * The filename size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_segment_filename_wide(
      libewf_handle_t *handle,
@@ -8627,6 +8627,7 @@ int libewf_handle_get_root_file_entry(
      libewf_file_entry_t **root_file_entry,
      libcerror_error_t **error )
 {
+	libcdata_tree_node_t *root_node           = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_root_file_entry";
 	int result                                = 0;
@@ -8692,12 +8693,26 @@ int libewf_handle_get_root_file_entry(
 		return( -1 );
 	}
 #endif
-	if( internal_handle->single_files->root_file_entry_node != NULL )
+	if( libewf_single_files_get_file_entry_tree_root_node(
+	     internal_handle->single_files,
+	     &root_node,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry tree root node.",
+		 function );
+
+		result = -1;
+	}
+	else if( root_node != NULL )
 	{
 		result = libewf_file_entry_initialize(
 		          root_file_entry,
 		          internal_handle,
-		          internal_handle->single_files->root_file_entry_node,
+		          root_node,
 		          error );
 
 		if( result != 1 )
@@ -8708,6 +8723,8 @@ int libewf_handle_get_root_file_entry(
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create root file entry.",
 			 function );
+
+			result = -1;
 		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
@@ -8740,15 +8757,16 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libewf_single_file_entry_t *single_file_entry     = NULL;
-	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libcdata_tree_node_t *node                        = NULL;
-	libcdata_tree_node_t *sub_node                    = NULL;
-	uint8_t *utf8_string_segment                      = NULL;
-	static char *function                             = "libewf_handle_get_file_entry_by_utf8_path";
-	size_t utf8_string_index                          = 0;
-	size_t utf8_string_segment_length                 = 0;
-	int result                                        = 0;
+	libcdata_tree_node_t *node                  = NULL;
+	libcdata_tree_node_t *root_node             = NULL;
+	libcdata_tree_node_t *sub_node              = NULL;
+	libewf_lef_file_entry_t *lef_file_entry     = NULL;
+	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
+	uint8_t *utf8_string_segment                = NULL;
+	static char *function                       = "libewf_handle_get_file_entry_by_utf8_path";
+	size_t utf8_string_index                    = 0;
+	size_t utf8_string_segment_length           = 0;
+	int result                                  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -8816,13 +8834,27 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-	if( internal_handle->single_files->root_file_entry_node == NULL )
+	if( libewf_single_files_get_file_entry_tree_root_node(
+	     internal_handle->single_files,
+	     &root_node,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry tree root node.",
+		 function );
+
+		result = -1;
+	}
+	else if( root_node == NULL )
 	{
 		return( 0 );
 	}
 	if( libcdata_tree_node_get_value(
-	     internal_handle->single_files->root_file_entry_node,
-	     (intptr_t **) &single_file_entry,
+	     root_node,
+	     (intptr_t **) &lef_file_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -8834,7 +8866,7 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -8854,7 +8886,7 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 			utf8_string_index++;
 		}
 	}
-	node = internal_handle->single_files->root_file_entry_node;
+	node = root_node;
 
 	if( ( utf8_string_length == 0 )
 	 || ( utf8_string_length == 1 ) )
@@ -8895,7 +8927,7 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 			  utf8_string_segment,
 			  utf8_string_segment_length,
 			  &sub_node,
-			  &sub_single_file_entry,
+			  &sub_lef_file_entry,
 			  error );
 
 		if( result == -1 )
@@ -8904,7 +8936,7 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve single file entry sub node by name.",
+			 "%s: unable to retrieve file entry sub node by name.",
 			 function );
 
 			return( -1 );
@@ -9025,15 +9057,16 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
      libewf_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libewf_single_file_entry_t *single_file_entry     = NULL;
-	libewf_single_file_entry_t *sub_single_file_entry = NULL;
-	libcdata_tree_node_t *node                        = NULL;
-	libcdata_tree_node_t *sub_node                    = NULL;
-	uint16_t *utf16_string_segment                    = NULL;
-	static char *function                             = "libewf_handle_get_file_entry_by_utf16_path";
-	size_t utf16_string_index                         = 0;
-	size_t utf16_string_segment_length                = 0;
-	int result                                        = 0;
+	libcdata_tree_node_t *node                  = NULL;
+	libcdata_tree_node_t *root_node             = NULL;
+	libcdata_tree_node_t *sub_node              = NULL;
+	libewf_lef_file_entry_t *lef_file_entry     = NULL;
+	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
+	uint16_t *utf16_string_segment              = NULL;
+	static char *function                       = "libewf_handle_get_file_entry_by_utf16_path";
+	size_t utf16_string_index                   = 0;
+	size_t utf16_string_segment_length          = 0;
+	int result                                  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -9101,13 +9134,27 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-	if( internal_handle->single_files->root_file_entry_node == NULL )
+	if( libewf_single_files_get_file_entry_tree_root_node(
+	     internal_handle->single_files,
+	     &root_node,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry tree root node.",
+		 function );
+
+		result = -1;
+	}
+	else if( root_node == NULL )
 	{
 		return( 0 );
 	}
 	if( libcdata_tree_node_get_value(
-	     internal_handle->single_files->root_file_entry_node,
-	     (intptr_t **) &single_file_entry,
+	     root_node,
+	     (intptr_t **) &lef_file_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -9119,7 +9166,7 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -9139,7 +9186,7 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 			utf16_string_index++;
 		}
 	}
-	node = internal_handle->single_files->root_file_entry_node;
+	node = root_node;
 
 	if( ( utf16_string_length == 0 )
 	 || ( utf16_string_length == 1 ) )
@@ -9180,7 +9227,7 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 			  utf16_string_segment,
 			  utf16_string_segment_length,
 			  &sub_node,
-			  &sub_single_file_entry,
+			  &sub_lef_file_entry,
 			  error );
 
 		if( result == -1 )
@@ -9189,7 +9236,7 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve single file entry sub node by name.",
+			 "%s: unable to retrieve file entry sub node by name.",
 			 function );
 
 			return( -1 );
@@ -11702,7 +11749,7 @@ on_error:
 }
 
 /* Retrieves the MD5 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_md5_hash(
      libewf_handle_t *handle,
@@ -12034,7 +12081,7 @@ on_error:
 }
 
 /* Retrieves the SHA1 hash
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_sha1_hash(
      libewf_handle_t *handle,
@@ -14278,7 +14325,7 @@ int libewf_handle_get_header_value_identifier(
 
 /* Retrieves the size of the UTF-8 encoded header value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf8_header_value_size(
      libewf_handle_t *handle,
@@ -14370,7 +14417,7 @@ int libewf_handle_get_utf8_header_value_size(
 
 /* Retrieves the UTF-8 encoded header value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf8_header_value(
      libewf_handle_t *handle,
@@ -14574,7 +14621,7 @@ int libewf_handle_set_utf8_header_value(
 
 /* Retrieves the size of the UTF-16 encoded header value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf16_header_value_size(
      libewf_handle_t *handle,
@@ -14666,7 +14713,7 @@ int libewf_handle_get_utf16_header_value_size(
 
 /* Retrieves the UTF-16 encoded header value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf16_header_value(
      libewf_handle_t *handle,
@@ -15452,7 +15499,7 @@ int libewf_handle_get_hash_value_identifier(
 
 /* Retrieves the size of the UTF-8 encoded hash value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf8_hash_value_size(
      libewf_handle_t *handle,
@@ -15550,7 +15597,7 @@ int libewf_handle_get_utf8_hash_value_size(
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf8_hash_value(
      libewf_handle_t *handle,
@@ -15793,7 +15840,7 @@ int libewf_handle_set_utf8_hash_value(
 
 /* Retrieves the size of the UTF-16 encoded hash value of an identifier
  * The string size includes the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf16_hash_value_size(
      libewf_handle_t *handle,
@@ -15891,7 +15938,7 @@ int libewf_handle_get_utf16_hash_value_size(
 
 /* Retrieves the UTF-16 encoded hash value of an identifier
  * The string size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_handle_get_utf16_hash_value(
      libewf_handle_t *handle,

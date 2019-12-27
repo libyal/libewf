@@ -784,7 +784,6 @@ int libewf_lef_source_read_data(
 	uint8_t *value_string                 = NULL;
 	static char *function                 = "libewf_lef_source_read_data";
 	size_t type_string_size               = 0;
-	size_t value_string_index             = 0;
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
 	int number_of_types                   = 0;
@@ -1374,7 +1373,7 @@ int libewf_lef_source_get_identifier(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -2959,7 +2958,7 @@ int libewf_lef_source_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -2996,7 +2995,7 @@ int libewf_lef_source_get_logical_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3033,7 +3032,7 @@ int libewf_lef_source_get_physical_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3070,7 +3069,7 @@ int libewf_lef_source_get_acquisition_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3092,7 +3091,7 @@ int libewf_lef_source_get_acquisition_time(
 }
 
 /* Retrieves the UTF-8 encoded MD5 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_utf8_hash_value_md5(
      libewf_lef_source_t *lef_source,
@@ -3109,7 +3108,7 @@ int libewf_lef_source_get_utf8_hash_value_md5(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3135,7 +3134,7 @@ int libewf_lef_source_get_utf8_hash_value_md5(
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_utf16_hash_value_md5(
      libewf_lef_source_t *lef_source,
@@ -3152,7 +3151,7 @@ int libewf_lef_source_get_utf16_hash_value_md5(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3178,7 +3177,7 @@ int libewf_lef_source_get_utf16_hash_value_md5(
 }
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_utf8_hash_value_sha1(
      libewf_lef_source_t *lef_source,
@@ -3195,7 +3194,7 @@ int libewf_lef_source_get_utf8_hash_value_sha1(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );
@@ -3221,7 +3220,7 @@ int libewf_lef_source_get_utf8_hash_value_sha1(
 }
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_utf16_hash_value_sha1(
      libewf_lef_source_t *lef_source,
@@ -3238,7 +3237,7 @@ int libewf_lef_source_get_utf16_hash_value_sha1(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid source.",
 		 function );
 
 		return( -1 );

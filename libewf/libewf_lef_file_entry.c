@@ -32,75 +32,75 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_serialized_string.h"
-#include "libewf_single_file_entry.h"
+#include "libewf_lef_file_entry.h"
 
-/* Creates a single file entry
- * Make sure the value single_file_entry is referencing, is set to NULL
+/* Creates a file entry
+ * Make sure the value lef_file_entry is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_initialize(
-     libewf_single_file_entry_t **single_file_entry,
+int libewf_lef_file_entry_initialize(
+     libewf_lef_file_entry_t **lef_file_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_initialize";
+	static char *function = "libewf_lef_file_entry_initialize";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( *single_file_entry != NULL )
+	if( *lef_file_entry != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid single file entry value already set.",
+		 "%s: invalid file entry value already set.",
 		 function );
 
 		return( -1 );
 	}
-	*single_file_entry = memory_allocate_structure(
-	                      libewf_single_file_entry_t );
+	*lef_file_entry = memory_allocate_structure(
+	                   libewf_lef_file_entry_t );
 
-	if( *single_file_entry == NULL )
+	if( *lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create single file entry.",
+		 "%s: unable to create file entry.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     *single_file_entry,
+	     *lef_file_entry,
 	     0,
-	     sizeof( libewf_single_file_entry_t ) ) == NULL )
+	     sizeof( libewf_lef_file_entry_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear single file entry.",
+		 "%s: unable to clear file entry.",
 		 function );
 
 		memory_free(
-		 *single_file_entry );
+		 *lef_file_entry );
 
-		*single_file_entry = NULL;
+		*lef_file_entry = NULL;
 
 		return( -1 );
 	}
 	if( libewf_serialized_string_initialize(
-	     &( ( *single_file_entry )->name ),
+	     &( ( *lef_file_entry )->name ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -113,7 +113,7 @@ int libewf_single_file_entry_initialize(
 		goto on_error;
 	}
 	if( libewf_serialized_string_initialize(
-	     &( ( *single_file_entry )->short_name ),
+	     &( ( *lef_file_entry )->short_name ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -126,7 +126,7 @@ int libewf_single_file_entry_initialize(
 		goto on_error;
 	}
 	if( libewf_serialized_string_initialize(
-	     &( ( *single_file_entry )->md5_hash ),
+	     &( ( *lef_file_entry )->md5_hash ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -139,7 +139,7 @@ int libewf_single_file_entry_initialize(
 		goto on_error;
 	}
 	if( libewf_serialized_string_initialize(
-	     &( ( *single_file_entry )->sha1_hash ),
+	     &( ( *lef_file_entry )->sha1_hash ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -151,67 +151,67 @@ int libewf_single_file_entry_initialize(
 
 		goto on_error;
 	}
-	( *single_file_entry )->data_offset           = -1;
-	( *single_file_entry )->duplicate_data_offset = -1;
+	( *lef_file_entry )->data_offset           = -1;
+	( *lef_file_entry )->duplicate_data_offset = -1;
 
 	return( 1 );
 
 on_error:
-	if( *single_file_entry != NULL )
+	if( *lef_file_entry != NULL )
 	{
-		if( ( *single_file_entry )->md5_hash != NULL )
+		if( ( *lef_file_entry )->md5_hash != NULL )
 		{
 			libewf_serialized_string_free(
-			 &( ( *single_file_entry )->md5_hash ),
+			 &( ( *lef_file_entry )->md5_hash ),
 			 NULL );
 		}
-		if( ( *single_file_entry )->short_name != NULL )
+		if( ( *lef_file_entry )->short_name != NULL )
 		{
 			libewf_serialized_string_free(
-			 &( ( *single_file_entry )->short_name ),
+			 &( ( *lef_file_entry )->short_name ),
 			 NULL );
 		}
-		if( ( *single_file_entry )->name != NULL )
+		if( ( *lef_file_entry )->name != NULL )
 		{
 			libewf_serialized_string_free(
-			 &( ( *single_file_entry )->name ),
+			 &( ( *lef_file_entry )->name ),
 			 NULL );
 		}
 		memory_free(
-		 *single_file_entry );
+		 *lef_file_entry );
 
-		*single_file_entry = NULL;
+		*lef_file_entry = NULL;
 	}
 	return( -1 );
 }
 
-/* Frees a single file entry
+/* Frees a file entry
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_free(
-     libewf_single_file_entry_t **single_file_entry,
+int libewf_lef_file_entry_free(
+     libewf_lef_file_entry_t **lef_file_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_free";
+	static char *function = "libewf_lef_file_entry_free";
 	int result            = 1;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( *single_file_entry != NULL )
+	if( *lef_file_entry != NULL )
 	{
-		if( ( *single_file_entry )->name != NULL )
+		if( ( *lef_file_entry )->name != NULL )
 		{
 			if( libewf_serialized_string_free(
-			     &( ( *single_file_entry )->name ),
+			     &( ( *lef_file_entry )->name ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -224,10 +224,10 @@ int libewf_single_file_entry_free(
 				result = -1;
 			}
 		}
-		if( ( *single_file_entry )->short_name != NULL )
+		if( ( *lef_file_entry )->short_name != NULL )
 		{
 			if( libewf_serialized_string_free(
-			     &( ( *single_file_entry )->short_name ),
+			     &( ( *lef_file_entry )->short_name ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -240,10 +240,10 @@ int libewf_single_file_entry_free(
 				result = -1;
 			}
 		}
-		if( ( *single_file_entry )->md5_hash != NULL )
+		if( ( *lef_file_entry )->md5_hash != NULL )
 		{
 			if( libewf_serialized_string_free(
-			     &( ( *single_file_entry )->md5_hash ),
+			     &( ( *lef_file_entry )->md5_hash ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -256,10 +256,10 @@ int libewf_single_file_entry_free(
 				result = -1;
 			}
 		}
-		if( ( *single_file_entry )->sha1_hash != NULL )
+		if( ( *lef_file_entry )->sha1_hash != NULL )
 		{
 			if( libewf_serialized_string_free(
-			     &( ( *single_file_entry )->sha1_hash ),
+			     &( ( *lef_file_entry )->sha1_hash ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -273,92 +273,92 @@ int libewf_single_file_entry_free(
 			}
 		}
 		memory_free(
-		 *single_file_entry );
+		 *lef_file_entry );
 
-		*single_file_entry = NULL;
+		*lef_file_entry = NULL;
 	}
 	return( result );
 }
 
-/* Clones the single file entry
+/* Clones the file entry
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_clone(
-     libewf_single_file_entry_t **destination_single_file_entry,
-     libewf_single_file_entry_t *source_single_file_entry,
+int libewf_lef_file_entry_clone(
+     libewf_lef_file_entry_t **destination_lef_file_entry,
+     libewf_lef_file_entry_t *source_lef_file_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_clone";
+	static char *function = "libewf_lef_file_entry_clone";
 
-	if( destination_single_file_entry == NULL )
+	if( destination_lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid destination single file entry.",
+		 "%s: invalid destination file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( *destination_single_file_entry != NULL )
+	if( *destination_lef_file_entry != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid destination single file entry value already set.",
+		 "%s: invalid destination file entry value already set.",
 		 function );
 
 		return( -1 );
 	}
-	if( source_single_file_entry == NULL )
+	if( source_lef_file_entry == NULL )
 	{
-		*destination_single_file_entry = NULL;
+		*destination_lef_file_entry = NULL;
 
 		return( 1 );
 	}
-	*destination_single_file_entry = memory_allocate_structure(
-			                  libewf_single_file_entry_t );
+	*destination_lef_file_entry = memory_allocate_structure(
+			               libewf_lef_file_entry_t );
 
-	if( *destination_single_file_entry == NULL )
+	if( *destination_lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create destination single file entry.",
+		 "%s: unable to create destination file entry.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_copy(
-	     *destination_single_file_entry,
-	     source_single_file_entry,
-	     sizeof( libewf_single_file_entry_t ) ) == NULL )
+	     *destination_lef_file_entry,
+	     source_lef_file_entry,
+	     sizeof( libewf_lef_file_entry_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy source to destination single file entry.",
+		 "%s: unable to copy source to destination file entry.",
 		 function );
 
 		memory_free(
-		 *destination_single_file_entry );
+		 *destination_lef_file_entry );
 
-		*destination_single_file_entry = NULL;
+		*destination_lef_file_entry = NULL;
 
 		return( -1 );
 	}
-	( *destination_single_file_entry )->name       = NULL;
-	( *destination_single_file_entry )->short_name = NULL;
-	( *destination_single_file_entry )->md5_hash   = NULL;
-	( *destination_single_file_entry )->sha1_hash  = NULL;
+	( *destination_lef_file_entry )->name       = NULL;
+	( *destination_lef_file_entry )->short_name = NULL;
+	( *destination_lef_file_entry )->md5_hash   = NULL;
+	( *destination_lef_file_entry )->sha1_hash  = NULL;
 
 	if( libewf_serialized_string_clone(
-	     &( ( *destination_single_file_entry )->name ),
-	     source_single_file_entry->name,
+	     &( ( *destination_lef_file_entry )->name ),
+	     source_lef_file_entry->name,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -371,8 +371,8 @@ int libewf_single_file_entry_clone(
 		goto on_error;
 	}
 	if( libewf_serialized_string_clone(
-	     &( ( *destination_single_file_entry )->short_name ),
-	     source_single_file_entry->short_name,
+	     &( ( *destination_lef_file_entry )->short_name ),
+	     source_lef_file_entry->short_name,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -385,8 +385,8 @@ int libewf_single_file_entry_clone(
 		goto on_error;
 	}
 	if( libewf_serialized_string_clone(
-	     &( ( *destination_single_file_entry )->md5_hash ),
-	     source_single_file_entry->md5_hash,
+	     &( ( *destination_lef_file_entry )->md5_hash ),
+	     source_lef_file_entry->md5_hash,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -399,8 +399,8 @@ int libewf_single_file_entry_clone(
 		goto on_error;
 	}
 	if( libewf_serialized_string_clone(
-	     &( ( *destination_single_file_entry )->sha1_hash ),
-	     source_single_file_entry->sha1_hash,
+	     &( ( *destination_lef_file_entry )->sha1_hash ),
+	     source_lef_file_entry->sha1_hash,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -415,10 +415,10 @@ int libewf_single_file_entry_clone(
 	return( 1 );
 
 on_error:
-	if( *destination_single_file_entry != NULL )
+	if( *destination_lef_file_entry != NULL )
 	{
-		libewf_single_file_entry_free(
-		 destination_single_file_entry,
+		libewf_lef_file_entry_free(
+		 destination_lef_file_entry,
 		 NULL );
 	}
 	return( -1 );
@@ -427,26 +427,26 @@ on_error:
 /* Reads a single file binary extents
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_read_binary_extents(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_binary_extents(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *offset_values  = NULL;
 	uint8_t *offset_value_string                  = NULL;
-	static char *function                         = "libewf_single_file_entry_read_binary_extents";
+	static char *function                         = "libewf_lef_file_entry_read_binary_extents";
 	size_t offset_value_string_size               = 0;
 	uint64_t value_64bit                          = 0;
 	int number_of_offset_values                   = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -528,7 +528,7 @@ int libewf_single_file_entry_read_binary_extents(
 
 			goto on_error;
 		}
-		single_file_entry->data_offset = (off64_t) value_64bit;
+		lef_file_entry->data_offset = (off64_t) value_64bit;
 
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     offset_values,
@@ -563,7 +563,7 @@ int libewf_single_file_entry_read_binary_extents(
 
 			goto on_error;
 		}
-		single_file_entry->data_size = (size64_t) value_64bit;
+		lef_file_entry->data_size = (size64_t) value_64bit;
 	}
 	if( libfvalue_split_utf8_string_free(
 	     &offset_values,
@@ -593,26 +593,26 @@ on_error:
 /* Reads a single file extended attributes
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_read_extended_attributes(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_extended_attributes(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	libewf_lef_extended_attribute_t *extended_attribute = NULL;
 	uint8_t *byte_stream                                = NULL;
-	static char *function                               = "libewf_single_file_entry_read_extended_attributes";
+	static char *function                               = "libewf_lef_file_entry_read_extended_attributes";
 	size_t byte_stream_offset                           = 0;
 	size_t byte_stream_size                             = 0;
 	ssize_t read_count                                  = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -785,24 +785,24 @@ on_error:
 	return( -1 );
 }
 
-/* Reads a single file entry short name
+/* Reads a file entry short name
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_read_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_read_short_name";
+	static char *function = "libewf_lef_file_entry_read_short_name";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -811,11 +811,11 @@ int libewf_single_file_entry_read_short_name(
 	return( 1 );
 }
 
-/* Reads a single file entry
+/* Reads a file entry
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_read_data(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_read_data(
+     libewf_lef_file_entry_t *lef_file_entry,
      libfvalue_split_utf8_string_t *types,
      const uint8_t *data,
      size_t data_size,
@@ -824,22 +824,21 @@ int libewf_single_file_entry_read_data(
 	libfvalue_split_utf8_string_t *values = NULL;
 	uint8_t *type_string                  = NULL;
 	uint8_t *value_string                 = NULL;
-	static char *function                 = "libewf_single_file_entry_read_data";
+	static char *function                 = "libewf_lef_file_entry_read_data";
 	size_t type_string_size               = 0;
-	size_t value_string_index             = 0;
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
 	int value_index                       = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1031,7 +1030,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->record_type = (uint32_t) value_64bit;
+				lef_file_entry->record_type = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 			      && ( type_string[ 1 ] == (uint8_t) 'i' )
@@ -1070,7 +1069,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->flags = (uint32_t) value_64bit;
+				lef_file_entry->flags = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' )
@@ -1104,7 +1103,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->source_identifier = (uint32_t) value_64bit;
+				lef_file_entry->source_identifier = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' )
@@ -1138,14 +1137,14 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->subject_identifier = (uint32_t) value_64bit;
+				lef_file_entry->subject_identifier = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
 			      && ( type_string[ 1 ] == (uint8_t) 'h' )
 			      && ( type_string[ 2 ] == (uint8_t) 'a' ) )
 			{
 				if( libewf_serialized_string_read_hexadecimal_data(
-				     single_file_entry->sha1_hash,
+				     lef_file_entry->sha1_hash,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1164,8 +1163,8 @@ int libewf_single_file_entry_read_data(
 			      && ( type_string[ 1 ] == (uint8_t) 'n' )
 			      && ( type_string[ 2 ] == (uint8_t) 'h' ) )
 			{
-				if( libewf_single_file_entry_read_short_name(
-				     single_file_entry,
+				if( libewf_lef_file_entry_read_short_name(
+				     lef_file_entry,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1205,7 +1204,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->access_time = (int32_t) value_64bit;
+				lef_file_entry->access_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1217,8 +1216,8 @@ int libewf_single_file_entry_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'b' )
 			      && ( type_string[ 1 ] == (uint8_t) 'e' ) )
 			{
-				if( libewf_single_file_entry_read_binary_extents(
-				     single_file_entry,
+				if( libewf_lef_file_entry_read_binary_extents(
+				     lef_file_entry,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1255,7 +1254,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->creation_time = (int32_t) value_64bit;
+				lef_file_entry->creation_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
@@ -1277,7 +1276,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->deletion_time = (int32_t) value_64bit;
+				lef_file_entry->deletion_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
@@ -1299,13 +1298,13 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->duplicate_data_offset = (off64_t) value_64bit;
+				lef_file_entry->duplicate_data_offset = (off64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'e' )
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
-				if( libewf_single_file_entry_read_extended_attributes(
-				     single_file_entry,
+				if( libewf_lef_file_entry_read_extended_attributes(
+				     lef_file_entry,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1324,7 +1323,7 @@ int libewf_single_file_entry_read_data(
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
 				if( libewf_serialized_string_read_hexadecimal_data(
-				     single_file_entry->md5_hash,
+				     lef_file_entry->md5_hash,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1370,7 +1369,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->identifier = (uint32_t) value_64bit;
+				lef_file_entry->identifier = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'j' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1400,7 +1399,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->size = (size64_t) value_64bit;
+				lef_file_entry->size = (size64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
@@ -1422,7 +1421,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->entry_modification_time = (int32_t) value_64bit;
+				lef_file_entry->entry_modification_time = (int32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
@@ -1459,7 +1458,7 @@ int libewf_single_file_entry_read_data(
 				}
 				if( (int64_t) value_64bit >= 0 )
 				{
-					single_file_entry->permissions_identifier = (uint32_t) value_64bit;
+					lef_file_entry->permissions_identifier = (uint32_t) value_64bit;
 				}
 */
 			}
@@ -1487,7 +1486,7 @@ int libewf_single_file_entry_read_data(
 
 					goto on_error;
 				}
-				single_file_entry->modification_time = (int32_t) value_64bit;
+				lef_file_entry->modification_time = (int32_t) value_64bit;
 			}
 		}
 		else if( type_string_size == 2 )
@@ -1495,7 +1494,7 @@ int libewf_single_file_entry_read_data(
 			if( type_string[ 0 ] == (uint8_t) 'n' )
 			{
 				if( libewf_serialized_string_read_data(
-				     single_file_entry->name,
+				     lef_file_entry->name,
 				     value_string,
 				     value_string_size,
 				     error ) != 1 )
@@ -1522,12 +1521,12 @@ int libewf_single_file_entry_read_data(
 				 */
 				if( value_string == NULL )
 				{
-					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
+					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
 				}
 				else if( ( value_string_size == 2 )
 				      && ( value_string[ 0 ] == (uint8_t) '1' ) )
 				{
-					single_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
+					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
 				}
 			}
 		}
@@ -1567,20 +1566,20 @@ on_error:
 /* Retrieves the identifier
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_identifier(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_identifier(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *identifier,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_identifier";
+	static char *function = "libewf_lef_file_entry_get_identifier";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1596,7 +1595,7 @@ int libewf_single_file_entry_get_identifier(
 
 		return( -1 );
 	}
-	*identifier = single_file_entry->identifier;
+	*identifier = lef_file_entry->identifier;
 
 	return( 1 );
 }
@@ -1604,20 +1603,20 @@ int libewf_single_file_entry_get_identifier(
 /* Retrieves the type
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_type(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_type(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *type,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_type";
+	static char *function = "libewf_lef_file_entry_get_type";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1633,7 +1632,7 @@ int libewf_single_file_entry_get_type(
 
 		return( -1 );
 	}
-	*type = single_file_entry->type;
+	*type = lef_file_entry->type;
 
 	return( 1 );
 }
@@ -1641,20 +1640,20 @@ int libewf_single_file_entry_get_type(
 /* Retrieves the flags
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_flags(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_flags(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *flags,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_flags";
+	static char *function = "libewf_lef_file_entry_get_flags";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1670,7 +1669,7 @@ int libewf_single_file_entry_get_flags(
 
 		return( -1 );
 	}
-	*flags = single_file_entry->flags;
+	*flags = lef_file_entry->flags;
 
 	return( 1 );
 }
@@ -1678,20 +1677,20 @@ int libewf_single_file_entry_get_flags(
 /* Retrieves the data offset
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_data_offset(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_data_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
      off64_t *data_offset,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_data_offset";
+	static char *function = "libewf_lef_file_entry_get_data_offset";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1707,7 +1706,7 @@ int libewf_single_file_entry_get_data_offset(
 
 		return( -1 );
 	}
-	*data_offset = single_file_entry->data_offset;
+	*data_offset = lef_file_entry->data_offset;
 
 	return( 1 );
 }
@@ -1715,20 +1714,20 @@ int libewf_single_file_entry_get_data_offset(
 /* Retrieves the data size
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_data_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_data_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size64_t *data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_data_size";
+	static char *function = "libewf_lef_file_entry_get_data_size";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1744,7 +1743,7 @@ int libewf_single_file_entry_get_data_size(
 
 		return( -1 );
 	}
-	*data_size = single_file_entry->data_size;
+	*data_size = lef_file_entry->data_size;
 
 	return( 1 );
 }
@@ -1752,20 +1751,20 @@ int libewf_single_file_entry_get_data_size(
 /* Retrieves the duplicate data offset
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_duplicate_data_offset(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_duplicate_data_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
      off64_t *duplicate_data_offset,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_duplicate_data_offset";
+	static char *function = "libewf_lef_file_entry_get_duplicate_data_offset";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -1781,7 +1780,7 @@ int libewf_single_file_entry_get_duplicate_data_offset(
 
 		return( -1 );
 	}
-	*duplicate_data_offset = single_file_entry->duplicate_data_offset;
+	*duplicate_data_offset = lef_file_entry->duplicate_data_offset;
 
 	return( 1 );
 }
@@ -1790,27 +1789,27 @@ int libewf_single_file_entry_get_duplicate_data_offset(
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf8_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_name_size";
+	static char *function = "libewf_lef_file_entry_get_utf8_name_size";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string_size(
-	          single_file_entry->name,
+	          lef_file_entry->name,
 	          utf8_string_size,
 	          error );
 
@@ -1832,28 +1831,28 @@ int libewf_single_file_entry_get_utf8_name_size(
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf8_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_name";
+	static char *function = "libewf_lef_file_entry_get_utf8_name";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string(
-	          single_file_entry->name,
+	          lef_file_entry->name,
 	          utf8_string,
 	          utf8_string_size,
 	          error );
@@ -1876,27 +1875,27 @@ int libewf_single_file_entry_get_utf8_name(
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf16_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_name_size";
+	static char *function = "libewf_lef_file_entry_get_utf16_name_size";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string_size(
-	          single_file_entry->name,
+	          lef_file_entry->name,
 	          utf16_string_size,
 	          error );
 
@@ -1918,28 +1917,28 @@ int libewf_single_file_entry_get_utf16_name_size(
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf16_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_name";
+	static char *function = "libewf_lef_file_entry_get_utf16_name";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string(
-	          single_file_entry->name,
+	          lef_file_entry->name,
 	          utf16_string,
 	          utf16_string_size,
 	          error );
@@ -1962,27 +1961,27 @@ int libewf_single_file_entry_get_utf16_name(
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf8_short_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_short_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_short_name_size";
+	static char *function = "libewf_lef_file_entry_get_utf8_short_name_size";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string_size(
-	          single_file_entry->short_name,
+	          lef_file_entry->short_name,
 	          utf8_string_size,
 	          error );
 
@@ -2004,28 +2003,28 @@ int libewf_single_file_entry_get_utf8_short_name_size(
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf8_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_short_name";
+	static char *function = "libewf_lef_file_entry_get_utf8_short_name";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string(
-	          single_file_entry->short_name,
+	          lef_file_entry->short_name,
 	          utf8_string,
 	          utf8_string_size,
 	          error );
@@ -2048,27 +2047,27 @@ int libewf_single_file_entry_get_utf8_short_name(
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf16_short_name_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_short_name_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_short_name_size";
+	static char *function = "libewf_lef_file_entry_get_utf16_short_name_size";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string_size(
-	          single_file_entry->short_name,
+	          lef_file_entry->short_name,
 	          utf16_string_size,
 	          error );
 
@@ -2090,28 +2089,28 @@ int libewf_single_file_entry_get_utf16_short_name_size(
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_utf16_short_name(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_short_name(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_short_name";
+	static char *function = "libewf_lef_file_entry_get_utf16_short_name";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string(
-	          single_file_entry->short_name,
+	          lef_file_entry->short_name,
 	          utf16_string,
 	          utf16_string_size,
 	          error );
@@ -2133,20 +2132,20 @@ int libewf_single_file_entry_get_utf16_short_name(
 /* Retrieves the size
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_size(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_size(
+     libewf_lef_file_entry_t *lef_file_entry,
      size64_t *size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_size";
+	static char *function = "libewf_lef_file_entry_get_size";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -2162,7 +2161,7 @@ int libewf_single_file_entry_get_size(
 
 		return( -1 );
 	}
-	*size = single_file_entry->size;
+	*size = lef_file_entry->size;
 
 	return( 1 );
 }
@@ -2170,20 +2169,20 @@ int libewf_single_file_entry_get_size(
 /* Retrieves the record type
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_file_entry_get_record_type(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_record_type(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *record_type,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_record_type";
+	static char *function = "libewf_lef_file_entry_get_record_type";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -2199,221 +2198,221 @@ int libewf_single_file_entry_get_record_type(
 
 		return( -1 );
 	}
-	*record_type = single_file_entry->record_type;
+	*record_type = lef_file_entry->record_type;
 
 	return( 1 );
 }
 
 /* Retrieves the creation date and time
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_creation_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *creation_time,
+int libewf_lef_file_entry_get_creation_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_creation_time";
+	static char *function = "libewf_lef_file_entry_get_creation_time";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( creation_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid creation time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*creation_time = single_file_entry->creation_time;
+	*posix_time = lef_file_entry->creation_time;
 
 	return( 1 );
 }
 
 /* Retrieves the (file) modification (last written) date and time
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_modification_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *modification_time,
+int libewf_lef_file_entry_get_modification_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_modification_time";
+	static char *function = "libewf_lef_file_entry_get_modification_time";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( modification_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid modification time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*modification_time = single_file_entry->modification_time;
+	*posix_time = lef_file_entry->modification_time;
 
 	return( 1 );
 }
 
 /* Retrieves the access date and time
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_access_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *access_time,
+int libewf_lef_file_entry_get_access_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_access_time";
+	static char *function = "libewf_lef_file_entry_get_access_time";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( access_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid access time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*access_time = single_file_entry->access_time;
+	*posix_time = lef_file_entry->access_time;
 
 	return( 1 );
 }
 
 /* Retrieves the (file system entry) modification date and time
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_entry_modification_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *entry_modification_time,
+int libewf_lef_file_entry_get_entry_modification_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_entry_modification_time";
+	static char *function = "libewf_lef_file_entry_get_entry_modification_time";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( entry_modification_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid entry modification time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*entry_modification_time = single_file_entry->entry_modification_time;
+	*posix_time = lef_file_entry->entry_modification_time;
 
 	return( 1 );
 }
 
 /* Retrieves the deletion date and time
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_deletion_time(
-     libewf_single_file_entry_t *single_file_entry,
-     int32_t *deletion_time,
+int libewf_lef_file_entry_get_deletion_time(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int32_t *posix_time,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_deletion_time";
+	static char *function = "libewf_lef_file_entry_get_deletion_time";
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( deletion_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid deletion time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*deletion_time = single_file_entry->deletion_time;
+	*posix_time = lef_file_entry->deletion_time;
 
 	return( 1 );
 }
 
 /* Retrieves the UTF-8 encoded MD5 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_utf8_hash_value_md5(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_hash_value_md5(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_hash_value_md5";
+	static char *function = "libewf_lef_file_entry_get_utf8_hash_value_md5";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string(
-	          single_file_entry->md5_hash,
+	          lef_file_entry->md5_hash,
 	          utf8_string,
 	          utf8_string_size,
 	          error );
@@ -2433,30 +2432,30 @@ int libewf_single_file_entry_get_utf8_hash_value_md5(
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_utf16_hash_value_md5(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_hash_value_md5(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_hash_value_md5";
+	static char *function = "libewf_lef_file_entry_get_utf16_hash_value_md5";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string(
-	          single_file_entry->md5_hash,
+	          lef_file_entry->md5_hash,
 	          utf16_string,
 	          utf16_string_size,
 	          error );
@@ -2476,30 +2475,30 @@ int libewf_single_file_entry_get_utf16_hash_value_md5(
 }
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_utf8_hash_value_sha1(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf8_hash_value_sha1(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf8_hash_value_sha1";
+	static char *function = "libewf_lef_file_entry_get_utf8_hash_value_sha1";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf8_string(
-	          single_file_entry->sha1_hash,
+	          lef_file_entry->sha1_hash,
 	          utf8_string,
 	          utf8_string_size,
 	          error );
@@ -2519,30 +2518,30 @@ int libewf_single_file_entry_get_utf8_hash_value_sha1(
 }
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
- * Returns 1 if successful, 0 if value not present or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
-int libewf_single_file_entry_get_utf16_hash_value_sha1(
-     libewf_single_file_entry_t *single_file_entry,
+int libewf_lef_file_entry_get_utf16_hash_value_sha1(
+     libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_single_file_entry_get_utf16_hash_value_sha1";
+	static char *function = "libewf_lef_file_entry_get_utf16_hash_value_sha1";
 	int result            = 0;
 
-	if( single_file_entry == NULL )
+	if( lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single file entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
 	}
 	result = libewf_serialized_string_get_utf16_string(
-	          single_file_entry->sha1_hash,
+	          lef_file_entry->sha1_hash,
 	          utf16_string,
 	          utf16_string_size,
 	          error );

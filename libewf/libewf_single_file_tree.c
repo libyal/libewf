@@ -22,29 +22,29 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_lef_file_entry.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libuna.h"
-#include "libewf_single_file_entry.h"
 #include "libewf_single_file_tree.h"
 
-/* Retrieves the single file entry sub node for the specific UTF-8 formatted name
- * Returns 1 if successful, 0 if no such sub single file entry or -1 on error
+/* Retrieves the file entry sub node for the specific UTF-8 formatted name
+ * Returns 1 if successful, 0 in no such value or -1 on error
  */
 int libewf_single_file_tree_get_sub_node_by_utf8_name(
      libcdata_tree_node_t *node,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libcdata_tree_node_t **sub_node,
-     libewf_single_file_entry_t **sub_single_file_entry,
+     libewf_lef_file_entry_t **sub_lef_file_entry,
      libcerror_error_t **error )
 {
-	libcdata_tree_node_t *safe_sub_node                    = NULL;
-	libewf_single_file_entry_t *safe_sub_single_file_entry = NULL;
-	static char *function                                  = "libewf_single_file_tree_get_sub_node_by_utf8_name";
-	int number_of_sub_nodes                                = 0;
-	int result                                             = LIBUNA_COMPARE_GREATER;
-	int sub_node_index                                     = 0;
+	libcdata_tree_node_t *safe_sub_node              = NULL;
+	libewf_lef_file_entry_t *safe_sub_lef_file_entry = NULL;
+	static char *function                            = "libewf_single_file_tree_get_sub_node_by_utf8_name";
+	int number_of_sub_nodes                          = 0;
+	int result                                       = LIBUNA_COMPARE_GREATER;
+	int sub_node_index                               = 0;
 
 	if( node == NULL )
 	{
@@ -68,19 +68,19 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 		return( -1 );
 	}
-	if( sub_single_file_entry == NULL )
+	if( sub_lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sub single file entry.",
+		 "%s: invalid sub file entry.",
 		 function );
 
 		return( -1 );
 	}
-	*sub_node              = NULL;
-	*sub_single_file_entry = NULL;
+	*sub_node           = NULL;
+	*sub_lef_file_entry = NULL;
 
 	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
@@ -117,7 +117,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	{
 		if( libcdata_tree_node_get_value(
 		     safe_sub_node,
-		     (intptr_t **) &safe_sub_single_file_entry,
+		     (intptr_t **) &safe_sub_lef_file_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -130,20 +130,20 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 			return( -1 );
 		}
-		if( safe_sub_single_file_entry == NULL )
+		if( safe_sub_lef_file_entry == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing sub single file entry: %d.",
+			 "%s: missing sub file entry: %d.",
 			 function,
 			 sub_node_index );
 
 			return( -1 );
 		}
 		result = libewf_serialized_string_compare_with_utf8_string(
-			  safe_sub_single_file_entry->name,
+			  safe_sub_lef_file_entry->name,
 			  utf8_string,
 			  utf8_string_length,
 			  error );
@@ -161,8 +161,8 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 		}
 		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
-			*sub_node              = safe_sub_node;
-			*sub_single_file_entry = safe_sub_single_file_entry;
+			*sub_node           = safe_sub_node;
+			*sub_lef_file_entry = safe_sub_lef_file_entry;
 
 			break;
 		}
@@ -185,23 +185,23 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	return( 0 );
 }
 
-/* Retrieves the single file entry sub node for the specific UTF-16 formatted name
- * Returns 1 if successful, 0 if no such sub single file entry or -1 on error
+/* Retrieves the file entry sub node for the specific UTF-16 formatted name
+ * Returns 1 if successful, 0 in no such value or -1 on error
  */
 int libewf_single_file_tree_get_sub_node_by_utf16_name(
      libcdata_tree_node_t *node,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libcdata_tree_node_t **sub_node,
-     libewf_single_file_entry_t **sub_single_file_entry,
+     libewf_lef_file_entry_t **sub_lef_file_entry,
      libcerror_error_t **error )
 {
-	libcdata_tree_node_t *safe_sub_node                    = NULL;
-	libewf_single_file_entry_t *safe_sub_single_file_entry = NULL;
-	static char *function                                  = "libewf_single_file_tree_get_sub_node_by_utf16_name";
-	int number_of_sub_nodes                                = 0;
-	int result                                             = LIBUNA_COMPARE_GREATER;
-	int sub_node_index                                     = 0;
+	libcdata_tree_node_t *safe_sub_node              = NULL;
+	libewf_lef_file_entry_t *safe_sub_lef_file_entry = NULL;
+	static char *function                            = "libewf_single_file_tree_get_sub_node_by_utf16_name";
+	int number_of_sub_nodes                          = 0;
+	int result                                       = LIBUNA_COMPARE_GREATER;
+	int sub_node_index                               = 0;
 
 	if( node == NULL )
 	{
@@ -225,19 +225,19 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 		return( -1 );
 	}
-	if( sub_single_file_entry == NULL )
+	if( sub_lef_file_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sub single file entry.",
+		 "%s: invalid sub file entry.",
 		 function );
 
 		return( -1 );
 	}
-	*sub_node              = NULL;
-	*sub_single_file_entry = NULL;
+	*sub_node           = NULL;
+	*sub_lef_file_entry = NULL;
 
 	if( libcdata_tree_node_get_number_of_sub_nodes(
 	     node,
@@ -274,7 +274,7 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	{
 		if( libcdata_tree_node_get_value(
 		     safe_sub_node,
-		     (intptr_t **) &safe_sub_single_file_entry,
+		     (intptr_t **) &safe_sub_lef_file_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -287,20 +287,20 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 			return( -1 );
 		}
-		if( safe_sub_single_file_entry == NULL )
+		if( safe_sub_lef_file_entry == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing sub single file entry: %d.",
+			 "%s: missing sub file entry: %d.",
 			 function,
 			 sub_node_index );
 
 			return( -1 );
 		}
 		result = libewf_serialized_string_compare_with_utf16_string(
-			  safe_sub_single_file_entry->name,
+			  safe_sub_lef_file_entry->name,
 			  utf16_string,
 			  utf16_string_length,
 			  error );
@@ -318,8 +318,8 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 		}
 		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
-			*sub_node              = safe_sub_node;
-			*sub_single_file_entry = safe_sub_single_file_entry;
+			*sub_node           = safe_sub_node;
+			*sub_lef_file_entry = safe_sub_lef_file_entry;
 
 			break;
 		}

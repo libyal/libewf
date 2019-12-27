@@ -1,5 +1,5 @@
 /*
- * Single file tree functions
+ * Access control entry functions
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,39 +19,50 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SINGLE_FILE_TREE_H )
-#define _LIBEWF_SINGLE_FILE_TREE_H
+#if !defined( _LIBEWF_ACCESS_CONTROL_ENTRY_H )
+#define _LIBEWF_ACCESS_CONTROL_ENTRY_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libewf_lef_file_entry.h"
-#include "libewf_libcdata.h"
+#include "libewf_extern.h"
+#include "libewf_lef_permission.h"
 #include "libewf_libcerror.h"
+#include "libewf_libcthreads.h"
+#include "libewf_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_single_file_tree_get_sub_node_by_utf8_name(
-     libcdata_tree_node_t *single_file_tree_node,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcdata_tree_node_t **single_file_tree_sub_node,
-     libewf_lef_file_entry_t **sub_lef_file_entry,
+typedef struct libewf_internal_access_control_entry libewf_internal_access_control_entry_t;
+
+struct libewf_internal_access_control_entry
+{
+	/* The permission
+	 */
+	libewf_lef_permission_t *lef_permission;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
+};
+
+int libewf_access_control_entry_initialize(
+     libewf_access_control_entry_t **access_control_entry,
+     libewf_lef_permission_t *lef_permission,
      libcerror_error_t **error );
 
-int libewf_single_file_tree_get_sub_node_by_utf16_name(
-     libcdata_tree_node_t *single_file_tree_node,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libcdata_tree_node_t **single_file_tree_sub_node,
-     libewf_lef_file_entry_t **sub_lef_file_entry,
+LIBEWF_EXTERN \
+int libewf_access_control_entry_free(
+     libewf_access_control_entry_t **access_control_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBEWF_SINGLE_FILE_TREE_H ) */
+#endif /* !defined( _LIBEWF_ACCESS_CONTROL_ENTRY_H ) */
 

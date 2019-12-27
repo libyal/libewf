@@ -35,15 +35,10 @@
 
 #include "../libewf/libewf_lef_extended_attribute.h"
 
-uint8_t ewf_test_lef_extended_attribute_data1[ 123 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x41, 0x00, 0x74,
-	0x00, 0x74, 0x00, 0x72, 0x00, 0x69, 0x00, 0x62, 0x00, 0x75, 0x00, 0x74, 0x00, 0x65, 0x00, 0x73,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x00, 0x00, 0x05, 0x00,
-	0x00, 0x00, 0x44, 0x00, 0x6f, 0x00, 0x4e, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x50, 0x00, 0x72, 0x00,
-	0x6f, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x73, 0x00, 0x00, 0x00, 0x74, 0x00, 0x72, 0x00,
-	0x75, 0x00, 0x65, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x05,
-	0x00, 0x00, 0x00, 0x48, 0x00, 0x69, 0x00, 0x64, 0x00, 0x64, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x00,
-	0x00, 0x74, 0x00, 0x72, 0x00, 0x75, 0x00, 0x65, 0x00, 0x00, 0x00 };
+uint8_t ewf_test_lef_extended_attribute_data1[ 37 ] = {
+	0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x48, 0x00, 0x69,
+	0x00, 0x64, 0x00, 0x64, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x00, 0x00, 0x74, 0x00, 0x72, 0x00, 0x75,
+	0x00, 0x65, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -560,6 +555,15 @@ int ewf_test_lef_extended_attribute_read_data(
 	ssize_t read_count                                      = 0;
 	int result                                              = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests                         = 2;
+	int test_number                                         = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests                         = 2;
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Initialize test
 	 */
 	result = libewf_lef_extended_attribute_initialize(
@@ -584,7 +588,7 @@ int ewf_test_lef_extended_attribute_read_data(
 	read_count = libewf_lef_extended_attribute_read_data(
 	              lef_extended_attribute,
 	              ewf_test_lef_extended_attribute_data1,
-	              123,
+	              37,
 	              &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
@@ -596,13 +600,95 @@ int ewf_test_lef_extended_attribute_read_data(
 	 "error",
 	 error );
 
+	/* Clean up
+	 */
+	result = libewf_lef_extended_attribute_free(
+	          &lef_extended_attribute,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "lef_extended_attribute",
+	 lef_extended_attribute );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_lef_extended_attribute_initialize(
+	          &lef_extended_attribute,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "lef_extended_attribute",
+	 lef_extended_attribute );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	read_count = libewf_lef_extended_attribute_read_data(
 	              NULL,
 	              ewf_test_lef_extended_attribute_data1,
-	              123,
+	              37,
 	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	lef_extended_attribute->name = (uint8_t *) 0x12345678UL;
+
+	read_count = libewf_lef_extended_attribute_read_data(
+	              lef_extended_attribute,
+	              ewf_test_lef_extended_attribute_data1,
+	              37,
+	              &error );
+
+	lef_extended_attribute->name = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	lef_extended_attribute->value = (uint8_t *) 0x12345678UL;
+
+	read_count = libewf_lef_extended_attribute_read_data(
+	              lef_extended_attribute,
+	              ewf_test_lef_extended_attribute_data1,
+	              37,
+	              &error );
+
+	lef_extended_attribute->value = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
@@ -619,7 +705,7 @@ int ewf_test_lef_extended_attribute_read_data(
 	read_count = libewf_lef_extended_attribute_read_data(
 	              lef_extended_attribute,
 	              NULL,
-	              123,
+	              37,
 	              &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
@@ -670,6 +756,79 @@ int ewf_test_lef_extended_attribute_read_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_lef_extended_attribute_read_data with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		read_count = libewf_lef_extended_attribute_read_data(
+		              lef_extended_attribute,
+		              ewf_test_lef_extended_attribute_data1,
+		              37,
+		              &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_SSIZE(
+			 "read_count",
+			 read_count,
+			 (ssize_t) -1 );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_lef_extended_attribute_read_data with memcpy failing
+		 */
+		ewf_test_memcpy_attempts_before_fail = test_number;
+
+		read_count = libewf_lef_extended_attribute_read_data(
+		              lef_extended_attribute,
+		              ewf_test_lef_extended_attribute_data1,
+		              37,
+		              &error );
+
+		if( ewf_test_memcpy_attempts_before_fail != -1 )
+		{
+			ewf_test_memcpy_attempts_before_fail = -1;
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_SSIZE(
+			 "read_count",
+			 read_count,
+			 (ssize_t) -1 );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_lef_extended_attribute_free(
@@ -705,6 +864,751 @@ on_error:
 	}
 	return( 0 );
 }
+
+/* Tests the libewf_lef_extended_attribute_get_utf8_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf8_name_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_string_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_name_size(
+	          lef_extended_attribute,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_name_size(
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_name_size(
+	          lef_extended_attribute,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf8_name function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf8_name(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	uint8_t utf8_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_name(
+	          lef_extended_attribute,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_name(
+	          NULL,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_name(
+	          lef_extended_attribute,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_name(
+	          lef_extended_attribute,
+	          utf8_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_name(
+	          lef_extended_attribute,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf16_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf16_name_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_string_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_name_size(
+	          lef_extended_attribute,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_name_size(
+	          NULL,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_name_size(
+	          lef_extended_attribute,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf16_name function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf16_name(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	uint16_t utf16_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_name(
+	          lef_extended_attribute,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_name(
+	          NULL,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_name(
+	          lef_extended_attribute,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_name(
+	          lef_extended_attribute,
+	          utf16_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_name(
+	          lef_extended_attribute,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf8_value_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf8_value_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_string_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_value_size(
+	          lef_extended_attribute,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_value_size(
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_value_size(
+	          lef_extended_attribute,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf8_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf8_value(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	uint8_t utf8_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_value(
+	          lef_extended_attribute,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf8_value(
+	          NULL,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_value(
+	          lef_extended_attribute,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_value(
+	          lef_extended_attribute,
+	          utf8_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf8_value(
+	          lef_extended_attribute,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf16_value_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf16_value_size(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_string_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_value_size(
+	          lef_extended_attribute,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_value_size(
+	          NULL,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_value_size(
+	          lef_extended_attribute,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_extended_attribute_get_utf16_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_extended_attribute_get_utf16_value(
+     libewf_lef_extended_attribute_t *lef_extended_attribute )
+{
+	uint16_t utf16_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_value(
+	          lef_extended_attribute,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_extended_attribute_get_utf16_value(
+	          NULL,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_value(
+	          lef_extended_attribute,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_value(
+	          lef_extended_attribute,
+	          utf16_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_extended_attribute_get_utf16_value(
+	          lef_extended_attribute,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
@@ -774,7 +1678,7 @@ int main(
 	read_count = libewf_lef_extended_attribute_read_data(
 	              lef_extended_attribute,
 	              ewf_test_lef_extended_attribute_data1,
-	              123,
+	              37,
 	              &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
@@ -788,12 +1692,45 @@ int main(
 
 	/* Run tests
 	 */
-/* TODO implement
 	EWF_TEST_RUN_WITH_ARGS(
-	 "libewf_lef_extended_attribute_get_type",
-	 ewf_test_lef_extended_attribute_get_type,
+	 "libewf_lef_extended_attribute_get_utf8_name_size",
+	 ewf_test_lef_extended_attribute_get_utf8_name_size,
 	 lef_extended_attribute );
-*/
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf8_name",
+	 ewf_test_lef_extended_attribute_get_utf8_name,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf16_name_size",
+	 ewf_test_lef_extended_attribute_get_utf16_name_size,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf16_name",
+	 ewf_test_lef_extended_attribute_get_utf16_name,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf8_value_size",
+	 ewf_test_lef_extended_attribute_get_utf8_value_size,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf8_value",
+	 ewf_test_lef_extended_attribute_get_utf8_value,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf16_value_size",
+	 ewf_test_lef_extended_attribute_get_utf16_value_size,
+	 lef_extended_attribute );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_extended_attribute_get_utf16_value",
+	 ewf_test_lef_extended_attribute_get_utf16_value,
+	 lef_extended_attribute );
 
 	/* Clean up
 	 */
