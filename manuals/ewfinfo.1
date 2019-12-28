@@ -1,4 +1,4 @@
-.Dd December 27, 2019
+.Dd December 28, 2019
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -10,6 +10,7 @@
 .Op Fl B Ar bodyfile
 .Op Fl d Ar date_format
 .Op Fl f Ar format
+.Op Fl F Ar file_entry
 .Op Fl ehHimvV
 .Ar ewf_files
 .Sh DESCRIPTION
@@ -38,6 +39,8 @@ the date format, options: ctime (default), dm (day/month), md (month/day), iso86
 only show EWF read error information
 .It Fl f Ar format
 specify the output format, options: text (default), dfxml
+.It Fl F Ar file_entry
+show information about a specific file entry path
 .It Fl h
 shows this help
 .It Fl H

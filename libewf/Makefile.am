@@ -13,6 +13,7 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
+	@LIBFDATETIME_CPPFLAGS@ \
 	@LIBFGUID_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
 	@ZLIB_CPPFLAGS@ \
@@ -39,6 +40,7 @@ libewf_la_SOURCES = \
 	libewf.c \
 	libewf_access_control_entry.c libewf_access_control_entry.h \
 	libewf_analytical_data.c libewf_analytical_data.h \
+	libewf_attribute.c libewf_attribute.h \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
@@ -56,7 +58,6 @@ libewf_la_SOURCES = \
 	libewf_digest_section.c libewf_digest_section.h \
 	libewf_error.c libewf_error.h \
 	libewf_error2_section.c libewf_error2_section.h \
-	libewf_extended_attribute.c libewf_extended_attribute.h \
 	libewf_extern.h \
 	libewf_filename.c libewf_filename.h \
 	libewf_file_entry.c libewf_file_entry.h \
@@ -101,6 +102,7 @@ libewf_la_SOURCES = \
 	libewf_sha1_hash_section.c libewf_sha1_hash_section.h \
 	libewf_single_files.c libewf_single_files.h \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
+	libewf_source.c libewf_source.h \
 	libewf_support.c libewf_support.h \
 	libewf_types.h \
 	libewf_unused.h \
@@ -120,6 +122,7 @@ libewf_la_LIBADD = \
 	@LIBBFIO_LIBADD@ \
 	@LIBFCACHE_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
 	@ZLIB_LIBADD@ \

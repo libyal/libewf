@@ -36,15 +36,14 @@
 
 #include "../libewf/libewf_lef_source.h"
 
-uint8_t ewf_test_lef_source_types_data1[ 64 ] = {
-	0x70, 0x09, 0x6e, 0x09, 0x69, 0x64, 0x09, 0x65, 0x76, 0x09, 0x64, 0x6f, 0x09, 0x6c, 0x6f, 0x63,
-	0x09, 0x73, 0x65, 0x09, 0x6d, 0x66, 0x72, 0x09, 0x6d, 0x6f, 0x09, 0x74, 0x62, 0x09, 0x6c, 0x6f,
-	0x09, 0x70, 0x6f, 0x09, 0x61, 0x68, 0x09, 0x73, 0x68, 0x09, 0x67, 0x75, 0x09, 0x70, 0x67, 0x75,
-	0x09, 0x61, 0x71, 0x09, 0x69, 0x70, 0x09, 0x73, 0x69, 0x09, 0x6d, 0x61, 0x09, 0x64, 0x74, 0x0d };
+uint8_t ewf_test_lef_source_types_data1[ 28 ] = {
+	0x70, 0x09, 0x6e, 0x09, 0x69, 0x64, 0x09, 0x65, 0x76, 0x09, 0x74, 0x62, 0x09, 0x6c, 0x6f, 0x09,
+	0x70, 0x6f, 0x09, 0x61, 0x68, 0x09, 0x67, 0x75, 0x09, 0x61, 0x71, 0x0d };
 
-uint8_t ewf_test_lef_source_values_data1[ 26 ] = {
-        0x09, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x2d, 0x31, 0x09, 0x2d, 0x31,
-        0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x0d };
+uint8_t ewf_test_lef_source_values_data1[ 36 ] = {
+	0x09, 0x45, 0x09, 0x31, 0x09, 0x45, 0x09, 0x32, 0x36, 0x31, 0x38, 0x39, 0x30, 0x30, 0x34, 0x38,
+	0x09, 0x2d, 0x31, 0x09, 0x2d, 0x31, 0x09, 0x09, 0x09, 0x31, 0x31, 0x34, 0x32, 0x36, 0x38, 0x33,
+	0x36, 0x32, 0x34, 0x0a };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -59,7 +58,7 @@ int ewf_test_lef_source_initialize(
 	int result                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 12;
+	int number_of_malloc_fail_tests = 14;
 	int number_of_memset_fail_tests = 1;
 	int test_number                 = 0;
 #endif
@@ -294,7 +293,7 @@ int ewf_test_lef_source_clone(
 	int result                                  = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests             = 12;
+	int number_of_malloc_fail_tests             = 14;
 	int test_number                             = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -323,7 +322,7 @@ int ewf_test_lef_source_clone(
 
 	result = libfvalue_utf8_string_split(
 	          ewf_test_lef_source_types_data1,
-	          64,
+	          28,
 	          (uint8_t) '\t',
 	          &types,
 	          &error );
@@ -345,7 +344,7 @@ int ewf_test_lef_source_clone(
 	          source_lef_source,
 	          types,
 	          ewf_test_lef_source_values_data1,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -642,7 +641,7 @@ int ewf_test_lef_source_read_data(
 
 	result = libfvalue_utf8_string_split(
 	          ewf_test_lef_source_types_data1,
-	          64,
+	          28,
 	          (uint8_t) '\t',
 	          &types,
 	          &error );
@@ -666,7 +665,7 @@ int ewf_test_lef_source_read_data(
 	          lef_source,
 	          types,
 	          ewf_test_lef_source_values_data1,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -722,7 +721,7 @@ int ewf_test_lef_source_read_data(
 	          NULL,
 	          types,
 	          ewf_test_lef_source_values_data1,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -741,7 +740,7 @@ int ewf_test_lef_source_read_data(
 	          lef_source,
 	          NULL,
 	          ewf_test_lef_source_values_data1,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -760,7 +759,7 @@ int ewf_test_lef_source_read_data(
 	          lef_source,
 	          types,
 	          NULL,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -819,7 +818,7 @@ int ewf_test_lef_source_read_data(
 	          lef_source,
 	          types,
 	          ewf_test_lef_source_values_data1,
-	          26 - 2,
+	          36 - 12,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2082,6 +2081,822 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_lef_source_get_utf8_device_guid_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf8_device_guid_size(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_string_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf8_device_guid_size(
+	          lef_source,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf8_device_guid_size(
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_device_guid_size(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf8_device_guid function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf8_device_guid(
+     libewf_lef_source_t *lef_source )
+{
+	uint8_t utf8_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf8_device_guid(
+	          lef_source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf8_device_guid(
+	          NULL,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_device_guid(
+	          lef_source,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_device_guid(
+	          lef_source,
+	          utf8_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_device_guid(
+	          lef_source,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf16_device_guid_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf16_device_guid_size(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_string_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf16_device_guid_size(
+	          lef_source,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf16_device_guid_size(
+	          NULL,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_device_guid_size(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf16_device_guid function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf16_device_guid(
+     libewf_lef_source_t *lef_source )
+{
+	uint16_t utf16_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf16_device_guid(
+	          lef_source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf16_device_guid(
+	          NULL,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_device_guid(
+	          lef_source,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_device_guid(
+	          lef_source,
+	          utf16_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_device_guid(
+	          lef_source,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf8_primary_device_guid_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf8_primary_device_guid_size(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_string_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf8_primary_device_guid_size(
+	          lef_source,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf8_primary_device_guid_size(
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_primary_device_guid_size(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf8_primary_device_guid function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf8_primary_device_guid(
+     libewf_lef_source_t *lef_source )
+{
+	uint8_t utf8_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf8_primary_device_guid(
+	          lef_source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf8_primary_device_guid(
+	          NULL,
+	          utf8_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_primary_device_guid(
+	          lef_source,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_primary_device_guid(
+	          lef_source,
+	          utf8_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf8_primary_device_guid(
+	          lef_source,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf16_primary_device_guid_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf16_primary_device_guid_size(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_string_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf16_primary_device_guid_size(
+	          lef_source,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf16_primary_device_guid_size(
+	          NULL,
+	          &utf16_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_primary_device_guid_size(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_utf16_primary_device_guid function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_utf16_primary_device_guid(
+     libewf_lef_source_t *lef_source )
+{
+	uint16_t utf16_string[ 64 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_utf16_primary_device_guid(
+	          lef_source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_utf16_primary_device_guid(
+	          NULL,
+	          utf16_string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_primary_device_guid(
+	          lef_source,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_primary_device_guid(
+	          lef_source,
+	          utf16_string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_utf16_primary_device_guid(
+	          lef_source,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_lef_source_get_drive_type function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_source_get_drive_type(
+     libewf_lef_source_t *lef_source )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t drive_type       = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_source_get_drive_type(
+	          lef_source,
+	          &drive_type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_source_get_drive_type(
+	          NULL,
+	          &drive_type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_source_get_drive_type(
+	          lef_source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
 
 /* Tests the libewf_lef_source_get_utf8_manufacturer_size function
  * Returns 1 if successful or 0 if not
@@ -5146,7 +5961,7 @@ int main(
 
 	result = libfvalue_utf8_string_split(
 	          ewf_test_lef_source_types_data1,
-	          64,
+	          28,
 	          (uint8_t) '\t',
 	          &types,
 	          &error );
@@ -5168,7 +5983,7 @@ int main(
 	          lef_source,
 	          types,
 	          ewf_test_lef_source_values_data1,
-	          26,
+	          36,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -5245,6 +6060,51 @@ int main(
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_lef_source_get_utf16_location",
 	 ewf_test_lef_source_get_utf16_location,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf8_device_guid_size",
+	 ewf_test_lef_source_get_utf8_device_guid_size,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf8_device_guid",
+	 ewf_test_lef_source_get_utf8_device_guid,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf16_device_guid_size",
+	 ewf_test_lef_source_get_utf16_device_guid_size,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf16_device_guid",
+	 ewf_test_lef_source_get_utf16_device_guid,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf8_primary_device_guid_size",
+	 ewf_test_lef_source_get_utf8_primary_device_guid_size,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf8_primary_device_guid",
+	 ewf_test_lef_source_get_utf8_primary_device_guid,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf16_primary_device_guid_size",
+	 ewf_test_lef_source_get_utf16_primary_device_guid_size,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_utf16_primary_device_guid",
+	 ewf_test_lef_source_get_utf16_primary_device_guid,
+	 lef_source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_source_get_drive_type",
+	 ewf_test_lef_source_get_drive_type,
 	 lef_source );
 
 	EWF_TEST_RUN_WITH_ARGS(

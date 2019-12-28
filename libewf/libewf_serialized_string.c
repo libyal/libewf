@@ -316,7 +316,7 @@ int libewf_serialized_string_read_data(
 	if( ( data_size >= 1 )
 	 && ( data[ data_size - 1 ] == 0 ) )
 	{
-		data_size--;
+		data_size -= 1;
 	}
 	serialized_string->data = (uint8_t *) memory_allocate(
 	                                       sizeof( uint8_t ) * ( data_size + 1 ) );
@@ -425,7 +425,7 @@ int libewf_serialized_string_read_hexadecimal_data(
 	if( ( data_size >= 1 )
 	 && ( data[ data_size - 1 ] == 0 ) )
 	{
-		data_size--;
+		data_size -= 1;
 	}
 	serialized_string->data = (uint8_t *) memory_allocate(
 	                                       sizeof( uint8_t ) * ( data_size + 1 ) );

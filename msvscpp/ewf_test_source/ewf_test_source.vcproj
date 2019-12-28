@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_chunk_table"
-	ProjectGUID="{4F26882A-9D21-46D0-81FC-2448C6DA2F77}"
-	RootNamespace="ewf_test_chunk_table"
+	Name="ewf_test_source"
+	ProjectGUID="{FBEC455A-DAA0-44F9-BFA0-929FB56A56D1}"
+	RootNamespace="ewf_test_source"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_chunk_table.c"
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_source.c"
 				>
 			</File>
 		</Filter>
@@ -195,6 +195,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libewf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_libfvalue.h"
 				>
 			</File>
 			<File

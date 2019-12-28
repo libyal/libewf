@@ -39,7 +39,7 @@ struct libewf_lef_file_entry
 {
 	/* The identifier
 	 */
-	uint32_t identifier;
+	uint64_t identifier;
 
 	/* The type
 	 */
@@ -57,6 +57,10 @@ struct libewf_lef_file_entry
 	 */
 	size64_t data_size;
 
+	/* The GUID string
+	 */
+	libewf_serialized_string_t *guid;
+
 	/* The name string
 	 */
 	libewf_serialized_string_t *name;
@@ -69,21 +73,29 @@ struct libewf_lef_file_entry
 	 */
 	size64_t size;
 
+	/* The logical offset
+	 */
+	off64_t logical_offset;
+
+	/* The physical offset
+	 */
+	off64_t physical_offset;
+
 	/* The duplicate data offset
 	 */
 	off64_t duplicate_data_offset;
 
-	/* The identifier of the corresponding source
+	/* The identifier of the source of the file entry
 	 */
-	uint32_t source_identifier;
+	int source_identifier;
 
 	/* The identifier of the corresponding subject
 	 */
 	uint32_t subject_identifier;
 
-	/* The identifier of the corresponding permissions
+	/* The permission group index
 	 */
-	uint32_t permissions_identifier;
+	int permission_group_index;
 
 	/* The record type
 	 */
@@ -163,7 +175,7 @@ int libewf_lef_file_entry_read_data(
 
 int libewf_lef_file_entry_get_identifier(
      libewf_lef_file_entry_t *lef_file_entry,
-     uint32_t *identifier,
+     uint64_t *identifier,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_type(
@@ -186,9 +198,41 @@ int libewf_lef_file_entry_get_data_size(
      size64_t *data_size,
      libcerror_error_t **error );
 
+int libewf_lef_file_entry_get_logical_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
+     off64_t *logical_offset,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_physical_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
+     off64_t *physical_offset,
+     libcerror_error_t **error );
+
 int libewf_lef_file_entry_get_duplicate_data_offset(
      libewf_lef_file_entry_t *lef_file_entry,
      off64_t *duplicate_data_offset,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_utf8_guid_size(
+     libewf_lef_file_entry_t *lef_file_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_utf8_guid(
+     libewf_lef_file_entry_t *lef_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_utf16_guid_size(
+     libewf_lef_file_entry_t *lef_file_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_utf16_guid(
+     libewf_lef_file_entry_t *lef_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_utf8_name_size(
@@ -238,6 +282,16 @@ int libewf_lef_file_entry_get_utf16_short_name(
 int libewf_lef_file_entry_get_size(
      libewf_lef_file_entry_t *lef_file_entry,
      size64_t *size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_source_identifier(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *source_identifier,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_permission_group_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *permission_group_index,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_record_type(

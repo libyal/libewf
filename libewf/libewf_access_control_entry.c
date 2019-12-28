@@ -185,3 +185,832 @@ int libewf_access_control_entry_free(
 	return( result );
 }
 
+/* Retrieves the (property) type
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_access_control_entry_get_type(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *type,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_type";
+	int result                                                            = 1;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_permission_get_property_type(
+	     internal_access_control_entry->lef_permission,
+	     type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve property type.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-8 encoded identifier
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf8_identifier_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf8_identifier_size";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf8_identifier_size(
+	          internal_access_control_entry->lef_permission,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 identifier size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-8 encoded identifier value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf8_identifier(
+     libewf_access_control_entry_t *access_control_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf8_identifier";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf8_identifier(
+	          internal_access_control_entry->lef_permission,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 identifier size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-16 encoded identifier
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf16_identifier_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf16_identifier_size";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf16_identifier_size(
+	          internal_access_control_entry->lef_permission,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 identifier size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded identifier value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf16_identifier(
+     libewf_access_control_entry_t *access_control_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf16_identifier";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf16_identifier(
+	          internal_access_control_entry->lef_permission,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 identifier size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf8_name_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf8_name_size";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf8_name_size(
+	          internal_access_control_entry->lef_permission,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-8 encoded name value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf8_name(
+     libewf_access_control_entry_t *access_control_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf8_name";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf8_name(
+	          internal_access_control_entry->lef_permission,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf16_name_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf16_name_size";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf16_name_size(
+	          internal_access_control_entry->lef_permission,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded name value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+int libewf_access_control_entry_get_utf16_name(
+     libewf_access_control_entry_t *access_control_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_utf16_name";
+	int result                                                            = 0;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_utf16_name(
+	          internal_access_control_entry->lef_permission,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the access mask
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_access_control_entry_get_access_mask(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *access_mask,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_access_mask";
+	int result                                                            = 1;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_access_mask(
+	          internal_access_control_entry->lef_permission,
+	          access_mask,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access mask.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the flags
+ * Contains Windows NT access control entry (ACE) flags
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_access_control_entry_get_flags(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *flags,
+     libcerror_error_t **error )
+{
+	libewf_internal_access_control_entry_t *internal_access_control_entry = NULL;
+	static char *function                                                 = "libewf_access_control_entry_get_flags";
+	int result                                                            = 1;
+
+	if( access_control_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access control entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_access_control_entry = (libewf_internal_access_control_entry_t *) access_control_entry;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libewf_lef_permission_get_ace_flags(
+	          internal_access_control_entry->lef_permission,
+	          flags,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve ACE flags.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_access_control_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+

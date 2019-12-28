@@ -100,6 +100,19 @@ int libewf_lef_file_entry_initialize(
 		return( -1 );
 	}
 	if( libewf_serialized_string_initialize(
+	     &( ( *lef_file_entry )->guid ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create GUID string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
 	     &( ( *lef_file_entry )->name ),
 	     error ) != 1 )
 	{
@@ -151,8 +164,9 @@ int libewf_lef_file_entry_initialize(
 
 		goto on_error;
 	}
-	( *lef_file_entry )->data_offset           = -1;
-	( *lef_file_entry )->duplicate_data_offset = -1;
+	( *lef_file_entry )->data_offset            = -1;
+	( *lef_file_entry )->duplicate_data_offset  = -1;
+	( *lef_file_entry )->permission_group_index = 0;
 
 	return( 1 );
 
@@ -175,6 +189,12 @@ on_error:
 		{
 			libewf_serialized_string_free(
 			 &( ( *lef_file_entry )->name ),
+			 NULL );
+		}
+		if( ( *lef_file_entry )->guid != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *lef_file_entry )->guid ),
 			 NULL );
 		}
 		memory_free(
@@ -208,6 +228,22 @@ int libewf_lef_file_entry_free(
 	}
 	if( *lef_file_entry != NULL )
 	{
+		if( ( *lef_file_entry )->guid != NULL )
+		{
+			if( libewf_serialized_string_free(
+			     &( ( *lef_file_entry )->guid ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free GUID string.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *lef_file_entry )->name != NULL )
 		{
 			if( libewf_serialized_string_free(
@@ -351,11 +387,26 @@ int libewf_lef_file_entry_clone(
 
 		return( -1 );
 	}
+	( *destination_lef_file_entry )->guid       = NULL;
 	( *destination_lef_file_entry )->name       = NULL;
 	( *destination_lef_file_entry )->short_name = NULL;
 	( *destination_lef_file_entry )->md5_hash   = NULL;
 	( *destination_lef_file_entry )->sha1_hash  = NULL;
 
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_lef_file_entry )->guid ),
+	     source_lef_file_entry->guid,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination GUID string.",
+		 function );
+
+		goto on_error;
+	}
 	if( libewf_serialized_string_clone(
 	     &( ( *destination_lef_file_entry )->name ),
 	     source_lef_file_entry->name,
@@ -433,12 +484,12 @@ int libewf_lef_file_entry_read_binary_extents(
      size_t data_size,
      libcerror_error_t **error )
 {
-	libfvalue_split_utf8_string_t *offset_values  = NULL;
-	uint8_t *offset_value_string                  = NULL;
-	static char *function                         = "libewf_lef_file_entry_read_binary_extents";
-	size_t offset_value_string_size               = 0;
-	uint64_t value_64bit                          = 0;
-	int number_of_offset_values                   = 0;
+	libfvalue_split_utf8_string_t *values = NULL;
+	uint8_t *value_string                 = NULL;
+	static char *function                 = "libewf_lef_file_entry_read_binary_extents";
+	size_t value_string_size              = 0;
+	uint64_t value_64bit                  = 0;
+	int number_of_values                  = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -455,65 +506,65 @@ int libewf_lef_file_entry_read_binary_extents(
 	     data,
 	     data_size,
 	     (uint8_t) ' ',
-	     &offset_values,
+	     &values,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split string into offset values.",
+		 "%s: unable to split string into values.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfvalue_split_utf8_string_get_number_of_segments(
-	     offset_values,
-	     &number_of_offset_values,
+	     values,
+	     &number_of_values,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of offset values",
+		 "%s: unable to retrieve number of values",
 		 function );
 
 		goto on_error;
 	}
-	if( ( number_of_offset_values != 1 )
-	 && ( number_of_offset_values != 3 ) )
+	if( ( number_of_values != 1 )
+	 && ( number_of_values != 3 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported number of offset values.",
+		 "%s: unsupported number of values.",
 		 function );
 
 		goto on_error;
 	}
-	if( number_of_offset_values == 3 )
+	if( number_of_values == 3 )
 	{
 		if( libfvalue_split_utf8_string_get_segment_by_index(
-		     offset_values,
+		     values,
 		     1,
-		     &offset_value_string,
-		     &offset_value_string_size,
+		     &value_string,
+		     &value_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve offset value string: 1.",
+			 "%s: unable to retrieve value string: 1.",
 			 function );
 
 			goto on_error;
 		}
 		if( libfvalue_utf8_string_copy_to_integer(
-		     offset_value_string,
-		     offset_value_string_size,
+		     value_string,
+		     value_string_size,
 		     &value_64bit,
 		     64,
 		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
@@ -531,24 +582,24 @@ int libewf_lef_file_entry_read_binary_extents(
 		lef_file_entry->data_offset = (off64_t) value_64bit;
 
 		if( libfvalue_split_utf8_string_get_segment_by_index(
-		     offset_values,
+		     values,
 		     2,
-		     &offset_value_string,
-		     &offset_value_string_size,
+		     &value_string,
+		     &value_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve offset value string: 2.",
+			 "%s: unable to retrieve value string: 2.",
 			 function );
 
 			goto on_error;
 		}
 		if( libfvalue_utf8_string_copy_to_integer(
-		     offset_value_string,
-		     offset_value_string_size,
+		     value_string,
+		     value_string_size,
 		     &value_64bit,
 		     64,
 		     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
@@ -566,14 +617,14 @@ int libewf_lef_file_entry_read_binary_extents(
 		lef_file_entry->data_size = (size64_t) value_64bit;
 	}
 	if( libfvalue_split_utf8_string_free(
-	     &offset_values,
+	     &values,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split offset values.",
+		 "%s: unable to free split values.",
 		 function );
 
 		goto on_error;
@@ -581,10 +632,10 @@ int libewf_lef_file_entry_read_binary_extents(
 	return( 1 );
 
 on_error:
-	if( offset_values != NULL )
+	if( values != NULL )
 	{
 		libfvalue_split_utf8_string_free(
-		 &offset_values,
+		 &values,
 		 NULL );
 	}
 	return( -1 );
@@ -794,7 +845,12 @@ int libewf_lef_file_entry_read_short_name(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_lef_file_entry_read_short_name";
+	libfvalue_split_utf8_string_t *values = NULL;
+	uint8_t *value_string                 = NULL;
+	static char *function                 = "libewf_lef_file_entry_read_short_name";
+	size_t value_string_size              = 0;
+	uint64_t short_name_size              = 0;
+	int number_of_values                  = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -807,8 +863,150 @@ int libewf_lef_file_entry_read_short_name(
 
 		return( -1 );
 	}
-/* TODO implement */
+	if( libfvalue_utf8_string_split(
+	     data,
+	     data_size,
+	     (uint8_t) ' ',
+	     &values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to split string into values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_number_of_segments(
+	     values,
+	     &number_of_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_values != 2 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported number of values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     values,
+	     0,
+	     &value_string,
+	     &value_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_copy_to_integer(
+	     value_string,
+	     value_string_size,
+	     &short_name_size,
+	     64,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to set record type.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     values,
+	     1,
+	     &value_string,
+	     &value_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string: 1.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( short_name_size > (uint64_t) SSIZE_MAX )
+	 || ( (size_t) short_name_size != value_string_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid short name size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( value_string != NULL )
+	 && ( value_string_size > 0 ) )
+	{
+		if( libewf_serialized_string_read_data(
+		     lef_file_entry->short_name,
+		     value_string,
+		     value_string_size - 1,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read short name string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfvalue_split_utf8_string_free(
+	     &values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free split values.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
+
+on_error:
+	if( values != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &values,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Reads a file entry
@@ -933,14 +1131,6 @@ int libewf_lef_file_entry_read_data(
 
 			goto on_error;
 		}
-		/* Remove trailing carriage return
-		 */
-		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			type_string[ type_string_size - 2 ] = 0;
-
-			type_string_size -= 1;
-		}
 		if( value_index >= number_of_values )
 		{
 			value_string      = NULL;
@@ -972,14 +1162,6 @@ int libewf_lef_file_entry_read_data(
 				value_string      = NULL;
 				value_string_size = 0;
 			}
-			/* Remove trailing carriage return
-			 */
-			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-			{
-				value_string[ value_string_size - 2 ] = 0;
-
-				value_string_size -= 1;
-			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -991,7 +1173,8 @@ int libewf_lef_file_entry_read_data(
 			 (char *) value_string );
 		}
 #endif
-		if( value_string == NULL )
+		if( ( value_string == NULL )
+		 || ( value_string_size == 0 ) )
 		{
 			/* Ignore empty values
 			 */
@@ -1036,6 +1219,21 @@ int libewf_lef_file_entry_read_data(
 			      && ( type_string[ 1 ] == (uint8_t) 'i' )
 			      && ( type_string[ 2 ] == (uint8_t) 'd' ) )
 			{
+				if( libewf_serialized_string_read_hexadecimal_data(
+				     lef_file_entry->guid,
+				     value_string,
+				     value_string_size - 1,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read GUID.",
+					 function );
+
+					goto on_error;
+				}
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'o' )
 			      && ( type_string[ 1 ] == (uint8_t) 'p' )
@@ -1092,7 +1290,8 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				if( value_64bit > (uint64_t) UINT32_MAX )
+				if( ( (int64_t) value_64bit < (int64_t) 0 )
+				 || ( (int64_t) value_64bit > (int64_t) INT_MAX ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1103,7 +1302,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->source_identifier = (uint32_t) value_64bit;
+				lef_file_entry->source_identifier = (int) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 's' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' )
@@ -1146,7 +1345,7 @@ int libewf_lef_file_entry_read_data(
 				if( libewf_serialized_string_read_hexadecimal_data(
 				     lef_file_entry->sha1_hash,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1209,6 +1408,7 @@ int libewf_lef_file_entry_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
 			{
+/* TODO implement */
 			}
 			/* Data offset
 			 * consist of: unknown, offset and size
@@ -1325,7 +1525,7 @@ int libewf_lef_file_entry_read_data(
 				if( libewf_serialized_string_read_hexadecimal_data(
 				     lef_file_entry->md5_hash,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1344,7 +1544,7 @@ int libewf_lef_file_entry_read_data(
 				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
 				     value_string_size,
-				     &value_64bit,
+				     &( lef_file_entry->identifier ),
 				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
 				     error ) != 1 )
@@ -1358,26 +1558,33 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				if( value_64bit > (uint64_t) UINT32_MAX )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid identifier value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				lef_file_entry->identifier = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'j' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
 			{
+/* TODO implement */
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
 			{
+				if( libfvalue_utf8_string_copy_to_integer(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set logical offset.",
+					 function );
+
+					goto on_error;
+				}
+				lef_file_entry->logical_offset = (off64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
 			      && ( type_string[ 1 ] == (uint8_t) 's' ) )
@@ -1438,33 +1645,46 @@ int libewf_lef_file_entry_read_data(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set permissions identifier.",
+					 "%s: unable to set permission group index.",
 					 function );
 
 					goto on_error;
 				}
-/* TODO fix check
 				if( ( (int64_t) value_64bit < (int64_t) -1 )
-				 || ( (int64_t) value_64bit > (int64_t) UINT32_MAX ) )
+				 || ( (int64_t) value_64bit > (int64_t) INT_MAX ) )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid permissions identifier value out of bounds.",
+					 "%s: invalid permission group index value out of bounds.",
 					 function );
 
 					goto on_error;
 				}
-				if( (int64_t) value_64bit >= 0 )
-				{
-					lef_file_entry->permissions_identifier = (uint32_t) value_64bit;
-				}
-*/
+				lef_file_entry->permission_group_index = (int) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
 			{
+				if( libfvalue_utf8_string_copy_to_integer(
+				     value_string,
+				     value_string_size,
+				     &value_64bit,
+				     64,
+				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+					 "%s: unable to set physical offset.",
+					 function );
+
+					goto on_error;
+				}
+				lef_file_entry->physical_offset = (off64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'w' )
 			      && ( type_string[ 1 ] == (uint8_t) 'r' ) )
@@ -1496,7 +1716,7 @@ int libewf_lef_file_entry_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_file_entry->name,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1568,7 +1788,7 @@ on_error:
  */
 int libewf_lef_file_entry_get_identifier(
      libewf_lef_file_entry_t *lef_file_entry,
-     uint32_t *identifier,
+     uint64_t *identifier,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_identifier";
@@ -1748,6 +1968,80 @@ int libewf_lef_file_entry_get_data_size(
 	return( 1 );
 }
 
+/* Retrieves the logical offset
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_logical_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
+     off64_t *logical_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_logical_offset";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( logical_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid logical offset.",
+		 function );
+
+		return( -1 );
+	}
+	*logical_offset = lef_file_entry->logical_offset;
+
+	return( 1 );
+}
+
+/* Retrieves the physical offset
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_physical_offset(
+     libewf_lef_file_entry_t *lef_file_entry,
+     off64_t *physical_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_physical_offset";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( physical_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid physical offset.",
+		 function );
+
+		return( -1 );
+	}
+	*physical_offset = lef_file_entry->physical_offset;
+
+	return( 1 );
+}
+
 /* Retrieves the duplicate data offset
  * Returns 1 if successful or -1 on error
  */
@@ -1782,6 +2076,178 @@ int libewf_lef_file_entry_get_duplicate_data_offset(
 	}
 	*duplicate_data_offset = lef_file_entry->duplicate_data_offset;
 
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded GUID
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_utf8_guid_size(
+     libewf_lef_file_entry_t *lef_file_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_utf8_guid_size";
+	int result            = 0;
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string_size(
+	          lef_file_entry->guid,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve GUID UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_utf8_guid(
+     libewf_lef_file_entry_t *lef_file_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_utf8_guid";
+	int result            = 0;
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string(
+	          lef_file_entry->guid,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy GUID to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded GUID
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_utf16_guid_size(
+     libewf_lef_file_entry_t *lef_file_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_utf16_guid_size";
+	int result            = 0;
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string_size(
+	          lef_file_entry->guid,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve GUID UTF-16 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_utf16_guid(
+     libewf_lef_file_entry_t *lef_file_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_utf16_guid";
+	int result            = 0;
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string(
+	          lef_file_entry->guid,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy GUID to UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
@@ -2162,6 +2628,80 @@ int libewf_lef_file_entry_get_size(
 		return( -1 );
 	}
 	*size = lef_file_entry->size;
+
+	return( 1 );
+}
+
+/* Retrieves the source identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_source_identifier(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *source_identifier,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_source_identifier";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source identifier.",
+		 function );
+
+		return( -1 );
+	}
+	*source_identifier = lef_file_entry->source_identifier;
+
+	return( 1 );
+}
+
+/* Retrieves the permission group index
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_permission_group_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *permission_group_index,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_permission_group_index";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( permission_group_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid permission group index.",
+		 function );
+
+		return( -1 );
+	}
+	*permission_group_index = lef_file_entry->permission_group_index;
 
 	return( 1 );
 }

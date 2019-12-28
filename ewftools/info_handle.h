@@ -115,6 +115,12 @@ int info_handle_set_header_codepage(
      const system_character_t *string,
      libcerror_error_t **error );
 
+int info_handle_posix_time_value_fprint(
+     info_handle_t *info_handle,
+     const char *value_name,
+     int32_t value_32bit,
+     libcerror_error_t **error );
+
 int info_handle_section_header_fprint(
      info_handle_t *info_handle,
      const char *identifier,
@@ -217,7 +223,35 @@ int info_handle_tracks_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
-int info_handle_single_files_fprint(
+int info_handle_access_control_entry_value_fprint(
+     info_handle_t *info_handle,
+     libewf_access_control_entry_t *access_control_entry,
+     libcerror_error_t **error );
+
+int info_handle_source_value_fprint(
+     info_handle_t *info_handle,
+     libewf_source_t *source,
+     libcerror_error_t **error );
+
+int info_handle_file_entry_value_fprint(
+     info_handle_t *info_handle,
+     libewf_file_entry_t *file_entry,
+     const system_character_t *path,
+     libcerror_error_t **error );
+
+int info_handle_logical_files_hierarchy_fprint_file_entry(
+     info_handle_t *info_handle,
+     libewf_file_entry_t *file_entry,
+     const system_character_t *path,
+     uint8_t is_root,
+     libcerror_error_t **error );
+
+int info_handle_file_entry_fprint_by_path(
+     info_handle_t *info_handle,
+     const system_character_t *path,
+     libcerror_error_t **error );
+
+int info_handle_logical_files_hierarchy_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
@@ -225,6 +259,11 @@ int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      libewf_file_entry_t *file_entry,
      const system_character_t *path,
+     libcerror_error_t **error );
+
+int info_handle_image_fprint(
+     info_handle_t *info_handle,
+     char info_option,
      libcerror_error_t **error );
 
 int info_handle_dfxml_header_fprint(

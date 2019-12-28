@@ -8711,7 +8711,8 @@ int libewf_handle_get_root_file_entry(
 	{
 		result = libewf_file_entry_initialize(
 		          root_file_entry,
-		          internal_handle,
+		          handle,
+		          internal_handle->single_files,
 		          root_node,
 		          error );
 
@@ -8951,7 +8952,8 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 	{
 		if( libewf_file_entry_initialize(
 		     file_entry,
-		     internal_handle,
+		     (libewf_handle_t *) internal_handle,
+		     internal_handle->single_files,
 		     node,
 		     error ) != 1 )
 		{
@@ -9251,7 +9253,8 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 	{
 		if( libewf_file_entry_initialize(
 		     file_entry,
-		     internal_handle,
+		     (libewf_handle_t *) internal_handle,
+		     internal_handle->single_files,
 		     node,
 		     error ) != 1 )
 		{

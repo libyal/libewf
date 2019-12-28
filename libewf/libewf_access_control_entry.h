@@ -60,6 +60,70 @@ int libewf_access_control_entry_free(
      libewf_access_control_entry_t **access_control_entry,
      libcerror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_type(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *type,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf8_identifier_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf8_identifier(
+     libewf_access_control_entry_t *access_control_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf16_identifier_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf16_identifier(
+     libewf_access_control_entry_t *access_control_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf8_name_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf8_name(
+     libewf_access_control_entry_t *access_control_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf16_name_size(
+     libewf_access_control_entry_t *access_control_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_utf16_name(
+     libewf_access_control_entry_t *access_control_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_access_mask(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *access_mask,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

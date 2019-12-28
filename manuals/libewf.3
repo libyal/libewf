@@ -1,4 +1,4 @@
-.Dd December 27, 2019
+.Dd December 28, 2019
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -287,6 +287,8 @@ File entry functions
 .Ft int
 .Fn libewf_file_entry_free "libewf_file_entry_t **file_entry" "libewf_error_t **error"
 .Ft int
+.Fn libewf_file_entry_get_identifier "libewf_file_entry_t *file_entry" "uint64_t *identifier" "libewf_error_t **error"
+.Ft int
 .Fn libewf_file_entry_get_type "libewf_file_entry_t *file_entry" "uint8_t *type" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_flags "libewf_file_entry_t *file_entry" "uint32_t *flags" "libewf_error_t **error"
@@ -304,6 +306,14 @@ File entry functions
 .Fn libewf_file_entry_get_utf16_name_size "libewf_file_entry_t *file_entry" "size_t *utf16_string_size" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_utf16_name "libewf_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf8_short_name_size "libewf_file_entry_t *file_entry" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf8_short_name "libewf_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf16_short_name_size "libewf_file_entry_t *file_entry" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_utf16_short_name "libewf_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_size "libewf_file_entry_t *file_entry" "size64_t *size" "libewf_error_t **error"
 .Ft int
@@ -352,14 +362,92 @@ File entry functions
 Access control entry functions
 .Ft int
 .Fn libewf_access_control_entry_free "libewf_access_control_entry_t **access_control_entry" "libewf_error_t **error"
-.Pp
-Extended attribute functions
 .Ft int
-.Fn libewf_extended_attribute_free "libewf_extended_attribute_t **extended_attribute" "libewf_error_t **error"
+.Fn libewf_access_control_entry_get_type "libewf_access_control_entry_t *access_control_entry" "uint32_t *type" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf8_identifier_size "libewf_access_control_entry_t *access_control_entry" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf8_identifier "libewf_access_control_entry_t *access_control_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf16_identifier_size "libewf_access_control_entry_t *access_control_entry" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf16_identifier "libewf_access_control_entry_t *access_control_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf8_name_size "libewf_access_control_entry_t *access_control_entry" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf8_name "libewf_access_control_entry_t *access_control_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf16_name_size "libewf_access_control_entry_t *access_control_entry" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_utf16_name "libewf_access_control_entry_t *access_control_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_access_mask "libewf_access_control_entry_t *access_control_entry" "uint32_t *access_mask" "libewf_error_t **error"
+.Ft int
+.Fn libewf_access_control_entry_get_flags "libewf_access_control_entry_t *access_control_entry" "uint32_t *flags" "libewf_error_t **error"
+.Pp
+Attribute functions
+.Ft int
+.Fn libewf_attribute_free "libewf_attribute_t **attribute" "libewf_error_t **error"
 .Pp
 Source functions
 .Ft int
 .Fn libewf_source_free "libewf_source_t **source" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_name_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_name "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_name_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_name "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_evidence_number_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_evidence_number "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_evidence_number_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_evidence_number "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_location_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_location "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_location_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_location "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_device_guid_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_device_guid "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_device_guid_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_device_guid "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_primary_device_guid_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_primary_device_guid "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_primary_device_guid_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_primary_device_guid "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_manufacturer_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_manufacturer "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_manufacturer_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_manufacturer "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_model_size "libewf_source_t *source" "size_t *utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf8_model "libewf_source_t *source" "uint8_t *utf8_string" "size_t utf8_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_model_size "libewf_source_t *source" "size_t *utf16_string_size" "libewf_error_t **error"
+.Ft int
+.Fn libewf_source_get_utf16_model "libewf_source_t *source" "uint16_t *utf16_string" "size_t utf16_string_size" "libewf_error_t **error"
 .Pp
 Subject functions
 .Ft int

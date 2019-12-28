@@ -1741,21 +1741,21 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libewf_lef_permission_get_type function
+/* Tests the libewf_lef_permission_get_property_type function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_lef_permission_get_type(
+int ewf_test_lef_permission_get_property_type(
      libewf_lef_permission_t *lef_permission )
 {
 	libcerror_error_t *error = NULL;
-	uint32_t type            = 0;
+	uint32_t property_type   = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = libewf_lef_permission_get_type(
+	result = libewf_lef_permission_get_property_type(
 	          lef_permission,
-	          &type,
+	          &property_type,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1769,9 +1769,9 @@ int ewf_test_lef_permission_get_type(
 
 	/* Test error cases
 	 */
-	result = libewf_lef_permission_get_type(
+	result = libewf_lef_permission_get_property_type(
 	          NULL,
-	          &type,
+	          &property_type,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1786,7 +1786,7 @@ int ewf_test_lef_permission_get_type(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_lef_permission_get_type(
+	result = libewf_lef_permission_get_property_type(
 	          lef_permission,
 	          NULL,
 	          &error );
@@ -1814,21 +1814,21 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libewf_lef_permission_get_ace_access_mask function
+/* Tests the libewf_lef_permission_get_access_mask function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_lef_permission_get_ace_access_mask(
+int ewf_test_lef_permission_get_access_mask(
      libewf_lef_permission_t *lef_permission )
 {
 	libcerror_error_t *error = NULL;
-	uint32_t ace_access_mask = 0;
+	uint32_t access_mask     = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = libewf_lef_permission_get_ace_access_mask(
+	result = libewf_lef_permission_get_access_mask(
 	          lef_permission,
-	          &ace_access_mask,
+	          &access_mask,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1842,9 +1842,9 @@ int ewf_test_lef_permission_get_ace_access_mask(
 
 	/* Test error cases
 	 */
-	result = libewf_lef_permission_get_ace_access_mask(
+	result = libewf_lef_permission_get_access_mask(
 	          NULL,
-	          &ace_access_mask,
+	          &access_mask,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1859,7 +1859,7 @@ int ewf_test_lef_permission_get_ace_access_mask(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_lef_permission_get_ace_access_mask(
+	result = libewf_lef_permission_get_access_mask(
 	          lef_permission,
 	          NULL,
 	          &error );
@@ -2104,13 +2104,13 @@ int main(
 	 lef_permission );
 
 	EWF_TEST_RUN_WITH_ARGS(
-	 "libewf_lef_permission_get_type",
-	 ewf_test_lef_permission_get_type,
+	 "libewf_lef_permission_get_property_type",
+	 ewf_test_lef_permission_get_property_type,
 	 lef_permission );
 
 	EWF_TEST_RUN_WITH_ARGS(
-	 "libewf_lef_permission_get_ace_access_mask",
-	 ewf_test_lef_permission_get_ace_access_mask,
+	 "libewf_lef_permission_get_access_mask",
+	 ewf_test_lef_permission_get_access_mask,
 	 lef_permission );
 
 	EWF_TEST_RUN_WITH_ARGS(

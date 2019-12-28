@@ -1,5 +1,5 @@
 /*
- * Library extended_attribute type test program
+ * Library attribute type test program
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,12 +33,12 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
-#include "../libewf/libewf_extended_attribute.h"
+#include "../libewf/libewf_attribute.h"
 
-/* Tests the libewf_extended_attribute_free function
+/* Tests the libewf_attribute_free function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_extended_attribute_free(
+int ewf_test_attribute_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -46,7 +46,7 @@ int ewf_test_extended_attribute_free(
 
 	/* Test error cases
 	 */
-	result = libewf_extended_attribute_free(
+	result = libewf_attribute_free(
 	          NULL,
 	          &error );
 
@@ -90,13 +90,13 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-	/* TODO: add tests for libewf_extended_attribute_initialize */
+	/* TODO: add tests for libewf_attribute_initialize */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	EWF_TEST_RUN(
-	 "libewf_extended_attribute_free",
-	 ewf_test_extended_attribute_free );
+	 "libewf_attribute_free",
+	 ewf_test_attribute_free );
 
 	return( EXIT_SUCCESS );
 

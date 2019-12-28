@@ -39,7 +39,7 @@ struct libewf_lef_source
 {
 	/* The identifier
 	 */
-	uint32_t identifier;
+	int identifier;
 
 	/* The name string
 	 */
@@ -52,6 +52,18 @@ struct libewf_lef_source
 	/* The location string
 	 */
 	libewf_serialized_string_t *location;
+
+	/* The device GUID string
+	 */
+	libewf_serialized_string_t *device_guid;
+
+	/* The primary device GUID string
+	 */
+	libewf_serialized_string_t *primary_device_guid;
+
+	/* The drive type
+	 */
+	uint8_t drive_type;
 
 	/* The manufacturer string
 	 */
@@ -125,7 +137,7 @@ int libewf_lef_source_read_data(
 
 int libewf_lef_source_get_identifier(
      libewf_lef_source_t *lef_source,
-     uint32_t *identifier,
+     int *identifier,
      libcerror_error_t **error );
 
 int libewf_lef_source_get_utf8_name_size(
@@ -192,6 +204,55 @@ int libewf_lef_source_get_utf16_location(
      libewf_lef_source_t *lef_source,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf8_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf8_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf16_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf16_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf8_primary_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf8_primary_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf16_primary_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_utf16_primary_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_source_get_drive_type(
+     libewf_lef_source_t *lef_source,
+     uint8_t *drive_type,
      libcerror_error_t **error );
 
 int libewf_lef_source_get_utf8_manufacturer_size(

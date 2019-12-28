@@ -1,8 +1,11 @@
 TODO
+* rename extended attribute to attribute
+* change single files tree to B-tree
+* ewftools ignore name of root - check ewfmount / ewfveriry
+* access control entry / permission group add get_owner and get_group functions
 * file entry add 0 if not set support for values
 * file entry get permission group from single files
-* ewfinfo -H add bodyfile support
-* ewfinfo add -F support
+* ewfinfo -H complete bodyfile support
 
 * be able to handle large chunk tables for version 2
   - move chunk list access into chunk group

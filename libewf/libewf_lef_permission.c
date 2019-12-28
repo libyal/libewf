@@ -438,14 +438,6 @@ int libewf_lef_permission_read_data(
 
 			goto on_error;
 		}
-		/* Remove trailing carriage return
-		 */
-		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			type_string[ type_string_size - 2 ] = 0;
-
-			type_string_size -= 1;
-		}
 		if( value_index >= number_of_values )
 		{
 			value_string      = NULL;
@@ -477,14 +469,6 @@ int libewf_lef_permission_read_data(
 				value_string      = NULL;
 				value_string_size = 0;
 			}
-			/* Remove trailing carriage return
-			 */
-			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-			{
-				value_string[ value_string_size - 2 ] = 0;
-
-				value_string_size -= 1;
-			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -496,7 +480,8 @@ int libewf_lef_permission_read_data(
 			 (char *) value_string );
 		}
 #endif
-		if( value_string == NULL )
+		if( ( value_string == NULL )
+		 || ( value_string_size == 0 ) )
 		{
 			/* Ignore empty values
 			 */
@@ -504,8 +489,8 @@ int libewf_lef_permission_read_data(
 		else if( type_string_size == 4 )
 		{
 			if( ( type_string[ 0 ] == (uint8_t) 'n' )
-			 || ( type_string[ 1 ] == (uint8_t) 't' )
-			 || ( type_string[ 2 ] == (uint8_t) 'a' ) )
+			 && ( type_string[ 1 ] == (uint8_t) 't' )
+			 && ( type_string[ 2 ] == (uint8_t) 'a' ) )
 			{
 				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
@@ -519,7 +504,7 @@ int libewf_lef_permission_read_data(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set ACE access mask.",
+					 "%s: unable to set access mask.",
 					 function );
 
 					goto on_error;
@@ -530,16 +515,16 @@ int libewf_lef_permission_read_data(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid ACE access mask value out of bounds.",
+					 "%s: invalid access mask value out of bounds.",
 					 function );
 
 					goto on_error;
 				}
-				lef_permission->ace_access_mask = (uint32_t) value_64bit;
+				lef_permission->access_mask = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'n' )
-			      || ( type_string[ 1 ] == (uint8_t) 't' )
-			      || ( type_string[ 2 ] == (uint8_t) 'i' ) )
+			      && ( type_string[ 1 ] == (uint8_t) 't' )
+			      && ( type_string[ 2 ] == (uint8_t) 'i' ) )
 			{
 				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
@@ -572,8 +557,8 @@ int libewf_lef_permission_read_data(
 				lef_permission->ace_flags = (uint32_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'n' )
-			      || ( type_string[ 1 ] == (uint8_t) 't' )
-			      || ( type_string[ 2 ] == (uint8_t) 's' ) )
+			      && ( type_string[ 1 ] == (uint8_t) 't' )
+			      && ( type_string[ 2 ] == (uint8_t) 's' ) )
 			{
 /* TODO implement */
 			}
@@ -581,7 +566,7 @@ int libewf_lef_permission_read_data(
 		else if( type_string_size == 3 )
 		{
 			if( ( type_string[ 0 ] == (uint8_t) 'p' )
-			 || ( type_string[ 1 ] == (uint8_t) 'r' ) )
+			 && ( type_string[ 1 ] == (uint8_t) 'r' ) )
 			{
 				if( libfvalue_utf8_string_copy_to_integer(
 				     value_string,
@@ -595,7 +580,7 @@ int libewf_lef_permission_read_data(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_MEMORY,
 					 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to set type.",
+					 "%s: unable to set property type.",
 					 function );
 
 					goto on_error;
@@ -606,12 +591,12 @@ int libewf_lef_permission_read_data(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid type value out of bounds.",
+					 "%s: invalid property type value out of bounds.",
 					 function );
 
 					goto on_error;
 				}
-				lef_permission->type = (uint32_t) value_64bit;
+				lef_permission->property_type = (uint32_t) value_64bit;
 			}
 		}
 		else if( type_string_size == 2 )
@@ -621,7 +606,7 @@ int libewf_lef_permission_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_permission->name,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -639,7 +624,7 @@ int libewf_lef_permission_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_permission->identifier,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -651,15 +636,6 @@ int libewf_lef_permission_read_data(
 
 					goto on_error;
 				}
-			}
-		}
-		/* Do not ignore empty values
-		 */
-		if( type_string_size == 2 )
-		{
-			if( type_string[ 0 ] == (uint8_t) 'p' )
-			{
-/* TODO implement */
 			}
 		}
 	}
@@ -697,7 +673,7 @@ on_error:
 
 /* Retrieves the size of the UTF-8 encoded name value
  * The returned size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf8_name_size(
      libewf_lef_permission_t *lef_permission,
@@ -734,12 +710,12 @@ int libewf_lef_permission_get_utf8_name_size(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded name value
  * The size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf8_name(
      libewf_lef_permission_t *lef_permission,
@@ -778,12 +754,12 @@ int libewf_lef_permission_get_utf8_name(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name value
  * The returned size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf16_name_size(
      libewf_lef_permission_t *lef_permission,
@@ -820,12 +796,12 @@ int libewf_lef_permission_get_utf16_name_size(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded name value
  * The size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf16_name(
      libewf_lef_permission_t *lef_permission,
@@ -864,12 +840,12 @@ int libewf_lef_permission_get_utf16_name(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-8 encoded identifier value
  * The returned size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf8_identifier_size(
      libewf_lef_permission_t *lef_permission,
@@ -906,12 +882,12 @@ int libewf_lef_permission_get_utf8_identifier_size(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded identifier value
  * The size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf8_identifier(
      libewf_lef_permission_t *lef_permission,
@@ -950,12 +926,12 @@ int libewf_lef_permission_get_utf8_identifier(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded identifier value
  * The returned size includes the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf16_identifier_size(
      libewf_lef_permission_t *lef_permission,
@@ -992,12 +968,12 @@ int libewf_lef_permission_get_utf16_identifier_size(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded identifier value
  * The size should include the end of string character
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_permission_get_utf16_identifier(
      libewf_lef_permission_t *lef_permission,
@@ -1036,18 +1012,18 @@ int libewf_lef_permission_get_utf16_identifier(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
-/* Retrieves the type
+/* Retrieves the property type
  * Returns 1 if successful or -1 on error
  */
-int libewf_lef_permission_get_type(
+int libewf_lef_permission_get_property_type(
      libewf_lef_permission_t *lef_permission,
-     uint32_t *type,
+     uint32_t *property_type,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_lef_permission_get_type";
+	static char *function = "libewf_lef_permission_get_property_type";
 
 	if( lef_permission == NULL )
 	{
@@ -1060,31 +1036,31 @@ int libewf_lef_permission_get_type(
 
 		return( -1 );
 	}
-	if( type == NULL )
+	if( property_type == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid type.",
+		 "%s: invalid property type.",
 		 function );
 
 		return( -1 );
 	}
-	*type = lef_permission->type;
+	*property_type = lef_permission->property_type;
 
 	return( 1 );
 }
 
-/* Retrieves the Windows NT access control entry (ACE) access rights flags (ACCESS_MASK)
+/* Retrieves the access mask
  * Returns 1 if successful or -1 on error
  */
-int libewf_lef_permission_get_ace_access_mask(
+int libewf_lef_permission_get_access_mask(
      libewf_lef_permission_t *lef_permission,
-     uint32_t *ace_access_mask,
+     uint32_t *access_mask,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_lef_permission_get_ace_access_mask";
+	static char *function = "libewf_lef_permission_get_access_mask";
 
 	if( lef_permission == NULL )
 	{
@@ -1097,18 +1073,18 @@ int libewf_lef_permission_get_ace_access_mask(
 
 		return( -1 );
 	}
-	if( ace_access_mask == NULL )
+	if( access_mask == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid ACE access mask.",
+		 "%s: invalid access mask.",
 		 function );
 
 		return( -1 );
 	}
-	*ace_access_mask = lef_permission->ace_access_mask;
+	*access_mask = lef_permission->access_mask;
 
 	return( 1 );
 }

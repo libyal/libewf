@@ -46,13 +46,13 @@ struct libewf_lef_permission
 	 */
 	libewf_serialized_string_t *identifier;
 
-	/* The (permission) type
+	/* The property type
 	 */
-	uint32_t type;
+	uint32_t property_type;
 
-	/* The Windows NT access control entry (ACE) access rights flags (ACCESS_MASK)
+	/* The access mask
 	 */
-	uint32_t ace_access_mask;
+	uint32_t access_mask;
 
 	/* The Windows NT access control entry (ACE) flags
 	 */
@@ -123,14 +123,14 @@ int libewf_lef_permission_get_utf16_identifier(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_lef_permission_get_type(
+int libewf_lef_permission_get_property_type(
      libewf_lef_permission_t *lef_permission,
-     uint32_t *type,
+     uint32_t *property_type,
      libcerror_error_t **error );
 
-int libewf_lef_permission_get_ace_access_mask(
+int libewf_lef_permission_get_access_mask(
      libewf_lef_permission_t *lef_permission,
-     uint32_t *ace_access_mask,
+     uint32_t *access_mask,
      libcerror_error_t **error );
 
 int libewf_lef_permission_get_ace_flags(

@@ -1,5 +1,5 @@
 /*
- * Extended attribute functions
+ * Attribute functions
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_EXTENDED_ATTRIBUTE_H )
-#define _LIBEWF_EXTENDED_ATTRIBUTE_H
+#if !defined( _LIBEWF_ATTRIBUTE_H )
+#define _LIBEWF_ATTRIBUTE_H
 
 #include <common.h>
 #include <types.h>
@@ -35,10 +35,14 @@
 extern "C" {
 #endif
 
-typedef struct libewf_internal_extended_attribute libewf_internal_extended_attribute_t;
+typedef struct libewf_internal_attribute libewf_internal_attribute_t;
 
-struct libewf_internal_extended_attribute
+struct libewf_internal_attribute
 {
+	/* The extended attribute
+	 */
+	libewf_lef_extended_attribute_t *lef_extended_attribute;
+
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
 	 */
@@ -46,19 +50,19 @@ struct libewf_internal_extended_attribute
 #endif
 };
 
-int libewf_extended_attribute_initialize(
-     libewf_extended_attribute_t **extended_attribute,
+int libewf_attribute_initialize(
+     libewf_attribute_t **attribute,
      libewf_lef_extended_attribute_t *lef_extended_attribute,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
-int libewf_extended_attribute_free(
-     libewf_extended_attribute_t **extended_attribute,
+int libewf_attribute_free(
+     libewf_attribute_t **attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBEWF_EXTENDED_ATTRIBUTE_H ) */
+#endif /* !defined( _LIBEWF_ATTRIBUTE_H ) */
 

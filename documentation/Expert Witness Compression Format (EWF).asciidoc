@@ -142,7 +142,7 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.79 | J.B. Metz | August 2015 | Switched to asciidoc format.
 | 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
 | 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
-| 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to J. Sylve.
+| 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to K. Stone.
 |===
 
 :numbered:
@@ -560,13 +560,15 @@ Contains an integer
 Contains an integer which is -1 when value is not set
 | 7 | po | Physical offset +
 Contains an integer which is -1 when value is not set
-| 8 | ah | [yellow-background]*Unknown (MD5?)* +
-Contains a string
-| 9 | sh | [yellow-background]*Unknown (SHA1?)* +
-Contains a string +
+| 8 | ah | MD5 hash +
+Contains a string with the MD5 hash of the source
+| 9 | sh | SHA1 hash +
+Contains a string with the SHA1 hash of the source +
 (introduced in EnCase 6.19)
-| 10 | gu | [yellow-background]*Unknown (GUID)*
-| 11 | pgu | [yellow-background]*Unknown* +
+| 10 | gu | Device GUID +
+Contains a string with a GUID or "0" if not set
+| 11 | pgu | Primary device GUID +
+Contains a string with a GUID or "0" if not set +
 (introduced in EnCase 7)
 | 12 | aq | Acquisition date and time +
 Contains an integer with a POSIX timestamp
@@ -578,6 +580,10 @@ Line 10 contains the values defined by line 8.
 
 [NOTE]
 The default values of some of these values has changed around EnCase 6.12.
+
+If the "ha" value contains "00000000000000000000000000000000" this means the
+MD5 hash is not set. The same applies for the "sha" value when it contains
+"0000000000000000000000000000000000000000" the SHA1 has is not set.
 
 ===== [[subjects_category1]]Subjects category
 
@@ -932,7 +938,8 @@ Contains a string
 | 9 | sh | [yellow-background]*Unknown (SHA1?)* +
 Contains a string +
 (Introduced in linen 6.19 or earlier)
-| 10 | gu | [yellow-background]*Unknown (GUID)*
+| 10 | gu | Device GUID +
+Contains a string with a GUID or "0" if not set
 | 11 | aq | Acquisition date and time +
 Contains an integer with a POSIX timestamp
 |===
@@ -1930,8 +1937,7 @@ Contains a string
 Contains a string with either a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#security-identifier[Windows NT security identifier (SID)] or a POSIX user (uid) or group identifier (gid) in the format " number:" such as " 99:"
 | 4 | pr | Property type +
 See section: <<permission_types,Permission types>>
-| 5 | nta | Access mask +
-Contains an integer with a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#access-rights-flags-access_mask[Windows NT access rights flags (ACCESS_MASK)]
+| 5 | nta | Access mask
 | 6 | nti | [yellow-background]*Unknown (Windows NT access control entry (ACE) flags?)* +
 Contains an integer with a https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc#access-control-entry-ace-flags[Windows NT access control entry (ACE) flags] +
 Seen 0x10, which presubly corresponds with INHERITED_ACE?
@@ -1948,9 +1954,52 @@ Seen 0x10, which presubly corresponds with INHERITED_ACE?
 | 1 | | Group
 | 2 | | Allow
 3+|
-| 6 | | [yellow-background]*Unknown*
+| 6 | | Other
 3+|
 | 10 | | [yellow-background]*Unknown (permissions group?)*
+|===
+
+===== Access mask
+
+Access mask seen in combination with property types 0, 1 and 6
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| (empty) | | Owner or category root
+| 0x00000001 | `[Lst Fldr/Rd Data]` | List folder / Read data
+| 0x00000002 | `[Crt Fl/W Data]` | Create file / Write data
+3+|
+| 0x00000020 | `[Trav Fldr/X Fl]` | Traverse folder / Execute file
+|===
+
+Access mask seen in combination with property type 2
+
+....
+[0x001200a9] [R&X] [R] [Sync]
+[0x001301bf] [M] [R&X] [R] [W] [Sync]
+[0x001f01ff] [FC] [M] [R&X] [R] [W] [Sync]
+....
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| (empty) | | Owner or category root
+| 0x00000001 | |
+| 0x00000002 | |
+| 0x00000004 | |
+| 0x00000008 | |
+| 0x00000010 | |
+| 0x00000020 | |
+| 0x00000040 | |
+| 0x00000080 | |
+| 0x00000100 | |
+3+|
+| 0x00010000 | |
+| 0x00020000 | |
+| 0x00040000 | |
+| 0x00080000 | |
+| 0x00100000 | |
 |===
 
 ==== [[sources_category3]]Sources category
@@ -1974,7 +2023,7 @@ more information see the sections below.
 
 The remaining lines in the category consist of:
 
-* category root 
+* category root
   * zero or more source entries
 
 Each entry consist of 2 lines:
@@ -2035,15 +2084,15 @@ Contains an integer
 Contains an integer which is -1 when value is not set
 | 12 | po | Physical offset +
 Contains an integer which is -1 when value is not set
-| 13 | ah | [yellow-background]*Unknown (MD5?)* +
-Contains a string
-| 14 | sh | [yellow-background]*Unknown (SHA1?)* +
-Contains a string +
+| 13 | ah | MD5 hash +
+Contains a string with the MD5 hash of the source
+| 14 | sh | SHA1 hash +
+Contains a string with the SHA1 hash of the source +
 (introduced in EnCase 6.19)
-| 15 | gu | [yellow-background]*Unknown (GUID)* +
-Contains "0" if not set
-| 16 | pgu | [yellow-background]*Unknown (Physical GUID)* +
-Contains "0" if not set +
+| 15 | gu | Device GUID +
+Contains a string with a GUID or "0" if not set
+| 16 | pgu | Primary device GUID +
+Contains a string with a GUID or "0" if not set +
 (introduced in EnCase 7)
 | 17 | aq | Acquisition date and time +
 Contains an integer with a POSIX timestamp
@@ -2054,16 +2103,22 @@ Contains a string +
 [yellow-background]*Contains 1 if static, empty otherwise* +
 (introduced in EnCase 7.9)
 | 20 | ma | MAC address +
-Contains a string +
-Seen: "0" +
+Contains a string without separator characters +
 (introduced in EnCase 7.9)
-| 21 | dt | [yellow-background]*Unknown* +
-Seen: "f" +
+| 21 | dt | Drive type +
+Seen: "f" => "fixed" +
 (introduced in EnCase 7.9)
 |===
 
 The acquisition date and time is in the form of: "1142163845", which is a POSIX
 epoch timestamp and represents the date: March 12 2006, 11:44:05.
+
+If the "ha" value contains "00000000000000000000000000000000" this means the
+MD5 hash is not set. The same applies for the "sha" value when it contains
+"0000000000000000000000000000000000000000" the SHA1 has is not set.
+
+If the "ma" value contains "000000000000" this means the MAC address is not
+set.
 
 ==== [[subjects_category3]]Subjects category
 
@@ -2086,7 +2141,7 @@ more information see the sections below.
 
 The remaining lines in the category consist of:
 
-* category root 
+* category root
   * zero or more subject entries
 
 Each entry consist of 2 lines:
@@ -2148,7 +2203,7 @@ more information see the sections below.
 
 The remaining lines in the category consist of:
 
-* category root 
+* category root
   * zero or more file entries
     * zero or more sub file entries
       * ...
@@ -2169,16 +2224,6 @@ The 1st line of the category root entry consists of the following 2 values:
 | 1 | | 0 if not set or 26 if [yellow-background]*Unknown*
 | 2 | | The number of file entries in the category
 |===
-
-....
-0       12
-1                                                                                                               00000000000000000000000000000000                                        00000000000000000000000000000000                0
-       -1      
-
-26      1
-                1 0 0                                                                           1       1       LogicalEntries                  0                                                                                       
-                        
-....
 
 The 1st line of the file entry consists of the following 2 values:
 
@@ -2216,8 +2261,8 @@ Contains an integer that corresponds to an identifier in the <<subjects_category
 | 13 | dl | Deletion date and time
 | 14 | aq | Acquisition date and time +
 Contains an integer with a POSIX timestamp
-| 15 | ha | Hash +
-The MD5 hash of the file data
+| 15 | ha | MD5 hash +
+Contains a string with the MD5 hash of the file data
 | 16 | ls | File size +
 The file size specified in bytes +
 If the file size is 0 the data size should be 1
@@ -2228,15 +2273,16 @@ Contains an integer which is -1 when value is not set
 | 19 | po | Physical offset +
 Contains an integer which is -1 when value is not set
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
-| 20 | mid | [yellow-background]*Unknown (identifier?)* +
-Contains a GUID/UUID +
+| 20 | mid | GUID +
+Contains a string with a GUID +
 (introduced in EnCase 6.19)
 | 21 | cfi | [yellow-background]*Unknown* +
 (introduced in EnCase 6.14)
 | 22 | be | Binary extents +
 See section: <<binary_extents,Binary extents value>>
-| 23 | pm | Permissions identifier +
-Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set
+| 23 | pm | Permissions group index +
+Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set +
+The value is 0 by default
 | 24 | lpt | [yellow-background]*Unknown* +
 (introduced in EnCase 6.19)
 |===
@@ -2246,7 +2292,7 @@ The creation, access and last written date and time are in the form of:
 12 2006, 11:44:05.
 
 The "ha" value (Hash) consist of a MD5 hash string when file entries are
-hashed. If the "ha" value contains "00000000000000000000000000000000." this
+hashed. If the "ha" value contains "00000000000000000000000000000000" this
 means the MD5 hash is not set.
 
 ====== Ltree file entries
@@ -2269,8 +2315,8 @@ The entries of files and directories:
 [cols="1,1,5",options="header"]
 |===
 | Identifier number | Character in 29th line | Meaning
-| 1 | mid | [yellow-background]*Unknown (identifier?)* +
-Contains a GUID/UUID +
+| 1 | mid | GUID +
+Contains a string with a GUID
 | 2 | ls | File size +
 The file size specified in bytes +
 If the file size is 0 the data size should be 1
@@ -2285,14 +2331,16 @@ Contains an integer identifying the file entry
 | 9 | dl | Deletion date and time
 | 10 | sig | [yellow-background]*Unknown* +
 (Introduced in EnCase 7)
-| 11 | ha | Hash +
-The MD5 hash of the file data
+| 11 | ha | MD5 hash +
+Contains a string with the MD5 hash of the file data
 | 12 | sha | SHA1 hash +
 Judging by the size this value is assumed to be the SHA1 hash of the file data, does not seem to be currently set by EnCase +
 (Introduced in EnCase 7)
 | 13 | ent | [yellow-background]*Unknown* +
+Seen: 'B' +
 (Introduced in EnCase 7.9)
 | 14 | snh | Short (or DOS 8.3) name +
+See section: <<short_name,Short name>> +
 (Introduced in EnCase 7.9)
 | 15 | p | Is parent +
 1 => if the entry is a directory +
@@ -2305,8 +2353,9 @@ Contains an integer which is -1 when value is not set
 | 19 | po | Physical offset +
 Contains an integer which is -1 when value is not set
 [yellow-background]*The segment file in which the start of the data is stored, -1 for a single segment file ?*
-| 20 | pm | Permissions identifier +
-Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set
+| 20 | pm | Permissions group index +
+Contains an integer that corresponds to an identifier in the <<permissions_category3,Permissions category>> or -1 if not set +
+The value is 0 by default
 | 21 | oes | [yellow-background]*Unknown (Original extents)* +
 (Introduced in EnCase 7)
 | 22 | opr | Flags +
@@ -2332,9 +2381,22 @@ See section: <<extended_attributes,Extended attributes value>> +
 | 33 | lpt | [yellow-background]*Unknown*
 |===
 
-If the "ha" value contains "00000000000000000000000000000000." this means the
+If the "ha" value contains "00000000000000000000000000000000" this means the
 MD5 hash is not set. The same applies for the "sha" value when it contains
 "0000000000000000000000000000000000000000" the SHA1 has is not set.
+
+====== [[short_name]]Short name
+
+The short name ("snh") value contains 2 values:
+
+[cols="1,5",options="header"]
+|===
+| Value number | Value | Description
+| 1 | | The number of characters in the short name including the end-of-string character
+| 2 | | The short name string
+|===
+
+For example: "13 FILE10~1.TXT"
 
 ====== Original extents
 

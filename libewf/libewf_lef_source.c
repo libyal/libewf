@@ -134,6 +134,32 @@ int libewf_lef_source_initialize(
 		goto on_error;
 	}
 	if( libewf_serialized_string_initialize(
+	     &( ( *lef_source )->device_guid ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create device GUID string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
+	     &( ( *lef_source )->primary_device_guid ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create primary device GUID string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_initialize(
 	     &( ( *lef_source )->manufacturer ),
 	     error ) != 1 )
 	{
@@ -287,6 +313,18 @@ on_error:
 			 &( ( *lef_source )->manufacturer ),
 			 NULL );
 		}
+		if( ( *lef_source )->primary_device_guid != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *lef_source )->primary_device_guid ),
+			 NULL );
+		}
+		if( ( *lef_source )->device_guid != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *lef_source )->device_guid ),
+			 NULL );
+		}
 		if( ( *lef_source )->location != NULL )
 		{
 			libewf_serialized_string_free(
@@ -379,6 +417,38 @@ int libewf_lef_source_free(
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free location string.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *lef_source )->device_guid != NULL )
+		{
+			if( libewf_serialized_string_free(
+			     &( ( *lef_source )->device_guid ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free device GUID string.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *lef_source )->primary_device_guid != NULL )
+		{
+			if( libewf_serialized_string_free(
+			     &( ( *lef_source )->primary_device_guid ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free primary device GUID string.",
 				 function );
 
 				result = -1;
@@ -591,17 +661,19 @@ int libewf_lef_source_clone(
 
 		return( -1 );
 	}
-	( *destination_lef_source )->name            = NULL;
-	( *destination_lef_source )->evidence_number = NULL;
-	( *destination_lef_source )->location        = NULL;
-	( *destination_lef_source )->manufacturer    = NULL;
-	( *destination_lef_source )->model           = NULL;
-	( *destination_lef_source )->serial_number   = NULL;
-	( *destination_lef_source )->domain          = NULL;
-	( *destination_lef_source )->ip_address      = NULL;
-	( *destination_lef_source )->mac_address     = NULL;
-	( *destination_lef_source )->md5_hash        = NULL;
-	( *destination_lef_source )->sha1_hash       = NULL;
+	( *destination_lef_source )->name                = NULL;
+	( *destination_lef_source )->evidence_number     = NULL;
+	( *destination_lef_source )->location            = NULL;
+	( *destination_lef_source )->device_guid         = NULL;
+	( *destination_lef_source )->primary_device_guid = NULL;
+	( *destination_lef_source )->manufacturer        = NULL;
+	( *destination_lef_source )->model               = NULL;
+	( *destination_lef_source )->serial_number       = NULL;
+	( *destination_lef_source )->domain              = NULL;
+	( *destination_lef_source )->ip_address          = NULL;
+	( *destination_lef_source )->mac_address         = NULL;
+	( *destination_lef_source )->md5_hash            = NULL;
+	( *destination_lef_source )->sha1_hash           = NULL;
 
 	if( libewf_serialized_string_clone(
 	     &( ( *destination_lef_source )->name ),
@@ -641,6 +713,34 @@ int libewf_lef_source_clone(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to clone destination location string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_lef_source )->device_guid ),
+	     source_lef_source->device_guid,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination device GUID string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_serialized_string_clone(
+	     &( ( *destination_lef_source )->primary_device_guid ),
+	     source_lef_source->primary_device_guid,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone destination primary device GUID string.",
 		 function );
 
 		goto on_error;
@@ -891,14 +991,6 @@ int libewf_lef_source_read_data(
 
 			goto on_error;
 		}
-		/* Remove trailing carriage return
-		 */
-		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			type_string[ type_string_size - 2 ] = 0;
-
-			type_string_size -= 1;
-		}
 		if( value_index >= number_of_values )
 		{
 			value_string      = NULL;
@@ -930,14 +1022,6 @@ int libewf_lef_source_read_data(
 				value_string      = NULL;
 				value_string_size = 0;
 			}
-			/* Remove trailing carriage return
-			 */
-			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-			{
-				value_string[ value_string_size - 2 ] = 0;
-
-				value_string_size -= 1;
-			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -949,7 +1033,8 @@ int libewf_lef_source_read_data(
 			 (char *) value_string );
 		}
 #endif
-		if( value_string == NULL )
+		if( ( value_string == NULL )
+		 || ( value_string_size == 0 ) )
 		{
 			/* Ignore empty values
 			 */
@@ -963,7 +1048,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->location,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -983,7 +1068,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->manufacturer,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1000,7 +1085,21 @@ int libewf_lef_source_read_data(
 			      && ( type_string[ 1 ] == (uint8_t) 'g' )
 			      && ( type_string[ 2 ] == (uint8_t) 'u' ) )
 			{
-/* TODO implement */
+				if( libewf_serialized_string_read_hexadecimal_data(
+				     lef_source->primary_device_guid,
+				     value_string,
+				     value_string_size - 1,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read primary device GUID string.",
+					 function );
+
+					goto on_error;
+				}
 			}
 		}
 		else if( type_string_size == 3 )
@@ -1011,7 +1110,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_hexadecimal_data(
 				     lef_source->md5_hash,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1052,7 +1151,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->domain,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1068,7 +1167,18 @@ int libewf_lef_source_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 't' ) )
 			{
-/* TODO implement */
+				if( value_string_size != 2 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read drive type string.",
+					 function );
+
+					goto on_error;
+				}
+				lef_source->drive_type = value_string[ 0 ];
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'e' )
 			      && ( type_string[ 1 ] == (uint8_t) 'v' ) )
@@ -1076,7 +1186,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->evidence_number,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1109,7 +1219,8 @@ int libewf_lef_source_read_data(
 
 					goto on_error;
 				}
-				if( value_64bit > (uint64_t) UINT32_MAX )
+				if( ( (int64_t) value_64bit < (int64_t) 0 )
+				 || ( (int64_t) value_64bit > (int64_t) INT_MAX ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1128,7 +1239,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->ip_address,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1144,7 +1255,21 @@ int libewf_lef_source_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'g' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
 			{
-/* TODO implement */
+				if( libewf_serialized_string_read_hexadecimal_data(
+				     lef_source->device_guid,
+				     value_string,
+				     value_string_size - 1,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read device GUID string.",
+					 function );
+
+					goto on_error;
+				}
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'l' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
@@ -1171,10 +1296,10 @@ int libewf_lef_source_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'm' )
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
-				if( libewf_serialized_string_read_data(
+				if( libewf_serialized_string_read_hexadecimal_data(
 				     lef_source->mac_address,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1193,7 +1318,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->model,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1234,7 +1359,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->serial_number,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1253,7 +1378,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_hexadecimal_data(
 				     lef_source->sha1_hash,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1301,7 +1426,7 @@ int libewf_lef_source_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_source->name,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1313,15 +1438,6 @@ int libewf_lef_source_read_data(
 
 					goto on_error;
 				}
-			}
-		}
-		/* Do not ignore empty values
-		 */
-		if( type_string_size == 2 )
-		{
-			if( type_string[ 0 ] == (uint8_t) 'p' )
-			{
-/* TODO implement */
 			}
 		}
 	}
@@ -1362,7 +1478,7 @@ on_error:
  */
 int libewf_lef_source_get_identifier(
      libewf_lef_source_t *lef_source,
-     uint32_t *identifier,
+     int *identifier,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_source_get_identifier";
@@ -1907,6 +2023,387 @@ int libewf_lef_source_get_utf16_location(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded device GUID value
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf8_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf8_device_guid_size";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string_size(
+	          lef_source->device_guid,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve device GUID UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded device GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf8_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf8_device_guid";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string(
+	          lef_source->device_guid,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy device GUID to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded device GUID value
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf16_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf16_device_guid_size";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string_size(
+	          lef_source->device_guid,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve device GUID UTF-16 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded device GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf16_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf16_device_guid";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string(
+	          lef_source->device_guid,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy device GUID to UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded primary device GUID value
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf8_primary_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf8_primary_device_guid_size";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string_size(
+	          lef_source->primary_device_guid,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve primary device GUID UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded primary device GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf8_primary_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf8_primary_device_guid";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf8_string(
+	          lef_source->primary_device_guid,
+	          utf8_string,
+	          utf8_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy primary device GUID to UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded primary device GUID value
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf16_primary_device_guid_size(
+     libewf_lef_source_t *lef_source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf16_primary_device_guid_size";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string_size(
+	          lef_source->primary_device_guid,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve primary device GUID UTF-16 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded primary device GUID value
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_utf16_primary_device_guid(
+     libewf_lef_source_t *lef_source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_utf16_primary_device_guid";
+	int result            = 0;
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_serialized_string_get_utf16_string(
+	          lef_source->primary_device_guid,
+	          utf16_string,
+	          utf16_string_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy primary device GUID to UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the drive type
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_source_get_drive_type(
+     libewf_lef_source_t *lef_source,
+     uint8_t *drive_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_source_get_drive_type";
+
+	if( lef_source == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source.",
+		 function );
+
+		return( -1 );
+	}
+	if( drive_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid drive type.",
+		 function );
+
+		return( -1 );
+	}
+	*drive_type = lef_source->drive_type;
+
 	return( 1 );
 }
 

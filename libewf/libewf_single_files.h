@@ -27,6 +27,7 @@
 
 #include "libewf_extern.h"
 #include "libewf_lef_file_entry.h"
+#include "libewf_lef_source.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
@@ -57,13 +58,17 @@ struct libewf_single_files
 	 */
 	size_t ltree_data_size;
 
-	/* The file entry tree root node
-	 */
-	libcdata_tree_node_t *file_entry_tree_root_node;
-
 	/* The permission groups array
 	 */
 	libcdata_array_t *permission_groups;
+
+	/* The sources array
+	 */
+	libcdata_array_t *sources;
+
+	/* The file entry tree root node
+	 */
+	libcdata_tree_node_t *file_entry_tree_root_node;
 };
 
 int libewf_single_files_initialize(
@@ -74,24 +79,11 @@ int libewf_single_files_free(
      libewf_single_files_t **single_files,
      libcerror_error_t **error );
 
-int libewf_single_files_get_format(
-     libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *types,
-     uint8_t *format,
-     libcerror_error_t **error );
-
-int libewf_single_files_parse(
-     libewf_single_files_t *single_files,
-     size64_t *media_size,
-     uint8_t *format,
-     libcerror_error_t **error );
-
-int libewf_single_files_parse_file_entries(
-     libewf_single_files_t *single_files,
-     size64_t *media_size,
-     const uint8_t *file_entries_string,
-     size_t file_entries_string_size,
-     uint8_t *format,
+int libewf_single_files_parse_line(
+     libfvalue_split_utf8_string_t *lines,
+     int line_index,
+     uint8_t **line_string,
+     size_t *line_string_size,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_category_number_of_entries(
@@ -110,6 +102,12 @@ int libewf_single_files_parse_number_of_entries(
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
      int *number_of_entries,
+     libcerror_error_t **error );
+
+int libewf_single_files_parse_format(
+     libewf_single_files_t *single_files,
+     libfvalue_split_utf8_string_t *types,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_rec_category(
@@ -171,9 +169,35 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
      int *number_of_sub_entries,
      libcerror_error_t **error );
 
+int libewf_single_files_parse_string(
+     libewf_single_files_t *single_files,
+     size64_t *media_size,
+     const uint8_t *string,
+     size_t string_size,
+     uint8_t *format,
+     libcerror_error_t **error );
+
+int libewf_single_files_parse(
+     libewf_single_files_t *single_files,
+     size64_t *media_size,
+     uint8_t *format,
+     libcerror_error_t **error );
+
 int libewf_single_files_get_file_entry_tree_root_node(
      libewf_single_files_t *single_files,
      libcdata_tree_node_t **root_node,
+     libcerror_error_t **error );
+
+int libewf_single_files_get_permission_group_by_index(
+     libewf_single_files_t *single_files,
+     int permission_group_index,
+     libewf_permission_group_t **permission_group,
+     libcerror_error_t **error );
+
+int libewf_single_files_get_source_by_index(
+     libewf_single_files_t *single_files,
+     int source_index,
+     libewf_lef_source_t **lef_source,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

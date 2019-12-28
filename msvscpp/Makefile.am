@@ -3,6 +3,7 @@ MSVSCPP_FILES = \
 	ewf.net/ewf.net.vcproj \
 	ewf_test_access_control_entry/ewf_test_access_control_entry.vcproj \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
+	ewf_test_attribute/ewf_test_attribute.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_chunk_data/ewf_test_chunk_data.vcproj \
 	ewf_test_chunk_group/ewf_test_chunk_group.vcproj \
@@ -15,7 +16,6 @@ MSVSCPP_FILES = \
 	ewf_test_digest_section/ewf_test_digest_section.vcproj \
 	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_error2_section/ewf_test_error2_section.vcproj \
-	ewf_test_extended_attribute/ewf_test_extended_attribute.vcproj \
 	ewf_test_file_entry/ewf_test_file_entry.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
@@ -42,6 +42,7 @@ MSVSCPP_FILES = \
 	ewf_test_session_section/ewf_test_session_section.vcproj \
 	ewf_test_sha1_hash_section/ewf_test_sha1_hash_section.vcproj \
 	ewf_test_single_files/ewf_test_single_files.vcproj \
+	ewf_test_source/ewf_test_source.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
 	ewf_test_volume_section/ewf_test_volume_section.vcproj \
@@ -70,6 +71,7 @@ MSVSCPP_FILES = \
 	libewf/libewf.vcproj \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \
+	libfdatetime/libfdatetime.vcproj \
 	libfguid/libfguid.vcproj \
 	libfvalue/libfvalue.vcproj \
 	libhmac/libhmac.vcproj \

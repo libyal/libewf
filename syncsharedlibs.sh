@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 
 GIT_URL_PREFIX="https://github.com/libyal";
-SHARED_LIBS="libcerror libcthreads libcdata libcdatetime libclocale libcnotify libcsplit libuna libcfile libcpath libbfio libfcache libfdata libfguid libfvalue libhmac libcaes libodraw libsmdev libsmraw";
+SHARED_LIBS="libcerror libcthreads libcdata libcdatetime libclocale libcnotify libcsplit libuna libcfile libcpath libbfio libfcache libfdata libfdatetime libfguid libfvalue libhmac libcaes libodraw libsmdev libsmraw";
 
 if test "${TRAVIS_OS_NAME}" != "linux";
 then

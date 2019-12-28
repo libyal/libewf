@@ -14,6 +14,8 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@ \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
+	@LIBFDATETIME_CPPFLAGS@ \
+	@LIBFGUID_CPPFLAGS@ \
 	@LIBFVALUE_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
 	@LIBODRAW_CPPFLAGS@ \
@@ -56,6 +58,7 @@ ewfacquire_SOURCES = \
 	ewftools_libcsplit.h \
 	ewftools_libcthreads.h \
 	ewftools_libewf.h \
+	ewftools_libfdatetime.h \
 	ewftools_libfvalue.h \
 	ewftools_libhmac.h \
 	ewftools_libodraw.h \
@@ -84,6 +87,7 @@ ewfacquire_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
@@ -233,6 +237,7 @@ ewfexport_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
@@ -279,6 +284,7 @@ ewfinfo_SOURCES = \
 
 ewfinfo_LDADD = \
 	@LIBUUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -380,6 +386,7 @@ ewfrecover_LDADD = \
 	@LIBDL_LIBADD@ \
 	@LIBFVALUE_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \

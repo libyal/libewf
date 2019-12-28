@@ -42,8 +42,9 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 	libcdata_tree_node_t *safe_sub_node              = NULL;
 	libewf_lef_file_entry_t *safe_sub_lef_file_entry = NULL;
 	static char *function                            = "libewf_single_file_tree_get_sub_node_by_utf8_name";
+	int compare_result                               = LIBUNA_COMPARE_GREATER;
 	int number_of_sub_nodes                          = 0;
-	int result                                       = LIBUNA_COMPARE_GREATER;
+	int result                                       = 0;
 	int sub_node_index                               = 0;
 
 	if( node == NULL )
@@ -142,13 +143,13 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 			return( -1 );
 		}
-		result = libewf_serialized_string_compare_with_utf8_string(
-			  safe_sub_lef_file_entry->name,
-			  utf8_string,
-			  utf8_string_length,
-			  error );
+		compare_result = libewf_serialized_string_compare_with_utf8_string(
+		                  safe_sub_lef_file_entry->name,
+		                  utf8_string,
+		                  utf8_string_length,
+		                  error );
 
-		if( result == -1 )
+		if( compare_result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -159,10 +160,12 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 
 			return( -1 );
 		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
+		else if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			*sub_node           = safe_sub_node;
 			*sub_lef_file_entry = safe_sub_lef_file_entry;
+
+			result = 1;
 
 			break;
 		}
@@ -182,7 +185,7 @@ int libewf_single_file_tree_get_sub_node_by_utf8_name(
 			return( -1 );
 		}
 	}
-	return( 0 );
+	return( result );
 }
 
 /* Retrieves the file entry sub node for the specific UTF-16 formatted name
@@ -199,8 +202,9 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 	libcdata_tree_node_t *safe_sub_node              = NULL;
 	libewf_lef_file_entry_t *safe_sub_lef_file_entry = NULL;
 	static char *function                            = "libewf_single_file_tree_get_sub_node_by_utf16_name";
+	int compare_result                               = LIBUNA_COMPARE_GREATER;
 	int number_of_sub_nodes                          = 0;
-	int result                                       = LIBUNA_COMPARE_GREATER;
+	int result                                       = 0;
 	int sub_node_index                               = 0;
 
 	if( node == NULL )
@@ -299,13 +303,13 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 			return( -1 );
 		}
-		result = libewf_serialized_string_compare_with_utf16_string(
-			  safe_sub_lef_file_entry->name,
-			  utf16_string,
-			  utf16_string_length,
-			  error );
+		compare_result = libewf_serialized_string_compare_with_utf16_string(
+		                  safe_sub_lef_file_entry->name,
+		                  utf16_string,
+		                  utf16_string_length,
+		                  error );
 
-		if( result == -1 )
+		if( compare_result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -316,10 +320,12 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 
 			return( -1 );
 		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
+		else if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			*sub_node           = safe_sub_node;
 			*sub_lef_file_entry = safe_sub_lef_file_entry;
+
+			result = 1;
 
 			break;
 		}
@@ -339,6 +345,6 @@ int libewf_single_file_tree_get_sub_node_by_utf16_name(
 			return( -1 );
 		}
 	}
-	return( 0 );
+	return( result );
 }
 

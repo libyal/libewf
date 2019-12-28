@@ -388,14 +388,6 @@ int libewf_lef_subject_read_data(
 
 			goto on_error;
 		}
-		/* Remove trailing carriage return
-		 */
-		else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			type_string[ type_string_size - 2 ] = 0;
-
-			type_string_size -= 1;
-		}
 		if( value_index >= number_of_values )
 		{
 			value_string      = NULL;
@@ -427,14 +419,6 @@ int libewf_lef_subject_read_data(
 				value_string      = NULL;
 				value_string_size = 0;
 			}
-			/* Remove trailing carriage return
-			 */
-			else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-			{
-				value_string[ value_string_size - 2 ] = 0;
-
-				value_string_size -= 1;
-			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -446,7 +430,8 @@ int libewf_lef_subject_read_data(
 			 (char *) value_string );
 		}
 #endif
-		if( value_string == NULL )
+		if( ( value_string == NULL )
+		 || ( value_string_size == 0 ) )
 		{
 			/* Ignore empty values
 			 */
@@ -458,7 +443,7 @@ int libewf_lef_subject_read_data(
 				if( libewf_serialized_string_read_data(
 				     lef_subject->name,
 				     value_string,
-				     value_string_size,
+				     value_string_size - 1,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -470,15 +455,6 @@ int libewf_lef_subject_read_data(
 
 					goto on_error;
 				}
-			}
-		}
-		/* Do not ignore empty values
-		 */
-		if( type_string_size == 2 )
-		{
-			if( type_string[ 0 ] == (uint8_t) 'p' )
-			{
-/* TODO implement */
 			}
 		}
 	}

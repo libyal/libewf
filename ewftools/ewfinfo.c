@@ -77,7 +77,7 @@ void usage_fprint(
 	                 "Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfinfo [ -A codepage ] [ -B bodyfile ] [ -d date_format ]\n"
-	                 "               [ -f format ] [ -ehHimvVx ] ewf_files\n\n" );
+	                 "               [ -f format ]  [ -F path ] [ -ehHimvVx ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -92,6 +92,7 @@ void usage_fprint(
 	fprintf( stream, "\t-e:        only show EWF read error information\n" );
 	fprintf( stream, "\t-f:        specify the output format, options: text (default),\n"
 	                 "\t           dfxml\n" );
+	fprintf( stream, "\t-F:        show information about a specific file entry path.\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-H:        shows the logical files hierarchy\n" );
 	fprintf( stream, "\t-i:        only show EWF acquiry information\n" );
@@ -158,6 +159,7 @@ int main( int argc, char * const argv[] )
 	libcerror_error_t *error                     = NULL;
 	system_character_t *option_bodyfile          = NULL;
 	system_character_t *option_date_format       = NULL;
+	system_character_t *option_file_entry        = NULL;
 	system_character_t *option_header_codepage   = NULL;
 	system_character_t *option_output_format     = NULL;
 	system_character_t *program                  = _SYSTEM_STRING( "ewfinfo" );
@@ -206,7 +208,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "A:B:d:ef:hHimvV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "A:B:d:ef:F:hHimvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -265,6 +267,12 @@ int main( int argc, char * const argv[] )
 
 			case (system_integer_t) 'f':
 				option_output_format = optarg;
+
+				break;
+
+			case (system_integer_t) 'F':
+				option_mode       = EWFINFO_MODE_FILE_ENTRY;
+				option_file_entry = optarg;
 
 				break;
 
@@ -429,24 +437,7 @@ int main( int argc, char * const argv[] )
 			 "Unsupported output format defaulting to: text.\n" );
 		}
 	}
-	if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
-	{
-		if( info_handle_dfxml_header_fprint(
-		     ewfinfo_info_handle,
-		     &error ) != 1 )
-		{
-			ewftools_output_version_fprint(
-			 stderr,
-			 program );
-
-			fprintf(
-			 stderr,
-			 "Unable to print header.\n" );
-
-			goto on_error;
-		}
-	}
-	else if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 	{
 		ewftools_output_version_fprint(
 		 stdout,
@@ -632,10 +623,7 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unable to attach signal handler.\n" );
 
-		libcnotify_print_error_backtrace(
-		 error );
-		libcerror_error_free(
-		 &error );
+		goto on_error;
 	}
 	result = info_handle_open_input(
 	          ewfinfo_info_handle,
@@ -683,12 +671,32 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-	if( option_mode == EWFINFO_MODE_IMAGE )
+	switch( option_mode )
 	{
-		if( ( info_option == 'a' )
-		 || ( info_option == 'i' ) )
-		{
-			if( info_handle_header_values_fprint(
+		case EWFINFO_MODE_FILE_ENTRY:
+			if( info_handle_file_entry_fprint_by_path(
+			     ewfinfo_info_handle,
+			     option_file_entry,
+			     &error ) != 1 )
+			{
+				if( print_header != 0 )
+				{
+					ewftools_output_version_fprint(
+					 stderr,
+					 program );
+
+					print_header = 0;
+				}
+				fprintf(
+				 stderr,
+				 "Unable to print file entry information.\n" );
+
+				goto on_error;
+			}
+			break;
+
+		case EWFINFO_MODE_FILE_SYSTEM_HIERARCHY:
+			if( info_handle_logical_files_hierarchy_fprint(
 			     ewfinfo_info_handle,
 			     &error ) != 1 )
 			{
@@ -702,19 +710,16 @@ int main( int argc, char * const argv[] )
 				}
 				fprintf(
 				 stderr,
-				 "Unable to print header values.\n" );
+				 "Unable to print logical files hierarchy.\n" );
 
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
+				goto on_error;
 			}
-		}
-		if( ( info_option == 'a' )
-		 || ( info_option == 'm' ) )
-		{
-			if( info_handle_media_information_fprint(
+			break;
+
+		case EWFINFO_MODE_IMAGE:
+			if( info_handle_image_fprint(
 			     ewfinfo_info_handle,
+			     info_option,
 			     &error ) != 1 )
 			{
 				if( print_header != 0 )
@@ -727,147 +732,11 @@ int main( int argc, char * const argv[] )
 				}
 				fprintf(
 				 stderr,
-				 "Unable to print media information.\n" );
+				 "Unable to print image.\n" );
 
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
+				goto on_error;
 			}
-			if( info_handle_hash_values_fprint(
-			     ewfinfo_info_handle,
-			     &error ) != 1 )
-			{
-				if( print_header != 0 )
-				{
-					ewftools_output_version_fprint(
-					 stderr,
-					 program );
-
-					print_header = 0;
-				}
-				fprintf(
-				 stderr,
-				 "Unable to print hash values.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-			}
-			if( info_handle_sessions_fprint(
-			     ewfinfo_info_handle,
-			     &error ) != 1 )
-			{
-				if( print_header != 0 )
-				{
-					ewftools_output_version_fprint(
-					 stderr,
-					 program );
-
-					print_header = 0;
-				}
-				fprintf(
-				 stderr,
-				 "Unable to print sessions.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-			}
-			if( info_handle_tracks_fprint(
-			     ewfinfo_info_handle,
-			     &error ) != 1 )
-			{
-				if( print_header != 0 )
-				{
-					ewftools_output_version_fprint(
-					 stderr,
-					 program );
-
-					print_header = 0;
-				}
-				fprintf(
-				 stderr,
-				 "Unable to print tracks.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-			}
-		}
-		if( ( info_option == 'a' )
-		 || ( info_option == 'e' ) )
-		{
-			if( info_handle_acquiry_errors_fprint(
-			     ewfinfo_info_handle,
-			     &error ) != 1 )
-			{
-				if( print_header != 0 )
-				{
-					ewftools_output_version_fprint(
-					 stderr,
-					 program );
-
-					print_header = 0;
-				}
-				fprintf(
-				 stderr,
-				 "Unable to print acquiry errors.\n" );
-
-				libcnotify_print_error_backtrace(
-				 error );
-				libcerror_error_free(
-				 &error );
-			}
-		}
-	}
-	else if( option_mode == EWFINFO_MODE_FILE_SYSTEM_HIERARCHY )
-	{
-		if( info_handle_single_files_fprint(
-		     ewfinfo_info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewftools_output_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print single files.\n" );
-
-			libcnotify_print_error_backtrace(
-			 error );
-			libcerror_error_free(
-			 &error );
-		}
-	}
-	if( ewfinfo_info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
-	{
-		if( info_handle_dfxml_footer_fprint(
-		     ewfinfo_info_handle,
-		     &error ) != 1 )
-		{
-			if( print_header != 0 )
-			{
-				ewftools_output_version_fprint(
-				 stderr,
-				 program );
-
-				print_header = 0;
-			}
-			fprintf(
-			 stderr,
-			 "Unable to print footer.\n" );
-
-			goto on_error;
-		}
+			break;
 	}
 on_abort:
 	if( info_handle_close(
@@ -903,10 +772,7 @@ on_abort:
 		 stderr,
 		 "Unable to detach signal handler.\n" );
 
-		libcnotify_print_error_backtrace(
-		 error );
-		libcerror_error_free(
-		 &error );
+		goto on_error;
 	}
 	if( info_handle_free(
 	     &ewfinfo_info_handle,
