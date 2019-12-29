@@ -1510,7 +1510,7 @@ int libewf_lef_source_get_identifier(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded name value
+/* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1552,7 +1552,7 @@ int libewf_lef_source_get_utf8_name_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1596,7 +1596,7 @@ int libewf_lef_source_get_utf8_name(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded name value
+/* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1638,7 +1638,7 @@ int libewf_lef_source_get_utf16_name_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1682,7 +1682,7 @@ int libewf_lef_source_get_utf16_name(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded evidence number value
+/* Retrieves the size of the UTF-8 encoded evidence number
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1724,7 +1724,7 @@ int libewf_lef_source_get_utf8_evidence_number_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded evidence number value
+/* Retrieves the UTF-8 encoded evidence number
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1768,7 +1768,7 @@ int libewf_lef_source_get_utf8_evidence_number(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded evidence number value
+/* Retrieves the size of the UTF-16 encoded evidence number
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1810,7 +1810,7 @@ int libewf_lef_source_get_utf16_evidence_number_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded evidence number value
+/* Retrieves the UTF-16 encoded evidence number
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1854,7 +1854,7 @@ int libewf_lef_source_get_utf16_evidence_number(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded location value
+/* Retrieves the size of the UTF-8 encoded location
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1896,7 +1896,7 @@ int libewf_lef_source_get_utf8_location_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded location value
+/* Retrieves the UTF-8 encoded location
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1940,7 +1940,7 @@ int libewf_lef_source_get_utf8_location(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded location value
+/* Retrieves the size of the UTF-16 encoded location
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1982,7 +1982,7 @@ int libewf_lef_source_get_utf16_location_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded location value
+/* Retrieves the UTF-16 encoded location
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2026,7 +2026,7 @@ int libewf_lef_source_get_utf16_location(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded device GUID value
+/* Retrieves the size of the UTF-8 encoded device GUID
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2068,7 +2068,7 @@ int libewf_lef_source_get_utf8_device_guid_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded device GUID value
+/* Retrieves the UTF-8 encoded device GUID
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2112,7 +2112,7 @@ int libewf_lef_source_get_utf8_device_guid(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded device GUID value
+/* Retrieves the size of the UTF-16 encoded device GUID
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2154,7 +2154,7 @@ int libewf_lef_source_get_utf16_device_guid_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded device GUID value
+/* Retrieves the UTF-16 encoded device GUID
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2198,7 +2198,7 @@ int libewf_lef_source_get_utf16_device_guid(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded primary device GUID value
+/* Retrieves the size of the UTF-8 encoded primary device GUID
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2240,7 +2240,7 @@ int libewf_lef_source_get_utf8_primary_device_guid_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded primary device GUID value
+/* Retrieves the UTF-8 encoded primary device GUID
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2284,7 +2284,7 @@ int libewf_lef_source_get_utf8_primary_device_guid(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded primary device GUID value
+/* Retrieves the size of the UTF-16 encoded primary device GUID
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2326,7 +2326,7 @@ int libewf_lef_source_get_utf16_primary_device_guid_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded primary device GUID value
+/* Retrieves the UTF-16 encoded primary device GUID
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2407,7 +2407,7 @@ int libewf_lef_source_get_drive_type(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded manufacturer value
+/* Retrieves the size of the UTF-8 encoded manufacturer
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2449,7 +2449,7 @@ int libewf_lef_source_get_utf8_manufacturer_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded manufacturer value
+/* Retrieves the UTF-8 encoded manufacturer
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2493,7 +2493,7 @@ int libewf_lef_source_get_utf8_manufacturer(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded manufacturer value
+/* Retrieves the size of the UTF-16 encoded manufacturer
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2535,7 +2535,7 @@ int libewf_lef_source_get_utf16_manufacturer_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded manufacturer value
+/* Retrieves the UTF-16 encoded manufacturer
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2579,7 +2579,7 @@ int libewf_lef_source_get_utf16_manufacturer(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded model value
+/* Retrieves the size of the UTF-8 encoded model
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2621,7 +2621,7 @@ int libewf_lef_source_get_utf8_model_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded model value
+/* Retrieves the UTF-8 encoded model
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2665,7 +2665,7 @@ int libewf_lef_source_get_utf8_model(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded model value
+/* Retrieves the size of the UTF-16 encoded model
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2707,7 +2707,7 @@ int libewf_lef_source_get_utf16_model_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded model value
+/* Retrieves the UTF-16 encoded model
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2751,7 +2751,7 @@ int libewf_lef_source_get_utf16_model(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded serial number value
+/* Retrieves the size of the UTF-8 encoded serial number
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2793,7 +2793,7 @@ int libewf_lef_source_get_utf8_serial_number_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded serial number value
+/* Retrieves the UTF-8 encoded serial number
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2837,7 +2837,7 @@ int libewf_lef_source_get_utf8_serial_number(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded serial number value
+/* Retrieves the size of the UTF-16 encoded serial number
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2879,7 +2879,7 @@ int libewf_lef_source_get_utf16_serial_number_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded serial number value
+/* Retrieves the UTF-16 encoded serial number
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2923,7 +2923,7 @@ int libewf_lef_source_get_utf16_serial_number(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded domain value
+/* Retrieves the size of the UTF-8 encoded domain
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2965,7 +2965,7 @@ int libewf_lef_source_get_utf8_domain_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded domain value
+/* Retrieves the UTF-8 encoded domain
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3009,7 +3009,7 @@ int libewf_lef_source_get_utf8_domain(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded domain value
+/* Retrieves the size of the UTF-16 encoded domain
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3051,7 +3051,7 @@ int libewf_lef_source_get_utf16_domain_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded domain value
+/* Retrieves the UTF-16 encoded domain
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3095,7 +3095,7 @@ int libewf_lef_source_get_utf16_domain(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded IP address value
+/* Retrieves the size of the UTF-8 encoded IP address
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3137,7 +3137,7 @@ int libewf_lef_source_get_utf8_ip_address_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded IP address value
+/* Retrieves the UTF-8 encoded IP address
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3181,7 +3181,7 @@ int libewf_lef_source_get_utf8_ip_address(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded IP address value
+/* Retrieves the size of the UTF-16 encoded IP address
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3223,7 +3223,7 @@ int libewf_lef_source_get_utf16_ip_address_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded IP address value
+/* Retrieves the UTF-16 encoded IP address
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3267,7 +3267,7 @@ int libewf_lef_source_get_utf16_ip_address(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded MAC address value
+/* Retrieves the size of the UTF-8 encoded MAC address
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3309,7 +3309,7 @@ int libewf_lef_source_get_utf8_mac_address_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-8 encoded MAC address value
+/* Retrieves the UTF-8 encoded MAC address
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3353,7 +3353,7 @@ int libewf_lef_source_get_utf8_mac_address(
 	return( 1 );
 }
 
-/* Retrieves the size of the UTF-16 encoded MAC address value
+/* Retrieves the size of the UTF-16 encoded MAC address
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3395,7 +3395,7 @@ int libewf_lef_source_get_utf16_mac_address_size(
 	return( 1 );
 }
 
-/* Retrieves the UTF-16 encoded MAC address value
+/* Retrieves the UTF-16 encoded MAC address
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3477,7 +3477,7 @@ int libewf_lef_source_get_size(
 }
 
 /* Retrieves the logical offset
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_logical_offset(
      libewf_lef_source_t *lef_source,
@@ -3508,13 +3508,17 @@ int libewf_lef_source_get_logical_offset(
 
 		return( -1 );
 	}
+	if( lef_source->logical_offset == -1 )
+	{
+		return( 0 );
+	}
 	*logical_offset = lef_source->logical_offset;
 
 	return( 1 );
 }
 
 /* Retrieves the physical offset
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_lef_source_get_physical_offset(
      libewf_lef_source_t *lef_source,
@@ -3544,6 +3548,10 @@ int libewf_lef_source_get_physical_offset(
 		 function );
 
 		return( -1 );
+	}
+	if( lef_source->physical_offset == -1 )
+	{
+		return( 0 );
 	}
 	*physical_offset = lef_source->physical_offset;
 

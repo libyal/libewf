@@ -173,38 +173,39 @@ int libewf_single_files_free(
 	}
 	if( *single_files != NULL )
 	{
-		if( ( *single_files )->section_data != NULL )
+		if( ( *single_files )->permission_groups != NULL )
 		{
-			memory_free(
-			 ( *single_files )->section_data );
-		}
-		if( libcdata_array_free(
-		     &( ( *single_files )->permission_groups ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_permission_group_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free permission groups array.",
-			 function );
+			if( libcdata_array_free(
+			     &( ( *single_files )->permission_groups ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_permission_group_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free permission groups array.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
-		if( libcdata_array_free(
-		     &( ( *single_files )->sources ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_source_free,
-		     error ) != 1 )
+		if( ( *single_files )->sources != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sources array.",
-			 function );
+			if( libcdata_array_free(
+			     &( ( *single_files )->sources ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_source_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sources array.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
 		if( ( *single_files )->file_entry_tree_root_node != NULL )
 		{
@@ -229,6 +230,122 @@ int libewf_single_files_free(
 		*single_files = NULL;
 	}
 	return( result );
+}
+
+/* Clones the single files
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_clone(
+     libewf_single_files_t **destination_single_files,
+     libewf_single_files_t *source_single_files,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_single_files_clone";
+
+	if( destination_single_files == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_single_files != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination single files value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_single_files == NULL )
+	{
+		*destination_single_files = NULL;
+
+		return( 1 );
+	}
+	*destination_single_files = memory_allocate_structure(
+	                             libewf_single_files_t );
+
+	if( *destination_single_files == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination single files.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_single_files )->permission_groups         = NULL;
+	( *destination_single_files )->sources                   = NULL;
+	( *destination_single_files )->file_entry_tree_root_node = NULL;
+
+	if( libcdata_array_clone(
+	     &( ( *destination_single_files )->permission_groups ),
+	     source_single_files->permission_groups,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_permission_group_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_permission_group_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination permission groups array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_clone(
+	     &( ( *destination_single_files )->sources ),
+	     source_single_files->sources,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_source_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_lef_source_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination sources array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_tree_node_clone(
+	     &( ( *destination_single_files )->file_entry_tree_root_node ),
+	     source_single_files->file_entry_tree_root_node,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_file_entry_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_lef_file_entry_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination file entry tree root node.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_single_files != NULL )
+	{
+		libewf_single_files_free(
+		 destination_single_files,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Parses a line
@@ -794,7 +911,6 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_format(
-     libewf_single_files_t *single_files,
      libfvalue_split_utf8_string_t *types,
      uint8_t *format,
      libcerror_error_t **error )
@@ -805,17 +921,6 @@ int libewf_single_files_parse_format(
 	int number_of_types     = 0;
 	int value_index         = 0;
 
-	if( single_files == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single files.",
-		 function );
-
-		return( -1 );
-	}
 	if( format == NULL )
 	{
 		libcerror_error_set(
@@ -908,9 +1013,9 @@ int libewf_single_files_parse_format(
  */
 int libewf_single_files_parse_rec_category(
      libewf_single_files_t *single_files,
-     size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     size64_t *media_size,
      libcerror_error_t **error )
 {
 	uint8_t *line_string    = NULL;
@@ -976,9 +1081,9 @@ int libewf_single_files_parse_rec_category(
 		return( -1 );
 	}
 	if( libewf_single_files_parse_record_values(
-	     media_size,
 	     lines,
 	     &safe_line_index,
+	     media_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1033,9 +1138,9 @@ int libewf_single_files_parse_rec_category(
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_record_values(
-     size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     size64_t *media_size,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *types  = NULL;
@@ -1053,17 +1158,6 @@ int libewf_single_files_parse_record_values(
 	int safe_line_index                   = 0;
 	int value_index                       = 0;
 
-	if( media_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media size.",
-		 function );
-
-		return( -1 );
-	}
 	if( line_index == NULL )
 	{
 		libcerror_error_set(
@@ -1071,6 +1165,17 @@ int libewf_single_files_parse_record_values(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid line index.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media size.",
 		 function );
 
 		return( -1 );
@@ -2715,9 +2820,9 @@ on_error:
  */
 int libewf_single_files_parse_entry_category(
      libewf_single_files_t *single_files,
-     uint8_t *format,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     uint8_t *format,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *types = NULL;
@@ -2830,7 +2935,6 @@ int libewf_single_files_parse_entry_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_format(
-	     single_files,
 	     types,
 	     format,
 	     error ) != 1 )
@@ -3417,20 +3521,20 @@ on_error:
 	return( -1 );
 }
 
-/* Parses a single files string
+/* Parses an UTF-8 encoded single files string
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_files_parse_string(
+int libewf_single_files_parse_utf8_string(
      libewf_single_files_t *single_files,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      size64_t *media_size,
-     const uint8_t *string,
-     size_t string_size,
      uint8_t *format,
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *lines = NULL;
 	uint8_t *line_string                 = NULL;
-	static char *function                = "libewf_single_files_parse_string";
+	static char *function                = "libewf_single_files_parse_utf8_string";
 	size_t line_string_size              = 0;
 	int line_index                       = 0;
 
@@ -3445,20 +3549,9 @@ int libewf_single_files_parse_string(
 
 		return( -1 );
 	}
-	if( string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid string.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfvalue_utf8_string_split(
-	     string,
-	     string_size - 1,
+	     utf8_string,
+	     utf8_string_size,
 	     (uint8_t) '\n',
 	     &lines,
 	     error ) != 1 )
@@ -3505,9 +3598,9 @@ int libewf_single_files_parse_string(
 
 	if( libewf_single_files_parse_rec_category(
 	     single_files,
-	     media_size,
 	     lines,
 	     &line_index,
+	     media_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3566,9 +3659,9 @@ int libewf_single_files_parse_string(
 	}
 	if( libewf_single_files_parse_entry_category(
 	     single_files,
-	     format,
 	     lines,
 	     &line_index,
+	     format,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3605,18 +3698,20 @@ on_error:
 	return( -1 );
 }
 
-/* Parses an EWF ltree for the values
+/* Reads the single files
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_files_parse(
+int libewf_single_files_read_data(
      libewf_single_files_t *single_files,
+     const uint8_t *data,
+     size_t data_size,
      size64_t *media_size,
      uint8_t *format,
      libcerror_error_t **error )
 {
-	uint8_t *string       = NULL;
-	static char *function = "libewf_single_files_parse";
-	size_t string_size    = 0;
+	uint8_t *utf8_string    = NULL;
+	static char *function   = "libewf_single_files_read_data";
+	size_t utf8_string_size = 0;
 
 	if( single_files == NULL )
 	{
@@ -3629,52 +3724,41 @@ int libewf_single_files_parse(
 
 		return( -1 );
 	}
-	if( single_files->ltree_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid single files - missing ltree data.",
-		 function );
-
-		return( -1 );
-	}
 	if( libuna_utf8_string_size_from_utf16_stream(
-	     single_files->ltree_data,
-	     single_files->ltree_data_size,
+	     data,
+	     data_size,
 	     LIBUNA_ENDIAN_LITTLE,
-	     &string_size,
+	     &utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine string size.",
+		 "%s: unable to determine UTF-8 string size.",
 		 function );
 
 		return( -1 );
 	}
-	string = (uint8_t *) memory_allocate(
-	                      sizeof( uint8_t ) * (size_t) string_size );
+	utf8_string = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * (size_t) utf8_string_size );
 
-	if( string == NULL )
+	if( utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	if( libuna_utf8_string_copy_from_utf16_stream(
-	     string,
-	     string_size,
-	     single_files->ltree_data,
-	     single_files->ltree_data_size,
+	     utf8_string,
+	     utf8_string_size,
+	     data,
+	     data_size,
 	     LIBUNA_ENDIAN_LITTLE,
 	     error ) != 1 )
 	{
@@ -3682,16 +3766,16 @@ int libewf_single_files_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.",
+		 "%s: unable to set UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_string(
+	if( libewf_single_files_parse_utf8_string(
 	     single_files,
+	     utf8_string,
+	     utf8_string_size,
 	     media_size,
-	     string,
-	     string_size,
 	     format,
 	     error ) != 1 )
 	{
@@ -3699,21 +3783,21 @@ int libewf_single_files_parse(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse string.",
+		 "%s: unable to parse UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	memory_free(
-	 string );
+	 utf8_string );
 
 	return( 1 );
 
 on_error:
-	if( string != NULL )
+	if( utf8_string != NULL )
 	{
 		memory_free(
-		 string );
+		 utf8_string );
 	}
 	return( -1 );
 }

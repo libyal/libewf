@@ -341,6 +341,7 @@ int ewf_test_case_data_generate(
 	libfvalue_table_t *header_values    = NULL;
 	uint8_t *case_data                  = NULL;
 	size_t case_data_size               = 0;
+	int header_value_index              = 0;
 	int result                          = 0;
 
 	/* Initialize test
@@ -516,6 +517,52 @@ int ewf_test_case_data_generate(
 	libcerror_error_free(
 	 &error );
 
+	/* Test libewf_case_data_parse with failing libfvalue_table_get_value_by_identifier
+	 */
+	for( header_value_index = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT - 1;
+	     header_value_index >= 0;
+	     header_value_index-- )
+	{
+		result = libfvalue_table_set_value_by_index(
+		          header_values,
+		          header_value_index,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		result = libewf_case_data_generate(
+		          &case_data,
+		          &case_data_size,
+		          NULL,
+		          header_values,
+		          0,
+		          LIBEWF_FORMAT_V2_ENCASE7,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "case_data",
+		 case_data );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
 	/* Clean up
 	 */
 	result = libewf_media_values_free(

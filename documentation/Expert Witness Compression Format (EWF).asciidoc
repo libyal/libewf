@@ -1074,7 +1074,7 @@ restriction of 40 characters instead of 3000 characters.
 
 [cols="1,1,5",options="header"]
 |===
-| Value of char | Meaning
+| Character value | Meaning
 | b | Best compression is used
 | f | Fastest compression is used
 | n | No compression is used
@@ -2106,7 +2106,7 @@ Contains a string +
 Contains a string without separator characters +
 (introduced in EnCase 7.9)
 | 21 | dt | Drive type +
-Seen: "f" => "fixed" +
+Contains a character +
 (introduced in EnCase 7.9)
 |===
 
@@ -2119,6 +2119,14 @@ MD5 hash is not set. The same applies for the "sha" value when it contains
 
 If the "ma" value contains "000000000000" this means the MAC address is not
 set.
+
+===== Drive type
+
+[cols="1,1,5",options="header"]
+|===
+| Character value | Meaning
+| f | Fixed drive
+|===
 
 ==== [[subjects_category3]]Subjects category
 
@@ -2483,7 +2491,7 @@ The extended attributes header is 37 bytes of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0 | 4 | 0 | [yellow-background]*Unknown (node level?)*
+| 0 | 4 | 0 | [yellow-background]*Unknown (0 => root, 1 => otherwise)*
 | 4 | 1 | 1 | [yellow-background]*Unknown (0 => is leaf node, 1 => is branch node?)*
 | 5 | 4 | 11 | Number of characters in name string including the end-of-string character
 | 9 | 4 | 1 | Number of characters in value string including the end-of-string character
@@ -2500,7 +2508,7 @@ An extended attributes is variable of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0 | 4 | | [yellow-background]*Unknown (node level?)*
+| 0 | 4 | | [yellow-background]*Unknown (0 => root, 1 => otherwise)*
 | 4 | 1 | | [yellow-background]*Unknown (0 => is leaf node, 1 => is branch node?)*
 | 5 | 4 | | Number of characters in name string including the end-of-string character
 | 9 | 4 | | Number of characters in value string including the end-of-string character
@@ -2511,6 +2519,10 @@ Contains an UTF-16 little-endian encoded string including end-of-string characte
 |===
 
 [yellow-background]*TODO: complete section*
+
+[NOTE]
+Branch nodes are presuably used to group attributes, however these are not used
+consistently and are not shown by Encase 7.
 
 === Map section
 

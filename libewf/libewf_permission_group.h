@@ -50,6 +50,11 @@ int libewf_permission_group_free(
      libewf_permission_group_t **permission_group,
      libcerror_error_t **error );
 
+int libewf_permission_group_clone(
+     libewf_permission_group_t **destination_permission_group,
+     libewf_permission_group_t *source_permission_group,
+     libcerror_error_t **error );
+
 int libewf_permission_group_append_permission(
      libewf_permission_group_t *permission_group,
      libewf_lef_permission_t *lef_permission,

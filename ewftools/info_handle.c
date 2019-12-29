@@ -286,10 +286,15 @@ int info_handle_set_bodyfile(
 
 		return( -1 );
 	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	info_handle->bodyfile_stream = file_stream_open_wide(
+	                                filename,
+	                                "wb" );
+#else
 	info_handle->bodyfile_stream = file_stream_open(
 	                                filename,
 	                                "wb" );
-
+#endif
 	if( info_handle->bodyfile_stream == NULL )
 	{
 		libcerror_error_set(
@@ -3202,7 +3207,6 @@ int info_handle_hash_value_fprint(
 	          hash_value_size,
 	          error );
 #endif
-
 	if( result == -1 )
 	{
 		libcerror_error_set(
@@ -4397,7 +4401,291 @@ on_error:
 	return( -1 );
 }
 
-/* Prints a (acquisition_ source value
+/* Prints a sub section header
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_sub_section_header_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     libcerror_error_t **error )
+{
+	static char *function = "info_handle_sub_section_header_fprint";
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t<%s>\n",
+		 identifier );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t%s:\n",
+		 description );
+	}
+	return( 1 );
+}
+
+/* Prints a sub section footer
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_sub_section_footer_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     libcerror_error_t **error )
+{
+	static char *function = "info_handle_sub_section_footer_fprint";
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t</%s>\n",
+		 identifier );
+	}
+	return( 1 );
+}
+
+/* Prints an attribute value
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int info_handle_attribute_value_fprint(
+     info_handle_t *info_handle,
+     libewf_attribute_t *attribute,
+     libcerror_error_t **error )
+{
+	system_character_t *name_string  = NULL;
+	system_character_t *value_string = NULL;
+	static char *function            = "info_handle_attribute_value_fprint";
+	size_t name_string_size          = 0;
+	size_t value_string_size         = 0;
+	int result                       = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_attribute_get_utf16_name_size(
+	          attribute,
+	          &name_string_size,
+	          error );
+#else
+	result = libewf_attribute_get_utf8_name_size(
+	          attribute,
+	          &name_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( name_string_size > 0 ) )
+	{
+		name_string = system_string_allocate(
+		               name_string_size );
+
+		if( name_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create name string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_attribute_get_utf16_name(
+		          attribute,
+		          (uint16_t *) name_string,
+		          name_string_size,
+		          error );
+#else
+		result = libewf_attribute_get_utf8_name(
+		          attribute,
+		          (uint8_t *) name_string,
+		          name_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve name string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_attribute_get_utf16_value_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#else
+	result = libewf_attribute_get_utf8_value_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create value string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_attribute_get_utf16_value(
+		          attribute,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libewf_attribute_get_utf8_value(
+		          attribute,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t\t\t<attribute name=\"%" PRIs_SYSTEM "\">%" PRIs_SYSTEM "</attribute>\n",
+		 name_string,
+		 value_string );
+	}
+	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\t%s",
+		 name_string );
+
+		do
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t" );
+
+			name_string_size += 8;
+		}
+		while( name_string_size <= 24 );
+
+		fprintf(
+		 info_handle->notify_stream,
+		 ": %" PRIs_SYSTEM "\n",
+		 value_string );
+	}
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
+	if( name_string != NULL )
+	{
+		memory_free(
+		 name_string );
+
+		name_string = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
+	if( name_string != NULL )
+	{
+		memory_free(
+		 name_string );
+	}
+	return( -1 );
+}
+
+/* Prints a (acquisition) source value
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int info_handle_source_value_fprint(
@@ -4407,8 +4695,9 @@ int info_handle_source_value_fprint(
 {
 	system_character_t *value_string = NULL;
 	static char *function            = "info_handle_source_value_fprint";
+	size64_t size                    = 0;
 	size_t value_string_size         = 0;
-	uint32_t value_32bit             = 0;
+	int32_t acquisition_time         = 0;
 	int result                       = 0;
 
 	if( info_handle == NULL )
@@ -4994,6 +5283,499 @@ int info_handle_source_value_fprint(
 	 info_handle->notify_stream,
 	 "\n" );
 
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tSerial number\t\t\t: " );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_serial_number_size(
+	          source,
+	          &value_string_size,
+	          error );
+#else
+	result = libewf_source_get_utf8_serial_number_size(
+	          source,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve serial number string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create serial number string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_source_get_utf16_serial_number(
+		          source,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libewf_source_get_utf8_serial_number(
+		          source,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve serial number string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tDomain\t\t\t\t: " );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_domain_size(
+	          source,
+	          &value_string_size,
+	          error );
+#else
+	result = libewf_source_get_utf8_domain_size(
+	          source,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve domain string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create domain string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_source_get_utf16_domain(
+		          source,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libewf_source_get_utf8_domain(
+		          source,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve domain string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tIP address\t\t\t: " );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_ip_address_size(
+	          source,
+	          &value_string_size,
+	          error );
+#else
+	result = libewf_source_get_utf8_ip_address_size(
+	          source,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve IP address string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create IP address string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_source_get_utf16_ip_address(
+		          source,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libewf_source_get_utf8_ip_address(
+		          source,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve IP address string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tMAC address\t\t\t: " );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_mac_address_size(
+	          source,
+	          &value_string_size,
+	          error );
+#else
+	result = libewf_source_get_utf8_mac_address_size(
+	          source,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MAC address string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create MAC address string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libewf_source_get_utf16_mac_address(
+		          source,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libewf_source_get_utf8_mac_address(
+		          source,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MAC address string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+/* TODO print drive type */
+
+	if( libewf_source_get_size(
+	     source,
+	     &size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tSize\t\t\t\t: %" PRIu64 "\n",
+	 size );
+
+/* TODO print physical offset */
+/* TODO print logical offset */
+
+	if( libewf_source_get_acquisition_time(
+	     source,
+	     &acquisition_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve acquisition time.",
+		 function );
+
+		goto on_error;
+	}
+	if( info_handle_posix_time_value_fprint(
+	     info_handle,
+	     "\tAcquisition time\t\t",
+	     acquisition_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to print POSIX time value.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tMD5\t\t\t\t: " );
+
+	value_string = system_string_allocate(
+	                33 );
+
+	if( value_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create MD5 string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_hash_value_md5(
+	          source,
+	          (uint16_t *) value_string,
+	          33,
+	          error );
+#else
+	result = libewf_source_get_utf8_hash_value_md5(
+	          source,
+	          (uint8_t *) value_string,
+	          33,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MD5 string.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+	}
+	memory_free(
+	 value_string );
+
+	value_string = NULL;
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tSHA1\t\t\t\t: " );
+
+	value_string = system_string_allocate(
+	                41 );
+
+	if( value_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create SHA1 string.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libewf_source_get_utf16_hash_value_sha1(
+	          source,
+	          (uint16_t *) value_string,
+	          41,
+	          error );
+#else
+	result = libewf_source_get_utf8_hash_value_sha1(
+	          source,
+	          (uint8_t *) value_string,
+	          41,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve SHA1 string.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "%" PRIs_SYSTEM "",
+		 value_string );
+	}
+	memory_free(
+	 value_string );
+
+	value_string = NULL;
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
 	return( 1 );
 
 on_error:
@@ -5017,6 +5799,7 @@ int info_handle_file_entry_value_fprint(
 	char file_mode_string[ 11 ]                         = { '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 0 };
 
 	libewf_access_control_entry_t *access_control_entry = NULL;
+	libewf_attribute_t *attribute                       = NULL;
 	libewf_source_t *source                             = NULL;
 	system_character_t *file_entry_name                 = NULL;
 	system_character_t *value_string                    = NULL;
@@ -5033,7 +5816,9 @@ int info_handle_file_entry_value_fprint(
 	int32_t entry_modification_time                     = 0;
 	int32_t modification_time                           = 0;
 	int access_control_entry_index                      = 0;
+	int attribute_index                                 = 0;
 	int number_of_access_control_entries                = 0;
+	int number_of_attributes                            = 0;
 	int result                                          = 0;
 
 	if( info_handle == NULL )
@@ -5428,6 +6213,102 @@ int info_handle_file_entry_value_fprint(
 
 			goto on_error;
 		}
+		if( libewf_file_entry_get_number_of_attributes(
+		     file_entry,
+		     &number_of_attributes,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of attributes.",
+			 function );
+
+			goto on_error;
+		}
+		if( number_of_attributes > 0 )
+		{
+			if( info_handle_sub_section_header_fprint(
+			     info_handle,
+			     "attributes",
+			     "Attributes",
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print sub section header: attributes.",
+				 function );
+
+				goto on_error;
+			}
+			for( attribute_index = 0;
+			     attribute_index < number_of_attributes;
+			     attribute_index++ )
+			{
+				if( libewf_file_entry_get_attribute(
+				     file_entry,
+				     attribute_index,
+				     &attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve attribute: %d.",
+					 function,
+					 attribute_index );
+
+					goto on_error;
+				}
+				if( info_handle_attribute_value_fprint(
+				     info_handle,
+				     attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print attribute: %d.",
+					 function,
+					 attribute_index );
+
+					goto on_error;
+				}
+				if( libewf_attribute_free(
+				     &attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free attribute: %d.",
+					 function,
+					 attribute_index );
+
+					goto on_error;
+				}
+			}
+			if( info_handle_sub_section_footer_fprint(
+			     info_handle,
+			     "attributes",
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print sub section footer: attributes.",
+				 function );
+
+				goto on_error;
+			}
+		}
 		if( libewf_file_entry_get_number_of_access_control_entries(
 		     file_entry,
 		     &number_of_access_control_entries,
@@ -5444,10 +6325,21 @@ int info_handle_file_entry_value_fprint(
 		}
 		if( number_of_access_control_entries > 0 )
 		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "\tPermissions:\n" );
+			if( info_handle_sub_section_header_fprint(
+			     info_handle,
+			     "permissions",
+			     "Permissions",
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print sub section header: permissions.",
+				 function );
 
+				goto on_error;
+			}
 			for( access_control_entry_index = 0;
 			     access_control_entry_index < number_of_access_control_entries;
 			     access_control_entry_index++ )
@@ -5497,6 +6389,20 @@ int info_handle_file_entry_value_fprint(
 
 					goto on_error;
 				}
+			}
+			if( info_handle_sub_section_footer_fprint(
+			     info_handle,
+			     "permissions",
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print sub section footer: permissions.",
+				 function );
+
+				goto on_error;
 			}
 		}
 		result = libewf_file_entry_get_source(

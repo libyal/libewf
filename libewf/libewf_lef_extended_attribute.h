@@ -50,6 +50,10 @@ struct libewf_lef_extended_attribute
 	/* The size of the UTF-16 little-endian encoded value
 	 */
 	size_t value_size;
+
+	/* Value to indicate if the extended attribute is a branch
+	 */
+	uint8_t is_branch;
 };
 
 int libewf_lef_extended_attribute_initialize(

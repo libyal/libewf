@@ -242,6 +242,150 @@ int libewf_source_get_utf16_model(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_serial_number_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_serial_number(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_serial_number_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_serial_number(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_domain_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_domain(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_domain_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_domain(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_ip_address_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_ip_address(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_ip_address_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_ip_address(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_mac_address_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_mac_address(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_mac_address_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_mac_address(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_size(
+     libewf_source_t *source,
+     size64_t *size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_acquisition_time(
+     libewf_source_t *source,
+     int32_t *posix_time,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_hash_value_md5(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_hash_value_md5(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_hash_value_sha1(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_hash_value_sha1(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

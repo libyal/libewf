@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_single_files"
-	ProjectGUID="{F32DF8CB-B028-4419-B0A4-FEF3A0A8D4A8}"
-	RootNamespace="ewf_test_single_files"
+	Name="ewf_test_permission_group"
+	ProjectGUID="{AE357D03-0B93-4B10-B33B-4F7736DFC5F0}"
+	RootNamespace="ewf_test_permission_group"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -180,7 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_single_files.c"
+				RelativePath="..\..\tests\ewf_test_permission_group.c"
 				>
 			</File>
 		</Filter>
@@ -195,10 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libewf.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libfvalue.h"
 				>
 			</File>
 			<File

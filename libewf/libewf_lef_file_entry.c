@@ -26,6 +26,7 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_lef_extended_attribute.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libfguid.h"
@@ -33,6 +34,11 @@
 #include "libewf_libuna.h"
 #include "libewf_serialized_string.h"
 #include "libewf_lef_file_entry.h"
+
+const uint8_t libewf_lef_extended_attributes_header[ 37 ] = {
+	0x00, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x41, 0x00, 0x74,
+	0x00, 0x74, 0x00, 0x72, 0x00, 0x69, 0x00, 0x62, 0x00, 0x75, 0x00, 0x74, 0x00, 0x65, 0x00, 0x73,
+	0x00, 0x00, 0x00, 0x00, 0x00 };
 
 /* Creates a file entry
  * Make sure the value lef_file_entry is referencing, is set to NULL
@@ -164,6 +170,20 @@ int libewf_lef_file_entry_initialize(
 
 		goto on_error;
 	}
+	if( libcdata_array_initialize(
+	     &( ( *lef_file_entry )->extended_attributes ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create extended attributes array.",
+		 function );
+
+		goto on_error;
+	}
 	( *lef_file_entry )->data_offset            = -1;
 	( *lef_file_entry )->duplicate_data_offset  = -1;
 	( *lef_file_entry )->permission_group_index = 0;
@@ -173,6 +193,12 @@ int libewf_lef_file_entry_initialize(
 on_error:
 	if( *lef_file_entry != NULL )
 	{
+		if( ( *lef_file_entry )->sha1_hash != NULL )
+		{
+			libewf_serialized_string_free(
+			 &( ( *lef_file_entry )->sha1_hash ),
+			 NULL );
+		}
 		if( ( *lef_file_entry )->md5_hash != NULL )
 		{
 			libewf_serialized_string_free(
@@ -308,6 +334,23 @@ int libewf_lef_file_entry_free(
 				result = -1;
 			}
 		}
+		if( ( *lef_file_entry )->extended_attributes != NULL )
+		{
+			if( libcdata_array_free(
+			     &( ( *lef_file_entry )->extended_attributes ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extended_attribute_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free extended attributes array.",
+				 function );
+
+				result = -1;
+			}
+		}
 		memory_free(
 		 *lef_file_entry );
 
@@ -387,11 +430,12 @@ int libewf_lef_file_entry_clone(
 
 		return( -1 );
 	}
-	( *destination_lef_file_entry )->guid       = NULL;
-	( *destination_lef_file_entry )->name       = NULL;
-	( *destination_lef_file_entry )->short_name = NULL;
-	( *destination_lef_file_entry )->md5_hash   = NULL;
-	( *destination_lef_file_entry )->sha1_hash  = NULL;
+	( *destination_lef_file_entry )->guid                = NULL;
+	( *destination_lef_file_entry )->name                = NULL;
+	( *destination_lef_file_entry )->short_name          = NULL;
+	( *destination_lef_file_entry )->md5_hash            = NULL;
+	( *destination_lef_file_entry )->sha1_hash           = NULL;
+	( *destination_lef_file_entry )->extended_attributes = NULL;
 
 	if( libewf_serialized_string_clone(
 	     &( ( *destination_lef_file_entry )->guid ),
@@ -459,6 +503,22 @@ int libewf_lef_file_entry_clone(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to clone destination SHA1 hash string.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_clone(
+	     &( ( *destination_lef_file_entry )->extended_attributes ),
+	     source_lef_file_entry->extended_attributes,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extended_attribute_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_lef_extended_attribute_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination extended attributes array.",
 		 function );
 
 		goto on_error;
@@ -650,12 +710,13 @@ int libewf_lef_file_entry_read_extended_attributes(
      size_t data_size,
      libcerror_error_t **error )
 {
-	libewf_lef_extended_attribute_t *extended_attribute = NULL;
-	uint8_t *byte_stream                                = NULL;
-	static char *function                               = "libewf_lef_file_entry_read_extended_attributes";
-	size_t byte_stream_offset                           = 0;
-	size_t byte_stream_size                             = 0;
-	ssize_t read_count                                  = 0;
+	libewf_lef_extended_attribute_t *lef_extended_attribute = NULL;
+	uint8_t *byte_stream                                    = NULL;
+	static char *function                                   = "libewf_lef_file_entry_read_extended_attributes";
+	size_t byte_stream_offset                               = 0;
+	size_t byte_stream_size                                 = 0;
+	ssize_t read_count                                      = 0;
+	int entry_index                                         = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -767,10 +828,25 @@ int libewf_lef_file_entry_read_extended_attributes(
 		 0 );
 	}
 #endif
+	if( ( byte_stream_size < 37 )
+	 || ( memory_compare(
+	       libewf_lef_extended_attributes_header,
+	       byte_stream,
+	       37 ) != 0 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported extended attributes header.",
+		 function );
+
+		goto on_error;
+	}
 	while( byte_stream_offset < byte_stream_size )
 	{
 		if( libewf_lef_extended_attribute_initialize(
-		     &extended_attribute,
+		     &lef_extended_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -783,7 +859,7 @@ int libewf_lef_file_entry_read_extended_attributes(
 			goto on_error;
 		}
 		read_count = libewf_lef_extended_attribute_read_data(
-		              extended_attribute,
+		              lef_extended_attribute,
 		              &( byte_stream[ byte_stream_offset ] ),
 		              byte_stream_size - byte_stream_offset,
 		              error );
@@ -800,20 +876,41 @@ int libewf_lef_file_entry_read_extended_attributes(
 			goto on_error;
 		}
 		byte_stream_offset += read_count;
-/* TODO implement */
 
-		if( libewf_lef_extended_attribute_free(
-		     &extended_attribute,
-		     error ) != 1 )
+		if( lef_extended_attribute->is_branch == 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free extended attribute.",
-			 function );
+			if( libcdata_array_append_entry(
+			     lef_file_entry->extended_attributes,
+			     &entry_index,
+			     (intptr_t *) lef_extended_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append entry to extended attributes array.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
+			lef_extended_attribute = NULL;
+		}
+		else
+		{
+			if( libewf_lef_extended_attribute_free(
+			     &lef_extended_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free extended attribute.",
+				 function );
+
+				goto on_error;
+			}
 		}
 	}
 	memory_free(
@@ -822,10 +919,10 @@ int libewf_lef_file_entry_read_extended_attributes(
 	return( 1 );
 
 on_error:
-	if( extended_attribute != NULL )
+	if( lef_extended_attribute != NULL )
 	{
 		libewf_lef_extended_attribute_free(
-		 &extended_attribute,
+		 &lef_extended_attribute,
 		 NULL );
 	}
 	if( byte_stream != NULL )
@@ -3098,5 +3195,84 @@ int libewf_lef_file_entry_get_utf16_hash_value_sha1(
 		return( -1 );
 	}
 	return( result );
+}
+
+/* Retrieves the number of extended attributes
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_number_of_extended_attributes(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *number_of_extended_attributes,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_number_of_extended_attributes";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     lef_file_entry->extended_attributes,
+	     number_of_extended_attributes,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from extended attributes array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific extended attribute from the group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_extended_attribute_by_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int extended_attribute_index,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_extended_attribute_by_index";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     lef_file_entry->extended_attributes,
+	     extended_attribute_index,
+	     (intptr_t **) lef_extended_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from extended attributes array.",
+		 function,
+		 extended_attribute_index );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 

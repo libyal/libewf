@@ -1611,7 +1611,7 @@ int libewf_file_entry_get_utf8_name_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1632,7 +1632,7 @@ int libewf_file_entry_get_utf16_name_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1653,7 +1653,7 @@ int libewf_file_entry_get_utf8_short_name_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded short name value
+/* Retrieves the UTF-8 encoded short name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1674,7 +1674,7 @@ int libewf_file_entry_get_utf16_short_name_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded short name value
+/* Retrieves the UTF-16 encoded short name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1745,6 +1745,7 @@ int libewf_file_entry_get_deletion_time(
      libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded MD5 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1755,6 +1756,7 @@ int libewf_file_entry_get_utf8_hash_value_md5(
      libewf_error_t **error );
 
 /* Retrieves the UTF-16 encoded MD5 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1765,6 +1767,7 @@ int libewf_file_entry_get_utf16_hash_value_md5(
      libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1775,6 +1778,7 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
      libewf_error_t **error );
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1889,6 +1893,25 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      libewf_file_entry_t **sub_file_entry,
      libewf_error_t **error );
 
+/* Retrieves the number of attributes
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_number_of_attributes(
+     libewf_file_entry_t *file_entry,
+     int *number_of_attributes,
+     libewf_error_t **error );
+
+/* Retrieves the attribute for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_attribute(
+     libewf_file_entry_t *file_entry,
+     int attribute_index,
+     libewf_attribute_t **attribute,
+     libewf_error_t **error );
+
 /* Retrieves the number of access control entries
  * Returns 1 if successful or -1 on error
  */
@@ -1911,9 +1934,106 @@ int libewf_file_entry_get_access_control_entry(
 /* Retrieves the (acquisition) source
  * Returns 1 if successful, 0 if not set or -1 on error
  */
+LIBEWF_EXTERN \
 int libewf_file_entry_get_source(
      libewf_file_entry_t *file_entry,
      libewf_source_t **source,
+     libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_free(
+     libewf_attribute_t **attribute,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_name_size(
+     libewf_attribute_t *attribute,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_name(
+     libewf_attribute_t *attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_name_size(
+     libewf_attribute_t *attribute,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_name(
+     libewf_attribute_t *attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded value
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_value_size(
+     libewf_attribute_t *attribute,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_value(
+     libewf_attribute_t *attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded value
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_value_size(
+     libewf_attribute_t *attribute,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_value(
+     libewf_attribute_t *attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1947,7 +2067,7 @@ int libewf_access_control_entry_get_utf8_identifier_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded identifier value
+/* Retrieves the UTF-8 encoded identifier
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -1968,7 +2088,7 @@ int libewf_access_control_entry_get_utf16_identifier_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded identifier value
+/* Retrieves the UTF-16 encoded identifier
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -1989,7 +2109,7 @@ int libewf_access_control_entry_get_utf8_name_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2010,7 +2130,7 @@ int libewf_access_control_entry_get_utf16_name_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2024,6 +2144,7 @@ int libewf_access_control_entry_get_utf16_name(
 /* Retrieves the access mask
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN \
 int libewf_access_control_entry_get_access_mask(
      libewf_access_control_entry_t *access_control_entry,
      uint32_t *access_mask,
@@ -2033,21 +2154,10 @@ int libewf_access_control_entry_get_access_mask(
  * Contains Windows NT access control entry (ACE) flags
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_EXTERN \
 int libewf_access_control_entry_get_flags(
      libewf_access_control_entry_t *access_control_entry,
      uint32_t *flags,
-     libewf_error_t **error );
-
-/* -------------------------------------------------------------------------
- * Attribute functions
- * ------------------------------------------------------------------------- */
-
-/* Frees an attribute
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN \
-int libewf_attribute_free(
-     libewf_attribute_t **attribute,
      libewf_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -2072,7 +2182,7 @@ int libewf_source_get_utf8_name_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2093,7 +2203,7 @@ int libewf_source_get_utf16_name_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2114,7 +2224,7 @@ int libewf_source_get_utf8_evidence_number_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded evidence number value
+/* Retrieves the UTF-8 encoded evidence number
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2135,7 +2245,7 @@ int libewf_source_get_utf16_evidence_number_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded evidence number value
+/* Retrieves the UTF-16 encoded evidence number
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2156,7 +2266,7 @@ int libewf_source_get_utf8_location_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded location value
+/* Retrieves the UTF-8 encoded location
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2177,7 +2287,7 @@ int libewf_source_get_utf16_location_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded location value
+/* Retrieves the UTF-16 encoded location
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2198,7 +2308,7 @@ int libewf_source_get_utf8_device_guid_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded device GUID value
+/* Retrieves the UTF-8 encoded device GUID
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2219,7 +2329,7 @@ int libewf_source_get_utf16_device_guid_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded device GUID value
+/* Retrieves the UTF-16 encoded device GUID
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2240,7 +2350,7 @@ int libewf_source_get_utf8_primary_device_guid_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded primary device GUID value
+/* Retrieves the UTF-8 encoded primary device GUID
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2261,7 +2371,7 @@ int libewf_source_get_utf16_primary_device_guid_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded primary device GUID value
+/* Retrieves the UTF-16 encoded primary device GUID
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2282,7 +2392,7 @@ int libewf_source_get_utf8_manufacturer_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded manufacturer value
+/* Retrieves the UTF-8 encoded manufacturer
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2303,7 +2413,7 @@ int libewf_source_get_utf16_manufacturer_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded manufacturer value
+/* Retrieves the UTF-16 encoded manufacturer
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2324,7 +2434,7 @@ int libewf_source_get_utf8_model_size(
      size_t *utf8_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-8 encoded model value
+/* Retrieves the UTF-8 encoded model
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -2345,12 +2455,243 @@ int libewf_source_get_utf16_model_size(
      size_t *utf16_string_size,
      libewf_error_t **error );
 
-/* Retrieves the UTF-16 encoded model value
+/* Retrieves the UTF-16 encoded model
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 LIBEWF_EXTERN \
 int libewf_source_get_utf16_model(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded serial number
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_serial_number_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded serial number
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_serial_number(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded serial number
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_serial_number_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded serial number
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_serial_number(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded domain
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_domain_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded domain
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_domain(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded domain
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_domain_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded domain
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_domain(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded IP address
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_ip_address_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded IP address
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_ip_address(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded IP address
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_ip_address_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded IP address
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_ip_address(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded MAC address
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_mac_address_size(
+     libewf_source_t *source,
+     size_t *utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded MAC address
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_mac_address(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded MAC address
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_mac_address_size(
+     libewf_source_t *source,
+     size_t *utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded MAC address
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_mac_address(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the size
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_size(
+     libewf_source_t *source,
+     size64_t *size,
+     libewf_error_t **error );
+
+/* Retrieves the acquisition date and time
+ * The date and time is formatted as a POSIX timestamp
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_acquisition_time(
+     libewf_source_t *source,
+     int32_t *posix_time,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded MD5 hash value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_hash_value_md5(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded MD5 hash value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_hash_value_md5(
+     libewf_source_t *source,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-8 encoded SHA1 hash value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf8_hash_value_sha1(
+     libewf_source_t *source,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libewf_error_t **error );
+
+/* Retrieves the UTF-16 encoded SHA1 hash value
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not set or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_source_get_utf16_hash_value_sha1(
      libewf_source_t *source,
      uint16_t *utf16_string,
      size_t utf16_string_size,

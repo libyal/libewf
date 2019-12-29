@@ -42,22 +42,6 @@ typedef struct libewf_single_files libewf_single_files_t;
 
 struct libewf_single_files
 {
-	/* The section data
-	 */
-	uint8_t *section_data;
-
-	/* The section data size
-	 */
-	size_t section_data_size;
-
-	/* The ltree data
-	 */
-	uint8_t *ltree_data;
-
-	/* The ltree data size
-	 */
-	size_t ltree_data_size;
-
 	/* The permission groups array
 	 */
 	libcdata_array_t *permission_groups;
@@ -77,6 +61,11 @@ int libewf_single_files_initialize(
 
 int libewf_single_files_free(
      libewf_single_files_t **single_files,
+     libcerror_error_t **error );
+
+int libewf_single_files_clone(
+     libewf_single_files_t **destination_single_files,
+     libewf_single_files_t *source_single_files,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_line(
@@ -105,22 +94,21 @@ int libewf_single_files_parse_number_of_entries(
      libcerror_error_t **error );
 
 int libewf_single_files_parse_format(
-     libewf_single_files_t *single_files,
      libfvalue_split_utf8_string_t *types,
      uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_rec_category(
      libewf_single_files_t *single_files,
-     size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     size64_t *media_size,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_record_values(
-     size64_t *media_size,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     size64_t *media_size,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_perm_category(
@@ -151,9 +139,9 @@ int libewf_single_files_parse_sub_category(
 
 int libewf_single_files_parse_entry_category(
      libewf_single_files_t *single_files,
-     uint8_t *format,
      libfvalue_split_utf8_string_t *lines,
      int *line_index,
+     uint8_t *format,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry(
@@ -169,16 +157,18 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
      int *number_of_sub_entries,
      libcerror_error_t **error );
 
-int libewf_single_files_parse_string(
+int libewf_single_files_parse_utf8_string(
      libewf_single_files_t *single_files,
+     const uint8_t *utf8_string,
+     size_t utf8_string_size,
      size64_t *media_size,
-     const uint8_t *string,
-     size_t string_size,
      uint8_t *format,
      libcerror_error_t **error );
 
-int libewf_single_files_parse(
+int libewf_single_files_read_data(
      libewf_single_files_t *single_files,
+     const uint8_t *data,
+     size_t data_size,
      size64_t *media_size,
      uint8_t *format,
      libcerror_error_t **error );

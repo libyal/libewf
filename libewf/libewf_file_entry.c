@@ -24,6 +24,7 @@
 #include <types.h>
 
 #include "libewf_access_control_entry.h"
+#include "libewf_attribute.h"
 #include "libewf_definitions.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
@@ -785,7 +786,7 @@ int libewf_file_entry_get_utf8_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -933,7 +934,7 @@ int libewf_file_entry_get_utf16_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1081,7 +1082,7 @@ int libewf_file_entry_get_utf8_short_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-8 encoded short name value
+/* Retrieves the UTF-8 encoded short name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1229,7 +1230,7 @@ int libewf_file_entry_get_utf16_short_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded short name value
+/* Retrieves the UTF-16 encoded short name
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1752,6 +1753,7 @@ int libewf_file_entry_get_deletion_time(
 }
 
 /* Retrieves the UTF-8 encoded MD5 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_file_entry_get_utf8_hash_value_md5(
@@ -1828,6 +1830,7 @@ int libewf_file_entry_get_utf8_hash_value_md5(
 }
 
 /* Retrieves the UTF-16 encoded MD5 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_file_entry_get_utf16_hash_value_md5(
@@ -1904,6 +1907,7 @@ int libewf_file_entry_get_utf16_hash_value_md5(
 }
 
 /* Retrieves the UTF-8 encoded SHA1 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_file_entry_get_utf8_hash_value_sha1(
@@ -1980,6 +1984,7 @@ int libewf_file_entry_get_utf8_hash_value_sha1(
 }
 
 /* Retrieves the UTF-16 encoded SHA1 hash value
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
 int libewf_file_entry_get_utf16_hash_value_sha1(
@@ -3537,6 +3542,202 @@ on_error:
 	 NULL );
 #endif
 	return( -1 );
+}
+
+/* Retrieves the number of attributes
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_number_of_attributes(
+     libewf_file_entry_t *file_entry,
+     int *number_of_attributes,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_number_of_attributes";
+	int result                                        = 1;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( number_of_attributes == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of attributes.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_file_entry_get_number_of_extended_attributes(
+	     internal_file_entry->lef_file_entry,
+	     number_of_attributes,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of extended attributes.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the attribute for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_attribute(
+     libewf_file_entry_t *file_entry,
+     int attribute_index,
+     libewf_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry       = NULL;
+	libewf_lef_extended_attribute_t *lef_extended_attribute = NULL;
+	static char *function                                   = "libewf_file_entry_get_attribute";
+	int result                                              = 1;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( *attribute != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: attribute already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_file_entry_get_extended_attribute_by_index(
+	     internal_file_entry->lef_file_entry,
+	     attribute_index,
+	     &lef_extended_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve extended attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+	else if( libewf_attribute_initialize(
+	          attribute,
+	          lef_extended_attribute,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the number of access control entries

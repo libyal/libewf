@@ -1,7 +1,7 @@
 #!/bin/sh
 # Script that synchronizes the local library dependencies
 #
-# Version: 20191228
+# Version: 20191229
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -169,11 +169,11 @@ SED_SCRIPT="/^$/ {
 	then
 		if test -f "m4/libfdatetime.m4";
 		then
-			sed -i'~' "/@LIBFVALUE_CPPFLAGS@/i \\\\t@LIBFDATETIME_CPPFLAGS@ \\\\" ${LOCAL_LIB_MAKEFILE_AM};
+			sed -i'~' '/@LIBFVALUE_CPPFLAGS@/{h; s/FVALUE/FDATETIME/; p; g;}' ${LOCAL_LIB_MAKEFILE_AM};
 		fi
 		if test -f "m4/libfguid.m4";
 		then
-			sed -i'~' "/@LIBFVALUE_CPPFLAGS@/i \\\\t@LIBFGUID_CPPFLAGS@ \\\\" ${LOCAL_LIB_MAKEFILE_AM};
+			sed -i'~' '/@LIBFVALUE_CPPFLAGS@/{h; s/FVALUE/FGUID/; p; g;}' ${LOCAL_LIB_MAKEFILE_AM};
 		fi
 	fi
 

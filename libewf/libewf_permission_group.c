@@ -165,6 +165,89 @@ int libewf_permission_group_free(
 	return( result );
 }
 
+/* Clones the permission group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_permission_group_clone(
+     libewf_permission_group_t **destination_permission_group,
+     libewf_permission_group_t *source_permission_group,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_permission_group_clone";
+
+	if( destination_permission_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination permission group.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_permission_group != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination permission group value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_permission_group == NULL )
+	{
+		*destination_permission_group = NULL;
+
+		return( 1 );
+	}
+	*destination_permission_group = memory_allocate_structure(
+	                                 libewf_permission_group_t );
+
+	if( *destination_permission_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination permission group.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_permission_group )->permissions = NULL;
+
+	if( libcdata_array_clone(
+	     &( ( *destination_permission_group )->permissions ),
+	     source_permission_group->permissions,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_permission_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_lef_permission_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination permissions array.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_permission_group != NULL )
+	{
+		memory_free(
+		 *destination_permission_group );
+
+		*destination_permission_group = NULL;
+	}
+	return( -1 );
+}
+
 /* Appends a permission to the group
  * Returns 1 if successful or -1 on error
  */

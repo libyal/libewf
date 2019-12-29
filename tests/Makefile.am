@@ -99,9 +99,11 @@ check_PROGRAMS = \
 	ewf_test_lef_permission \
 	ewf_test_lef_source \
 	ewf_test_lef_subject \
+	ewf_test_ltree_section \
 	ewf_test_md5_hash_section \
 	ewf_test_media_values \
 	ewf_test_notify \
+	ewf_test_permission_group \
 	ewf_test_read_io_handle \
 	ewf_test_restart_data \
 	ewf_test_section_descriptor \
@@ -321,11 +323,18 @@ ewf_test_file_entry_SOURCES = \
 	ewf_test_file_entry.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
 	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h
 
 ewf_test_file_entry_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -525,6 +534,17 @@ ewf_test_lef_subject_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_ltree_section_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_ltree_section.c \
+	ewf_test_unused.h
+
+ewf_test_ltree_section_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_md5_hash_section_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
@@ -556,6 +576,18 @@ ewf_test_notify_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_notify_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_permission_group_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_permission_group.c \
+	ewf_test_unused.h
+
+ewf_test_permission_group_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -679,12 +711,19 @@ ewf_test_sha1_hash_section_LDADD = \
 ewf_test_single_files_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
+	ewf_test_libfvalue.h \
 	ewf_test_macros.h \
 	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_single_files.c \
 	ewf_test_unused.h
 
 ewf_test_single_files_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

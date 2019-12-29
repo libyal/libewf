@@ -60,6 +60,58 @@ int libewf_attribute_free(
      libewf_attribute_t **attribute,
      libcerror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_name_size(
+     libewf_attribute_t *attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_name(
+     libewf_attribute_t *attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_name_size(
+     libewf_attribute_t *attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_name(
+     libewf_attribute_t *attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_value_size(
+     libewf_attribute_t *attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf8_value(
+     libewf_attribute_t *attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_value_size(
+     libewf_attribute_t *attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_attribute_get_utf16_value(
+     libewf_attribute_t *attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

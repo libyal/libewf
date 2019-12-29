@@ -25,6 +25,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_lef_extended_attribute.h"
+#include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
 #include "libewf_serialized_string.h"
@@ -133,6 +135,10 @@ struct libewf_lef_file_entry
 	/* The SHA1 digest hash string
 	 */
 	libewf_serialized_string_t *sha1_hash;
+
+	/* The extended attributes array
+	 */
+	libcdata_array_t *extended_attributes;
 };
 
 int libewf_lef_file_entry_initialize(
@@ -346,6 +352,17 @@ int libewf_lef_file_entry_get_utf16_hash_value_sha1(
      libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_number_of_extended_attributes(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *number_of_extended_attributes,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_extended_attribute_by_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int extended_attribute_index,
+     libewf_lef_extended_attribute_t **lef_extended_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

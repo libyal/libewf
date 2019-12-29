@@ -1630,8 +1630,12 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 	libewf_header_sections_t *header_sections = NULL;
 	libewf_section_descriptor_t *section      = NULL;
 	libfcache_cache_t *sections_cache         = NULL;
+	uint8_t *single_files_data                = NULL;
+	uint8_t *single_files_section_data        = NULL;
 	uint8_t *string_data                      = NULL;
 	static char *function                     = "libewf_internal_handle_open_read_segment_file_section_data";
+	size_t single_files_data_size             = 0;
+	size_t single_files_section_data_size     = 0;
 	size_t string_data_size                   = 0;
 	ssize_t read_count                        = 0;
 	off64_t section_data_offset               = 0;
@@ -1642,7 +1646,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 	int result                                = 0;
 	int section_index                         = 0;
 	int set_identifier_change                 = 0;
-	int single_files_section_found            = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	int known_section                         = 0;
@@ -1692,13 +1695,13 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 		return( -1 );
 	}
-	if( internal_handle->single_files == NULL )
+	if( internal_handle->single_files != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing single files.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid handle - single files value already set.",
 		 function );
 
 		return( -1 );
@@ -2328,13 +2331,11 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
-						      &( internal_handle->single_files->section_data ),
-						      &( internal_handle->single_files->section_data_size ),
-						      &( internal_handle->single_files->ltree_data ),
-						      &( internal_handle->single_files->ltree_data_size ),
+						      &single_files_section_data,
+						      &single_files_section_data_size,
+						      &single_files_data,
+						      &single_files_data_size,
 						      error );
-
-					single_files_section_found = 1;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
@@ -2852,10 +2853,25 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 			goto on_error;
 		}
 	}
-	if( single_files_section_found != 0 )
+	if( single_files_data != NULL )
 	{
-		if( libewf_single_files_parse(
+		if( libewf_single_files_initialize(
+		     &( internal_handle->single_files ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create single files.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_single_files_read_data(
 		     internal_handle->single_files,
+		     single_files_data,
+		     single_files_data_size,
 		     &( internal_handle->media_values->media_size ),
 		     &( internal_handle->io_handle->format ),
 		     error ) != 1 )
@@ -2869,6 +2885,11 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 			goto on_error;
 		}
+		memory_free(
+		 single_files_section_data );
+
+		single_files_section_data = NULL;
+
 		if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
 		{
 			if( internal_handle->io_handle->format == LIBEWF_FORMAT_LOGICAL_ENCASE7 )
@@ -2913,6 +2934,17 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 	return( 1 );
 
 on_error:
+	if( internal_handle->single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &( internal_handle->single_files ),
+		 NULL );
+	}
+	if( single_files_section_data != NULL )
+	{
+		memory_free(
+		 single_files_section_data );
+	}
 	if( string_data != NULL )
 	{
 		memory_free(
@@ -3484,19 +3516,6 @@ int libewf_internal_handle_open_file_io_pool(
 
 		goto on_error;
 	}
-	if( libewf_single_files_initialize(
-	     &( internal_handle->single_files ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create single files.",
-		 function );
-
-		goto on_error;
-	}
 	if( libcdata_array_empty(
 	     internal_handle->sessions,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
@@ -3718,7 +3737,7 @@ int libewf_internal_handle_open_file_io_pool(
 			goto on_error;
 		}
 /* TODO refactor */
-		if( internal_handle->single_files->ltree_data == NULL )
+		if( internal_handle->single_files == NULL )
 		{
 			if( libewf_internal_handle_get_media_values(
 			     internal_handle,

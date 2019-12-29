@@ -332,7 +332,7 @@ int libewf_access_control_entry_get_utf8_identifier_size(
 	return( result );
 }
 
-/* Retrieves the UTF-8 encoded identifier value
+/* Retrieves the UTF-8 encoded identifier
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -484,7 +484,7 @@ int libewf_access_control_entry_get_utf16_identifier_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded identifier value
+/* Retrieves the UTF-16 encoded identifier
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -636,7 +636,7 @@ int libewf_access_control_entry_get_utf8_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-8 encoded name value
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */
@@ -788,7 +788,7 @@ int libewf_access_control_entry_get_utf16_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded name value
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */

@@ -161,10 +161,12 @@ stamp-h[1-9]
 /tests/ewf_test_lef_file_entry
 /tests/ewf_test_lef_permission
 /tests/ewf_test_lef_source
+/tests/ewf_test_ltree_section
 /tests/ewf_test_lef_subject
 /tests/ewf_test_md5_hash_section
 /tests/ewf_test_media_values
 /tests/ewf_test_notify
+/tests/ewf_test_permission_group
 /tests/ewf_test_read_io_handle
 /tests/ewf_test_restart_data
 /tests/ewf_test_section_descriptor

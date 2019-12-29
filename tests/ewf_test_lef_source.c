@@ -899,7 +899,7 @@ int ewf_test_lef_source_get_identifier(
      libewf_lef_source_t *lef_source )
 {
 	libcerror_error_t *error = NULL;
-	uint32_t identifier      = 0;
+	int identifier           = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -5220,10 +5220,10 @@ int ewf_test_lef_source_get_logical_offset(
 	          &logical_offset,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -5293,10 +5293,10 @@ int ewf_test_lef_source_get_physical_offset(
 	          &physical_offset,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",

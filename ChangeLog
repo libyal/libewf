@@ -1,4 +1,5 @@
 TODO
+* ewfinfo sanitize special characters in file names?
 * rename extended attribute to attribute
 * change single files tree to B-tree
 * ewftools ignore name of root - check ewfmount / ewfveriry

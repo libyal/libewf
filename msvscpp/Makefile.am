@@ -29,9 +29,11 @@ MSVSCPP_FILES = \
 	ewf_test_lef_permission/ewf_test_lef_permission.vcproj \
 	ewf_test_lef_source/ewf_test_lef_source.vcproj \
 	ewf_test_lef_subject/ewf_test_lef_subject.vcproj \
+	ewf_test_ltree_section/ewf_test_ltree_section.vcproj \
 	ewf_test_md5_hash_section/ewf_test_md5_hash_section.vcproj \
 	ewf_test_media_values/ewf_test_media_values.vcproj \
 	ewf_test_notify/ewf_test_notify.vcproj \
+	ewf_test_permission_group/ewf_test_permission_group.vcproj \
 	ewf_test_read_io_handle/ewf_test_read_io_handle.vcproj \
 	ewf_test_restart_data/ewf_test_restart_data.vcproj \
 	ewf_test_section_descriptor/ewf_test_section_descriptor.vcproj \

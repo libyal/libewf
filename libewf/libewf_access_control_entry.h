@@ -124,6 +124,12 @@ int libewf_access_control_entry_get_access_mask(
      uint32_t *access_mask,
      libcerror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_access_control_entry_get_flags(
+     libewf_access_control_entry_t *access_control_entry,
+     uint32_t *flags,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

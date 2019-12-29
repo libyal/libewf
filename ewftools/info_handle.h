@@ -173,6 +173,17 @@ int info_handle_section_value_boolean_fprint(
      int value_boolean,
      libcerror_error_t **error );
 
+int info_handle_sub_section_header_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     const char *description,
+     libcerror_error_t **error );
+
+int info_handle_sub_section_footer_fprint(
+     info_handle_t *info_handle,
+     const char *identifier,
+     libcerror_error_t **error );
+
 int info_handle_header_value_fprint(
      info_handle_t *info_handle,
      const char *identifier,
@@ -226,6 +237,11 @@ int info_handle_tracks_fprint(
 int info_handle_access_control_entry_value_fprint(
      info_handle_t *info_handle,
      libewf_access_control_entry_t *access_control_entry,
+     libcerror_error_t **error );
+
+int info_handle_attribute_value_fprint(
+     info_handle_t *info_handle,
+     libewf_attribute_t *attribute,
      libcerror_error_t **error );
 
 int info_handle_source_value_fprint(

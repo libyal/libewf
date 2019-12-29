@@ -421,6 +421,8 @@ ssize_t libewf_lef_extended_attribute_read_data(
 		 0 );
 	}
 #endif
+	lef_extended_attribute->is_branch = data[ 4 ];
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -433,7 +435,7 @@ ssize_t libewf_lef_extended_attribute_read_data(
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: unknown2\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: is branch\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 data[ 4 ] );
 
