@@ -938,6 +938,29 @@ int ewf_test_lef_permission_read_data(
 	libcerror_error_free(
 	 &error );
 
+	/* Test number_of_types != number_of_values
+	 */
+	result = libewf_lef_permission_read_data(
+	          lef_permission,
+	          types,
+	          ewf_test_lef_permission_values_data1,
+	          11,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* TODO: test with invalid data */
+
 	/* Clean up
 	 */
 	result = libfvalue_split_utf8_string_free(

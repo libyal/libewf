@@ -104,7 +104,7 @@ struct libewf_lef_source
 	/* The acquisition date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t acquisition_time;
+	int64_t acquisition_time;
 
 	/* The MD5 digest hash string
 	 */
@@ -404,7 +404,7 @@ int libewf_lef_source_get_physical_offset(
 
 int libewf_lef_source_get_acquisition_time(
      libewf_lef_source_t *lef_source,
-     int32_t *acquisition_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_source_get_utf8_hash_value_md5(

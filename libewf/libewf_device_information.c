@@ -108,23 +108,6 @@ int libewf_device_information_generate_utf8_string(
 	}
 	if( libfvalue_table_get_value_by_identifier(
 	     header_values,
-	     (uint8_t *) "serial_number",
-	     14,
-	     &serial_number_header_value,
-	     0,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: serial_number.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfvalue_table_get_value_by_identifier(
-	     header_values,
 	     (uint8_t *) "model",
 	     6,
 	     &model_header_value,
@@ -136,6 +119,23 @@ int libewf_device_information_generate_utf8_string(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value: model.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_table_get_value_by_identifier(
+	     header_values,
+	     (uint8_t *) "serial_number",
+	     14,
+	     &serial_number_header_value,
+	     0,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value: serial_number.",
 		 function );
 
 		goto on_error;

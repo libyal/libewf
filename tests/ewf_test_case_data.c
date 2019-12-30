@@ -70,6 +70,7 @@ int ewf_test_case_data_generate_utf8_string(
 	libfvalue_table_t *header_values    = NULL;
 	uint8_t *utf8_string                = NULL;
 	size_t utf8_string_size             = 0;
+	int header_value_index              = 0;
 	int result                          = 0;
 
 	/* Initialize test
@@ -110,6 +111,8 @@ int ewf_test_case_data_generate_utf8_string(
 
 	/* Test regular cases
 	 */
+	utf8_string_size = 0;
+
 	result = libewf_case_data_generate_utf8_string(
 	          &utf8_string,
 	          &utf8_string_size,
@@ -139,6 +142,8 @@ int ewf_test_case_data_generate_utf8_string(
 
 	/* Test error cases
 	 */
+	utf8_string_size = 0;
+
 	result = libewf_case_data_generate_utf8_string(
 	          NULL,
 	          &utf8_string_size,
@@ -271,6 +276,142 @@ int ewf_test_case_data_generate_utf8_string(
 	libcerror_error_free(
 	 &error );
 
+	/* Test libewf_case_data_generate_utf8_string with failing libfvalue_table_get_value_by_identifier
+	 */
+	for( header_value_index = LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION;
+	     header_value_index >= LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER;
+	     header_value_index-- )
+	{
+		result = libfvalue_table_set_value_by_index(
+		          header_values,
+		          header_value_index,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		result = libewf_case_data_generate_utf8_string(
+		          &utf8_string,
+		          &utf8_string_size,
+		          media_values,
+		          header_values,
+		          0,
+		          LIBEWF_FORMAT_V2_ENCASE7,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "utf8_string",
+		 utf8_string );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+/* TODO fix test
+ */
+#ifdef TODO
+	/* Test libewf_case_data_generate_utf8_string with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_case_data_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+
+		if( utf8_string != NULL )
+		{
+			memory_free(
+			 utf8_string );
+
+			utf8_string = NULL;
+		}
+		utf8_string_size = 0;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "utf8_string",
+		 utf8_string );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(
@@ -341,7 +482,6 @@ int ewf_test_case_data_generate(
 	libfvalue_table_t *header_values    = NULL;
 	uint8_t *case_data                  = NULL;
 	size_t case_data_size               = 0;
-	int header_value_index              = 0;
 	int result                          = 0;
 
 	/* Initialize test
@@ -382,6 +522,8 @@ int ewf_test_case_data_generate(
 
 	/* Test regular cases
 	 */
+	case_data_size = 0;
+
 	result = libewf_case_data_generate(
 	          &case_data,
 	          &case_data_size,
@@ -411,6 +553,8 @@ int ewf_test_case_data_generate(
 
 	/* Test error cases
 	 */
+	case_data_size = 0;
+
 	result = libewf_case_data_generate(
 	          NULL,
 	          &case_data_size,
@@ -517,36 +661,39 @@ int ewf_test_case_data_generate(
 	libcerror_error_free(
 	 &error );
 
-	/* Test libewf_case_data_parse with failing libfvalue_table_get_value_by_identifier
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+/* TODO fix test
+ */
+#ifdef TODO
+	/* Test libewf_case_data_generate with malloc failing
 	 */
-	for( header_value_index = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT - 1;
-	     header_value_index >= 0;
-	     header_value_index-- )
+	ewf_test_malloc_attempts_before_fail = 1;
+
+	result = libewf_case_data_generate(
+	          &case_data,
+	          &case_data_size,
+	          media_values,
+	          header_values,
+	          0,
+	          LIBEWF_FORMAT_V2_ENCASE7,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
 	{
-		result = libfvalue_table_set_value_by_index(
-		          header_values,
-		          header_value_index,
-		          NULL,
-		          &error );
+		ewf_test_malloc_attempts_before_fail = -1;
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 1 );
+		if( case_data != NULL )
+		{
+			memory_free(
+			 case_data );
 
-		EWF_TEST_ASSERT_IS_NULL(
-		 "error",
-		 error );
-
-		result = libewf_case_data_generate(
-		          &case_data,
-		          &case_data_size,
-		          NULL,
-		          header_values,
-		          0,
-		          LIBEWF_FORMAT_V2_ENCASE7,
-		          &error );
-
+			case_data = NULL;
+		}
+		case_data_size = 0;
+	}
+	else
+	{
 		EWF_TEST_ASSERT_EQUAL_INT(
 		 "result",
 		 result,
@@ -563,6 +710,9 @@ int ewf_test_case_data_generate(
 		libcerror_error_free(
 		 &error );
 	}
+#endif
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(

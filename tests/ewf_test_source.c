@@ -4444,6 +4444,152 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_source_get_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_source_get_size(
+     libewf_source_t *source )
+{
+	libcerror_error_t *error = NULL;
+	size64_t size            = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_source_get_size(
+	          source,
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_source_get_size(
+	          NULL,
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_source_get_size(
+	          source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_source_get_acquisition_time function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_source_get_acquisition_time(
+     libewf_source_t *source )
+{
+	libcerror_error_t *error = NULL;
+	int64_t acquisition_time = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_source_get_acquisition_time(
+	          source,
+	          &acquisition_time,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_source_get_acquisition_time(
+	          NULL,
+	          &acquisition_time,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_source_get_acquisition_time(
+	          source,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_source_get_utf8_hash_value_md5 function
  * Returns 1 if successful or 0 if not
  */
@@ -5231,6 +5377,16 @@ int main(
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_source_get_utf16_mac_address",
 	 ewf_test_source_get_utf16_mac_address,
+	 source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_source_get_size",
+	 ewf_test_source_get_size,
+	 source );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_source_get_acquisition_time",
+	 ewf_test_source_get_acquisition_time,
 	 source );
 
 	EWF_TEST_RUN_WITH_ARGS(

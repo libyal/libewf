@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#if defined( HAVE_DEBUG_OUTPUT )
+
 void libewf_debug_print_compression_method(
       uint16_t compression_method );
 
@@ -74,6 +76,8 @@ int libewf_debug_utf16_stream_print(
      const uint8_t *utf16_stream,
      size_t utf16_stream_size,
      libcerror_error_t **error );
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 #if defined( __cplusplus )
 }

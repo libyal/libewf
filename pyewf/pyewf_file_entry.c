@@ -965,7 +965,7 @@ PyObject *pyewf_file_entry_get_creation_time(
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_creation_time";
-	uint32_t posix_time        = 0;
+	int64_t posix_time         = 0;
 	int result                 = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1017,7 +1017,7 @@ PyObject *pyewf_file_entry_get_creation_time_as_integer(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_creation_time_as_integer";
-	uint32_t posix_time      = 0;
+	int64_t posix_time       = 0;
 	int result               = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1069,7 +1069,7 @@ PyObject *pyewf_file_entry_get_modification_time(
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_modification_time";
-	uint32_t posix_time        = 0;
+	int64_t posix_time         = 0;
 	int result                 = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1121,7 +1121,7 @@ PyObject *pyewf_file_entry_get_modification_time_as_integer(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_modification_time_as_integer";
-	uint32_t posix_time      = 0;
+	int64_t posix_time       = 0;
 	int result               = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1173,7 +1173,7 @@ PyObject *pyewf_file_entry_get_access_time(
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_access_time";
-	uint32_t posix_time        = 0;
+	int64_t posix_time         = 0;
 	int result                 = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1225,7 +1225,7 @@ PyObject *pyewf_file_entry_get_access_time_as_integer(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_access_time_as_integer";
-	uint32_t posix_time      = 0;
+	int64_t posix_time       = 0;
 	int result               = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1277,7 +1277,7 @@ PyObject *pyewf_file_entry_get_entry_modification_time(
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
 	static char *function      = "pyewf_file_entry_get_entry_modification_time";
-	uint32_t posix_time        = 0;
+	int64_t posix_time         = 0;
 	int result                 = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )
@@ -1329,7 +1329,7 @@ PyObject *pyewf_file_entry_get_entry_modification_time_as_integer(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyewf_file_entry_get_entry_modification_time_as_integer";
-	uint32_t posix_time      = 0;
+	int64_t posix_time       = 0;
 	int result               = 0;
 
 	PYEWF_UNREFERENCED_PARAMETER( arguments )

@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -284,6 +285,7 @@ int ewf_test_lef_extended_attribute_clone(
 	libcerror_error_t *error                                            = NULL;
 	libewf_lef_extended_attribute_t *destination_lef_extended_attribute = NULL;
 	libewf_lef_extended_attribute_t *source_lef_extended_attribute      = NULL;
+	ssize_t read_count                                                  = 0;
 	int result                                                          = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
@@ -309,6 +311,21 @@ int ewf_test_lef_extended_attribute_clone(
 	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "source_lef_extended_attribute",
 	 source_lef_extended_attribute );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	read_count = libewf_lef_extended_attribute_read_data(
+	              source_lef_extended_attribute,
+	              ewf_test_lef_extended_attribute_data1,
+	              37,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 37 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -828,6 +845,62 @@ int ewf_test_lef_extended_attribute_read_data(
 	}
 #endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Test with an invalid name size
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_lef_extended_attribute_data1[ 5 ] ),
+	 0xffffffffUL );
+
+	read_count = libewf_lef_extended_attribute_read_data(
+	              lef_extended_attribute,
+	              ewf_test_lef_extended_attribute_data1,
+	              37,
+	              &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_lef_extended_attribute_data1[ 5 ] ),
+	 0x00000007UL );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test with an invalid value size
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_lef_extended_attribute_data1[ 9 ] ),
+	 0xffffffffUL );
+
+	read_count = libewf_lef_extended_attribute_read_data(
+	              lef_extended_attribute,
+	              ewf_test_lef_extended_attribute_data1,
+	              37,
+	              &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_lef_extended_attribute_data1[ 9 ] ),
+	 0x00000005UL );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	/* Clean up
 	 */

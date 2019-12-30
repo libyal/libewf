@@ -75,6 +75,17 @@ int libewf_compress_data(
 
 		return( -1 );
 	}
+	if( compressed_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compressed data size.",
+		 function );
+
+		return( -1 );
+	}
 	if( uncompressed_data == NULL )
 	{
 		libcerror_error_set(
@@ -93,17 +104,6 @@ int libewf_compress_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed data buffer equals compressed data buffer.",
-		 function );
-
-		return( -1 );
-	}
-	if( compressed_data_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed data size.",
 		 function );
 
 		return( -1 );
@@ -138,7 +138,11 @@ int libewf_compress_data(
 
 			return( -1 );
 		}
+#if ULONG_MAX < SSIZE_MAX
 		if( *compressed_data_size > (size_t) ULONG_MAX )
+#else
+		if( *compressed_data_size > (size_t) SSIZE_MAX )
+#endif
 		{
 			libcerror_error_set(
 			 error,
@@ -149,7 +153,11 @@ int libewf_compress_data(
 
 			return( -1 );
 		}
+#if ULONG_MAX < SSIZE_MAX
 		if( uncompressed_data_size > (size_t) ULONG_MAX )
+#else
+		if( uncompressed_data_size > (size_t) SSIZE_MAX )
+#endif
 		{
 			libcerror_error_set(
 			 error,
@@ -408,17 +416,6 @@ int libewf_decompress_data(
 
 		return( -1 );
 	}
-	if( uncompressed_data == compressed_data )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed data buffer equals uncompressed data buffer.",
-		 function );
-
-		return( -1 );
-	}
 	if( uncompressed_data_size == NULL )
 	{
 		libcerror_error_set(
@@ -430,10 +427,25 @@ int libewf_decompress_data(
 
 		return( -1 );
 	}
+	if( uncompressed_data == compressed_data )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compressed data buffer equals uncompressed data buffer.",
+		 function );
+
+		return( -1 );
+	}
 	if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
 	{
 #if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL )
+#if ULONG_MAX < SSIZE_MAX
 		if( compressed_data_size > (size_t) ULONG_MAX )
+#else
+		if( compressed_data_size > (size_t) SSIZE_MAX )
+#endif
 		{
 			libcerror_error_set(
 			 error,
@@ -444,7 +456,11 @@ int libewf_decompress_data(
 
 			return( -1 );
 		}
+#if ULONG_MAX < SSIZE_MAX
 		if( *uncompressed_data_size > (size_t) ULONG_MAX )
+#else
+		if( *uncompressed_data_size > (size_t) SSIZE_MAX )
+#endif
 		{
 			libcerror_error_set(
 			 error,

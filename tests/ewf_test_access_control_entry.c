@@ -32,6 +32,7 @@
 #include "ewf_test_libfvalue.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
+#include "ewf_test_rwlock.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_access_control_entry.h"
@@ -65,6 +66,10 @@ int ewf_test_access_control_entry_initialize(
 	int number_of_malloc_fail_tests                     = 1;
 	int number_of_memset_fail_tests                     = 1;
 	int test_number                                     = 0;
+#endif
+
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK )
+	number_of_malloc_fail_tests += 1;
 #endif
 
 	/* Initialize test
@@ -320,8 +325,13 @@ on_error:
 int ewf_test_access_control_entry_free(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error                            = NULL;
+	int result                                          = 0;
+
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+	libewf_access_control_entry_t *access_control_entry = NULL;
+	libewf_lef_permission_t *lef_permission             = NULL;
+#endif
 
 	/* Test error cases
 	 */
@@ -341,6 +351,96 @@ int ewf_test_access_control_entry_free(
 	libcerror_error_free(
 	 &error );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Initialize test
+	 */
+	result = libewf_lef_permission_initialize(
+	          &lef_permission,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "lef_permission",
+	 lef_permission );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_access_control_entry_initialize(
+	          &access_control_entry,
+	          lef_permission,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "access_control_entry",
+	 access_control_entry );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libewf_access_control_entry_free with pthread_rwlock_destroy failing in libcthreads_read_write_lock_free
+	 */
+	ewf_test_pthread_rwlock_destroy_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_free(
+	          &access_control_entry,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_destroy_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_destroy_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "access_control_entry",
+		 access_control_entry );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libewf_lef_permission_free(
+	          &lef_permission,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "lef_permission",
+	 lef_permission );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -349,6 +449,20 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+	if( access_control_entry != NULL )
+	{
+		libewf_access_control_entry_free(
+		 &access_control_entry,
+		 NULL );
+	}
+	if( lef_permission != NULL )
+	{
+		libewf_lef_permission_free(
+		 &lef_permission,
+		 NULL );
+	}
+#endif
 	return( 0 );
 }
 
@@ -416,6 +530,64 @@ int ewf_test_access_control_entry_get_type(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_type with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_type(
+	          access_control_entry,
+	          &type,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_type with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_type(
+	          access_control_entry,
+	          &type,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -433,9 +605,10 @@ on_error:
 int ewf_test_access_control_entry_get_utf8_identifier_size(
      libewf_access_control_entry_t *access_control_entry )
 {
-	libcerror_error_t *error = NULL;
-	size_t utf8_string_size  = 0;
-	int result               = 0;
+	libcerror_error_t *error        = NULL;
+	size_t utf8_string_size         = 0;
+	int result                      = 0;
+	int utf8_identifier_size_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -444,14 +617,16 @@ int ewf_test_access_control_entry_get_utf8_identifier_size(
 	          &utf8_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf8_identifier_size_is_set = result;
 
 	/* Test error cases
 	 */
@@ -472,22 +647,82 @@ int ewf_test_access_control_entry_get_utf8_identifier_size(
 	libcerror_error_free(
 	 &error );
 
+	if( utf8_identifier_size_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf8_identifier_size(
+		          access_control_entry,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf8_identifier_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf8_identifier_size(
 	          access_control_entry,
-	          NULL,
+	          &utf8_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf8_identifier_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_utf8_identifier_size(
+	          access_control_entry,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -508,8 +743,9 @@ int ewf_test_access_control_entry_get_utf8_identifier(
 {
 	uint8_t utf8_string[ 64 ];
 
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	int result                 = 0;
+	int utf8_identifier_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -519,14 +755,16 @@ int ewf_test_access_control_entry_get_utf8_identifier(
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf8_identifier_is_set = result;
 
 	/* Test error cases
 	 */
@@ -548,59 +786,121 @@ int ewf_test_access_control_entry_get_utf8_identifier(
 	libcerror_error_free(
 	 &error );
 
+	if( utf8_identifier_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf8_identifier(
+		          access_control_entry,
+		          NULL,
+		          64,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf8_identifier(
+		          access_control_entry,
+		          utf8_string,
+		          0,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf8_identifier(
+		          access_control_entry,
+		          utf8_string,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf8_identifier with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf8_identifier(
 	          access_control_entry,
-	          NULL,
+	          utf8_string,
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_access_control_entry_get_utf8_identifier(
-	          access_control_entry,
-	          utf8_string,
-	          0,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf8_identifier with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
 	result = libewf_access_control_entry_get_utf8_identifier(
 	          access_control_entry,
 	          utf8_string,
-	          (size_t) SSIZE_MAX + 1,
+	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -619,9 +919,10 @@ on_error:
 int ewf_test_access_control_entry_get_utf16_identifier_size(
      libewf_access_control_entry_t *access_control_entry )
 {
-	libcerror_error_t *error = NULL;
-	size_t utf16_string_size = 0;
-	int result               = 0;
+	libcerror_error_t *error         = NULL;
+	size_t utf16_string_size         = 0;
+	int result                       = 0;
+	int utf16_identifier_size_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -630,14 +931,16 @@ int ewf_test_access_control_entry_get_utf16_identifier_size(
 	          &utf16_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf16_identifier_size_is_set = result;
 
 	/* Test error cases
 	 */
@@ -658,22 +961,82 @@ int ewf_test_access_control_entry_get_utf16_identifier_size(
 	libcerror_error_free(
 	 &error );
 
+	if( utf16_identifier_size_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf16_identifier_size(
+		          access_control_entry,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf16_identifier_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf16_identifier_size(
 	          access_control_entry,
-	          NULL,
+	          &utf16_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf16_identifier_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_utf16_identifier_size(
+	          access_control_entry,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -694,8 +1057,9 @@ int ewf_test_access_control_entry_get_utf16_identifier(
 {
 	uint16_t utf16_string[ 64 ];
 
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error    = NULL;
+	int result                  = 0;
+	int utf16_identifier_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -705,14 +1069,16 @@ int ewf_test_access_control_entry_get_utf16_identifier(
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf16_identifier_is_set = result;
 
 	/* Test error cases
 	 */
@@ -734,59 +1100,121 @@ int ewf_test_access_control_entry_get_utf16_identifier(
 	libcerror_error_free(
 	 &error );
 
+	if( utf16_identifier_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf16_identifier(
+		          access_control_entry,
+		          NULL,
+		          64,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf16_identifier(
+		          access_control_entry,
+		          utf16_string,
+		          0,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf16_identifier(
+		          access_control_entry,
+		          utf16_string,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf16_identifier with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf16_identifier(
 	          access_control_entry,
-	          NULL,
+	          utf16_string,
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_access_control_entry_get_utf16_identifier(
-	          access_control_entry,
-	          utf16_string,
-	          0,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf16_identifier with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
 	result = libewf_access_control_entry_get_utf16_identifier(
 	          access_control_entry,
 	          utf16_string,
-	          (size_t) SSIZE_MAX + 1,
+	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -805,9 +1233,10 @@ on_error:
 int ewf_test_access_control_entry_get_utf8_name_size(
      libewf_access_control_entry_t *access_control_entry )
 {
-	libcerror_error_t *error = NULL;
-	size_t utf8_string_size  = 0;
-	int result               = 0;
+	libcerror_error_t *error  = NULL;
+	size_t utf8_string_size   = 0;
+	int result                = 0;
+	int utf8_name_size_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -816,14 +1245,16 @@ int ewf_test_access_control_entry_get_utf8_name_size(
 	          &utf8_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf8_name_size_is_set = result;
 
 	/* Test error cases
 	 */
@@ -844,22 +1275,82 @@ int ewf_test_access_control_entry_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
+	if( utf8_name_size_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf8_name_size(
+		          access_control_entry,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf8_name_size(
 	          access_control_entry,
-	          NULL,
+	          &utf8_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf8_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_utf8_name_size(
+	          access_control_entry,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -882,6 +1373,7 @@ int ewf_test_access_control_entry_get_utf8_name(
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
+	int utf8_name_is_set     = 0;
 
 	/* Test regular cases
 	 */
@@ -891,14 +1383,16 @@ int ewf_test_access_control_entry_get_utf8_name(
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf8_name_is_set = result;
 
 	/* Test error cases
 	 */
@@ -920,59 +1414,121 @@ int ewf_test_access_control_entry_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
+	if( utf8_name_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf8_name(
+		          access_control_entry,
+		          NULL,
+		          64,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf8_name(
+		          access_control_entry,
+		          utf8_string,
+		          0,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf8_name(
+		          access_control_entry,
+		          utf8_string,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf8_name(
 	          access_control_entry,
-	          NULL,
+	          utf8_string,
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_access_control_entry_get_utf8_name(
-	          access_control_entry,
-	          utf8_string,
-	          0,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf8_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
 	result = libewf_access_control_entry_get_utf8_name(
 	          access_control_entry,
 	          utf8_string,
-	          (size_t) SSIZE_MAX + 1,
+	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -991,9 +1547,10 @@ on_error:
 int ewf_test_access_control_entry_get_utf16_name_size(
      libewf_access_control_entry_t *access_control_entry )
 {
-	libcerror_error_t *error = NULL;
-	size_t utf16_string_size = 0;
-	int result               = 0;
+	libcerror_error_t *error   = NULL;
+	size_t utf16_string_size   = 0;
+	int result                 = 0;
+	int utf16_name_size_is_set = 0;
 
 	/* Test regular cases
 	 */
@@ -1002,14 +1559,16 @@ int ewf_test_access_control_entry_get_utf16_name_size(
 	          &utf16_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf16_name_size_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1030,22 +1589,82 @@ int ewf_test_access_control_entry_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
+	if( utf16_name_size_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf16_name_size(
+		          access_control_entry,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf16_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf16_name_size(
 	          access_control_entry,
-	          NULL,
+	          &utf16_string_size,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf16_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_utf16_name_size(
+	          access_control_entry,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1068,6 +1687,7 @@ int ewf_test_access_control_entry_get_utf16_name(
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
+	int utf16_name_is_set    = 0;
 
 	/* Test regular cases
 	 */
@@ -1077,14 +1697,16 @@ int ewf_test_access_control_entry_get_utf16_name(
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
+	EWF_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	utf16_name_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1106,59 +1728,121 @@ int ewf_test_access_control_entry_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
+	if( utf16_name_is_set != 0 )
+	{
+		result = libewf_access_control_entry_get_utf16_name(
+		          access_control_entry,
+		          NULL,
+		          64,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf16_name(
+		          access_control_entry,
+		          utf16_string,
+		          0,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_access_control_entry_get_utf16_name(
+		          access_control_entry,
+		          utf16_string,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_utf16_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
 	result = libewf_access_control_entry_get_utf16_name(
 	          access_control_entry,
-	          NULL,
+	          utf16_string,
 	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_access_control_entry_get_utf16_name(
-	          access_control_entry,
-	          utf16_string,
-	          0,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_utf16_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
 	result = libewf_access_control_entry_get_utf16_name(
 	          access_control_entry,
 	          utf16_string,
-	          (size_t) SSIZE_MAX + 1,
+	          64,
 	          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
 
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
-	libcerror_error_free(
-	 &error );
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1233,6 +1917,64 @@ int ewf_test_access_control_entry_get_access_mask(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_access_mask with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_access_mask(
+	          access_control_entry,
+	          &access_mask,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_access_mask with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_access_mask(
+	          access_control_entry,
+	          &access_mask,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1305,6 +2047,64 @@ int ewf_test_access_control_entry_get_flags(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_access_control_entry_get_flags with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_flags(
+	          access_control_entry,
+	          &flags,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_access_control_entry_get_flags with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_access_control_entry_get_flags(
+	          access_control_entry,
+	          &flags,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 

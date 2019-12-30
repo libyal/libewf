@@ -465,7 +465,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date time value string size: 1.",
+		 "%s: unsupported date time value string: 1 size.",
 		 function );
 
 		goto on_error;
@@ -509,7 +509,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date time value string size: 2.",
+		 "%s: unsupported date time value string: 2 size.",
 		 function );
 
 		goto on_error;
@@ -553,7 +553,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date time value string size: 3.",
+		 "%s: unsupported date time value string: 3 size.",
 		 function );
 
 		goto on_error;
@@ -597,7 +597,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date time value string size: 4.",
+		 "%s: unsupported date time value string: 4 size.",
 		 function );
 
 		goto on_error;
@@ -641,7 +641,7 @@ int libewf_date_time_values_copy_to_timestamp(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported date time value string size: 5.",
+		 "%s: unsupported date time value string: 5 size.",
 		 function );
 
 		goto on_error;

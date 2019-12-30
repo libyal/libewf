@@ -53,6 +53,570 @@ uint8_t ewf_test_device_information_data1[ 166 ] = {
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
+/* Tests the libewf_device_information_generate_utf8_string function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_device_information_generate_utf8_string(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_media_values_t *media_values = NULL;
+	libfvalue_table_t *header_values    = NULL;
+	uint8_t *utf8_string                = NULL;
+	size_t utf8_string_size             = 0;
+	int header_value_index              = 0;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	utf8_string_size = 0;
+
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "utf8_string",
+	 utf8_string );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	memory_free(
+	 utf8_string );
+
+	utf8_string = NULL;
+
+	/* Test error cases
+	 */
+	utf8_string_size = 0;
+
+	result = libewf_device_information_generate_utf8_string(
+	          NULL,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	utf8_string = (uint8_t *) 0x12345678UL;
+
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	utf8_string = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          NULL,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          NULL,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libewf_device_information_generate_utf8_string with failing libfvalue_table_get_value_by_identifier
+	 */
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libewf_device_information_generate_utf8_string with failing libfvalue_table_get_value_by_identifier
+	 */
+	for( header_value_index = LIBEWF_HEADER_VALUES_INDEX_PROCESS_IDENTIFIER;
+	     header_value_index >= LIBEWF_HEADER_VALUES_INDEX_MODEL;
+	     header_value_index-- )
+	{
+		result = libfvalue_table_set_value_by_index(
+		          header_values,
+		          header_value_index,
+		          NULL,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		result = libewf_device_information_generate_utf8_string(
+		          &utf8_string,
+		          &utf8_string_size,
+		          media_values,
+		          header_values,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "utf8_string",
+		 utf8_string );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_device_information_generate function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_device_information_generate(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_media_values_t *media_values = NULL;
+	libfvalue_table_t *header_values    = NULL;
+	uint8_t *device_information         = NULL;
+	size_t device_information_size      = 0;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	device_information_size = 0;
+
+	result = libewf_device_information_generate(
+	          &device_information,
+	          &device_information_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "device_information",
+	 device_information );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	memory_free(
+	 device_information );
+
+	device_information = NULL;
+
+	/* Test error cases
+	 */
+	device_information_size = 0;
+
+	result = libewf_device_information_generate(
+	          NULL,
+	          &device_information_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_information",
+	 device_information );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	device_information = (uint8_t *) 0x12345678UL;
+
+	result = libewf_device_information_generate(
+	          &device_information,
+	          &device_information_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	device_information = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_information",
+	 device_information );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_device_information_generate(
+	          &device_information,
+	          NULL,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_information",
+	 device_information );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libewf_device_information_parse with failing libewf_device_information_generate_utf8_string
+	 */
+	result = libewf_device_information_generate(
+	          &device_information,
+	          &device_information_size,
+	          NULL,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_information",
+	 device_information );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_device_information_parse_utf8_string function
  * Returns 1 if successful or 0 if not
  */
@@ -479,9 +1043,13 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-	/* TODO: add tests for libewf_device_information_generate_utf8_string */
+	EWF_TEST_RUN(
+	 "libewf_device_information_generate_utf8_string",
+	 ewf_test_device_information_generate_utf8_string );
 
-	/* TODO: add tests for libewf_device_information_generate */
+	EWF_TEST_RUN(
+	 "libewf_device_information_generate",
+	 ewf_test_device_information_generate );
 
 	EWF_TEST_RUN(
 	 "libewf_device_information_parse_utf8_string",

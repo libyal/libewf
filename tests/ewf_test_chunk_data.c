@@ -1415,6 +1415,70 @@ int ewf_test_chunk_data_unpack(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	chunk_data->range_flags = LIBEWF_RANGE_FLAG_IS_PACKED | LIBEWF_RANGE_FLAG_IS_COMPRESSED;
+
+	/* Test libewf_chunk_data_unpack with malloc failing
+	 */
+/* TODO fix test
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_chunk_data_unpack(
+	          chunk_data,
+	          io_handle,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+*/
+	/* Test libewf_chunk_data_unpack with memset failing
+	 */
+/* TODO fix test
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_chunk_data_unpack(
+	          chunk_data,
+	          io_handle,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+*/
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 /* TODO improve test coverage */
 
 	/* Clean up

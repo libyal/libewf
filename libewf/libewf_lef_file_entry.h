@@ -106,27 +106,27 @@ struct libewf_lef_file_entry
 	/* The creation date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t creation_time;
+	int64_t creation_time;
 
 	/* The last modification date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t modification_time;
+	int64_t modification_time;
 
 	/* The last access date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t access_time;
+	int64_t access_time;
 
 	/* The last (file system) entry modification date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t entry_modification_time;
+	int64_t entry_modification_time;
 
 	/* The deletion date and time
 	 * stored as a POSIX timestamp
 	 */
-	int32_t deletion_time;
+	int64_t deletion_time;
 
 	/* The MD5 digest hash string
 	 */
@@ -307,27 +307,27 @@ int libewf_lef_file_entry_get_record_type(
 
 int libewf_lef_file_entry_get_creation_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_modification_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_access_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_entry_modification_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_deletion_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_utf8_hash_value_md5(

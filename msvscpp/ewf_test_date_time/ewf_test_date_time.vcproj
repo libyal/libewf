@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_attribute"
-	ProjectGUID="{F01092C4-0BAE-493F-8BE5-AC50759E7368}"
-	RootNamespace="ewf_test_attribute"
+	Name="ewf_test_date_time"
+	ProjectGUID="{4DB5985B-7814-47A3-ABD6-A7A2E9326105}"
+	RootNamespace="ewf_test_date_time"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,15 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_attribute.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_rwlock.c"
+				RelativePath="..\..\tests\ewf_test_date_time.c"
 				>
 			</File>
 		</Filter>
@@ -203,14 +195,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_rwlock.h"
 				>
 			</File>
 			<File

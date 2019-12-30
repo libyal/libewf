@@ -355,7 +355,7 @@ int libewf_source_get_size(
 LIBEWF_EXTERN \
 int libewf_source_get_acquisition_time(
      libewf_source_t *source,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \

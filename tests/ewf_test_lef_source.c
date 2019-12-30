@@ -293,7 +293,7 @@ int ewf_test_lef_source_clone(
 	int result                                  = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests             = 14;
+	int number_of_malloc_fail_tests             = 16;
 	int test_number                             = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -832,6 +832,8 @@ int ewf_test_lef_source_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+	/* TODO: test with invalid data */
 
 	/* Clean up
 	 */
@@ -5215,15 +5217,33 @@ int ewf_test_lef_source_get_logical_offset(
 
 	/* Test regular cases
 	 */
+	lef_source->logical_offset = 1;
+
 	result = libewf_lef_source_get_logical_offset(
 	          lef_source,
 	          &logical_offset,
 	          &error );
 
-	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	lef_source->logical_offset = -1;
+
+	result = libewf_lef_source_get_logical_offset(
+	          lef_source,
+	          &logical_offset,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -5288,15 +5308,33 @@ int ewf_test_lef_source_get_physical_offset(
 
 	/* Test regular cases
 	 */
+	lef_source->physical_offset = 1;
+
 	result = libewf_lef_source_get_physical_offset(
 	          lef_source,
 	          &physical_offset,
 	          &error );
 
-	EWF_TEST_ASSERT_NOT_EQUAL_INT(
+	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	lef_source->physical_offset = -1;
+
+	result = libewf_lef_source_get_physical_offset(
+	          lef_source,
+	          &physical_offset,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -5356,7 +5394,7 @@ int ewf_test_lef_source_get_acquisition_time(
      libewf_lef_source_t *lef_source )
 {
 	libcerror_error_t *error = NULL;
-	int32_t acquisition_time    = 0;
+	int64_t acquisition_time = 0;
 	int result               = 0;
 
 	/* Test regular cases

@@ -560,3 +560,140 @@ int ewf_test_close_file_io_handle(
 	return( result );
 }
 
+/* Creates a file IO pool for test data
+ * Returns 1 if successful or -1 on error
+ */
+int ewf_test_open_file_io_pool(
+     libbfio_pool_t **file_io_pool,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	static char *function            = "ewf_test_open_file_io_pool";
+
+	if( file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_pool_initialize(
+	     file_io_pool,
+	     1,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO pool.",
+		 function );
+
+		goto on_error;
+	}
+	if( ewf_test_open_file_io_handle(
+	     &file_io_handle,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file IO handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libbfio_pool_set_handle(
+	     *file_io_pool,
+	     0,
+	     file_io_handle,
+	     LIBBFIO_OPEN_READ,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set file IO handle: 0 in pool.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	if( *file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 file_io_pool,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Closes a file IO pool for test data
+ * Returns 0 if successful or -1 on error
+ */
+int ewf_test_close_file_io_pool(
+     libbfio_pool_t **file_io_pool,
+     libcerror_error_t **error )
+{
+	static char *function = "ewf_test_close_file_io_pool";
+	int result            = 0;
+
+	if( file_io_pool == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_pool_close_all(
+	     *file_io_pool,
+	     error ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file IO pool.",
+		 function );
+
+		result = -1;
+	}
+	if( libbfio_pool_free(
+	     file_io_pool,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file IO pool.",
+		 function );
+
+		result = -1;
+	}
+	return( result );
+}
+

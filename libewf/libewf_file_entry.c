@@ -1383,7 +1383,7 @@ int libewf_file_entry_get_size(
  */
 int libewf_file_entry_get_creation_time(
      libewf_file_entry_t *file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1458,7 +1458,7 @@ int libewf_file_entry_get_creation_time(
  */
 int libewf_file_entry_get_modification_time(
      libewf_file_entry_t *file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1533,7 +1533,7 @@ int libewf_file_entry_get_modification_time(
  */
 int libewf_file_entry_get_access_time(
      libewf_file_entry_t *file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1608,7 +1608,7 @@ int libewf_file_entry_get_access_time(
  */
 int libewf_file_entry_get_entry_modification_time(
      libewf_file_entry_t *file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
@@ -1683,7 +1683,7 @@ int libewf_file_entry_get_entry_modification_time(
  */
 int libewf_file_entry_get_deletion_time(
      libewf_file_entry_t *file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;

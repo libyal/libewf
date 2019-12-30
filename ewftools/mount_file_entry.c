@@ -291,7 +291,7 @@ int mount_file_entry_get_creation_time(
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_creation_time";
-	int32_t posix_time    = 0;
+	int64_t posix_time    = 0;
 
 #if defined( WINAPI )
 	uint64_t filetime     = 0;
@@ -327,7 +327,7 @@ int mount_file_entry_get_creation_time(
 #if defined( WINAPI )
 		if( posix_time != 0 )
 		{
-			/* Convert the POSIX nanoseconds timestamp into a FILETIME timestamp
+			/* Convert the POSIX timestamp into a FILETIME timestamp
 			 */
 			filetime = (uint64_t) ( ( (int64_t) posix_time * 10000000 ) + 116444736000000000L );
 		}
@@ -367,7 +367,7 @@ int mount_file_entry_get_access_time(
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_access_time";
-	int32_t posix_time    = 0;
+	int64_t posix_time    = 0;
 
 #if defined( WINAPI )
 	uint64_t filetime     = 0;
@@ -403,7 +403,7 @@ int mount_file_entry_get_access_time(
 #if defined( WINAPI )
 		if( posix_time != 0 )
 		{
-			/* Convert the POSIX nanoseconds timestamp into a FILETIME timestamp
+			/* Convert the POSIX timestamp into a FILETIME timestamp
 			 */
 			filetime = (uint64_t) ( ( (int64_t) posix_time * 10000000 ) + 116444736000000000L );
 		}
@@ -443,7 +443,7 @@ int mount_file_entry_get_modification_time(
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_modification_time";
-	int32_t posix_time    = 0;
+	int64_t posix_time    = 0;
 
 #if defined( WINAPI )
 	uint64_t filetime     = 0;
@@ -479,7 +479,7 @@ int mount_file_entry_get_modification_time(
 #if defined( WINAPI )
 		if( posix_time != 0 )
 		{
-			/* Convert the POSIX nanoseconds timestamp into a FILETIME timestamp
+			/* Convert the POSIX timestamp into a FILETIME timestamp
 			 */
 			filetime = (uint64_t) ( ( (int64_t) posix_time * 10000000 ) + 116444736000000000L );
 		}
@@ -519,7 +519,7 @@ int mount_file_entry_get_inode_change_time(
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_get_inode_change_time";
-	int32_t posix_time    = 0;
+	int64_t posix_time    = 0;
 
 #if defined( WINAPI )
 	uint64_t filetime     = 0;
@@ -555,7 +555,7 @@ int mount_file_entry_get_inode_change_time(
 #if defined( WINAPI )
 		if( posix_time != 0 )
 		{
-			/* Convert the POSIX nanoseconds timestamp into a FILETIME timestamp
+			/* Convert the POSIX timestamp into a FILETIME timestamp
 			 */
 			filetime = (uint64_t) ( ( (int64_t) posix_time * 10000000 ) + 116444736000000000L );
 		}

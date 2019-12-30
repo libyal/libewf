@@ -656,7 +656,6 @@ ssize_t libewf_segment_file_read_file_header(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint16_t value_16bit         = 0;
-	int result                   = 0;
 #endif
 
 	if( segment_file == NULL )

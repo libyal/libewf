@@ -41,7 +41,7 @@ PyObject *pyewf_datetime_new_from_floatingtime(
            uint64_t floatingtime );
 
 PyObject *pyewf_datetime_new_from_posix_time(
-           uint32_t posix_time );
+           int64_t posix_time );
 
 #if defined( __cplusplus )
 }

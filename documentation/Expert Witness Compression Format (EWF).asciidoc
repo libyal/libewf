@@ -1872,7 +1872,7 @@ The 1st line of the category contains the string "perm".
 
 The 2nd line consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | | The number of permission groups in the category
@@ -1895,10 +1895,11 @@ Each entry consist of 2 lines:
 | Line number | Value | Description
 | 1 | | Number of entries
 | 2 | | Tab (0x09) separated values that correspond to the type indicators.
+|===
 
 The 1st line of the category root entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -1907,7 +1908,7 @@ The 1st line of the category root entry consists of the following 2 values:
 
 The 1st line of the permission group entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -1916,7 +1917,7 @@ The 1st line of the permission group entry consists of the following 2 values:
 
 The 1st line of the permission entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -2012,11 +2013,12 @@ The 1st line of the category contains the string "srce".
 
 The 2nd line consists of 2 values.
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value index | Value | Description
 | 1 | | The number of sources in the category
 | 2 | 1 | [yellow-background]*Unknown*
+|===
 
 The 3rd line of the category contains tab (0x09) separated type indicators. For
 more information see the sections below.
@@ -2033,10 +2035,11 @@ Each entry consist of 2 lines:
 | Line number | Value | Description
 | 1 | | Number of entries
 | 2 | | Tab (0x09) separated values that correspond to the type indicators.
+|===
 
 The 1st line of the category root entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -2045,7 +2048,7 @@ The 1st line of the category root entry consists of the following 2 values:
 
 The 1st line of the source entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -2138,11 +2141,12 @@ The 1st line of the category contains the string "sub".
 
 The 2nd line consists of 2 values.
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value index | Value | Description
 | 1 | | The number of subjects in the category
 | 2 | 1 | [yellow-background]*Unknown*
+|===
 
 The 3rd line of the category contains tab (0x09) separated type indicators. For
 more information see the sections below.
@@ -2159,10 +2163,11 @@ Each entry consist of 2 lines:
 | Line number | Value | Description
 | 1 | | Number of entries
 | 2 | | Tab (0x09) separated values that correspond to the type indicators.
+|===
 
 The 1st line of the category root entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -2171,7 +2176,7 @@ The 1st line of the category root entry consists of the following 2 values:
 
 The 1st line of the subject entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | 0 | [yellow-background]*Unknown*
@@ -2200,11 +2205,12 @@ The 1st line of the category contains the string "entry".
 
 The 2nd line consists of 2 values.
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value index | Value | Description
 | 1 | | The number of file entries in the category or 1 if [yellow-background]*unknown*
 | 2 | 1 | [yellow-background]*Unknown*
+|===
 
 The 3rd line of the category contains tab (0x09) separated type indicators. For
 more information see the sections below.
@@ -2223,10 +2229,11 @@ Each entry consist of 2 lines:
 | Line number | Value | Description
 | 1 | | Number of entries
 | 2 | | Tab (0x09) separated values that correspond to the type indicators.
+|===
 
 The 1st line of the category root entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | | 0 if not set or 26 if [yellow-background]*Unknown*
@@ -2235,7 +2242,7 @@ The 1st line of the category root entry consists of the following 2 values:
 
 The 1st line of the file entry consists of the following 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | | Number of file entries in the parent file entry or 0 if not set
@@ -2397,7 +2404,7 @@ MD5 hash is not set. The same applies for the "sha" value when it contains
 
 The short name ("snh") value contains 2 values:
 
-[cols="1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Value number | Value | Description
 | 1 | | The number of characters in the short name including the end-of-string character

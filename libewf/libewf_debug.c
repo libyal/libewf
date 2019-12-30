@@ -34,6 +34,8 @@
 #include "libewf_libfguid.h"
 #include "libewf_libuna.h"
 
+#if defined( HAVE_DEBUG_OUTPUT )
+
 /* Prints the compression method
  */
 void libewf_debug_print_compression_method(
@@ -743,4 +745,6 @@ int libewf_debug_utf16_stream_print(
 
 	return( 1 );
 }
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

@@ -58,6 +58,16 @@ int ewf_test_close_file_io_handle(
      libbfio_handle_t **file_io_handle,
      libcerror_error_t **error );
 
+int ewf_test_open_file_io_pool(
+     libbfio_pool_t **file_io_pool,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int ewf_test_close_file_io_pool(
+     libbfio_pool_t **file_io_pool,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

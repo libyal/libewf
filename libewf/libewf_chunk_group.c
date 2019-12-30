@@ -261,8 +261,9 @@ int libewf_chunk_group_clone(
 
 		return( -1 );
 	}
-/* TODO clone chunks_list */
 	( *destination_chunk_group )->chunks_list = NULL;
+
+/* TODO clone chunks_list */
 
 	return( 1 );
 

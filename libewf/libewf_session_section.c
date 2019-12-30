@@ -60,7 +60,6 @@ int libewf_session_section_read_data(
 	size_t session_entry_data_size      = 0;
 	size_t session_footer_data_size     = 0;
 	size_t session_header_data_size     = 0;
-	ssize_t read_count                  = 0;
 	uint64_t number_of_sectors          = 0;
 	uint64_t previous_start_sector      = 0;
 	uint64_t session_start_sector       = 0;
@@ -73,7 +72,6 @@ int libewf_session_section_read_data(
 	uint32_t session_entry_index        = 0;
 	uint32_t stored_checksum            = 0;
 	int entry_index                     = 0;
-	int result                          = 0;
 
 	if( data == NULL )
 	{
@@ -837,11 +835,10 @@ ssize_t libewf_section_session_read(
          libcdata_array_t *tracks,
          libcerror_error_t **error )
 {
-	libewf_sector_range_t *sector_range = NULL;
-	uint8_t *section_data               = NULL;
-	static char *function               = "libewf_section_session_read";
-	size_t section_data_size            = 0;
-	ssize_t read_count                  = 0;
+	uint8_t *section_data    = NULL;
+	static char *function    = "libewf_section_session_read";
+	size_t section_data_size = 0;
+	ssize_t read_count       = 0;
 
 	if( section_descriptor == NULL )
 	{

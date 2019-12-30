@@ -781,7 +781,7 @@ int info_handle_set_header_codepage(
 int info_handle_posix_time_value_fprint(
      info_handle_t *info_handle,
      const char *value_name,
-     int32_t value_32bit,
+     int64_t value_64bit,
      libcerror_error_t **error )
 {
 	system_character_t date_time_string[ 32 ];
@@ -801,7 +801,7 @@ int info_handle_posix_time_value_fprint(
 
 		return( -1 );
 	}
-	if( value_32bit == 0 )
+	if( value_64bit == 0 )
 	{
 		fprintf(
 		 info_handle->notify_stream,
@@ -823,17 +823,17 @@ int info_handle_posix_time_value_fprint(
 
 			goto on_error;
 		}
-		if( libfdatetime_posix_time_copy_from_32bit(
+		if( libfdatetime_posix_time_copy_from_64bit(
 		     posix_time,
-		     (uint32_t) value_32bit,
-		     LIBFDATETIME_POSIX_TIME_VALUE_TYPE_SECONDS_32BIT_SIGNED,
+		     (uint64_t) value_64bit,
+		     LIBFDATETIME_POSIX_TIME_VALUE_TYPE_SECONDS_64BIT_SIGNED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy POSIX time from 32-bit.",
+			 "%s: unable to copy POSIX time from 64-bit value.",
 			 function );
 
 			goto on_error;
@@ -4697,7 +4697,7 @@ int info_handle_source_value_fprint(
 	static char *function            = "info_handle_source_value_fprint";
 	size64_t size                    = 0;
 	size_t value_string_size         = 0;
-	int32_t acquisition_time         = 0;
+	int64_t acquisition_time         = 0;
 	int result                       = 0;
 
 	if( info_handle == NULL )
@@ -5810,11 +5810,11 @@ int info_handle_file_entry_value_fprint(
 	uint64_t file_identifier                            = 0;
 	uint32_t group_identifier                           = 0;
 	uint32_t owner_identifier                           = 0;
-	int32_t access_time                                 = 0;
-	int32_t creation_time                               = 0;
-	int32_t deletion_time                               = 0;
-	int32_t entry_modification_time                     = 0;
-	int32_t modification_time                           = 0;
+	int64_t access_time                                 = 0;
+	int64_t creation_time                               = 0;
+	int64_t deletion_time                               = 0;
+	int64_t entry_modification_time                     = 0;
+	int64_t modification_time                           = 0;
 	int access_control_entry_index                      = 0;
 	int attribute_index                                 = 0;
 	int number_of_access_control_entries                = 0;

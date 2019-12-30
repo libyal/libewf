@@ -1029,7 +1029,7 @@ int libewf_lef_file_entry_read_short_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to set record type.",
+		 "%s: unable to set short name size.",
 		 function );
 
 		goto on_error;
@@ -1487,7 +1487,7 @@ int libewf_lef_file_entry_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1500,7 +1500,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->access_time = (int32_t) value_64bit;
+				lef_file_entry->access_time = (int64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'a' )
 			      && ( type_string[ 1 ] == (uint8_t) 'q' ) )
@@ -1538,7 +1538,7 @@ int libewf_lef_file_entry_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1551,7 +1551,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->creation_time = (int32_t) value_64bit;
+				lef_file_entry->creation_time = (int64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'l' ) )
@@ -1560,7 +1560,7 @@ int libewf_lef_file_entry_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1573,7 +1573,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->deletion_time = (int32_t) value_64bit;
+				lef_file_entry->deletion_time = (int64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'u' ) )
@@ -1712,7 +1712,7 @@ int libewf_lef_file_entry_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1725,7 +1725,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->entry_modification_time = (int32_t) value_64bit;
+				lef_file_entry->entry_modification_time = (int64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'p' )
 			      && ( type_string[ 1 ] == (uint8_t) 'm' ) )
@@ -1790,7 +1790,7 @@ int libewf_lef_file_entry_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1803,7 +1803,7 @@ int libewf_lef_file_entry_read_data(
 
 					goto on_error;
 				}
-				lef_file_entry->modification_time = (int32_t) value_64bit;
+				lef_file_entry->modification_time = (int64_t) value_64bit;
 			}
 		}
 		else if( type_string_size == 2 )
@@ -2845,7 +2845,7 @@ int libewf_lef_file_entry_get_record_type(
  */
 int libewf_lef_file_entry_get_creation_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_creation_time";
@@ -2882,7 +2882,7 @@ int libewf_lef_file_entry_get_creation_time(
  */
 int libewf_lef_file_entry_get_modification_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_modification_time";
@@ -2919,7 +2919,7 @@ int libewf_lef_file_entry_get_modification_time(
  */
 int libewf_lef_file_entry_get_access_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_access_time";
@@ -2956,7 +2956,7 @@ int libewf_lef_file_entry_get_access_time(
  */
 int libewf_lef_file_entry_get_entry_modification_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_entry_modification_time";
@@ -2993,7 +2993,7 @@ int libewf_lef_file_entry_get_entry_modification_time(
  */
 int libewf_lef_file_entry_get_deletion_time(
      libewf_lef_file_entry_t *lef_file_entry,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_deletion_time";

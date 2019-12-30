@@ -34,7 +34,7 @@
 
 #include "../libewf/libewf_compression.h"
 
-uint8_t ewf_test_compression_deflate_compressed_byte_stream[ 2627 ] = {
+uint8_t ewf_test_compression_deflate_compressed_data1[ 2627 ] = {
 	0x78, 0xda, 0xbd, 0x59, 0x6d, 0x8f, 0xdb, 0xb8, 0x11, 0xfe, 0x7c, 0xfa, 0x15, 0xc4, 0x7e, 0xb9,
 	0x5d, 0xc0, 0x75, 0x5e, 0x7b, 0x45, 0x0f, 0x45, 0x81, 0xed, 0xde, 0x26, 0xdd, 0x62, 0x2f, 0x0d,
 	0xb2, 0x97, 0x16, 0xfd, 0x48, 0x4b, 0xb4, 0xcd, 0x46, 0x12, 0x5d, 0x52, 0x5a, 0xc7, 0xfd, 0xf5,
@@ -201,7 +201,7 @@ uint8_t ewf_test_compression_deflate_compressed_byte_stream[ 2627 ] = {
 	0x7d, 0x8a, 0x87, 0xf9, 0x9d, 0x74, 0x33, 0x0e, 0x79, 0xc5, 0xf8, 0x73, 0xcd, 0xff, 0x00, 0x30,
 	0x4a, 0x56, 0xa4 };
 
-uint8_t ewf_test_compression_uncompressed_byte_stream[ 7640 ] = {
+uint8_t ewf_test_compression_uncompressed_data1[ 7640 ] = {
 	0x09, 0x09, 0x20, 0x20, 0x20, 0x47, 0x4e, 0x55, 0x20, 0x4c, 0x45, 0x53, 0x53, 0x45, 0x52, 0x20,
 	0x47, 0x45, 0x4e, 0x45, 0x52, 0x41, 0x4c, 0x20, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x43, 0x20, 0x4c,
 	0x49, 0x43, 0x45, 0x4e, 0x53, 0x45, 0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -693,13 +693,8 @@ int ewf_test_compress_data(
 
 	libcerror_error_t *error    = NULL;
 	size_t compressed_data_size = 0;
+	size_t maximum_data_size    = 0;
 	int result                  = 0;
-
-#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL )
-	size_t maximum_data_size    = (size_t) ULONG_MAX;
-#else
-	size_t maximum_data_size    = (size_t) SSIZE_MAX;
-#endif
 
 	/* Test regular cases
 	 */
@@ -710,7 +705,7 @@ int ewf_test_compress_data(
 	          &compressed_data_size,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
+	          ewf_test_compression_uncompressed_data1,
 	          7640,
 	          &error );
 
@@ -734,7 +729,7 @@ int ewf_test_compress_data(
 	          &compressed_data_size,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
+	          ewf_test_compression_uncompressed_data1,
 	          7640,
 	          &error );
 
@@ -755,7 +750,7 @@ int ewf_test_compress_data(
 	          NULL,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
+	          ewf_test_compression_uncompressed_data1,
 	          7640,
 	          &error );
 
@@ -771,37 +766,35 @@ int ewf_test_compress_data(
 	libcerror_error_free(
 	 &error );
 
-	compressed_data_size = maximum_data_size + 1;
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          NULL,
+	          7640,
+	          &error );
 
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test compressed_data == uncompressed_data
+	 */
 	result = libewf_compress_data(
 	          compressed_data,
 	          &compressed_data_size,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
-	          7640,
-	          &error );
-
-	compressed_data_size = 4096;
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_compress_data(
 	          compressed_data,
-	          &compressed_data_size,
-	          LIBEWF_COMPRESSION_METHOD_NONE,
-	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
 	          7640,
 	          &error );
 
@@ -822,9 +815,40 @@ int ewf_test_compress_data(
 	          &compressed_data_size,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          99,
-	          ewf_test_compression_uncompressed_byte_stream,
+	          ewf_test_compression_uncompressed_data1,
 	          7640,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if ( ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL ) ) && ( ULONG_MAX < SSIZE_MAX )
+	maximum_data_size = (size_t) ULONG_MAX;
+#else
+	maximum_data_size = (size_t) SSIZE_MAX;
+#endif
+
+	compressed_data_size = maximum_data_size + 1;
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_data1,
+	          7640,
+	          &error );
+
+	compressed_data_size = 4096;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -843,29 +867,110 @@ int ewf_test_compress_data(
 	          &compressed_data_size,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          LIBEWF_COMPRESSION_DEFAULT,
-	          NULL,
-	          7640,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_compress_data(
-	          compressed_data,
-	          &compressed_data_size,
-	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
-	          LIBEWF_COMPRESSION_DEFAULT,
-	          ewf_test_compression_uncompressed_byte_stream,
+	          ewf_test_compression_uncompressed_data1,
 	          maximum_data_size + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
+
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_BZIP2,
+	          99,
+	          ewf_test_compression_uncompressed_data1,
+	          7640,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#endif /* defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL ) */
+
+#if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
+	maximum_data_size = (size_t) INT_MAX;
+#else
+	maximum_data_size = 0;
+#endif
+
+/* TODO fix tests
+	if( maximum_data_size > 0 )
+	{
+		compressed_data_size = maximum_data_size + 1;
+
+		result = libewf_compress_data(
+		          compressed_data,
+		          &compressed_data_size,
+		          LIBEWF_COMPRESSION_METHOD_BZIP2,
+		          LIBEWF_COMPRESSION_DEFAULT,
+		          ewf_test_compression_uncompressed_data1,
+		          7640,
+		          &error );
+
+		compressed_data_size = 4096;
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libewf_compress_data(
+		          compressed_data,
+		          &compressed_data_size,
+		          LIBEWF_COMPRESSION_METHOD_BZIP2,
+		          LIBEWF_COMPRESSION_DEFAULT,
+		          ewf_test_compression_uncompressed_data1,
+		          maximum_data_size + 1,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+*/
+	result = libewf_compress_data(
+	          compressed_data,
+	          &compressed_data_size,
+	          LIBEWF_COMPRESSION_METHOD_NONE,
+	          LIBEWF_COMPRESSION_DEFAULT,
+	          ewf_test_compression_uncompressed_data1,
+	          7640,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -900,21 +1005,16 @@ int ewf_test_decompress_data(
 	uint8_t uncompressed_data[ 8192 ];
 
 	libcerror_error_t *error      = NULL;
+	size_t maximum_data_size      = 0;
 	size_t uncompressed_data_size = 0;
 	int result                    = 0;
-
-#if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_UNCOMPRESS ) ) || defined( ZLIB_DLL )
-	size_t maximum_data_size      = (size_t) ULONG_MAX;
-#else
-	size_t maximum_data_size      = (size_t) SSIZE_MAX;
-#endif
 
 	/* Test regular cases
 	 */
 	uncompressed_data_size = 8196;
 
 	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
+	          ewf_test_compression_deflate_compressed_data1,
 	          2627,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
@@ -957,7 +1057,75 @@ int ewf_test_decompress_data(
 	 &error );
 
 	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
+	          ewf_test_compression_deflate_compressed_data1,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          NULL,
+	          &uncompressed_data_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_data1,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          uncompressed_data,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test uncompressed_data == compressed_data
+	 */
+	result = libewf_decompress_data(
+	          uncompressed_data,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
+	          uncompressed_data,
+	          &uncompressed_data_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if ( ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL ) ) && ( ULONG_MAX < SSIZE_MAX )
+	maximum_data_size = (size_t) ULONG_MAX;
+#else
+	maximum_data_size = (size_t) SSIZE_MAX;
+#endif
+
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_data1,
 	          maximum_data_size + 1,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
@@ -976,70 +1144,10 @@ int ewf_test_decompress_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
-	          2627,
-	          LIBEWF_COMPRESSION_METHOD_NONE,
-	          uncompressed_data,
-	          &uncompressed_data_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
-	          2627,
-	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
-	          NULL,
-	          &uncompressed_data_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
-	          2627,
-	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
-	          uncompressed_data,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
 	uncompressed_data_size = maximum_data_size + 1;
 
 	result = libewf_decompress_data(
-	          ewf_test_compression_deflate_compressed_byte_stream,
+	          ewf_test_compression_deflate_compressed_data1,
 	          2627,
 	          LIBEWF_COMPRESSION_METHOD_DEFLATE,
 	          uncompressed_data,
@@ -1047,6 +1155,80 @@ int ewf_test_decompress_data(
 	          &error );
 
 	uncompressed_data_size = 8192;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
+	maximum_data_size = (size_t) INT_MAX;
+#else
+	maximum_data_size = 0;
+#endif
+
+/* TODO fix tests
+	if( maximum_data_size > 0 )
+	{
+		result = libewf_decompress_data(
+		          ewf_test_compression_deflate_compressed_data1,
+		          maximum_data_size + 1,
+		          LIBEWF_COMPRESSION_METHOD_BZIP2,
+		          uncompressed_data,
+		          &uncompressed_data_size,
+		          &error );
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		uncompressed_data_size = maximum_data_size + 1;
+
+		result = libewf_decompress_data(
+		          ewf_test_compression_deflate_compressed_data1,
+		          2627,
+		          LIBEWF_COMPRESSION_METHOD_BZIP2,
+		          uncompressed_data,
+		          &uncompressed_data_size,
+		          &error );
+
+		uncompressed_data_size = 8192;
+
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+*/
+	result = libewf_decompress_data(
+	          ewf_test_compression_deflate_compressed_data1,
+	          2627,
+	          LIBEWF_COMPRESSION_METHOD_NONE,
+	          uncompressed_data,
+	          &uncompressed_data_size,
+	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",

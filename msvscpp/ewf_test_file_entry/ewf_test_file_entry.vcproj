@@ -190,15 +190,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\ewf_test_libcdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libewf.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_libfvalue.h"
 				>
 			</File>
 			<File

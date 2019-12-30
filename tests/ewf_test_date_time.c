@@ -1,5 +1,5 @@
 /*
- * Library analytical_data functions test program
+ * Library date_time functions test program
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -28,35 +28,42 @@
 #include <stdlib.h>
 #endif
 
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
-#include "../libewf/libewf_analytical_data.h"
-
-uint8_t ewf_test_analytical_data1[ 40 ] = {
-	0xff, 0xfe, 0x31, 0x00, 0x0a, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x0a, 0x00,
-	0x74, 0x00, 0x70, 0x00, 0x73, 0x00, 0x0a, 0x00, 0x33, 0x00, 0x32, 0x00, 0x37, 0x00, 0x36, 0x00,
-	0x38, 0x00, 0x30, 0x00, 0x0a, 0x00, 0x0a, 0x00 };
+#include "../libewf/libewf_date_time.h"
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-/* Tests the libewf_analytical_data_parse function
+/* Tests the libewf_date_time_localtime function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_analytical_data_parse(
+int ewf_test_date_time_localtime(
      void )
 {
+	struct tm time_elements;
+
 	libcerror_error_t *error = NULL;
+	time_t timestamp         = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = libewf_analytical_data_parse(
-	          ewf_test_analytical_data1,
-	          40,
+	result = libewf_date_time_localtime(
+	          &timestamp,
+	          &time_elements,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -70,9 +77,9 @@ int ewf_test_analytical_data_parse(
 
 	/* Test error cases
 	 */
-	result = libewf_analytical_data_parse(
+	result = libewf_date_time_localtime(
 	          NULL,
-	          40,
+	          &time_elements,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -87,9 +94,9 @@ int ewf_test_analytical_data_parse(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_analytical_data_parse(
-	          ewf_test_analytical_data1,
-	          (size_t) SSIZE_MAX + 1,
+	result = libewf_date_time_localtime(
+	          &timestamp,
+	          NULL,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -103,68 +110,6 @@ int ewf_test_analytical_data_parse(
 
 	libcerror_error_free(
 	 &error );
-
-#if defined( HAVE_EWF_TEST_MEMORY )
-
-	/* Test libewf_analytical_data_parse with malloc failing
-	 */
-	ewf_test_malloc_attempts_before_fail = 0;
-
-	result = libewf_analytical_data_parse(
-	          ewf_test_analytical_data1,
-	          40,
-	          &error );
-
-	if( ewf_test_malloc_attempts_before_fail != -1 )
-	{
-		ewf_test_malloc_attempts_before_fail = -1;
-	}
-	else
-	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
-
-/* TODO enable after making libuna less error tollerant
- */
-#ifdef TODO
-	/* Test with an invalid UTF-16 litte-endian stream
-	 */
-	byte_stream_copy_from_uint16_little_endian(
-	 &( ewf_test_analytical_data1[ 6 ] ),
-	 0xd800 );
-
-	result = libewf_analytical_data_parse(
-	          ewf_test_analytical_data1,
-	          40,
-	          &error );
-
-	byte_stream_copy_from_uint16_little_endian(
-	 &( ewf_test_analytical_data1[ 6 ] ),
-	 0x006d );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-#endif 
 
 	return( 1 );
 
@@ -197,8 +142,8 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
-	 "libewf_analytical_data_parse",
-	 ewf_test_analytical_data_parse );
+	 "libewf_date_time_localtime",
+	 ewf_test_date_time_localtime );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

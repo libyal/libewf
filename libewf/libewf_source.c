@@ -3607,7 +3607,7 @@ int libewf_source_get_size(
  */
 int libewf_source_get_acquisition_time(
      libewf_source_t *source,
-     int32_t *posix_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	libewf_internal_source_t *internal_source = NULL;

@@ -1,5 +1,5 @@
 /*
- * Date and time functions of libewf .net managed wrapper
+ * Read/Write lock functions for testing
  *
  * Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,35 +19,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWF_NET_DATETIME_H )
-#define _EWF_NET_DATETIME_H
+#if !defined( _EWF_TEST_RWLOCK_H )
+#define _EWF_TEST_RWLOCK_H
 
 #include <common.h>
-#include <types.h>
 
-#using <mscorlib.dll>
-
-using namespace System;
+#include "ewf_test_libewf.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-namespace EWF {
+#if defined( LIBEWF_HAVE_MULTI_THREAD_SUPPORT ) && defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#define HAVE_EWF_TEST_RWLOCK		1
+#endif
 
-public ref class DateTime sealed
-{
-        public:
-		static System::DateTime^ FromFiletime( System::UInt64 filetime );
+#if defined( HAVE_EWF_TEST_RWLOCK )
 
-		static System::DateTime^ FromPOSIXTime( System::Int64 posix_time );
-};
+extern int ewf_test_pthread_rwlock_init_attempts_before_fail;
 
-} // namespace EWF
+extern int ewf_test_pthread_rwlock_destroy_attempts_before_fail;
+
+extern int ewf_test_pthread_rwlock_rdlock_attempts_before_fail;
+
+extern int ewf_test_pthread_rwlock_wrlock_attempts_before_fail;
+
+extern int ewf_test_pthread_rwlock_unlock_attempts_before_fail;
+
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _EWF_NET_DATETIME_H ) */
+#endif /* !defined( _EWF_TEST_RWLOCK_H ) */
 

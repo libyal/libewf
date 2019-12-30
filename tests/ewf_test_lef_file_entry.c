@@ -361,7 +361,7 @@ int ewf_test_lef_file_entry_initialize(
 	int result                              = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests         = 6;
+	int number_of_malloc_fail_tests         = 7;
 	int number_of_memset_fail_tests         = 1;
 	int test_number                         = 0;
 #endif
@@ -596,7 +596,7 @@ int ewf_test_lef_file_entry_clone(
 	int result                                          = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests                     = 6;
+	int number_of_malloc_fail_tests                     = 9;
 	int test_number                                     = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -920,6 +920,9 @@ int ewf_test_lef_file_entry_read_binary_extents(
 {
 	libcerror_error_t *error                = NULL;
 	libewf_lef_file_entry_t *lef_file_entry = NULL;
+	uint8_t *binary_extents_data1           = (uint8_t *) "1 13135c1 3f44";
+	uint8_t *binary_extents_error_data1     = (uint8_t *) "1 XXXXXXX 3f44";
+	uint8_t *binary_extents_error_data2     = (uint8_t *) "1 13135c1 XXXX";
 	int result                              = 0;
 
 	/* Initialize test
@@ -945,7 +948,7 @@ int ewf_test_lef_file_entry_read_binary_extents(
 	 */
 	result = libewf_lef_file_entry_read_binary_extents(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 39 ] ),
+	          binary_extents_data1,
 	          14,
 	          &error );
 
@@ -962,7 +965,7 @@ int ewf_test_lef_file_entry_read_binary_extents(
 	 */
 	result = libewf_lef_file_entry_read_binary_extents(
 	          NULL,
-	          &( ewf_test_lef_file_entry_values_data1[ 39 ] ),
+	          binary_extents_data1,
 	          14,
 	          &error );
 
@@ -998,7 +1001,7 @@ int ewf_test_lef_file_entry_read_binary_extents(
 
 	result = libewf_lef_file_entry_read_binary_extents(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 39 ] ),
+	          binary_extents_data1,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -1016,7 +1019,7 @@ int ewf_test_lef_file_entry_read_binary_extents(
 
 	result = libewf_lef_file_entry_read_binary_extents(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 39 ] ),
+	          binary_extents_data1,
 	          0,
 	          &error );
 
@@ -1036,8 +1039,48 @@ int ewf_test_lef_file_entry_read_binary_extents(
 	 */
 	result = libewf_lef_file_entry_read_binary_extents(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 39 ] ),
+	          binary_extents_data1,
 	          9,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test invalid data offset
+	 */
+	result = libewf_lef_file_entry_read_binary_extents(
+	          lef_file_entry,
+	          binary_extents_error_data1,
+	          14,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test invalid data size
+	 */
+	result = libewf_lef_file_entry_read_binary_extents(
+	          lef_file_entry,
+	          binary_extents_error_data2,
+	          14,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1294,6 +1337,9 @@ int ewf_test_lef_file_entry_read_short_name(
 {
 	libcerror_error_t *error                = NULL;
 	libewf_lef_file_entry_t *lef_file_entry = NULL;
+	uint8_t *short_name_data1               = (uint8_t *) "13 FILE10~1.TXT";
+	uint8_t *short_name_error_data1         = (uint8_t *) "13 FILE10~1.TXT X";
+	uint8_t *short_name_error_data2         = (uint8_t *) "XX FILE10~1.TXT";
 	int result                              = 0;
 
 	/* Initialize test
@@ -1319,7 +1365,7 @@ int ewf_test_lef_file_entry_read_short_name(
 	 */
 	result = libewf_lef_file_entry_read_short_name(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 106 ] ),
+	          short_name_data1,
 	          16,
 	          &error );
 
@@ -1336,7 +1382,7 @@ int ewf_test_lef_file_entry_read_short_name(
 	 */
 	result = libewf_lef_file_entry_read_short_name(
 	          NULL,
-	          &( ewf_test_lef_file_entry_values_data1[ 106 ] ),
+	          short_name_data1,
 	          16,
 	          &error );
 
@@ -1372,8 +1418,48 @@ int ewf_test_lef_file_entry_read_short_name(
 
 	result = libewf_lef_file_entry_read_short_name(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 106 ] ),
+	          short_name_data1,
 	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test unsupported number of offset values
+	 */
+	result = libewf_lef_file_entry_read_short_name(
+	          lef_file_entry,
+	          short_name_error_data1,
+	          18,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test invalid short name size
+	 */
+	result = libewf_lef_file_entry_read_short_name(
+	          lef_file_entry,
+	          short_name_error_data2,
+	          16,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1588,6 +1674,29 @@ int ewf_test_lef_file_entry_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+	/* Test number_of_types != number_of_values
+	 */
+	result = libewf_lef_file_entry_read_data(
+	          lef_file_entry,
+	          types,
+	          ewf_test_lef_file_entry_values_data1,
+	          166,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* TODO: test with invalid data */
 
 	/* Clean up
 	 */
@@ -3421,6 +3530,79 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_lef_file_entry_get_source_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_lef_file_entry_get_source_identifier(
+     libewf_lef_file_entry_t *lef_file_entry )
+{
+	libcerror_error_t *error = NULL;
+	int source_identifier    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_lef_file_entry_get_source_identifier(
+	          lef_file_entry,
+	          &source_identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_lef_file_entry_get_source_identifier(
+	          NULL,
+	          &source_identifier,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_file_entry_get_source_identifier(
+	          lef_file_entry,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_lef_file_entry_get_permission_group_index function
  * Returns 1 if successful or 0 if not
  */
@@ -3574,7 +3756,7 @@ int ewf_test_lef_file_entry_get_creation_time(
      libewf_lef_file_entry_t *lef_file_entry )
 {
 	libcerror_error_t *error = NULL;
-	int32_t creation_time    = 0;
+	int64_t creation_time    = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -3647,7 +3829,7 @@ int ewf_test_lef_file_entry_get_modification_time(
      libewf_lef_file_entry_t *lef_file_entry )
 {
 	libcerror_error_t *error  = NULL;
-	int32_t modification_time = 0;
+	int64_t modification_time = 0;
 	int result                = 0;
 
 	/* Test regular cases
@@ -3720,7 +3902,7 @@ int ewf_test_lef_file_entry_get_access_time(
      libewf_lef_file_entry_t *lef_file_entry )
 {
 	libcerror_error_t *error = NULL;
-	int32_t access_time      = 0;
+	int64_t access_time      = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -3793,7 +3975,7 @@ int ewf_test_lef_file_entry_get_entry_modification_time(
      libewf_lef_file_entry_t *lef_file_entry )
 {
 	libcerror_error_t *error        = NULL;
-	int32_t entry_modification_time = 0;
+	int64_t entry_modification_time = 0;
 	int result                      = 0;
 
 	/* Test regular cases
@@ -3866,7 +4048,7 @@ int ewf_test_lef_file_entry_get_deletion_time(
      libewf_lef_file_entry_t *lef_file_entry )
 {
 	libcerror_error_t *error = NULL;
-	int32_t deletion_time    = 0;
+	int64_t deletion_time    = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -3940,9 +4122,8 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_md5(
 {
 	uint8_t utf8_hash_value_md5[ 64 ];
 
-	libcerror_error_t *error       = NULL;
-	int result                     = 0;
-	int utf8_hash_value_md5_is_set = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -3960,8 +4141,6 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_md5(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	utf8_hash_value_md5_is_set = result;
 
 	/* Test error cases
 	 */
@@ -3983,62 +4162,60 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_md5(
 	libcerror_error_free(
 	 &error );
 
-	if( utf8_hash_value_md5_is_set != 0 )
-	{
-		result = libewf_lef_file_entry_get_utf8_hash_value_md5(
-		          lef_file_entry,
-		          NULL,
-		          64,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_md5(
+	          lef_file_entry,
+	          NULL,
+	          64,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf8_hash_value_md5(
-		          lef_file_entry,
-		          utf8_hash_value_md5,
-		          0,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_md5(
+	          lef_file_entry,
+	          utf8_hash_value_md5,
+	          0,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf8_hash_value_md5(
-		          lef_file_entry,
-		          utf8_hash_value_md5,
-		          (size_t) SSIZE_MAX + 1,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_md5(
+	          lef_file_entry,
+	          utf8_hash_value_md5,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -4058,9 +4235,8 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_md5(
 {
 	uint16_t utf16_hash_value_md5[ 64 ];
 
-	libcerror_error_t *error        = NULL;
-	int result                      = 0;
-	int utf16_hash_value_md5_is_set = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -4078,8 +4254,6 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_md5(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	utf16_hash_value_md5_is_set = result;
 
 	/* Test error cases
 	 */
@@ -4101,62 +4275,60 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_md5(
 	libcerror_error_free(
 	 &error );
 
-	if( utf16_hash_value_md5_is_set != 0 )
-	{
-		result = libewf_lef_file_entry_get_utf16_hash_value_md5(
-		          lef_file_entry,
-		          NULL,
-		          64,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_md5(
+	          lef_file_entry,
+	          NULL,
+	          64,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf16_hash_value_md5(
-		          lef_file_entry,
-		          utf16_hash_value_md5,
-		          0,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_md5(
+	          lef_file_entry,
+	          utf16_hash_value_md5,
+	          0,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf16_hash_value_md5(
-		          lef_file_entry,
-		          utf16_hash_value_md5,
-		          (size_t) SSIZE_MAX + 1,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_md5(
+	          lef_file_entry,
+	          utf16_hash_value_md5,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -4176,9 +4348,8 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_sha1(
 {
 	uint8_t utf8_hash_value_sha1[ 64 ];
 
-	libcerror_error_t *error        = NULL;
-	int result                      = 0;
-	int utf8_hash_value_sha1_is_set = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -4196,8 +4367,6 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_sha1(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	utf8_hash_value_sha1_is_set = result;
 
 	/* Test error cases
 	 */
@@ -4219,62 +4388,60 @@ int ewf_test_lef_file_entry_get_utf8_hash_value_sha1(
 	libcerror_error_free(
 	 &error );
 
-	if( utf8_hash_value_sha1_is_set != 0 )
-	{
-		result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
-		          lef_file_entry,
-		          NULL,
-		          64,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
+	          lef_file_entry,
+	          NULL,
+	          64,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
-		          lef_file_entry,
-		          utf8_hash_value_sha1,
-		          0,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
+	          lef_file_entry,
+	          utf8_hash_value_sha1,
+	          0,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
-		          lef_file_entry,
-		          utf8_hash_value_sha1,
-		          (size_t) SSIZE_MAX + 1,
-		          &error );
+	result = libewf_lef_file_entry_get_utf8_hash_value_sha1(
+	          lef_file_entry,
+	          utf8_hash_value_sha1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -4294,9 +4461,8 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_sha1(
 {
 	uint16_t utf16_hash_value_sha1[ 64 ];
 
-	libcerror_error_t *error         = NULL;
-	int result                       = 0;
-	int utf16_hash_value_sha1_is_set = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -4314,8 +4480,6 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_sha1(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	utf16_hash_value_sha1_is_set = result;
 
 	/* Test error cases
 	 */
@@ -4337,62 +4501,60 @@ int ewf_test_lef_file_entry_get_utf16_hash_value_sha1(
 	libcerror_error_free(
 	 &error );
 
-	if( utf16_hash_value_sha1_is_set != 0 )
-	{
-		result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
-		          lef_file_entry,
-		          NULL,
-		          64,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
+	          lef_file_entry,
+	          NULL,
+	          64,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
-		          lef_file_entry,
-		          utf16_hash_value_sha1,
-		          0,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
+	          lef_file_entry,
+	          utf16_hash_value_sha1,
+	          0,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
+	libcerror_error_free(
+	 &error );
 
-		result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
-		          lef_file_entry,
-		          utf16_hash_value_sha1,
-		          (size_t) SSIZE_MAX + 1,
-		          &error );
+	result = libewf_lef_file_entry_get_utf16_hash_value_sha1(
+	          lef_file_entry,
+	          utf16_hash_value_sha1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
 
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -4622,6 +4784,11 @@ int main(
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_lef_file_entry_get_size",
 	 ewf_test_lef_file_entry_get_size,
+	 lef_file_entry );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_lef_file_entry_get_source_identifier",
+	 ewf_test_lef_file_entry_get_source_identifier,
 	 lef_file_entry );
 
 	EWF_TEST_RUN_WITH_ARGS(

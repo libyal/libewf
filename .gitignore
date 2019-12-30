@@ -143,6 +143,7 @@ stamp-h[1-9]
 /tests/ewf_test_chunk_table
 /tests/ewf_test_compression
 /tests/ewf_test_data_chunk
+/tests/ewf_test_date_time
 /tests/ewf_test_date_time_values
 /tests/ewf_test_deflate
 /tests/ewf_test_device_information
@@ -161,8 +162,8 @@ stamp-h[1-9]
 /tests/ewf_test_lef_file_entry
 /tests/ewf_test_lef_permission
 /tests/ewf_test_lef_source
-/tests/ewf_test_ltree_section
 /tests/ewf_test_lef_subject
+/tests/ewf_test_ltree_section
 /tests/ewf_test_md5_hash_section
 /tests/ewf_test_media_values
 /tests/ewf_test_notify

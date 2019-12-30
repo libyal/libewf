@@ -2156,7 +2156,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					break;
 
 				case LIBEWF_SECTION_TYPE_MD5_HASH:
-					read_count = libewf_md5_hash_section_read(
+					read_count = libewf_md5_hash_section_read_file_io_pool(
 						      section,
 						      internal_handle->io_handle,
 						      file_io_pool,
@@ -2325,7 +2325,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 						}
 					}
 #endif
-					read_count = libewf_section_ltree_read(
+					read_count = libewf_ltree_section_read_file_io_pool(
 						      section,
 						      internal_handle->io_handle,
 						      file_io_pool,

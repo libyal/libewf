@@ -1130,7 +1130,7 @@ int libewf_lef_source_read_data(
 				     value_string,
 				     value_string_size,
 				     &value_64bit,
-				     32,
+				     64,
 				     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_SIGNED,
 				     error ) != 1 )
 				{
@@ -1143,7 +1143,7 @@ int libewf_lef_source_read_data(
 
 					goto on_error;
 				}
-				lef_source->acquisition_time = (int32_t) value_64bit;
+				lef_source->acquisition_time = (int64_t) value_64bit;
 			}
 			else if( ( type_string[ 0 ] == (uint8_t) 'd' )
 			      && ( type_string[ 1 ] == (uint8_t) 'o' ) )
@@ -3563,7 +3563,7 @@ int libewf_lef_source_get_physical_offset(
  */
 int libewf_lef_source_get_acquisition_time(
      libewf_lef_source_t *lef_source,
-     int32_t *acquisition_time,
+     int64_t *posix_time,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_source_get_acquisition_time";
@@ -3579,18 +3579,18 @@ int libewf_lef_source_get_acquisition_time(
 
 		return( -1 );
 	}
-	if( acquisition_time == NULL )
+	if( posix_time == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid acquisition time.",
+		 "%s: invalid POSIX time.",
 		 function );
 
 		return( -1 );
 	}
-	*acquisition_time = lef_source->acquisition_time;
+	*posix_time = lef_source->acquisition_time;
 
 	return( 1 );
 }

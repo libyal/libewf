@@ -118,7 +118,7 @@ int info_handle_set_header_codepage(
 int info_handle_posix_time_value_fprint(
      info_handle_t *info_handle,
      const char *value_name,
-     int32_t value_32bit,
+     int64_t value_64bit,
      libcerror_error_t **error );
 
 int info_handle_section_header_fprint(

@@ -363,12 +363,12 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	{
 #if SIZEOF_SIZE_T < 4
 		if( ( (uint32_t) name_size > ( (uint32_t) SSIZE_MAX / 2 ) )
-		 || ( name_size > ( data_size - data_offset ) ) )
+		 || ( name_size > (uint32_t) ( data_size - data_offset ) ) )
 #elif SIZEOF_SIZE_T == 4
 		if( ( (size_t) name_size > ( (size_t) SSIZE_MAX / 2 ) )
-		 || ( name_size > ( data_size - data_offset ) ) )
+		 || ( (size_t) name_size > ( data_size - data_offset ) ) )
 #else
-		if( name_size > ( data_size - data_offset ) )
+		if( (size_t) name_size > ( data_size - data_offset ) )
 #endif
 		{
 			libcerror_error_set(
@@ -388,12 +388,12 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	{
 #if SIZEOF_SIZE_T < 4
 		if( ( (uint32_t) value_size > ( (uint32_t) SSIZE_MAX / 2 ) )
-		 || ( value_size > ( data_size - data_offset ) ) )
+		 || ( value_size > (uint32_t) ( data_size - data_offset ) ) )
 #elif SIZEOF_SIZE_T == 4
 		if( ( (size_t) value_size > ( (size_t) SSIZE_MAX / 2 ) )
-		 || ( value_size > ( data_size - data_offset ) ) )
+		 || ( (size_t) value_size > ( data_size - data_offset ) ) )
 #else
-		if( value_size > ( data_size - data_offset ) )
+		if( (size_t) value_size > ( data_size - data_offset ) )
 #endif
 		{
 			libcerror_error_set(
