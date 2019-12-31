@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <memory.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -44,9 +45,15 @@
 int ewf_test_hash_values_initialize(
      void )
 {
-	libcerror_error_t *error         = NULL;
-	libfvalue_table_t *hash_values = NULL;
-	int result                       = 0;
+	libcerror_error_t *error        = NULL;
+	libfvalue_table_t *hash_values  = NULL;
+	int result                      = 0;
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
+#endif
 
 	/* Test regular cases
 	 */
@@ -104,44 +111,1711 @@ int ewf_test_hash_values_initialize(
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
-	/* Test libewf_hash_values_initialize with malloc failing
-	 */
-	ewf_test_malloc_attempts_before_fail = 0;
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_hash_values_initialize with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
 
+		result = libewf_hash_values_initialize(
+		          &hash_values,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( hash_values != NULL )
+			{
+				libfvalue_table_free(
+				 &hash_values,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "hash_values",
+			 hash_values );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_hash_values_initialize with memset failing
+		 */
+		ewf_test_memset_attempts_before_fail = test_number;
+
+		result = libewf_hash_values_initialize(
+		          &hash_values,
+		          &error );
+
+		if( ewf_test_memset_attempts_before_fail != -1 )
+		{
+			ewf_test_memset_attempts_before_fail = -1;
+
+			if( hash_values != NULL )
+			{
+				libfvalue_table_free(
+				 &hash_values,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "hash_values",
+			 hash_values );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_parse_md5_hash function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_parse_md5_hash(
+     void )
+{
+	uint8_t md5_hash[ 16 ]         = {
+		0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e };
+
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
 	result = libewf_hash_values_initialize(
 	          &hash_values,
 	          &error );
 
-	if( ewf_test_malloc_attempts_before_fail != -1 )
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_parse_md5_hash(
+	          hash_values,
+	          md5_hash,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare hash value */
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_parse_md5_hash(
+	          NULL,
+	          md5_hash,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_md5_hash(
+	          hash_values,
+	          NULL,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_md5_hash(
+	          hash_values,
+	          md5_hash,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_md5_hash(
+	          hash_values,
+	          md5_hash,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
 	{
-		ewf_test_malloc_attempts_before_fail = -1;
-
-		if( hash_values != NULL )
-		{
-			libfvalue_table_free(
-			 &hash_values,
-			 NULL );
-		}
-	}
-	else
-	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		EWF_TEST_ASSERT_IS_NULL(
-		 "hash_values",
-		 hash_values );
-
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_parse_sha1_hash function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_parse_sha1_hash(
+     void )
+{
+	uint8_t sha1_hash[ 20 ]        = {
+		0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
+		0xaf, 0xd8, 0x07, 0x09 };
+
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_parse_sha1_hash(
+	          hash_values,
+	          sha1_hash,
+	          20,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare hash value */
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_parse_sha1_hash(
+	          NULL,
+	          sha1_hash,
+	          20,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_sha1_hash(
+	          hash_values,
+	          NULL,
+	          20,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_sha1_hash(
+	          hash_values,
+	          sha1_hash,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_hash_values_parse_sha1_hash(
+	          hash_values,
+	          sha1_hash,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_parse_xhash function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_parse_xhash(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	char *xhash                    = "\xef\xbb\xbf<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xhash>\n\t<md5>d41d8cd98f00b204e9800998ecf8427e</md5>\n</xhash>\n\n";
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_parse_xhash(
+	          hash_values,
+	          (uint8_t *) xhash,
+	          106,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare hash value */
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_parse_xhash(
+	          NULL,
+	          (uint8_t *) xhash,
+	          106,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_generate_xhash function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_generate_xhash(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	uint8_t *xhash                 = NULL;
+	char *expected_xhash           = "\xef\xbb\xbf<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xhash>\n\t<md5>d41d8cd98f00b204e9800998ecf8427e</md5>\n</xhash>\n\n";
+	size_t xhash_size              = 0;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_generate_xhash(
+	          hash_values,
+	          &xhash,
+	          &xhash_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "xhash_size",
+	 xhash_size,
+	 (size_t) 106 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          xhash,
+	          expected_xhash,
+	          106 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	memory_free(
+	 xhash );
+
+	xhash = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_generate_xhash(
+	          NULL,
+	          &xhash,
+	          &xhash_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( xhash != NULL )
+	{
+		memory_free(
+		 xhash );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_identifier_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_identifier_size(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	size_t identifier_size         = 0;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	identifier_size = 0;
+
+	result = libewf_hash_values_get_identifier_size(
+	          hash_values,
+	          0,
+	          &identifier_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "identifier_size",
+	 identifier_size,
+	 (size_t) 4 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	identifier_size = 0;
+
+	result = libewf_hash_values_get_identifier_size(
+	          NULL,
+	          0,
+	          &identifier_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "identifier_size",
+	 identifier_size,
+	 (size_t) 0 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_identifier function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_identifier(
+     void )
+{
+	uint8_t identifier[ 16 ];
+
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_get_identifier(
+	          hash_values,
+	          0,
+	          identifier,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          identifier,
+	          "md5",
+	          4 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_get_identifier(
+	          NULL,
+	          0,
+	          identifier,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_utf8_value_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_utf8_value_size(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	size_t utf8_value_size         = 0;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	utf8_value_size = 0;
+
+	result = libewf_hash_values_get_utf8_value_size(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          &utf8_value_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_value_size",
+	 utf8_value_size,
+	 (size_t) 33 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	utf8_value_size = 0;
+
+	result = libewf_hash_values_get_utf8_value_size(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          &utf8_value_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_value_size",
+	 utf8_value_size,
+	 (size_t) 0 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_utf8_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_utf8_value(
+     void )
+{
+	uint8_t value[ 64 ];
+
+	uint8_t expected_utf8_value[ 33 ] = {
+		'd', '4', '1', 'd', '8', 'c', 'd', '9', '8', 'f', '0', '0', 'b', '2', '0', '4',
+		'e', '9', '8', '0', '0', '9', '9', '8', 'e', 'c', 'f', '8', '4', '2', '7', 'e',
+		0 };
+
+	libcerror_error_t *error          = NULL;
+	libfvalue_table_t *hash_values    = NULL;
+	int result                        = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_get_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          value,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          value,
+	          expected_utf8_value,
+	          33 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_get_utf8_value(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          value,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_set_utf8_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_set_utf8_value(
+     void )
+{
+	uint8_t utf8_value[ 33 ]       = {
+		'd', '4', '1', 'd', '8', 'c', 'd', '9', '8', 'f', '0', '0', 'b', '2', '0', '4',
+		'e', '9', '8', '0', '0', '9', '9', '8', 'e', 'c', 'f', '8', '4', '2', '7', 'e',
+		0 };
+
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          utf8_value,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_set_utf8_value(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          utf8_value,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_utf16_value_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_utf16_value_size(
+     void )
+{
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	size_t utf16_value_size        = 0;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	utf16_value_size = 0;
+
+	result = libewf_hash_values_get_utf16_value_size(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          &utf16_value_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_value_size",
+	 utf16_value_size,
+	 (size_t) 33 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	utf16_value_size = 0;
+
+	result = libewf_hash_values_get_utf16_value_size(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          &utf16_value_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_value_size",
+	 utf16_value_size,
+	 (size_t) 0 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_get_utf16_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_get_utf16_value(
+     void )
+{
+	uint16_t value[ 64 ];
+
+	uint16_t expected_utf16_value[ 33 ] = {
+		'd', '4', '1', 'd', '8', 'c', 'd', '9', '8', 'f', '0', '0', 'b', '2', '0', '4',
+		'e', '9', '8', '0', '0', '9', '9', '8', 'e', 'c', 'f', '8', '4', '2', '7', 'e',
+		0 };
+
+	libcerror_error_t *error            = NULL;
+	libfvalue_table_t *hash_values      = NULL;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_hash_values_set_utf8_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          (uint8_t *) "d41d8cd98f00b204e9800998ecf8427e",
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_get_utf16_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          value,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          value,
+	          expected_utf16_value,
+	          33 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_get_utf16_value(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          value,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( hash_values != NULL )
+	{
+		libfvalue_table_free(
+		 &hash_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_hash_values_set_utf16_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_hash_values_set_utf16_value(
+     void )
+{
+	uint16_t utf16_value[ 33 ]     = {
+		'd', '4', '1', 'd', '8', 'c', 'd', '9', '8', 'f', '0', '0', 'b', '2', '0', '4',
+		'e', '9', '8', '0', '0', '9', '9', '8', 'e', 'c', 'f', '8', '4', '2', '7', 'e',
+		0 };
+
+	libcerror_error_t *error       = NULL;
+	libfvalue_table_t *hash_values = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_hash_values_initialize(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_hash_values_set_utf16_value(
+	          hash_values,
+	          (uint8_t *) "md5",
+	          3,
+	          utf16_value,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_hash_values_set_utf16_value(
+	          NULL,
+	          (uint8_t *) "md5",
+	          3,
+	          utf16_value,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &hash_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "hash_values",
+	 hash_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -183,33 +1857,57 @@ int main(
 	 "libewf_hash_values_initialize",
 	 ewf_test_hash_values_initialize );
 
-	/* TODO: add tests for libewf_hash_values_parse_md5_hash */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_parse_md5_hash",
+	 ewf_test_hash_values_parse_md5_hash );
 
-	/* TODO: add tests for libewf_hash_values_parse_sha1_hash */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_parse_sha1_hash",
+	 ewf_test_hash_values_parse_sha1_hash );
 
-	/* TODO: add tests for libewf_hash_values_parse_xhash */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_parse_xhash",
+	 ewf_test_hash_values_parse_xhash );
 
-	/* TODO: add tests for libewf_hash_values_generate_xhash */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_generate_xhash",
+	 ewf_test_hash_values_generate_xhash );
 
 	/* TODO: add tests for libewf_hash_values_generate_md5_hash */
 
 	/* TODO: add tests for libewf_hash_values_generate_sha1_hash */
 
-	/* TODO: add tests for libewf_hash_values_get_identifier_size */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_identifier_size",
+	 ewf_test_hash_values_get_identifier_size );
 
-	/* TODO: add tests for libewf_hash_values_get_identifier */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_identifier",
+	 ewf_test_hash_values_get_identifier );
 
-	/* TODO: add tests for libewf_hash_values_get_utf8_value_size */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_utf8_value_size",
+	 ewf_test_hash_values_get_utf8_value_size );
 
-	/* TODO: add tests for libewf_hash_values_get_utf8_value */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_utf8_value",
+	 ewf_test_hash_values_get_utf8_value );
 
-	/* TODO: add tests for libewf_hash_values_set_utf8_value */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_set_utf8_value",
+	 ewf_test_hash_values_set_utf8_value );
 
-	/* TODO: add tests for libewf_hash_values_get_utf16_value_size */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_utf16_value_size",
+	 ewf_test_hash_values_get_utf16_value_size );
 
-	/* TODO: add tests for libewf_hash_values_get_utf16_value */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_get_utf16_value",
+	 ewf_test_hash_values_get_utf16_value );
 
-	/* TODO: add tests for libewf_hash_values_set_utf16_value */
+	EWF_TEST_RUN(
+	 "libewf_hash_values_set_utf16_value",
+	 ewf_test_hash_values_set_utf16_value );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

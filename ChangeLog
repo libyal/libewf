@@ -1,4 +1,5 @@
 TODO
+* move libewf_hash_values_get_identifier_size libewf_hash_values_get_identifier into libfvalue
 * ewfinfo sanitize special characters in file names?
 * rename extended attribute to attribute
 * change single files tree to B-tree

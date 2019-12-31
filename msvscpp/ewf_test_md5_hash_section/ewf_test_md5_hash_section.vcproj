@@ -183,6 +183,10 @@
 				RelativePath="..\..\tests\ewf_test_md5_hash_section.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -207,6 +211,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

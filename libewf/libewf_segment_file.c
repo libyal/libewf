@@ -1755,7 +1755,7 @@ ssize_t libewf_segment_file_read_volume_section(
 	}
 	if( section_descriptor->data_size == (size64_t) sizeof( ewf_volume_t ) )
 	{
-		read_count = libewf_volume_section_e01_read(
+		read_count = libewf_volume_section_e01_read_file_io_pool(
 		              section_descriptor,
 		              segment_file->io_handle,
 		              file_io_pool,
@@ -1777,7 +1777,7 @@ ssize_t libewf_segment_file_read_volume_section(
 	}
 	else if( section_descriptor->data_size == (size64_t) sizeof( ewf_volume_smart_t ) )
 	{
-		read_count = libewf_volume_section_s01_read(
+		read_count = libewf_volume_section_s01_read_file_io_pool(
 		              section_descriptor,
 		              segment_file->io_handle,
 		              file_io_pool,
@@ -3241,7 +3241,7 @@ ssize_t libewf_segment_file_write_start(
 
 			if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 			{
-				write_count = libewf_volume_section_e01_write(
+				write_count = libewf_volume_section_e01_write_file_io_pool(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -3252,7 +3252,7 @@ ssize_t libewf_segment_file_write_start(
 			}
 			else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 			{
-				write_count = libewf_volume_section_s01_write(
+				write_count = libewf_volume_section_s01_write_file_io_pool(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -4330,7 +4330,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 				goto on_error;
 			}
-			write_count = libewf_digest_section_write(
+			write_count = libewf_digest_section_write_file_io_pool(
 				       section_descriptor,
 				       segment_file->io_handle,
 				       file_io_pool,
@@ -4403,7 +4403,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 			goto on_error;
 		}
-		write_count = libewf_md5_hash_section_write(
+		write_count = libewf_md5_hash_section_write_file_io_pool(
 			       section_descriptor,
 			       segment_file->io_handle,
 			       file_io_pool,
@@ -4493,7 +4493,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 
 				goto on_error;
 			}
-			write_count = libewf_sha1_hash_section_write(
+			write_count = libewf_sha1_hash_section_write_file_io_pool(
 				       section_descriptor,
 				       segment_file->io_handle,
 				       file_io_pool,
@@ -4909,7 +4909,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
-				write_count = libewf_section_session_write(
+				write_count = libewf_session_section_write_file_io_pool(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -4926,7 +4926,7 @@ ssize_t libewf_segment_file_write_close(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write sessions section.",
+					 "%s: unable to write session section.",
 					 function );
 
 					goto on_error;
@@ -5024,7 +5024,7 @@ ssize_t libewf_segment_file_write_close(
 
 					goto on_error;
 				}
-				write_count = libewf_section_error_write(
+				write_count = libewf_error2_section_write_file_io_pool(
 					       section_descriptor,
 					       segment_file->io_handle,
 					       file_io_pool,
@@ -5040,7 +5040,7 @@ ssize_t libewf_segment_file_write_close(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write error section.",
+					 "%s: unable to write error2 section.",
 					 function );
 
 					goto on_error;
@@ -5774,7 +5774,7 @@ int libewf_segment_file_write_sections_correction(
 
 				if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 				{
-					write_count = libewf_volume_section_e01_write(
+					write_count = libewf_volume_section_e01_write_file_io_pool(
 						       section_descriptor,
 						       segment_file->io_handle,
 						       file_io_pool,
@@ -5785,7 +5785,7 @@ int libewf_segment_file_write_sections_correction(
 				}
 				else if( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 				{
-					write_count = libewf_volume_section_s01_write(
+					write_count = libewf_volume_section_s01_write_file_io_pool(
 						       section_descriptor,
 						       segment_file->io_handle,
 						       file_io_pool,

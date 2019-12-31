@@ -41,7 +41,7 @@ int libewf_sha1_hash_section_read_data(
      libewf_hash_sections_t *hash_sections,
      libcerror_error_t **error );
 
-ssize_t libewf_sha1_hash_section_read(
+ssize_t libewf_sha1_hash_section_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -49,7 +49,13 @@ ssize_t libewf_sha1_hash_section_read(
          libewf_hash_sections_t *hash_sections,
          libcerror_error_t **error );
 
-ssize_t libewf_sha1_hash_section_write(
+int libewf_sha1_hash_section_write_data(
+     uint8_t *data,
+     size_t data_size,
+     libewf_hash_sections_t *hash_sections,
+     libcerror_error_t **error );
+
+ssize_t libewf_sha1_hash_section_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,

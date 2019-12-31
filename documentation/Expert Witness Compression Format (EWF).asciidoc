@@ -2852,8 +2852,8 @@ The xhash section contains a zlib compressed data (see section:
 ....
 <?xml version="1.0" encoding="UTF-8"?>
 <xhash>
-        <MD5>ae1ce8f5ac079d3ee93f97fe3792bda3</MD5>
-        <SHA1>31a58f090460b92220d724b28eeb2838a1df6184</SHA1>
+        <md5>ae1ce8f5ac079d3ee93f97fe3792bda3</md5>
+        <sha1>31a58f090460b92220d724b28eeb2838a1df6184</sha1>
 </xhash>
 ....
 

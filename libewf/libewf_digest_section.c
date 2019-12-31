@@ -39,7 +39,7 @@
 #include "ewf_digest.h"
 
 /* Reads a digest section
- * Returns the number of bytes read or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_digest_section_read_data(
      const uint8_t *data,
@@ -260,7 +260,7 @@ int libewf_digest_section_read_data(
 /* Reads a digest section
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libewf_digest_section_read(
+ssize_t libewf_digest_section_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -269,7 +269,7 @@ ssize_t libewf_digest_section_read(
          libcerror_error_t **error )
 {
 	uint8_t *section_data    = NULL;
-	static char *function    = "libewf_digest_section_read";
+	static char *function    = "libewf_digest_section_read_file_io_pool";
 	size_t section_data_size = 0;
 	ssize_t read_count       = 0;
 
@@ -336,31 +336,46 @@ on_error:
 }
 
 /* Writes a digest section
- * Returns the number of bytes written or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-ssize_t libewf_digest_section_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t section_offset,
-         libewf_hash_sections_t *hash_sections,
-         libcerror_error_t **error )
+int libewf_digest_section_write_data(
+     uint8_t *data,
+     size_t data_size,
+     libewf_hash_sections_t *hash_sections,
+     libcerror_error_t **error )
 {
-	ewf_digest_t digest;
-
-	static char *function        = "libewf_digest_section_write";
-	ssize_t total_write_count    = 0;
-	ssize_t write_count          = 0;
+	static char *function        = "libewf_digest_section_write_data";
 	uint32_t calculated_checksum = 0;
 
-	if( section_descriptor == NULL )
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section descriptor.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size != (size_t) sizeof( ewf_digest_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -372,6 +387,139 @@ ssize_t libewf_digest_section_write(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     data,
+	     0,
+	     data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear data.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_sections->md5_digest_set != 0 )
+	{
+		if( memory_copy(
+		     ( (ewf_digest_t *) data )->md5_hash,
+		     hash_sections->md5_digest,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set MD5 hash.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( hash_sections->sha1_digest_set != 0 )
+	{
+		if( memory_copy(
+		     ( (ewf_digest_t *) data )->sha1_hash,
+		     hash_sections->sha1_digest,
+		     20 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set MD5 hash.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: digest section data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 0 );
+	}
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: MD5 hash:\n",
+		 function );
+		libcnotify_print_data(
+		 ( (ewf_digest_t *) data )->md5_hash,
+		 16,
+		 0 );
+
+		libcnotify_printf(
+		 "%s: SHA1 hash:\n",
+		 function );
+		libcnotify_print_data(
+		 ( (ewf_digest_t *) data )->sha1_hash,
+		 20,
+		 0 );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	if( libewf_checksum_calculate_adler32(
+	     &calculated_checksum,
+	     data,
+	     data_size - 4,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to calculate checksum.",
+		 function );
+
+		return( -1 );
+	}
+	byte_stream_copy_from_uint32_little_endian(
+	 ( (ewf_digest_t *) data )->checksum,
+	 calculated_checksum );
+
+	return( 1 );
+}
+
+/* Writes a digest section
+ * Returns the number of bytes written or -1 on error
+ */
+ssize_t libewf_digest_section_write_file_io_pool(
+         libewf_section_descriptor_t *section_descriptor,
+         libewf_io_handle_t *io_handle,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         off64_t section_offset,
+         libewf_hash_sections_t *hash_sections,
+         libcerror_error_t **error )
+{
+	uint8_t section_data[ sizeof( ewf_digest_t ) ];
+
+	static char *function     = "libewf_digest_section_write_file_io_pool";
+	ssize_t total_write_count = 0;
+	ssize_t write_count       = 0;
+
+	if( section_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section descriptor.",
 		 function );
 
 		return( -1 );
@@ -416,100 +564,27 @@ ssize_t libewf_digest_section_write(
 	}
 	total_write_count += write_count;
 
-	if( memory_set(
-	     &digest,
-	     0,
-	     sizeof( ewf_digest_t ) ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear digest.",
-		 function );
-
-		return( -1 );
-	}
-	if( hash_sections->md5_digest_set != 0 )
-	{
-		if( memory_copy(
-		     digest.md5_hash,
-		     hash_sections->md5_digest,
-		     16 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set MD5 hash.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( hash_sections->sha1_digest_set != 0 )
-	{
-		if( memory_copy(
-		     digest.sha1_hash,
-		     hash_sections->sha1_digest,
-		     20 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set MD5 hash.",
-			 function );
-
-			return( -1 );
-		}
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: MD5 hash:\n",
-		 function );
-		libcnotify_print_data(
-		 digest.md5_hash,
-		 16,
-		 0 );
-
-		libcnotify_printf(
-		 "%s: SHA1 hash:\n",
-		 function );
-		libcnotify_print_data(
-		 digest.sha1_hash,
-		 20,
-		 0 );
-	}
-#endif
-	if( libewf_checksum_calculate_adler32(
-	     &calculated_checksum,
-	     (uint8_t *) &digest,
-	     sizeof( ewf_digest_t ) - 4,
-	     1,
+	if( libewf_digest_section_write_data(
+	     section_data,
+	     sizeof( ewf_digest_t ),
+	     hash_sections,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to calculate checksum.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to write section data.",
 		 function );
 
 		return( -1 );
 	}
-	byte_stream_copy_from_uint32_little_endian(
-	 digest.checksum,
-	 calculated_checksum );
-
 	write_count = libewf_section_write_data(
 	               section_descriptor,
 	               io_handle,
 	               file_io_pool,
 	               file_io_pool_entry,
-	               (uint8_t *) &digest,
+	               section_data,
 	               sizeof( ewf_digest_t ),
 	               error );
 

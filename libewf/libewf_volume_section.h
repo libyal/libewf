@@ -46,7 +46,7 @@ int libewf_volume_section_e01_read_data(
      libewf_media_values_t *media_values,
      libcerror_error_t **error );
 
-ssize_t libewf_volume_section_e01_read(
+ssize_t libewf_volume_section_e01_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -54,7 +54,14 @@ ssize_t libewf_volume_section_e01_read(
          libewf_media_values_t *media_values,
          libcerror_error_t **error );
 
-ssize_t libewf_volume_section_e01_write(
+int libewf_volume_section_e01_write_data(
+     uint8_t *data,
+     size_t data_size,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     libcerror_error_t **error );
+
+ssize_t libewf_volume_section_e01_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -70,7 +77,7 @@ int libewf_volume_section_s01_read_data(
      libewf_media_values_t *media_values,
      libcerror_error_t **error );
 
-ssize_t libewf_volume_section_s01_read(
+ssize_t libewf_volume_section_s01_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -78,7 +85,14 @@ ssize_t libewf_volume_section_s01_read(
          libewf_media_values_t *media_values,
          libcerror_error_t **error );
 
-ssize_t libewf_volume_section_s01_write(
+int libewf_volume_section_s01_write_data(
+     uint8_t *data,
+     size_t data_size,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     libcerror_error_t **error );
+
+ssize_t libewf_volume_section_s01_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,

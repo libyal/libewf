@@ -54,8 +54,7 @@ ssize_t libewf_ltree_section_read_file_io_pool(
          size_t *single_files_data_size,
          libcerror_error_t **error );
 
-/* TODO rename libewf_section_ltree_write to libewf_ltree_section_write_file_io_pool */
-ssize_t libewf_section_ltree_write(
+ssize_t libewf_ltree_section_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,

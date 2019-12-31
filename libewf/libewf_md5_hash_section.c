@@ -183,7 +183,8 @@ int libewf_md5_hash_section_read_data(
 			 0 );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( format_version == 2 )
 	{
 		data_size -= 12;
@@ -419,7 +420,7 @@ int libewf_md5_hash_section_write_data(
 	if( memory_set(
 	     data,
 	     0,
-	     md5_hash_data_size ) == NULL )
+	     data_size ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -449,12 +450,12 @@ int libewf_md5_hash_section_write_data(
 	}
 	if( format_version == 2 )
 	{
-		md5_hash_data_size -= 12;
+		data_size -= 12;
 	}
 	if( libewf_checksum_calculate_adler32(
 	     &calculated_checksum,
 	     data,
-	     md5_hash_data_size - 4,
+	     data_size - 4,
 	     1,
 	     error ) != 1 )
 	{
@@ -479,17 +480,17 @@ int libewf_md5_hash_section_write_data(
 		 ( (ewf_md5_hash_t *) data )->checksum,
 		 calculated_checksum );
 
-		md5_hash_data_size += 12;
+		data_size += 12;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: MD5 hash data:\n",
+		 "%s: MD5 hash section data:\n",
 		 function );
 		libcnotify_print_data(
 		 data,
-		 md5_hash_data_size,
+		 data_size,
 		 0 );
 	}
 #endif
@@ -543,7 +544,7 @@ int libewf_md5_hash_section_write_data(
 /* Writes a version 1 or 2 MD5 hash section
  * Returns the number of bytes written or -1 on error
  */
-ssize_t libewf_md5_hash_section_write(
+ssize_t libewf_md5_hash_section_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -554,7 +555,7 @@ ssize_t libewf_md5_hash_section_write(
          libcerror_error_t **error )
 {
 	uint8_t *section_data               = NULL;
-	static char *function               = "libewf_md5_hash_section_write";
+	static char *function               = "libewf_md5_hash_section_write_file_io_pool";
 	size_t md5_hash_data_size           = 0;
 	size_t section_descriptor_data_size = 0;
 	size_t section_padding_size         = 0;

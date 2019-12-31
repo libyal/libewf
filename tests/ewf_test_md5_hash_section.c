@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -32,6 +33,7 @@
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
+#include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_hash_sections.h"
@@ -91,6 +93,8 @@ int ewf_test_md5_hash_section_read_data(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+/* TODO test with empty MD5 */
 
 	/* Test error cases
 	 */
@@ -176,6 +180,68 @@ int ewf_test_md5_hash_section_read_data(
 	          2,
 	          NULL,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
+
+	/* Test libewf_md5_hash_section_read_data with memcpy of md5_hash failing
+	 */
+	ewf_test_memcpy_attempts_before_fail = 0;
+
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          32,
+	          2,
+	          hash_sections,
+	          &error );
+
+	if( ewf_test_memcpy_attempts_before_fail != -1 )
+	{
+		ewf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
+
+	/* Test with an invalid checksum
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_md5_hash_section_data1[ 16 ] ),
+	 0xffffffffUL );
+
+	result = libewf_md5_hash_section_read_data(
+	          ewf_test_md5_hash_section_data1,
+	          32,
+	          2,
+	          hash_sections,
+	          &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_md5_hash_section_data1[ 16 ] ),
+	 0x30a9066eUL );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -373,6 +439,75 @@ int ewf_test_md5_hash_section_read_file_io_pool(
 	 "error",
 	 error );
 
+/* TODO test with libewf_section_read_data failing */
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          ewf_test_md5_hash_section_data1,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with libewf_md5_hash_section_read_data failing due to an invalid checksum
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_md5_hash_section_data1[ 16 ] ),
+	 0xffffffffUL );
+
+	read_count = libewf_md5_hash_section_read_file_io_pool(
+	              section_descriptor,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              2,
+	              hash_sections,
+	              &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_md5_hash_section_data1[ 16 ] ),
+	 0x30a9066eUL );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Clean up
 	 */
 	result = libewf_hash_sections_free(
@@ -514,7 +649,7 @@ int ewf_test_md5_hash_section_write_data(
 
 	/* Test error cases
 	 */
-	result = libewf_md5_hash_section_read_data(
+	result = libewf_md5_hash_section_write_data(
 	          NULL,
 	          32,
 	          2,
@@ -533,7 +668,7 @@ int ewf_test_md5_hash_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_md5_hash_section_read_data(
+	result = libewf_md5_hash_section_write_data(
 	          section_data,
 	          (size_t) SSIZE_MAX + 1,
 	          2,
@@ -552,7 +687,7 @@ int ewf_test_md5_hash_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_md5_hash_section_read_data(
+	result = libewf_md5_hash_section_write_data(
 	          section_data,
 	          0,
 	          2,
@@ -571,7 +706,7 @@ int ewf_test_md5_hash_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_md5_hash_section_read_data(
+	result = libewf_md5_hash_section_write_data(
 	          section_data,
 	          32,
 	          0,
@@ -590,7 +725,7 @@ int ewf_test_md5_hash_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_md5_hash_section_read_data(
+	result = libewf_md5_hash_section_write_data(
 	          section_data,
 	          32,
 	          2,
@@ -608,6 +743,71 @@ int ewf_test_md5_hash_section_write_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_md5_hash_section_write_data with memset of data failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_md5_hash_section_write_data(
+	          section_data,
+	          32,
+	          2,
+	          hash_sections,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libewf_md5_hash_section_write_data with memcpy of data->md5_hash failing
+	 */
+	ewf_test_memcpy_attempts_before_fail = 0;
+
+	result = libewf_md5_hash_section_write_data(
+	          section_data,
+	          32,
+	          2,
+	          hash_sections,
+	          &error );
+
+	if( ewf_test_memcpy_attempts_before_fail != -1 )
+	{
+		ewf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
 	 */
@@ -676,7 +876,7 @@ int main(
 	 "libewf_md5_hash_section_write_data",
 	 ewf_test_md5_hash_section_write_data );
 
-	/* TODO: add tests for libewf_md5_hash_section_write */
+	/* TODO: add tests for libewf_md5_hash_section_write_file_io_pool */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

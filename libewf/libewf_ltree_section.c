@@ -459,7 +459,7 @@ on_error:
 /* Writes a version 1 ltree section or version 2 singles files data section
  * Returns the number of bytes written or -1 on error
  */
-ssize_t libewf_section_ltree_write(
+ssize_t libewf_ltree_section_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
@@ -472,7 +472,7 @@ ssize_t libewf_section_ltree_write(
          size_t single_files_data_size,
          libcerror_error_t **error )
 {
-	static char *function               = "libewf_section_ltree_write";
+	static char *function               = "libewf_ltree_section_write_file_io_pool";
 	size_t ltree_header_data_size       = 0;
 	size_t required_section_data_size   = 0;
 	size_t section_descriptor_data_size = 0;

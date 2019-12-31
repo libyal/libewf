@@ -87,13 +87,14 @@ int libewf_hash_values_parse_md5_hash(
 
 		return( -1 );
 	}
-	if( md5_hash_size < 16 )
+	if( ( md5_hash_size < 16 )
+	 || ( md5_hash_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: MD5 hash too small.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MD5 hash size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -261,13 +262,14 @@ int libewf_hash_values_parse_sha1_hash(
 
 		return( -1 );
 	}
-	if( sha1_hash_size < 20 )
+	if( ( sha1_hash_size < 20 )
+	 || ( sha1_hash_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: SHA1 hash too small.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid SHA1 hash size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -395,7 +397,7 @@ on_error:
 	return( -1 );
 }
 
-/* Parse an xhash for the hash values
+/* Parses a xhash for the hash values
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_xhash(
@@ -426,7 +428,7 @@ int libewf_hash_values_parse_xhash(
 	return( 1 );
 }
 
-/* Generate an xhash
+/* Generate a xhash
  * Sets xhash and xhash size
  * Returns 1 if successful or -1 on error
  */
@@ -1404,45 +1406,27 @@ int libewf_hash_values_get_utf8_value_size(
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	result = libfvalue_value_has_data(
-		  hash_value,
-		  error );
+		result = libfvalue_value_get_utf8_string_size(
+		          hash_value,
+		          0,
+		          utf8_string_size,
+		          error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if hash value has data.",
-		 function );
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size of hash value.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	else if( result == 0 )
-	{
-		return( 0 );
-	}
-	if( libfvalue_value_get_utf8_string_size(
-	     hash_value,
-	     0,
-	     utf8_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 string size of hash value.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded hash value of an identifier
@@ -1503,46 +1487,28 @@ int libewf_hash_values_get_utf8_value(
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	result = libfvalue_value_has_data(
-		  hash_value,
-		  error );
+		result = libfvalue_value_copy_to_utf8_string(
+		          hash_value,
+		          0,
+		          utf8_string,
+		          utf8_string_size,
+		          error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if hash value has data.",
-		 function );
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy hash value to UTF-8 string.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	else if( result == 0 )
-	{
-		return( 0 );
-	}
-	if( libfvalue_value_copy_to_utf8_string(
-	     hash_value,
-	     0,
-	     utf8_string,
-	     utf8_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy hash value to UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Sets the UTF-8 encoded hash value specified by the identifier
@@ -1735,45 +1701,27 @@ int libewf_hash_values_get_utf16_value_size(
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	result = libfvalue_value_has_data(
-		  hash_value,
-		  error );
+		result = libfvalue_value_get_utf16_string_size(
+		          hash_value,
+		          0,
+		          utf16_string_size,
+		          error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if hash value has data.",
-		 function );
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size of hash value.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	else if( result == 0 )
-	{
-		return( 0 );
-	}
-	if( libfvalue_value_get_utf16_string_size(
-	     hash_value,
-	     0,
-	     utf16_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string size of hash value.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded hash value of an identifier
@@ -1834,46 +1782,28 @@ int libewf_hash_values_get_utf16_value(
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	result = libfvalue_value_has_data(
-		  hash_value,
-		  error );
+		result = libfvalue_value_copy_to_utf16_string(
+		          hash_value,
+		          0,
+		          utf16_string,
+		          utf16_string_size,
+		          error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if hash value has data.",
-		 function );
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy hash value to UTF-16 string.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	else if( result == 0 )
-	{
-		return( 0 );
-	}
-	if( libfvalue_value_copy_to_utf16_string(
-	     hash_value,
-	     0,
-	     utf16_string,
-	     utf16_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy hash value to UTF-16 string.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( result );
 }
 
 /* Sets the UTF-16 encoded hash value specified by the identifier

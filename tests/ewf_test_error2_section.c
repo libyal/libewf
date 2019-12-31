@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -27,6 +28,8 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_functions.h"
+#include "ewf_test_libbfio.h"
 #include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
@@ -34,6 +37,7 @@
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_error2_section.h"
+#include "../libewf/libewf_io_handle.h"
 #include "../libewf/libewf_section_descriptor.h"
 
 uint8_t ewf_test_error2_section_data1[ 548 ] = {
@@ -181,10 +185,569 @@ int ewf_test_error2_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-/* TODO test format version */
+	result = libewf_error2_section_read_data(
+	          ewf_test_error2_section_data1,
+	          548,
+	          0,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libewf_error2_section_read_data failing in libcdata_range_list_empty
+	 */
+	result = libewf_error2_section_read_data(
+	          ewf_test_error2_section_data1,
+	          548,
+	          1,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test with an invalid checksum
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_error2_section_data1[ 516 ] ),
+	 0xffffffffUL );
 
 	result = libewf_error2_section_read_data(
 	          ewf_test_error2_section_data1,
+	          548,
+	          1,
+	          acquiry_errors,
+	          &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_error2_section_data1[ 516 ] ),
+	 0x08100004UL );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libcdata_range_list_free(
+	          &acquiry_errors,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "acquiry_errors",
+	 acquiry_errors );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( acquiry_errors != NULL )
+	{
+		libcdata_range_list_free(
+		 &acquiry_errors,
+		 NULL,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_error2_section_read_file_io_pool function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_error2_section_read_file_io_pool(
+     void )
+{
+	libbfio_pool_t *file_io_pool                    = NULL;
+	libcdata_range_list_t *acquiry_errors           = NULL;
+	libcerror_error_t *error                        = NULL;
+	libewf_io_handle_t *io_handle                   = NULL;
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	ssize_t read_count                              = 0;
+	int result                                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_section_descriptor_initialize(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	section_descriptor->data_size = 548;
+
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcdata_range_list_initialize(
+	          &acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "acquiry_errors",
+	 acquiry_errors );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          ewf_test_error2_section_data1,
+	          548,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libewf_error2_section_read_file_io_pool(
+	              section_descriptor,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              1,
+	              acquiry_errors,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 548 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	read_count = libewf_error2_section_read_file_io_pool(
+	              NULL,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              1,
+	              acquiry_errors,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO test with libewf_section_read_data failing */
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          ewf_test_error2_section_data1,
+	          548,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with libewf_error2_section_read_data failing due to an invalid checksum
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_error2_section_data1[ 516 ] ),
+	 0xffffffffUL );
+
+	read_count = libewf_error2_section_read_file_io_pool(
+	              section_descriptor,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              1,
+	              acquiry_errors,
+	              &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( ewf_test_error2_section_data1[ 516 ] ),
+	 0x08100004UL );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libcdata_range_list_free(
+	          &acquiry_errors,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "acquiry_errors",
+	 acquiry_errors );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_section_descriptor_free(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+	}
+	if( acquiry_errors != NULL )
+	{
+		libcdata_range_list_free(
+		 &acquiry_errors,
+		 NULL,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	if( section_descriptor != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &section_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_error2_section_write_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_error2_section_write_data(
+     void )
+{
+	uint8_t section_data[ 548 ];
+
+	libcdata_range_list_t *acquiry_errors = NULL;
+	libcerror_error_t *error              = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libcdata_range_list_initialize(
+	          &acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "acquiry_errors",
+	 acquiry_errors );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcdata_range_list_insert_range(
+	          acquiry_errors,
+	          1024,
+	          16,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_error2_section_write_data(
+	          section_data,
+	          548,
+	          1,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_error2_section_write_data(
+	          NULL,
+	          548,
+	          1,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_error2_section_write_data(
+	          section_data,
+	          (size_t) SSIZE_MAX + 1,
+	          1,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_error2_section_write_data(
+	          section_data,
+	          0,
+	          1,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_error2_section_write_data(
+	          section_data,
+	          548,
+	          0,
+	          acquiry_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libewf_error2_section_write_data failing in libcdata_range_list_get_number_of_elements
+	 */
+	result = libewf_error2_section_write_data(
+	          section_data,
 	          548,
 	          1,
 	          NULL,
@@ -262,6 +825,16 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_error2_section_read_data",
 	 ewf_test_error2_section_read_data );
+
+	EWF_TEST_RUN(
+	 "libewf_error2_section_read_file_io_pool",
+	 ewf_test_error2_section_read_file_io_pool );
+
+	EWF_TEST_RUN(
+	 "libewf_error2_section_write_data",
+	 ewf_test_error2_section_write_data );
+
+	/* TODO: add tests for libewf_error2_section_write_file_io_pool */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

@@ -58,7 +58,7 @@ int libewf_md5_hash_section_write_data(
      libewf_hash_sections_t *hash_sections,
      libcerror_error_t **error );
 
-ssize_t libewf_md5_hash_section_write(
+ssize_t libewf_md5_hash_section_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,

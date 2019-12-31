@@ -179,12 +179,24 @@
 				RelativePath="..\..\tests\ewf_test_error2_section.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_functions.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\tests\ewf_test_functions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_libbfio.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libcdata.h"
 				>

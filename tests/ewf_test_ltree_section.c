@@ -895,7 +895,7 @@ int main(
 	 "libewf_ltree_section_read_file_io_pool",
 	 ewf_test_ltree_section_read_file_io_pool );
 
-	/* TODO: add tests for libewf_section_ltree_write */
+	/* TODO: add tests for libewf_ltree_section_write_file_io_pool */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
