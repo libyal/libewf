@@ -54,12 +54,13 @@
 #include "storage_media_buffer_queue.h"
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
-#define EWFACQUIRE_2_TIB			0x20000000000UL
+#define EWFACQUIRE_2_TIB				0x20000000000UL
 #else
-#define EWFACQUIRE_2_TIB			0x20000000000ULL
+#define EWFACQUIRE_2_TIB				0x20000000000ULL
 #endif
 
-#define EWFACQUIRE_INPUT_BUFFER_SIZE		64
+#define EWFACQUIRE_INPUT_BUFFER_SIZE			64
+#define EWFACQUIRE_MAXIMUM_PROCESS_BUFFERS_SIZE		64 * 1024 * 1024
 
 device_handle_t *ewfacquire_device_handle   = NULL;
 imaging_handle_t *ewfacquire_imaging_handle = NULL;
@@ -796,7 +797,7 @@ int ewfacquire_read_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( imaging_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( EWFACQUIRE_MAXIMUM_PROCESS_BUFFERS_SIZE / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( imaging_handle->process_thread_pool ),

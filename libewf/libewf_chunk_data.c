@@ -669,7 +669,8 @@ int libewf_chunk_data_pack(
 				}
 			}
 		}
-		else if( ( io_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		else if( ( ( io_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
+		      || ( io_handle->compression_level != LIBEWF_COMPRESSION_NONE ) )
 		{
 			result = libewf_chunk_data_check_for_empty_block(
 				  chunk_data->data,

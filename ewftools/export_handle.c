@@ -60,10 +60,11 @@
 #include "storage_media_buffer.h"
 #include "storage_media_buffer_queue.h"
 
-#define EXPORT_HANDLE_BUFFER_SIZE		8192
-#define EXPORT_HANDLE_INPUT_BUFFER_SIZE		64
-#define EXPORT_HANDLE_STRING_SIZE		1024
-#define EXPORT_HANDLE_NOTIFY_STREAM		stderr
+#define EXPORT_HANDLE_BUFFER_SIZE			8192
+#define EXPORT_HANDLE_INPUT_BUFFER_SIZE			64
+#define EXPORT_HANDLE_STRING_SIZE			1024
+#define EXPORT_HANDLE_NOTIFY_STREAM			stderr
+#define EXPORT_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE	64 * 1024 * 1024
 
 /* Creates an export handle
  * Make sure the value export_handle is referencing, is set to NULL
@@ -4506,11 +4507,9 @@ int export_handle_process_storage_media_buffer_callback(
 			goto on_error;
 		}
 	}
-	if( libcthreads_thread_pool_push_sorted(
+	if( libcthreads_thread_pool_push(
 	     export_handle->output_thread_pool,
 	     (intptr_t *) storage_media_buffer,
-	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
-	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5210,7 +5209,7 @@ int export_handle_export_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( export_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( EXPORT_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( export_handle->input_process_thread_pool ),

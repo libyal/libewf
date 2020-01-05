@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
@@ -33,6 +35,7 @@ TESTS = \
 	test_library.sh \
 	test_glob.sh \
 	test_write_functions.sh \
+	test_tools.sh \
 	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	test_ewfexport_logical.sh \
@@ -65,6 +68,7 @@ check_SCRIPTS = \
 	test_manpage.sh \
 	test_python_module.sh \
 	test_runner.sh \
+	test_tools.sh \
 	test_write_functions.sh
 
 EXTRA_DIST = \
@@ -94,6 +98,7 @@ check_PROGRAMS = \
 	ewf_test_hash_values \
 	ewf_test_header_sections \
 	ewf_test_header_values \
+	ewf_test_info_handle \
 	ewf_test_io_handle \
 	ewf_test_lef_extended_attribute \
 	ewf_test_lef_file_entry \
@@ -463,6 +468,25 @@ ewf_test_header_values_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_info_handle_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	../ewftools/guid.c ../ewftools/guid.h \
+	../ewftools/info_handle.c ../ewftools/info_handle.h \
+	ewf_test_info_handle.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_info_handle_LDADD = \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

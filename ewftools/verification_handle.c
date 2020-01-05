@@ -45,9 +45,10 @@
 #include "storage_media_buffer_queue.h"
 #include "verification_handle.h"
 
-#define VERIFICATION_HANDLE_VALUE_SIZE			64
-#define VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE	32
-#define VERIFICATION_HANDLE_NOTIFY_STREAM		stdout
+#define VERIFICATION_HANDLE_VALUE_SIZE				64
+#define VERIFICATION_HANDLE_VALUE_IDENTIFIER_SIZE		32
+#define VERIFICATION_HANDLE_NOTIFY_STREAM			stdout
+#define VERIFICATION_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE	64 * 1024 * 1024
 
 /* Creates a verification handle
  * Make sure the value verification_handle is referencing, is set to NULL
@@ -1141,11 +1142,9 @@ int verification_handle_process_storage_media_buffer_callback(
 			goto on_error;
 		}
 	}
-	if( libcthreads_thread_pool_push_sorted(
+	if( libcthreads_thread_pool_push(
 	     verification_handle->output_thread_pool,
 	     (intptr_t *) storage_media_buffer,
-	     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &storage_media_buffer_compare,
-	     LIBCTHREADS_SORT_FLAG_UNIQUE_VALUES,
 	     &error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1703,7 +1702,7 @@ int verification_handle_verify_input(
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 	if( verification_handle->number_of_threads != 0 )
 	{
-		maximum_number_of_queued_items = 1 + (int) ( ( 512 * 1024 * 1024 ) / process_buffer_size );
+		maximum_number_of_queued_items = 1 + (int) ( VERIFICATION_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE / process_buffer_size );
 
 		if( libcthreads_thread_pool_create(
 		     &( verification_handle->process_thread_pool ),

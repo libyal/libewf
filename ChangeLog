@@ -1,4 +1,5 @@
 TODO
+* fix issue with encase7 header value having invalid hex character
 * move libewf_hash_values_get_identifier_size libewf_hash_values_get_identifier into libfvalue
 * ewfinfo sanitize special characters in file names?
 * rename extended attribute to attribute
