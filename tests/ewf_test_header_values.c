@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <memory.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -424,7 +425,7 @@ int ewf_test_generate_date_header_value(
 	/* Test regular cases
 	 */
 	result = libewf_generate_date_header_value(
-	          0,
+	          1578288885,
 	          &date_time_values_string,
 	          &date_time_values_string_size,
 	          &error );
@@ -441,7 +442,7 @@ int ewf_test_generate_date_header_value(
 	/* Test error cases
 	 */
 	result = libewf_generate_date_header_value(
-	          0,
+	          1578288885,
 	          NULL,
 	          &date_time_values_string_size,
 	          &error );
@@ -459,7 +460,7 @@ int ewf_test_generate_date_header_value(
 	 &error );
 
 	result = libewf_generate_date_header_value(
-	          0,
+	          1578288885,
 	          &date_time_values_string,
 	          NULL,
 	          &error );
@@ -548,7 +549,7 @@ int ewf_test_generate_date_header2_value(
 	/* Test regular cases
 	 */
 	result = libewf_generate_date_header2_value(
-	          0,
+	          1578288885,
 	          &date_time_values_string,
 	          &date_time_values_string_size,
 	          &error );
@@ -565,7 +566,7 @@ int ewf_test_generate_date_header2_value(
 	/* Test error cases
 	 */
 	result = libewf_generate_date_header2_value(
-	          0,
+	          1578288885,
 	          NULL,
 	          &date_time_values_string_size,
 	          &error );
@@ -583,7 +584,7 @@ int ewf_test_generate_date_header2_value(
 	 &error );
 
 	result = libewf_generate_date_header2_value(
-	          0,
+	          1578288885,
 	          &date_time_values_string,
 	          NULL,
 	          &error );
@@ -830,7 +831,7 @@ int ewf_test_header_values_parse_utf8_header_string(
 	          header_values,
 	          header_string,
 	          0,
-	          99,
+	          0xff,
 	          &format,
 	          &error );
 
@@ -1198,6 +1199,1136 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_header_values_generate_utf8_header_string function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_utf8_header_string(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *utf8_string             = NULL;
+	size_t utf8_string_size          = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          0xff,
+	          (uint8_t *) "\n",
+	          1,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &utf8_string,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          LIBEWF_HEADER_STRING_TYPE_1,
+	          NULL,
+	          1,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &utf8_string,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          LIBEWF_HEADER_STRING_TYPE_1,
+	          (uint8_t *) "\n",
+	          0,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &utf8_string,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          LIBEWF_HEADER_STRING_TYPE_1,
+	          (uint8_t *) "\n",
+	          1,
+	          1578288885,
+	          0x7f,
+	          &utf8_string,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          LIBEWF_HEADER_STRING_TYPE_1,
+	          (uint8_t *) "\n",
+	          1,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          NULL,
+	          &utf8_string_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_header_values_generate_utf8_header_string(
+	          header_values,
+	          LIBEWF_HEADER_STRING_TYPE_1,
+	          (uint8_t *) "\n",
+	          1,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &utf8_string,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_ewf function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_ewf(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_ewf(
+	          header_values,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 70 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_ewf(
+	          header_values,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_encase1 function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_encase1(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_encase1(
+	          header_values,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 75 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_encase1(
+	          header_values,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_ftk function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_ftk(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_ftk(
+	          header_values,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 78 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_ftk(
+	          header_values,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_encase2 function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_encase2(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_encase2(
+	          header_values,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 83 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_encase2(
+	          header_values,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_encase4 function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_encase4(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_encase4(
+	          header_values,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 79 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_encase4(
+	          header_values,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header_linen function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header_linen(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header                  = NULL;
+	size_t header_size               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header_linen(
+	          header_values,
+	          LIBEWF_FORMAT_LINEN5,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header",
+	 header );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header_size",
+	 header_size,
+	 (size_t) 154 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header against expected value */
+
+	memory_free(
+	 header );
+
+	header = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header_linen(
+	          header_values,
+	          LIBEWF_FORMAT_LINEN5,
+	          1578288885,
+	          0x7f,
+	          &header,
+	          &header_size,
+	          LIBEWF_CODEPAGE_ASCII,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header != NULL )
+	{
+		memory_free(
+		 header );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_header_values_generate_header2 function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_header_values_generate_header2(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfvalue_table_t *header_values = NULL;
+	uint8_t *header2                 = NULL;
+	size_t header2_size              = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_header_values_generate_header2(
+	          header_values,
+	          LIBEWF_FORMAT_ENCASE4,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header2,
+	          &header2_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header2",
+	 header2 );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "header2_size",
+	 header2_size,
+	 (size_t) 126 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO compare header2 against expected value */
+
+	memory_free(
+	 header2 );
+
+	header2 = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_header_values_generate_header2(
+	          header_values,
+	          0xff,
+	          1578288885,
+	          LIBEWF_COMPRESSION_FAST,
+	          &header2,
+	          &header2_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header2 != NULL )
+	{
+		memory_free(
+		 header2 );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -1261,21 +2392,37 @@ int main(
 	 "libewf_header_values_convert_utf8_header_string_to_header",
 	 ewf_test_header_values_convert_utf8_header_string_to_header );
 
-	/* TODO: add tests for libewf_header_values_generate_utf8_header_string */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_utf8_header_string",
+	 ewf_test_header_values_generate_utf8_header_string );
 
-	/* TODO: add tests for libewf_header_values_generate_header_ewf */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_ewf",
+	 ewf_test_header_values_generate_header_ewf );
 
-	/* TODO: add tests for libewf_header_values_generate_header_encase1 */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_encase1",
+	 ewf_test_header_values_generate_header_encase1 );
 
-	/* TODO: add tests for libewf_header_values_generate_header_ftk */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_ftk",
+	 ewf_test_header_values_generate_header_ftk );
 
-	/* TODO: add tests for libewf_header_values_generate_header_encase2 */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_encase2",
+	 ewf_test_header_values_generate_header_encase2 );
 
-	/* TODO: add tests for libewf_header_values_generate_header_encase4 */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_encase4",
+	 ewf_test_header_values_generate_header_encase4 );
 
-	/* TODO: add tests for libewf_header_values_generate_header_linen */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header_linen",
+	 ewf_test_header_values_generate_header_linen );
 
-	/* TODO: add tests for libewf_header_values_generate_header2 */
+	EWF_TEST_RUN(
+	 "libewf_header_values_generate_header2",
+	 ewf_test_header_values_generate_header2 );
 
 	/* TODO: add tests for libewf_convert_date_xheader_value */
 

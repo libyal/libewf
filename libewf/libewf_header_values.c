@@ -5183,6 +5183,35 @@ int libewf_header_values_generate_header2(
 	size_t header_string_size  = 0;
 	uint8_t header_string_type = 0;
 
+	switch( format )
+	{
+		case LIBEWF_FORMAT_ENCASE4:
+		case LIBEWF_FORMAT_EWFX:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_4;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE5:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_5;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE6:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_6;
+			break;
+
+		case LIBEWF_FORMAT_ENCASE7:
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_8;
+			break;
+
+		default:
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported format.",
+			 function );
+
+			break;
+	}
 	if( header2 == NULL )
 	{
 		libcerror_error_set(
@@ -5215,35 +5244,6 @@ int libewf_header_values_generate_header2(
 		 function );
 
 		return( -1 );
-	}
-	switch( format )
-	{
-		case LIBEWF_FORMAT_ENCASE4:
-		case LIBEWF_FORMAT_EWFX:
-			header_string_type = LIBEWF_HEADER_STRING_TYPE_4;
-			break;
-
-		case LIBEWF_FORMAT_ENCASE5:
-			header_string_type = LIBEWF_HEADER_STRING_TYPE_5;
-			break;
-
-		case LIBEWF_FORMAT_ENCASE6:
-			header_string_type = LIBEWF_HEADER_STRING_TYPE_6;
-			break;
-
-		case LIBEWF_FORMAT_ENCASE7:
-			header_string_type = LIBEWF_HEADER_STRING_TYPE_8;
-			break;
-
-		default:
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported format.",
-			 function );
-
-			break;
 	}
 	if( libewf_header_values_generate_utf8_header_string(
 	     header_values,

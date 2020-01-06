@@ -477,6 +477,7 @@ ewf_test_info_handle_SOURCES = \
 	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
 	../ewftools/guid.c ../ewftools/guid.h \
 	../ewftools/info_handle.c ../ewftools/info_handle.h \
+	../ewftools/platform.c ../ewftools/platform.h \
 	ewf_test_info_handle.c \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
@@ -485,10 +486,13 @@ ewf_test_info_handle_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_info_handle_LDADD = \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBUUID_LIBADD@
 
 ewf_test_io_handle_SOURCES = \
 	ewf_test_io_handle.c \
