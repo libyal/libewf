@@ -138,6 +138,7 @@ stamp-h[1-9]
 /tests/ewf_test_analytical_data
 /tests/ewf_test_attribute
 /tests/ewf_test_bit_stream
+/tests/ewf_test_byte_size_string
 /tests/ewf_test_case_data
 /tests/ewf_test_chunk_data
 /tests/ewf_test_chunk_group

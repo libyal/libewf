@@ -5,6 +5,7 @@ MSVSCPP_FILES = \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
 	ewf_test_attribute/ewf_test_attribute.vcproj \
 	ewf_test_bit_stream/ewf_test_bit_stream.vcproj \
+	ewf_test_byte_size_string/ewf_test_byte_size_string.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_chunk_data/ewf_test_chunk_data.vcproj \
 	ewf_test_chunk_group/ewf_test_chunk_group.vcproj \

@@ -79,6 +79,7 @@ check_PROGRAMS = \
 	ewf_test_analytical_data \
 	ewf_test_attribute \
 	ewf_test_bit_stream \
+	ewf_test_byte_size_string \
 	ewf_test_case_data \
 	ewf_test_chunk_data \
 	ewf_test_chunk_group \
@@ -187,6 +188,18 @@ ewf_test_bit_stream_SOURCES = \
 
 ewf_test_bit_stream_LDADD = \
 	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_byte_size_string_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	ewf_test_byte_size_string.c \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_byte_size_string_LDADD = \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@
 
 ewf_test_case_data_SOURCES = \

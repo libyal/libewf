@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TOOL_TESTS="info_handle";
+TOOL_TESTS="byte_size_string info_handle";
 TOOL_TESTS_WITH_INPUT="";
 OPTION_SETS="";
 
