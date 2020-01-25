@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_libfvalue.h"
@@ -3535,6 +3536,147 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_single_files_get_file_entry_tree_root_node function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_single_files_get_file_entry_tree_root_node(
+     void )
+{
+	libcdata_tree_node_t *root_node     = NULL;
+	libcerror_error_t *error            = NULL;
+	libewf_single_files_t *single_files = NULL;
+	size64_t media_size                 = 0;
+	uint8_t format                      = 0;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_single_files_initialize(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data(
+	          single_files,
+	          ewf_test_single_files_data1,
+	          5700,
+	          &media_size,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_single_files_get_file_entry_tree_root_node(
+	          single_files,
+	          &root_node,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "root_node",
+	 root_node );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_single_files_get_file_entry_tree_root_node(
+	          NULL,
+	          &root_node,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_single_files_get_file_entry_tree_root_node(
+	          single_files,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_single_files_free(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &single_files,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -3626,7 +3768,9 @@ int main(
 	 "libewf_single_files_read_data",
 	 ewf_test_single_files_read_data );
 
-	/* TODO: add tests for libewf_single_files_get_file_entry_tree_root_node */
+	EWF_TEST_RUN(
+	 "libewf_single_files_get_file_entry_tree_root_node",
+	 ewf_test_single_files_get_file_entry_tree_root_node );
 
 	/* TODO: add tests for libewf_single_files_get_source_by_index */
 

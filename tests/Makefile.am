@@ -6,6 +6,7 @@ AM_CPPFLAGS = \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
+	@LIBCDATETIME_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
 	@LIBCSPLIT_CPPFLAGS@ \
@@ -23,6 +24,9 @@ AM_CPPFLAGS = \
 	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBHMAC_CPPFLAGS@ \
 	@LIBCAES_CPPFLAGS@ \
+	@LIBODRAW_CPPFLAGS@ \
+	@LIBSMDEV_CPPFLAGS@ \
+	@LIBSMRAW_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
@@ -89,12 +93,15 @@ check_PROGRAMS = \
 	ewf_test_date_time \
 	ewf_test_date_time_values \
 	ewf_test_deflate \
+	ewf_test_device_handle \
 	ewf_test_device_information \
+	ewf_test_digest_hash \
 	ewf_test_digest_section \
 	ewf_test_error \
 	ewf_test_error2_section \
 	ewf_test_file_entry \
 	ewf_test_glob \
+	ewf_test_guid \
 	ewf_test_handle \
 	ewf_test_hash_sections \
 	ewf_test_hash_values \
@@ -113,6 +120,7 @@ check_PROGRAMS = \
 	ewf_test_media_values \
 	ewf_test_notify \
 	ewf_test_permission_group \
+	ewf_test_platform \
 	ewf_test_read_io_handle \
 	ewf_test_restart_data \
 	ewf_test_section_descriptor \
@@ -122,10 +130,12 @@ check_PROGRAMS = \
 	ewf_test_serialized_string \
 	ewf_test_session_section \
 	ewf_test_sha1_hash_section \
+	ewf_test_single_file_tree \
 	ewf_test_single_files \
 	ewf_test_source \
 	ewf_test_support \
 	ewf_test_truncate \
+	ewf_test_verification_handle \
 	ewf_test_volume_section \
 	ewf_test_write \
 	ewf_test_write_chunk \
@@ -247,6 +257,7 @@ ewf_test_chunk_group_LDADD = \
 
 ewf_test_chunk_table_SOURCES = \
 	ewf_test_chunk_table.c \
+	ewf_test_libcdata.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
@@ -317,6 +328,37 @@ ewf_test_deflate_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_device_handle_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	../ewftools/device_handle.c ../ewftools/device_handle.h \
+	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	ewf_test_device_handle.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_device_handle_LDADD = \
+	@LIBSMRAW_LIBADD@ \
+	@LIBSMDEV_LIBADD@ \
+	@LIBODRAW_LIBADD@ \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBFDATA_LIBADD@ \
+	@LIBFCACHE_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
 ewf_test_device_information_SOURCES = \
 	ewf_test_device_information.c \
 	ewf_test_libcerror.h \
@@ -334,6 +376,16 @@ ewf_test_device_information_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_digest_hash_SOURCES = \
+	../ewftools/digest_hash.c ../ewftools/digest_hash.h \
+	ewf_test_digest_hash.c \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_digest_hash_LDADD = \
 	@LIBCERROR_LIBADD@
 
 ewf_test_digest_section_SOURCES = \
@@ -409,6 +461,17 @@ ewf_test_glob_SOURCES = \
 
 ewf_test_glob_LDADD = \
 	../libewf/libewf.la
+
+ewf_test_guid_SOURCES = \
+	../ewftools/guid.c ../ewftools/guid.h \
+	ewf_test_guid.c \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_guid_LDADD = \
+	@LIBCERROR_LIBADD@ \
+	@LIBUUID_LIBADD@
 
 ewf_test_handle_SOURCES = \
 	ewf_test_functions.c ewf_test_functions.h \
@@ -712,6 +775,18 @@ ewf_test_permission_group_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_platform_SOURCES = \
+	../ewftools/platform.c ../ewftools/platform.h \
+	ewf_test_platform.c \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_unused.h
+
+ewf_test_platform_LDADD = \
+	@LIBUNA_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
 ewf_test_read_io_handle_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
@@ -849,6 +924,18 @@ ewf_test_sha1_hash_section_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_single_file_tree_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_single_file_tree.c \
+	ewf_test_unused.h
+
+ewf_test_single_file_tree_LDADD = \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_single_files_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
@@ -926,6 +1013,32 @@ ewf_test_truncate_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
+ewf_test_verification_handle_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	../ewftools/digest_hash.c ../ewftools/digest_hash.h \
+	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	../ewftools/log_handle.c ../ewftools/log_handle.h \
+	../ewftools/process_status.c ../ewftools/process_status.h \
+	../ewftools/storage_media_buffer.c ../ewftools/storage_media_buffer.h \
+	../ewftools/storage_media_buffer_queue.c ../ewftools/storage_media_buffer_queue.h \
+	../ewftools/verification_handle.c ../ewftools/verification_handle.h \
+	ewf_test_verification_handle.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_verification_handle_LDADD = \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
+	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
 ewf_test_volume_section_SOURCES = \

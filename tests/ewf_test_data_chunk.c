@@ -31,8 +31,10 @@
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
+#include "ewf_test_rwlock.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_chunk_data.h"
 #include "../libewf/libewf_data_chunk.h"
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
@@ -357,13 +359,76 @@ on_error:
 int ewf_test_internal_data_chunk_set_chunk_data(
      void )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error        = NULL;
+	libewf_chunk_data_t *chunk_data = NULL;
+	libewf_data_chunk_t *data_chunk = NULL;
+	libewf_io_handle_t *io_handle   = NULL;
+	int result                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_data_chunk_initialize(
+	          &data_chunk,
+	          io_handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_chunk",
+	 data_chunk );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
 
 	/* Test error cases
 	 */
 	result = libewf_internal_data_chunk_set_chunk_data(
 	          NULL,
+	          0,
+	          chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_internal_data_chunk_set_chunk_data(
+	          (libewf_internal_data_chunk_t *) data_chunk,
 	          0,
 	          NULL,
 	          &error );
@@ -380,6 +445,25 @@ int ewf_test_internal_data_chunk_set_chunk_data(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = libewf_data_chunk_free(
+	          &data_chunk,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_chunk",
+	 data_chunk );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -387,6 +471,18 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( data_chunk != NULL )
+	{
+		libewf_data_chunk_free(
+		 &data_chunk,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
 	}
 	return( 0 );
 }

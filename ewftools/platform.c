@@ -261,7 +261,8 @@ int platform_get_operating_system(
 			return( -1 );
 		}
 	}
-#endif
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 	return( 1 );
 }
 

@@ -209,9 +209,9 @@ install:
 - ps: If ($env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m pip install -U pip setuptools twine wheel" }
 - cmd: if [%BUILD_ENVIRONMENT%]==[cygwin] (
-    C:\cygwin\setup-x86.exe -qgnNdO -l C:\cygwin\var\cache\setup -R c:\cygwin -s http://cygwin.mirror.constant.com -P bison -P flex -P zlib-devel -P bzip2-devel -P openssl-devel -P python2-devel -P python3-devel -P libuuid-devel )
+    C:\cygwin\setup-x86.exe -qgnNdO -l C:\cygwin\var\cache\setup -R c:\cygwin -s http://cygwin.mirror.constant.com -P bison -P flex -P zlib-devel -P bzip2-devel -P libssl-devel -P python2-devel -P python3-devel -P libuuid-devel )
 - cmd: if [%BUILD_ENVIRONMENT%]==[cygwin64] (
-    C:\cygwin64\setup-x86_64.exe -qgnNdO -l C:\cygwin64\var\cache\setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com -P bison -P flex -P zlib-devel -P bzip2-devel -P openssl-devel -P python2-devel -P python3-devel -P libuuid-devel )
+    C:\cygwin64\setup-x86_64.exe -qgnNdO -l C:\cygwin64\var\cache\setup -R c:\cygwin64 -s http://cygwin.mirror.constant.com -P bison -P flex -P zlib-devel -P bzip2-devel -P libssl-devel -P python2-devel -P python3-devel -P libuuid-devel )
 - cmd: if [%BUILD_ENVIRONMENT%]==[mingw] (
     C:\MinGW\bin\mingw-get install libz-dev )
 - cmd: if [%BUILD_ENVIRONMENT%]==[mingw-w64] (

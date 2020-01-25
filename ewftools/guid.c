@@ -109,7 +109,7 @@ int guid_generate(
 		 guid );
 #endif
 	}
-	if( guid_type == GUID_TYPE_TIME )
+	else if( guid_type == GUID_TYPE_TIME )
 	{
 #if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
 		/* No support for the time type GUID */
@@ -150,11 +150,13 @@ int guid_generate(
 	guid[ 5 ] = uuid.Data4[ 5 ];
 	guid[ 6 ] = uuid.Data4[ 6 ];
 	guid[ 7 ] = uuid.Data4[ 7 ];
-#endif
+
+#endif /* defined( WINAPI ) */
+
 	return( 1 );
 }
 
-#endif
+#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
 
 /* Converts the GUID into a string
  * Returns 1 if successful or -1 on error
@@ -305,7 +307,6 @@ int guid_to_string(
 			       guid[ 8 ], guid[ 9 ],
 			       guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
 	}
-
 	if( ( print_count < 0 )
 	 || ( (size_t) print_count > string_size ) )
 	{

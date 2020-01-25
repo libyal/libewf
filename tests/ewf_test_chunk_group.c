@@ -35,6 +35,7 @@
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_chunk_group.h"
+#include "../libewf/libewf_section_descriptor.h"
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -795,10 +796,13 @@ on_error:
 int ewf_test_chunk_group_fill_v1(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_chunk_group_t *chunk_group = NULL;
-	libewf_io_handle_t *io_handle     = NULL;
-	int result                        = 0;
+	uint8_t table_entries_data[ 16 ];
+
+	libcerror_error_t *error                   = NULL;
+	libewf_chunk_group_t *chunk_group          = NULL;
+	libewf_io_handle_t *io_handle              = NULL;
+	libewf_section_descriptor_t *table_section = NULL;
+	int result                                 = 0;
 
 	/* Initialize test
 	 */
@@ -837,6 +841,23 @@ int ewf_test_chunk_group_fill_v1(
 	 "error",
 	 error );
 
+	result = libewf_section_descriptor_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 /* TODO implement */
@@ -848,11 +869,111 @@ int ewf_test_chunk_group_fill_v1(
 	          0,
 	          0,
 	          0,
+	          table_section,
+	          0,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
 	          NULL,
 	          0,
 	          0,
-	          NULL,
+	          table_entries_data,
+	          16,
 	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          -1,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          0,
+	          NULL,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          0,
+	          table_entries_data,
+	          (size_t) SSIZE_MAX + 1,
 	          0,
 	          &error );
 
@@ -870,6 +991,23 @@ int ewf_test_chunk_group_fill_v1(
 
 	/* Clean up
 	 */
+	result = libewf_section_descriptor_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_chunk_group_free(
 	          &chunk_group,
 	          &error );
@@ -911,6 +1049,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( table_section != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &table_section,
+		 NULL );
 	}
 	if( chunk_group != NULL )
 	{
@@ -933,10 +1077,13 @@ on_error:
 int ewf_test_chunk_group_fill_v2(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_chunk_group_t *chunk_group = NULL;
-	libewf_io_handle_t *io_handle     = NULL;
-	int result                        = 0;
+	uint8_t table_entries_data[ 16 ];
+
+	libcerror_error_t *error                   = NULL;
+	libewf_chunk_group_t *chunk_group          = NULL;
+	libewf_io_handle_t *io_handle              = NULL;
+	libewf_section_descriptor_t *table_section = NULL;
+	int result                                 = 0;
 
 	/* Initialize test
 	 */
@@ -975,6 +1122,23 @@ int ewf_test_chunk_group_fill_v2(
 	 "error",
 	 error );
 
+	result = libewf_section_descriptor_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 /* TODO implement */
@@ -986,10 +1150,82 @@ int ewf_test_chunk_group_fill_v2(
 	          0,
 	          0,
 	          0,
-	          NULL,
+	          table_section,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v2(
+	          chunk_group,
+	          0,
+	          0,
 	          0,
 	          NULL,
 	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v2(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          NULL,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_fill_v2(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          table_entries_data,
+	          (size_t) SSIZE_MAX + 1,
 	          0,
 	          &error );
 
@@ -1007,6 +1243,23 @@ int ewf_test_chunk_group_fill_v2(
 
 	/* Clean up
 	 */
+	result = libewf_section_descriptor_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_chunk_group_free(
 	          &chunk_group,
 	          &error );
@@ -1048,6 +1301,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( table_section != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &table_section,
+		 NULL );
 	}
 	if( chunk_group != NULL )
 	{
@@ -1070,10 +1329,13 @@ on_error:
 int ewf_test_chunk_group_correct_v1(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_chunk_group_t *chunk_group = NULL;
-	libewf_io_handle_t *io_handle     = NULL;
-	int result                        = 0;
+	uint8_t table_entries_data[ 16 ];
+
+	libcerror_error_t *error                   = NULL;
+	libewf_chunk_group_t *chunk_group          = NULL;
+	libewf_io_handle_t *io_handle              = NULL;
+	libewf_section_descriptor_t *table_section = NULL;
+	int result                                 = 0;
 
 	/* Initialize test
 	 */
@@ -1112,6 +1374,23 @@ int ewf_test_chunk_group_correct_v1(
 	 "error",
 	 error );
 
+	result = libewf_section_descriptor_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 /* TODO implement */
@@ -1123,11 +1402,111 @@ int ewf_test_chunk_group_correct_v1(
 	          0,
 	          0,
 	          0,
+	          table_section,
+	          0,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_correct_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
 	          NULL,
 	          0,
 	          0,
-	          NULL,
+	          table_entries_data,
+	          16,
 	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_correct_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          -1,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_correct_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          0,
+	          NULL,
+	          16,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_correct_v1(
+	          chunk_group,
+	          0,
+	          0,
+	          0,
+	          table_section,
+	          0,
+	          0,
+	          table_entries_data,
+	          (size_t) SSIZE_MAX + 1,
 	          0,
 	          &error );
 
@@ -1145,6 +1524,23 @@ int ewf_test_chunk_group_correct_v1(
 
 	/* Clean up
 	 */
+	result = libewf_section_descriptor_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_chunk_group_free(
 	          &chunk_group,
 	          &error );
@@ -1187,6 +1583,12 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( table_section != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &table_section,
+		 NULL );
+	}
 	if( chunk_group != NULL )
 	{
 		libewf_chunk_group_free(
@@ -1208,6 +1610,8 @@ on_error:
 int ewf_test_chunk_group_generate_table_entries_data(
      void )
 {
+	uint8_t table_entries_data[ 16 ];
+
 	libcerror_error_t *error          = NULL;
 	libewf_chunk_group_t *chunk_group = NULL;
 	libewf_io_handle_t *io_handle     = NULL;
@@ -1258,12 +1662,122 @@ int ewf_test_chunk_group_generate_table_entries_data(
 	 */
 	result = libewf_chunk_group_generate_table_entries_data(
 	          NULL,
+	          1,
 	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_generate_table_entries_data(
+	          chunk_group,
+	          0,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_generate_table_entries_data(
+	          chunk_group,
+	          1,
 	          0,
 	          NULL,
+	          16,
+	          0,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_generate_table_entries_data(
+	          chunk_group,
+	          1,
+	          0,
+	          table_entries_data,
+	          (size_t) SSIZE_MAX + 1,
+	          0,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_generate_table_entries_data(
+	          chunk_group,
+	          1,
+	          0,
+	          table_entries_data,
 	          0,
 	          0,
 	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_group_generate_table_entries_data(
+	          chunk_group,
+	          1,
+	          0,
+	          table_entries_data,
+	          16,
+	          0,
+	          -1,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

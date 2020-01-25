@@ -53,7 +53,7 @@ int ewf_test_byte_size_string_create(
 	result = byte_size_string_create(
 	          byte_size_string,
 	          32,
-	          (size64_t) 8192 * 1024 * 1024 * 1024,
+	          (size64_t) 8192 * 1024 * 1024,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          &error );
 
@@ -66,12 +66,22 @@ int ewf_test_byte_size_string_create(
 	 "error",
 	 error );
 
+	result = memory_compare(
+	          byte_size_string,
+	          "8.0 GiB",
+	          8 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	/* Test error cases
 	 */
 	result = byte_size_string_create(
 	          NULL,
 	          32,
-	          (size64_t) 8192 * 1024 * 1024 * 1024,
+	          (size64_t) 8192 * 1024 * 1024,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          &error );
 
@@ -116,7 +126,7 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 	result = byte_size_string_create_with_decimal_point(
 	          byte_size_string,
 	          32,
-	          (size64_t) 8192 * 1024 * 1024 * 1024,
+	          (size64_t) 8192 * 1024 * 1024,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          (int) '.',
 	          &error );
@@ -130,17 +140,56 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 	 "error",
 	 error );
 
+	result = memory_compare(
+	          byte_size_string,
+	          "8.0 GiB",
+	          8 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	size = 999;
+
+	result = byte_size_string_create_with_decimal_point(
+	          byte_size_string,
+	          32,
+	          size,
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	          (int) '.',
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          byte_size_string,
+	          "999 B",
+	          6 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	for( factor = 1;
 	     factor <= 8;
 	     factor++ )
 	{
+		size *= 1000;
+
 		result = byte_size_string_create_with_decimal_point(
 		          byte_size_string,
 		          32,
 		          size,
-		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          BYTE_SIZE_STRING_UNIT_MEGABYTE,
 		          (int) '.',
 		          &error );
 
@@ -152,15 +201,13 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 		EWF_TEST_ASSERT_IS_NULL(
 		 "error",
 		 error );
-
-		size *= 1024;
 	}
 	/* Test error cases
 	 */
 	result = byte_size_string_create_with_decimal_point(
 	          NULL,
 	          32,
-	          (size64_t) 8192 * 1024 * 1024 * 1024,
+	          (size64_t) 8192 * 1024 * 1024,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          (int) '.',
 	          &error );
@@ -180,7 +227,7 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 	result = byte_size_string_create_with_decimal_point(
 	          byte_size_string,
 	          0,
-	          (size64_t) 8192 * 1024 * 1024 * 1024,
+	          (size64_t) 8192 * 1024 * 1024,
 	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
 	          (int) '.',
 	          &error );
@@ -230,6 +277,11 @@ int ewf_test_byte_size_string_convert(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8192 * 1024 * 1024 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -290,6 +342,200 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 result,
 	 1 );
 
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8192 * 1024 * 1024 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "999 B",
+	          5,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 999 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 kB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 MB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 GB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 TB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 PB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 EB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 ZB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 YB",
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
@@ -320,6 +566,25 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	          5,
 	          (int) '.',
 	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          "8 kg",
+	          4,
+	          (int) '.',
+	          &size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

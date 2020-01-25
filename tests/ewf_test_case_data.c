@@ -362,12 +362,9 @@ int ewf_test_case_data_generate_utf8_string(
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
-/* TODO fix test
- */
-#ifdef TODO
 	/* Test libewf_case_data_generate_utf8_string with malloc failing
 	 */
-	ewf_test_malloc_attempts_before_fail = 0;
+	ewf_test_malloc_attempts_before_fail = 2;
 
 	result = libewf_case_data_generate_utf8_string(
 	          &utf8_string,
@@ -409,7 +406,6 @@ int ewf_test_case_data_generate_utf8_string(
 		libcerror_error_free(
 		 &error );
 	}
-#endif
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up

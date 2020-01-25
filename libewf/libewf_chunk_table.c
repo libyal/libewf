@@ -295,9 +295,10 @@ int libewf_chunk_table_clone(
 
 		return( -1 );
 	}
-/* TODO: clonse corrupted_chunks_list */
 	( *destination_chunk_table )->corrupted_chunks_list = NULL;
 	( *destination_chunk_table )->checksum_errors       = NULL;
+
+/* TODO: clone corrupted_chunks_list */
 
 	if( libcdata_range_list_clone(
 	     &( ( *destination_chunk_table )->checksum_errors ),
@@ -375,22 +376,10 @@ int libewf_chunk_table_get_number_of_checksum_errors(
 
 		return( -1 );
 	}
-	if( number_of_elements < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of elements value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	*number_of_errors = (uint32_t) number_of_elements;
 
 	return( 1 );
 }
-
 
 /* Retrieves a checksum error
  * Returns 1 if successful or -1 on error

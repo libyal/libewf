@@ -40,12 +40,14 @@ enum GUID_TYPES
 };
 
 #if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+
 int guid_generate(
      uint8_t *guid,
      size_t guid_size,
      uint8_t guid_type,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
 
 int guid_to_string(
      uint8_t *guid,

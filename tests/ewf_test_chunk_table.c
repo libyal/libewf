@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
@@ -50,7 +51,7 @@ int ewf_test_chunk_table_initialize(
 	int result                        = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests   = 1;
+	int number_of_malloc_fail_tests   = 3;
 	int number_of_memset_fail_tests   = 1;
 	int test_number                   = 0;
 #endif
@@ -351,7 +352,7 @@ int ewf_test_chunk_table_clone(
 	int result                                    = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests               = 1;
+	int number_of_malloc_fail_tests               = 2;
 	int test_number                               = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -655,11 +656,12 @@ on_error:
 int ewf_test_chunk_table_get_number_of_checksum_errors(
      void )
 {
-	libcerror_error_t *error           = NULL;
-	libewf_chunk_table_t *chunk_table  = NULL;
-	libewf_io_handle_t *io_handle      = NULL;
-	uint32_t number_of_checksum_errors = 0;
-	int result                         = 0;
+	libcdata_range_list_t *checksum_errors = NULL;
+	libcerror_error_t *error               = NULL;
+	libewf_chunk_table_t *chunk_table      = NULL;
+	libewf_io_handle_t *io_handle          = NULL;
+	uint32_t number_of_checksum_errors     = 0;
+	int result                             = 0;
 
 	/* Initialize test
 	 */
@@ -740,6 +742,29 @@ int ewf_test_chunk_table_get_number_of_checksum_errors(
 	          NULL,
 	          &number_of_checksum_errors,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	checksum_errors = chunk_table->checksum_errors;
+
+	chunk_table->checksum_errors = NULL;
+
+	result = libewf_chunk_table_get_number_of_checksum_errors(
+	          chunk_table,
+	          &number_of_checksum_errors,
+	          &error );
+
+	chunk_table->checksum_errors = checksum_errors;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -835,12 +860,13 @@ on_error:
 int ewf_test_chunk_table_get_checksum_error(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_chunk_table_t *chunk_table = NULL;
-	libewf_io_handle_t *io_handle     = NULL;
-	uint64_t number_of_sectors        = 0;
-	uint64_t start_sector             = 0;
-	int result                        = 0;
+	libcdata_range_list_t *checksum_errors = NULL;
+	libcerror_error_t *error               = NULL;
+	libewf_chunk_table_t *chunk_table      = NULL;
+	libewf_io_handle_t *io_handle          = NULL;
+	uint64_t number_of_sectors             = 0;
+	uint64_t start_sector                  = 0;
+	int result                             = 0;
 
 	/* Initialize test
 	 */
@@ -930,6 +956,31 @@ int ewf_test_chunk_table_get_checksum_error(
 	          &start_sector,
 	          &number_of_sectors,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	checksum_errors = chunk_table->checksum_errors;
+
+	chunk_table->checksum_errors = NULL;
+
+	result = libewf_chunk_table_get_checksum_error(
+	          chunk_table,
+	          0,
+	          &start_sector,
+	          &number_of_sectors,
+	          &error );
+
+	chunk_table->checksum_errors = checksum_errors;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1065,10 +1116,11 @@ on_error:
 int ewf_test_chunk_table_append_checksum_error(
      void )
 {
-	libcerror_error_t *error          = NULL;
-	libewf_chunk_table_t *chunk_table = NULL;
-	libewf_io_handle_t *io_handle     = NULL;
-	int result                        = 0;
+	libcdata_range_list_t *checksum_errors = NULL;
+	libcerror_error_t *error               = NULL;
+	libewf_chunk_table_t *chunk_table      = NULL;
+	libewf_io_handle_t *io_handle          = NULL;
+	int result                             = 0;
 
 	/* Initialize test
 	 */
@@ -1130,6 +1182,487 @@ int ewf_test_chunk_table_append_checksum_error(
 	          NULL,
 	          1024,
 	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	checksum_errors = chunk_table->checksum_errors;
+
+	chunk_table->checksum_errors = NULL;
+
+	result = libewf_chunk_table_append_checksum_error(
+	          chunk_table,
+	          1024,
+	          16,
+	          &error );
+
+	chunk_table->checksum_errors = checksum_errors;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_table_free(
+	          &chunk_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( chunk_table != NULL )
+	{
+		libewf_chunk_table_free(
+		 &chunk_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_chunk_table_get_segment_file_chunk_group_by_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_table_get_segment_file_chunk_group_by_offset(
+     void )
+{
+	libcerror_error_t *error          = NULL;
+	libewf_chunk_table_t *chunk_table = NULL;
+	libewf_io_handle_t *io_handle     = NULL;
+	int result                        = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_initialize(
+	          &chunk_table,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_append_checksum_error(
+	          chunk_table,
+	          1024,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_table_get_segment_file_chunk_group_by_offset(
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          0,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_table_free(
+	          &chunk_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( chunk_table != NULL )
+	{
+		libewf_chunk_table_free(
+		 &chunk_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_chunk_table_chunk_exists_for_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_table_chunk_exists_for_offset(
+     void )
+{
+	libcerror_error_t *error          = NULL;
+	libewf_chunk_table_t *chunk_table = NULL;
+	libewf_io_handle_t *io_handle     = NULL;
+	int result                        = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_initialize(
+	          &chunk_table,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_append_checksum_error(
+	          chunk_table,
+	          1024,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_table_chunk_exists_for_offset(
+	          NULL,
+	          0,
+	          NULL,
+	          NULL,
+	          NULL,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_table_free(
+	          &chunk_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( chunk_table != NULL )
+	{
+		libewf_chunk_table_free(
+		 &chunk_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_chunk_table_get_chunk_data_by_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_table_get_chunk_data_by_offset(
+     void )
+{
+	libcerror_error_t *error          = NULL;
+	libewf_chunk_table_t *chunk_table = NULL;
+	libewf_io_handle_t *io_handle     = NULL;
+	int result                        = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_initialize(
+	          &chunk_table,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_table",
+	 chunk_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_table_append_checksum_error(
+	          chunk_table,
+	          1024,
+	          16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_table_get_chunk_data_by_offset(
+	          NULL,
+	          0,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          0,
+	          NULL,
+	          NULL,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1246,11 +1779,17 @@ int main(
 	 "libewf_chunk_table_append_checksum_error",
 	 ewf_test_chunk_table_append_checksum_error );
 
-	/* TODO: add tests for libewf_chunk_table_get_segment_file_chunk_group_by_offset */
+	EWF_TEST_RUN(
+	 "libewf_chunk_table_get_segment_file_chunk_group_by_offset",
+	 ewf_test_chunk_table_get_segment_file_chunk_group_by_offset );
 
-	/* TODO: add tests for libewf_chunk_table_chunk_exists_for_offset */
+	EWF_TEST_RUN(
+	 "libewf_chunk_table_chunk_exists_for_offset",
+	 ewf_test_chunk_table_chunk_exists_for_offset );
 
-	/* TODO: add tests for libewf_chunk_table_get_chunk_data_by_offset */
+	EWF_TEST_RUN(
+	 "libewf_chunk_table_get_chunk_data_by_offset",
+	 ewf_test_chunk_table_get_chunk_data_by_offset );
 
 	/* TODO: add tests for libewf_chunk_table_set_chunk_data_by_offset */
 
