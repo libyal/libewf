@@ -467,17 +467,6 @@ int libewf_convert_date_header_value(
 	time_t timestamp                                = 0;
 	int number_of_date_time_values                  = 0;
 
-	if( header_value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header value.",
-		 function );
-
-		return( -1 );
-	}
 	if( date_time_values_string == NULL )
 	{
 		libcerror_error_set(
@@ -498,7 +487,7 @@ int libewf_convert_date_header_value(
 		 "%s: invalid date time values string size.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libfvalue_utf8_string_split(
 	     header_value,
@@ -2397,17 +2386,6 @@ int libewf_header_values_parse_header(
 	static char *function     = "libewf_header_values_parse_header";
 	size_t header_string_size = 0;
 
-	if( header == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.",
-		 function );
-
-		return( -1 );
-	}
 	if( libuna_utf8_string_size_from_byte_stream(
 	     header,
 	     header_size,
@@ -2500,17 +2478,6 @@ int libewf_header_values_parse_header2(
 	static char *function     = "libewf_header_values_parse_header2";
 	size_t header_string_size = 0;
 
-	if( header2 == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header2.",
-		 function );
-
-		return( -1 );
-	}
 	if( libuna_utf8_string_size_from_utf16_stream(
 	     header2,
 	     header2_size,

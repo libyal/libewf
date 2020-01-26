@@ -744,7 +744,7 @@ int ewf_test_md5_hash_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_MEMORY )
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
 
 	/* Test libewf_md5_hash_section_write_data with memset of data failing
 	 */
@@ -775,8 +775,6 @@ int ewf_test_md5_hash_section_write_data(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( OPTIMIZATION_DISABLED )
-
 	/* Test libewf_md5_hash_section_write_data with memcpy of data->md5_hash failing
 	 */
 	ewf_test_memcpy_attempts_before_fail = 0;
@@ -806,8 +804,7 @@ int ewf_test_md5_hash_section_write_data(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( OPTIMIZATION_DISABLED ) */
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
 
 	/* Clean up
 	 */
