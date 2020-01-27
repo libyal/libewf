@@ -464,6 +464,23 @@ int ewf_test_internal_data_chunk_set_chunk_data(
 	 "error",
 	 error );
 
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:

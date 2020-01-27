@@ -1033,13 +1033,21 @@ ewf_test_verification_handle_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_verification_handle_LDADD = \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATETIME_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_volume_section_SOURCES = \
 	ewf_test_functions.c ewf_test_functions.h \
