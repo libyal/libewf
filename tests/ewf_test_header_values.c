@@ -28,6 +28,15 @@
 #include <stdlib.h>
 #endif
 
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_libfvalue.h"
@@ -593,7 +602,6 @@ int ewf_test_generate_date_header_value(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          date_time_values_string,
 	          "2020 1 6 6 34 45",
@@ -603,7 +611,6 @@ int ewf_test_generate_date_header_value(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 date_time_values_string );
@@ -742,7 +749,6 @@ int ewf_test_convert_date_header2_value(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          date_time_values_string,
 	          "2020 01 06 06 34 45",
@@ -752,7 +758,6 @@ int ewf_test_convert_date_header2_value(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 date_time_values_string );
@@ -2135,7 +2140,6 @@ int ewf_test_header_values_generate_header_ewf(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2145,7 +2149,6 @@ int ewf_test_header_values_generate_header_ewf(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2277,7 +2280,6 @@ int ewf_test_header_values_generate_header_encase1(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2287,7 +2289,6 @@ int ewf_test_header_values_generate_header_encase1(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2419,7 +2420,6 @@ int ewf_test_header_values_generate_header_ftk(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2429,7 +2429,6 @@ int ewf_test_header_values_generate_header_ftk(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2561,7 +2560,6 @@ int ewf_test_header_values_generate_header_encase2(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2571,7 +2569,6 @@ int ewf_test_header_values_generate_header_encase2(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2703,7 +2700,6 @@ int ewf_test_header_values_generate_header_encase4(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2713,7 +2709,6 @@ int ewf_test_header_values_generate_header_encase4(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2846,7 +2841,6 @@ int ewf_test_header_values_generate_header_linen(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header,
 	          expected_header,
@@ -2856,7 +2850,6 @@ int ewf_test_header_values_generate_header_linen(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header );
@@ -2998,7 +2991,6 @@ int ewf_test_header_values_generate_header2(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          header2,
 	          expected_header2,
@@ -3008,7 +3000,6 @@ int ewf_test_header_values_generate_header2(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 header2 );
@@ -3160,7 +3151,6 @@ int ewf_test_convert_date_xheader_value(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          date_time_values_string,
 	          "2007 01 20 18 32 08 CET",
@@ -3170,7 +3160,6 @@ int ewf_test_convert_date_xheader_value(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 date_time_values_string );
@@ -3354,7 +3343,6 @@ int ewf_test_generate_date_xheader_value(
 	 "error",
 	 error );
 
-/* TODO fix flaky test
 	result = memory_compare(
 	          date_time_values_string,
 	          "Mon Jan  6 06:34:45 2020 CET",
@@ -3364,7 +3352,6 @@ int ewf_test_generate_date_xheader_value(
 	 "result",
 	 result,
 	 0 );
-*/
 
 	memory_free(
 	 date_time_values_string );
@@ -3628,6 +3615,17 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
+	/* Some tests use local time, therefore we need to make sure the time zone is set correctly
+	 */
+	setenv(
+	 "TZ",
+	 "CET",
+	 1 );
+
+	tzset();
+
+	/* Run tests
+	 */
 	EWF_TEST_RUN(
 	 "libewf_header_values_initialize",
 	 ewf_test_header_values_initialize );
