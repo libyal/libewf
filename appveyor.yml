@@ -37,6 +37,11 @@ environment:
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     VisualStudioVersion: 15.0
     configuration: Release
+  - TARGET: vs2019
+    BUILD_ENVIRONMENT: msbuild
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    VisualStudioVersion: 16.0
+    configuration: Release
   - TARGET: python27
     BUILD_ENVIRONMENT: python
     PYTHON: "C:\\Python27\\python.exe"
@@ -161,7 +166,7 @@ install:
     .\synczlib.ps1 }
 - cmd: git clone https://github.com/joachimmetz/bzip2.git ..\bzip2
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
-    If ($env:TARGET -eq "vs2017") {
+    If (($env:TARGET -eq "vs2017") -Or ($env:TARGET -eq "vs2019")) {
       .\syncdokan.ps1 }
     Else {
       .\syncdokan.ps1 -UseLegacyVersion }
@@ -169,33 +174,33 @@ install:
 - cmd: if [%TARGET%]==[vs2010] (
     pushd ..\dokan &&
     set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --output-format 2010 msvscpp\dokan.sln &&
+    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --output-format 2010 msvscpp\dokan.sln &&
     rd /q /s msvscpp &&
     ren vs2010 msvscpp &&
     popd )
 - cmd: if [%TARGET%]==[vs2012] (
     pushd ..\dokan &&
     set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --extend-with-x64 --output-format 2012 msvscpp\dokan.sln &&
+    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --extend-with-x64 --output-format 2012 msvscpp\dokan.sln &&
     rd /q /s msvscpp &&
     ren vs2012 msvscpp &&
     popd )
 - cmd: if [%TARGET%]==[vs2013] (
     pushd ..\dokan &&
     set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2013 msvscpp\dokan.sln &&
+    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2013 msvscpp\dokan.sln &&
     rd /q /s msvscpp &&
     ren vs2013 msvscpp &&
     popd )
 - cmd: if [%TARGET%]==[vs2015] (
     pushd ..\dokan &&
     set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 msvscpp\dokan.sln &&
+    C:\Python37\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 msvscpp\dokan.sln &&
     rd /q /s msvscpp &&
     ren vs2015 msvscpp &&
     popd )
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
-    If ($env:TARGET -eq "vs2017") {
+    If (($env:TARGET -eq "vs2017") -Or ($env:TARGET -eq "vs2019")) {
       $Configuration = $env:CONFIGURATION;
       If (${Configuration} -eq "VSDebug") {
         $Configuration = "Debug" }
@@ -221,29 +226,21 @@ build_script:
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild" -or ($env:BUILD_ENVIRONMENT -eq "python" -and $isWindows)) {
     .\synclibs.ps1;
     .\autogen.ps1 }
-- cmd: if [%TARGET%]==[vs2008] (
-    msbuild /verbosity:quiet msvscpp\libewf.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2010] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --no-python-dll --output-format 2010 msvscpp\libewf.sln &&
-    msbuild /verbosity:quiet vs2010\libewf.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2012] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --output-format 2012 --python-path "C:\\Python27-x64" msvscpp\libewf.sln &&
-    msbuild /verbosity:quiet vs2012\libewf.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2013] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2013 msvscpp\libewf.sln &&
-    msbuild /verbosity:quiet vs2013\libewf.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2015] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --output-format 2015 msvscpp\libewf.sln &&
-    msbuild /verbosity:quiet vs2015\libewf.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
-- cmd: if [%TARGET%]==[vs2017] (
-    set PYTHONPATH=..\vstools &&
-    C:\Python27\python.exe ..\vstools\scripts\msvscpp-convert.py --extend-with-x64 --no-python-dll --output-format 2017 --with-dokany msvscpp\libewf.sln &&
-    msbuild /verbosity:quiet vs2017\libewf.sln /property:Platform=Win32 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" &&
-    msbuild /verbosity:quiet vs2017\libewf.sln /property:Platform=x64 /property:PlatformToolset=v141 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" )
+- ps: If ($env:TARGET -eq "vs2008") {
+    .\build.ps1 -VisualStudioVersion 2008 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2010") {
+    .\build.ps1 -VisualStudioVersion 2010 -VSToolsOptions "--no-python-dll" }
+- ps: If ($env:TARGET -eq "vs2012") {
+    .\build.ps1 -VisualStudioVersion 2012 -VSToolsOptions "--extend-with-x64 --python-path C:\\Python27-x64" }
+- ps: If ($env:TARGET -eq "vs2013") {
+    .\build.ps1 -VisualStudioVersion 2013 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2015") {
+    .\build.ps1 -VisualStudioVersion 2015 -VSToolsOptions "" }
+- ps: If ($env:TARGET -eq "vs2017") {
+    .\build.ps1 -VisualStudioVersion 2017 -Platform Win32 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany";
+    .\build.ps1 -VisualStudioVersion 2017 -Platform x64 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany" }
+- ps: If ($env:TARGET -eq "vs2019") {
+    .\build.ps1 -VisualStudioVersion 2019 -VSToolsOptions "--extend-with-x64 --no-python-dll --with-dokany" }
 - cmd: if [%BUILD_ENVIRONMENT%]==[python] (
     "%PYTHON%" setup.py bdist_msi bdist_wheel )
 - sh: if test ${BUILD_ENVIRONMENT} = "python"; then ./synclibs.sh && ./autogen.sh && ./configure ${CONFIGURE_OPTIONS} && make > /dev/null; fi
