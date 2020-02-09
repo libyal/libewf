@@ -251,6 +251,14 @@ matrix:
     compiler: gcc
     os: osx
     osx_image: xcode8.3
+  allow_failures:
+    env:
+    - DOCKERHUB_REPO="s390x/ubuntu"
+    - DOCKERHUB_TAG="bionic"
+    - CONFIGURE_OPTIONS=""
+    - CFLAGS="--coverage"
+    - LDFLAGS="--coverage"
+    - TARGET="docker"
 before_install:
 - .travis/before_install.sh
 install:
