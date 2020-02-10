@@ -7125,6 +7125,17 @@ int libewf_header_values_get_utf8_value_size(
 
 		return( -1 );
 	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( identifier_length == 16 )
 	 && ( narrow_string_compare(
 	       (char *) identifier,
@@ -7313,6 +7324,17 @@ int libewf_header_values_get_utf8_value(
 
 		return( -1 );
 	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( identifier_length == 16 )
 	 && ( narrow_string_compare(
 	       (char *) identifier,
@@ -7476,6 +7498,17 @@ int libewf_header_values_set_utf8_value(
 
 		return( -1 );
 	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	result = libfvalue_table_get_value_by_identifier(
 	          header_values,
 	          identifier,
@@ -7613,6 +7646,17 @@ int libewf_header_values_get_utf16_value_size(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid indentifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -7805,6 +7849,17 @@ int libewf_header_values_get_utf16_value(
 
 		return( -1 );
 	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
 	if( ( identifier_length == 16 )
 	 && ( narrow_string_compare(
 	       (char *) identifier,
@@ -7964,6 +8019,17 @@ int libewf_header_values_set_utf16_value(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
 		return( -1 );
