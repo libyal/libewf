@@ -1932,7 +1932,7 @@ int main( int argc, char * const argv[] )
 	{
 		result = device_handle_set_number_of_error_retries(
 			  ewfacquire_device_handle,
-			  option_sectors_per_chunk,
+			  option_number_of_error_retries,
 			  &error );
 
 		if( result == -1 )
