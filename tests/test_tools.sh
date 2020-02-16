@@ -1,17 +1,17 @@
 #!/bin/bash
-# Tests tools functions.
+# Tests tools functions and types.
 #
-# Version: 20190101
+# Version: 20190216
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TOOL_TESTS="byte_size_string device_handle digest_hash guid info_handle platform verification_handle";
-TOOL_TESTS_WITH_INPUT="";
+TOOLS_TESTS="byte_size_string device_handle digest_hash guid info_handle platform verification_handle";
+TOOLS_TESTS_WITH_INPUT="";
 OPTION_SETS="";
 
-INPUT_GLOB="*";
+INPUT_GLOB="*.[Ees]*01";
 
 run_test()
 {
@@ -129,7 +129,7 @@ run_test_with_input()
 	return ${RESULT};
 }
 
-if ! test -z ${SKIP_TOOL_TESTS};
+if ! test -z ${SKIP_TOOLS_TESTS};
 then
 	exit ${EXIT_IGNORE};
 fi
@@ -152,7 +152,7 @@ source ${TEST_RUNNER};
 
 RESULT=${EXIT_IGNORE};
 
-for TEST_NAME in ${TOOL_TESTS};
+for TEST_NAME in ${TOOLS_TESTS};
 do
 	run_test "${TEST_NAME}";
 	RESULT=$?;
@@ -168,7 +168,7 @@ then
 	exit ${RESULT};
 fi
 
-for TEST_NAME in ${TOOL_TESTS_WITH_INPUT};
+for TEST_NAME in ${TOOLS_TESTS_WITH_INPUT};
 do
 	if test -d "input";
 	then

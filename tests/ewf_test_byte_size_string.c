@@ -45,8 +45,11 @@ int ewf_test_byte_size_string_create(
 {
 	system_character_t byte_size_string[ 32 ];
 
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	system_character_t expected_byte_size_string[ 8 ] = {
+		'8', '.', '0', ' ', 'G', 'i', 'B', 0 };
+
+	libcerror_error_t *error                          = NULL;
+	int result                                        = 0;
 
 	/* Test regular cases
 	 */
@@ -68,8 +71,8 @@ int ewf_test_byte_size_string_create(
 
 	result = memory_compare(
 	          byte_size_string,
-	          "8.0 GiB",
-	          8 );
+	          expected_byte_size_string,
+	          sizeof( system_character_t ) * 8 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -116,10 +119,16 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 {
 	system_character_t byte_size_string[ 32 ];
 
-	libcerror_error_t *error = NULL;
-	size64_t size            = 0;
-	int factor               = 0;
-	int result               = 0;
+	system_character_t expected_byte_size_string1[ 8 ] = {
+		'8', '.', '0', ' ', 'G', 'i', 'B', 0 };
+
+	system_character_t expected_byte_size_string2[ 6 ] = {
+		'9', '9', '9', ' ', 'B', 0 };
+
+	libcerror_error_t *error                           = NULL;
+	size64_t size                                      = 0;
+	int factor                                         = 0;
+	int result                                         = 0;
 
 	/* Test regular cases
 	 */
@@ -142,8 +151,8 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 
 	result = memory_compare(
 	          byte_size_string,
-	          "8.0 GiB",
-	          8 );
+	          expected_byte_size_string1,
+	          sizeof( system_character_t ) * 8 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -171,8 +180,8 @@ int ewf_test_byte_size_string_create_with_decimal_point(
 
 	result = memory_compare(
 	          byte_size_string,
-	          "999 B",
-	          6 );
+	          expected_byte_size_string2,
+	          sizeof( system_character_t ) * 6 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -261,14 +270,17 @@ on_error:
 int ewf_test_byte_size_string_convert(
      void )
 {
-	libcerror_error_t *error = NULL;
-	size64_t size            = 0;
-	int result               = 0;
+	system_character_t byte_size_string[ 6 ] = {
+		'8', ' ', 'G', 'i', 'B', 0 };
+
+	libcerror_error_t *error                 = NULL;
+	size64_t size                            = 0;
+	int result                               = 0;
 
 	/* Test regular cases
 	 */
 	result = byte_size_string_convert(
-	          "8 GiB",
+	          byte_size_string,
 	          5,
 	          &size,
 	          &error );
@@ -324,14 +336,47 @@ on_error:
 int ewf_test_byte_size_string_convert_with_decimal_point(
      void )
 {
-	libcerror_error_t *error = NULL;
-	size64_t size            = 0;
-	int result               = 0;
+	system_character_t byte_size_string1[ 6 ]  = {
+		'8', ' ', 'G', 'i', 'B', 0 };
+
+	system_character_t byte_size_string2[ 6 ]  = {
+		'9', '9', '9', ' ', 'B', 0 };
+
+	system_character_t byte_size_string3[ 5 ]  = {
+		'8', ' ', 'k', 'B', 0 };
+
+	system_character_t byte_size_string4[ 5 ]  = {
+		'8', ' ', 'M', 'B', 0 };
+
+	system_character_t byte_size_string5[ 5 ]  = {
+		'8', ' ', 'G', 'B', 0 };
+
+	system_character_t byte_size_string6[ 5 ]  = {
+		'8', ' ', 'T', 'B', 0 };
+
+	system_character_t byte_size_string7[ 5 ]  = {
+		'8', ' ', 'P', 'B', 0 };
+
+	system_character_t byte_size_string8[ 5 ]  = {
+		'8', ' ', 'E', 'B', 0 };
+
+	system_character_t byte_size_string9[ 5 ]  = {
+		'8', ' ', 'Z', 'B', 0 };
+
+	system_character_t byte_size_string10[ 5 ] = {
+		'8', ' ', 'Y', 'B', 0 };
+
+	system_character_t byte_size_string11[ 5 ] = {
+		'8', ' ', 'k', 'g', 0 };
+
+	libcerror_error_t *error                   = NULL;
+	size64_t size                              = 0;
+	int result                                 = 0;
 
 	/* Test regular cases
 	 */
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 GiB",
+	          byte_size_string1,
 	          5,
 	          (int) '.',
 	          &size,
@@ -352,7 +397,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "999 B",
+	          byte_size_string2,
 	          5,
 	          (int) '.',
 	          &size,
@@ -373,7 +418,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 kB",
+	          byte_size_string3,
 	          4,
 	          (int) '.',
 	          &size,
@@ -394,7 +439,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 MB",
+	          byte_size_string4,
 	          4,
 	          (int) '.',
 	          &size,
@@ -415,7 +460,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 GB",
+	          byte_size_string5,
 	          4,
 	          (int) '.',
 	          &size,
@@ -436,7 +481,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 TB",
+	          byte_size_string6,
 	          4,
 	          (int) '.',
 	          &size,
@@ -457,7 +502,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 PB",
+	          byte_size_string7,
 	          4,
 	          (int) '.',
 	          &size,
@@ -478,7 +523,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 EB",
+	          byte_size_string8,
 	          4,
 	          (int) '.',
 	          &size,
@@ -499,7 +544,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 ZB",
+	          byte_size_string9,
 	          4,
 	          (int) '.',
 	          &size,
@@ -520,7 +565,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 YB",
+	          byte_size_string10,
 	          4,
 	          (int) '.',
 	          &size,
@@ -562,7 +607,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 &error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 GiB",
+	          byte_size_string1,
 	          5,
 	          (int) '.',
 	          NULL,
@@ -581,7 +626,7 @@ int ewf_test_byte_size_string_convert_with_decimal_point(
 	 &error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          "8 kg",
+	          byte_size_string11,
 	          4,
 	          (int) '.',
 	          &size,

@@ -1,4 +1,4 @@
-# Tests library functions and types.
+# Tests tools functions and types.
 #
 # Version: 20200216
 
@@ -6,8 +6,8 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$LibraryTests = "access_control_entry analytical_data attribute bit_stream case_data chunk_data chunk_group chunk_table compression data_chunk date_time date_time_values deflate device_information digest_section error error2_section file_entry hash_sections hash_values header_sections header_values huffman_tree io_handle lef_extended_attribute lef_file_entry lef_permission lef_source lef_subject ltree_section md5_hash_section media_values notify permission_group read_io_handle restart_data section_descriptor sector_range segment_file segment_table serialized_string session_section sha1_hash_section single_file_tree single_files source volume_section write_io_handle"
-$LibraryTestsWithInput = "handle support"
+$ToolsTests = "byte_size_string device_handle digest_hash guid info_handle platform verification_handle"
+$ToolsTestsWithInput = ""
 
 $InputGlob = "*.[Ees]*01"
 
@@ -113,7 +113,7 @@ Function RunTestWithInput
 	$TestDescription = "Testing: ${TestName}"
 	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
 
-	$TestProfileDirectory = GetTestProfileDirectory "input" "libewf"
+	$TestProfileDirectory = GetTestProfileDirectory "input" "ewftools"
 
 	$IgnoreList = ReadIgnoreList ${TestProfileDirectory}
 
@@ -183,9 +183,9 @@ If (-Not (Test-Path ${TestExecutablesDirectory}))
 
 $Result = ${ExitIgnore}
 
-Foreach (${TestName} in ${LibraryTests} -split " ")
+Foreach (${TestName} in ${ToolsTests} -split " ")
 {
-	# Split will return an array of a single empty string when LibraryTests is empty.
+	# Split will return an array of a single empty string when ToolsTests is empty.
 	If (-Not (${TestName}))
 	{
 		Continue
@@ -198,9 +198,9 @@ Foreach (${TestName} in ${LibraryTests} -split " ")
 	}
 }
 
-Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
+Foreach (${TestName} in ${ToolsTestsWithInput} -split " ")
 {
-	# Split will return an array of a single empty string when LibraryTestsWithInput is empty.
+	# Split will return an array of a single empty string when ToolsTestsWithInput is empty.
 	If (-Not (${TestName}))
 	{
 		Continue
