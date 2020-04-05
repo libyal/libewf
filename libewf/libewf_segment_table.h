@@ -79,6 +79,10 @@ int libewf_segment_table_free(
      libewf_segment_table_t **segment_table,
      libcerror_error_t **error );
 
+int libewf_segment_table_clear(
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error );
+
 int libewf_segment_table_clone(
      libewf_segment_table_t **destination_segment_table,
      libewf_segment_table_t *source_segment_table,

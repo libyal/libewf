@@ -192,20 +192,15 @@ int libewf_segment_table_free(
 	}
 	if( *segment_table != NULL )
 	{
-		if( ( *segment_table )->basename != NULL )
-		{
-			memory_free(
-			 ( *segment_table )->basename );
-		}
-		if( libfdata_list_free(
-		     &( ( *segment_table )->segment_files_list ),
+		if( libewf_segment_table_clear(
+		     *segment_table,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free segment files list.",
+			 "%s: unable to clear segment table.",
 			 function );
 
 			result = -1;
@@ -223,12 +218,85 @@ int libewf_segment_table_free(
 
 			result = -1;
 		}
+		if( libfdata_list_free(
+		     &( ( *segment_table )->segment_files_list ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free segment files list.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 *segment_table );
 
 		*segment_table = NULL;
 	}
 	return( result );
+}
+
+/* Clears the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_clear(
+     libewf_segment_table_t *segment_table,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_segment_table_clear";
+
+	if( segment_table == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename = NULL;
+	}
+	if( libfdata_list_empty(
+	     segment_table->segment_files_list,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty segment files list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfcache_cache_empty(
+	     segment_table->segment_files_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty segment files cache.",
+		 function );
+
+		return( -1 );
+	}
+	segment_table->maximum_segment_size = 0;
+	segment_table->number_of_segments   = 0;
+	segment_table->flags                = 0;
+
+	return( 1 );
 }
 
 /* Clones the segment table

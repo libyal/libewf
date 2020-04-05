@@ -1,15 +1,9 @@
 # Script that synchronizes bzip2.
 #
-# Version: 20171105
+# Version: 20200229
 
 $ExitSuccess = 0
 $ExitFailure = 1
-
-Function DownloadFile($Url, $Destination)
-{
-	$Client = New-Object Net.WebClient
-	${Client}.DownloadFile(${Url}, ${Destination})
-}
 
 Function ExtractTarGz($Filename)
 {
@@ -45,7 +39,7 @@ If (Test-Path ${Filename})
 {
 	Remove-Item -Path ${Filename} -Force
 }
-DownloadFile -Url ${Url} -Destination ${Filename}
+Invoke-WebRequest -Uri ${Url} -OutFile ${Filename}
 
 If (Test-Path ${ExtractedPath})
 {

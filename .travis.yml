@@ -1,18 +1,18 @@
+version: ~> 1.0
 language: c
+os: linux
+dist: bionic
 env:
   global:
    # Encrypted COVERITY_SCAN_TOKEN
    - secure: "KTCRRKAlMthsG9BafisxO6bSEP1y8Z7Qr8hK+kDbgqf8qa5mmEAvTecZTn+rxsf7KYwVZbM3tlCnKfUdkMB+5dpnLqArWxXDIcJ8C00ggv0mk9jt9f/JGS+/anZ6l7gM49g64QPRvdCo2P3y0oCXBIbO3CXgFTY2gm9oj19I4jU="
-matrix:
+jobs:
   include:
   - name: "Coverity"
     env:
     - CONFIGURE_OPTIONS=""
     - TARGET="coverity"
     compiler: clang
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
     addons:
       coverity_scan:
@@ -30,9 +30,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-clang"
     compiler: clang
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc"
     env:
@@ -41,9 +38,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc on s390x (Docker)"
     env:
@@ -54,9 +48,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="docker"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
     services:
     - docker
@@ -67,9 +58,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-wide-character-type"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc without optimization"
     env:
@@ -79,9 +67,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-no-optimization"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc without OpenSSL"
     env:
@@ -90,9 +75,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-no-openssl"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc with OpenSSL EVP"
     env:
@@ -101,9 +83,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-openssl-evp"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc with OpenSSL non-EVP"
     env:
@@ -112,9 +91,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-openssl"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc and Python module"
     env:
@@ -123,9 +99,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-python"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc and Python 2 module"
     env:
@@ -135,9 +108,6 @@ matrix:
     - PYTHON_VERSION=2
     - TARGET="linux-gcc-python2"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc and Python 3 module"
     env:
@@ -147,26 +117,17 @@ matrix:
     - PYTHON_VERSION=3
     - TARGET="linux-gcc-python3"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc and Python 2 module (setup.py)"
     env:
     - TARGET="linux-gcc-python-setup-py"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
     python: 2.7
   - name: "Linux with gcc and Python 3 module (setup.py)"
     env:
     - TARGET="linux-gcc-python-setup-py"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
     python: 3.6
   - name: "Linux with gcc and shared libraries"
@@ -176,9 +137,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-shared"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc, shared libraries and wide character type (wchar_t) support"
     env:
@@ -187,9 +145,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-shared-wide-character-type"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Linux with gcc and static executables support"
     env:
@@ -198,9 +153,6 @@ matrix:
     - LDFLAGS="--coverage"
     - TARGET="linux-gcc-static-executables"
     compiler: gcc
-    os: linux
-    dist: bionic
-    sudo: required
     group: edge
   - name: "Mac OS with clang"
     env:

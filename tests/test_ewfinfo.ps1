@@ -1,10 +1,14 @@
 # Info tool testing script
 #
-# Version: 20200216
+# Version: 20200223
 
 $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
+
+$Profiles = @("ewfinfo")
+$OptionsPerProfile = @("")
+$OptionSets = "";
 
 $InputGlob = "*.[ELels]*01"
 
@@ -52,13 +56,39 @@ If (-Not (Test-Path -Path "input"))
 	Exit ${ExitSuccess}
 }
 
-Get-ChildItem -Path "input\${InputGlob}" | Foreach-Object
+For ($ProfileIndex = 0; $ProfileIndex -le ($Profiles.length - 1); $ProfileIndex += 1)
 {
-	Invoke-Expression ${TestExecutable} $_
+	$TestProfile = $Profiles[$ProfileIndex]
+	$TestProfileDirectory = "input\.${TestProfile}"
+	$Options = $OptionsPerProfile[$ProfileIndex]
 
-	If (${LastExitCode} -ne ${ExitSuccess})
+	Get-ChildItem -Path "input\*" | Foreach-Object
 	{
-		Break
+		$TestSetDirectory = $_
+
+		# TODO: check ignore file
+
+		If (-Not (Test-Path -Path ${TestSetDirectory} -PathType Container))
+		{
+			Continue
+		}
+		Get-ChildItem -Path "${TestSetDirectory}\${InputGlob}" | Foreach-Object
+		{
+			$InputFile = $_
+
+			# TODO: handle test data options
+
+			Invoke-Expression ${TestExecutable} ${Options} ${InputFile}
+
+			If (${LastExitCode} -ne ${ExitSuccess})
+			{
+				Break
+			}
+		}
+		If (${LastExitCode} -ne ${ExitSuccess})
+		{
+			Break
+		}
 	}
 }
 

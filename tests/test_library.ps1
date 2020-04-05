@@ -8,6 +8,7 @@ $ExitIgnore = 77
 
 $LibraryTests = "access_control_entry analytical_data attribute bit_stream case_data chunk_data chunk_group chunk_table compression data_chunk date_time date_time_values deflate device_information digest_section error error2_section file_entry hash_sections hash_values header_sections header_values huffman_tree io_handle lef_extended_attribute lef_file_entry lef_permission lef_source lef_subject ltree_section md5_hash_section media_values notify permission_group read_io_handle restart_data section_descriptor sector_range segment_file segment_table serialized_string session_section sha1_hash_section single_file_tree single_files source volume_section write_io_handle"
 $LibraryTestsWithInput = "handle support"
+$OptionSets = "";
 
 $InputGlob = "*.[Ees]*01"
 
