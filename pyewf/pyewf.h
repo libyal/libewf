@@ -1,5 +1,5 @@
 /*
- * Python bindings for libewf (pyewf)
+ * Python bindings module for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
  * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
@@ -47,6 +47,16 @@ PyObject *pyewf_check_file_signature_file_object(
            PyObject *keywords );
 
 PyObject *pyewf_glob(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyewf_open_new_handle(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyewf_open_new_handle_with_file_objects(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );

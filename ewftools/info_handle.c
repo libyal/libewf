@@ -48,6 +48,7 @@
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
+#define DIGEST_HASH_STRING_SIZE_MD5		33
 #endif
 
 /* Creates an info handle

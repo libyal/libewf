@@ -1,4 +1,4 @@
-.Dd December 30, 2019
+.Dd July 22, 2020
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -362,6 +362,8 @@ File entry functions
 .Fn libewf_file_entry_get_number_of_access_control_entries "libewf_file_entry_t *file_entry" "int *number_of_access_control_entries" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_access_control_entry "libewf_file_entry_t *file_entry" "int access_control_entry_index" "libewf_access_control_entry_t **access_control_entry" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_source "libewf_file_entry_t *file_entry" "libewf_source_t **source" "libewf_error_t **error"
 .Pp
 Attribute functions
 .Ft int

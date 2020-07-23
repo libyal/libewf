@@ -40,7 +40,7 @@
 /* Tests the byte_size_string_create function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_byte_size_string_create(
+int ewf_test_tools_byte_size_string_create(
      void )
 {
 	system_character_t byte_size_string[ 32 ];
@@ -114,7 +114,7 @@ on_error:
 /* Tests the byte_size_string_create_with_decimal_point function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_byte_size_string_create_with_decimal_point(
+int ewf_test_tools_byte_size_string_create_with_decimal_point(
      void )
 {
 	system_character_t byte_size_string[ 32 ];
@@ -267,7 +267,7 @@ on_error:
 /* Tests the byte_size_string_convert function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_byte_size_string_convert(
+int ewf_test_tools_byte_size_string_convert(
      void )
 {
 	system_character_t byte_size_string[ 6 ] = {
@@ -333,7 +333,7 @@ on_error:
 /* Tests the byte_size_string_convert_with_decimal_point function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_byte_size_string_convert_with_decimal_point(
+int ewf_test_tools_byte_size_string_convert_with_decimal_point(
      void )
 {
 	system_character_t byte_size_string1[ 6 ]  = {
@@ -672,19 +672,19 @@ int main(
 
 	EWF_TEST_RUN(
 	 "byte_size_string_create",
-	 ewf_test_byte_size_string_create );
+	 ewf_test_tools_byte_size_string_create );
 
 	EWF_TEST_RUN(
 	 "byte_size_string_create_with_decimal_point",
-	 ewf_test_byte_size_string_create_with_decimal_point );
+	 ewf_test_tools_byte_size_string_create_with_decimal_point );
 
 	EWF_TEST_RUN(
 	 "byte_size_string_convert",
-	 ewf_test_byte_size_string_convert );
+	 ewf_test_tools_byte_size_string_convert );
 
 	EWF_TEST_RUN(
 	 "byte_size_string_convert_with_decimal_point",
-	 ewf_test_byte_size_string_convert_with_decimal_point );
+	 ewf_test_tools_byte_size_string_convert_with_decimal_point );
 
 	return( EXIT_SUCCESS );
 

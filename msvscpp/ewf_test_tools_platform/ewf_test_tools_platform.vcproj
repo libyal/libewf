@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_digest_hash"
-	ProjectGUID="{D9E89B13-DD42-42D1-82BF-2F38FCC8DD83}"
-	RootNamespace="ewf_test_digest_hash"
+	Name="ewf_test_tools_platform"
+	ProjectGUID="{9F3E9A40-DB71-442C-9AF2-C868D38787C6}"
+	RootNamespace="ewf_test_tools_platform"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.c"
+				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_digest_hash.c"
+				RelativePath="..\..\tests\ewf_test_tools_platform.c"
 				>
 			</File>
 		</Filter>
@@ -190,7 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\digest_hash.h"
+				RelativePath="..\..\ewftools\platform.h"
 				>
 			</File>
 			<File

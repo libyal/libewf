@@ -1,7 +1,7 @@
 #!/bin/bash
 # Verify tool testing script
 #
-# Version: 20190223
+# Version: 20200705
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -12,7 +12,7 @@ OPTIONS=(-q);
 
 INPUT_GLOB="*.[Ees]*01";
 
-if ! test -z ${SKIP_TOOLS_TESTS};
+if test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}";
 then
 	exit ${EXIT_IGNORE};
 fi

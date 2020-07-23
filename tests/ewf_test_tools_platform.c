@@ -1,5 +1,5 @@
 /*
- * Tools guid functions test program
+ * Tools platform functions test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -36,28 +36,22 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-#include "../ewftools/guid.h"
+#include "../ewftools/platform.h"
 
-/* Tests the guid_to_string function
+/* Tests the platform_get_operating_system function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_guid_to_string(
+int ewf_test_tools_platform_get_operating_system(
      void )
 {
 	system_character_t string[ 64 ];
-
-	uint8_t guid[ 16 ] = {
-		0xd0, 0x74, 0xeb, 0x89, 0x79, 0xfe, 0x4e, 0x3d, 0x91, 0x9f, 0x95, 0xbf, 0x46, 0xf7, 0xf5, 0x5f };
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = guid_to_string(
-	          guid,
-	          16,
-	          _BYTE_STREAM_ENDIAN_BIG,
+	result = platform_get_operating_system(
 	          string,
 	          64,
 	          &error );
@@ -71,23 +65,10 @@ int ewf_test_guid_to_string(
 	 "error",
 	 error );
 
-	result = memory_compare(
-	          string,
-	          "d074eb89-79fe-4e3d-919f-95bf46f7f55f",
-	          37 );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
 	/* Test error cases
 	 */
-	result = guid_to_string(
+	result = platform_get_operating_system(
 	          NULL,
-	          16,
-	          _BYTE_STREAM_ENDIAN_BIG,
-	          string,
 	          64,
 	          &error );
 
@@ -129,11 +110,9 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-/* TODO add tests for guid_generate */
-
 	EWF_TEST_RUN(
-	 "guid_to_string",
-	 ewf_test_guid_to_string );
+	 "platform_get_operating_system",
+	 ewf_test_tools_platform_get_operating_system );
 
 	return( EXIT_SUCCESS );
 

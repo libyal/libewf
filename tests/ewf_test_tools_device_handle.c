@@ -1,5 +1,5 @@
 /*
- * Tools verification_handle type test program
+ * Tools device_handle type test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -34,30 +34,28 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
-#include "../ewftools/verification_handle.h"
+#include "../ewftools/device_handle.h"
 
-/* Tests the verification_handle_initialize function
+/* Tests the device_handle_initialize function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_verification_handle_initialize(
+int ewf_test_tools_device_handle_initialize(
      void )
 {
-	libcerror_error_t *error                   = NULL;
-	verification_handle_t *verification_handle = NULL;
-	int result                                 = 0;
+	device_handle_t *device_handle      = NULL;
+	libcerror_error_t *error        = NULL;
+	int result                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests            = 1;
-	int number_of_memset_fail_tests            = 1;
-	int test_number                            = 0;
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = verification_handle_initialize(
-	          &verification_handle,
-	          1,
-	          0,
+	result = device_handle_initialize(
+	          &device_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -66,15 +64,15 @@ int ewf_test_verification_handle_initialize(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "verification_handle",
-	 verification_handle );
+	 "device_handle",
+	 device_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = verification_handle_free(
-	          &verification_handle,
+	result = device_handle_free(
+	          &device_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -83,8 +81,8 @@ int ewf_test_verification_handle_initialize(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
-	 "verification_handle",
-	 verification_handle );
+	 "device_handle",
+	 device_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -92,10 +90,8 @@ int ewf_test_verification_handle_initialize(
 
 	/* Test error cases
 	 */
-	result = verification_handle_initialize(
+	result = device_handle_initialize(
 	          NULL,
-	          1,
-	          0,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -110,15 +106,13 @@ int ewf_test_verification_handle_initialize(
 	libcerror_error_free(
 	 &error );
 
-	verification_handle = (verification_handle_t *) 0x12345678UL;
+	device_handle = (device_handle_t *) 0x12345678UL;
 
-	result = verification_handle_initialize(
-	          &verification_handle,
-	          1,
-	          0,
+	result = device_handle_initialize(
+	          &device_handle,
 	          &error );
 
-	verification_handle = NULL;
+	device_handle = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -138,24 +132,22 @@ int ewf_test_verification_handle_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test verification_handle_initialize with malloc failing
+		/* Test device_handle_initialize with malloc failing
 		 */
 		ewf_test_malloc_attempts_before_fail = test_number;
 
-		result = verification_handle_initialize(
-		          &verification_handle,
-		          1,
-		          0,
+		result = device_handle_initialize(
+		          &device_handle,
 		          &error );
 
 		if( ewf_test_malloc_attempts_before_fail != -1 )
 		{
 			ewf_test_malloc_attempts_before_fail = -1;
 
-			if( verification_handle != NULL )
+			if( device_handle != NULL )
 			{
-				verification_handle_free(
-				 &verification_handle,
+				device_handle_free(
+				 &device_handle,
 				 NULL );
 			}
 		}
@@ -167,8 +159,8 @@ int ewf_test_verification_handle_initialize(
 			 -1 );
 
 			EWF_TEST_ASSERT_IS_NULL(
-			 "verification_handle",
-			 verification_handle );
+			 "device_handle",
+			 device_handle );
 
 			EWF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -182,24 +174,22 @@ int ewf_test_verification_handle_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test verification_handle_initialize with memset failing
+		/* Test device_handle_initialize with memset failing
 		 */
 		ewf_test_memset_attempts_before_fail = test_number;
 
-		result = verification_handle_initialize(
-		          &verification_handle,
-		          1,
-		          0,
+		result = device_handle_initialize(
+		          &device_handle,
 		          &error );
 
 		if( ewf_test_memset_attempts_before_fail != -1 )
 		{
 			ewf_test_memset_attempts_before_fail = -1;
 
-			if( verification_handle != NULL )
+			if( device_handle != NULL )
 			{
-				verification_handle_free(
-				 &verification_handle,
+				device_handle_free(
+				 &device_handle,
 				 NULL );
 			}
 		}
@@ -211,8 +201,8 @@ int ewf_test_verification_handle_initialize(
 			 -1 );
 
 			EWF_TEST_ASSERT_IS_NULL(
-			 "verification_handle",
-			 verification_handle );
+			 "device_handle",
+			 device_handle );
 
 			EWF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -232,19 +222,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( verification_handle != NULL )
+	if( device_handle != NULL )
 	{
-		verification_handle_free(
-		 &verification_handle,
+		device_handle_free(
+		 &device_handle,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the verification_handle_free function
+/* Tests the device_handle_free function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_verification_handle_free(
+int ewf_test_tools_device_handle_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -252,7 +242,7 @@ int ewf_test_verification_handle_free(
 
 	/* Test error cases
 	 */
-	result = verification_handle_free(
+	result = device_handle_free(
 	          NULL,
 	          &error );
 
@@ -279,18 +269,18 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the verification_handle_signal_abort function
+/* Tests the device_handle_signal_abort function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_verification_handle_signal_abort(
-     verification_handle_t *handle )
+int ewf_test_tools_device_handle_signal_abort(
+     device_handle_t *handle )
 {
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = verification_handle_signal_abort(
+	result = device_handle_signal_abort(
 	          handle,
 	          &error );
 
@@ -305,7 +295,7 @@ int ewf_test_verification_handle_signal_abort(
 
 	/* Test error cases
 	 */
-	result = verification_handle_signal_abort(
+	result = device_handle_signal_abort(
 	          NULL,
 	          &error );
 
@@ -344,28 +334,26 @@ int main(
      char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcerror_error_t *error                   = NULL;
-	verification_handle_t *verification_handle = NULL;
-	int result                                 = 0;
+	device_handle_t *device_handle = NULL;
+	libcerror_error_t *error   = NULL;
+	int result                 = 0;
 
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	EWF_TEST_RUN(
-	 "verification_handle_initialize",
-	 ewf_test_verification_handle_initialize );
+	 "device_handle_initialize",
+	 ewf_test_tools_device_handle_initialize );
 
 	EWF_TEST_RUN(
-	 "verification_handle_free",
-	 ewf_test_verification_handle_free );
+	 "device_handle_free",
+	 ewf_test_tools_device_handle_free );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
-	/* Initialize info handle for tests
+	/* Initialize device handle for tests
 	 */
-	result = verification_handle_initialize(
-	          &verification_handle,
-	          1,
-	          0,
+	result = device_handle_initialize(
+	          &device_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -374,22 +362,22 @@ int main(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "verification_handle",
-	 verification_handle );
+	 "device_handle",
+	 device_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
 	EWF_TEST_RUN_WITH_ARGS(
-	 "verification_handle_signal_abort",
-	 ewf_test_verification_handle_signal_abort,
-	 verification_handle );
+	 "device_handle_signal_abort",
+	 ewf_test_tools_device_handle_signal_abort,
+	 device_handle );
 
 	/* Clean up
 	 */
-	result = verification_handle_free(
-	          &verification_handle,
+	result = device_handle_free(
+	          &device_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -398,8 +386,8 @@ int main(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
-	 "verification_handle",
-	 verification_handle );
+	 "device_handle",
+	 device_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -415,10 +403,10 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( verification_handle != NULL )
+	if( device_handle != NULL )
 	{
-		verification_handle_free(
-		 &verification_handle,
+		device_handle_free(
+		 &device_handle,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

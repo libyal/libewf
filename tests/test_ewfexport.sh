@@ -60,7 +60,7 @@ test_callback()
 	return ${RESULT};
 }
 
-if ! test -z ${SKIP_TOOLS_TESTS};
+if test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}";
 then
 	exit ${EXIT_IGNORE};
 fi

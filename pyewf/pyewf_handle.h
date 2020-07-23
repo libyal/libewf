@@ -55,19 +55,6 @@ struct pyewf_handle
 extern PyMethodDef pyewf_handle_object_methods[];
 extern PyTypeObject pyewf_handle_type_object;
 
-PyObject *pyewf_handle_new(
-           void );
-
-PyObject *pyewf_handle_new_open(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyewf_handle_new_open_file_objects(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
 int pyewf_handle_init(
      pyewf_handle_t *pyewf_handle );
 

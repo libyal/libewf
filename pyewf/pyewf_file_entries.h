@@ -69,23 +69,23 @@ PyObject *pyewf_file_entries_new(
            int number_of_items );
 
 int pyewf_file_entries_init(
-     pyewf_file_entries_t *file_entries_object );
+     pyewf_file_entries_t *sequence_object );
 
 void pyewf_file_entries_free(
-      pyewf_file_entries_t *file_entries_object );
+      pyewf_file_entries_t *sequence_object );
 
 Py_ssize_t pyewf_file_entries_len(
-            pyewf_file_entries_t *file_entries_object );
+            pyewf_file_entries_t *sequence_object );
 
 PyObject *pyewf_file_entries_getitem(
-           pyewf_file_entries_t *file_entries_object,
+           pyewf_file_entries_t *sequence_object,
            Py_ssize_t item_index );
 
 PyObject *pyewf_file_entries_iter(
-           pyewf_file_entries_t *file_entries_object );
+           pyewf_file_entries_t *sequence_object );
 
 PyObject *pyewf_file_entries_iternext(
-           pyewf_file_entries_t *file_entries_object );
+           pyewf_file_entries_t *sequence_object );
 
 #if defined( __cplusplus )
 }

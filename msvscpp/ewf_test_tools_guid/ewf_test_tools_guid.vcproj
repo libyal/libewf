@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_byte_size_string"
-	ProjectGUID="{6E955688-82F0-4294-8BF0-6D777430B9AC}"
-	RootNamespace="ewf_test_byte_size_string"
+	Name="ewf_test_tools_guid"
+	ProjectGUID="{5DA605D2-C60E-45BC-AF98-A16E80EDFCB4}"
+	RootNamespace="ewf_test_tools_guid"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -58,6 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				SubSystem="1"
@@ -134,6 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -176,11 +178,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.c"
+				RelativePath="..\..\ewftools\guid.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_byte_size_string.c"
+				RelativePath="..\..\tests\ewf_test_tools_guid.c"
 				>
 			</File>
 		</Filter>
@@ -190,7 +192,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.h"
+				RelativePath="..\..\ewftools\guid.h"
 				>
 			</File>
 			<File

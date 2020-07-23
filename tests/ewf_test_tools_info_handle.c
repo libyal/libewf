@@ -1,5 +1,5 @@
 /*
- * Tools device_handle type test program
+ * Tools info_handle type test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -34,15 +34,15 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
-#include "../ewftools/device_handle.h"
+#include "../ewftools/info_handle.h"
 
-/* Tests the device_handle_initialize function
+/* Tests the info_handle_initialize function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_device_handle_initialize(
+int ewf_test_tools_info_handle_initialize(
      void )
 {
-	device_handle_t *device_handle      = NULL;
+	info_handle_t *info_handle      = NULL;
 	libcerror_error_t *error        = NULL;
 	int result                      = 0;
 
@@ -54,8 +54,8 @@ int ewf_test_device_handle_initialize(
 
 	/* Test regular cases
 	 */
-	result = device_handle_initialize(
-	          &device_handle,
+	result = info_handle_initialize(
+	          &info_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -64,15 +64,15 @@ int ewf_test_device_handle_initialize(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "device_handle",
-	 device_handle );
+	 "info_handle",
+	 info_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = device_handle_free(
-	          &device_handle,
+	result = info_handle_free(
+	          &info_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -81,8 +81,8 @@ int ewf_test_device_handle_initialize(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
-	 "device_handle",
-	 device_handle );
+	 "info_handle",
+	 info_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -90,7 +90,7 @@ int ewf_test_device_handle_initialize(
 
 	/* Test error cases
 	 */
-	result = device_handle_initialize(
+	result = info_handle_initialize(
 	          NULL,
 	          &error );
 
@@ -106,13 +106,13 @@ int ewf_test_device_handle_initialize(
 	libcerror_error_free(
 	 &error );
 
-	device_handle = (device_handle_t *) 0x12345678UL;
+	info_handle = (info_handle_t *) 0x12345678UL;
 
-	result = device_handle_initialize(
-	          &device_handle,
+	result = info_handle_initialize(
+	          &info_handle,
 	          &error );
 
-	device_handle = NULL;
+	info_handle = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -132,22 +132,22 @@ int ewf_test_device_handle_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test device_handle_initialize with malloc failing
+		/* Test info_handle_initialize with malloc failing
 		 */
 		ewf_test_malloc_attempts_before_fail = test_number;
 
-		result = device_handle_initialize(
-		          &device_handle,
+		result = info_handle_initialize(
+		          &info_handle,
 		          &error );
 
 		if( ewf_test_malloc_attempts_before_fail != -1 )
 		{
 			ewf_test_malloc_attempts_before_fail = -1;
 
-			if( device_handle != NULL )
+			if( info_handle != NULL )
 			{
-				device_handle_free(
-				 &device_handle,
+				info_handle_free(
+				 &info_handle,
 				 NULL );
 			}
 		}
@@ -159,8 +159,8 @@ int ewf_test_device_handle_initialize(
 			 -1 );
 
 			EWF_TEST_ASSERT_IS_NULL(
-			 "device_handle",
-			 device_handle );
+			 "info_handle",
+			 info_handle );
 
 			EWF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -174,22 +174,22 @@ int ewf_test_device_handle_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test device_handle_initialize with memset failing
+		/* Test info_handle_initialize with memset failing
 		 */
 		ewf_test_memset_attempts_before_fail = test_number;
 
-		result = device_handle_initialize(
-		          &device_handle,
+		result = info_handle_initialize(
+		          &info_handle,
 		          &error );
 
 		if( ewf_test_memset_attempts_before_fail != -1 )
 		{
 			ewf_test_memset_attempts_before_fail = -1;
 
-			if( device_handle != NULL )
+			if( info_handle != NULL )
 			{
-				device_handle_free(
-				 &device_handle,
+				info_handle_free(
+				 &info_handle,
 				 NULL );
 			}
 		}
@@ -201,8 +201,8 @@ int ewf_test_device_handle_initialize(
 			 -1 );
 
 			EWF_TEST_ASSERT_IS_NULL(
-			 "device_handle",
-			 device_handle );
+			 "info_handle",
+			 info_handle );
 
 			EWF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -222,19 +222,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( device_handle != NULL )
+	if( info_handle != NULL )
 	{
-		device_handle_free(
-		 &device_handle,
+		info_handle_free(
+		 &info_handle,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the device_handle_free function
+/* Tests the info_handle_free function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_device_handle_free(
+int ewf_test_tools_info_handle_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -242,7 +242,7 @@ int ewf_test_device_handle_free(
 
 	/* Test error cases
 	 */
-	result = device_handle_free(
+	result = info_handle_free(
 	          NULL,
 	          &error );
 
@@ -269,18 +269,18 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the device_handle_signal_abort function
+/* Tests the info_handle_signal_abort function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_device_handle_signal_abort(
-     device_handle_t *handle )
+int ewf_test_tools_info_handle_signal_abort(
+     info_handle_t *handle )
 {
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = device_handle_signal_abort(
+	result = info_handle_signal_abort(
 	          handle,
 	          &error );
 
@@ -295,7 +295,7 @@ int ewf_test_device_handle_signal_abort(
 
 	/* Test error cases
 	 */
-	result = device_handle_signal_abort(
+	result = info_handle_signal_abort(
 	          NULL,
 	          &error );
 
@@ -334,7 +334,7 @@ int main(
      char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	device_handle_t *device_handle = NULL;
+	info_handle_t *info_handle = NULL;
 	libcerror_error_t *error   = NULL;
 	int result                 = 0;
 
@@ -342,18 +342,18 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	EWF_TEST_RUN(
-	 "device_handle_initialize",
-	 ewf_test_device_handle_initialize );
+	 "info_handle_initialize",
+	 ewf_test_tools_info_handle_initialize );
 
 	EWF_TEST_RUN(
-	 "device_handle_free",
-	 ewf_test_device_handle_free );
+	 "info_handle_free",
+	 ewf_test_tools_info_handle_free );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
-	/* Initialize device handle for tests
+	/* Initialize info handle for tests
 	 */
-	result = device_handle_initialize(
-	          &device_handle,
+	result = info_handle_initialize(
+	          &info_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -362,22 +362,22 @@ int main(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "device_handle",
-	 device_handle );
+	 "info_handle",
+	 info_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
 	EWF_TEST_RUN_WITH_ARGS(
-	 "device_handle_signal_abort",
-	 ewf_test_device_handle_signal_abort,
-	 device_handle );
+	 "info_handle_signal_abort",
+	 ewf_test_tools_info_handle_signal_abort,
+	 info_handle );
 
 	/* Clean up
 	 */
-	result = device_handle_free(
-	          &device_handle,
+	result = info_handle_free(
+	          &info_handle,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -386,8 +386,8 @@ int main(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
-	 "device_handle",
-	 device_handle );
+	 "info_handle",
+	 info_handle );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -403,10 +403,10 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( device_handle != NULL )
+	if( info_handle != NULL )
 	{
-		device_handle_free(
-		 &device_handle,
+		info_handle_free(
+		 &info_handle,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

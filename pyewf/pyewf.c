@@ -25,7 +25,7 @@
 #include <types.h>
 #include <wide_string.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
 #include <stdlib.h>
 #endif
 
@@ -44,11 +44,13 @@
 #include "pyewf_unused.h"
 
 #if !defined( LIBEWF_HAVE_BFIO )
+
 LIBEWF_EXTERN \
 int libewf_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libewf_error_t **error );
-#endif
+
+#endif /* !defined( LIBEWF_HAVE_BFIO ) */
 
 /* The pyewf module methods
  */
@@ -83,20 +85,22 @@ PyMethodDef pyewf_module_methods[] = {
 	  "based on the extension (e.g. E01) and returns a sequence (list) of all the segment filenames." },
 
 	{ "open",
-	  (PyCFunction) pyewf_handle_new_open,
+	  (PyCFunction) pyewf_open_new_handle,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open(filenames, mode='r') -> Object\n"
 	  "\n"
           "Opens file(s) from a sequence (list) of all the segment filenames.\n"
           "Use pyewf.glob() to determine the segment filenames from first (E01)." },
 
-/* TODO: open file-like object using pool - list of file objects */
+	{ "open_file_objects",
+	  (PyCFunction) pyewf_open_new_handle_with_file_objects,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "open_file_objects(file_objects, mode='r') -> Object\n"
+	  "\n"
+          "Opens file(s) from a sequence (list) of file-like objects." },
 
 	/* Sentinel */
-	{ NULL,
-	  NULL,
-	  0,
-	  NULL}
+	{ NULL, NULL, 0, NULL }
 };
 
 /* Retrieves the pyewf/libewf version
@@ -142,9 +146,9 @@ PyObject *pyewf_check_file_signature(
 {
 	PyObject *string_object      = NULL;
 	libcerror_error_t *error     = NULL;
+	const char *filename_narrow  = NULL;
 	static char *function        = "pyewf_check_file_signature";
 	static char *keyword_list[]  = { "filename", NULL };
-	const char *filename_narrow  = NULL;
 	int result                   = 0;
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -163,7 +167,7 @@ PyObject *pyewf_check_file_signature(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &string_object ) == 0 )
 	{
@@ -179,7 +183,7 @@ PyObject *pyewf_check_file_signature(
 	{
 		pyewf_error_fetch_and_raise(
 	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -206,17 +210,17 @@ PyObject *pyewf_check_file_signature(
 		{
 			pyewf_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -229,7 +233,7 @@ PyObject *pyewf_check_file_signature(
 		Py_DecRef(
 		 utf8_string_object );
 
-#endif /* #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 		if( result == -1 )
 		{
@@ -260,12 +264,12 @@ PyObject *pyewf_check_file_signature(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
@@ -336,9 +340,9 @@ PyObject *pyewf_check_file_signature_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	libcerror_error_t *error         = NULL;
-	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
+	libbfio_handle_t *file_io_handle = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function            = "pyewf_check_file_signature_file_object";
 	static char *keyword_list[]      = { "file_object", NULL };
 	int result                       = 0;
@@ -348,7 +352,7 @@ PyObject *pyewf_check_file_signature_file_object(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &file_object ) == 0 )
 	{
@@ -467,7 +471,7 @@ PyObject *pyewf_glob(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &string_object ) == 0 )
 	{
@@ -483,7 +487,7 @@ PyObject *pyewf_glob(
 	{
 		pyewf_error_fetch_and_raise(
 	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		goto on_error;
@@ -518,17 +522,17 @@ PyObject *pyewf_glob(
 		{
 			pyewf_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		filename_length = narrow_string_length(
 		                   filename_narrow );
@@ -648,12 +652,12 @@ PyObject *pyewf_glob(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
@@ -811,6 +815,108 @@ on_error:
 	return( NULL );
 }
 
+/* Creates a new handle object and opens it
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_open_new_handle(
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	pyewf_handle_t *pyewf_handle = NULL;
+	static char *function        = "pyewf_open_new_handle";
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
+
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyewf_handle = PyObject_New(
+	              struct pyewf_handle,
+	              &pyewf_handle_type_object );
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( pyewf_handle_init(
+	     pyewf_handle ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyewf_handle_open(
+	     pyewf_handle,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyewf_handle );
+
+on_error:
+	if( pyewf_handle != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyewf_handle );
+	}
+	return( NULL );
+}
+
+/* Creates a new handle object and opens it using file-like objects
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyewf_open_new_handle_with_file_objects(
+           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	pyewf_handle_t *pyewf_handle = NULL;
+	static char *function        = "pyewf_open_new_handle_with_file_objects";
+
+	PYEWF_UNREFERENCED_PARAMETER( self )
+
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyewf_handle = PyObject_New(
+	                struct pyewf_handle,
+	                &pyewf_handle_type_object );
+
+	if( pyewf_handle == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( pyewf_handle_init(
+	     pyewf_handle ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyewf_handle_open_file_objects(
+	     pyewf_handle,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyewf_handle );
+
+on_error:
+	if( pyewf_handle != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyewf_handle );
+	}
+	return( NULL );
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 /* The pyewf module definition
@@ -848,14 +954,8 @@ PyMODINIT_FUNC initpyewf(
                 void )
 #endif
 {
-	PyObject *module                              = NULL;
-	PyTypeObject *compression_methods_type_object = NULL;
-	PyTypeObject *file_entries_type_object        = NULL;
-	PyTypeObject *file_entry_type_object          = NULL;
-	PyTypeObject *handle_type_object              = NULL;
-	PyTypeObject *media_flags_type_object         = NULL;
-	PyTypeObject *media_types_type_object         = NULL;
-	PyGILState_STATE gil_state                    = 0;
+	PyObject *module           = NULL;
+	PyGILState_STATE gil_state = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libewf_notify_set_stream(
@@ -890,25 +990,6 @@ PyMODINIT_FUNC initpyewf(
 
 	gil_state = PyGILState_Ensure();
 
-	/* Setup the handle type object
-	 */
-	pyewf_handle_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyewf_handle_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyewf_handle_type_object );
-
-	handle_type_object = &pyewf_handle_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "handle",
-	 (PyObject *) handle_type_object );
-
 	/* Setup the compression methods type object
 	 */
 	pyewf_compression_methods_type_object.tp_new = PyType_GenericNew;
@@ -926,36 +1007,61 @@ PyMODINIT_FUNC initpyewf(
 	Py_IncRef(
 	 (PyObject *) &pyewf_compression_methods_type_object );
 
-	compression_methods_type_object = &pyewf_compression_methods_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "compression_methods",
-	 (PyObject *) compression_methods_type_object );
+	 (PyObject *) &pyewf_compression_methods_type_object );
 
-	/* Setup the media types type object
+	/* Setup the file entries type object
 	 */
-	pyewf_media_types_type_object.tp_new = PyType_GenericNew;
+	pyewf_file_entries_type_object.tp_new = PyType_GenericNew;
 
-	if( pyewf_media_types_init_type(
-	     &pyewf_media_types_type_object ) != 1 )
-	{
-		goto on_error;
-	}
 	if( PyType_Ready(
-	     &pyewf_media_types_type_object ) < 0 )
+	     &pyewf_file_entries_type_object ) < 0 )
 	{
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject *) &pyewf_media_types_type_object );
-
-	media_types_type_object = &pyewf_media_types_type_object;
+	 (PyObject *) &pyewf_file_entries_type_object );
 
 	PyModule_AddObject(
 	 module,
-	 "media_types",
-	 (PyObject *) media_types_type_object );
+	 "file_entries",
+	 (PyObject *) &pyewf_file_entries_type_object );
+
+	/* Setup the file entry type object
+	 */
+	pyewf_file_entry_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyewf_file_entry_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyewf_file_entry_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "file_entry",
+	 (PyObject *) &pyewf_file_entry_type_object );
+
+	/* Setup the handle type object
+	 */
+	pyewf_handle_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyewf_handle_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyewf_handle_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "handle",
+	 (PyObject *) &pyewf_handle_type_object );
 
 	/* Setup the media flags type object
 	 */
@@ -974,50 +1080,32 @@ PyMODINIT_FUNC initpyewf(
 	Py_IncRef(
 	 (PyObject *) &pyewf_media_flags_type_object );
 
-	media_flags_type_object = &pyewf_media_flags_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "media_flags",
-	 (PyObject *) media_flags_type_object );
+	 (PyObject *) &pyewf_media_flags_type_object );
 
-	/* Setup the file entry type object
+	/* Setup the media types type object
 	 */
-	pyewf_file_entry_type_object.tp_new = PyType_GenericNew;
+	pyewf_media_types_type_object.tp_new = PyType_GenericNew;
 
+	if( pyewf_media_types_init_type(
+	     &pyewf_media_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
 	if( PyType_Ready(
-	     &pyewf_file_entry_type_object ) < 0 )
+	     &pyewf_media_types_type_object ) < 0 )
 	{
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject *) &pyewf_file_entry_type_object );
-
-	file_entry_type_object = &pyewf_file_entry_type_object;
+	 (PyObject *) &pyewf_media_types_type_object );
 
 	PyModule_AddObject(
 	 module,
-	 "file_entry",
-	 (PyObject *) file_entry_type_object );
-
-	/* Setup the file entries type object
-	 */
-	pyewf_file_entries_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyewf_file_entries_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyewf_file_entries_type_object );
-
-	file_entries_type_object = &pyewf_file_entries_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_file_entries",
-	 (PyObject *) file_entries_type_object );
+	 "media_types",
+	 (PyObject *) &pyewf_media_types_type_object );
 
 	PyGILState_Release(
 	 gil_state );

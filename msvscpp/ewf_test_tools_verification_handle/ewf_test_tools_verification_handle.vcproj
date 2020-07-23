@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_guid"
-	ProjectGUID="{19AB81BB-18A7-4C81-B17F-A0465BAD5294}"
-	RootNamespace="ewf_test_guid"
+	Name="ewf_test_tools_verification_handle"
+	ProjectGUID="{66464361-62CD-4A0E-86BC-FE73B8E45C8D}"
+	RootNamespace="ewf_test_tools_verification_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -58,7 +58,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				SubSystem="1"
@@ -135,7 +134,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -178,11 +176,47 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\guid.c"
+				RelativePath="..\..\ewftools\byte_size_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_guid.c"
+				RelativePath="..\..\ewftools\digest_hash.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfinput.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_system_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\process_status.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\verification_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_tools_verification_handle.c"
 				>
 			</File>
 		</Filter>
@@ -192,7 +226,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\guid.h"
+				RelativePath="..\..\ewftools\byte_size_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\digest_hash.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfinput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_system_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\process_status.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\verification_handle.h"
 				>
 			</File>
 			<File
@@ -200,7 +266,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\ewf_test_libewf.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

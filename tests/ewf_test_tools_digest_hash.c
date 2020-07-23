@@ -1,5 +1,5 @@
 /*
- * Tools platform functions test program
+ * Tools digest_hash functions test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <file_stream.h>
 #include <memory.h>
 #include <narrow_string.h>
@@ -36,22 +35,27 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-#include "../ewftools/platform.h"
+#include "../ewftools/digest_hash.h"
 
-/* Tests the platform_get_operating_system function
+/* Tests the digest_hash_copy_to_string function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_platform_get_operating_system(
+int ewf_test_tools_digest_hash_copy_to_string(
      void )
 {
 	system_character_t string[ 64 ];
+
+	uint8_t md5_hash[ 16 ] = {
+		0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e };
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = platform_get_operating_system(
+	result = digest_hash_copy_to_string(
+	          md5_hash,
+	          16,
 	          string,
 	          64,
 	          &error );
@@ -65,11 +69,99 @@ int ewf_test_platform_get_operating_system(
 	 "error",
 	 error );
 
+	result = memory_compare(
+	          string,
+	          "d41d8cd98f00b204e9800998ecf8427e",
+	          33 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	/* Test error cases
 	 */
-	result = platform_get_operating_system(
+	result = digest_hash_copy_to_string(
+	          NULL,
+	          16,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = digest_hash_copy_to_string(
+	          md5_hash,
+	          (size_t) SSIZE_MAX + 1,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = digest_hash_copy_to_string(
+	          md5_hash,
+	          16,
 	          NULL,
 	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = digest_hash_copy_to_string(
+	          md5_hash,
+	          16,
+	          string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = digest_hash_copy_to_string(
+	          md5_hash,
+	          16,
+	          string,
+	          0,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -111,8 +203,8 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	EWF_TEST_RUN(
-	 "platform_get_operating_system",
-	 ewf_test_platform_get_operating_system );
+	 "digest_hash_copy_to_string",
+	 ewf_test_tools_digest_hash_copy_to_string );
 
 	return( EXIT_SUCCESS );
 

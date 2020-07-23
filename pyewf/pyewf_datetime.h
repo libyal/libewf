@@ -43,6 +43,9 @@ PyObject *pyewf_datetime_new_from_floatingtime(
 PyObject *pyewf_datetime_new_from_posix_time(
            int64_t posix_time );
 
+PyObject *pyewf_datetime_new_from_posix_time_in_micro_seconds(
+           int64_t posix_time );
+
 #if defined( __cplusplus )
 }
 #endif

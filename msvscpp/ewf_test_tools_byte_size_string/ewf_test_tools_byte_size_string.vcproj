@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_platform"
-	ProjectGUID="{CF6673C9-DE60-4B15-8AD0-0FD84064E5D5}"
-	RootNamespace="ewf_test_platform"
+	Name="ewf_test_tools_byte_size_string"
+	ProjectGUID="{68660E1C-95FE-489A-B3D1-04B2A51F4B5A}"
+	RootNamespace="ewf_test_tools_byte_size_string"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ewftools\platform.c"
+				RelativePath="..\..\ewftools\byte_size_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_platform.c"
+				RelativePath="..\..\tests\ewf_test_tools_byte_size_string.c"
 				>
 			</File>
 		</Filter>
@@ -190,7 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\ewftools\platform.h"
+				RelativePath="..\..\ewftools\byte_size_string.h"
 				>
 			</File>
 			<File

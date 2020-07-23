@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20200405],
+ [20200723],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -44,6 +44,9 @@ AC_SYS_LARGEFILE
 
 dnl Check if shared library support should be disabled
 AX_COMMON_CHECK_DISABLE_SHARED_LIBS
+
+dnl Check if tools should be build as static executables
+AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 
 dnl Check if WINAPI support should be enabled
 AX_COMMON_CHECK_ENABLE_WINAPI
@@ -118,7 +121,7 @@ AX_ZLIB_CHECK_COMPRESS2
 AX_ZLIB_CHECK_COMPRESSBOUND
 AX_ZLIB_CHECK_UNCOMPRESS
 
-dnl Check if bz2lib or required headers and functions are available
+dnl Check if bzip2 or required headers and functions are available
 AX_BZIP2_CHECK_ENABLE
 
 dnl Check if libhmac or required headers and functions are available
@@ -164,46 +167,25 @@ AX_LIBFUSE_CHECK_ENABLE
 dnl Check if ewftools required headers and functions are available
 AX_EWFTOOLS_CHECK_LOCAL
 
+dnl Check if DLL support is needed
+AX_LIBEWF_CHECK_DLL_SUPPORT
+
 dnl Check if tests required headers and functions are available
 AX_TESTS_CHECK_LOCAL
-
-dnl Check if DLL support is needed
-AS_IF(
- [test "x$enable_shared" = xyes],
- [AS_CASE(
-  [$host],
-  [*cygwin* | *mingw* | *msys*],
-  [AC_DEFINE(
-   [HAVE_DLLMAIN],
-   [1],
-   [Define to 1 to enable the DllMain function.])
-  AC_SUBST(
-   [HAVE_DLLMAIN],
-   [1])
-
-  AC_SUBST(
-   [LIBEWF_DLL_EXPORT],
-   ["-DLIBEWF_DLL_EXPORT"])
-
-  AC_SUBST(
-   [LIBEWF_DLL_IMPORT],
-   ["-DLIBEWF_DLL_IMPORT"])
-  ])
- ])
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
 
 dnl Check if requires and build requires should be set in spec file
 AS_IF(
- [test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcthreads" = xyes || test "x$ac_cv_libcdata" = xyes || test "x$ac_cv_libcdatetime" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfcache" = xyes || test "x$ac_cv_libfdata" = xyes|| test "x$ac_cv_libfdatetime" = xyes || test "x$ac_cv_libfguid" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes || test "x$ac_c v_libcrypto" != xno],
+ [test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcthreads" = xyes || test "x$ac_cv_libcdata" = xyes || test "x$ac_cv_libcdatetime" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfcache" = xyes || test "x$ac_cv_libfdata" = xyes || test "x$ac_cv_libfdatetime" = xyes || test "x$ac_cv_libfguid" = xyes || test "x$ac_cv_libfvalue" = xyes || test "x$ac_cv_zlib" != xno || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcaes" = xyes || test "x$ac_cv_libcrypto" != xno],
  [AC_SUBST(
   [libewf_spec_requires],
   [Requires:])
  ])
 
 AS_IF(
- [test "x$ac_cv_libodraw" = xyes || test "x$ac_cv_libsmdev" = xyes || test "x$ac_cv_libsmraw" = xyes || test "x$ac_cv_libfuse" != xno],
+ [test "x$ac_cv_libodraw" = xyes || test "x$ac_cv_libsmdev" = xyes || test "x$ac_cv_libsmraw" = xyes || test "x$ac_cv_libfuse" != xno || test "x$ac_cv_libuuid" = xyes],
  [AC_SUBST(
   [libewf_spec_tools_build_requires],
   [BuildRequires:])

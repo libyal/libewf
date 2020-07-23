@@ -59,7 +59,7 @@ PyTypeObject pyewf_file_entries_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyewf._file_entries",
+	"pyewf.file_entries",
 	/* tp_basicsize */
 	sizeof( pyewf_file_entries_t ),
 	/* tp_itemsize */
@@ -97,7 +97,7 @@ PyTypeObject pyewf_file_entries_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"pyewf internal sequence and iterator object of file entries",
+	"pyewf sequence and iterator object of file entries",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -150,7 +150,7 @@ PyTypeObject pyewf_file_entries_type_object = {
 	0
 };
 
-/* Creates a new file entries object
+/* Creates a new file entries sequence and iterator object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyewf_file_entries_new(
@@ -160,8 +160,8 @@ PyObject *pyewf_file_entries_new(
                         int index ),
            int number_of_items )
 {
-	pyewf_file_entries_t *file_entries_object = NULL;
-	static char *function                     = "pyewf_file_entries_new";
+	pyewf_file_entries_t *sequence_object = NULL;
+	static char *function                 = "pyewf_file_entries_new";
 
 	if( parent_object == NULL )
 	{
@@ -183,93 +183,89 @@ PyObject *pyewf_file_entries_new(
 	}
 	/* Make sure the file entries values are initialized
 	 */
-	file_entries_object = PyObject_New(
-	                       struct pyewf_file_entries,
-	                       &pyewf_file_entries_type_object );
+	sequence_object = PyObject_New(
+	                   struct pyewf_file_entries,
+	                   &pyewf_file_entries_type_object );
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create file entries object.",
+		 "%s: unable to create sequence object.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyewf_file_entries_init(
-	     file_entries_object ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file entries object.",
-		 function );
-
-		goto on_error;
-	}
-	file_entries_object->parent_object     = parent_object;
-	file_entries_object->get_item_by_index = get_item_by_index;
-	file_entries_object->number_of_items   = number_of_items;
+	sequence_object->parent_object     = parent_object;
+	sequence_object->get_item_by_index = get_item_by_index;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) file_entries_object->parent_object );
+	 (PyObject *) sequence_object->parent_object );
 
-	return( (PyObject *) file_entries_object );
+	return( (PyObject *) sequence_object );
 
 on_error:
-	if( file_entries_object != NULL )
+	if( sequence_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) file_entries_object );
+		 (PyObject *) sequence_object );
 	}
 	return( NULL );
 }
 
-/* Intializes a file entries object
+/* Intializes a file entries sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyewf_file_entries_init(
-     pyewf_file_entries_t *file_entries_object )
+     pyewf_file_entries_t *sequence_object )
 {
 	static char *function = "pyewf_file_entries_init";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the file entries values are initialized
 	 */
-	file_entries_object->parent_object     = NULL;
-	file_entries_object->get_item_by_index = NULL;
-	file_entries_object->current_index     = 0;
-	file_entries_object->number_of_items   = 0;
+	sequence_object->parent_object     = NULL;
+	sequence_object->get_item_by_index = NULL;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = 0;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of file entries not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees a file entries object
+/* Frees a file entries sequence object
  */
 void pyewf_file_entries_free(
-      pyewf_file_entries_t *file_entries_object )
+      pyewf_file_entries_t *sequence_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyewf_file_entries_free";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           file_entries_object );
+	           sequence_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +285,72 @@ void pyewf_file_entries_free(
 
 		return;
 	}
-	if( file_entries_object->parent_object != NULL )
+	if( sequence_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) file_entries_object->parent_object );
+		 (PyObject *) sequence_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) file_entries_object );
+	 (PyObject*) sequence_object );
 }
 
 /* The file entries len() function
  */
 Py_ssize_t pyewf_file_entries_len(
-            pyewf_file_entries_t *file_entries_object )
+            pyewf_file_entries_t *sequence_object )
 {
 	static char *function = "pyewf_file_entries_len";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) file_entries_object->number_of_items );
+	return( (Py_ssize_t) sequence_object->number_of_items );
 }
 
 /* The file entries getitem() function
  */
 PyObject *pyewf_file_entries_getitem(
-           pyewf_file_entries_t *file_entries_object,
+           pyewf_file_entries_t *sequence_object,
            Py_ssize_t item_index )
 {
 	PyObject *file_entry_object = NULL;
 	static char *function       = "pyewf_file_entries_getitem";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) file_entries_object->number_of_items ) )
+	 || ( item_index >= (Py_ssize_t) sequence_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +359,8 @@ PyObject *pyewf_file_entries_getitem(
 
 		return( NULL );
 	}
-	file_entry_object = file_entries_object->get_item_by_index(
-	                     file_entries_object->parent_object,
+	file_entry_object = sequence_object->get_item_by_index(
+	                     sequence_object->parent_object,
 	                     (int) item_index );
 
 	return( file_entry_object );
@@ -373,83 +369,83 @@ PyObject *pyewf_file_entries_getitem(
 /* The file entries iter() function
  */
 PyObject *pyewf_file_entries_iter(
-           pyewf_file_entries_t *file_entries_object )
+           pyewf_file_entries_t *sequence_object )
 {
 	static char *function = "pyewf_file_entries_iter";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) file_entries_object );
+	 (PyObject *) sequence_object );
 
-	return( (PyObject *) file_entries_object );
+	return( (PyObject *) sequence_object );
 }
 
 /* The file entries iternext() function
  */
 PyObject *pyewf_file_entries_iternext(
-           pyewf_file_entries_t *file_entries_object )
+           pyewf_file_entries_t *sequence_object )
 {
 	PyObject *file_entry_object = NULL;
 	static char *function       = "pyewf_file_entries_iternext";
 
-	if( file_entries_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->current_index < 0 )
+	if( sequence_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object - invalid current index.",
+		 "%s: invalid sequence object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entries object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( file_entries_object->current_index >= file_entries_object->number_of_items )
+	if( sequence_object->current_index >= sequence_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	file_entry_object = file_entries_object->get_item_by_index(
-	                     file_entries_object->parent_object,
-	                     file_entries_object->current_index );
+	file_entry_object = sequence_object->get_item_by_index(
+	                     sequence_object->parent_object,
+	                     sequence_object->current_index );
 
 	if( file_entry_object != NULL )
 	{
-		file_entries_object->current_index++;
+		sequence_object->current_index++;
 	}
 	return( file_entry_object );
 }

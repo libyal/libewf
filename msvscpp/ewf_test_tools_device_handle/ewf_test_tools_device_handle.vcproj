@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_device_handle"
-	ProjectGUID="{DEE4D2BB-3D28-4777-BD32-D6D92657C98D}"
-	RootNamespace="ewf_test_device_handle"
+	Name="ewf_test_tools_device_handle"
+	ProjectGUID="{245F47E7-2847-41E7-B96B-82D8A2632CA1}"
+	RootNamespace="ewf_test_tools_device_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -192,11 +192,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_device_handle.c"
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_tools_device_handle.c"
 				>
 			</File>
 		</Filter>

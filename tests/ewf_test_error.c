@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"

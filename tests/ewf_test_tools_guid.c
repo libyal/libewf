@@ -1,5 +1,5 @@
 /*
- * Tools digest_hash functions test program
+ * Tools guid functions test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <memory.h>
 #include <narrow_string.h>
@@ -35,27 +36,28 @@
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
-#include "../ewftools/digest_hash.h"
+#include "../ewftools/guid.h"
 
-/* Tests the digest_hash_copy_to_string function
+/* Tests the guid_to_string function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_digest_hash_copy_to_string(
+int ewf_test_tools_guid_to_string(
      void )
 {
 	system_character_t string[ 64 ];
 
-	uint8_t md5_hash[ 16 ] = {
-		0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e };
+	uint8_t guid[ 16 ] = {
+		0xd0, 0x74, 0xeb, 0x89, 0x79, 0xfe, 0x4e, 0x3d, 0x91, 0x9f, 0x95, 0xbf, 0x46, 0xf7, 0xf5, 0x5f };
 
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = digest_hash_copy_to_string(
-	          md5_hash,
+	result = guid_to_string(
+	          guid,
 	          16,
+	          _BYTE_STREAM_ENDIAN_BIG,
 	          string,
 	          64,
 	          &error );
@@ -71,8 +73,8 @@ int ewf_test_digest_hash_copy_to_string(
 
 	result = memory_compare(
 	          string,
-	          "d41d8cd98f00b204e9800998ecf8427e",
-	          33 );
+	          "d074eb89-79fe-4e3d-919f-95bf46f7f55f",
+	          37 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -81,87 +83,12 @@ int ewf_test_digest_hash_copy_to_string(
 
 	/* Test error cases
 	 */
-	result = digest_hash_copy_to_string(
+	result = guid_to_string(
 	          NULL,
 	          16,
+	          _BYTE_STREAM_ENDIAN_BIG,
 	          string,
 	          64,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = digest_hash_copy_to_string(
-	          md5_hash,
-	          (size_t) SSIZE_MAX + 1,
-	          string,
-	          64,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = digest_hash_copy_to_string(
-	          md5_hash,
-	          16,
-	          NULL,
-	          64,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = digest_hash_copy_to_string(
-	          md5_hash,
-	          16,
-	          string,
-	          (size_t) SSIZE_MAX + 1,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = digest_hash_copy_to_string(
-	          md5_hash,
-	          16,
-	          string,
-	          0,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -202,9 +129,11 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
+/* TODO add tests for guid_generate */
+
 	EWF_TEST_RUN(
-	 "digest_hash_copy_to_string",
-	 ewf_test_digest_hash_copy_to_string );
+	 "guid_to_string",
+	 ewf_test_tools_guid_to_string );
 
 	return( EXIT_SUCCESS );
 

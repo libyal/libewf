@@ -453,93 +453,6 @@ PyTypeObject pyewf_handle_type_object = {
 	0
 };
 
-/* Creates a new pyewf handle object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyewf_handle_new(
-           void )
-{
-	static char *function        = "pyewf_handle_new";
-	pyewf_handle_t *pyewf_handle = NULL;
-
-	pyewf_handle = PyObject_New(
-	                struct pyewf_handle,
-	                &pyewf_handle_type_object );
-
-	if( pyewf_handle == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize handle.",
-		 function );
-
-		goto on_error;
-	}
-	if( pyewf_handle_init(
-	     pyewf_handle ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize handle.",
-		 function );
-
-		goto on_error;
-	}
-	return( (PyObject *) pyewf_handle );
-
-on_error:
-	if( pyewf_handle != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) pyewf_handle );
-	}
-	return( NULL );
-}
-
-/* Creates a new handle object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyewf_handle_new_open(
-           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyewf_handle = NULL;
-
-	PYEWF_UNREFERENCED_PARAMETER( self )
-
-	pyewf_handle = pyewf_handle_new();
-
-	pyewf_handle_open(
-	 (pyewf_handle_t *) pyewf_handle,
-	 arguments,
-	 keywords );
-
-	return( pyewf_handle );
-}
-
-/* Creates a new handle object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyewf_handle_new_open_file_objects(
-           PyObject *self PYEWF_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyewf_handle = NULL;
-
-	PYEWF_UNREFERENCED_PARAMETER( self )
-
-	pyewf_handle = pyewf_handle_new();
-
-	pyewf_handle_open_file_objects(
-	 (pyewf_handle_t *) pyewf_handle,
-	 arguments,
-	 keywords );
-
-	return( pyewf_handle );
-}
-
 /* Intializes a handle object
  * Returns 0 if successful or -1 on error
  */
@@ -1142,11 +1055,12 @@ PyObject *pyewf_handle_open_file_objects(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *file_objects      = NULL;
+	PyObject *sequence_object   = NULL;
 	libcerror_error_t *error    = NULL;
-	char *mode                  = NULL;
-	static char *keyword_list[] = { "file_object", "mode", NULL };
 	static char *function       = "pyewf_handle_open_file_objects";
+	static char *keyword_list[] = { "file_object", "mode", NULL };
+	char *mode                  = NULL;
+	int access_flags            = 0;
 	int result                  = 0;
 
 	if( pyewf_handle == NULL )
@@ -1163,13 +1077,53 @@ PyObject *pyewf_handle_open_file_objects(
 	     keywords,
 	     "O|s",
 	     keyword_list,
-	     &file_objects,
+	     &sequence_object,
 	     &mode ) == 0 )
 	{
 		return( NULL );
 	}
-	if( ( mode != NULL )
-	 && ( mode[ 0 ] != 'r' ) )
+	if( PySequence_Check(
+	     sequence_object ) == 0 )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: argument: files must be a sequence object.",
+		 function );
+
+		return( NULL );
+	}
+	if( mode == NULL )
+	{
+		access_flags = LIBEWF_OPEN_READ;
+	}
+	else if( mode[ 0 ] == 'r' )
+	{
+		if( ( mode[ 1 ] == 0 )
+		  || ( ( mode[ 1 ] == 'b' )
+		   &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_READ;
+		}
+	}
+	else if( mode[ 0 ] == 'w' )
+	{
+		if( ( mode[ 1 ] == 0 )
+		 || ( ( mode[ 1 ] == 'b' )
+		  &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_WRITE;
+		}
+	}
+	else if( mode[ 0 ] == 'a' )
+	{
+		if( ( mode[ 1 ] == 0 )
+		 || ( ( mode[ 1 ] == 'b' )
+		  &&  ( mode[ 2 ] == 0 ) ) )
+		{
+			access_flags = LIBEWF_OPEN_WRITE_RESUME;
+		}
+	}
+	if( access_flags == 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -1181,7 +1135,7 @@ PyObject *pyewf_handle_open_file_objects(
 	}
 	if( pyewf_file_objects_pool_initialize(
 	     &( pyewf_handle->file_io_pool ),
-	     file_objects,
+	     sequence_object,
 	     LIBBFIO_OPEN_READ,
 	     &error ) != 1 )
 	{
@@ -1201,7 +1155,7 @@ PyObject *pyewf_handle_open_file_objects(
 	result = libewf_handle_open_file_io_pool(
 	          pyewf_handle->handle,
 	          pyewf_handle->file_io_pool,
-	          LIBEWF_OPEN_READ,
+	          access_flags,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -1211,7 +1165,7 @@ PyObject *pyewf_handle_open_file_objects(
 		pyewf_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to open file.",
+		 "%s: unable to open handle.",
 		 function );
 
 		libcerror_error_free(

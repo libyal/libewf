@@ -84,7 +84,7 @@ Function RunTest
 	param( [string]$TestType )
 
 	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
+	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_tools_${TestName}.exe"
 
 	$Output = Invoke-Expression ${TestExecutable}
 	$Result = ${LastExitCode}
@@ -111,7 +111,7 @@ Function RunTestWithInput
 	param( [string]$TestType )
 
 	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
+	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_tools_${TestName}.exe"
 
 	$TestProfileDirectory = GetTestProfileDirectory "input" "ewftools"
 

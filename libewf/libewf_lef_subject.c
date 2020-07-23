@@ -282,7 +282,6 @@ int libewf_lef_subject_read_data(
 	static char *function                 = "libewf_lef_subject_read_data";
 	size_t type_string_size               = 0;
 	size_t value_string_size              = 0;
-	uint64_t value_64bit                  = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
 	int value_index                       = 0;

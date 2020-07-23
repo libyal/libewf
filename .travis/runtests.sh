@@ -17,8 +17,15 @@ then
 	then
 		install_name_tool -change /usr/local/lib/libewf.3.dylib ${PWD}/libewf/.libs/libewf.3.dylib ./pyewf/.libs/pyewf.so;
 	fi
-	make check CHECK_WITH_STDERR=1;
-	RESULT=$?;
+	if test ${TARGET} = "linux-gcc-no-optimization";
+	then
+		# Skip the tools end-to-end tests otherwise gcov will not generate the reports properly.
+		make check CHECK_WITH_STDERR=1 SKIP_TOOLS_END_TO_END_TESTS=1;
+		RESULT=$?;
+	else
+		make check CHECK_WITH_STDERR=1;
+		RESULT=$?;
+	fi
 fi
 if test ${RESULT} -ne 0;
 then
