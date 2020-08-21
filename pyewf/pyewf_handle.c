@@ -671,7 +671,7 @@ PyObject *pyewf_handle_open(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: argument: files must be a sequence object.",
+		 "%s: argument: filenames must be a sequence object.",
 		 function );
 
 		return( NULL );
@@ -1058,7 +1058,7 @@ PyObject *pyewf_handle_open_file_objects(
 	PyObject *sequence_object   = NULL;
 	libcerror_error_t *error    = NULL;
 	static char *function       = "pyewf_handle_open_file_objects";
-	static char *keyword_list[] = { "file_object", "mode", NULL };
+	static char *keyword_list[] = { "file_objects", "mode", NULL };
 	char *mode                  = NULL;
 	int access_flags            = 0;
 	int result                  = 0;
@@ -1087,7 +1087,7 @@ PyObject *pyewf_handle_open_file_objects(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: argument: files must be a sequence object.",
+		 "%s: argument: file_objects must be a sequence object.",
 		 function );
 
 		return( NULL );

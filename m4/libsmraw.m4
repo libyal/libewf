@@ -1,10 +1,10 @@
 dnl Checks for libsmraw required headers and functions
 dnl
-dnl Version: 20190308
+dnl Version: 20200726
 
 dnl Function to detect if libsmraw is available
 dnl ac_libsmraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
-AC_DEFUN([AX_LIBSMRAW_CHECK_LIB],
+AC_DEFUN([AX_LIBSMRAW_CHECK_LOCAL],
   [AS_IF(
     [test "x$ac_cv_enable_shared_libs" = xno || test "x$ac_cv_with_libsmraw" = xno],
     [ac_cv_libsmraw=no],
@@ -184,7 +184,7 @@ AC_DEFUN([AX_LIBSMRAW_CHECK_ENABLE],
     [auto-detect],
     [DIR])
 
-  AX_LIBSMRAW_CHECK_LIB
+  AX_LIBSMRAW_CHECK_LOCAL
 
   AS_IF(
    [test "x$ac_cv_libsmraw" != xyes],
