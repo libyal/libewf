@@ -3738,7 +3738,19 @@ int libewf_single_files_read_data(
 		 "%s: unable to determine UTF-8 string size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( ( utf8_string_size == 0 )
+	 || ( utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
+		 function );
+
+		goto on_error;
 	}
 	utf8_string = (uint8_t *) memory_allocate(
 	                           sizeof( uint8_t ) * (size_t) utf8_string_size );

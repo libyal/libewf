@@ -6086,7 +6086,7 @@ int libewf_segment_file_read_element_data(
 			 "%s: unsupported compression method.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	/* Read the section descriptors:

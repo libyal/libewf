@@ -67,6 +67,18 @@ int libewf_restart_data_parse(
 
 		goto on_error;
 	}
+	if( ( restart_data_string_size == 0 )
+	 || ( restart_data_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid restart data string size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	restart_data_string = (uint8_t *) memory_allocate(
 	                                   sizeof( uint8_t ) * restart_data_string_size );
 

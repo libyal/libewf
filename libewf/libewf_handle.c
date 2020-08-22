@@ -1214,6 +1214,10 @@ int libewf_handle_open(
 		 "%s: unable to open handle using a file IO pool.",
 		 function );
 
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+
 		result = -1;
 	}
 	else

@@ -600,6 +600,17 @@ int libewf_hash_values_generate_xhash(
 	 */
 	*xhash_size += 1;
 
+	if( *xhash_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid xhash size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	*xhash = (uint8_t *) memory_allocate(
                               sizeof( uint8_t ) * *xhash_size );
 

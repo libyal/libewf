@@ -368,10 +368,21 @@ int libewf_device_information_generate_utf8_string(
 	 */
 	*utf8_string_size += 1;
 
+	if( *utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	/* Determine the string
 	 */
 	*utf8_string = (uint8_t *) memory_allocate(
-	                                          sizeof( uint8_t ) * *utf8_string_size );
+	                            sizeof( uint8_t ) * *utf8_string_size );
 
 	if( *utf8_string == NULL )
 	{
@@ -701,9 +712,11 @@ int libewf_device_information_generate(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	uint8_t *utf8_string    = NULL;
-	static char *function                 = "libewf_device_information_generate";
-	size_t utf8_string_size = 0;
+	uint8_t *safe_device_information    = NULL;
+	uint8_t *utf8_string                = NULL;
+	static char *function               = "libewf_device_information_generate";
+	size_t safe_device_information_size = 0;
+	size_t utf8_string_size             = 0;
 
 	if( device_information == NULL )
 	{
@@ -766,7 +779,7 @@ int libewf_device_information_generate(
 	if( libuna_utf16_stream_size_from_utf8(
 	     utf8_string,
 	     utf8_string_size,
-	     device_information_size,
+	     &safe_device_information_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -778,10 +791,22 @@ int libewf_device_information_generate(
 
 		goto on_error;
 	}
-	*device_information = (uint8_t *) memory_allocate(
-	                                   sizeof( uint8_t ) * *device_information_size );
+	if( ( safe_device_information_size == 0 )
+	 || ( safe_device_information_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid device information size value out of bounds.",
+		 function );
 
-	if( *device_information == NULL )
+		goto on_error;
+	}
+	safe_device_information = (uint8_t *) memory_allocate(
+	                                       sizeof( uint8_t ) * safe_device_information_size );
+
+	if( safe_device_information == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -793,8 +818,8 @@ int libewf_device_information_generate(
 		goto on_error;
 	}
 	if( libuna_utf16_stream_copy_from_utf8(
-	     *device_information,
-	     *device_information_size,
+	     safe_device_information,
+	     safe_device_information_size,
 	     LIBUNA_ENDIAN_LITTLE,
 	     utf8_string,
 	     utf8_string_size,
@@ -812,6 +837,9 @@ int libewf_device_information_generate(
 	memory_free(
 	 utf8_string );
 
+	*device_information      = safe_device_information;
+	*device_information_size = safe_device_information_size;
+
 	return( 1 );
 
 on_error:
@@ -820,15 +848,11 @@ on_error:
 		memory_free(
 		 utf8_string );
 	}
-	if( *device_information != NULL )
+	if( safe_device_information != NULL )
 	{
 		memory_free(
-		 device_information );
-
-		*device_information = NULL;
+		 safe_device_information );
 	}
-	*device_information_size = 0;
-
 	return( -1 );
 }
 
@@ -1666,6 +1690,18 @@ int libewf_device_information_parse(
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine UTF-8 string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( utf8_string_size == 0 )
+	 || ( utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
 		 function );
 
 		goto on_error;

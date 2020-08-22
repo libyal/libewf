@@ -2402,6 +2402,18 @@ int libewf_header_values_parse_header(
 
 		goto on_error;
 	}
+	if( ( header_string_size == 0 )
+	 || ( header_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid header string size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	header_string = (uint8_t *) memory_allocate(
 	                             sizeof( uint8_t ) * header_string_size );
 
@@ -2490,6 +2502,18 @@ int libewf_header_values_parse_header2(
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( header_string_size == 0 )
+	 || ( header_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid header string size value out of bounds.",
 		 function );
 
 		goto on_error;
@@ -2626,6 +2650,18 @@ int libewf_header_values_convert_utf8_header_string_to_header(
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( *header_size == 0 )
+	 || ( *header_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid header size value out of bounds.",
 		 function );
 
 		goto on_error;
@@ -3884,6 +3920,17 @@ int libewf_header_values_generate_utf8_header_string(
 	 */
 	*utf8_string_size += 1;
 
+	if( *utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	/* Determine the string
 	 */
 	*utf8_string = (uint8_t *) memory_allocate(
@@ -5247,6 +5294,18 @@ int libewf_header_values_generate_header2(
 
 		goto on_error;
 	}
+	if( ( *header2_size == 0 )
+	 || ( *header2_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid header2 size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	*header2 = (uint8_t *) memory_allocate(
 	                        sizeof( uint8_t ) * *header2_size );
 
@@ -5748,6 +5807,18 @@ int libewf_convert_date_xheader_value(
 			goto on_error;
 		}
 		*date_time_values_string_size += timezone_name_size;
+	}
+	if( ( *date_time_values_string_size == 0 )
+	  | ( *date_time_values_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid date time values string size value out of bounds.",
+		 function );
+
+		goto on_error;
 	}
 	*date_time_values_string = (uint8_t *) memory_allocate(
 	                                        sizeof( uint8_t ) * *date_time_values_string_size );
@@ -6541,6 +6612,17 @@ int libewf_header_values_generate_xheader(
 	 */
 	*xheader_size += 1;
 
+	if( *xheader_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid xheader size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	*xheader = (uint8_t *) memory_allocate(
 	                        sizeof( uint8_t ) * *xheader_size );
 

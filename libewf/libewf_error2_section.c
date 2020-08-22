@@ -1049,6 +1049,18 @@ ssize_t libewf_error2_section_write_file_io_pool(
 		}
 		total_write_count += write_count;
 	}
+	if( ( section_data_size == 0 )
+	 || ( section_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	section_data = (uint8_t *) memory_allocate(
 	                            section_data_size );
 

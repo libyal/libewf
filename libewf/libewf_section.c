@@ -1213,13 +1213,14 @@ ssize_t libewf_section_read_data(
 
 		return( -1 );
 	}
-	if( section_descriptor->data_size > (size64_t) SSIZE_MAX )
+	if( ( section_descriptor->data_size == 0 )
+	 || ( section_descriptor->data_size > (size64_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid section size value exceeds maximum.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section descriptor - data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1597,6 +1598,18 @@ ssize_t libewf_section_compressed_string_read(
 
 		goto on_error;
 	}
+	if( ( section_data_size == 0 )
+	 || ( section_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -1815,6 +1828,18 @@ ssize_t libewf_section_write_compressed_string(
 			padding_size            = 16 - padding_size;
 			compressed_string_size += padding_size;
 		}
+	}
+	if( ( compressed_string_size == 0 )
+	 || ( compressed_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid compressed string size value out of bounds.",
+		 function );
+
+		goto on_error;
 	}
 	compressed_string = (uint8_t *) memory_allocate(
 	                                 sizeof( uint8_t ) * compressed_string_size );
@@ -3186,6 +3211,18 @@ ssize_t libewf_section_table_read(
 	}
 /* TODO add support for table with chunk data */
 
+	if( ( *section_data_size == 0 )
+	 || ( *section_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	*section_data = (uint8_t *) memory_allocate(
 	                             sizeof( uint8_t ) * *section_data_size );
 
@@ -3458,6 +3495,18 @@ ssize_t libewf_section_table_read(
 
 			*section_data_size += *table_entries_data_size + table_footer_data_size;
 
+			if( ( *section_data_size == 0 )
+			 || ( *section_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid section data size value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
 			*section_data = (uint8_t *) memory_allocate(
 						     sizeof( uint8_t ) * *section_data_size );
 

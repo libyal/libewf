@@ -561,13 +561,14 @@ int libewf_write_io_handle_initialize_values(
 
 		return( -1 );
 	}
-	if( media_values->chunk_size == 0 )
+	if( ( media_values->chunk_size == 0 )
+	 || ( media_values->chunk_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid media values - missing chunk size.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid media values - chunk size value out of bounds.",
 		 function );
 
 		return( -1 );

@@ -455,6 +455,17 @@ ssize_t libewf_lef_extended_attribute_read_data(
 
 	if( name_size > 0 )
 	{
+		if( name_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid name size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		lef_extended_attribute->name = (uint8_t *) memory_allocate(
 		                                            sizeof( uint8_t ) * name_size );
 
@@ -511,6 +522,17 @@ ssize_t libewf_lef_extended_attribute_read_data(
 	}
 	if( value_size > 0 )
 	{
+		if( value_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid value size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		lef_extended_attribute->value = (uint8_t *) memory_allocate(
 		                                             sizeof( uint8_t ) * value_size );
 

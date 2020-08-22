@@ -773,7 +773,8 @@ int libewf_lef_file_entry_read_extended_attributes(
 
 		goto on_error;
 	}
-	if( byte_stream_size > (size_t) SSIZE_MAX )
+	if( ( byte_stream_size == 0 )
+	 || ( byte_stream_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,

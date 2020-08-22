@@ -740,6 +740,18 @@ int libewf_glob(
 	{
 		segment_filename_length = filename_length + additional_length;
 
+		if( ( segment_filename_length == 0 )
+		 || ( segment_filename_length > ( MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( char ) ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid segment filename length value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		segment_filename = (char *) memory_allocate(
 			                     sizeof( char ) * ( segment_filename_length + 1 ) );
 
@@ -1177,6 +1189,18 @@ int libewf_glob_wide(
 	{
 		segment_filename_length = filename_length + additional_length;
 
+		if( ( segment_filename_length == 0 )
+		 || ( segment_filename_length > ( MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( wchar_t ) ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid segment filename length value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		segment_filename = (wchar_t *) memory_allocate(
 			                        sizeof( wchar_t ) * ( segment_filename_length + 1 ) );
 

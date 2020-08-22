@@ -79,13 +79,13 @@ int libewf_chunk_data_initialize(
 		return( -1 );
 	}
 	if( ( chunk_size == 0 )
-	 || ( chunk_size > (size32_t) ( INT32_MAX - 16 ) ) )
+	 || ( chunk_size > (size32_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE - 16 ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid chunk size.",
+		 "%s: invalid chunk size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -731,6 +731,18 @@ int libewf_chunk_data_pack(
 		{
 			chunk_data->compressed_data_size = 2 * chunk_data->chunk_size;
 		}
+		if( ( chunk_data->compressed_data_size == 0 )
+		 || ( chunk_data->compressed_data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid chunk data - compressed data size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		chunk_data->compressed_data = (uint8_t *) memory_allocate(
 		                                           sizeof( uint8_t ) * chunk_data->compressed_data_size );
 
@@ -1086,18 +1098,14 @@ int libewf_chunk_data_unpack(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T <= 4
 	if( ( chunk_data->chunk_size == 0 )
-	 || ( (size_t) chunk_data->chunk_size > (size_t) SSIZE_MAX ) )
-#else
-	if( chunk_data->chunk_size == 0 )
-#endif
+	 || ( chunk_data->chunk_size > (size32_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE - 16 ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: chunk size value out of bounds.",
+		 "%s: invalid chunk size value out of bounds.",
 		 function );
 
 		return( -1 );

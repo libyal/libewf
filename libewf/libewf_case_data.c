@@ -709,6 +709,17 @@ int libewf_case_data_generate_utf8_string(
 	 */
 	safe_utf8_string_size += 1;
 
+	if( safe_utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	/* Determine the string
 	 */
 	safe_utf8_string = (uint8_t *) memory_allocate(
@@ -1292,6 +1303,18 @@ int libewf_case_data_generate(
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine case data size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( safe_case_data_size == 0 )
+	 || ( safe_case_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid case data size value out of bounds.",
 		 function );
 
 		goto on_error;
@@ -2288,6 +2311,18 @@ int libewf_case_data_parse(
 		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine UTF-8 string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( utf8_string_size == 0 )
+	 || ( utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
 		 function );
 
 		goto on_error;
