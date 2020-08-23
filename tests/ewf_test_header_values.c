@@ -6005,12 +6005,20 @@ int main(
 
 	/* Some tests use local time, therefore we need to make sure the time zone is set correctly
 	 */
+#if defined( WINAPI )
+	_putenv_s(
+	 "TZ",
+         "CET" );
+
+	_tzset();
+#else
 	setenv(
 	 "TZ",
 	 "CET",
 	 1 );
 
 	tzset();
+#endif
 
 	/* Run tests
 	 */
