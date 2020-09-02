@@ -171,8 +171,7 @@ int libewf_section_set_values(
 
 		return( -1 );
 	}
-	if( ( section_offset < 0 )
-	 || ( section_offset > (off64_t) INT64_MAX ) )
+	if( section_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -280,6 +279,7 @@ ssize_t libewf_section_descriptor_read(
 	static char *function               = "libewf_section_descriptor_read";
 	size_t section_descriptor_data_size = 0;
 	ssize_t read_count                  = 0;
+	uint64_t safe_start_offset          = 0;
 	uint32_t calculated_checksum        = 0;
 	uint32_t section_descriptor_size    = 0;
 	uint32_t stored_checksum            = 0;
@@ -432,7 +432,7 @@ ssize_t libewf_section_descriptor_read(
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
-		 section_descriptor->start_offset );
+		 safe_start_offset );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_size,
@@ -516,7 +516,7 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 "%s: previous offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section_descriptor->start_offset );
+			 safe_start_offset );
 
 			libcnotify_printf(
 			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
@@ -557,7 +557,8 @@ ssize_t libewf_section_descriptor_read(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libewf_checksum_calculate_adler32(
 	     &calculated_checksum,
 	     section_descriptor_data,
@@ -594,8 +595,7 @@ ssize_t libewf_section_descriptor_read(
 
 	if( format_version == 1 )
 	{
-		if( ( section_descriptor->end_offset < file_offset )
-		 || ( section_descriptor->end_offset > (off64_t) INT64_MAX ) )
+		if( section_descriptor->end_offset < file_offset )
 		{
 			libcerror_error_set(
 			 error,
@@ -636,10 +636,19 @@ ssize_t libewf_section_descriptor_read(
 	}
 	else if( format_version == 2 )
 	{
-		if( ( section_descriptor->start_offset < 0 )
-		 || ( ( section_descriptor->start_offset != 0 )
-		  &&  ( section_descriptor->start_offset < (off64_t) sizeof( ewf_file_header_v2_t ) ) )
-		 || ( section_descriptor->start_offset >= file_offset ) )
+		if( ( file_offset < 0 )
+		 || ( file_offset > (off64_t) ( INT64_MAX - sizeof( ewf_section_descriptor_v2_t ) ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid file offset value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
+		if( safe_start_offset > (uint64_t) file_offset )
 		{
 			libcerror_error_set(
 			 error,
@@ -650,15 +659,26 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
-		if( section_descriptor->start_offset == 0 )
+		if( safe_start_offset == 0 )
 		{
 			section_descriptor->start_offset = sizeof( ewf_file_header_v2_t );
 		}
 		else
 		{
-			section_descriptor->start_offset += sizeof( ewf_section_descriptor_v2_t );
+			if( safe_start_offset < (uint64_t) sizeof( ewf_file_header_v2_t ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid section previous offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			section_descriptor->start_offset = (off64_t) ( safe_start_offset + sizeof( ewf_section_descriptor_v2_t ) );
 		}
-		section_descriptor->end_offset = file_offset + sizeof( ewf_section_descriptor_v2_t );
+		section_descriptor->end_offset = file_offset + (off64_t) sizeof( ewf_section_descriptor_v2_t );
 		section_descriptor->size       = (size64_t) ( section_descriptor->end_offset - section_descriptor->start_offset );
 
 		if( section_descriptor->data_size > section_descriptor->size )

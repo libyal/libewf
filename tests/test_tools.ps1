@@ -1,6 +1,6 @@
 # Tests tools functions and types.
 #
-# Version: 20200216
+# Version: 20200820
 
 $ExitSuccess = 0
 $ExitFailure = 1
