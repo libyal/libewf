@@ -153,6 +153,19 @@ int libewf_header_values_parse_utf8_header_string(
      uint8_t *format,
      libcerror_error_t **error );
 
+int libewf_header_values_parse_utf8_header_string_value(
+     libfvalue_table_t *header_values,
+     uint8_t *type_string,
+     size_t type_string_size,
+     uint8_t *value_string,
+     size_t value_string_size,
+     int value_index,
+     uint8_t header_section_number,
+     uint8_t number_of_sections,
+     uint8_t *format,
+     uint8_t *acquiry_software_version,
+     libcerror_error_t **error );
+
 int libewf_header_values_parse_header(
      libfvalue_table_t *header_values,
      uint8_t *header,

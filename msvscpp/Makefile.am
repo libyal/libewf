@@ -55,7 +55,9 @@ MSVSCPP_FILES = \
 	ewf_test_tools_digest_hash/ewf_test_tools_digest_hash.vcproj \
 	ewf_test_tools_guid/ewf_test_tools_guid.vcproj \
 	ewf_test_tools_info_handle/ewf_test_tools_info_handle.vcproj \
+	ewf_test_tools_output/ewf_test_tools_output.vcproj \
 	ewf_test_tools_platform/ewf_test_tools_platform.vcproj \
+	ewf_test_tools_signal/ewf_test_tools_signal.vcproj \
 	ewf_test_tools_verification_handle/ewf_test_tools_verification_handle.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
 	ewf_test_volume_section/ewf_test_volume_section.vcproj \

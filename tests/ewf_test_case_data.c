@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -997,6 +998,461 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_case_data_parse_utf8_string_value function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_case_data_parse_utf8_string_value(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_media_values_t *media_values = NULL;
+	libfvalue_table_t *header_values    = NULL;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_header_values_initialize(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "av",
+	          3,
+	          (uint8_t *) "ewftest",
+	          8,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "at",
+	          3,
+	          (uint8_t *) "1599219555",
+	          11,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "cp",
+	          3,
+	          (uint8_t *) "0",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "cp",
+	          3,
+	          (uint8_t *) "1",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "cp",
+	          3,
+	          (uint8_t *) "2",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "en",
+	          3,
+	          (uint8_t *) "evidence number",
+	          16,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "ex",
+	          3,
+	          (uint8_t *) "examiner name",
+	          14,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "gr",
+	          3,
+	          (uint8_t *) "64",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "nm",
+	          3,
+	          (uint8_t *) "description",
+	          12,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "nt",
+	          3,
+	          (uint8_t *) "notes",
+	          6,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "os",
+	          3,
+	          (uint8_t *) "acquiry operating system",
+	          25,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "sb",
+	          3,
+	          (uint8_t *) "64",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "tb",
+	          3,
+	          (uint8_t *) "512",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "tt",
+	          3,
+	          (uint8_t *) "1599219555",
+	          11,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "wb",
+	          3,
+	          (uint8_t *) "0",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "wb",
+	          3,
+	          (uint8_t *) "1",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_case_data_parse_utf8_string_value(
+	          (uint8_t *) "wb",
+	          3,
+	          (uint8_t *) "2",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_case_data_parse_utf8_string_value(
+	          NULL,
+	          3,
+	          (uint8_t *) "0",
+	          2,
+	          0,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_table_free(
+	          &header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "header_values",
+	 header_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( header_values != NULL )
+	{
+		libfvalue_table_free(
+		 &header_values,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_case_data_parse function
  * Returns 1 if successful or 0 if not
  */
@@ -1162,6 +1618,58 @@ int ewf_test_case_data_parse(
 	}
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
+	/* Test with an empty UTF-16 litte-endian stream
+	 */
+	result = libewf_case_data_parse(
+	          ewf_test_case_data1,
+	          0,
+	          media_values,
+	          header_values,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test with an invalid UTF-16 litte-endian stream
+	 */
+	byte_stream_copy_from_uint16_little_endian(
+	 &( ewf_test_case_data1[ 6 ] ),
+	 0xd800 );
+
+	result = libewf_case_data_parse(
+	          ewf_test_case_data1,
+	          272,
+	          media_values,
+	          header_values,
+	          &format,
+	          &error );
+
+	byte_stream_copy_from_uint16_little_endian(
+	 &( ewf_test_case_data1[ 6 ] ),
+	 0x006d );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(
@@ -1253,6 +1761,10 @@ int main(
 	 ewf_test_case_data_parse_utf8_string );
 
 	EWF_TEST_RUN(
+	 "libewf_case_data_parse_utf8_string_value",
+	 ewf_test_case_data_parse_utf8_string_value );
+
+	EWF_TEST_RUN(
 	 "libewf_case_data_parse",
 	 ewf_test_case_data_parse );
 
@@ -1260,7 +1772,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

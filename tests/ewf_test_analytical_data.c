@@ -135,9 +135,25 @@ int ewf_test_analytical_data_parse(
 	}
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
-/* TODO enable after making libuna less error tollerant
- */
-#ifdef TODO
+	/* Test with an empty UTF-16 litte-endian stream
+	 */
+	result = libewf_analytical_data_parse(
+	          ewf_test_analytical_data1,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Test with an invalid UTF-16 litte-endian stream
 	 */
 	byte_stream_copy_from_uint16_little_endian(
@@ -164,7 +180,6 @@ int ewf_test_analytical_data_parse(
 
 	libcerror_error_free(
 	 &error );
-#endif 
 
 	return( 1 );
 

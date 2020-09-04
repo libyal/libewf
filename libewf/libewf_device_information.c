@@ -869,17 +869,13 @@ int libewf_device_information_parse_utf8_string(
 	libfvalue_split_utf8_string_t *lines  = NULL;
 	libfvalue_split_utf8_string_t *types  = NULL;
 	libfvalue_split_utf8_string_t *values = NULL;
-	libfvalue_value_t *header_value       = NULL;
-	uint8_t *identifier                   = NULL;
 	uint8_t *line_string                  = NULL;
 	uint8_t *type_string                  = NULL;
 	uint8_t *value_string                 = NULL;
 	static char *function                 = "libewf_device_information_parse_utf8_string";
-	size_t identifier_size                = 0;
 	size_t line_string_size               = 0;
 	size_t type_string_size               = 0;
 	size_t value_string_size              = 0;
-	uint64_t value_64bit                  = 0;
 	int number_of_lines                   = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
@@ -892,28 +888,6 @@ int libewf_device_information_parse_utf8_string(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( media_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( header_values == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header values.",
 		 function );
 
 		return( -1 );
@@ -1217,363 +1191,47 @@ int libewf_device_information_parse_utf8_string(
 
 				goto on_error;
 			}
-			if( ( type_string == NULL )
-			 || ( type_string_size < 2 )
-			 || ( type_string[ 0 ] == 0 ) )
+			if( value_index >= number_of_values )
+			{
+				value_string      = NULL;
+				value_string_size = 0;
+			}
+			else if( libfvalue_split_utf8_string_get_segment_by_index(
+			          values,
+			          value_index,
+			          &value_string,
+			          &value_string_size,
+			          error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing type string: %d.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value string: %d.",
 				 function,
 				 value_index );
 
 				goto on_error;
 			}
-			/* Remove trailing carriage return
-			 */
-			else if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
+			if( libewf_device_information_parse_utf8_string_value(
+			     type_string,
+			     type_string_size,
+			     value_string,
+			     value_string_size,
+			     value_index,
+			     media_values,
+			     header_values,
+			     error ) != 1 )
 			{
-				type_string[ type_string_size - 2 ] = 0;
-
-				type_string_size -= 1;
-			}
-			if( value_index < number_of_values )
-			{
-				if( libfvalue_split_utf8_string_get_segment_by_index(
-				     values,
-				     value_index,
-				     &value_string,
-				     &value_string_size,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve value string: %d.",
-					 function,
-					 value_index );
-
-					goto on_error;
-				}
-				if( ( value_string == NULL )
-				 || ( value_string_size < 2 )
-				 || ( value_string[ 0 ] == 0 ) )
-				{
-					value_string      = NULL;
-					value_string_size = 0;
-				}
-				/* Remove trailing carriage return
-				 */
-				else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
-				{
-					value_string[ value_string_size - 2 ] = 0;
-
-					value_string_size -= 1;
-				}
-			}
-			else
-			{
-				value_string      = NULL;
-				value_string_size = 0;
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: type: %s with value: %s.\n",
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unable to parse UTF-8 string value: %d.",
 				 function,
-				 (char *) type_string,
-				 (char *) value_string );
-			}
-#endif
-			/* Ignore empty values
-			 */
-			if( value_string == NULL )
-			{
-				continue;
-			}
-			identifier      = NULL;
-			identifier_size = 0;
+				 value_index );
 
-			if( type_string_size == 4 )
-			{
-				if( ( type_string[ 0 ] == (uint8_t) 'p' )
-				 && ( type_string[ 1 ] == (uint8_t) 'i' )
-				 && ( type_string[ 2 ] == (uint8_t) 'd' ) )
-				{
-					identifier      = (uint8_t *) "process_identifier";
-					identifier_size = 19;
-				}
-			}
-			else if( type_string_size == 3 )
-			{
-				if( ( type_string[ 0 ] == (uint8_t) 'b' )
-				 && ( type_string[ 1 ] == (uint8_t) 'p' ) )
-				{
-					if( libfvalue_utf8_string_copy_to_integer(
-					     value_string,
-					     value_string_size,
-					     &value_64bit,
-					     32,
-					     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_MEMORY,
-						 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set bytes per sector.",
-						 function );
-
-						goto on_error;
-					}
-					media_values->bytes_per_sector = (uint32_t) value_64bit;
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'd' )
-				      && ( type_string[ 1 ] == (uint8_t) 'c' ) )
-				{
-					if( libfvalue_utf8_string_copy_to_integer(
-					     value_string,
-					     value_string_size,
-					     &value_64bit,
-					     64,
-					     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_MEMORY,
-						 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set number of DCO protected sectors.",
-						 function );
-
-						goto on_error;
-					}
-/* TODO number of DCO protected sectors */
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'd' )
-				      && ( type_string[ 1 ] == (uint8_t) 't' ) )
-				{
-					if( value_string_size == 2 )
-					{
-						switch( value_string[ 0 ] )
-						{
-/* TODO need the EWF1 equivalent value
-							case (uint8_t) 'a':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_RAM_DISK;
-								break;
-*/
-
-							case (uint8_t) 'c':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
-								break;
-
-							case (uint8_t) 'f':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_FIXED;
-								break;
-
-							case (uint8_t) 'l':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_SINGLE_FILES;
-								break;
-
-							case (uint8_t) 'm':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_MEMORY;
-								break;
-
-/* TODO need the EWF1 equivalent value
-							case (uint8_t) 'p':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_PALM;
-								break;
-*/
-
-							case (uint8_t) 'r':
-								media_values->media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
-								break;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-							default:
-								if( libcnotify_verbose != 0 )
-								{
-									libcnotify_printf(
-								 	"%s: unsupported is drive type.\n",
-									 function );
-								}
-								break;
-#endif
-						}
-					}
-#if defined( HAVE_DEBUG_OUTPUT )
-					else if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-					 	"%s: unsupported drive type.\n",
-						 function );
-					}
-#endif
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'h' )
-				      && ( type_string[ 1 ] == (uint8_t) 's' ) )
-				{
-					if( libfvalue_utf8_string_copy_to_integer(
-					     value_string,
-					     value_string_size,
-					     &value_64bit,
-					     64,
-					     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_MEMORY,
-						 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set number of HPA protected sectors.",
-						 function );
-
-						goto on_error;
-					}
-/* TODO number of HPA protected sectors */
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'l' )
-				      && ( type_string[ 1 ] == (uint8_t) 'b' ) )
-				{
-					identifier      = (uint8_t *) "device_label";
-					identifier_size = 13;
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'l' )
-				      && ( type_string[ 1 ] == (uint8_t) 's' ) )
-				{
-/* TODO number of sectors of SMART logs */
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'm' )
-				      && ( type_string[ 1 ] == (uint8_t) 'd' ) )
-				{
-					identifier      = (uint8_t *) "model";
-					identifier_size = 6;
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'p' )
-				      && ( type_string[ 1 ] == (uint8_t) 'h' ) )
-				{
-					if( ( value_string_size == 2 )
-					 && ( value_string[ 0 ] == (uint8_t) '1' ) )
-					{
-						media_values->media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
-					}
-#if defined( HAVE_DEBUG_OUTPUT )
-					else
-					{
-						if( libcnotify_verbose != 0 )
-						{
-							libcnotify_printf(
-						 	"%s: unsupported is physical.\n",
-							 function );
-						}
-					}
-#endif
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 'r' )
-				      && ( type_string[ 1 ] == (uint8_t) 's' ) )
-				{
-/* TODO number of sectors of PALM RAM device */
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 's' )
-				      && ( type_string[ 1 ] == (uint8_t) 'n' ) )
-				{
-					identifier      = (uint8_t *) "serial_number";
-					identifier_size = 14;
-				}
-				else if( ( type_string[ 0 ] == (uint8_t) 't' )
-				      && ( type_string[ 1 ] == (uint8_t) 's' ) )
-				{
-					if( libfvalue_utf8_string_copy_to_integer(
-					     value_string,
-					     value_string_size,
-					     &value_64bit,
-					     64,
-					     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_MEMORY,
-						 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-						 "%s: unable to set number of sectors.",
-						 function );
-
-						goto on_error;
-					}
-					media_values->number_of_sectors = value_64bit;
-				}
-			}
-			if( identifier != NULL )
-			{
-				if( libfvalue_value_type_initialize(
-				     &header_value,
-				     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create header value.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfvalue_value_set_identifier(
-				     header_value,
-				     identifier,
-				     identifier_size,
-				     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set header value: %s identifier.",
-					 function,
-					 (char *) identifier );
-
-					goto on_error;
-				}
-				if( libfvalue_value_set_data(
-				     header_value,
-				     value_string,
-				     value_string_size,
-				     LIBFVALUE_CODEPAGE_UTF8,
-				     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set header value: %s data.",
-					 function,
-					 (char *) identifier );
-
-					goto on_error;
-				}
-				if( libfvalue_table_set_value(
-				     header_values,
-				     header_value,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set header value: %s in table.",
-					 function,
-					 (char *) identifier );
-
-					goto on_error;
-				}
-				header_value = NULL;
+				goto on_error;
 			}
 		}
 		if( libfvalue_split_utf8_string_free(
@@ -1626,12 +1284,6 @@ int libewf_device_information_parse_utf8_string(
 	return( 1 );
 
 on_error:
-	if( header_value != NULL )
-	{
-		libfvalue_value_free(
-		 &header_value,
-		 NULL );
-	}
 	if( values != NULL )
 	{
 		libfvalue_split_utf8_string_free(
@@ -1648,6 +1300,389 @@ on_error:
 	{
 		libfvalue_split_utf8_string_free(
 		 &lines,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Parses an UTF-8 encoded device information string value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_device_information_parse_utf8_string_value(
+     uint8_t *type_string,
+     size_t type_string_size,
+     uint8_t *value_string,
+     size_t value_string_size,
+     int value_index,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *header_value = NULL;
+	uint8_t *identifier             = NULL;
+	static char *function           = "libewf_device_information_parse_utf8_string_value";
+	size_t identifier_size          = 0;
+	uint64_t value_64bit            = 0;
+
+	if( ( type_string == NULL )
+	 || ( type_string_size < 2 )
+	 || ( type_string[ 0 ] == 0 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing type string: %d.",
+		 function,
+		 value_index );
+
+		goto on_error;
+	}
+	if( media_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( header_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header values.",
+		 function );
+
+		return( -1 );
+	}
+	/* Remove trailing carriage return
+	 */
+	if( type_string[ type_string_size - 2 ] == (uint8_t) '\r' )
+	{
+		type_string[ type_string_size - 2 ] = 0;
+
+		type_string_size -= 1;
+	}
+	if( ( value_string == NULL )
+	 || ( value_string_size < 2 )
+	 || ( value_string[ 0 ] == 0 ) )
+	{
+		value_string      = NULL;
+		value_string_size = 0;
+	}
+	/* Remove trailing carriage return
+	 */
+	else if( value_string[ value_string_size - 2 ] == (uint8_t) '\r' )
+	{
+		value_string[ value_string_size - 2 ] = 0;
+
+		value_string_size -= 1;
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: type: %s with value: %s.\n",
+		 function,
+		 (char *) type_string,
+		 (char *) value_string );
+	}
+#endif
+	/* Ignore empty values
+	 */
+	if( value_string == NULL )
+	{
+		return( 1 );
+	}
+	identifier      = NULL;
+	identifier_size = 0;
+
+	if( type_string_size == 4 )
+	{
+		if( ( type_string[ 0 ] == (uint8_t) 'p' )
+		 && ( type_string[ 1 ] == (uint8_t) 'i' )
+		 && ( type_string[ 2 ] == (uint8_t) 'd' ) )
+		{
+			identifier      = (uint8_t *) "process_identifier";
+			identifier_size = 19;
+		}
+	}
+	else if( type_string_size == 3 )
+	{
+		if( ( type_string[ 0 ] == (uint8_t) 'b' )
+		 && ( type_string[ 1 ] == (uint8_t) 'p' ) )
+		{
+			if( libfvalue_utf8_string_copy_to_integer(
+			     value_string,
+			     value_string_size,
+			     &value_64bit,
+			     32,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set bytes per sector.",
+				 function );
+
+				goto on_error;
+			}
+			media_values->bytes_per_sector = (uint32_t) value_64bit;
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'd' )
+		      && ( type_string[ 1 ] == (uint8_t) 'c' ) )
+		{
+			if( libfvalue_utf8_string_copy_to_integer(
+			     value_string,
+			     value_string_size,
+			     &value_64bit,
+			     64,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set number of DCO protected sectors.",
+				 function );
+
+				goto on_error;
+			}
+/* TODO number of DCO protected sectors */
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'd' )
+		      && ( type_string[ 1 ] == (uint8_t) 't' ) )
+		{
+			if( value_string_size == 2 )
+			{
+				switch( value_string[ 0 ] )
+				{
+/* TODO need the EWF1 equivalent value
+					case (uint8_t) 'a':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_RAM_DISK;
+						break;
+*/
+
+					case (uint8_t) 'c':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
+						break;
+
+					case (uint8_t) 'f':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_FIXED;
+						break;
+
+					case (uint8_t) 'l':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_SINGLE_FILES;
+						break;
+
+					case (uint8_t) 'm':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_MEMORY;
+						break;
+
+/* TODO need the EWF1 equivalent value
+					case (uint8_t) 'p':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_PALM;
+						break;
+*/
+
+					case (uint8_t) 'r':
+						media_values->media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+						break;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+					default:
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+							"%s: unsupported is drive type.\n",
+							 function );
+						}
+						break;
+#endif
+				}
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			else if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				"%s: unsupported drive type.\n",
+				 function );
+			}
+#endif
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'h' )
+		      && ( type_string[ 1 ] == (uint8_t) 's' ) )
+		{
+			if( libfvalue_utf8_string_copy_to_integer(
+			     value_string,
+			     value_string_size,
+			     &value_64bit,
+			     64,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set number of HPA protected sectors.",
+				 function );
+
+				goto on_error;
+			}
+/* TODO number of HPA protected sectors */
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'l' )
+		      && ( type_string[ 1 ] == (uint8_t) 'b' ) )
+		{
+			identifier      = (uint8_t *) "device_label";
+			identifier_size = 13;
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'l' )
+		      && ( type_string[ 1 ] == (uint8_t) 's' ) )
+		{
+/* TODO number of sectors of SMART logs */
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'm' )
+		      && ( type_string[ 1 ] == (uint8_t) 'd' ) )
+		{
+			identifier      = (uint8_t *) "model";
+			identifier_size = 6;
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'p' )
+		      && ( type_string[ 1 ] == (uint8_t) 'h' ) )
+		{
+			if( ( value_string_size == 2 )
+			 && ( value_string[ 0 ] == (uint8_t) '1' ) )
+			{
+				media_values->media_flags |= LIBEWF_MEDIA_FLAG_PHYSICAL;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			else if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				"%s: unsupported is physical.\n",
+				 function );
+			}
+#endif
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 'r' )
+		      && ( type_string[ 1 ] == (uint8_t) 's' ) )
+		{
+/* TODO number of sectors of PALM RAM device */
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 's' )
+		      && ( type_string[ 1 ] == (uint8_t) 'n' ) )
+		{
+			identifier      = (uint8_t *) "serial_number";
+			identifier_size = 14;
+		}
+		else if( ( type_string[ 0 ] == (uint8_t) 't' )
+		      && ( type_string[ 1 ] == (uint8_t) 's' ) )
+		{
+			if( libfvalue_utf8_string_copy_to_integer(
+			     value_string,
+			     value_string_size,
+			     &value_64bit,
+			     64,
+			     LIBFVALUE_INTEGER_FORMAT_TYPE_DECIMAL_UNSIGNED,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to set number of sectors.",
+				 function );
+
+				goto on_error;
+			}
+			media_values->number_of_sectors = value_64bit;
+		}
+	}
+	if( identifier != NULL )
+	{
+		if( libfvalue_value_type_initialize(
+		     &header_value,
+		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header value.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfvalue_value_set_identifier(
+		     header_value,
+		     identifier,
+		     identifier_size,
+		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: %s identifier.",
+			 function,
+			 (char *) identifier );
+
+			goto on_error;
+		}
+		if( libfvalue_value_set_data(
+		     header_value,
+		     value_string,
+		     value_string_size,
+		     LIBFVALUE_CODEPAGE_UTF8,
+		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: %s data.",
+			 function,
+			 (char *) identifier );
+
+			goto on_error;
+		}
+		if( libfvalue_table_set_value(
+		     header_values,
+		     header_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set header value: %s in table.",
+			 function,
+			 (char *) identifier );
+
+			goto on_error;
+		}
+		header_value = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( header_value != NULL )
+	{
+		libfvalue_value_free(
+		 &header_value,
 		 NULL );
 	}
 	return( -1 );

@@ -133,7 +133,9 @@ check_PROGRAMS = \
 	ewf_test_tools_digest_hash \
 	ewf_test_tools_guid \
 	ewf_test_tools_info_handle \
+	ewf_test_tools_output \
 	ewf_test_tools_platform \
+	ewf_test_tools_signal \
 	ewf_test_tools_verification_handle \
 	ewf_test_truncate \
 	ewf_test_volume_section \
@@ -988,6 +990,18 @@ ewf_test_tools_info_handle_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBUUID_LIBADD@
 
+ewf_test_tools_output_SOURCES = \
+	../ewftools/ewftools_output.c ../ewftools/ewftools_output.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_tools_output.c \
+	ewf_test_unused.h
+
+ewf_test_tools_output_LDADD = \
+	@LIBCNOTIFY_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_tools_platform_SOURCES = \
 	../ewftools/platform.c ../ewftools/platform.h \
 	ewf_test_libcerror.h \
@@ -998,6 +1012,17 @@ ewf_test_tools_platform_SOURCES = \
 ewf_test_tools_platform_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
+ewf_test_tools_signal_SOURCES = \
+	../ewftools/ewftools_signal.c ../ewftools/ewftools_signal.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_tools_signal.c \
+	ewf_test_unused.h
+
+ewf_test_tools_signal_LDADD = \
+	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
 ewf_test_tools_verification_handle_SOURCES = \

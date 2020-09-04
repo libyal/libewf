@@ -54,6 +54,16 @@ int libewf_device_information_parse_utf8_string(
      libfvalue_table_t *header_values,
      libcerror_error_t **error );
 
+int libewf_device_information_parse_utf8_string_value(
+     uint8_t *type_string,
+     size_t type_string_size,
+     uint8_t *value_string,
+     size_t value_string_size,
+     int value_index,
+     libewf_media_values_t *media_values,
+     libfvalue_table_t *header_values,
+     libcerror_error_t **error );
+
 int libewf_device_information_parse(
      const uint8_t *device_information,
      size_t device_information_size,
