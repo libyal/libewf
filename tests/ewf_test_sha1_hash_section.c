@@ -338,6 +338,7 @@ int ewf_test_sha1_hash_section_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_sha1_hash_section_data1,
 	          32,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -417,6 +418,7 @@ int ewf_test_sha1_hash_section_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_sha1_hash_section_data1,
 	          32,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

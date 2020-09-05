@@ -441,6 +441,7 @@ int ewf_test_open_file_io_handle(
      libbfio_handle_t **file_io_handle,
      uint8_t *data,
      size_t data_size,
+     int access_flags,
      libcerror_error_t **error )
 {
 	static char *function = "ewf_test_open_file_io_handle";
@@ -486,7 +487,7 @@ int ewf_test_open_file_io_handle(
 	}
 	if( libbfio_handle_open(
 	     *file_io_handle,
-	     LIBBFIO_OPEN_READ,
+	     access_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -567,6 +568,7 @@ int ewf_test_open_file_io_pool(
      libbfio_pool_t **file_io_pool,
      uint8_t *data,
      size_t data_size,
+     int access_flags,
      libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
@@ -602,6 +604,7 @@ int ewf_test_open_file_io_pool(
 	     &file_io_handle,
 	     data,
 	     data_size,
+	     access_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -617,7 +620,7 @@ int ewf_test_open_file_io_pool(
 	     *file_io_pool,
 	     0,
 	     file_io_handle,
-	     LIBBFIO_OPEN_READ,
+	     access_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

@@ -433,7 +433,7 @@ int libewf_digest_section_write_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set MD5 hash.",
+			 "%s: unable to set SHA1 hash.",
 			 function );
 
 			return( -1 );

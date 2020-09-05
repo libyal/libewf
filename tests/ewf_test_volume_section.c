@@ -443,6 +443,7 @@ int ewf_test_volume_section_e01_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_volume_section_e01_data1,
 	          1052,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -522,6 +523,7 @@ int ewf_test_volume_section_e01_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_volume_section_e01_data1,
 	          1052,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1218,6 +1220,7 @@ int ewf_test_volume_section_s01_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_volume_section_s01_data1,
 	          94,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1297,6 +1300,7 @@ int ewf_test_volume_section_s01_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_volume_section_s01_data1,
 	          94,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

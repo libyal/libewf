@@ -1433,6 +1433,18 @@ ssize_t libewf_section_write_data(
 
 		return( -1 );
 	}
+/* TODO remove? */
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( section_data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(

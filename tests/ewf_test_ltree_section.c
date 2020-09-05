@@ -712,6 +712,7 @@ int ewf_test_ltree_section_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_ltree_section_data1,
 	          5748,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

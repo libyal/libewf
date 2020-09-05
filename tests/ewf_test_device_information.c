@@ -534,6 +534,54 @@ int ewf_test_device_information_generate(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_device_information_generate with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 1;
+
+	device_information_size = 0;
+
+	result = libewf_device_information_generate(
+	          &device_information,
+	          &device_information_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+
+		if( device_information != NULL )
+		{
+			memory_free(
+			 device_information );
+
+			device_information = NULL;
+		}
+		device_information_size = 0;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "device_information",
+		 device_information );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Test libewf_device_information_parse with failing libewf_device_information_generate_utf8_string
 	 */
 	result = libewf_device_information_generate(
@@ -627,7 +675,7 @@ int ewf_test_device_information_parse_utf8_string(
 	libcerror_error_t *error            = NULL;
 	libfvalue_table_t *header_values    = NULL;
 	libewf_media_values_t *media_values = NULL;
-	uint8_t *utf8_string                = (uint8_t *) "1\nmain\nsn\tmd\tlb\tts\ths\tdc\tdt\tpid\trs\tls\tbp\tph\nЉ\tFlash Disk\tUSB\t512000\tD\t512\t1\n\n";
+	uint8_t *utf8_string                = (uint8_t *) "1\nmain\nsn\tmd\tlb\tts\ths\tdc\tdt\tpid\trs\tls\tbp\tph\nЉ\tFlash Disk\tUSB\t512000\t\t\tD\t\t\t\t512\t1\n\n";
 	int result                          = 0;
 
 	/* Initialize test
@@ -668,7 +716,21 @@ int ewf_test_device_information_parse_utf8_string(
 
 	/* Test regular cases
 	 */
-/* TODO implement */
+	result = libewf_device_information_parse_utf8_string(
+	          utf8_string,
+	          83,
+	          media_values,
+	          header_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */

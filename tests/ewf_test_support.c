@@ -605,6 +605,7 @@ int ewf_test_check_file_signature_file_io_handle(
 	          &file_io_handle,
 	          empty_block,
 	          sizeof( uint8_t ) * 1,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -655,6 +656,7 @@ int ewf_test_check_file_signature_file_io_handle(
 	          &file_io_handle,
 	          empty_block,
 	          sizeof( uint8_t ) * 8192,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

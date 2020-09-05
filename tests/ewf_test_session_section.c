@@ -481,6 +481,7 @@ int ewf_test_session_section_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_session_section_data1,
 	          168,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -566,6 +567,7 @@ int ewf_test_session_section_read_file_io_pool(
 	          &file_io_pool,
 	          ewf_test_session_section_data1,
 	          168,
+	          LIBBFIO_OPEN_READ,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
