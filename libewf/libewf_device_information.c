@@ -31,6 +31,7 @@
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
 #include "libewf_media_values.h"
+#include "libewf_value_table.h"
 
 /* Generate an UTF-8 encoded device information string
  * Sets utf8_string and utf8_string_size
@@ -43,24 +44,21 @@ int libewf_device_information_generate_utf8_string(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	libfvalue_value_t *device_label_header_value       = NULL;
-	libfvalue_value_t *model_header_value              = NULL;
-	libfvalue_value_t *process_identifier_header_value = NULL;
-	libfvalue_value_t *serial_number_header_value      = NULL;
-	const char *newline_string                         = "\n";
-	static char *function                              = "libewf_device_information_generate_utf8_string";
-	size_t bytes_per_sector_string_length              = 0;
-	size_t device_label_string_length                  = 0;
-	size_t model_string_length                         = 0;
-	size_t newline_string_length                       = 1;
-	size_t number_of_sectors_string_length             = 0;
-	size_t process_identifier_string_length            = 0;
-	size_t serial_number_string_length                 = 0;
-	size_t utf8_string_index                           = 0;
-	uint64_t value_64bit                               = 0;
-	int number_of_characters                           = 0;
-	int number_of_tabs                                 = 0;
-	int result                                         = 0;
+	uint8_t *safe_utf8_string               = NULL;
+	static char *function                   = "libewf_device_information_generate_utf8_string";
+	const char *newline_string              = "\n";
+	size_t bytes_per_sector_string_length   = 0;
+	size_t device_label_string_length       = 0;
+	size_t model_string_length              = 0;
+	size_t newline_string_length            = 1;
+	size_t number_of_sectors_string_length  = 0;
+	size_t process_identifier_string_length = 0;
+	size_t safe_utf8_string_size            = 0;
+	size_t serial_number_string_length      = 0;
+	size_t utf8_string_index                = 0;
+	uint64_t value_64bit                    = 0;
+	int number_of_characters                = 0;
+	int number_of_tabs                      = 0;
 
 	if( utf8_string == NULL )
 	{
@@ -106,70 +104,66 @@ int libewf_device_information_generate_utf8_string(
 
 		return( -1 );
 	}
-	if( libfvalue_table_get_value_by_identifier(
+	if( libewf_value_table_get_value_utf8_string_length(
 	     header_values,
 	     (uint8_t *) "model",
 	     6,
-	     &model_header_value,
-	     0,
+	     &model_string_length,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: model.",
+		 "%s: unable to retrieve header value: model length.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfvalue_table_get_value_by_identifier(
+	if( libewf_value_table_get_value_utf8_string_length(
 	     header_values,
 	     (uint8_t *) "serial_number",
 	     14,
-	     &serial_number_header_value,
-	     0,
+	     &serial_number_string_length,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: serial_number.",
+		 "%s: unable to retrieve header value: serial_number length.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfvalue_table_get_value_by_identifier(
+	if( libewf_value_table_get_value_utf8_string_length(
 	     header_values,
 	     (uint8_t *) "device_label",
 	     13,
-	     &device_label_header_value,
-	     0,
+	     &device_label_string_length,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: device_label.",
+		 "%s: unable to retrieve header value: device_label length.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfvalue_table_get_value_by_identifier(
+	if( libewf_value_table_get_value_utf8_string_length(
 	     header_values,
 	     (uint8_t *) "process_identifier",
 	     19,
-	     &process_identifier_header_value,
-	     0,
+	     &process_identifier_string_length,
 	     error ) == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value: process_identifier.",
+		 "%s: unable to retrieve header value: process_identifier length.",
 		 function );
 
 		goto on_error;
@@ -179,7 +173,7 @@ int libewf_device_information_generate_utf8_string(
 	 * 1 <newline>
 	 * main <newline>
 	 */
-	*utf8_string_size = 5 + ( 2 * newline_string_length );
+	safe_utf8_string_size = 5 + ( 2 * newline_string_length );
 
 	/* Reserve space for:
 	 * sn <tab> md <tab> lb <tab> ts <tab> hs <tab> dc <tab> dt <tab> pid <tab> rs <tab> ls <tab> bp <tab> ph <newline>
@@ -187,86 +181,14 @@ int libewf_device_information_generate_utf8_string(
 	number_of_characters = 25;
 	number_of_tabs       = 11;
 
-	*utf8_string_size += number_of_characters + number_of_tabs + newline_string_length;
+	safe_utf8_string_size += number_of_characters + number_of_tabs + newline_string_length;
 
-	if( serial_number_header_value != NULL )
-	{
-		result = libfvalue_value_get_utf8_string_size(
-			  serial_number_header_value,
-			  0,
-			  &serial_number_string_length,
-			  error );
+	/* Reserve space for the values
+	 */
+	safe_utf8_string_size += serial_number_string_length
+	                       + model_string_length
+	                       + device_label_string_length;
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: serial_number.",
-			 function );
-
-			goto on_error;
-		}
-		if( serial_number_string_length > 0 )
-		{
-			serial_number_string_length -= 1;
-
-			*utf8_string_size += serial_number_string_length;
-		}
-	}
-	if( model_header_value != NULL )
-	{
-		result = libfvalue_value_get_utf8_string_size(
-			  model_header_value,
-			  0,
-			  &model_string_length,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: model.",
-			 function );
-
-			goto on_error;
-		}
-		if( model_string_length > 0 )
-		{
-			model_string_length -= 1;
-
-			*utf8_string_size += model_string_length;
-		}
-	}
-	if( device_label_header_value != NULL )
-	{
-		result = libfvalue_value_get_utf8_string_size(
-			  device_label_header_value,
-			  0,
-			  &device_label_string_length,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: device_label.",
-			 function );
-
-			goto on_error;
-		}
-		if( device_label_string_length > 0 )
-		{
-			device_label_string_length -= 1;
-
-			*utf8_string_size += device_label_string_length;
-		}
-	}
 	/* If we do a streamed write reserve space for the final value
 	 */
 	if( media_values->media_size == 0 )
@@ -299,39 +221,15 @@ int libewf_device_information_generate_utf8_string(
 	{
 		number_of_sectors_string_length -= 1;
 
-		*utf8_string_size += number_of_sectors_string_length;
+		safe_utf8_string_size += number_of_sectors_string_length;
 	}
 /* TODO: hs, dc */
 
 	/* Reserve space for the media (or drive) type */
-	*utf8_string_size += 1;
+	safe_utf8_string_size += 1;
 
-	if( process_identifier_header_value != NULL )
-	{
-		result = libfvalue_value_get_utf8_string_size(
-			  process_identifier_header_value,
-			  0,
-			  &process_identifier_string_length,
-			  error );
+	safe_utf8_string_size += process_identifier_string_length;
 
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve string size of header value: process_identifier.",
-			 function );
-
-			goto on_error;
-		}
-		if( process_identifier_string_length > 0 )
-		{
-			process_identifier_string_length -= 1;
-
-			*utf8_string_size += process_identifier_string_length;
-		}
-	}
 /* TODO: rs, ls */
 
 	if( libfvalue_string_size_from_integer(
@@ -354,21 +252,21 @@ int libewf_device_information_generate_utf8_string(
 	{
 		bytes_per_sector_string_length -= 1;
 
-		*utf8_string_size += bytes_per_sector_string_length;
+		safe_utf8_string_size += bytes_per_sector_string_length;
 	}
 	if( ( media_values->media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
 	{
-		*utf8_string_size += 1;
+		safe_utf8_string_size += 1;
 	}
 	/* Reserve space for the tabs and 2 newlines
 	 */
-	*utf8_string_size += number_of_tabs + ( 2 * newline_string_length );
+	safe_utf8_string_size += number_of_tabs + ( 2 * newline_string_length );
 
 	/* Reserve space for the end-of-string character
 	 */
-	*utf8_string_size += 1;
+	safe_utf8_string_size += 1;
 
-	if( *utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
+	if( safe_utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE )
 	{
 		libcerror_error_set(
 		 error,
@@ -381,10 +279,10 @@ int libewf_device_information_generate_utf8_string(
 	}
 	/* Determine the string
 	 */
-	*utf8_string = (uint8_t *) memory_allocate(
-	                            sizeof( uint8_t ) * *utf8_string_size );
+	safe_utf8_string = (uint8_t *) memory_allocate(
+	                                sizeof( uint8_t ) * safe_utf8_string_size );
 
-	if( *utf8_string == NULL )
+	if( safe_utf8_string == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -395,80 +293,78 @@ int libewf_device_information_generate_utf8_string(
 
 		goto on_error;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '1';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '1';
 
-	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
-
-	if( newline_string_length == 2 )
-	{
-		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
-	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'a';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'i';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
-
-	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+	safe_utf8_string[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+		safe_utf8_string[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'n';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'h';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 't';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'i';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'd';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'r';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 's';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'b';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'p';
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'h';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'm';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'a';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'i';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'n';
 
-	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+	safe_utf8_string[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+		safe_utf8_string[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	if( ( serial_number_header_value != NULL )
-	 && ( serial_number_string_length > 0 ) )
-	{
-		result = libfvalue_value_copy_to_utf8_string_with_index(
-			  serial_number_header_value,
-			  0,
-			  *utf8_string,
-			  *utf8_string_size,
-		          &utf8_string_index,
-			  error );
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'n';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'm';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'd';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'l';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'b';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 't';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'h';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'd';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'c';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'd';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 't';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'p';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'i';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'd';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'r';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'l';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'b';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'p';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'p';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'h';
 
-		if( result == -1 )
+	safe_utf8_string[ utf8_string_index++ ] = newline_string[ 0 ];
+
+	if( newline_string_length == 2 )
+	{
+		safe_utf8_string[ utf8_string_index++ ] = newline_string[ 1 ];
+	}
+	if( serial_number_string_length > 0 )
+	{
+		if( libewf_value_table_get_value_copy_to_utf8_string_with_index(
+		     header_values,
+		     (uint8_t *) "serial_number",
+		     14,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
+		     &utf8_string_index,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -479,22 +375,19 @@ int libewf_device_information_generate_utf8_string(
 
 			goto on_error;
 		}
-		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
-	if( ( model_header_value != NULL )
-	 && ( model_string_length > 0 ) )
+	if( model_string_length > 0 )
 	{
-		result = libfvalue_value_copy_to_utf8_string_with_index(
-			  model_header_value,
-			  0,
-			  *utf8_string,
-			  *utf8_string_size,
-		          &utf8_string_index,
-			  error );
-
-		if( result == -1 )
+		if( libewf_value_table_get_value_copy_to_utf8_string_with_index(
+		     header_values,
+		     (uint8_t *) "model",
+		     6,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
+		     &utf8_string_index,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -505,22 +398,19 @@ int libewf_device_information_generate_utf8_string(
 
 			goto on_error;
 		}
-		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
-	if( ( device_label_header_value != NULL )
-	 && ( device_label_string_length > 0 ) )
+	if( device_label_string_length > 0 )
 	{
-		result = libfvalue_value_copy_to_utf8_string_with_index(
-			  device_label_header_value,
-			  0,
-			  *utf8_string,
-			  *utf8_string_size,
-		          &utf8_string_index,
-			  error );
-
-		if( result == -1 )
+		if( libewf_value_table_get_value_copy_to_utf8_string_with_index(
+		     header_values,
+		     (uint8_t *) "device_label",
+		     13,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
+		     &utf8_string_index,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -531,9 +421,8 @@ int libewf_device_information_generate_utf8_string(
 
 			goto on_error;
 		}
-		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( number_of_sectors_string_length > 0 )
 	{
@@ -550,8 +439,8 @@ int libewf_device_information_generate_utf8_string(
 			value_64bit = media_values->number_of_sectors;
 		}
 		if( libfvalue_utf8_string_with_index_copy_from_integer(
-		     *utf8_string,
-		     *utf8_string_size,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
 		     &utf8_string_index,
 		     value_64bit,
 		     64,
@@ -569,35 +458,35 @@ int libewf_device_information_generate_utf8_string(
 		}
 		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 /* TODO: set hs */
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 /* TODO: set dc */
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 /* TODO add support for media types: RAM disk, PALM */
 	switch( media_values->media_type )
 	{
 		case LIBEWF_MEDIA_TYPE_REMOVABLE:
-			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'r';
+			safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'r';
 			break;
 
 		case LIBEWF_MEDIA_TYPE_FIXED:
-			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'f';
+			safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'f';
 			break;
 
 		case LIBEWF_MEDIA_TYPE_OPTICAL:
-			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'c';
+			safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'c';
 			break;
 
 		case LIBEWF_MEDIA_TYPE_SINGLE_FILES:
-			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'l';
+			safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'l';
 			break;
 
 		case LIBEWF_MEDIA_TYPE_MEMORY:
-			( *utf8_string )[ utf8_string_index++ ] = (uint8_t) 'm';
+			safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'm';
 			break;
 
 		default:
@@ -610,20 +499,18 @@ int libewf_device_information_generate_utf8_string(
 
 			goto on_error;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
-	if( ( process_identifier_header_value != NULL )
-	 && ( process_identifier_string_length > 0 ) )
+	if( process_identifier_string_length > 0 )
 	{
-		result = libfvalue_value_copy_to_utf8_string_with_index(
-			  process_identifier_header_value,
-			  0,
-			  *utf8_string,
-			  *utf8_string_size,
-		          &utf8_string_index,
-			  error );
-
-		if( result == -1 )
+		if( libewf_value_table_get_value_copy_to_utf8_string_with_index(
+		     header_values,
+		     (uint8_t *) "process_identifier",
+		     19,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
+		     &utf8_string_index,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -634,21 +521,20 @@ int libewf_device_information_generate_utf8_string(
 
 			goto on_error;
 		}
-		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 /* TODO: rs */
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 /* TODO: ls */
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( bytes_per_sector_string_length > 0 )
 	{
 		if( libfvalue_utf8_string_with_index_copy_from_integer(
-		     *utf8_string,
-		     *utf8_string_size,
+		     safe_utf8_string,
+		     safe_utf8_string_size,
 		     &utf8_string_index,
 		     media_values->bytes_per_sector,
 		     32,
@@ -666,38 +552,37 @@ int libewf_device_information_generate_utf8_string(
 		}
 		utf8_string_index--;
 	}
-	( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '\t';
+	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
 	if( ( media_values->media_flags & LIBEWF_MEDIA_FLAG_PHYSICAL ) != 0 )
 	{
-		( *utf8_string )[ utf8_string_index++ ] = (uint8_t) '1';
+		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '1';
 	}
-	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+	safe_utf8_string[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+		safe_utf8_string[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *utf8_string )[ utf8_string_index++ ] = newline_string[ 0 ];
+	safe_utf8_string[ utf8_string_index++ ] = newline_string[ 0 ];
 
 	if( newline_string_length == 2 )
 	{
-		( *utf8_string )[ utf8_string_index++ ] = newline_string[ 1 ];
+		safe_utf8_string[ utf8_string_index++ ] = newline_string[ 1 ];
 	}
-	( *utf8_string )[ utf8_string_index++ ] = 0;
+	safe_utf8_string[ utf8_string_index++ ] = 0;
+
+	*utf8_string      = safe_utf8_string;
+	*utf8_string_size = safe_utf8_string_size;
 
 	return( 1 );
 
 on_error:
-	if( *utf8_string != NULL )
+	if( safe_utf8_string != NULL )
 	{
 		memory_free(
-		 *utf8_string );
-
-		*utf8_string = NULL;
+		 safe_utf8_string );
 	}
-	*utf8_string_size = 0;
-
 	return( -1 );
 }
 

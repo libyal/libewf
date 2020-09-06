@@ -174,6 +174,7 @@ stamp-h[1-9]
 /tests/ewf_test_restart_data
 /tests/ewf_test_section_descriptor
 /tests/ewf_test_sector_range
+/tests/ewf_test_sector_range_list
 /tests/ewf_test_segment_file
 /tests/ewf_test_segment_table
 /tests/ewf_test_serialized_string

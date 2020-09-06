@@ -41,6 +41,7 @@ MSVSCPP_FILES = \
 	ewf_test_restart_data/ewf_test_restart_data.vcproj \
 	ewf_test_section_descriptor/ewf_test_section_descriptor.vcproj \
 	ewf_test_sector_range/ewf_test_sector_range.vcproj \
+	ewf_test_sector_range_list/ewf_test_sector_range_list.vcproj \
 	ewf_test_segment_file/ewf_test_segment_file.vcproj \
 	ewf_test_segment_table/ewf_test_segment_table.vcproj \
 	ewf_test_serialized_string/ewf_test_serialized_string.vcproj \

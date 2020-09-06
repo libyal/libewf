@@ -279,6 +279,7 @@ ssize_t libewf_section_descriptor_read(
 	static char *function               = "libewf_section_descriptor_read";
 	size_t section_descriptor_data_size = 0;
 	ssize_t read_count                  = 0;
+	uint64_t safe_end_offset            = 0;
 	uint64_t safe_start_offset          = 0;
 	uint32_t calculated_checksum        = 0;
 	uint32_t section_descriptor_size    = 0;
@@ -414,7 +415,7 @@ ssize_t libewf_section_descriptor_read(
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->next_offset,
-		 section_descriptor->end_offset );
+		 safe_end_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->checksum,
@@ -478,7 +479,7 @@ ssize_t libewf_section_descriptor_read(
 			libcnotify_printf(
 			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
-			 section_descriptor->end_offset );
+			 safe_end_offset );
 
 			libcnotify_printf(
 			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
@@ -595,7 +596,8 @@ ssize_t libewf_section_descriptor_read(
 
 	if( format_version == 1 )
 	{
-		if( section_descriptor->end_offset < file_offset )
+		if( ( safe_end_offset < (uint64_t) file_offset )
+		 || ( safe_end_offset > (uint64_t) INT64_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -606,6 +608,8 @@ ssize_t libewf_section_descriptor_read(
 
 			goto on_error;
 		}
+		section_descriptor->end_offset = (off64_t) safe_end_offset;
+
 		if( ( section_descriptor->size != 0 )
 		 && ( ( section_descriptor->size < (size64_t) sizeof( ewf_section_descriptor_v1_t ) )
 		  ||  ( section_descriptor->size > (size64_t) INT64_MAX ) ) )

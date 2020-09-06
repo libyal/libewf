@@ -59,6 +59,7 @@
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
 #include "libewf_sector_range.h"
+#include "libewf_sector_range_list.h"
 #include "libewf_segment_file.h"
 #include "libewf_session_section.h"
 #include "libewf_sha1_hash_section.h"
@@ -13211,8 +13212,8 @@ int libewf_handle_get_session(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_session";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -13242,24 +13243,9 @@ int libewf_handle_get_session(
 		return( -1 );
 	}
 #endif
-	if( libcdata_array_get_entry_by_index(
+	if( libewf_sector_range_list_get_range(
 	     internal_handle->sessions,
-	     (int) index,
-	     (intptr_t **) &sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve session sector range: %" PRIu32 " from array.",
-		 function,
-		 index );
-
-		goto on_error;
-	}
-	if( libewf_sector_range_get(
-	     sector_range,
+	     index,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -13272,7 +13258,7 @@ int libewf_handle_get_session(
 		 function,
 		 index );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -13289,15 +13275,7 @@ int libewf_handle_get_session(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_read(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Appends a session
@@ -13310,9 +13288,8 @@ int libewf_handle_append_session(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_append_session";
-	int entry_index                           = 0;
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -13342,21 +13319,8 @@ int libewf_handle_append_session(
 		return( -1 );
 	}
 #endif
-	if( libewf_sector_range_initialize(
-	     &sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create session sector range.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_sector_range_set(
-	     sector_range,
+	if( libewf_sector_range_list_append_range(
+	     internal_handle->sessions,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -13364,26 +13328,11 @@ int libewf_handle_append_session(
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set session sector range.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_append_entry(
-	     internal_handle->sessions,
-	     &entry_index,
-	     (intptr_t *) sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append session sector range to array.",
+		 "%s: unable to append session sector range.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -13400,21 +13349,7 @@ int libewf_handle_append_session(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-	if( sector_range != NULL )
-	{
-		libewf_sector_range_free(
-		 &sector_range,
-		 NULL );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the number of tracks
@@ -13535,8 +13470,8 @@ int libewf_handle_get_track(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_get_track";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -13566,24 +13501,9 @@ int libewf_handle_get_track(
 		return( -1 );
 	}
 #endif
-	if( libcdata_array_get_entry_by_index(
+	if( libewf_sector_range_list_get_range(
 	     internal_handle->tracks,
-	     (int) index,
-	     (intptr_t **) &sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve track sector range: %" PRIu32 " from array.",
-		 function,
-		 index );
-
-		goto on_error;
-	}
-	if( libewf_sector_range_get(
-	     sector_range,
+	     index,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -13596,7 +13516,7 @@ int libewf_handle_get_track(
 		 function,
 		 index );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -13613,15 +13533,7 @@ int libewf_handle_get_track(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_read(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Appends a track
@@ -13634,9 +13546,8 @@ int libewf_handle_append_track(
      libcerror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	libewf_sector_range_t *sector_range       = NULL;
 	static char *function                     = "libewf_handle_append_track";
-	int entry_index                           = 0;
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -13666,21 +13577,8 @@ int libewf_handle_append_track(
 		return( -1 );
 	}
 #endif
-	if( libewf_sector_range_initialize(
-	     &sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create track sector range.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_sector_range_set(
-	     sector_range,
+	if( libewf_sector_range_list_append_range(
+	     internal_handle->tracks,
 	     start_sector,
 	     number_of_sectors,
 	     error ) != 1 )
@@ -13688,26 +13586,11 @@ int libewf_handle_append_track(
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set track sector range.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_append_entry(
-	     internal_handle->tracks,
-	     &entry_index,
-	     (intptr_t *) sector_range,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append track sector range to array.",
+		 "%s: unable to append track sector range.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -13724,21 +13607,7 @@ int libewf_handle_append_track(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-	if( sector_range != NULL )
-	{
-		libewf_sector_range_free(
-		 &sector_range,
-		 NULL );
-	}
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the header codepage

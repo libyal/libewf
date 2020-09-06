@@ -67,17 +67,6 @@ int libewf_volume_section_e01_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size != (size_t) sizeof( ewf_volume_t ) )
 	{
 		libcerror_error_set(
@@ -322,7 +311,8 @@ int libewf_volume_section_e01_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libewf_checksum_calculate_adler32(
 	     &calculated_checksum,
 	     data,
@@ -454,17 +444,6 @@ int libewf_volume_section_e01_write_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -668,11 +647,10 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
          libewf_media_values_t *media_values,
          libcerror_error_t **error )
 {
-	uint8_t *section_data        = NULL;
-	static char *function        = "libewf_volume_section_e01_write_file_io_pool";
-	ssize_t total_write_count    = 0;
-	ssize_t write_count          = 0;
-	uint32_t calculated_checksum = 0;
+	uint8_t *section_data     = NULL;
+	static char *function     = "libewf_volume_section_e01_write_file_io_pool";
+	ssize_t total_write_count = 0;
+	ssize_t write_count       = 0;
 
 	if( section_descriptor == NULL )
 	{
@@ -849,17 +827,6 @@ int libewf_volume_section_s01_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size != (size_t) sizeof( ewf_volume_smart_t ) )
 	{
 		libcerror_error_set(
@@ -988,7 +955,8 @@ int libewf_volume_section_s01_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( memory_compare(
 	     (void *) ( (ewf_volume_smart_t *) data )->signature,
 	     (void *) "SMART",
@@ -1137,17 +1105,6 @@ int libewf_volume_section_s01_write_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size != (size_t) sizeof( ewf_volume_smart_t ) )
 	{
 		libcerror_error_set(
@@ -1226,7 +1183,8 @@ int libewf_volume_section_s01_write_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	( (ewf_volume_smart_t *) data )->unknown1[ 0 ] = 1;
 
 	byte_stream_copy_from_uint32_little_endian(
@@ -1305,11 +1263,10 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
          libewf_media_values_t *media_values,
          libcerror_error_t **error )
 {
-	uint8_t *section_data        = NULL;
-	static char *function        = "libewf_volume_section_s01_write_file_io_pool";
-	ssize_t total_write_count    = 0;
-	ssize_t write_count          = 0;
-	uint32_t calculated_checksum = 0;
+	uint8_t *section_data     = NULL;
+	static char *function     = "libewf_volume_section_s01_write_file_io_pool";
+	ssize_t total_write_count = 0;
+	ssize_t write_count       = 0;
 
 	if( section_descriptor == NULL )
 	{

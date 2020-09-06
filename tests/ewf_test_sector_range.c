@@ -539,6 +539,261 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_sector_range_get function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_sector_range_get(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_sector_range_t *sector_range = NULL;
+	uint64_t number_of_sectors          = 0;
+	uint64_t start_sector               = 0;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_sector_range_initialize(
+	          &sector_range,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "sector_range",
+	 sector_range );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	sector_range->start_sector      = 32;
+	sector_range->number_of_sectors = 64;
+
+	/* Test regular cases
+	 */
+	result = libewf_sector_range_get(
+	          sector_range,
+	          &start_sector,
+	          &number_of_sectors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "start_sector",
+	 start_sector,
+	 (uint64_t) 32 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "number_of_sectors",
+	 number_of_sectors,
+	 (uint64_t) 64 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_sector_range_get(
+	          NULL,
+	          &start_sector,
+	          &number_of_sectors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_sector_range_get(
+	          sector_range,
+	          NULL,
+	          &number_of_sectors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_sector_range_get(
+	          sector_range,
+	          &start_sector,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_sector_range_free(
+	          &sector_range,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "sector_range",
+	 sector_range );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( sector_range != NULL )
+	{
+		libewf_sector_range_free(
+		 &sector_range,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_sector_range_set function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_sector_range_set(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_sector_range_t *sector_range = NULL;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_sector_range_initialize(
+	          &sector_range,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "sector_range",
+	 sector_range );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_sector_range_set(
+	          sector_range,
+	          32,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_sector_range_set(
+	          NULL,
+	          32,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_sector_range_free(
+	          &sector_range,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "sector_range",
+	 sector_range );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( sector_range != NULL )
+	{
+		libewf_sector_range_free(
+		 &sector_range,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -570,15 +825,23 @@ int main(
 	 "libewf_sector_range_clone",
 	 ewf_test_sector_range_clone );
 
-	/* TODO: add tests for libewf_sector_range_get */
+	EWF_TEST_RUN(
+	 "libewf_sector_range_get",
+	 ewf_test_sector_range_get );
 
-	/* TODO: add tests for libewf_sector_range_set */
+	EWF_TEST_RUN(
+	 "libewf_sector_range_set",
+	 ewf_test_sector_range_set );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

@@ -36,6 +36,7 @@
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
 #include "libewf_sector_range.h"
+#include "libewf_sector_range_list.h"
 #include "libewf_session_section.h"
 
 #include "ewf_session.h"
@@ -52,26 +53,24 @@ int libewf_session_section_read_data(
      libcdata_array_t *tracks,
      libcerror_error_t **error )
 {
-	libewf_sector_range_t *sector_range = NULL;
-	const uint8_t *session_data         = NULL;
-	const uint8_t *session_entry_data   = NULL;
-	static char *function               = "libewf_session_section_read_data";
-	size_t session_entries_data_size    = 0;
-	size_t session_entry_data_size      = 0;
-	size_t session_footer_data_size     = 0;
-	size_t session_header_data_size     = 0;
-	uint64_t number_of_sectors          = 0;
-	uint64_t previous_start_sector      = 0;
-	uint64_t session_start_sector       = 0;
-	uint64_t start_sector               = 0;
-	uint64_t track_start_sector         = 0;
-	uint32_t calculated_checksum        = 0;
-	uint32_t flags                      = 0;
-	uint32_t number_of_session_entries  = 0;
-	uint32_t previous_flags             = 0;
-	uint32_t session_entry_index        = 0;
-	uint32_t stored_checksum            = 0;
-	int entry_index                     = 0;
+	const uint8_t *session_data        = NULL;
+	const uint8_t *session_entry_data  = NULL;
+	static char *function              = "libewf_session_section_read_data";
+	size_t session_entries_data_size   = 0;
+	size_t session_entry_data_size     = 0;
+	size_t session_footer_data_size    = 0;
+	size_t session_header_data_size    = 0;
+	uint64_t number_of_sectors         = 0;
+	uint64_t previous_start_sector     = 0;
+	uint64_t session_start_sector      = 0;
+	uint64_t start_sector              = 0;
+	uint64_t track_start_sector        = 0;
+	uint32_t calculated_checksum       = 0;
+	uint32_t flags                     = 0;
+	uint32_t number_of_session_entries = 0;
+	uint32_t previous_flags            = 0;
+	uint32_t session_entry_index       = 0;
+	uint32_t stored_checksum           = 0;
 
 	if( data == NULL )
 	{
@@ -80,17 +79,6 @@ int libewf_session_section_read_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -118,13 +106,14 @@ int libewf_session_section_read_data(
 
 		return( -1 );
 	}
-	if( data_size < session_header_data_size )
+	if( ( data_size < session_header_data_size )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid data size value out of bounds - insufficient space for header.",
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -221,7 +210,8 @@ int libewf_session_section_read_data(
 			 0 );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( format_version == 2 )
 	{
 		session_header_data_size -= 12;
@@ -484,7 +474,8 @@ int libewf_session_section_read_data(
 				 0 );
 			}
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 		session_entry_data += session_entry_data_size;
 
 		/* Note that EnCase says the first session starts at session 16
@@ -569,7 +560,8 @@ int libewf_session_section_read_data(
 					 0 );
 				}
 			}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 			session_entry_data += session_entry_data_size;
 
 			if( start_sector < previous_start_sector )
@@ -589,21 +581,8 @@ int libewf_session_section_read_data(
 /* TODO bounds check */
 				number_of_sectors = start_sector - session_start_sector;
 
-				if( libewf_sector_range_initialize(
-				     &sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create session sector range.",
-					 function );
-
-					goto on_error;
-				}
-				if( libewf_sector_range_set(
-				     sector_range,
+				if( libewf_sector_range_list_append_range(
+				     sessions,
 				     session_start_sector,
 				     (uint64_t) number_of_sectors,
 				     error ) != 1 )
@@ -611,29 +590,12 @@ int libewf_session_section_read_data(
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set session sector range.",
-					 function );
-
-					goto on_error;
-				}
-				if( libcdata_array_append_entry(
-				     sessions,
-				     &entry_index,
-				     (intptr_t *) sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append session sector range to array.",
+					 "%s: unable to append session sector range.",
 					 function );
 
 					goto on_error;
 				}
-				sector_range = NULL;
-
 				session_start_sector = start_sector;
 			}
 			if( ( previous_flags & LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK ) != 0 )
@@ -641,21 +603,8 @@ int libewf_session_section_read_data(
 /* TODO bounds check */
 				number_of_sectors = start_sector - track_start_sector;
 
-				if( libewf_sector_range_initialize(
-				     &sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create track sector range.",
-					 function );
-
-					goto on_error;
-				}
-				if( libewf_sector_range_set(
-				     sector_range,
+				if( libewf_sector_range_list_append_range(
+				     tracks,
 				     track_start_sector,
 				     (uint64_t) number_of_sectors,
 				     error ) != 1 )
@@ -663,29 +612,12 @@ int libewf_session_section_read_data(
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set track sector range.",
-					 function );
-
-					goto on_error;
-				}
-				if( libcdata_array_append_entry(
-				     tracks,
-				     &entry_index,
-				     (intptr_t *) sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append track sector range to array.",
+					 "%s: unable to append track sector range.",
 					 function );
 
 					goto on_error;
 				}
-				sector_range = NULL;
-
 				track_start_sector = start_sector;
 			}
 			previous_start_sector = start_sector;
@@ -699,21 +631,8 @@ int libewf_session_section_read_data(
 		{
 			number_of_sectors = 0;
 		}
-		if( libewf_sector_range_initialize(
-		     &sector_range,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create session sector range.",
-			 function );
-
-			goto on_error;
-		}
-		if( libewf_sector_range_set(
-		     sector_range,
+		if( libewf_sector_range_list_append_range(
+		     sessions,
 		     session_start_sector,
 		     (uint64_t) number_of_sectors,
 		     error ) != 1 )
@@ -721,29 +640,12 @@ int libewf_session_section_read_data(
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set session sector range.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcdata_array_append_entry(
-		     sessions,
-		     &entry_index,
-		     (intptr_t *) sector_range,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append session sector range to array.",
+			 "%s: unable to append session sector range.",
 			 function );
 
 			goto on_error;
 		}
-		sector_range = NULL;
-
 		if( ( flags & LIBEWF_SESSION_ENTRY_FLAGS_IS_AUDIO_TRACK ) != 0 )
 		{
 			if( media_values->number_of_sectors > track_start_sector )
@@ -754,21 +656,8 @@ int libewf_session_section_read_data(
 			{
 				number_of_sectors = 0;
 			}
-			if( libewf_sector_range_initialize(
-			     &sector_range,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create track sector range.",
-				 function );
-
-				goto on_error;
-			}
-			if( libewf_sector_range_set(
-			     sector_range,
+			if( libewf_sector_range_list_append_range(
+			     tracks,
 			     track_start_sector,
 			     (uint64_t) number_of_sectors,
 			     error ) != 1 )
@@ -776,28 +665,12 @@ int libewf_session_section_read_data(
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set track sector range.",
-				 function );
-
-				goto on_error;
-			}
-			if( libcdata_array_append_entry(
-			     tracks,
-			     &entry_index,
-			     (intptr_t *) sector_range,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append track sector range to array.",
+				 "%s: unable to append track sector range.",
 				 function );
 
 				goto on_error;
 			}
-			sector_range = NULL;
 		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -811,13 +684,16 @@ int libewf_session_section_read_data(
 	return( 1 );
 
 on_error:
-	if( sector_range != NULL )
-	{
-		libewf_sector_range_free(
-		 &sector_range,
-		 NULL );
-	}
-/* TODO clear sessions and tracks */
+	libcdata_array_empty(
+	 tracks,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	 error );
+
+	libcdata_array_empty(
+	 sessions,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	 error );
+
 	return( -1 );
 }
 
@@ -917,28 +793,27 @@ int libewf_session_section_write_data(
      int number_of_session_entries,
      libcerror_error_t **error )
 {
-	libewf_sector_range_t *sector_range = NULL;
-	uint8_t *session_data               = NULL;
-	uint8_t *session_entry_data         = NULL;
-	static char *function               = "libewf_session_section_write_data";
-	size_t required_data_size           = 0;
-	size_t session_entries_data_size    = 0;
-	size_t session_entry_data_size      = 0;
-	size_t session_footer_data_size     = 0;
-	size_t session_header_data_size     = 0;
-	uint64_t current_sector             = 0;
-	uint64_t session_last_sector        = 0;
-	uint64_t session_number_of_sectors  = 0;
-	uint64_t session_start_sector       = 0;
-	uint64_t track_last_sector          = 0;
-	uint64_t track_number_of_sectors    = 0;
-	uint64_t track_start_sector         = 0;
-	uint32_t calculated_checksum        = 0;
-	uint32_t session_entry_index        = 0;
-	int number_of_sessions              = 0;
-	int number_of_tracks                = 0;
-	int session_index                   = 0;
-	int track_index                     = 0;
+	uint8_t *session_data              = NULL;
+	uint8_t *session_entry_data        = NULL;
+	static char *function              = "libewf_session_section_write_data";
+	size_t required_data_size          = 0;
+	size_t session_entries_data_size   = 0;
+	size_t session_entry_data_size     = 0;
+	size_t session_footer_data_size    = 0;
+	size_t session_header_data_size    = 0;
+	uint64_t current_sector            = 0;
+	uint64_t session_last_sector       = 0;
+	uint64_t session_number_of_sectors = 0;
+	uint64_t session_start_sector      = 0;
+	uint64_t track_last_sector         = 0;
+	uint64_t track_number_of_sectors   = 0;
+	uint64_t track_start_sector        = 0;
+	uint32_t calculated_checksum       = 0;
+	uint32_t session_entry_index       = 0;
+	int number_of_sessions             = 0;
+	int number_of_tracks               = 0;
+	int session_index                  = 0;
+	int track_index                    = 0;
 
 	if( data == NULL )
 	{
@@ -947,17 +822,6 @@ int libewf_session_section_write_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -991,13 +855,14 @@ int libewf_session_section_write_data(
 	                   + session_entries_data_size
 	                   + session_footer_data_size;
 
-	if( data_size < required_data_size )
+	if( ( data_size < required_data_size )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid data value too small.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1119,24 +984,9 @@ int libewf_session_section_write_data(
 		if( ( session_index < number_of_sessions )
 		 && ( current_sector >= session_last_sector ) )
 		{
-			if( libcdata_array_get_entry_by_index(
+			if( libewf_sector_range_list_get_range(
 			     sessions,
 			     session_index,
-			     (intptr_t **) &sector_range,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve session sector range: %d from array.",
-				 function,
-				 session_index );
-
-				return( -1 );
-			}
-			if( libewf_sector_range_get(
-			     sector_range,
 			     &session_start_sector,
 			     &session_number_of_sectors,
 			     error ) != 1 )
@@ -1159,24 +1009,9 @@ int libewf_session_section_write_data(
 		if( ( track_index < number_of_tracks )
 		 && ( current_sector >= track_last_sector ) )
 		{
-			if( libcdata_array_get_entry_by_index(
+			if( libewf_sector_range_list_get_range(
 			     tracks,
 			     track_index,
-			     (intptr_t **) &sector_range,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve track sector range: %d from array.",
-				 function,
-				 track_index );
-
-				return( -1 );
-			}
-			if( libewf_sector_range_get(
-			     sector_range,
 			     &track_start_sector,
 			     &track_number_of_sectors,
 			     error ) != 1 )
@@ -1388,27 +1223,26 @@ ssize_t libewf_session_section_write_file_io_pool(
          libcdata_array_t *tracks,
          libcerror_error_t **error )
 {
-	libewf_sector_range_t *sector_range = NULL;
 	uint8_t *section_data               = NULL;
 	static char *function               = "libewf_session_section_write_file_io_pool";
 	size_t section_data_size            = 0;
 	size_t section_descriptor_data_size = 0;
-	size_t session_entry_data_size      = 0;
 	size_t session_entries_data_size    = 0;
+	size_t session_entry_data_size      = 0;
 	size_t session_footer_data_size     = 0;
 	size_t session_header_data_size     = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
 	uint64_t current_sector             = 0;
-	uint64_t session_start_sector       = 0;
 	uint64_t session_last_sector        = 0;
 	uint64_t session_number_of_sectors  = 0;
-	uint64_t track_start_sector         = 0;
+	uint64_t session_start_sector       = 0;
 	uint64_t track_last_sector          = 0;
 	uint64_t track_number_of_sectors    = 0;
+	uint64_t track_start_sector         = 0;
 	uint32_t section_padding_size       = 0;
-	int number_of_sessions              = 0;
 	int number_of_session_entries       = 0;
+	int number_of_sessions              = 0;
 	int number_of_tracks                = 0;
 	int session_index                   = 0;
 	int track_index                     = 0;
@@ -1522,24 +1356,9 @@ ssize_t libewf_session_section_write_file_io_pool(
 			if( ( session_index < number_of_sessions )
 			 && ( current_sector >= session_last_sector ) )
 			{
-				if( libcdata_array_get_entry_by_index(
+				if( libewf_sector_range_list_get_range(
 				     sessions,
 				     session_index,
-				     (intptr_t **) &sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve session sector range: %d from array.",
-					 function,
-					 session_index );
-
-					goto on_error;
-				}
-				if( libewf_sector_range_get(
-				     sector_range,
 				     &session_start_sector,
 				     &session_number_of_sectors,
 				     error ) != 1 )
@@ -1562,24 +1381,9 @@ ssize_t libewf_session_section_write_file_io_pool(
 			if( ( track_index < number_of_tracks )
 			 && ( current_sector >= track_last_sector ) )
 			{
-				if( libcdata_array_get_entry_by_index(
+				if( libewf_sector_range_list_get_range(
 				     tracks,
 				     track_index,
-				     (intptr_t **) &sector_range,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve track sector range: %d from array.",
-					 function,
-					 track_index );
-
-					goto on_error;
-				}
-				if( libewf_sector_range_get(
-				     sector_range,
 				     &track_start_sector,
 				     &track_number_of_sectors,
 				     error ) != 1 )

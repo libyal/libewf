@@ -63,17 +63,6 @@ int libewf_sha1_hash_section_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size != (size_t) sizeof( ewf_sha1_hash_t ) )
 	{
 		libcerror_error_set(
@@ -136,7 +125,8 @@ int libewf_sha1_hash_section_read_data(
 		 8,
 		 0 );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	data_size -= 8;
 
 	if( libewf_checksum_calculate_adler32(
@@ -307,17 +297,6 @@ int libewf_sha1_hash_section_write_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );

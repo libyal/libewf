@@ -119,6 +119,7 @@ check_PROGRAMS = \
 	ewf_test_restart_data \
 	ewf_test_section_descriptor \
 	ewf_test_sector_range \
+	ewf_test_sector_range_list \
 	ewf_test_segment_file \
 	ewf_test_segment_table \
 	ewf_test_serialized_string \
@@ -737,6 +738,20 @@ ewf_test_sector_range_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_sector_range_list_SOURCES = \
+	ewf_test_libcdata.h \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_sector_range_list.c \
+	ewf_test_unused.h
+
+ewf_test_sector_range_list_LDADD = \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_segment_file_SOURCES = \
 	ewf_test_functions.c ewf_test_functions.h \
 	ewf_test_libbfio.h \
@@ -985,6 +1000,7 @@ ewf_test_tools_info_handle_LDADD = \
 	@LIBFDATETIME_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \

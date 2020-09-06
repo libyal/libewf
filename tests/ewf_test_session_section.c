@@ -1035,6 +1035,382 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_session_section_write_file_io_pool function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_session_section_write_file_io_pool(
+     void )
+{
+	uint8_t section_data[ 256 ];
+
+	libbfio_pool_t *file_io_pool                    = NULL;
+	libcdata_array_t *sessions                      = NULL;
+	libcdata_array_t *tracks                        = NULL;
+	libcerror_error_t *error                        = NULL;
+	libewf_io_handle_t *io_handle                   = NULL;
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	ssize_t write_count                             = 0;
+	int result                                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_section_descriptor_initialize(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcdata_array_initialize(
+	          &sessions,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "sessions",
+	 sessions );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcdata_array_initialize(
+	          &tracks,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "tracks",
+	 tracks );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          section_data,
+	          256,
+	          LIBBFIO_OPEN_WRITE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO fix test
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               1,
+	               0,
+	               sessions,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 112 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	write_count = libewf_session_section_write_file_io_pool(
+	               NULL,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               1,
+	               0,
+	               sessions,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               NULL,
+	               file_io_pool,
+	               0,
+	               1,
+	               0,
+	               sessions,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               NULL,
+	               0,
+	               1,
+	               0,
+	               sessions,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               1,
+	               0,
+	               NULL,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               1,
+	               0,
+	               sessions,
+	               NULL,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libcdata_array_free(
+	          &tracks,
+	          (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "tracks",
+	 tracks );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libcdata_array_free(
+	          &sessions,
+	          (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "sessions",
+	 sessions );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_section_descriptor_free(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( tracks != NULL )
+	{
+		libcdata_array_free(
+		 &tracks,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+		 NULL );
+	}
+	if( sessions != NULL )
+	{
+		libcdata_array_free(
+		 &sessions,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	if( section_descriptor != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &section_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -1066,13 +1442,19 @@ int main(
 	 "libewf_session_section_write_data",
 	 ewf_test_session_section_write_data );
 
-	/* TODO: add tests for libewf_sessions_section_write_file_io_pool */
+	EWF_TEST_RUN(
+	 "libewf_session_section_write_file_io_pool",
+	 ewf_test_session_section_write_file_io_pool );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 
