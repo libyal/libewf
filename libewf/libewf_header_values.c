@@ -79,7 +79,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER,
 	     (uint8_t *) "case_number",
@@ -95,7 +95,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION,
 	     (uint8_t *) "description",
@@ -111,7 +111,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME,
 	     (uint8_t *) "examiner_name",
@@ -127,7 +127,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER,
 	     (uint8_t *) "evidence_number",
@@ -143,7 +143,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_NOTES,
 	     (uint8_t *) "notes",
@@ -159,7 +159,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE,
 	     (uint8_t *) "acquiry_date",
@@ -175,7 +175,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE,
 	     (uint8_t *) "system_date",
@@ -191,7 +191,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION,
 	     (uint8_t *) "acquiry_software_version",
@@ -207,7 +207,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM,
 	     (uint8_t *) "acquiry_operating_system",
@@ -223,7 +223,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_PASSWORD,
 	     (uint8_t *) "password",
@@ -239,7 +239,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE,
 	     (uint8_t *) "compression_level",
@@ -255,7 +255,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_MODEL,
 	     (uint8_t *) "model",
@@ -271,7 +271,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER,
 	     (uint8_t *) "serial_number",
@@ -287,7 +287,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_DEVICE_LABEL,
 	     (uint8_t *) "device_label",
@@ -303,7 +303,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_PROCESS_IDENTIFIER,
 	     (uint8_t *) "process_identifier",
@@ -319,7 +319,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC,
 	     (uint8_t *) "unknown_dc",
@@ -335,7 +335,7 @@ int libewf_header_values_initialize(
 
 		goto on_error;
 	}
-	if( libewf_header_values_set_value_by_index(
+	if( libewf_value_table_set_value_by_index(
 	     *header_values,
 	     LIBEWF_HEADER_VALUES_INDEX_EXTENTS,
 	     (uint8_t *) "extents",
@@ -358,91 +358,6 @@ on_error:
 	{
 		libfvalue_table_free(
 		 header_values,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Sets a header value
- * Returns 1 if successful or -1 on error
- */
-int libewf_header_values_set_value_by_index(
-     libfvalue_table_t *header_values,
-     int value_index,
-     const uint8_t *identifier,
-     size_t identifier_size,
-     libcerror_error_t **error )
-{
-	libfvalue_value_t *header_value = NULL;
-	static char *function           = "libewf_header_values_set_value_by_index";
-
-	if( identifier == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid identifier.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfvalue_value_type_initialize(
-	     &header_value,
-	     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header value.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfvalue_value_set_identifier(
-	     header_value,
-	     identifier,
-	     identifier_size,
-	     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: %s identifier.",
-		 function,
-		 (char *) identifier );
-
-		goto on_error;
-	}
-	if( libfvalue_table_set_value_by_index(
-	     header_values,
-	     value_index,
-	     header_value,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value: %d in table.",
-		 function,
-		 value_index );
-
-		goto on_error;
-	}
-	header_value = NULL;
-
-	return( 1 );
-
-on_error:
-	if( header_value != NULL )
-	{
-		libfvalue_value_free(
-		 &header_value,
 		 NULL );
 	}
 	return( -1 );

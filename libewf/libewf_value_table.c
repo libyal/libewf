@@ -207,3 +207,88 @@ int libewf_value_table_get_value_copy_to_utf8_string_with_index(
 	return( 1 );
 }
 
+/* Sets a value in the table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_value_table_set_value_by_index(
+     libfvalue_table_t *value_table,
+     int value_index,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     libcerror_error_t **error )
+{
+	libfvalue_value_t *value = NULL;
+	static char *function    = "libewf_value_table_set_value_by_index";
+
+	if( identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfvalue_value_type_initialize(
+	     &value,
+	     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create value.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_value_set_identifier(
+	     value,
+	     identifier,
+	     identifier_size,
+	     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set value: %s identifier.",
+		 function,
+		 (char *) identifier );
+
+		goto on_error;
+	}
+	if( libfvalue_table_set_value_by_index(
+	     value_table,
+	     value_index,
+	     value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set value: %d in table.",
+		 function,
+		 value_index );
+
+		goto on_error;
+	}
+	value = NULL;
+
+	return( 1 );
+
+on_error:
+	if( value != NULL )
+	{
+		libfvalue_value_free(
+		 &value,
+		 NULL );
+	}
+	return( -1 );
+}
+

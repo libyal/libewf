@@ -1,5 +1,5 @@
 /*
- * Library sector_range)list functions test program
+ * Library sector_range_list functions test program
  *
  * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
  *

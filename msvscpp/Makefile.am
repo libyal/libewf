@@ -61,6 +61,7 @@ MSVSCPP_FILES = \
 	ewf_test_tools_signal/ewf_test_tools_signal.vcproj \
 	ewf_test_tools_verification_handle/ewf_test_tools_verification_handle.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
+	ewf_test_value_table/ewf_test_value_table.vcproj \
 	ewf_test_volume_section/ewf_test_volume_section.vcproj \
 	ewf_test_write/ewf_test_write.vcproj \
 	ewf_test_write_chunk/ewf_test_write_chunk.vcproj \

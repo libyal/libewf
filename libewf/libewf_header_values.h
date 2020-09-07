@@ -107,13 +107,6 @@ int libewf_header_values_initialize(
      libfvalue_table_t **header_values,
      libcerror_error_t **error );
 
-int libewf_header_values_set_value_by_index(
-     libfvalue_table_t *header_values,
-     int value_index,
-     const uint8_t *identifier,
-     size_t identifier_size,
-     libcerror_error_t **error );
-
 int libewf_convert_date_header_value(
      const uint8_t *header_value,
      size_t header_value_size,

@@ -48,6 +48,13 @@ int libewf_value_table_get_value_copy_to_utf8_string_with_index(
      size_t *utf8_string_index,
      libcerror_error_t **error );
 
+int libewf_value_table_set_value_by_index(
+     libfvalue_table_t *value_table,
+     int value_index,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
