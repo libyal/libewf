@@ -1688,8 +1688,10 @@ int libewf_write_io_handle_resize_table_entries(
      uint32_t number_of_entries,
      libcerror_error_t **error )
 {
-	void *reallocation    = NULL;
-	static char *function = "libewf_write_io_handle_resize_table_entries";
+	static char *function          = "libewf_write_io_handle_resize_table_entries";
+	void *reallocation             = NULL;
+	size_t table_entries_data_size = 0;
+	size_t table_section_data_size = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -1702,29 +1704,49 @@ int libewf_write_io_handle_resize_table_entries(
 
 		return( -1 );
 	}
-	if( number_of_entries < write_io_handle->number_of_table_entries )
+	if( write_io_handle->table_entry_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing table entry size.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( number_of_entries < write_io_handle->number_of_table_entries )
+	 || ( (size_t) number_of_entries > ( (size_t) SSIZE_MAX / write_io_handle->table_entry_size ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: number of entries values out of bounds.",
+		 "%s: invalid number of entries value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	write_io_handle->table_entries_data_size = number_of_entries
-	                                         * write_io_handle->table_entry_size;
+	table_entries_data_size = number_of_entries * write_io_handle->table_entry_size;
 
+	if( table_entries_data_size > ( MEMORY_MAXIMUM_ALLOCATION_SIZE - write_io_handle->table_header_size - 16 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid table entries data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	/* Reserve space for the header, entries and footer
 	 */
-	write_io_handle->table_section_data_size = write_io_handle->table_header_size
-						 + write_io_handle->table_entries_data_size
-						 + 16;
+	table_section_data_size = write_io_handle->table_header_size + table_entries_data_size + 16;
 
 	reallocation = memory_reallocate(
 			write_io_handle->table_section_data,
-			write_io_handle->table_section_data_size );
+			table_section_data_size );
 
 	if( reallocation == NULL )
 	{
@@ -1732,13 +1754,15 @@ int libewf_write_io_handle_resize_table_entries(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create table section data.",
+		 "%s: unable to resize table section data.",
 		 function );
 
 		return( -1 );
 	}
 	write_io_handle->table_section_data      = (uint8_t *) reallocation;
+	write_io_handle->table_section_data_size = table_section_data_size;
 	write_io_handle->table_entries_data      = &( write_io_handle->table_section_data[ write_io_handle->table_header_size ] );
+	write_io_handle->table_entries_data_size = table_entries_data_size;
 	write_io_handle->number_of_table_entries = number_of_entries;
 
 	return( 1 );

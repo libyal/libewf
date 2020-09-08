@@ -33,6 +33,9 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_io_handle.h"
+#include "../libewf/libewf_media_values.h"
+#include "../libewf/libewf_segment_table.h"
 #include "../libewf/libewf_write_io_handle.h"
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
@@ -49,7 +52,7 @@ int ewf_test_write_io_handle_initialize(
 	int result                                = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests           = 1;
+	int number_of_malloc_fail_tests           = 2;
 	int number_of_memset_fail_tests           = 1;
 	int test_number                           = 0;
 #endif
@@ -648,6 +651,1177 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_write_io_handle_initialize_values function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_initialize_values(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_media_values_t *media_values       = NULL;
+	libewf_segment_table_t *segment_table     = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_initialize_values(
+	          write_io_handle,
+	          io_handle,
+	          media_values,
+	          segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_initialize_values(
+	          NULL,
+	          io_handle,
+	          media_values,
+	          segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_write_io_handle_initialize_values(
+	          write_io_handle,
+	          NULL,
+	          media_values,
+	          segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_write_io_handle_initialize_values(
+	          write_io_handle,
+	          io_handle,
+	          NULL,
+	          segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_write_io_handle_initialize_values(
+	          write_io_handle,
+	          io_handle,
+	          media_values,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_resize_table_entries function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_resize_table_entries(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_io_handle->table_entry_size = 16;
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_resize_table_entries(
+	          write_io_handle,
+	          8,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_resize_table_entries(
+	          NULL,
+	          8,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_write_io_handle_resize_table_entries(
+	          write_io_handle,
+	          0xffffffffUL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_calculate_chunks_per_segment_file function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_calculate_chunks_per_segment_file(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_media_values_t *media_values       = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_io_handle->table_entry_size = 16;
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_calculate_chunks_per_segment_file(
+	          write_io_handle,
+	          media_values,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_calculate_chunks_per_segment_file(
+	          NULL,
+	          media_values,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_calculate_chunks_per_section function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_calculate_chunks_per_section(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_io_handle->table_entry_size = 16;
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_calculate_chunks_per_section(
+	          write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_calculate_chunks_per_section(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_test_segment_file_full function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_test_segment_file_full(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_media_values_t *media_values       = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_io_handle->table_entry_size = 16;
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_test_segment_file_full(
+	          write_io_handle,
+	          media_values,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_test_segment_file_full(
+	          NULL,
+	          media_values,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_test_chunks_section_full function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_test_chunks_section_full(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_media_values_t *media_values       = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_media_values_initialize(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_io_handle->table_entry_size = 16;
+
+	/* Test regular cases
+	 */
+	result = libewf_write_io_handle_test_chunks_section_full(
+	          write_io_handle,
+	          media_values,
+	          0,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_write_io_handle_test_chunks_section_full(
+	          NULL,
+	          media_values,
+	          0,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          LIBEWF_FORMAT_ENCASE7,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_media_values_free(
+	          &media_values,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "media_values",
+	 media_values );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( media_values != NULL )
+	{
+		libewf_media_values_free(
+		 &media_values,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -679,19 +1853,31 @@ int main(
 	 "libewf_write_io_handle_clone",
 	 ewf_test_write_io_handle_clone );
 
-	/* TODO: add tests for libewf_write_io_handle_initialize_values */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_initialize_values",
+	 ewf_test_write_io_handle_initialize_values );
 
 	/* TODO: add tests for libewf_write_io_handle_initialize_resume */
 
-	/* TODO: add tests for libewf_write_io_handle_resize_table_entries */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_resize_table_entries",
+	 ewf_test_write_io_handle_resize_table_entries );
 
-	/* TODO: add tests for libewf_write_io_handle_calculate_chunks_per_segment_file */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_calculate_chunks_per_segment_file",
+	 ewf_test_write_io_handle_calculate_chunks_per_segment_file );
 
-	/* TODO: add tests for libewf_write_io_handle_calculate_chunks_per_section */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_calculate_chunks_per_section",
+	 ewf_test_write_io_handle_calculate_chunks_per_section );
 
-	/* TODO: add tests for libewf_write_io_handle_test_segment_file_full */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_test_segment_file_full",
+	 ewf_test_write_io_handle_test_segment_file_full );
 
-	/* TODO: add tests for libewf_write_io_handle_test_chunks_section_full */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_test_chunks_section_full",
+	 ewf_test_write_io_handle_test_chunks_section_full );
 
 	/* TODO: add tests for libewf_write_io_handle_create_segment_file */
 
@@ -707,7 +1893,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

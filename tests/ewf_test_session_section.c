@@ -40,6 +40,7 @@
 #include "../libewf/libewf_media_values.h"
 #include "../libewf/libewf_section_descriptor.h"
 #include "../libewf/libewf_sector_range.h"
+#include "../libewf/libewf_sector_range_list.h"
 #include "../libewf/libewf_session_section.h"
 
 uint8_t ewf_test_session_section_data1[ 168 ] = {
@@ -1124,6 +1125,21 @@ int ewf_test_session_section_write_file_io_pool(
 	 "error",
 	 error );
 
+	result = libewf_sector_range_list_append_range(
+	          tracks,
+	          32,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Initialize file IO pool
 	 */
 	result = ewf_test_open_file_io_pool(
@@ -1148,7 +1164,6 @@ int ewf_test_session_section_write_file_io_pool(
 
 	/* Test regular cases
 	 */
-/* TODO fix test
 	write_count = libewf_session_section_write_file_io_pool(
 	               section_descriptor,
 	               io_handle,
@@ -1163,12 +1178,11 @@ int ewf_test_session_section_write_file_io_pool(
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "write_count",
 	 write_count,
-	 (ssize_t) 112 );
+	 (ssize_t) 148 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-*/
 
 	/* Test error cases
 	 */
@@ -1224,6 +1238,29 @@ int ewf_test_session_section_write_file_io_pool(
 	               NULL,
 	               0,
 	               1,
+	               0,
+	               sessions,
+	               tracks,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_session_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               0xff,
 	               0,
 	               sessions,
 	               tracks,

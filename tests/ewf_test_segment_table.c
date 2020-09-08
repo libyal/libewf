@@ -33,9 +33,278 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_io_handle.h"
 #include "../libewf/libewf_segment_table.h"
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
+/* Tests the libewf_segment_table_initialize function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_initialize(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests       = 1;
+	int number_of_memset_fail_tests       = 1;
+	int test_number                       = 0;
+#endif
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_initialize(
+	          NULL,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	segment_table = (libewf_segment_table_t *) 0x12345678UL;
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	segment_table = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          NULL,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_segment_table_initialize with malloc failing
+		 */
+		ewf_test_malloc_attempts_before_fail = test_number;
+
+		result = libewf_segment_table_initialize(
+		          &segment_table,
+		          io_handle,
+		          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+		          &error );
+
+		if( ewf_test_malloc_attempts_before_fail != -1 )
+		{
+			ewf_test_malloc_attempts_before_fail = -1;
+
+			if( segment_table != NULL )
+			{
+				libewf_segment_table_free(
+				 &segment_table,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "segment_table",
+			 segment_table );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
+	{
+		/* Test libewf_segment_table_initialize with memset failing
+		 */
+		ewf_test_memset_attempts_before_fail = test_number;
+
+		result = libewf_segment_table_initialize(
+		          &segment_table,
+		          io_handle,
+		          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+		          &error );
+
+		if( ewf_test_memset_attempts_before_fail != -1 )
+		{
+			ewf_test_memset_attempts_before_fail = -1;
+
+			if( segment_table != NULL )
+			{
+				libewf_segment_table_free(
+				 &segment_table,
+				 NULL );
+			}
+		}
+		else
+		{
+			EWF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			EWF_TEST_ASSERT_IS_NULL(
+			 "segment_table",
+			 segment_table );
+
+			EWF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
 
 /* Tests the libewf_segment_table_free function
  * Returns 1 if successful or 0 if not
@@ -335,7 +604,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 
