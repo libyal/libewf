@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\ewf_test_rwlock.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_source.c"
 				>
 			</File>
@@ -207,6 +211,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_rwlock.h"
 				>
 			</File>
 			<File

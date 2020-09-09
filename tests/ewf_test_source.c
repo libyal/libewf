@@ -32,6 +32,7 @@
 #include "ewf_test_libfvalue.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
+#include "ewf_test_rwlock.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_lef_source.h"
@@ -63,6 +64,10 @@ int ewf_test_source_initialize(
 	int number_of_malloc_fail_tests = 1;
 	int number_of_memset_fail_tests = 1;
 	int test_number                 = 0;
+#endif
+
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK )
+	number_of_malloc_fail_tests += 1;
 #endif
 
 	/* Initialize test
@@ -414,6 +419,64 @@ int ewf_test_source_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -527,6 +590,66 @@ int ewf_test_source_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -599,6 +722,64 @@ int ewf_test_source_get_utf16_name_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_name_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_name_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -713,6 +894,66 @@ int ewf_test_source_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_name(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_name(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -785,6 +1026,64 @@ int ewf_test_source_get_utf8_evidence_number_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_evidence_number_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_evidence_number_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_evidence_number_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_evidence_number_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -899,6 +1198,66 @@ int ewf_test_source_get_utf8_evidence_number(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_evidence_number with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_evidence_number(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_evidence_number with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_evidence_number(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -971,6 +1330,64 @@ int ewf_test_source_get_utf16_evidence_number_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_evidence_number_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_evidence_number_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_evidence_number_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_evidence_number_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1085,6 +1502,66 @@ int ewf_test_source_get_utf16_evidence_number(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_evidence_number with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_evidence_number(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_evidence_number with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_evidence_number(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1157,6 +1634,64 @@ int ewf_test_source_get_utf8_location_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1271,6 +1806,66 @@ int ewf_test_source_get_utf8_location(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_location with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_location(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_location with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_location(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1343,6 +1938,64 @@ int ewf_test_source_get_utf16_location_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_location_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_location_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_location_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_location_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1457,6 +2110,66 @@ int ewf_test_source_get_utf16_location(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_location with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_location(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_location with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_location(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1529,6 +2242,64 @@ int ewf_test_source_get_utf8_device_guid_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_location_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_location_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_location_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_location_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1643,6 +2414,66 @@ int ewf_test_source_get_utf8_device_guid(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_name(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1715,6 +2546,64 @@ int ewf_test_source_get_utf16_device_guid_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_device_guid_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_device_guid_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_device_guid_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_device_guid_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -1829,6 +2718,66 @@ int ewf_test_source_get_utf16_device_guid(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_device_guid with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_device_guid(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_device_guid with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_device_guid(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -1901,6 +2850,64 @@ int ewf_test_source_get_utf8_primary_device_guid_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_primary_device_guid_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_primary_device_guid_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_primary_device_guid_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_primary_device_guid_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2015,6 +3022,66 @@ int ewf_test_source_get_utf8_primary_device_guid(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_primary_device_guid with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_primary_device_guid(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_primary_device_guid with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_primary_device_guid(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -2087,6 +3154,64 @@ int ewf_test_source_get_utf16_primary_device_guid_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_primary_device_guid_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_primary_device_guid_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_primary_device_guid_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_primary_device_guid_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2201,6 +3326,66 @@ int ewf_test_source_get_utf16_primary_device_guid(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_primary_device_guid with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_primary_device_guid(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_primary_device_guid with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_primary_device_guid(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -2273,6 +3458,64 @@ int ewf_test_source_get_utf8_manufacturer_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_manufacturer_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_manufacturer_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_manufacturer_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_manufacturer_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2387,6 +3630,66 @@ int ewf_test_source_get_utf8_manufacturer(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_manufacturer with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_manufacturer(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_manufacturer with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_manufacturer(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -2459,6 +3762,64 @@ int ewf_test_source_get_utf16_manufacturer_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_manufacturer_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_manufacturer_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_manufacturer_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_manufacturer_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2573,6 +3934,66 @@ int ewf_test_source_get_utf16_manufacturer(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_manufacturer with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_manufacturer(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_manufacturer with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_manufacturer(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -2645,6 +4066,64 @@ int ewf_test_source_get_utf8_model_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_model_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_model_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_model_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_model_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2759,6 +4238,66 @@ int ewf_test_source_get_utf8_model(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_model with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_model(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_model with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_model(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -2831,6 +4370,64 @@ int ewf_test_source_get_utf16_model_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_model_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_model_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_model_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_model_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -2945,6 +4542,66 @@ int ewf_test_source_get_utf16_model(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_model with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_model(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_model with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_model(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3017,6 +4674,64 @@ int ewf_test_source_get_utf8_serial_number_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_serial_number_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_serial_number_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_serial_number_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_serial_number_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -3131,6 +4846,66 @@ int ewf_test_source_get_utf8_serial_number(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_serial_number with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_serial_number(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_serial_number with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_serial_number(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3203,6 +4978,64 @@ int ewf_test_source_get_utf16_serial_number_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_serial_number_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_serial_number_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_serial_number_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_serial_number_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -3317,6 +5150,66 @@ int ewf_test_source_get_utf16_serial_number(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_serial_number with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_serial_number(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_serial_number with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_serial_number(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3389,6 +5282,64 @@ int ewf_test_source_get_utf8_domain_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_domain_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_domain_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_domain_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_domain_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -3503,6 +5454,66 @@ int ewf_test_source_get_utf8_domain(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_domain with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_domain(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_domain with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_domain(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3575,6 +5586,64 @@ int ewf_test_source_get_utf16_domain_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_domain_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_domain_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_domain_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_domain_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -3689,6 +5758,66 @@ int ewf_test_source_get_utf16_domain(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_domain with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_domain(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_domain with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_domain(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3761,6 +5890,64 @@ int ewf_test_source_get_utf8_ip_address_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_ip_address_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_ip_address_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_ip_address_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_ip_address_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -3875,6 +6062,66 @@ int ewf_test_source_get_utf8_ip_address(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_ip_address with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_ip_address(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_ip_address with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_ip_address(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -3947,6 +6194,64 @@ int ewf_test_source_get_utf16_ip_address_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_ip_address_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_ip_address_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_ip_address_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_ip_address_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -4061,6 +6366,66 @@ int ewf_test_source_get_utf16_ip_address(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_ip_address with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_ip_address(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_ip_address with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_ip_address(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -4133,6 +6498,64 @@ int ewf_test_source_get_utf8_mac_address_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_mac_address_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_mac_address_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_mac_address_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_mac_address_size(
+	          source,
+	          &utf8_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -4247,6 +6670,66 @@ int ewf_test_source_get_utf8_mac_address(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf8_mac_address with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_mac_address(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf8_mac_address with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf8_mac_address(
+	          source,
+	          utf8_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+
 	return( 1 );
 
 on_error:
@@ -4319,6 +6802,64 @@ int ewf_test_source_get_utf16_mac_address_size(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_mac_address_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_mac_address_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_mac_address_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_mac_address_size(
+	          source,
+	          &utf16_string_size,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 
@@ -4432,6 +6973,66 @@ int ewf_test_source_get_utf16_mac_address(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_RWLOCK )
+
+	/* Test libewf_source_get_utf16_mac_address with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	ewf_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_mac_address(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libewf_source_get_utf16_mac_address with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	ewf_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libewf_source_get_utf16_mac_address(
+	          source,
+	          utf16_string,
+	          64,
+	          &error );
+
+	if( ewf_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		ewf_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
 
 	return( 1 );
 

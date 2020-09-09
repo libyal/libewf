@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "ewf_test_functions.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
@@ -35,6 +36,7 @@
 
 #include "../libewf/libewf_io_handle.h"
 #include "../libewf/libewf_media_values.h"
+#include "../libewf/libewf_segment_file.h"
 #include "../libewf/libewf_segment_table.h"
 #include "../libewf/libewf_write_io_handle.h"
 
@@ -1822,6 +1824,556 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_write_io_handle_write_chunks_section_start function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_write_chunks_section_start(
+     void )
+{
+	uint8_t section_data[ 256 ];
+
+	libbfio_pool_t *file_io_pool              = NULL;
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_segment_file_t *segment_file       = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	ssize_t write_count                       = 0;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_segment_file_initialize(
+	          &segment_file,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          section_data,
+	          256,
+	          LIBBFIO_OPEN_WRITE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement tests
+	write_count = libewf_write_io_handle_write_chunks_section_start(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 156 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	write_count = libewf_write_io_handle_write_chunks_section_start(
+	               NULL,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_write_io_handle_write_chunks_section_start(
+	               write_io_handle,
+	               NULL,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_write_io_handle_write_chunks_section_start(
+	               write_io_handle,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               NULL,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_file_free(
+	          &segment_file,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_write_io_handle_write_chunks_section_end function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_write_io_handle_write_chunks_section_end(
+     void )
+{
+	uint8_t section_data[ 256 ];
+
+	libbfio_pool_t *file_io_pool              = NULL;
+	libcerror_error_t *error                  = NULL;
+	libewf_io_handle_t *io_handle             = NULL;
+	libewf_segment_file_t *segment_file       = NULL;
+	libewf_write_io_handle_t *write_io_handle = NULL;
+	ssize_t write_count                       = 0;
+	int result                                = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->format = LIBEWF_FORMAT_V2_ENCASE7;
+
+	result = libewf_segment_file_initialize(
+	          &segment_file,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_write_io_handle_initialize(
+	          &write_io_handle,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          section_data,
+	          256,
+	          LIBBFIO_OPEN_WRITE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement tests
+	write_count = libewf_write_io_handle_write_chunks_section_end(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 156 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	write_count = libewf_write_io_handle_write_chunks_section_end(
+	               NULL,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_write_io_handle_write_chunks_section_end(
+	               write_io_handle,
+	               NULL,
+	               file_io_pool,
+	               0,
+	               segment_file,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_write_io_handle_write_chunks_section_end(
+	               write_io_handle,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               NULL,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libewf_write_io_handle_free(
+	          &write_io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "write_io_handle",
+	 write_io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_file_free(
+	          &segment_file,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( write_io_handle != NULL )
+	{
+		libewf_write_io_handle_free(
+		 &write_io_handle,
+		 NULL );
+	}
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -1881,9 +2433,13 @@ int main(
 
 	/* TODO: add tests for libewf_write_io_handle_create_segment_file */
 
-	/* TODO: add tests for libewf_write_io_handle_write_chunks_section_start */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_write_chunks_section_start",
+	 ewf_test_write_io_handle_write_chunks_section_start );
 
-	/* TODO: add tests for libewf_write_io_handle_write_chunks_section_end */
+	EWF_TEST_RUN(
+	 "libewf_write_io_handle_write_chunks_section_end",
+	 ewf_test_write_io_handle_write_chunks_section_end );
 
 	/* TODO: add tests for libewf_write_io_handle_write_new_chunk */
 
