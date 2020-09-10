@@ -793,62 +793,64 @@ int ewf_test_glob(
 	int number_of_filenames     = 0;
 	int result                  = 0;
 
-	/* Initialize test
-	 */
-	result = ewf_test_get_narrow_source(
-	          source,
-	          narrow_source,
-	          256,
-	          &error );
+	if( source != NULL )
+	{
+		/* Initialize test
+		 */
+		result = ewf_test_get_narrow_source(
+		          source,
+		          narrow_source,
+		          256,
+		          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	narrow_source_length = narrow_string_length(
-	                        narrow_source );
+		narrow_source_length = narrow_string_length(
+		                        narrow_source );
 
-	/* Test regular cases
-	 */
-	result = libewf_glob(
-	          narrow_source,
-	          narrow_source_length,
-	          LIBEWF_FORMAT_UNKNOWN,
-	          &filenames,
-	          &number_of_filenames,
-	          &error );
+		/* Test regular cases
+		 */
+		result = libewf_glob(
+		          narrow_source,
+		          narrow_source_length,
+		          LIBEWF_FORMAT_UNKNOWN,
+		          &filenames,
+		          &number_of_filenames,
+		          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	result = libewf_glob_free(
-	          filenames,
-	          number_of_filenames,
-	          &error );
+		result = libewf_glob_free(
+		          filenames,
+		          number_of_filenames,
+		          &error );
 
-	filenames           = NULL;
-	number_of_filenames = 0;
+		filenames           = NULL;
+		number_of_filenames = 0;
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
 	/* Test error cases
 	 */
 	result = libewf_glob(
@@ -1068,62 +1070,64 @@ int ewf_test_glob_wide(
 	int number_of_filenames   = 0;
 	int result                = 0;
 
-	/* Initialize test
-	 */
-	result = ewf_test_get_wide_source(
-	          source,
-	          wide_source,
-	          256,
-	          &error );
+	if( source != NULL )
+	{
+		/* Initialize test
+		 */
+		result = ewf_test_get_wide_source(
+		          source,
+		          wide_source,
+		          256,
+		          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	wide_source_length = wide_string_length(
-	                      wide_source );
+		wide_source_length = wide_string_length(
+		                      wide_source );
 
-	/* Test regular cases
-	 */
-	result = libewf_glob_wide(
-	          wide_source,
-	          wide_source_length,
-	          LIBEWF_FORMAT_UNKNOWN,
-	          &filenames,
-	          &number_of_filenames,
-	          &error );
+		/* Test regular cases
+		 */
+		result = libewf_glob_wide(
+		          wide_source,
+		          wide_source_length,
+		          LIBEWF_FORMAT_UNKNOWN,
+		          &filenames,
+		          &number_of_filenames,
+		          &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
-	result = libewf_glob_wide_free(
-	          filenames,
-	          number_of_filenames,
-	          &error );
+		result = libewf_glob_wide_free(
+		          filenames,
+		          number_of_filenames,
+		          &error );
 
-	filenames           = NULL;
-	number_of_filenames = 0;
+		filenames           = NULL;
+		number_of_filenames = 0;
 
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
+		EWF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
 	/* Test error cases
 	 */
 	result = libewf_glob_wide(
