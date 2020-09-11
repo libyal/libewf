@@ -779,6 +779,165 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_glob_determine_format function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_glob_determine_format(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t format           = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_glob_determine_format(
+	          "test.E01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_ENCASE5 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_determine_format(
+	          "test.L01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_LOGICAL_ENCASE5 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_determine_format(
+	          "test.e01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_EWF );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_determine_format(
+	          "test.s01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_SMART );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_glob_determine_format(
+	          NULL,
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_determine_format(
+	          "test.x01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_determine_format(
+	          "test.E01",
+	          8,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_glob function
  * Returns 1 if successful or 0 if not
  */
@@ -1022,6 +1181,7 @@ int ewf_test_glob_free(
      void )
 {
 	libcerror_error_t *error = NULL;
+	char **filenames         = NULL;
 	int result               = 0;
 
 	/* Test error cases
@@ -1030,6 +1190,27 @@ int ewf_test_glob_free(
 	          NULL,
 	          0,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	filenames = (char **) 0x12345678UL;
+
+	result = libewf_glob_free(
+	          filenames,
+	          -1,
+	          &error );
+
+	filenames = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1055,6 +1236,165 @@ on_error:
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Tests the libewf_glob_wide_determine_format function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_glob_wide_determine_format(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t format           = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_glob_wide_determine_format(
+	          L"test.E01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_ENCASE5 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.L01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_LOGICAL_ENCASE5 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.e01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_EWF );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.s01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_SMART );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_glob_wide_determine_format(
+	          NULL,
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.x01",
+	          8,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.E01",
+	          8,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
 
 /* Tests the libewf_glob_wide function
  * Returns 1 if successful or 0 if not
@@ -1299,6 +1639,7 @@ int ewf_test_glob_wide_free(
      void )
 {
 	libcerror_error_t *error = NULL;
+	wchar_t **filenames      = NULL;
 	int result               = 0;
 
 	/* Test error cases
@@ -1307,6 +1648,27 @@ int ewf_test_glob_wide_free(
 	          NULL,
 	          0,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	filenames = (wchar_t **) 0x12345678UL;
+
+	result = libewf_glob_wide_free(
+	          filenames,
+	          -1,
+	          &error );
+
+	filenames = NULL;
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1418,6 +1780,12 @@ int main(
 	 ewf_test_check_file_signature_file_io_handle,
 	 source );
 
+	EWF_TEST_RUN(
+	 "libewf_glob_determine_format",
+	 ewf_test_glob_determine_format );
+
+	/* TODO add tests for libewf_glob_get_segment_filename */
+
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_glob",
 	 ewf_test_glob,
@@ -1428,6 +1796,12 @@ int main(
 	 ewf_test_glob_free );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+	EWF_TEST_RUN(
+	 "libewf_glob_wide_determine_format",
+	 ewf_test_glob_wide_determine_format );
+
+	/* TODO add tests for libewf_glob_wide_get_segment_filename */
 
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_glob_wide",

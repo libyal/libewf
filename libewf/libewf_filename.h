@@ -43,6 +43,7 @@ int libewf_filename_set_extension(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 int libewf_filename_set_extension_wide(
      wchar_t *filename,
      size_t filename_size,
@@ -52,7 +53,8 @@ int libewf_filename_set_extension_wide(
      uint8_t segment_file_type,
      uint8_t format,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 int libewf_filename_create(
      system_character_t **filename,

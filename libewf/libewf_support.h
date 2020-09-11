@@ -86,6 +86,22 @@ int libewf_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
+int libewf_glob_determine_format(
+     const char *filename,
+     size_t filename_length,
+     uint8_t *format,
+     libcerror_error_t **error );
+
+int libewf_glob_get_segment_filename(
+     const char *filename,
+     size_t filename_length,
+     size_t extension_index,
+     uint8_t segment_file_type,
+     uint32_t segment_number,
+     uint8_t format,
+     char **segment_filename,
+     libcerror_error_t **error );
+
 LIBEWF_EXTERN \
 int libewf_glob(
      const char *filename,
@@ -102,6 +118,22 @@ int libewf_glob_free(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+int libewf_glob_wide_determine_format(
+     const wchar_t *filename,
+     size_t filename_length,
+     uint8_t *format,
+     libcerror_error_t **error );
+
+int libewf_glob_wide_get_segment_filename(
+     const wchar_t *filename,
+     size_t filename_length,
+     size_t extension_index,
+     uint8_t segment_file_type,
+     uint32_t segment_number,
+     uint8_t format,
+     wchar_t **segment_filename,
+     libcerror_error_t **error );
 
 LIBEWF_EXTERN \
 int libewf_glob_wide(

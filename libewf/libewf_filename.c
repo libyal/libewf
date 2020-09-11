@@ -102,7 +102,7 @@ int libewf_filename_set_extension(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: segment number: %" PRIu16 " is out of bounds.",
+		 "%s: segment number: %" PRIu32 " is out of bounds.",
 		 function,
 		 segment_number );
 
@@ -312,7 +312,7 @@ int libewf_filename_set_extension_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: segment number: %" PRIu16 " is out of bounds.",
+		 "%s: segment number: %" PRIu32 " is out of bounds.",
 		 function,
 		 segment_number );
 
@@ -448,7 +448,7 @@ int libewf_filename_set_extension_wide(
 	return( 1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Creates a filename for a certain segment file
  * Returns 1 if successful or -1 on error
