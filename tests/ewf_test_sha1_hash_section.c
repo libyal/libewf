@@ -806,6 +806,10 @@ int ewf_test_sha1_hash_section_write_file_io_pool(
 	ssize_t write_count                             = 0;
 	int result                                      = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	off64_t offset                                  = 0;
+#endif
+
 	/* Initialize test
 	 */
 	result = libewf_section_descriptor_initialize(
@@ -977,6 +981,28 @@ int ewf_test_sha1_hash_section_write_file_io_pool(
 	               io_handle,
 	               file_io_pool,
 	               0,
+	               0xff,
+	               0,
+	               hash_sections,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_sha1_hash_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
 	               2,
 	               0,
 	               NULL,
@@ -993,6 +1019,58 @@ int ewf_test_sha1_hash_section_write_file_io_pool(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libewf_sha1_hash_section_write_file_io_pool with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	write_count = libewf_sha1_hash_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               2,
+	               0,
+	               hash_sections,
+	               &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
+		 "write_count",
+		 write_count,
+		 (ssize_t) -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up file IO pool
 	 */

@@ -27,6 +27,10 @@
 #include <sys/utsname.h>
 #endif
 
+#if defined( WINAPI ) && ( WINVER >= 0x0a00 )
+#include <VersionHelpers.h>
+#endif
+
 #include "ewftools_libcerror.h"
 #include "ewftools_libclocale.h"
 #include "ewftools_libuna.h"
@@ -56,9 +60,6 @@ int platform_get_operating_system(
 	DWORD windows_version        = 0;
 	DWORD windows_major_version  = 0;
 	DWORD windows_minor_version  = 0;
-/*
-	DWORD windows_build_number   = 0;
- */
 #endif
 
 	if( operating_system_string == NULL )
@@ -72,7 +73,64 @@ int platform_get_operating_system(
 
 		return( -1 );
 	}
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( WINVER >= 0x0a00 )
+
+/* TODO consider detecting Windows server version with IsWindowsServer() */
+
+	if( IsWindowsXPOrGreater() == FALSE )
+	{
+		operating_system = "Windows 2000";
+	}
+	else if( IsWindowsXPSP1OrGreater() == FALSE )
+	{
+		operating_system = "Windows XP";
+	}
+	else if( IsWindowsXPSP2OrGreater() == FALSE )
+	{
+		operating_system = "Windows XP SP1";
+	}
+	else if( IsWindowsXPSP3OrGreater() == FALSE )
+	{
+		operating_system = "Windows XP SP2";
+	}
+	else if( IsWindowsVistaOrGreater() == FALSE )
+	{
+		operating_system = "Windows XP SP3";
+	}
+	else if( IsWindowsVistaSP1OrGreater() == FALSE )
+	{
+		operating_system = "Windows Vista";
+	}
+	else if( IsWindowsVistaSP2OrGreater() == FALSE )
+	{
+		operating_system = "Windows Vista SP1";
+	}
+	else if( IsWindows7OrGreater() == FALSE )
+	{
+		operating_system = "Windows Vista SP2";
+	}
+	else if( IsWindows7SP1OrGreater() == FALSE )
+	{
+		operating_system = "Windows 7";
+	}
+	else if( IsWindows8OrGreater() == FALSE )
+	{
+		operating_system = "Windows 7 SP1";
+	}
+	else if( Windows8Point1OrGreater() == FALSE )
+	{
+		operating_system = "Windows 8.0";
+	}
+	else if( IsWindows10OrGreater() == FALSE )
+	{
+		operating_system = "Windows 8.1";
+	}
+	else
+	{
+		operating_system = "Windows 10";
+	}
+
+#elif defined( WINAPI )
 	operating_system = "Windows";
 
 	windows_version = GetVersion();
@@ -80,12 +138,6 @@ int platform_get_operating_system(
 	windows_major_version = (DWORD) ( LOBYTE( LOWORD( windows_version ) ) );
 	windows_minor_version = (DWORD) ( HIBYTE( LOWORD( windows_version ) ) );
 
-/*
-	if( windows_version < 0x80000000 )
-	{
-		windows_build_number = (DWORD)( HIWORD( windows_version ) );
-	}
-*/
 	if( windows_major_version == 3 )
 	{
 		if( windows_version < 0x80000000 )
@@ -150,6 +202,14 @@ int platform_get_operating_system(
 			else if( windows_minor_version == 1 )
 			{
 				operating_system = "Windows 7";
+			}
+			else if( windows_minor_version == 2 )
+			{
+				operating_system = "Windows 8.0";
+			}
+			else if( windows_minor_version == 3 )
+			{
+				operating_system = "Windows 8.1";
 			}
 		}
 	}

@@ -301,7 +301,26 @@ int ewf_test_value_table_get_value_copy_to_utf8_string_with_index(
 	libcerror_error_free(
 	 &error );
 
-/* TODO add test coverage */
+	result = libewf_value_table_get_value_copy_to_utf8_string_with_index(
+	          value_table,
+	          (uint8_t *) "identifier",
+	          10,
+	          utf8_string,
+	          64,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	/* Clean up
 	 */

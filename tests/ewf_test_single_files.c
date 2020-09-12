@@ -594,7 +594,7 @@ int ewf_test_single_files_initialize(
 	int result                          = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests     = 1;
+	int number_of_malloc_fail_tests     = 4;
 	int number_of_memset_fail_tests     = 1;
 	int test_number                     = 0;
 #endif
@@ -830,7 +830,7 @@ int ewf_test_single_files_clone(
 	int result                                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests                 = 4;
+	int number_of_malloc_fail_tests                 = 6;
 	int test_number                                 = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -2023,6 +2023,29 @@ int ewf_test_single_files_parse_rec_category(
 	libcerror_error_free(
 	 &error );
 
+	/* Test unsupported category header
+	 */
+	line_index = 5;
+
+	result = libewf_single_files_parse_rec_category(
+	          single_files,
+	          lines,
+	          &line_index,
+	          &media_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libewf_single_files_free(
@@ -2335,6 +2358,162 @@ int ewf_test_single_files_parse_perm_category(
 	          single_files,
 	          lines,
 	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_single_files_free(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfvalue_split_utf8_string_free(
+	          &lines,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "lines",
+	 lines );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( lines != NULL )
+	{
+		libfvalue_split_utf8_string_free(
+		 &lines,
+		 NULL );
+	}
+	if( single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &single_files,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_single_files_parse_permission_group function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_single_files_parse_permission_group(
+     void )
+{
+	libcerror_error_t *error                    = NULL;
+	libewf_permission_group_t *permission_group = NULL;
+	libewf_single_files_t *single_files         = NULL;
+	libfvalue_split_utf8_string_t *lines        = NULL;
+	libfvalue_split_utf8_string_t *types        = NULL;
+	int line_index                              = 0;
+	int result                                  = 0;
+
+	/* Initialize test
+	 */
+	result = libfvalue_utf8_string_split(
+	          ewf_test_single_files_data2,
+	          2851,
+	          (uint8_t) '\n',
+	          &lines,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "lines",
+	 lines );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_initialize(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	line_index = 7;
+
+	result = libewf_single_files_parse_permission_group(
+	          single_files,
+	          lines,
+	          types,
+	          &line_index,
+	          permission_group,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_single_files_parse_permission_group(
+	          NULL,
+	          lines,
+	          types,
+	          NULL,
+	          permission_group,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3740,7 +3919,9 @@ int main(
 	 "libewf_single_files_parse_perm_category",
 	 ewf_test_single_files_parse_perm_category );
 
-	/* TODO: add tests for libewf_single_files_parse_permission_group */
+	EWF_TEST_RUN(
+	 "libewf_single_files_parse_permission_group",
+	 ewf_test_single_files_parse_permission_group );
 
 	EWF_TEST_RUN(
 	 "libewf_single_files_parse_srce_category",

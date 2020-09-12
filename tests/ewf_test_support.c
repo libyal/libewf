@@ -39,6 +39,8 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_support.h"
+
 #if !defined( LIBEWF_HAVE_BFIO )
 
 LIBEWF_EXTERN \
@@ -779,6 +781,8 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 /* Tests the libewf_glob_determine_format function
  * Returns 1 if successful or 0 if not
  */
@@ -871,6 +875,46 @@ int ewf_test_glob_determine_format(
 	 "error",
 	 error );
 
+	result = libewf_glob_determine_format(
+	          "test.Ex01",
+	          9,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_V2_ENCASE7 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_determine_format(
+	          "test.Lx01",
+	          9,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_glob_determine_format(
@@ -927,6 +971,24 @@ int ewf_test_glob_determine_format(
 	libcerror_error_free(
 	 &error );
 
+	result = libewf_glob_determine_format(
+	          "test",
+	          4,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -938,6 +1000,219 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_glob_get_segment_filename function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_glob_get_segment_filename(
+     void )
+{
+	char expected_segment_filename[ 9 ] = {
+		't', 'e', 's', 't', '.', 'E', '0', '2', 0 };
+
+	libcerror_error_t *error            = NULL;
+	char *segment_filename              = NULL;
+	int result                          = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_glob_get_segment_filename(
+	          "test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_filename",
+	 segment_filename );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          segment_filename,
+	          expected_segment_filename,
+	          9 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	memory_free(
+	 segment_filename );
+
+	segment_filename = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_glob_get_segment_filename(
+	          NULL,
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_get_segment_filename(
+	          "test.E01",
+	          0,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_get_segment_filename(
+	          "test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	segment_filename = (char *) 0x12345678UL;
+
+	result = libewf_glob_get_segment_filename(
+	          "test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	segment_filename = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_glob_get_segment_filename with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_glob_get_segment_filename(
+	          "test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+
+		if( segment_filename != NULL )
+		{
+			memory_free(
+			 segment_filename );
+
+			segment_filename = NULL;
+		}
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "segment_filename",
+		 segment_filename );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_filename != NULL )
+	{
+		memory_free(
+		 segment_filename );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
+
 /* Tests the libewf_glob function
  * Returns 1 if successful or 0 if not
  */
@@ -946,11 +1221,16 @@ int ewf_test_glob(
 {
 	char narrow_source[ 256 ];
 
-	libcerror_error_t *error    = NULL;
-	char **filenames            = NULL;
-	size_t narrow_source_length = 0;
-	int number_of_filenames     = 0;
-	int result                  = 0;
+	libcerror_error_t *error        = NULL;
+	char **filenames                = NULL;
+	size_t narrow_source_length     = 0;
+	int number_of_filenames         = 0;
+	int result                      = 0;
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 3;
+	int test_number                 = 0;
+#endif
 
 	if( source != NULL )
 	{
@@ -1156,6 +1436,63 @@ int ewf_test_glob(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	if( source != NULL )
+	{
+		for( test_number = 0;
+		     test_number < number_of_malloc_fail_tests;
+		     test_number++ )
+		{
+			/* Test libewf_glob with malloc failing
+			 */
+			ewf_test_malloc_attempts_before_fail = test_number;
+
+			result = libewf_glob(
+			          narrow_source,
+			          narrow_source_length,
+			          LIBEWF_FORMAT_UNKNOWN,
+			          &filenames,
+			          &number_of_filenames,
+			          &error );
+
+			if( ewf_test_malloc_attempts_before_fail != -1 )
+			{
+				ewf_test_malloc_attempts_before_fail = -1;
+
+				if( filenames != NULL )
+				{
+					result = libewf_glob_free(
+						  filenames,
+						  number_of_filenames,
+						  &error );
+
+					filenames           = NULL;
+					number_of_filenames = 0;
+				}
+			}
+			else
+			{
+				EWF_TEST_ASSERT_EQUAL_INT(
+				 "result",
+				 result,
+				 -1 );
+
+				EWF_TEST_ASSERT_IS_NULL(
+				 "filenames",
+				 filenames );
+
+				EWF_TEST_ASSERT_IS_NOT_NULL(
+				 "error",
+				 error );
+
+				libcerror_error_free(
+				 &error );
+			}
+		}
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	return( 1 );
 
 on_error:
@@ -1236,6 +1573,8 @@ on_error:
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_glob_wide_determine_format function
  * Returns 1 if successful or 0 if not
@@ -1329,6 +1668,46 @@ int ewf_test_glob_wide_determine_format(
 	 "error",
 	 error );
 
+	result = libewf_glob_wide_determine_format(
+	          L"test.Ex01",
+	          9,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_V2_ENCASE7 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_glob_wide_determine_format(
+	          L"test.Lx01",
+	          9,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "format",
+	 format,
+	 LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_glob_wide_determine_format(
@@ -1385,6 +1764,24 @@ int ewf_test_glob_wide_determine_format(
 	libcerror_error_free(
 	 &error );
 
+	result = libewf_glob_wide_determine_format(
+	          L"test",
+	          4,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -1396,6 +1793,219 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_glob_wide_get_segment_filename function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_glob_wide_get_segment_filename(
+     void )
+{
+	wchar_t expected_segment_filename[ 9 ] = {
+		't', 'e', 's', 't', '.', 'E', '0', '2', 0 };
+
+	libcerror_error_t *error               = NULL;
+	wchar_t *segment_filename              = NULL;
+	int result                             = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_glob_wide_get_segment_filename(
+	          L"test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_filename",
+	 segment_filename );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          segment_filename,
+	          expected_segment_filename,
+	          9 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	memory_free(
+	 segment_filename );
+
+	segment_filename = NULL;
+
+	/* Test error cases
+	 */
+	result = libewf_glob_wide_get_segment_filename(
+	          NULL,
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_wide_get_segment_filename(
+	          L"test.E01",
+	          0,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_glob_wide_get_segment_filename(
+	          L"test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	segment_filename = (char *) 0x12345678UL;
+
+	result = libewf_glob_wide_get_segment_filename(
+	          L"test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	segment_filename = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_glob_wide_get_segment_filename with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_glob_wide_get_segment_filename(
+	          L"test.E01",
+	          8,
+	          4,
+	          LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	          2,
+	          LIBEWF_FORMAT_LOGICAL_ENCASE5,
+	          &segment_filename,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+
+		if( segment_filename != NULL )
+		{
+			memory_free(
+			 segment_filename );
+
+			segment_filename = NULL;
+		}
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NULL(
+		 "segment_filename",
+		 segment_filename );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_filename != NULL )
+	{
+		memory_free(
+		 segment_filename );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
+
 /* Tests the libewf_glob_wide function
  * Returns 1 if successful or 0 if not
  */
@@ -1404,11 +2014,16 @@ int ewf_test_glob_wide(
 {
 	wchar_t wide_source[ 256 ];
 
-	libcerror_error_t *error  = NULL;
-	wchar_t **filenames       = NULL;
-	size_t wide_source_length = 0;
-	int number_of_filenames   = 0;
-	int result                = 0;
+	libcerror_error_t *error        = NULL;
+	wchar_t **filenames             = NULL;
+	size_t wide_source_length       = 0;
+	int number_of_filenames         = 0;
+	int result                      = 0;
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 3;
+	int test_number                 = 0;
+#endif
 
 	if( source != NULL )
 	{
@@ -1614,6 +2229,63 @@ int ewf_test_glob_wide(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	if( source != NULL )
+	{
+		for( test_number = 0;
+		     test_number < number_of_malloc_fail_tests;
+		     test_number++ )
+		{
+			/* Test libewf_glob_wide with malloc failing
+			 */
+			ewf_test_malloc_attempts_before_fail = test_number;
+
+			result = libewf_glob_wide(
+			          wide_source,
+			          wide_source_length,
+			          LIBEWF_FORMAT_UNKNOWN,
+			          &filenames,
+			          &number_of_filenames,
+			          &error );
+
+			if( ewf_test_malloc_attempts_before_fail != -1 )
+			{
+				ewf_test_malloc_attempts_before_fail = -1;
+
+				if( filenames != NULL )
+				{
+					result = libewf_glob_wide_free(
+						  filenames,
+						  number_of_filenames,
+						  &error );
+
+					filenames           = NULL;
+					number_of_filenames = 0;
+				}
+			}
+			else
+			{
+				EWF_TEST_ASSERT_EQUAL_INT(
+				 "result",
+				 result,
+				 -1 );
+
+				EWF_TEST_ASSERT_IS_NULL(
+				 "filenames",
+				 filenames );
+
+				EWF_TEST_ASSERT_IS_NOT_NULL(
+				 "error",
+				 error );
+
+				libcerror_error_free(
+				 &error );
+			}
+		}
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	return( 1 );
 
 on_error:
@@ -1780,11 +2452,17 @@ int main(
 	 ewf_test_check_file_signature_file_io_handle,
 	 source );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 	EWF_TEST_RUN(
 	 "libewf_glob_determine_format",
 	 ewf_test_glob_determine_format );
 
-	/* TODO add tests for libewf_glob_get_segment_filename */
+	EWF_TEST_RUN(
+	 "libewf_glob_get_segment_filename",
+	 ewf_test_glob_get_segment_filename );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_glob",
@@ -1796,12 +2474,17 @@ int main(
 	 ewf_test_glob_free );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
 	 "libewf_glob_wide_determine_format",
 	 ewf_test_glob_wide_determine_format );
 
-	/* TODO add tests for libewf_glob_wide_get_segment_filename */
+	EWF_TEST_RUN(
+	 "libewf_glob_wide_get_segment_filename",
+	 ewf_test_glob_wide_get_segment_filename );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_glob_wide",

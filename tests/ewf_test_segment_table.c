@@ -344,6 +344,44 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_segment_table_clear function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_clear(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_clear(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_segment_table_clone function
  * Returns 1 if successful or 0 if not
  */
@@ -533,6 +571,993 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_segment_table_empty function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_empty(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_empty(
+	          segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_empty(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_get_basename_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_get_basename_size(
+     libewf_segment_table_t *segment_table )
+{
+	libcerror_error_t *error = NULL;
+	size_t basename_size     = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_get_basename_size(
+	          segment_table,
+	          &basename_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_get_basename_size(
+	          NULL,
+	          &basename_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_get_basename_size(
+	          segment_table,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_get_basename function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_get_basename(
+     libewf_segment_table_t *segment_table )
+{
+	char basename[ 32 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_get_basename(
+	          segment_table,
+	          basename,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_get_basename(
+	          NULL,
+	          basename,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_get_basename(
+	          segment_table,
+	          NULL,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_set_basename function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_set_basename(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_set_basename(
+	          segment_table,
+	          "test",
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_set_basename(
+	          NULL,
+	          "test",
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_set_basename(
+	          segment_table,
+	          NULL,
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Tests the libewf_segment_table_get_basename_size_wide function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_get_basename_size_wide(
+     libewf_segment_table_t *segment_table )
+{
+	libcerror_error_t *error = NULL;
+	size_t basename_size     = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_get_basename_size_wide(
+	          segment_table,
+	          &basename_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_get_basename_size_wide(
+	          NULL,
+	          &basename_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_get_basename_size_wide(
+	          segment_table,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_get_basename_wide function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_get_basename_wide(
+     libewf_segment_table_t *segment_table )
+{
+	wchar_t basename[ 32 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_get_basename_wide(
+	          segment_table,
+	          basename,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_get_basename_wide(
+	          NULL,
+	          basename,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_get_basename_wide(
+	          segment_table,
+	          NULL,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_set_basename_wide function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_set_basename_wide(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_set_basename_wide(
+	          segment_table,
+	          L"test",
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_set_basename_wide(
+	          NULL,
+	          L"test",
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_set_basename_wide(
+	          segment_table,
+	          NULL,
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Tests the libewf_segment_table_set_maximum_segment_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_set_maximum_segment_size(
+     void )
+{
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_set_maximum_segment_size(
+	          segment_table,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_set_maximum_segment_size(
+	          NULL,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_segment_table_get_number_of_segments function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_table_get_number_of_segments(
+     libewf_segment_table_t *segment_table )
+{
+	libcerror_error_t *error    = NULL;
+	uint32_t number_of_segments = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_table_get_number_of_segments(
+	          segment_table,
+	          &number_of_segments,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_table_get_number_of_segments(
+	          NULL,
+	          &number_of_segments,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_table_get_number_of_segments(
+	          segment_table,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -547,42 +1572,139 @@ int main(
      char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	libcerror_error_t *error              = NULL;
+	libewf_io_handle_t *io_handle         = NULL;
+	libewf_segment_table_t *segment_table = NULL;
+	int result                            = 0;
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
+
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-	/* TODO: add tests for libewf_segment_table_initialize */
+	EWF_TEST_RUN(
+	 "libewf_segment_table_initialize",
+	 ewf_test_segment_table_initialize );
 
 	EWF_TEST_RUN(
 	 "libewf_segment_table_free",
 	 ewf_test_segment_table_free );
 
 	EWF_TEST_RUN(
+	 "libewf_segment_table_clear",
+	 ewf_test_segment_table_clear );
+
+	EWF_TEST_RUN(
 	 "libewf_segment_table_clone",
 	 ewf_test_segment_table_clone );
 
-	/* TODO: add tests for libewf_segment_table_empty */
+	EWF_TEST_RUN(
+	 "libewf_segment_table_empty",
+	 ewf_test_segment_table_empty );
 
-	/* TODO: add tests for libewf_segment_table_get_basename_size */
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
-	/* TODO: add tests for libewf_segment_table_get_basename */
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
 
-	/* TODO: add tests for libewf_segment_table_set_basename */
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_initialize(
+	          &segment_table,
+	          io_handle,
+	          LIBEWF_DEFAULT_SEGMENT_FILE_SIZE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_table_set_basename(
+	          segment_table,
+	          "test",
+	          4,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_segment_table_get_basename_size",
+	 ewf_test_segment_table_get_basename_size,
+	 segment_table );
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_segment_table_get_basename",
+	 ewf_test_segment_table_get_basename,
+	 segment_table );
+
+	EWF_TEST_RUN(
+	 "libewf_segment_table_set_basename",
+	 ewf_test_segment_table_set_basename );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-	/* TODO: add tests for libewf_segment_table_get_basename_size_wide */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_segment_table_get_basename_size_wide",
+	 ewf_test_segment_table_get_basename_size_wide,
+	 segment_table );
 
-	/* TODO: add tests for libewf_segment_table_get_basename_wide */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_segment_table_get_basename_wide",
+	 ewf_test_segment_table_get_basename_wide,
+	 segment_table );
 
-	/* TODO: add tests for libewf_segment_table_set_basename_wide */
+	EWF_TEST_RUN(
+	 "libewf_segment_table_set_basename_wide",
+	 ewf_test_segment_table_set_basename_wide );
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-	/* TODO: add tests for libewf_segment_table_set_maximum_segment_size */
+	EWF_TEST_RUN(
+	 "libewf_segment_table_set_maximum_segment_size",
+	 ewf_test_segment_table_set_maximum_segment_size );
 
-	/* TODO: add tests for libewf_segment_table_get_number_of_segments */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "libewf_segment_table_get_number_of_segments",
+	 ewf_test_segment_table_get_number_of_segments,
+	 segment_table );
 
 	/* TODO: add tests for libewf_segment_table_get_segment_by_index */
 
@@ -600,6 +1722,43 @@ int main(
 
 	/* TODO: add tests for libewf_segment_table_append_segment_by_segment_file */
 
+	/* Clean up
+	 */
+	result = libewf_segment_table_free(
+	          &segment_table,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_table",
+	 segment_table );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
@@ -607,6 +1766,27 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 on_error:
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_table != NULL )
+	{
+		libewf_segment_table_free(
+		 &segment_table,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
 	return( EXIT_FAILURE );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */

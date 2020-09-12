@@ -1117,6 +1117,7 @@ ewf_test_volume_section_SOURCES = \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
 	ewf_test_unused.h \
 	ewf_test_volume_section.c
 

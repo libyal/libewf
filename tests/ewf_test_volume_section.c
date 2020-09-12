@@ -33,6 +33,7 @@
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
+#include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_io_handle.h"
@@ -308,6 +309,39 @@ int ewf_test_volume_section_e01_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
+
+	/* Test libewf_volume_section_e01_read_data with memcpy of set_identifier failing
+	 */
+	ewf_test_memcpy_attempts_before_fail = 0;
+
+	result = libewf_volume_section_e01_read_data(
+	          ewf_test_volume_section_e01_data1,
+	          1052,
+	          io_handle,
+	          media_values,
+	          &error );
+
+	if( ewf_test_memcpy_attempts_before_fail != -1 )
+	{
+		ewf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
 
 	/* Clean up
 	 */
@@ -704,6 +738,8 @@ int ewf_test_volume_section_e01_write_data(
 	 "error",
 	 error );
 
+	io_handle->format = LIBEWF_FORMAT_ENCASE7;
+
 	result = libewf_media_values_initialize(
 	          &media_values,
 	          &error );
@@ -836,6 +872,73 @@ int ewf_test_volume_section_e01_write_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+#ifdef TODO
+/* This test currently fails */
+	/* Test libewf_volume_section_e01_write_data with memset failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_volume_section_e01_write_data(
+	          section_data,
+	          1052,
+	          io_handle,
+	          media_values,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif
+#if defined( OPTIMIZATION_DISABLED )
+	/* Test libewf_volume_section_e01_write_data with memcpy of set_identifier failing
+	 */
+	ewf_test_memcpy_attempts_before_fail = 0;
+
+	result = libewf_volume_section_e01_write_data(
+	          section_data,
+	          1052,
+	          io_handle,
+	          media_values,
+	          &error );
+
+	if( ewf_test_memcpy_attempts_before_fail != -1 )
+	{
+		ewf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(
@@ -911,6 +1014,10 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 	ssize_t write_count                             = 0;
 	int result                                      = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	off64_t offset                                  = 0;
+#endif
+
 	/* Initialize test
 	 */
 	result = libewf_section_descriptor_initialize(
@@ -946,6 +1053,8 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	io_handle->format = LIBEWF_FORMAT_ENCASE7;
 
 	result = libewf_media_values_initialize(
 	          &media_values,
@@ -1091,6 +1200,82 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 
 	libcerror_error_free(
 	 &error );
+
+	media_values->number_of_chunks = (uint64_t) UINT32_MAX + 1;
+
+	write_count = libewf_volume_section_e01_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               0,
+	               media_values,
+	               &error );
+
+	media_values->number_of_chunks = 0;
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libewf_volume_section_e01_write_file_io_pool with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	write_count = libewf_volume_section_e01_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               0,
+	               media_values,
+	               &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
+		 "write_count",
+		 write_count,
+		 (ssize_t) -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up file IO pool
 	 */
@@ -1775,6 +1960,8 @@ int ewf_test_volume_section_s01_write_data(
 	 "error",
 	 error );
 
+	io_handle->format = LIBEWF_FORMAT_SMART;
+
 	result = libewf_media_values_initialize(
 	          &media_values,
 	          &error );
@@ -1907,6 +2094,39 @@ int ewf_test_volume_section_s01_write_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_volume_section_s01_write_data with memset failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_volume_section_s01_write_data(
+	          section_data,
+	          94,
+	          io_handle,
+	          media_values,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(
@@ -1982,6 +2202,10 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 	ssize_t write_count                             = 0;
 	int result                                      = 0;
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+	off64_t offset                                  = 0;
+#endif
+
 	/* Initialize test
 	 */
 	result = libewf_section_descriptor_initialize(
@@ -2017,6 +2241,8 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	io_handle->format = LIBEWF_FORMAT_SMART;
 
 	result = libewf_media_values_initialize(
 	          &media_values,
@@ -2162,6 +2388,82 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 
 	libcerror_error_free(
 	 &error );
+
+	media_values->number_of_chunks = (uint64_t) UINT32_MAX + 1;
+
+	write_count = libewf_volume_section_s01_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               0,
+	               media_values,
+	               &error );
+
+	media_values->number_of_chunks = 0;
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libewf_volume_section_s01_write_file_io_pool with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	write_count = libewf_volume_section_s01_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               0,
+	               media_values,
+	               &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
+		 "write_count",
+		 write_count,
+		 (ssize_t) -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up file IO pool
 	 */

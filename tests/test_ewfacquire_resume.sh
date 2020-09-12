@@ -1,14 +1,11 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20160328
+# Version: 20200912
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
-
-TEST_PREFIX=`dirname ${PWD}`;
-TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib\([^-]*\)/\1/'`;
 
 test_write_resume()
 { 
@@ -72,11 +69,11 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire";
+ACQUIRE_TOOL="../ewftools/ewfacquire";
 
 if ! test -x "${ACQUIRE_TOOL}";
 then
-	ACQUIRE_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}acquire.exe";
+	ACQUIRE_TOOL="../ewftools/ewfacquire.exe";
 fi
 
 if ! test -x "${ACQUIRE_TOOL}";
@@ -100,11 +97,11 @@ then
 	exit ${EXIT_FAILURE};
 fi
 
-VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify";
+VERIFY_TOOL="../ewftools/ewfverify";
 
 if ! test -x "${VERIFY_TOOL}";
 then
-	VERIFY_TOOL="../${TEST_PREFIX}tools/${TEST_PREFIX}verify.exe";
+	VERIFY_TOOL="../ewftools/ewfverify.exe";
 fi
 
 if ! test -x "${VERIFY_TOOL}";
