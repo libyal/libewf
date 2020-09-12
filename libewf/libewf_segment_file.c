@@ -641,21 +641,18 @@ int libewf_segment_file_get_section_by_index(
 }
 
 /* Reads the segment file header
- * Returns the number of bytes read if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-ssize_t libewf_segment_file_read_file_header(
-         libewf_segment_file_t *segment_file,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         libcerror_error_t **error )
+int libewf_segment_file_read_file_header_data(
+     libewf_segment_file_t *segment_file,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
 {
-	uint8_t *file_header_data    = NULL;
-	static char *function        = "libewf_segment_file_read_file_header";
-	size_t file_header_data_size = 0;
-	ssize_t read_count           = 0;
+	static char *function = "libewf_segment_file_read_file_header_data";
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint16_t value_16bit         = 0;
+	uint16_t value_16bit  = 0;
 #endif
 
 	if( segment_file == NULL )
@@ -669,19 +666,187 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
-	file_header_data = (uint8_t *) memory_allocate(
-	                                sizeof( ewf_file_header_v2_t ) );
-
-	if( file_header_data == NULL )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create file header data.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing data.",
 		 function );
 
-		goto on_error;
+		return( -1 );
+	}
+	if( ( data_size != sizeof( ewf_file_header_v1_t ) )
+	 && ( data_size != sizeof( ewf_file_header_v2_t ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: file header:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 0 );
+	}
+#endif
+	if( data_size == sizeof( ewf_file_header_v1_t ) )
+	{
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (ewf_file_header_v1_t *) data )->segment_number,
+		 segment_file->segment_number );
+
+		segment_file->major_version      = 1;
+		segment_file->minor_version      = 0;
+		segment_file->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
+	}
+	else if( data_size == sizeof( ewf_file_header_v2_t ) )
+	{
+		segment_file->major_version = ( (ewf_file_header_v2_t *) data )->major_version;
+		segment_file->minor_version = ( (ewf_file_header_v2_t *) data )->minor_version;
+
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (ewf_file_header_v2_t *) data )->compression_method,
+		 segment_file->compression_method );
+
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (ewf_file_header_v2_t *) data )->segment_number,
+		 segment_file->segment_number );
+
+		if( memory_copy(
+		     segment_file->set_identifier,
+		     ( (ewf_file_header_v2_t *) data )->set_identifier,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy set identifier.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+	 	 "%s: signature:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 8,
+		 0 );
+
+		if( data_size == sizeof( ewf_file_header_v1_t ) )
+		{
+			libcnotify_printf(
+		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
+			 function,
+			 ( (ewf_file_header_v1_t *) data )->fields_start );
+		}
+		else if( data_size == sizeof( ewf_file_header_v2_t ) )
+		{
+			libcnotify_printf(
+		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 segment_file->major_version );
+
+			libcnotify_printf(
+		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
+			 function,
+			 segment_file->minor_version );
+
+			libcnotify_printf(
+		 	 "%s: compression method\t\t: %" PRIu16 " (",
+			 function,
+			 segment_file->compression_method );
+			libewf_debug_print_compression_method(
+			 segment_file->compression_method );
+			libcnotify_printf(
+			 ")\n" );
+		}
+		libcnotify_printf(
+	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
+		 function,
+		 segment_file->segment_number );
+
+		if( data_size == sizeof( ewf_file_header_v1_t ) )
+		{
+			byte_stream_copy_to_uint16_little_endian(
+			 ( (ewf_file_header_v1_t *) data )->fields_end,
+			 value_16bit );
+			libcnotify_printf(
+		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 value_16bit );
+		}
+		else if( data_size == sizeof( ewf_file_header_v2_t ) )
+		{
+			if( libewf_debug_print_guid_value(
+			     function,
+			     "set identifier\t\t\t",
+			     segment_file->set_identifier,
+			     16,
+			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		libcnotify_printf(
+	 	 "\n" );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	return( 1 );
+}
+
+/* Reads the segment file header
+ * Returns the number of bytes read if successful, or -1 on error
+ */
+ssize_t libewf_segment_file_read_file_header_file_io_pool(
+         libewf_segment_file_t *segment_file,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         libcerror_error_t **error )
+{
+	uint8_t file_header_data[ sizeof( ewf_file_header_v2_t ) ];
+
+	static char *function        = "libewf_segment_file_read_file_header_file_io_pool";
+	size_t file_header_data_size = 0;
+	ssize_t read_count           = 0;
+
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -705,7 +870,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to seek file header offset: 0.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	segment_file->current_offset = 0;
 
@@ -725,7 +890,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to read file header signature.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	segment_file->current_offset += read_count;
 
@@ -770,7 +935,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unsupported file header signature.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	read_count = libbfio_pool_read_buffer(
 	              file_io_pool,
@@ -788,152 +953,26 @@ ssize_t libewf_segment_file_read_file_header(
 		 "%s: unable to read file header data.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	segment_file->current_offset += read_count;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+	if( libewf_segment_file_read_file_header_data(
+	     segment_file,
+	     file_header_data,
+	     file_header_data_size,
+	     error ) != 1 )
 	{
-		libcnotify_printf(
-	 	 "%s: file header:\n",
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read file header.",
 		 function );
-		libcnotify_print_data(
-		 file_header_data,
-		 file_header_data_size,
-		 0 );
+
+		return( -1 );
 	}
-#endif
-	if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
-	{
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (ewf_file_header_v1_t *) file_header_data )->segment_number,
-		 segment_file->segment_number );
-
-		segment_file->major_version      = 1;
-		segment_file->minor_version      = 0;
-		segment_file->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	}
-	else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
-	{
-		segment_file->major_version = ( (ewf_file_header_v2_t *) file_header_data )->major_version;
-		segment_file->minor_version = ( (ewf_file_header_v2_t *) file_header_data )->minor_version;
-
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (ewf_file_header_v2_t *) file_header_data )->compression_method,
-		 segment_file->compression_method );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_file_header_v2_t *) file_header_data )->segment_number,
-		 segment_file->segment_number );
-
-		if( memory_copy(
-		     segment_file->set_identifier,
-		     ( (ewf_file_header_v2_t *) file_header_data )->set_identifier,
-		     16 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy set identifier.",
-			 function );
-
-			goto on_error;
-		}
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-	 	 "%s: signature:\n",
-		 function );
-		libcnotify_print_data(
-		 file_header_data,
-		 8,
-		 0 );
-
-		if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
-		{
-			libcnotify_printf(
-		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
-			 function,
-			 ( (ewf_file_header_v1_t *) file_header_data )->fields_start );
-		}
-		else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
-		{
-			libcnotify_printf(
-		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
-			 function,
-			 segment_file->major_version );
-
-			libcnotify_printf(
-		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
-			 function,
-			 segment_file->minor_version );
-
-			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 " (",
-			 function,
-			 segment_file->compression_method );
-			libewf_debug_print_compression_method(
-			 segment_file->compression_method );
-			libcnotify_printf(
-			 ")\n" );
-		}
-		libcnotify_printf(
-	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
-		 function,
-		 segment_file->segment_number );
-
-		if( file_header_data_size == sizeof( ewf_file_header_v1_t ) )
-		{
-			byte_stream_copy_to_uint16_little_endian(
-			 ( (ewf_file_header_v1_t *) file_header_data )->fields_end,
-			 value_16bit );
-			libcnotify_printf(
-		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
-			 function,
-			 value_16bit );
-		}
-		else if( file_header_data_size == sizeof( ewf_file_header_v2_t ) )
-		{
-			if( libewf_debug_print_guid_value(
-			     function,
-			     "set identifier\t\t\t",
-			     segment_file->set_identifier,
-			     16,
-			     LIBFGUID_ENDIAN_LITTLE,
-			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print GUID value.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		libcnotify_printf(
-	 	 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-	memory_free(
-	 file_header_data );
-
 	return( (ssize_t) file_header_data_size );
-
-on_error:
-	if( file_header_data != NULL )
-	{
-		memory_free(
-		 file_header_data );
-	}
-	return( -1 );
 }
 
 /* Writes the segment file header
@@ -6024,7 +6063,7 @@ int libewf_segment_file_read_element_data(
 
 		goto on_error;
 	}
-	read_count = libewf_segment_file_read_file_header(
+	read_count = libewf_segment_file_read_file_header_file_io_pool(
 		      segment_file,
 		      file_io_pool,
 		      file_io_pool_entry,

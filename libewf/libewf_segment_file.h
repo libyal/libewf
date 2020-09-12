@@ -170,7 +170,13 @@ int libewf_segment_file_get_section_by_index(
      libewf_section_descriptor_t **section,
      libcerror_error_t **error );
 
-ssize_t libewf_segment_file_read_file_header(
+int libewf_segment_file_read_file_header_data(
+     libewf_segment_file_t *segment_file,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+ssize_t libewf_segment_file_read_file_header_file_io_pool(
          libewf_segment_file_t *segment_file,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,

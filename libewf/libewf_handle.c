@@ -3640,7 +3640,7 @@ int libewf_internal_handle_open_file_io_pool(
 				 file_io_pool_entry );
 			}
 #endif
-			read_count = libewf_segment_file_read_file_header(
+			read_count = libewf_segment_file_read_file_header_file_io_pool(
 				      segment_file,
 				      file_io_pool,
 				      file_io_pool_entry,

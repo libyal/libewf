@@ -1012,11 +1012,8 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 	libewf_media_values_t *media_values             = NULL;
 	libewf_section_descriptor_t *section_descriptor = NULL;
 	ssize_t write_count                             = 0;
-	int result                                      = 0;
-
-#if defined( HAVE_EWF_TEST_MEMORY )
 	off64_t offset                                  = 0;
-#endif
+	int result                                      = 0;
 
 	/* Initialize test
 	 */
@@ -1117,6 +1114,22 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 
 	/* Test error cases
 	 */
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	write_count = libewf_volume_section_e01_write_file_io_pool(
 	               NULL,
 	               io_handle,
@@ -1227,22 +1240,6 @@ int ewf_test_volume_section_e01_write_file_io_pool(
 	 &error );
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-
-	offset = libbfio_pool_seek_offset(
-	          file_io_pool,
-	          0,
-	          0,
-	          SEEK_SET,
-	          &error );
-
-	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
-	 "offset",
-	 offset,
-	 (int64_t) -1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
 
 	/* Test libewf_volume_section_e01_write_file_io_pool with malloc failing
 	 */
@@ -2200,11 +2197,8 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 	libewf_media_values_t *media_values             = NULL;
 	libewf_section_descriptor_t *section_descriptor = NULL;
 	ssize_t write_count                             = 0;
-	int result                                      = 0;
-
-#if defined( HAVE_EWF_TEST_MEMORY )
 	off64_t offset                                  = 0;
-#endif
+	int result                                      = 0;
 
 	/* Initialize test
 	 */
@@ -2305,6 +2299,22 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 
 	/* Test error cases
 	 */
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	write_count = libewf_volume_section_s01_write_file_io_pool(
 	               NULL,
 	               io_handle,
@@ -2415,22 +2425,6 @@ int ewf_test_volume_section_s01_write_file_io_pool(
 	 &error );
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-
-	offset = libbfio_pool_seek_offset(
-	          file_io_pool,
-	          0,
-	          0,
-	          SEEK_SET,
-	          &error );
-
-	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
-	 "offset",
-	 offset,
-	 (int64_t) -1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
 
 	/* Test libewf_volume_section_s01_write_file_io_pool with malloc failing
 	 */

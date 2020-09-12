@@ -36,6 +36,13 @@
 
 #include "../libewf/libewf_segment_file.h"
 
+unsigned char ewf_test_segment_file_data1[ 13 ] = {
+	0x45, 0x56, 0x46, 0x09, 0x0d, 0x0a, 0xff, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00 };
+
+unsigned char ewf_test_segment_file_data2[ 32 ] = {
+	0x45, 0x56, 0x46, 0x32, 0x0d, 0x0a, 0x81, 0x00, 0x02, 0x01, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00,
+	0xb0, 0x29, 0xc8, 0xd4, 0x97, 0xb5, 0xcc, 0xc7, 0xb4, 0x2a, 0x32, 0x3a, 0x7d, 0xf5, 0x18, 0x5a };
+
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_segment_file_initialize function
@@ -50,7 +57,7 @@ int ewf_test_segment_file_initialize(
 	int result                          = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests     = 3;
+	int number_of_malloc_fail_tests     = 4;
 	int number_of_memset_fail_tests     = 1;
 	int test_number                     = 0;
 #endif
@@ -351,7 +358,7 @@ int ewf_test_segment_file_clone(
 	int result                                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests                 = 5;
+	int number_of_malloc_fail_tests                 = 6;
 	int test_number                                 = 0;
 
 #if defined( OPTIMIZATION_DISABLED )
@@ -809,6 +816,183 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_segment_file_read_file_header_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_segment_file_read_file_header_data(
+     void )
+{
+	libcerror_error_t *error            = NULL;
+	libewf_io_handle_t *io_handle       = NULL;
+	libewf_segment_file_t *segment_file = NULL;
+	int result                          = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_file_initialize(
+	          &segment_file,
+	          io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_segment_file_read_file_header_data(
+	          segment_file,
+	          ewf_test_segment_file_data1,
+	          13,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_segment_file_read_file_header_data(
+	          segment_file,
+	          ewf_test_segment_file_data2,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_segment_file_read_file_header_data(
+	          NULL,
+	          ewf_test_segment_file_data1,
+	          13,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_segment_file_read_file_header_data(
+	          segment_file,
+	          NULL,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_segment_file_free(
+	          &segment_file,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "segment_file",
+	 segment_file );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &segment_file,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libewf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libewf_segment_file_seek_offset function
  * Returns 1 if successful or 0 if not
  */
@@ -1056,9 +1240,13 @@ int main(
 
 	/* TODO: add tests for libewf_segment_file_get_section_by_index */
 
-	/* TODO: add tests for libewf_segment_file_read_file_header */
+	EWF_TEST_RUN(
+	 "libewf_segment_file_read_file_header_data",
+	 ewf_test_segment_file_read_file_header_data );
 
-	/* TODO: add tests for libewf_segment_file_write_file_header */
+	/* TODO: add tests for libewf_segment_file_read_file_header_file_io_pool */
+
+	/* TODO: add tests for libewf_segment_file_write_file_header_file_io_pool */
 
 	EWF_TEST_RUN(
 	 "libewf_segment_file_seek_offset",
