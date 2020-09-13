@@ -789,6 +789,36 @@ int ewf_test_ltree_section_read_file_io_pool(
 	libcerror_error_free(
 	 &error );
 
+	/* Test libewf_ltree_section_read_file_io_pool failing in libewf_section_read_data
+	 */
+	section_descriptor->data_size = 0;
+
+	read_count = libewf_ltree_section_read_file_io_pool(
+	              NULL,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              2,
+	              &section_data,
+	              &section_data_size,
+	              &single_files_data,
+	              &single_files_data_size,
+	              &error );
+
+	section_descriptor->data_size = 5748;
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up file IO pool
 	 */
 	result = ewf_test_close_file_io_pool(
@@ -875,8 +905,8 @@ on_error:
 int ewf_test_ltree_section_write_file_io_pool(
      void )
 {
-	uint8_t section_data[ 256 ];
-	uint8_t single_files_section_data[ 256 ];
+	uint8_t section_data[ 512 ];
+	uint8_t single_files_section_data[ 386 ];
 
 	libbfio_pool_t *file_io_pool                    = NULL;
 	libcerror_error_t *error                        = NULL;
@@ -927,7 +957,7 @@ int ewf_test_ltree_section_write_file_io_pool(
 	result = ewf_test_open_file_io_pool(
 	          &file_io_pool,
 	          section_data,
-	          256,
+	          512,
 	          LIBBFIO_OPEN_WRITE,
 	          &error );
 
@@ -946,7 +976,6 @@ int ewf_test_ltree_section_write_file_io_pool(
 
 	/* Test regular cases
 	 */
-/* TODO fix test
 	write_count = libewf_ltree_section_write_file_io_pool(
 	               section_descriptor,
 	               io_handle,
@@ -955,20 +984,57 @@ int ewf_test_ltree_section_write_file_io_pool(
 	               1,
 	               0,
 	               single_files_section_data,
-	               256,
-	               single_files_section_data,
+	               386,
+	               &( single_files_section_data[ 48 ] ),
 	               256,
 	               &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "write_count",
 	 write_count,
-	 (ssize_t) 156 );
+	 (ssize_t) 380 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-*/
+
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_count = libewf_ltree_section_write_file_io_pool(
+	               section_descriptor,
+	               io_handle,
+	               file_io_pool,
+	               0,
+	               2,
+	               0,
+	               single_files_section_data,
+	               386,
+	               &( single_files_section_data[ 48 ] ),
+	               256,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 320 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */

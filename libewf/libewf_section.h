@@ -65,21 +65,6 @@ int libewf_section_set_values(
      uint32_t padding_size,
      libcerror_error_t **error );
 
-ssize_t libewf_section_descriptor_read(
-         libewf_section_descriptor_t *section_descriptor,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         off64_t file_offset,
-         uint8_t format_version,
-         libcerror_error_t **error );
-
-ssize_t libewf_section_descriptor_write(
-         libewf_section_descriptor_t *section_descriptor,
-         libbfio_pool_t *file_io_pool,
-         int file_io_pool_entry,
-         uint8_t format_version,
-         libcerror_error_t **error );
-
 ssize_t libewf_section_read_data(
          libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,

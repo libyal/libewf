@@ -693,7 +693,7 @@ int libewf_segment_file_read_file_header_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: file header:\n",
+		 "%s: file header:\n",
 		 function );
 		libcnotify_print_data(
 		 data,
@@ -743,7 +743,7 @@ int libewf_segment_file_read_file_header_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: signature:\n",
+		 "%s: signature:\n",
 		 function );
 		libcnotify_print_data(
 		 data,
@@ -753,24 +753,24 @@ int libewf_segment_file_read_file_header_data(
 		if( data_size == sizeof( ewf_file_header_v1_t ) )
 		{
 			libcnotify_printf(
-		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
+			 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
 			 function,
 			 ( (ewf_file_header_v1_t *) data )->fields_start );
 		}
 		else if( data_size == sizeof( ewf_file_header_v2_t ) )
 		{
 			libcnotify_printf(
-		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
+			 "%s: major version\t\t: %" PRIu8 "\n",
 			 function,
 			 segment_file->major_version );
 
 			libcnotify_printf(
-		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
+			 "%s: minor version\t\t: %" PRIu8 "\n",
 			 function,
 			 segment_file->minor_version );
 
 			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 " (",
+			 "%s: compression method\t\t: %" PRIu16 " (",
 			 function,
 			 segment_file->compression_method );
 			libewf_debug_print_compression_method(
@@ -779,7 +779,7 @@ int libewf_segment_file_read_file_header_data(
 			 ")\n" );
 		}
 		libcnotify_printf(
-	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
+		 "%s: segment number\t\t: %" PRIu32 "\n",
 		 function,
 		 segment_file->segment_number );
 
@@ -789,7 +789,7 @@ int libewf_segment_file_read_file_header_data(
 			 ( (ewf_file_header_v1_t *) data )->fields_end,
 			 value_16bit );
 			libcnotify_printf(
-		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
+			 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
 			 function,
 			 value_16bit );
 		}
@@ -797,7 +797,7 @@ int libewf_segment_file_read_file_header_data(
 		{
 			if( libewf_debug_print_guid_value(
 			     function,
-			     "set identifier\t\t\t",
+			     "set identifier\t\t",
 			     segment_file->set_identifier,
 			     16,
 			     LIBFGUID_ENDIAN_LITTLE,
@@ -815,7 +815,7 @@ int libewf_segment_file_read_file_header_data(
 			}
 		}
 		libcnotify_printf(
-	 	 "\n" );
+		 "\n" );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
@@ -852,7 +852,7 @@ ssize_t libewf_segment_file_read_file_header_file_io_pool(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	"%s: reading file header at offset: 0 (0x00000000)\n",
+		 "%s: reading file header at offset: 0 (0x00000000)\n",
 		 function );
 	}
 #endif
@@ -1165,7 +1165,7 @@ ssize_t libewf_segment_file_write_file_header(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: file header:\n",
+		 "%s: file header:\n",
 		 function );
 		libcnotify_print_data(
 		 file_header_data,
@@ -1177,7 +1177,7 @@ ssize_t libewf_segment_file_write_file_header(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-	 	 "%s: signature:\n",
+		 "%s: signature:\n",
 		 function );
 		libcnotify_print_data(
 		 file_header_data,
@@ -1187,24 +1187,24 @@ ssize_t libewf_segment_file_write_file_header(
 		if( segment_file->major_version == 1 )
 		{
 			libcnotify_printf(
-		 	 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
+			 "%s: fields start\t\t\t: 0x%02" PRIx8 "\n",
 			 function,
 			 ( (ewf_file_header_v1_t *) file_header_data )->fields_start );
 		}
 		else if( segment_file->major_version == 2 )
 		{
 			libcnotify_printf(
-		 	 "%s: major version\t\t\t: %" PRIu8 "\n",
+			 "%s: major version\t\t: %" PRIu8 "\n",
 			 function,
 			 segment_file->major_version );
 
 			libcnotify_printf(
-		 	 "%s: minor version\t\t\t: %" PRIu8 "\n",
+			 "%s: minor version\t\t: %" PRIu8 "\n",
 			 function,
 			 segment_file->minor_version );
 
 			libcnotify_printf(
-		 	 "%s: compression method\t\t: %" PRIu16 " (",
+			 "%s: compression method\t\t: %" PRIu16 " (",
 			 function,
 			 segment_file->compression_method );
 			libewf_debug_print_compression_method(
@@ -1213,7 +1213,7 @@ ssize_t libewf_segment_file_write_file_header(
 			 ")\n" );
 		}
 		libcnotify_printf(
-	 	 "%s: segment number\t\t\t: %" PRIu32 "\n",
+		 "%s: segment number\t\t: %" PRIu32 "\n",
 		 function,
 		 segment_file->segment_number );
 
@@ -1223,25 +1223,36 @@ ssize_t libewf_segment_file_write_file_header(
 			 ( (ewf_file_header_v1_t *) file_header_data )->fields_end,
 			 value_16bit );
 			libcnotify_printf(
-		 	 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
+			 "%s: fields end\t\t\t: 0x%04" PRIx16 "\n",
 			 function,
 			 value_16bit );
 		}
 		else if( segment_file->major_version == 2 )
 		{
-/* TODO replace by GUID print */
-			libcnotify_printf(
-			 "%s: set identifier:\n",
-			 function );
-			libcnotify_print_data(
-			 segment_file->set_identifier,
-			 16,
-			 0 );
+			if( libewf_debug_print_guid_value(
+			     function,
+			     "set identifier\t\t",
+			     segment_file->set_identifier,
+			     16,
+			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
+				 function );
+
+				return( -1 );
+			}
 		}
 		libcnotify_printf(
-	 	 "\n" );
+		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	write_count = libbfio_pool_write_buffer(
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -3119,7 +3130,7 @@ ssize_t libewf_segment_file_write_last_section(
 
 		goto on_error;
 	}
-	write_count = libewf_section_descriptor_write(
+	write_count = libewf_section_descriptor_write_file_io_pool(
 	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,
@@ -3699,7 +3710,7 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-		 	"%s: setting file descriptor to start of chunks section offset: %" PRIi64 ".\n",
+			 "%s: setting file descriptor to start of chunks section offset: %" PRIi64 ".\n",
 			 function,
 			 chunks_section_offset );
 		}
@@ -6158,7 +6169,7 @@ int libewf_segment_file_read_element_data(
 	while( ( segment_file_offset > 0 )
 	    && ( (size64_t) segment_file_offset < segment_file_size ) )
 	{
-		read_count = libewf_section_descriptor_read(
+		read_count = libewf_section_descriptor_read_file_io_pool(
 			      section_descriptor,
 			      file_io_pool,
 			      file_io_pool_entry,
@@ -6645,7 +6656,7 @@ int libewf_segment_file_read_section_element_data(
 
 		goto on_error;
 	}
-	read_count = libewf_section_descriptor_read(
+	read_count = libewf_section_descriptor_read_file_io_pool(
 		      section_descriptor,
 		      file_io_pool,
 		      file_io_pool_entry,
@@ -6790,7 +6801,7 @@ int libewf_segment_file_read_chunk_group_element_data(
 	}
 	if( segment_file->major_version == 1 )
 	{
-		read_count = libewf_section_descriptor_read(
+		read_count = libewf_section_descriptor_read_file_io_pool(
 			      section_descriptor,
 			      file_io_pool,
 			      file_io_pool_entry,

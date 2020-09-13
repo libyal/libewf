@@ -91,6 +91,29 @@ int libewf_section_descriptor_clone(
      libewf_section_descriptor_t *source_section_descriptor,
      libcerror_error_t **error );
 
+int libewf_section_descriptor_read_data(
+     libewf_section_descriptor_t *section_descriptor,
+     const uint8_t *data,
+     size_t data_size,
+     off64_t file_offset,
+     uint8_t format_version,
+     libcerror_error_t **error );
+
+ssize_t libewf_section_descriptor_read_file_io_pool(
+         libewf_section_descriptor_t *section_descriptor,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         off64_t file_offset,
+         uint8_t format_version,
+         libcerror_error_t **error );
+
+ssize_t libewf_section_descriptor_write_file_io_pool(
+         libewf_section_descriptor_t *section_descriptor,
+         libbfio_pool_t *file_io_pool,
+         int file_io_pool_entry,
+         uint8_t format_version,
+         libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

@@ -544,7 +544,7 @@ ssize_t libewf_digest_section_write_file_io_pool(
 
 		return( -1 );
 	}
-	write_count = libewf_section_descriptor_write(
+	write_count = libewf_section_descriptor_write_file_io_pool(
 	               section_descriptor,
 	               file_io_pool,
 	               file_io_pool_entry,

@@ -592,7 +592,7 @@ ssize_t libewf_ltree_section_write_file_io_pool(
 	}
 	if( format_version == 1 )
 	{
-		write_count = libewf_section_descriptor_write(
+		write_count = libewf_section_descriptor_write_file_io_pool(
 			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,
@@ -784,7 +784,7 @@ ssize_t libewf_ltree_section_write_file_io_pool(
 
 	if( format_version == 2 )
 	{
-		write_count = libewf_section_descriptor_write(
+		write_count = libewf_section_descriptor_write_file_io_pool(
 			       section_descriptor,
 			       file_io_pool,
 			       file_io_pool_entry,

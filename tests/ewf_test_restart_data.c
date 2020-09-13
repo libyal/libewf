@@ -30,6 +30,7 @@
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
 #include "ewf_test_macros.h"
+#include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
 #include "../libewf/libewf_restart_data.h"
@@ -42,14 +43,33 @@
 int ewf_test_restart_data_parse(
      void )
 {
+	uint8_t restart_data[ 32 ] = {
+		0xff, 0xfe, 0x00, 0x00 };
+
 	libcerror_error_t *error = NULL;
 	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libewf_restart_data_parse(
+	          restart_data,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
 	result = libewf_restart_data_parse(
 	          NULL,
-	          0,
+	          32,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -63,6 +83,54 @@ int ewf_test_restart_data_parse(
 
 	libcerror_error_free(
 	 &error );
+
+	result = libewf_restart_data_parse(
+	          restart_data,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_restart_data_parse with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	result = libewf_restart_data_parse(
+	          restart_data,
+	          32,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	return( 1 );
 
