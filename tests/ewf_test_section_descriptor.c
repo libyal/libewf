@@ -603,6 +603,23 @@ int ewf_test_section_descriptor_read_data(
 	 "error",
 	 error );
 
+	result = libewf_section_descriptor_read_data(
+	          section_descriptor,
+	          ewf_test_section_descriptor_data2,
+	          64,
+	          0x031f4b40UL,
+	          2,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libewf_section_descriptor_read_data(
@@ -1027,6 +1044,416 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_section_descriptor_write_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_section_descriptor_write_data(
+     void )
+{
+	uint8_t section_descriptor_data[ 128 ];
+
+	libcerror_error_t *error                        = NULL;
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	int result                                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_section_descriptor_initialize(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_section_descriptor_write_data(
+	          section_descriptor,
+	          section_descriptor_data,
+	          76,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_section_descriptor_write_data(
+	          NULL,
+	          section_descriptor_data,
+	          76,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_section_descriptor_write_data(
+	          section_descriptor,
+	          NULL,
+	          76,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_section_descriptor_write_data(
+	          section_descriptor,
+	          section_descriptor_data,
+	          (size_t) SSIZE_MAX + 1,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_section_descriptor_write_data(
+	          section_descriptor,
+	          section_descriptor_data,
+	          76,
+	          0xff,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_section_descriptor_write_data with memset failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_section_descriptor_write_data(
+	          section_descriptor,
+	          section_descriptor_data,
+	          76,
+	          1,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libewf_section_descriptor_free(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( section_descriptor != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &section_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_section_descriptor_write_file_io_pool function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_section_descriptor_write_file_io_pool(
+     void )
+{
+	uint8_t section_descriptor_data[ 128 ];
+
+	libbfio_pool_t *file_io_pool                    = NULL;
+	libcerror_error_t *error                        = NULL;
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	ssize_t write_count                             = 0;
+	off64_t offset                                  = 0;
+	int result                                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_section_descriptor_initialize(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
+	          section_descriptor_data,
+	          128,
+	          LIBBFIO_OPEN_WRITE,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	write_count = libewf_section_descriptor_write_file_io_pool(
+	               section_descriptor,
+	               file_io_pool,
+	               0,
+	               1,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) 76 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	write_count = libewf_section_descriptor_write_file_io_pool(
+	               NULL,
+	               file_io_pool,
+	               0,
+	               1,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	write_count = libewf_section_descriptor_write_file_io_pool(
+	               section_descriptor,
+	               NULL,
+	               0,
+	               1,
+	               &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "write_count",
+	 write_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_section_descriptor_write_file_io_pool with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	write_count = libewf_section_descriptor_write_file_io_pool(
+	               section_descriptor,
+	               file_io_pool,
+	               0,
+	               1,
+	               &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
+		 "write_count",
+		 write_count,
+		 (ssize_t) -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libewf_section_descriptor_free(
+	          &section_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "section_descriptor",
+	 section_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( section_descriptor != NULL )
+	{
+		libewf_section_descriptor_free(
+		 &section_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -1058,6 +1485,8 @@ int main(
 	 "libewf_section_descriptor_clone",
 	 ewf_test_section_descriptor_clone );
 
+/* TODO add tests for libewf_section_descriptor_set */
+
 	EWF_TEST_RUN(
 	 "libewf_section_descriptor_read_data",
 	 ewf_test_section_descriptor_read_data );
@@ -1066,7 +1495,13 @@ int main(
 	 "libewf_section_descriptor_read_file_io_pool",
 	 ewf_test_section_descriptor_read_file_io_pool );
 
-	/* TODO add tests for libewf_section_descriptor_write_file_io_pool */
+	EWF_TEST_RUN(
+	 "libewf_section_descriptor_write_data",
+	 ewf_test_section_descriptor_write_data );
+
+	EWF_TEST_RUN(
+	 "libewf_section_descriptor_write_file_io_pool",
+	 ewf_test_section_descriptor_write_file_io_pool );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

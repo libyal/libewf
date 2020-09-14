@@ -1455,7 +1455,7 @@ ssize_t libewf_session_section_write_file_io_pool(
 	                  + session_entries_data_size
 	                  + session_footer_data_size;
 
-	if( libewf_section_set_values(
+	if( libewf_section_descriptor_set(
 	     section_descriptor,
 	     LIBEWF_SECTION_TYPE_SESSION_TABLE,
 	     (uint8_t *) "session",
@@ -1470,7 +1470,7 @@ ssize_t libewf_session_section_write_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set section values.",
+		 "%s: unable to set section descriptor.",
 		 function );
 
 		goto on_error;

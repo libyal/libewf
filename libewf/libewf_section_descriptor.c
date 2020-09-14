@@ -218,6 +218,126 @@ on_error:
 	return( -1 );
 }
 
+/* Sets the section values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_section_descriptor_set(
+     libewf_section_descriptor_t *section_descriptor,
+     uint32_t type,
+     const uint8_t *type_string,
+     size_t type_string_length,
+     off64_t section_offset,
+     size64_t section_size,
+     size64_t data_size,
+     uint32_t padding_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_section_descriptor_set";
+
+	if( section_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( section_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid section offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size64_t) INT64_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( (size64_t) padding_size > data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid padding size value exceeds data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( type_string != NULL )
+	{
+		if( ( type_string_length == 0 )
+		 || ( type_string_length > 16 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid type string length value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_copy(
+		     section_descriptor->type_string,
+		     type_string,
+		     type_string_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy type string.",
+			 function );
+
+			return( -1 );
+		}
+		section_descriptor->type_string[ type_string_length ] = 0;
+
+		section_descriptor->type_string_length = type_string_length;
+	}
+	else
+	{
+		if( memory_set(
+		     section_descriptor->type_string,
+		     0,
+		     17 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to set type string.",
+			 function );
+
+			return( -1 );
+		}
+		section_descriptor->type_string_length = 0;
+	}
+	section_descriptor->type         = type;
+	section_descriptor->start_offset = section_offset;
+	section_descriptor->end_offset   = (off64_t) ( section_offset + section_size );
+	section_descriptor->size         = section_size;
+	section_descriptor->data_size    = data_size;
+	section_descriptor->padding_size = padding_size;
+
+	return( 1 );
+}
+
 /* Reads a section descriptor
  * Returns the number of bytes read or -1 on error
  */
@@ -229,12 +349,13 @@ int libewf_section_descriptor_read_data(
      uint8_t format_version,
      libcerror_error_t **error )
 {
-	static char *function            = "libewf_section_descriptor_read_data";
-	uint64_t safe_end_offset         = 0;
-	uint64_t safe_start_offset       = 0;
-	uint32_t calculated_checksum     = 0;
-	uint32_t section_descriptor_size = 0;
-	uint32_t stored_checksum         = 0;
+	static char *function               = "libewf_section_descriptor_read_data";
+	size_t section_descriptor_data_size = 0;
+	uint64_t safe_end_offset            = 0;
+	uint64_t safe_start_offset          = 0;
+	uint32_t calculated_checksum        = 0;
+	uint32_t section_descriptor_size    = 0;
+	uint32_t stored_checksum            = 0;
 
 	if( section_descriptor == NULL )
 	{
@@ -258,26 +379,32 @@ int libewf_section_descriptor_read_data(
 
 		return( -1 );
 	}
-	if( ( data_size != (size_t) sizeof( ewf_section_descriptor_v1_t ) )
-	 && ( data_size != (size_t) sizeof( ewf_section_descriptor_v2_t ) ) )
+	if( format_version == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid data size value out of bounds.",
-		 function );
-
-		return( -1 );
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
 	}
-	if( ( format_version != 1 )
-	 && ( format_version != 2 ) )
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size != section_descriptor_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -936,6 +1063,293 @@ on_error:
 /* Writes a section descriptor
  * Returns the number of bytes written or -1 on error
  */
+int libewf_section_descriptor_write_data(
+     libewf_section_descriptor_t *section_descriptor,
+     uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libcerror_error_t **error )
+{
+	static char *function               = "libewf_section_descriptor_write_data";
+	size_t section_descriptor_data_size = 0;
+	off64_t previous_offset             = 0;
+	uint32_t calculated_checksum        = 0;
+
+	if( section_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( format_version == 1 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v1_t );
+	}
+	else if( format_version == 2 )
+	{
+		section_descriptor_data_size = sizeof( ewf_section_descriptor_v2_t );
+	}
+	else
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format version.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size != section_descriptor_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     data,
+	     0,
+	     data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear data.",
+		 function );
+
+		return( -1 );
+	}
+	if( format_version == 1 )
+	{
+		if( memory_copy(
+		     ( (ewf_section_descriptor_v1_t *) data )->type_string,
+		     section_descriptor->type_string,
+		     section_descriptor->type_string_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set type string.",
+			 function );
+
+			return( -1 );
+		}
+		byte_stream_copy_from_uint64_little_endian(
+		 ( (ewf_section_descriptor_v1_t *) data )->size,
+		 section_descriptor->size );
+
+		byte_stream_copy_from_uint64_little_endian(
+		 ( (ewf_section_descriptor_v1_t *) data )->next_offset,
+		 section_descriptor->end_offset );
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->type,
+		 section_descriptor->type );
+
+		if( section_descriptor->start_offset > (off64_t) sizeof( ewf_section_descriptor_v2_t ) )
+		{
+			previous_offset = section_descriptor->start_offset - sizeof( ewf_section_descriptor_v2_t );
+		}
+		byte_stream_copy_from_uint64_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->previous_offset,
+		 previous_offset );
+
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->data_flags,
+		 section_descriptor->data_flags );
+
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->data_size,
+		 section_descriptor->data_size );
+
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->descriptor_size,
+		 (uint32_t) sizeof( ewf_section_descriptor_v2_t ) );
+
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->padding_size,
+		 section_descriptor->padding_size );
+
+		if( memory_copy(
+		     ( (ewf_section_descriptor_v2_t *) data )->data_integrity_hash,
+		     section_descriptor->data_integrity_hash,
+		     16 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set data integrity hash.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( libewf_checksum_calculate_adler32(
+	     &calculated_checksum,
+	     data,
+	     data_size - 4,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to calculate checksum.",
+		 function );
+
+		return( -1 );
+	}
+	if( format_version == 1 )
+	{
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v1_t *) data )->checksum,
+		 calculated_checksum );
+	}
+	else if( format_version == 2 )
+	{
+		byte_stream_copy_from_uint32_little_endian(
+		 ( (ewf_section_descriptor_v2_t *) data )->checksum,
+		 calculated_checksum );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: section descriptor data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 0 );
+	}
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( format_version == 1 )
+		{
+			libcnotify_printf(
+			 "%s: type string\t\t\t\t: %s\n",
+			 function,
+			 (char *) section_descriptor->type_string );
+
+			libcnotify_printf(
+			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 section_descriptor->end_offset );
+
+			libcnotify_printf(
+			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
+			 function,
+			 section_descriptor->size );
+
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_section_descriptor_v1_t *) data )->padding,
+			 40,
+			 0 );
+		}
+		else if( format_version == 2 )
+		{
+			libcnotify_printf(
+			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
+			 function,
+			 section_descriptor->type );
+			libewf_debug_print_section_type(
+			 section_descriptor->type );
+			libcnotify_printf(
+			 ")\n" );
+
+			libcnotify_printf(
+			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 section_descriptor->data_flags );
+			libewf_debug_print_section_data_flags(
+			 section_descriptor->data_flags );
+			libcnotify_printf(
+			 "\n" );
+
+			libcnotify_printf(
+			 "%s: previous offset\t\t\t: 0x%08" PRIx64 "\n",
+			 function,
+			 previous_offset );
+
+			libcnotify_printf(
+			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
+			 function,
+			 section_descriptor->data_size );
+
+			libcnotify_printf(
+			 "%s: section descriptor size\t\t: %" PRIzd "\n",
+			 function,
+			 data_size );
+
+			libcnotify_printf(
+			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 section_descriptor->padding_size );
+
+			libcnotify_printf(
+			 "%s: data integrity hash:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_section_descriptor_v2_t *) data )->data_integrity_hash,
+			 16,
+			 0 );
+
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 ( (ewf_section_descriptor_v2_t *) data )->padding,
+			 12,
+			 0 );
+		}
+		libcnotify_printf(
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
+		 function,
+		 calculated_checksum );
+
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	return( 1 );
+}
+
+/* Writes a section descriptor
+ * Returns the number of bytes written or -1 on error
+ */
 ssize_t libewf_section_descriptor_write_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
          libbfio_pool_t *file_io_pool,
@@ -945,10 +1359,8 @@ ssize_t libewf_section_descriptor_write_file_io_pool(
 {
 	uint8_t *section_descriptor_data    = NULL;
 	static char *function               = "libewf_section_descriptor_write_file_io_pool";
-	off64_t previous_offset             = 0;
 	size_t section_descriptor_data_size = 0;
 	ssize_t write_count                 = 0;
-	uint32_t calculated_checksum        = 0;
 
 	if( section_descriptor == NULL )
 	{
@@ -994,222 +1406,22 @@ ssize_t libewf_section_descriptor_write_file_io_pool(
 
 		goto on_error;
 	}
-	if( memory_set(
+	if( libewf_section_descriptor_write_data(
+	     section_descriptor,
 	     section_descriptor_data,
-	     0,
-	     section_descriptor_data_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear section descriptor data.",
-		 function );
-
-		goto on_error;
-	}
-	if( format_version == 1 )
-	{
-		if( memory_copy(
-		     ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->type_string,
-		     section_descriptor->type_string,
-		     section_descriptor->type_string_length ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set type string.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_from_uint64_little_endian(
-		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->size,
-		 section_descriptor->size );
-
-		byte_stream_copy_from_uint64_little_endian(
-		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->next_offset,
-		 section_descriptor->end_offset );
-	}
-	else if( format_version == 2 )
-	{
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->type,
-		 section_descriptor->type );
-
-		if( section_descriptor->start_offset > (off64_t) sizeof( ewf_section_descriptor_v2_t ) )
-		{
-			previous_offset = section_descriptor->start_offset - sizeof( ewf_section_descriptor_v2_t );
-		}
-		byte_stream_copy_from_uint64_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->previous_offset,
-		 previous_offset );
-
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_flags,
-		 section_descriptor->data_flags );
-
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_size,
-		 section_descriptor->data_size );
-
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->descriptor_size,
-		 (uint32_t) section_descriptor_data_size );
-
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->padding_size,
-		 section_descriptor->padding_size );
-
-		if( memory_copy(
-		     ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_integrity_hash,
-		     section_descriptor->data_integrity_hash,
-		     16 ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set data integrity hash.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( libewf_checksum_calculate_adler32(
-	     &calculated_checksum,
-	     section_descriptor_data,
-	     section_descriptor_data_size - 4,
-	     1,
+	     section_descriptor_data_size,
+	     format_version,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to calculate checksum.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to write section descriptor data.",
 		 function );
 
 		goto on_error;
 	}
-	if( format_version == 1 )
-	{
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->checksum,
-		 calculated_checksum );
-	}
-	else if( format_version == 2 )
-	{
-		byte_stream_copy_from_uint32_little_endian(
-		 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->checksum,
-		 calculated_checksum );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: section descriptor data:\n",
-		 function );
-		libcnotify_print_data(
-		 section_descriptor_data,
-		 section_descriptor_data_size,
-		 0 );
-	}
-#endif
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( format_version == 1 )
-		{
-			libcnotify_printf(
-			 "%s: type string\t\t\t\t: %s\n",
-			 function,
-			 (char *) section_descriptor->type_string );
-
-			libcnotify_printf(
-			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
-			 function,
-			 section_descriptor->end_offset );
-
-			libcnotify_printf(
-			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
-			 function,
-			 section_descriptor->size );
-
-			libcnotify_printf(
-			 "%s: padding:\n",
-			 function );
-			libcnotify_print_data(
-			 ( (ewf_section_descriptor_v1_t *) section_descriptor_data )->padding,
-			 40,
-			 0 );
-		}
-		else if( format_version == 2 )
-		{
-			libcnotify_printf(
-			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
-			 function,
-			 section_descriptor->type );
-			libewf_debug_print_section_type(
-			 section_descriptor->type );
-			libcnotify_printf(
-			 ")\n" );
-
-			libcnotify_printf(
-			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
-			 function,
-			 section_descriptor->data_flags );
-			libewf_debug_print_section_data_flags(
-			 section_descriptor->data_flags );
-			libcnotify_printf(
-			 "\n" );
-
-			libcnotify_printf(
-			 "%s: previous offset\t\t\t: 0x%08" PRIx64 "\n",
-			 function,
-			 previous_offset );
-
-			libcnotify_printf(
-			 "%s: data size\t\t\t\t: %" PRIu64 "\n",
-			 function,
-			 section_descriptor->data_size );
-
-			libcnotify_printf(
-			 "%s: section descriptor size\t\t: %" PRIzd "\n",
-			 function,
-			 section_descriptor_data_size );
-
-			libcnotify_printf(
-			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
-			 function,
-			 section_descriptor->padding_size );
-
-			libcnotify_printf(
-			 "%s: data integrity hash:\n",
-			 function );
-			libcnotify_print_data(
-			 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->data_integrity_hash,
-			 16,
-			 0 );
-
-			libcnotify_printf(
-			 "%s: padding:\n",
-			 function );
-			libcnotify_print_data(
-			 ( (ewf_section_descriptor_v2_t *) section_descriptor_data )->padding,
-			 12,
-			 0 );
-		}
-		libcnotify_printf(
-		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 calculated_checksum );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
 	write_count = libbfio_pool_write_buffer(
 	               file_io_pool,
 	               file_io_pool_entry,

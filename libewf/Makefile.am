@@ -107,6 +107,7 @@ libewf_la_SOURCES = \
 	libewf_single_file_tree.c libewf_single_file_tree.h \
 	libewf_source.c libewf_source.h \
 	libewf_support.c libewf_support.h \
+	libewf_table_section.c libewf_table_section.h \
 	libewf_types.h \
 	libewf_unused.h \
 	libewf_value_table.c libewf_value_table.h \
