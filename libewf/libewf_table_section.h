@@ -38,6 +38,18 @@ typedef struct libewf_table_section libewf_table_section_t;
 
 struct libewf_table_section
 {
+	/* The base offset
+	 */
+	uint64_t base_offset;
+
+	/* The first chunk index
+	 */
+	uint64_t first_chunk_index;
+
+	/* The number of entries
+	 */
+	uint32_t number_of_entries;
+
 	/* The section data
 	 */
 	uint8_t *section_data;
@@ -45,6 +57,18 @@ struct libewf_table_section
 	/* The section data size
 	 */
 	size_t section_data_size;
+
+	/* The table entries data offset
+	 */
+	size_t entries_offset;
+
+	/* The table entries data size
+	 */
+	size_t entries_size;
+
+	/* Values to indicate if the table entries were corrupted
+	 */
+	uint8_t entries_corrupted;
 };
 
 int libewf_table_section_initialize(
@@ -55,6 +79,22 @@ int libewf_table_section_free(
      libewf_table_section_t **table_section,
      libcerror_error_t **error );
 
+int libewf_table_section_read_header_data(
+     libewf_table_section_t *table_section,
+     libewf_io_handle_t *io_handle,
+     const uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libcerror_error_t **error );
+
+int libewf_table_section_read_footer_data(
+     libewf_table_section_t *table_section,
+     const uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     uint32_t *stored_checksum,
+     libcerror_error_t **error );
+
 ssize_t libewf_table_section_read_file_io_pool(
          libewf_table_section_t *table_section,
          libewf_section_descriptor_t *section_descriptor,
@@ -63,14 +103,6 @@ ssize_t libewf_table_section_read_file_io_pool(
          int file_io_pool_entry,
          uint8_t format_version,
          uint8_t segment_file_type,
-         uint8_t **section_data,
-         size_t *section_data_size,
-         uint64_t *first_chunk_index,
-         uint64_t *base_offset,
-         uint8_t **table_entries_data,
-         size_t *table_entries_data_size,
-         uint32_t *number_of_entries,
-         uint8_t *entries_corrupted,
          libcerror_error_t **error );
 
 ssize_t libewf_table_section_write_file_io_pool(

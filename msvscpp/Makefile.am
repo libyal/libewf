@@ -51,6 +51,7 @@ MSVSCPP_FILES = \
 	ewf_test_single_files/ewf_test_single_files.vcproj \
 	ewf_test_source/ewf_test_source.vcproj \
 	ewf_test_support/ewf_test_support.vcproj \
+	ewf_test_table_section/ewf_test_table_section.vcproj \
 	ewf_test_tools_byte_size_string/ewf_test_tools_byte_size_string.vcproj \
 	ewf_test_tools_device_handle/ewf_test_tools_device_handle.vcproj \
 	ewf_test_tools_digest_hash/ewf_test_tools_digest_hash.vcproj \

@@ -129,6 +129,7 @@ check_PROGRAMS = \
 	ewf_test_single_files \
 	ewf_test_source \
 	ewf_test_support \
+	ewf_test_table_section \
 	ewf_test_tools_byte_size_string \
 	ewf_test_tools_device_handle \
 	ewf_test_tools_digest_hash \
@@ -922,6 +923,28 @@ ewf_test_support_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_support_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_table_section_SOURCES = \
+	ewf_test_functions.c ewf_test_functions.h \
+	ewf_test_libbfio.h \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_table_section.c \
+	ewf_test_unused.h
+
+ewf_test_table_section_LDADD = \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

@@ -63,17 +63,6 @@ int libewf_digest_section_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size != (size_t) sizeof( ewf_digest_t ) )
 	{
 		libcerror_error_set(

@@ -1345,20 +1345,12 @@ ssize_t libewf_segment_file_read_table_section(
          libcerror_error_t **error )
 {
 	libewf_table_section_t *table_section = NULL;
-	uint8_t *section_data                 = NULL;
-	uint8_t *table_entries_data           = NULL;
 	static char *function                 = "libewf_segment_file_read_table_section";
 	size64_t chunk_group_data_size        = 0;
 	size64_t storage_media_size           = 0;
-	size_t section_data_size              = 0;
-	size_t table_entries_data_size        = 0;
 	ssize_t read_count                    = 0;
 	off64_t chunk_group_data_offset       = 0;
-	uint64_t base_offset                  = 0;
-	uint64_t first_chunk_index            = 0;
-	uint32_t number_of_entries            = 0;
 	uint32_t range_flags                  = 0;
-	uint8_t entries_corrupted             = 0;
 
 	if( segment_file == NULL )
 	{
@@ -1416,14 +1408,6 @@ ssize_t libewf_segment_file_read_table_section(
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
-		      &section_data,
-		      &section_data_size,
-	              &first_chunk_index,
-	              &base_offset,
-		      &table_entries_data,
-		      &table_entries_data_size,
-	              &number_of_entries,
-		      &entries_corrupted,
 	              error );
 	
 	if( read_count == -1 )
@@ -1457,9 +1441,9 @@ ssize_t libewf_segment_file_read_table_section(
 
 		if( segment_file->last_chunk_filled == -1 )
 		{
-			segment_file->last_chunk_filled = (int64_t) first_chunk_index;
+			segment_file->last_chunk_filled = (int64_t) table_section->first_chunk_index;
 		}
-		else if( (int64_t) first_chunk_index != segment_file->last_chunk_filled )
+		else if( (int64_t) table_section->first_chunk_index != segment_file->last_chunk_filled )
 		{
 			libcerror_error_set(
 			 error,
@@ -1471,15 +1455,15 @@ ssize_t libewf_segment_file_read_table_section(
 			return( -1 );
 		}
 	}
-	if( entries_corrupted != 0 )
+	if( table_section->entries_corrupted != 0 )
 	{
 		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED;
 
 		range_flags = LIBEWF_RANGE_FLAG_IS_TAINTED;
 	}
-	if( number_of_entries > 0 )
+	if( table_section->number_of_entries > 0 )
 	{
-		storage_media_size = (size64_t) chunk_size * number_of_entries;
+		storage_media_size = (size64_t) chunk_size * table_section->number_of_entries;
 
 		if( libfdata_list_append_element_with_mapped_size(
 		     segment_file->chunk_groups_list,
@@ -1501,8 +1485,8 @@ ssize_t libewf_segment_file_read_table_section(
 			goto on_error;
 		}
 		segment_file->storage_media_size += storage_media_size;
-		segment_file->number_of_chunks   += (uint64_t) number_of_entries;
-		segment_file->last_chunk_filled  += (int64_t) number_of_entries;
+		segment_file->number_of_chunks   += (uint64_t) table_section->number_of_entries;
+		segment_file->last_chunk_filled  += (int64_t) table_section->number_of_entries;
 	}
 	if( libewf_table_section_free(
 	     &table_section,
@@ -1517,17 +1501,9 @@ ssize_t libewf_segment_file_read_table_section(
 
 		goto on_error;
 	}
-	memory_free(
-	 section_data );
-
 	return( 1 );
 
 on_error:
-	if( section_data != NULL )
-	{
-		memory_free(
-		 section_data );
-	}
 	if( table_section != NULL )
 	{
 		libewf_table_section_free(
@@ -1548,20 +1524,12 @@ ssize_t libewf_segment_file_read_table2_section(
          libcerror_error_t **error )
 {
 	libewf_table_section_t *table_section = NULL;
-	uint8_t *section_data                 = NULL;
-	uint8_t *table_entries_data           = NULL;
 	static char *function                 = "libewf_segment_file_read_table2_section";
 	size64_t chunk_group_data_size        = 0;
-	size_t section_data_size              = 0;
-	size_t table_entries_data_size        = 0;
 	ssize_t read_count                    = 0;
 	off64_t chunk_group_data_offset       = 0;
-	uint64_t base_offset                  = 0;
-	uint64_t first_chunk_index            = 0;
 	int64_t chunk_group_number_of_entries = 0;
 	uint32_t chunk_group_range_flags      = 0;
-	uint32_t number_of_entries            = 0;
-	uint8_t entries_corrupted             = 0;
 	uint8_t number_of_entries_mismatch    = 0;
 	int chunk_group_file_io_pool_entry    = 0;
 	int result                            = 0;
@@ -1642,14 +1610,6 @@ ssize_t libewf_segment_file_read_table2_section(
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
-		      &section_data,
-		      &section_data_size,
-	              &first_chunk_index,
-	              &base_offset,
-		      &table_entries_data,
-		      &table_entries_data_size,
-	              &number_of_entries,
-		      &entries_corrupted,
 	              error );
 	
 	if( read_count == -1 )
@@ -1668,7 +1628,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	chunk_group_number_of_entries = segment_file->last_chunk_filled
 	                              - segment_file->previous_last_chunk_filled;
 
-	if( (int64_t) number_of_entries != chunk_group_number_of_entries )
+	if( (int64_t) table_section->number_of_entries != chunk_group_number_of_entries )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1706,11 +1666,11 @@ ssize_t libewf_segment_file_read_table2_section(
 	}
 	result = 1;
 
-	if( entries_corrupted != 0 )
+	if( table_section->entries_corrupted != 0 )
 	{
 		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED;
 
-		number_of_entries = chunk_group_number_of_entries;
+		table_section->number_of_entries = chunk_group_number_of_entries;
 	}
 	else if( number_of_entries_mismatch != 0 )
 	{
@@ -1719,7 +1679,7 @@ ssize_t libewf_segment_file_read_table2_section(
 		{
 			/* If the number of entries in the table section are not 0 prefer the table section
 			 */
-			number_of_entries = chunk_group_number_of_entries;
+			table_section->number_of_entries = chunk_group_number_of_entries;
 		}
 		else
 		{
@@ -1730,9 +1690,9 @@ ssize_t libewf_segment_file_read_table2_section(
 	}
 	if( ( chunk_group_range_flags & LIBEWF_RANGE_FLAG_IS_TAINTED ) != 0 )
 	{
-		if( entries_corrupted == 0 )
+		if( table_section->entries_corrupted == 0 )
 		{
-			segment_file->last_chunk_filled = segment_file->previous_last_chunk_filled + number_of_entries;
+			segment_file->last_chunk_filled = segment_file->previous_last_chunk_filled + table_section->number_of_entries;
 
 			/* For EWF version 1 the entire table2 section is considered the group
 			 * because the section descriptor is need to determine the chunk data
@@ -1790,7 +1750,7 @@ ssize_t libewf_segment_file_read_table2_section(
 			goto on_error;
 		}
 	}
-	segment_file->last_chunk_compared += (int64_t) number_of_entries;
+	segment_file->last_chunk_compared += (int64_t) table_section->number_of_entries;
 
 	if( libewf_table_section_free(
 	     &table_section,
@@ -1805,17 +1765,9 @@ ssize_t libewf_segment_file_read_table2_section(
 
 		goto on_error;
 	}
-	memory_free(
-	 section_data );
-
 	return( 1 );
 
 on_error:
-	if( section_data != NULL )
-	{
-		memory_free(
-		 section_data );
-	}
 	if( table_section != NULL )
 	{
 		libewf_table_section_free(
@@ -6795,18 +6747,10 @@ int libewf_segment_file_read_chunk_group_element_data(
 	libewf_chunk_group_t *chunk_group               = NULL;
 	libewf_section_descriptor_t *section_descriptor = NULL;
 	libewf_table_section_t *table_section           = NULL;
-	uint8_t *section_data                           = NULL;
-	uint8_t *table_entries_data                     = NULL;
 	static char *function                           = "libewf_segment_file_read_chunk_group_element_data";
-	size_t section_data_size                        = 0;
-	size_t table_entries_data_size                  = 0;
 	ssize_t read_count                              = 0;
 	off64_t storage_media_offset                    = 0;
-	uint64_t base_offset                            = 0;
 	uint64_t chunk_index                            = 0;
-	uint64_t first_chunk_index                      = 0;
-	uint32_t number_of_entries                      = 0;
-	uint8_t entries_corrupted                       = 0;
 	int result                                      = 0;
 
 	LIBEWF_UNREFERENCED_PARAMETER( element_flags )
@@ -6961,14 +6905,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
-		      &section_data,
-		      &section_data_size,
-	              &first_chunk_index,
-	              &base_offset,
-		      &table_entries_data,
-		      &table_entries_data_size,
-	              &number_of_entries,
-		      &entries_corrupted,
 	              error );
 	
 	if( read_count < 0 )
@@ -6985,7 +6921,7 @@ int libewf_segment_file_read_chunk_group_element_data(
 	segment_file->current_offset += read_count;
 	chunk_group_data_size        -= read_count;
 
-	if( number_of_entries == 0 )
+	if( table_section->number_of_entries == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -7036,11 +6972,11 @@ int libewf_segment_file_read_chunk_group_element_data(
 			  segment_file->io_handle->chunk_size,
 			  file_io_pool_entry,
 			  section_descriptor,
-			  (off64_t) base_offset,
-			  number_of_entries,
-			  table_entries_data,
-			  table_entries_data_size,
-			  entries_corrupted,
+			  (off64_t) table_section->base_offset,
+			  table_section->number_of_entries,
+			  &( table_section->section_data[ table_section->entries_offset ] ),
+			  table_section->entries_size,
+			  table_section->entries_corrupted,
 			  error );
 	}
 	else if( segment_file->major_version == 2 )
@@ -7051,10 +6987,10 @@ int libewf_segment_file_read_chunk_group_element_data(
 			  segment_file->io_handle->chunk_size,
 			  file_io_pool_entry,
 			  section_descriptor,
-			  number_of_entries,
-			  table_entries_data,
-			  table_entries_data_size,
-			  entries_corrupted,
+			  table_section->number_of_entries,
+			  &( table_section->section_data[ table_section->entries_offset ] ),
+			  table_section->entries_size,
+			  table_section->entries_corrupted,
 			  error );
 	}
 	if( result != 1 )
@@ -7081,11 +7017,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 
 		goto on_error;
 	}
-	memory_free(
-	 section_data );
-
-	section_data = NULL;
-
 	if( libewf_section_descriptor_free(
 	     &section_descriptor,
 	     error ) != 1 )
@@ -7100,7 +7031,7 @@ int libewf_segment_file_read_chunk_group_element_data(
 		goto on_error;
 	}
 /* TODO read and process backup range if available and neccessary
-	if( entries_corrupted != 0 )
+	if( table_section->entries_corrupted != 0 )
 	{
 		if( segment_file->major_version == 1 )
 		{
@@ -7110,11 +7041,11 @@ int libewf_segment_file_read_chunk_group_element_data(
 			          segment_file->io_handle->chunk_size,
 				  file_io_pool_entry,
 				  section_descriptor,
-				  (off64_t) base_offset,
-				  number_of_entries,
-				  table_entries_data,
-				  table_entries_data_size,
-				  entries_corrupted,
+				  (off64_t) table_section->base_offset,
+				  table_section->number_of_entries,
+				  &( table_section->section_data[ table_section->entries_offset ] ),
+				  table_section->entries_size,
+				  table_section->entries_corrupted,
 				  error );
 		}
 		if( result != 1 )
@@ -7156,11 +7087,6 @@ on_error:
 		libewf_chunk_group_free(
 		 &chunk_group,
 		 NULL );
-	}
-	if( section_data != NULL )
-	{
-		memory_free(
-		 section_data );
 	}
 	if( table_section != NULL )
 	{

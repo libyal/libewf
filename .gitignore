@@ -184,6 +184,7 @@ stamp-h[1-9]
 /tests/ewf_test_single_files
 /tests/ewf_test_source
 /tests/ewf_test_support
+/tests/ewf_test_table_section
 /tests/ewf_test_tools_byte_size_string
 /tests/ewf_test_tools_device_handle
 /tests/ewf_test_tools_digest_hash
