@@ -1402,14 +1402,15 @@ ssize_t libewf_segment_file_read_table_section(
 
 	read_count = libewf_table_section_read_file_io_pool(
 	              table_section,
-	              section_descriptor,
 	              segment_file->io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
+	              section_descriptor->data_size,
+	              section_descriptor->data_flags,
 	              error );
-	
+
 	if( read_count == -1 )
 	{
 		libcerror_error_set(
@@ -1604,14 +1605,15 @@ ssize_t libewf_segment_file_read_table2_section(
 	}
 	read_count = libewf_table_section_read_file_io_pool(
 	              table_section,
-	              section_descriptor,
 	              segment_file->io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
+	              section_descriptor->data_size,
+	              section_descriptor->data_flags,
 	              error );
-	
+
 	if( read_count == -1 )
 	{
 		libcerror_error_set(
@@ -3484,8 +3486,9 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          uint32_t number_of_table_entries,
          uint64_t number_of_chunks_written,
          libcerror_error_t **error )
-{	
+{
 	libewf_section_descriptor_t *section_descriptor = NULL;
+	libewf_table_section_t *table_section           = NULL;
 	static char *function                           = "libewf_segment_file_write_chunks_section_start";
 	ssize_t write_count                             = 0;
 
@@ -3524,26 +3527,31 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		return( -1 );
 	}
-	if( libewf_section_descriptor_initialize(
-	     &section_descriptor,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create section descriptor.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 || ( segment_file->io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
+		if( libewf_table_section_initialize(
+		     &table_section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create table section.",
+			 function );
+
+			goto on_error;
+		}
+		table_section->first_chunk_index = number_of_chunks_written;
+		table_section->base_offset       = 0;
+		table_section->section_data      = table_section_data;
+		table_section->section_data_size = table_section_data_size;
+
 		/* Write table section descriptor
 		 */
 		write_count = libewf_table_section_write_file_io_pool(
-		               section_descriptor,
+		               table_section,
 		               segment_file->io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
@@ -3552,15 +3560,14 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               (uint8_t *) "table",
 		               5,
 		               segment_file->current_offset,
-		               table_section_data,
-		               table_section_data_size,
-		               number_of_chunks_written,
-		               0,
 		               table_entries_data,
 		               table_entries_data_size,
 		               number_of_table_entries,
 		               0,
 		               error );
+
+		table_section->section_data      = NULL;
+		table_section->section_data_size = 0;
 
 		if( write_count == -1 )
 		{
@@ -3571,12 +3578,38 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 			 "%s: unable to write table section.",
 			 function );
 
-			return( -1 );
+			goto on_error;
+		}
+		if( libewf_table_section_free(
+		     &table_section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free table section.",
+			 function );
+
+			goto on_error;
 		}
 	}
 	else if( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 	      || ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL ) )
 	{
+		if( libewf_section_descriptor_initialize(
+		     &section_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create section descriptor.",
+			 function );
+
+			goto on_error;
+		}
 		write_count = libewf_section_sectors_write(
 		               section_descriptor,
 		               file_io_pool,
@@ -3598,22 +3631,22 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 			goto on_error;
 		}
+		if( libewf_section_descriptor_free(
+		     &section_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free section.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	segment_file->current_offset += write_count;
 
-	if( libewf_section_descriptor_free(
-	     &section_descriptor,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free section.",
-		 function );
-
-		goto on_error;
-	}
 	return( write_count );
 
 on_error:
@@ -3621,6 +3654,12 @@ on_error:
 	{
 		libewf_section_descriptor_free(
 		 &section_descriptor,
+		 NULL );
+	}
+	if( table_section != NULL )
+	{
+		libewf_table_section_free(
+		 &table_section,
 		 NULL );
 	}
 	return( -1 );
@@ -3647,7 +3686,9 @@ ssize_t libewf_segment_file_write_chunks_section_end(
          libcerror_error_t **error )
 {
 	libewf_section_descriptor_t *section_descriptor = NULL;
+	libewf_table_section_t *table_section           = NULL;
 	static char *function                           = "libewf_segment_file_write_chunks_section_end";
+	size64_t maximum_chunks_section_size            = 0;
 	ssize_t total_write_count                       = 0;
 	ssize_t write_count                             = 0;
 	int element_index                               = 0;
@@ -3680,31 +3721,22 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 	 || ( segment_file->io_handle->format == LIBEWF_FORMAT_ENCASE7 )
 	 || ( segment_file->io_handle->format == LIBEWF_FORMAT_V2_ENCASE7 ) )
 	{
-		if( chunks_section_size >= (size64_t) INT64_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk section size value exceeds maximum.",
-			 function );
-
-			return( -1 );
-		}
+		maximum_chunks_section_size = (size64_t) INT64_MAX;
 	}
 	else
 	{
-		if( chunks_section_size >= (size64_t) INT32_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk section size value exceeds maximum.",
-			 function );
+		maximum_chunks_section_size = (size64_t) INT32_MAX;
+	}
+	if( chunks_section_size >= maximum_chunks_section_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk section size value exceeds maximum.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	if( libewf_section_descriptor_initialize(
 	     &section_descriptor,
@@ -3767,10 +3799,28 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 				 chunks_section_size );
 			}
 #endif
+			if( libewf_table_section_initialize(
+			     &table_section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create table section.",
+				 function );
+
+				goto on_error;
+			}
+			table_section->first_chunk_index = first_chunk_index;
+			table_section->base_offset       = 0;
+			table_section->section_data      = table_section_data;
+			table_section->section_data_size = table_section_data_size;
+
 			/* Rewrite table section descriptor
 			 */
 			write_count = libewf_table_section_write_file_io_pool(
-				       section_descriptor,
+				       table_section,
 				       segment_file->io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
@@ -3779,15 +3829,14 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 				       (uint8_t *) "table",
 				       5,
 				       chunks_section_offset,
-				       table_section_data,
-				       table_section_data_size,
-				       first_chunk_index,
-				       0,
 				       table_entries_data,
 				       table_entries_data_size,
 				       number_of_table_entries,
 				       chunks_section_size,
 				       error );
+
+			table_section->section_data      = NULL;
+			table_section->section_data_size = 0;
 
 			if( write_count == -1 )
 			{
@@ -3796,6 +3845,19 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to write table section.",
+				 function );
+
+				goto on_error;
+			}
+			if( libewf_table_section_free(
+			     &table_section,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free table section.",
 				 function );
 
 				goto on_error;
@@ -3941,21 +4003,26 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 	if( ( segment_file->type != LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
 	 && ( segment_file->io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		if( libewf_section_descriptor_initialize(
-		     &section_descriptor,
+		if( libewf_table_section_initialize(
+		     &table_section,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section descriptor.",
+			 "%s: unable to create table section.",
 			 function );
 
 			goto on_error;
 		}
+		table_section->first_chunk_index = first_chunk_index;
+		table_section->base_offset       = base_offset;
+		table_section->section_data      = table_section_data;
+		table_section->section_data_size = table_section_data_size;
+
 		write_count = libewf_table_section_write_file_io_pool(
-		               section_descriptor,
+		               table_section,
 		               segment_file->io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
@@ -3964,15 +4031,14 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		               (uint8_t *) "table",
 		               5,
 		               segment_file->current_offset,
-		               table_section_data,
-		               table_section_data_size,
-		               first_chunk_index,
-		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,
 		               number_of_table_entries,
 		               0,
 		               error );
+
+		table_section->section_data      = NULL;
+		table_section->section_data_size = 0;
 
 		if( write_count == -1 )
 		{
@@ -3981,6 +4047,19 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write sector table section.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_table_section_free(
+		     &table_section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free table section.",
 			 function );
 
 			goto on_error;
@@ -4021,39 +4100,31 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 
 			goto on_error;
 		}
-		if( libewf_section_descriptor_free(
-		     &section_descriptor,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free section.",
-			 function );
-
-			goto on_error;
-		}
 	}
 	if( ( ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 	  ||  ( segment_file->type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_LOGICAL ) )
 	 && ( segment_file->io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		if( libewf_section_descriptor_initialize(
-		     &section_descriptor,
+		if( libewf_table_section_initialize(
+		     &table_section,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create section descriptor.",
+			 "%s: unable to create table section.",
 			 function );
 
 			goto on_error;
 		}
+		table_section->first_chunk_index = first_chunk_index;
+		table_section->base_offset       = base_offset;
+		table_section->section_data      = table_section_data;
+		table_section->section_data_size = table_section_data_size;
+
 		write_count = libewf_table_section_write_file_io_pool(
-		               section_descriptor,
+		               table_section,
 		               segment_file->io_handle,
 		               file_io_pool,
 		               file_io_pool_entry,
@@ -4062,15 +4133,14 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		               (uint8_t *) "table2",
 		               6,
 		               segment_file->current_offset,
-		               table_section_data,
-		               table_section_data_size,
-		               first_chunk_index,
-		               base_offset,
 		               table_entries_data,
 		               table_entries_data_size,
 		               number_of_table_entries,
 		               0,
 		               error );
+
+		table_section->section_data      = NULL;
+		table_section->section_data_size = 0;
 
 		if( write_count == -1 )
 		{
@@ -4079,6 +4149,19 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write table2 section.",
+			 function );
+
+			goto on_error;
+		}
+		if( libewf_table_section_free(
+		     &table_section,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free table section.",
 			 function );
 
 			goto on_error;
@@ -4103,24 +4186,16 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		}
 		segment_file->current_offset += write_count;
 		total_write_count            += write_count;
-
-		if( libewf_section_descriptor_free(
-		     &section_descriptor,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free section.",
-			 function );
-
-			goto on_error;
-		}
 	}
 	return( total_write_count );
 
 on_error:
+	if( table_section != NULL )
+	{
+		libewf_table_section_free(
+		 &table_section,
+		 NULL );
+	}
 	if( section_descriptor != NULL )
 	{
 		libewf_section_descriptor_free(
@@ -5581,7 +5656,7 @@ int libewf_segment_file_write_sections_correction(
 		libcnotify_printf(
 		 "%s: correcting sections in segment file: %" PRIu16 ".\n",
 		 function,
-		 segment_file->segment_number );	
+		 segment_file->segment_number );
 	}
 #endif
 	if( libfdata_list_get_number_of_elements(
@@ -6899,14 +6974,15 @@ int libewf_segment_file_read_chunk_group_element_data(
 	}
 	read_count = libewf_table_section_read_file_io_pool(
 	              table_section,
-	              section_descriptor,
 	              segment_file->io_handle,
 	              file_io_pool,
 	              file_io_pool_entry,
 	              segment_file->major_version,
 	              segment_file->type,
+	              section_descriptor->data_size,
+	              section_descriptor->data_flags,
 	              error );
-	
+
 	if( read_count < 0 )
 	{
 		libcerror_error_set(

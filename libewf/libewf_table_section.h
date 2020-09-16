@@ -28,7 +28,6 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
-#include "libewf_section_descriptor.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -97,16 +96,17 @@ int libewf_table_section_read_footer_data(
 
 ssize_t libewf_table_section_read_file_io_pool(
          libewf_table_section_t *table_section,
-         libewf_section_descriptor_t *section_descriptor,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
          uint8_t segment_file_type,
+         size64_t section_data_size,
+         uint32_t section_data_flags,
          libcerror_error_t **error );
 
 ssize_t libewf_table_section_write_file_io_pool(
-         libewf_section_descriptor_t *section_descriptor,
+         libewf_table_section_t *table_section,
          libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
@@ -115,10 +115,6 @@ ssize_t libewf_table_section_write_file_io_pool(
          uint8_t *type_string,
          size_t type_string_length,
          off64_t section_offset,
-         uint8_t *section_data,
-         size_t section_data_size,
-         uint64_t first_chunk_index,
-         uint64_t base_offset,
          uint8_t *table_entries_data,
          size_t table_entries_data_size,
          uint32_t number_of_entries,
