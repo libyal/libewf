@@ -3545,6 +3545,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		}
 		table_section->first_chunk_index = number_of_chunks_written;
 		table_section->base_offset       = 0;
+		table_section->number_of_entries = number_of_table_entries;
 		table_section->section_data      = table_section_data;
 		table_section->section_data_size = table_section_data_size;
 
@@ -3562,7 +3563,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               segment_file->current_offset,
 		               table_entries_data,
 		               table_entries_data_size,
-		               number_of_table_entries,
 		               0,
 		               error );
 
@@ -3814,6 +3814,7 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 			}
 			table_section->first_chunk_index = first_chunk_index;
 			table_section->base_offset       = 0;
+			table_section->number_of_entries = number_of_table_entries;
 			table_section->section_data      = table_section_data;
 			table_section->section_data_size = table_section_data_size;
 
@@ -3831,7 +3832,6 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 				       chunks_section_offset,
 				       table_entries_data,
 				       table_entries_data_size,
-				       number_of_table_entries,
 				       chunks_section_size,
 				       error );
 
@@ -4018,6 +4018,7 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		}
 		table_section->first_chunk_index = first_chunk_index;
 		table_section->base_offset       = base_offset;
+		table_section->number_of_entries = number_of_table_entries;
 		table_section->section_data      = table_section_data;
 		table_section->section_data_size = table_section_data_size;
 
@@ -4033,7 +4034,6 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		               segment_file->current_offset,
 		               table_entries_data,
 		               table_entries_data_size,
-		               number_of_table_entries,
 		               0,
 		               error );
 
@@ -4120,6 +4120,7 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		}
 		table_section->first_chunk_index = first_chunk_index;
 		table_section->base_offset       = base_offset;
+		table_section->number_of_entries = number_of_table_entries;
 		table_section->section_data      = table_section_data;
 		table_section->section_data_size = table_section_data_size;
 
@@ -4135,7 +4136,6 @@ ssize_t libewf_segment_file_write_chunks_section_end(
 		               segment_file->current_offset,
 		               table_entries_data,
 		               table_entries_data_size,
-		               number_of_table_entries,
 		               0,
 		               error );
 

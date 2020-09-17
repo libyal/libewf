@@ -43,11 +43,11 @@ uint8_t ewf_test_table_section_data1[ 32 ] = {
 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x28, 0x00, 0x00, 0x08, 0x00, 0x80, 0x34, 0x69, 0xd5, 0x60 };
 
-uint8_t ewf_test_table_section_data2[ 56 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9d, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x9f, 0x00, 0xff, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0xa0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7b, 0x12, 0x2e, 0xd2, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t ewf_test_table_section_data2[ 64 ] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x02, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xa0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfa, 0x03, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+	0x7b, 0x12, 0x2e, 0xd2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
@@ -935,6 +935,103 @@ int ewf_test_table_section_read_file_io_pool(
 	 */
 	result = ewf_test_open_file_io_pool(
 	          &file_io_pool,
+	          ewf_test_table_section_data2,
+	          64,
+	          LIBBFIO_OPEN_READ,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_pool",
+	 file_io_pool );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libewf_table_section_read_file_io_pool(
+	              table_section,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              2,
+	              LIBEWF_SEGMENT_FILE_TYPE_EWF2,
+	              64,
+	              0,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 64 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up file IO pool
+	 */
+	result = ewf_test_close_file_io_pool(
+	          &file_io_pool,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libewf_table_section_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_table_section_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO pool
+	 */
+	result = ewf_test_open_file_io_pool(
+	          &file_io_pool,
 	          ewf_test_table_section_data1,
 	          32,
 	          LIBBFIO_OPEN_READ,
@@ -1037,6 +1134,89 @@ int ewf_test_table_section_read_file_io_pool(
 
 	libcerror_error_free(
 	 &error );
+
+	read_count = libewf_table_section_read_file_io_pool(
+	              table_section,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              0xff,
+	              LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	              32,
+	              0,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libewf_table_section_read_file_io_pool(
+	              table_section,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              1,
+	              LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	              (size_t) SSIZE_MAX + 1,
+	              0,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_table_section_read_file_io_pool with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	read_count = libewf_table_section_read_file_io_pool(
+	              table_section,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              1,
+	              LIBEWF_SEGMENT_FILE_TYPE_EWF1,
+	              32,
+	              0,
+	              &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up file IO pool
 	 */

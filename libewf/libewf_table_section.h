@@ -105,6 +105,21 @@ ssize_t libewf_table_section_read_file_io_pool(
          uint32_t section_data_flags,
          libcerror_error_t **error );
 
+int libewf_table_section_write_header_data(
+     libewf_table_section_t *table_section,
+     uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     libcerror_error_t **error );
+
+int libewf_table_section_write_footer_data(
+     libewf_table_section_t *table_section,
+     uint8_t *data,
+     size_t data_size,
+     uint8_t format_version,
+     uint32_t calculated_checksum,
+     libcerror_error_t **error );
+
 ssize_t libewf_table_section_write_file_io_pool(
          libewf_table_section_t *table_section,
          libewf_io_handle_t *io_handle,
@@ -117,7 +132,6 @@ ssize_t libewf_table_section_write_file_io_pool(
          off64_t section_offset,
          uint8_t *table_entries_data,
          size_t table_entries_data_size,
-         uint32_t number_of_entries,
          size64_t chunks_data_size,
          libcerror_error_t **error );
 
