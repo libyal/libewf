@@ -1368,6 +1368,424 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_table_section_write_header_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_table_section_write_header_data(
+     void )
+{
+	uint8_t section_data[ 128 ];
+
+	libcerror_error_t *error              = NULL;
+	libewf_table_section_t *table_section = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_table_section_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_table_section_write_header_data(
+	          table_section,
+	          section_data,
+	          128,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_table_section_write_header_data(
+	          NULL,
+	          section_data,
+	          128,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_header_data(
+	          table_section,
+	          NULL,
+	          128,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_header_data(
+	          table_section,
+	          section_data,
+	          (size_t) SSIZE_MAX + 1,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_header_data(
+	          table_section,
+	          section_data,
+	          0,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_table_section_write_header_data with memset of data failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_table_section_write_header_data(
+	          table_section,
+	          section_data,
+	          128,
+	          1,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libewf_table_section_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( table_section != NULL )
+	{
+		libewf_table_section_free(
+		 &table_section,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_table_section_write_footer_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_table_section_write_footer_data(
+     void )
+{
+	uint8_t section_data[ 128 ];
+
+	libcerror_error_t *error              = NULL;
+	libewf_table_section_t *table_section = NULL;
+	int result                            = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_table_section_initialize(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          section_data,
+	          128,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_table_section_write_footer_data(
+	          NULL,
+	          section_data,
+	          128,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          NULL,
+	          128,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          section_data,
+	          (size_t) SSIZE_MAX + 1,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          section_data,
+	          0,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          section_data,
+	          128,
+	          0xff,
+	          0x12345678UL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_table_section_write_footer_data with memset of data failing
+	 */
+	ewf_test_memset_attempts_before_fail = 0;
+
+	result = libewf_table_section_write_footer_data(
+	          table_section,
+	          section_data,
+	          128,
+	          1,
+	          0x12345678UL,
+	          &error );
+
+	if( ewf_test_memset_attempts_before_fail != -1 )
+	{
+		ewf_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libewf_table_section_free(
+	          &table_section,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "table_section",
+	 table_section );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( table_section != NULL )
+	{
+		libewf_table_section_free(
+		 &table_section,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -1406,6 +1824,14 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_table_section_read_file_io_pool",
 	 ewf_test_table_section_read_file_io_pool );
+
+	EWF_TEST_RUN(
+	 "libewf_table_section_write_header_data",
+	 ewf_test_table_section_write_header_data );
+
+	EWF_TEST_RUN(
+	 "libewf_table_section_write_footer_data",
+	 ewf_test_table_section_write_footer_data );
 
 	/* TODO add tests for libewf_table_section_write_file_io_pool */
 
