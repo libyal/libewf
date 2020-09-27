@@ -152,7 +152,7 @@ int libewf_md5_hash_section_read_data(
 			 0 );
 		}
 		libcnotify_printf(
-		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 stored_checksum );
 
@@ -494,7 +494,7 @@ int libewf_md5_hash_section_write_data(
 			 0 );
 		}
 		libcnotify_printf(
-		 "%s: checksum\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: checksum\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 calculated_checksum );
 

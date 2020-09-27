@@ -242,7 +242,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a compression methods object
+/* Initializes a compression methods object
  * Returns 0 if successful or -1 on error
  */
 int pyewf_compression_methods_init(

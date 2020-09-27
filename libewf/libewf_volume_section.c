@@ -196,7 +196,7 @@ int libewf_volume_section_e01_read_data(
 		 ( (ewf_volume_t *) data )->chs_cylinders,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: CHS number of cylinders\t\t\t: %" PRIu32 "\n",
+		 "%s: CHS number of cylinders\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -204,7 +204,7 @@ int libewf_volume_section_e01_read_data(
 		 ( (ewf_volume_t *) data )->chs_heads,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: CHS number of heads\t\t\t: %" PRIu32 "\n",
+		 "%s: CHS number of heads\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -212,12 +212,12 @@ int libewf_volume_section_e01_read_data(
 		 ( (ewf_volume_t *) data )->chs_sectors,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: CHS number of sectors\t\t\t: %" PRIu32 "\n",
+		 "%s: CHS number of sectors\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: media flags\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: media flags\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 media_values->media_flags );
 
@@ -249,7 +249,7 @@ int libewf_volume_section_e01_read_data(
 		 ( (ewf_volume_t *) data )->smart_logs_start_sector,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: SMART logs start sector\t\t\t: %" PRIu32 "\n",
+		 "%s: SMART logs start sector\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 

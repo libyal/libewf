@@ -977,7 +977,7 @@ int ewf_test_session_section_write_data(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_MEMORY )
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
 
 	/* Test libewf_session_section_write_data with memset failing
 	 */
@@ -1010,7 +1010,7 @@ int ewf_test_session_section_write_data(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
 
 	/* Test libewf_session_section_write_data failing in libcdata_array_get_number_of_entries
 	 */

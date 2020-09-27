@@ -53,7 +53,7 @@ AC_DEFUN([AX_LIBEWF_CHECK_LOCAL],
       [Missing functions: localtime and localtime_r],
       [1])
   ])
- 
+
   AS_IF(
     [test "x$ac_cv_func_mktime" != xyes],
     [AC_MSG_FAILURE(
@@ -61,7 +61,7 @@ AC_DEFUN([AX_LIBEWF_CHECK_LOCAL],
       [1])
   ])
 
-  dnl Check for internationalization functions in libewf/libewf_i18n.c 
+  dnl Check for internationalization functions in libewf/libewf_i18n.c
   AC_CHECK_FUNCS([bindtextdomain])
 ])
 

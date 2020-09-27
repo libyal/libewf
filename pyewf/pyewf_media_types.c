@@ -270,7 +270,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a media types object
+/* Initializes a media types object
  * Returns 0 if successful or -1 on error
  */
 int pyewf_media_types_init(

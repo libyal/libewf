@@ -242,7 +242,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a media flags object
+/* Initializes a media flags object
  * Returns 0 if successful or -1 on error
  */
 int pyewf_media_flags_init(

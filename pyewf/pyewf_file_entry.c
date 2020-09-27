@@ -417,7 +417,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a file_entry object
+/* Initializes a file_entry object
  * Returns 0 if successful or -1 on error
  */
 int pyewf_file_entry_init(
