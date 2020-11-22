@@ -1689,7 +1689,7 @@ is compressed (1) or uncompressed (0).
 
 A chunk data offset points to the start of the chunk of media data, which
 resides in the preceding sectors section within the segment file. The offset
-contains a value relative to the start of the file.
+contains a value relative to the table base offset.
 
 In EnCase 6.7.1 the sectors section can be larger than 2048Mb. The table
 entries offsets are 31 bit values in EnCase6 the offset in a table entry value

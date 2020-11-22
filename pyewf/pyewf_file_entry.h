@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libewf file entry
+ * Python object wrapper of libewf_file_entry_t
  *
  * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
  *

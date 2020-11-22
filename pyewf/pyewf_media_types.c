@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #endif
 
-#include "pyewf_media_types.h"
 #include "pyewf_libewf.h"
+#include "pyewf_media_types.h"
 #include "pyewf_python.h"
 #include "pyewf_unused.h"
 

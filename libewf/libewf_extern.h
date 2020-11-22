@@ -30,7 +30,11 @@
 
 #include <libewf/extern.h>
 
+#if defined( __CYGWIN__ )
+#define LIBEWF_EXTERN_VARIABLE	extern
+#else
 #define LIBEWF_EXTERN_VARIABLE	LIBEWF_EXTERN
+#endif
 
 #else
 #define LIBEWF_EXTERN		/* extern */

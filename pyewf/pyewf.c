@@ -72,7 +72,7 @@ PyMethodDef pyewf_module_methods[] = {
 	{ "check_file_signature_file_object",
 	  (PyCFunction) pyewf_check_file_signature_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "check_file_signature_file_object(filename) -> Boolean\n"
+	  "check_file_signature_file_object(file_object) -> Boolean\n"
 	  "\n"
 	  "Checks if a file has an Expert Witness Compression Format (EWF) signature using a file-like object." },
 
@@ -286,10 +286,10 @@ PyObject *pyewf_check_file_signature(
 
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   string_object );
+		                   string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   string_object );
+		                   string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -986,8 +986,9 @@ PyMODINIT_FUNC initpyewf(
 		return;
 #endif
 	}
+#if PY_VERSION_HEX < 0x03070000
 	PyEval_InitThreads();
-
+#endif
 	gil_state = PyGILState_Ensure();
 
 	/* Setup the compression methods type object

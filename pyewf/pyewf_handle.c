@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libewf handle
+ * Python object wrapper of libewf_handle_t
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
  * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
@@ -26,7 +26,7 @@
 #include <types.h>
 #include <wide_string.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
 #include <stdlib.h>
 #endif
 
