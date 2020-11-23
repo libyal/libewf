@@ -58,11 +58,6 @@ environment:
     APPVEYOR_BUILD_WORKER_IMAGE: macos
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     CONFIGURE_OPTIONS: "--enable-python"
-  - TARGET: macos-x64-gcc-python2
-    BUILD_ENVIRONMENT: xcode
-    APPVEYOR_BUILD_WORKER_IMAGE: macos
-    HOMEBREW_NO_INSTALL_CLEANUP: 1
-    CONFIGURE_OPTIONS: "--enable-python2"
   - TARGET: macos-pkgbuild
     BUILD_ENVIRONMENT: xcode
     APPVEYOR_BUILD_WORKER_IMAGE: macos

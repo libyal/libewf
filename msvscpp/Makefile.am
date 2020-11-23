@@ -6,6 +6,7 @@ MSVSCPP_FILES = \
 	ewf_test_attribute/ewf_test_attribute.vcproj \
 	ewf_test_bit_stream/ewf_test_bit_stream.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
+	ewf_test_checksum/ewf_test_checksum.vcproj \
 	ewf_test_chunk_data/ewf_test_chunk_data.vcproj \
 	ewf_test_chunk_group/ewf_test_chunk_group.vcproj \
 	ewf_test_chunk_table/ewf_test_chunk_table.vcproj \
@@ -19,6 +20,7 @@ MSVSCPP_FILES = \
 	ewf_test_error/ewf_test_error.vcproj \
 	ewf_test_error2_section/ewf_test_error2_section.vcproj \
 	ewf_test_file_entry/ewf_test_file_entry.vcproj \
+	ewf_test_filename/ewf_test_filename.vcproj \
 	ewf_test_glob/ewf_test_glob.vcproj \
 	ewf_test_handle/ewf_test_handle.vcproj \
 	ewf_test_hash_sections/ewf_test_hash_sections.vcproj \
