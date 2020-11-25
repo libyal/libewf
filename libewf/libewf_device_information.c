@@ -1203,11 +1203,10 @@ int libewf_device_information_parse_utf8_string_value(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	libfvalue_value_t *header_value = NULL;
-	uint8_t *identifier             = NULL;
-	static char *function           = "libewf_device_information_parse_utf8_string_value";
-	size_t identifier_size          = 0;
-	uint64_t value_64bit            = 0;
+	uint8_t *identifier    = NULL;
+	static char *function  = "libewf_device_information_parse_utf8_string_value";
+	size_t identifier_size = 0;
+	uint64_t value_64bit   = 0;
 
 	if( ( type_string == NULL )
 	 || ( type_string_size < 2 )
@@ -1221,7 +1220,7 @@ int libewf_device_information_parse_utf8_string_value(
 		 function,
 		 value_index );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( media_values == NULL )
 	{
@@ -1317,7 +1316,7 @@ int libewf_device_information_parse_utf8_string_value(
 				 "%s: unable to set bytes per sector.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 			media_values->bytes_per_sector = (uint32_t) value_64bit;
 		}
@@ -1339,7 +1338,7 @@ int libewf_device_information_parse_utf8_string_value(
 				 "%s: unable to set number of DCO protected sectors.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 /* TODO number of DCO protected sectors */
 		}
@@ -1421,7 +1420,7 @@ int libewf_device_information_parse_utf8_string_value(
 				 "%s: unable to set number of HPA protected sectors.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 /* TODO number of HPA protected sectors */
 		}
@@ -1488,89 +1487,33 @@ int libewf_device_information_parse_utf8_string_value(
 				 "%s: unable to set number of sectors.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
 			media_values->number_of_sectors = value_64bit;
 		}
 	}
 	if( identifier != NULL )
 	{
-		if( libfvalue_value_type_initialize(
-		     &header_value,
-		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header value.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfvalue_value_set_identifier(
-		     header_value,
+		if( libewf_value_table_set_value_by_identifier(
+		     header_values,
 		     identifier,
 		     identifier_size,
-		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s identifier.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		if( libfvalue_value_set_data(
-		     header_value,
 		     value_string,
 		     value_string_size,
-		     LIBFVALUE_CODEPAGE_UTF8,
-		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s data.",
+			 "%s: unable to set header value: %s.",
 			 function,
 			 (char *) identifier );
 
-			goto on_error;
+			return( -1 );
 		}
-		if( libfvalue_table_set_value(
-		     header_values,
-		     header_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s in table.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		header_value = NULL;
 	}
 	return( 1 );
-
-on_error:
-	if( header_value != NULL )
-	{
-		libfvalue_value_free(
-		 &header_value,
-		 NULL );
-	}
-	return( -1 );
 }
 
 /* Parses EWF version 2 device information

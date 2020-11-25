@@ -1,9 +1,16 @@
 TODO
+* remove old version of libewf_chunk_data_check_for_empty_block
+* rename attribute to extended attribute?
+
+* move overlapping/generic header and hash value functions into value table
+** libewf_hash_values_get_identifier_size
+** libewf_hash_values_get_identifier
+** move value table functions into libfvalue?
+
 * move use of libfvalue_table_get_value_by_identifier out of header_values and hash_values
+* refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
+
 * is libewf_huffman_tree.[ch] still used ? remove ?
-* fix issue with encase7 header value having invalid hex character
-* move libewf_hash_values_get_identifier_size libewf_hash_values_get_identifier into libfvalue
-* rename extended attribute to attribute
 * change single files tree to B-tree
 * access control entry / permission group add get_owner and get_group functions
 * file entry add 0 if not set support for values
@@ -31,7 +38,6 @@ TODO
 * speed of verification of Ex01 file? - debug outout related?
 
 * clean up TODO refactor notes
-* refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 * look into issues with high speed variations between chunk and non-chunk modes
 * process status change the code to have to determine decimal point only once
 

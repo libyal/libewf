@@ -243,7 +243,7 @@ void ewftools_output_version_detailed_fprint(
 	 " (libcrypto %s)",
 	 SHLIB_VERSION_NUMBER );
 #endif
-#endif
+#endif /* defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC ) */
 
 #if defined( HAVE_LIBODRAW ) || defined( HAVE_LOCAL_LIBODRAW )
 	fprintf(

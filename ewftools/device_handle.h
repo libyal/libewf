@@ -39,19 +39,19 @@ extern "C" {
  */
 enum DEVICE_HANDLE_TYPES
 {
-	DEVICE_HANDLE_TYPE_DEVICE			= (uint8_t) 'd',
-	DEVICE_HANDLE_TYPE_FILE				= (uint8_t) 'f',
-	DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE		= (uint8_t) 'o'
+	DEVICE_HANDLE_TYPE_DEVICE		= (uint8_t) 'd',
+	DEVICE_HANDLE_TYPE_FILE			= (uint8_t) 'f',
+	DEVICE_HANDLE_TYPE_OPTICAL_DISC_FILE	= (uint8_t) 'o'
 };
 
 /* The media type definitions
  */
 enum DEVICE_HANDLE_MEDIA_TYPES
 {
-	DEVICE_HANDLE_MEDIA_TYPE_REMOVABLE		= 0x00,
-	DEVICE_HANDLE_MEDIA_TYPE_FIXED			= 0x01,
-	DEVICE_HANDLE_MEDIA_TYPE_OPTICAL		= 0x03,
-	DEVICE_HANDLE_MEDIA_TYPE_MEMORY			= 0x10
+	DEVICE_HANDLE_MEDIA_TYPE_REMOVABLE	= 0x00,
+	DEVICE_HANDLE_MEDIA_TYPE_FIXED		= 0x01,
+	DEVICE_HANDLE_MEDIA_TYPE_OPTICAL	= 0x03,
+	DEVICE_HANDLE_MEDIA_TYPE_MEMORY		= 0x10
 };
 
 /* The (optical disc) track type definitions
@@ -278,6 +278,7 @@ int device_handle_media_information_fprint(
 
 int device_handle_read_errors_fprint(
      device_handle_t *device_handle,
+     uint32_t bytes_per_sector,
      FILE *stream,
      libcerror_error_t **error );
 

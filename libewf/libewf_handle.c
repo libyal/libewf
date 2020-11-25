@@ -67,6 +67,7 @@
 #include "libewf_single_files.h"
 #include "libewf_types.h"
 #include "libewf_unused.h"
+#include "libewf_value_table.h"
 #include "libewf_write_io_handle.h"
 
 #include "ewf_data.h"
@@ -14465,7 +14466,7 @@ int libewf_handle_set_utf8_header_value(
 	}
 	if( result == 1 )
 	{
-		result = libewf_header_values_set_utf8_value(
+		result = libewf_value_table_copy_value_from_utf8_string(
 			  internal_handle->header_values,
 			  identifier,
 			  identifier_length,
@@ -14761,7 +14762,7 @@ int libewf_handle_set_utf16_header_value(
 	}
 	if( result == 1 )
 	{
-		result = libewf_header_values_set_utf16_value(
+		result = libewf_value_table_copy_value_from_utf16_string(
 		          internal_handle->header_values,
 		          identifier,
 		          identifier_length,
@@ -15442,7 +15443,7 @@ int libewf_handle_get_utf8_hash_value_size(
 #endif
 	if( internal_handle->hash_values != NULL )
 	{
-		result = libewf_hash_values_get_utf8_value_size(
+		result = libewf_value_table_get_utf8_value_size(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,
@@ -15541,7 +15542,7 @@ int libewf_handle_get_utf8_hash_value(
 #endif
 	if( internal_handle->hash_values != NULL )
 	{
-		result = libewf_hash_values_get_utf8_value(
+		result = libewf_value_table_get_utf8_value(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,
@@ -15665,7 +15666,7 @@ int libewf_handle_set_utf8_hash_value(
 	}
 	if( result == 1 )
 	{
-		result = libewf_hash_values_set_utf8_value(
+		result = libewf_value_table_copy_value_from_utf8_string(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,
@@ -15783,7 +15784,7 @@ int libewf_handle_get_utf16_hash_value_size(
 #endif
 	if( internal_handle->hash_values != NULL )
 	{
-		result = libewf_hash_values_get_utf16_value_size(
+		result = libewf_value_table_get_utf16_value_size(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,
@@ -15882,7 +15883,7 @@ int libewf_handle_get_utf16_hash_value(
 #endif
 	if( internal_handle->hash_values != NULL )
 	{
-		result = libewf_hash_values_get_utf16_value(
+		result = libewf_value_table_get_utf16_value(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,
@@ -16006,7 +16007,7 @@ int libewf_handle_set_utf16_hash_value(
 	}
 	if( result == 1 )
 	{
-		result = libewf_hash_values_set_utf16_value(
+		result = libewf_value_table_copy_value_from_utf16_string(
 		          internal_handle->hash_values,
 		          identifier,
 		          identifier_length,

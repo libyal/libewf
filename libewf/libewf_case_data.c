@@ -1578,7 +1578,6 @@ int libewf_case_data_parse_utf8_string_value(
      libfvalue_table_t *header_values,
      libcerror_error_t **error )
 {
-	libfvalue_value_t *header_value     = NULL;
 	uint8_t *date_time_values_string    = NULL;
 	uint8_t *identifier                 = NULL;
 	static char *function               = "libewf_case_data_parse_utf8_string_value";
@@ -1951,71 +1950,24 @@ int libewf_case_data_parse_utf8_string_value(
 	}
 	if( identifier != NULL )
 	{
-		if( libfvalue_value_type_initialize(
-		     &header_value,
-		     LIBFVALUE_VALUE_TYPE_STRING_UTF8,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header value.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfvalue_value_set_identifier(
-		     header_value,
+		if( libewf_value_table_set_value_by_identifier(
+		     header_values,
 		     identifier,
 		     identifier_size,
-		     LIBFVALUE_VALUE_IDENTIFIER_FLAG_MANAGED,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s identifier.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		if( libfvalue_value_set_data(
-		     header_value,
 		     value_string,
 		     value_string_size,
-		     LIBFVALUE_CODEPAGE_UTF8,
-		     LIBFVALUE_VALUE_DATA_FLAG_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s data.",
+			 "%s: unable to set header value: %s.",
 			 function,
 			 (char *) identifier );
 
 			goto on_error;
 		}
-		if( libfvalue_table_set_value(
-		     header_values,
-		     header_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set header value: %s in table.",
-			 function,
-			 (char *) identifier );
-
-			goto on_error;
-		}
-		header_value = NULL;
 	}
 	if( date_time_values_string != NULL )
 	{
@@ -2027,12 +1979,6 @@ int libewf_case_data_parse_utf8_string_value(
 	return( 1 );
 
 on_error:
-	if( header_value != NULL )
-	{
-		libfvalue_value_free(
-		 &header_value,
-		 NULL );
-	}
 	if( date_time_values_string != NULL )
 	{
 		memory_free(

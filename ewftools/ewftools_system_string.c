@@ -41,8 +41,9 @@ int ewftools_system_string_decimal_copy_to_64_bit(
      libcerror_error_t **error )
 {
 	static char *function              = "ewftools_system_string_decimal_copy_to_64_bit";
-	size_t string_index                = 0;
 	system_character_t character_value = 0;
+	size_t string_index                = 0;
+	uint64_t safe_value_64bit          = 0;
 	uint8_t maximum_string_index       = 20;
 	int8_t sign                        = 1;
 
@@ -57,13 +58,14 @@ int ewftools_system_string_decimal_copy_to_64_bit(
 
 		return( -1 );
 	}
-	if( string_size > (size_t) SSIZE_MAX )
+	if( ( string_size == 0 )
+	 || ( string_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid string size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -79,8 +81,6 @@ int ewftools_system_string_decimal_copy_to_64_bit(
 
 		return( -1 );
 	}
-	*value_64bit = 0;
-
 	if( string[ string_index ] == (system_character_t) '-' )
 	{
 		string_index++;
@@ -110,7 +110,7 @@ int ewftools_system_string_decimal_copy_to_64_bit(
 
 			return( -1 );
 		}
-		*value_64bit *= 10;
+		safe_value_64bit *= 10;
 
 		if( ( string[ string_index ] >= (system_character_t) '0' )
 		 && ( string[ string_index ] <= (system_character_t) '9' ) )
@@ -130,14 +130,16 @@ int ewftools_system_string_decimal_copy_to_64_bit(
 
 			return( -1 );
 		}
-		*value_64bit += character_value;
+		safe_value_64bit += character_value;
 
 		string_index++;
 	}
 	if( sign == -1 )
 	{
-		*value_64bit *= (uint64_t) -1;
+		safe_value_64bit *= (uint64_t) -1;
 	}
+	*value_64bit = safe_value_64bit;
+
 	return( 1 );
 }
 
@@ -163,13 +165,14 @@ int ewftools_string_size_to_utf8_string(
 
 		return( -1 );
 	}
-	if( string_size > (size_t) SSIZE_MAX )
+	if( ( string_size == 0 )
+	 || ( string_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid string size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -234,7 +237,8 @@ int ewftools_string_size_to_utf8_string(
 			return( -1 );
 		}
 	}
-#endif
+#endif /* if defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 	return( 1 );
 }
 
@@ -250,28 +254,6 @@ int ewftools_string_copy_to_utf8_string(
 {
 	static char *function = "ewftools_string_copy_to_utf8_string";
 
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( string == NULL )
 	{
 		libcerror_error_set(
@@ -283,13 +265,37 @@ int ewftools_string_copy_to_utf8_string(
 
 		return( -1 );
 	}
-	if( string_size > (size_t) SSIZE_MAX )
+	if( ( string_size == 0 )
+	 || ( string_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid string size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( utf8_string_size == 0 )
+	 || ( utf8_string_size > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-8 string size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -366,7 +372,8 @@ int ewftools_string_copy_to_utf8_string(
 
 		return( -1 );
 	}
-#endif
+#endif /* if defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 	return( 1 );
 }
 

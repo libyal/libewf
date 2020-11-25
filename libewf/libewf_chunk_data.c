@@ -1376,6 +1376,59 @@ int libewf_chunk_data_check_for_empty_block(
      size_t data_size,
      libcerror_error_t **error )
 {
+	static char *function = "libewf_chunk_data_check_for_empty_block";
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size == 0 )
+	{
+		return( 0 );
+	}
+	else if( data_size == 1 )
+	{
+		return( 1 );
+	}
+	if( memory_compare(
+	     data,
+	     &( data[ 1 ] ),
+	     data_size - 1 ) != 0 )
+	{
+		return( 0 );
+	}
+	return( 1 );
+}
+
+/* Previous version keep for now */
+#ifdef TEST_EMPTY_BLOCK_MEMCMP
+
+/* Checks if a buffer containing the chunk data is filled with same value bytes (empty-block)
+ * Returns 1 if a pattern was found, 0 if not or -1 on error
+ */
+int libewf_chunk_data_check_for_empty_block(
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
 	libewf_aligned_t *aligned_data_index = NULL;
 	libewf_aligned_t *aligned_data_start = NULL;
 	uint8_t *data_index                  = NULL;
@@ -1470,6 +1523,8 @@ int libewf_chunk_data_check_for_empty_block(
 	}
 	return( 1 );
 }
+
+#endif /* TEST_EMPTY_BLOCK_MEMCMP */
 
 /* Checks if a buffer containing the chunk data is filled with a 64-bit pattern
  * Returns 1 if a pattern was found, 0 if not or -1 on error

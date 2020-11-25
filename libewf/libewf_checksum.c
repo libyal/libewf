@@ -31,7 +31,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_types.h"
 
-#if defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
+#if defined( HAVE_ZLIB_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
 
 /* Calculates the little-endian Adler-32 of a buffer
  * It uses the initial value to calculate a new Adler-32
@@ -68,7 +68,8 @@ int libewf_checksum_calculate_adler32(
 
 		return( -1 );
 	}
-	if( size > (size_t) UINT_MAX )
+	if( ( size > (size_t) UINT_MAX )
+	 || ( size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -87,5 +88,5 @@ int libewf_checksum_calculate_adler32(
 	return( 1 );
 }
 
-#endif /* defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
+#endif /* defined( HAVE_ZLIB_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
 

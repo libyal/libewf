@@ -637,7 +637,7 @@ int ewfacquire_read_input(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid imaging handle - acquire size value exceeds maximum.",
+		 "%s: invalid imaging handle - acquiry size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -674,7 +674,7 @@ int ewfacquire_read_input(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid acquire size value out of bounds.",
+		 "%s: invalid acquiry size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1442,6 +1442,7 @@ int ewfacquire_read_input(
 	{
 		if( device_handle_read_errors_fprint(
 		     device_handle,
+		     ewfacquire_imaging_handle->bytes_per_sector,
 		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
@@ -1472,6 +1473,7 @@ int ewfacquire_read_input(
 		{
 			if( device_handle_read_errors_fprint(
 			     device_handle,
+			     ewfacquire_imaging_handle->bytes_per_sector,
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
@@ -2381,11 +2383,17 @@ int main( int argc, char * const argv[] )
 
 		if( result == -1 )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
+			libcnotify_print_error_backtrace(
+			 error );
+#endif
+			libcerror_error_free(
+			 &error );
+
 			fprintf(
 			 stderr,
-			 "Unable to retrieve bytes per sector from device.\n" );
-
-			goto on_error;
+			 "Unable to retrieve bytes per sector from device defaulting to: %" PRIu32 ".\n",
+			 ewfacquire_imaging_handle->bytes_per_sector );
 		}
 		else if( result == 0 )
 		{
@@ -2844,7 +2852,7 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-			if( option_compression_values== NULL )
+			if( option_compression_values == NULL )
 			{
 				result = imaging_handle_prompt_for_compression_method(
 					  ewfacquire_imaging_handle,

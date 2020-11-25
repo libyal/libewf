@@ -64,24 +64,14 @@ int guid_generate(
 
 		return( -1 );
 	}
-	if( guid_size < GUID_SIZE )
+	if( ( guid_size < GUID_SIZE )
+	 || ( guid_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: GUID too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( guid_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid GUID size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid GUID size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -183,24 +173,14 @@ int guid_to_string(
 
 		return( -1 );
 	}
-	if( guid_size < GUID_SIZE )
+	if( ( guid_size < GUID_SIZE )
+	 || ( guid_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: GUID too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( guid_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid GUID size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid GUID size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -228,24 +208,14 @@ int guid_to_string(
 
 		return( -1 );
 	}
-	if( string_size < 37 )
+	if( ( string_size < 37 )
+	 || ( string_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: string too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid string size value out of bounds.",
 		 function );
 
 		return( -1 );

@@ -35,6 +35,169 @@
 #include "ewf_test_unused.h"
 
 #include "../ewftools/device_handle.h"
+#include "../ewftools/ewftools_libodraw.h"
+#include "../ewftools/ewftools_libsmdev.h"
+#include "../ewftools/ewftools_libsmraw.h"
+
+/* Tests the device_handle_get_track_type function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_track_type(
+     void )
+{
+	const char *description = NULL;
+	int result              = 0;
+
+	/* Test regular cases
+	 */
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_AUDIO );
+
+	result = memory_compare(
+	          description,
+	          "audio",
+	          6 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_CDG );
+
+	result = memory_compare(
+	          description,
+	          "CD+G",
+	          5 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE1_2048 );
+
+	result = memory_compare(
+	          description,
+	          "mode1/2048",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE1_2352 );
+
+	result = memory_compare(
+	          description,
+	          "mode1/2352",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE2_2048 );
+
+	result = memory_compare(
+	          description,
+	          "mode2/2048",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE2_2324 );
+
+	result = memory_compare(
+	          description,
+	          "mode2/2324",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE2_2336 );
+
+	result = memory_compare(
+	          description,
+	          "mode2/2336",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_MODE2_2352 );
+
+	result = memory_compare(
+	          description,
+	          "mode2/2352",
+	          11 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_CDI_2336 );
+
+	result = memory_compare(
+	          description,
+	          "CDI/2336",
+	          9 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               DEVICE_HANDLE_TRACK_TYPE_CDI_2352 );
+
+	result = memory_compare(
+	          description,
+	          "CDI/2352",
+	          9 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	description = device_handle_get_track_type(
+	               0xff );
+
+	result = memory_compare(
+	          description,
+	          "UNKNOWN",
+	          8 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
 
 /* Tests the device_handle_initialize function
  * Returns 1 if successful or 0 if not
@@ -42,13 +205,13 @@
 int ewf_test_tools_device_handle_initialize(
      void )
 {
-	device_handle_t *device_handle      = NULL;
+	device_handle_t *device_handle  = NULL;
 	libcerror_error_t *error        = NULL;
 	int result                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 1;
-	int number_of_memset_fail_tests = 1;
+	int number_of_malloc_fail_tests = 2;
+	int number_of_memset_fail_tests = 2;
 	int test_number                 = 0;
 #endif
 
@@ -322,6 +485,600 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the device_handle_open_input function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_open_input(
+     void )
+{
+	device_handle_t *device_handle = NULL;
+	libcerror_error_t *error       = NULL;
+	char **filenames               = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = device_handle_initialize(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = device_handle_open_input(
+	          NULL,
+	          filenames,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_input(
+	          device_handle,
+	          NULL,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = device_handle_free(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( device_handle != NULL )
+	{
+		device_handle_free(
+		 &device_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_open_smdev_input function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_open_smdev_input(
+     void )
+{
+	device_handle_t *device_handle = NULL;
+	libcerror_error_t *error       = NULL;
+	char **filenames               = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = device_handle_initialize(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = device_handle_open_smdev_input(
+	          NULL,
+	          filenames,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	device_handle->smdev_input_handle = (libsmdev_handle_t *) 0x12345678UL;
+
+	result = device_handle_open_smdev_input(
+	          device_handle,
+	          filenames,
+	          1,
+	          &error );
+
+	device_handle->smdev_input_handle = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_smdev_input(
+	          device_handle,
+	          NULL,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_smdev_input(
+	          device_handle,
+	          filenames,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = device_handle_free(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( device_handle != NULL )
+	{
+		device_handle_free(
+		 &device_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_open_odraw_input function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_open_odraw_input(
+     void )
+{
+	device_handle_t *device_handle = NULL;
+	libcerror_error_t *error       = NULL;
+	char **filenames               = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = device_handle_initialize(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = device_handle_open_odraw_input(
+	          NULL,
+	          filenames,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	device_handle->odraw_input_handle = (libodraw_handle_t *) 0x12345678UL;
+
+	result = device_handle_open_odraw_input(
+	          device_handle,
+	          filenames,
+	          1,
+	          &error );
+
+	device_handle->odraw_input_handle = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_odraw_input(
+	          device_handle,
+	          NULL,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_odraw_input(
+	          device_handle,
+	          filenames,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = device_handle_free(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( device_handle != NULL )
+	{
+		device_handle_free(
+		 &device_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_open_smraw_input function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_open_smraw_input(
+     void )
+{
+	device_handle_t *device_handle = NULL;
+	libcerror_error_t *error       = NULL;
+	char **filenames               = NULL;
+	int result                     = 0;
+
+	/* Initialize test
+	 */
+	result = device_handle_initialize(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = device_handle_open_smraw_input(
+	          NULL,
+	          filenames,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	device_handle->smraw_input_handle = (libsmraw_handle_t *) 0x12345678UL;
+
+	result = device_handle_open_smraw_input(
+	          device_handle,
+	          filenames,
+	          1,
+	          &error );
+
+	device_handle->smraw_input_handle = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_smraw_input(
+	          device_handle,
+	          NULL,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_open_smraw_input(
+	          device_handle,
+	          filenames,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = device_handle_free(
+	          &device_handle,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "device_handle",
+	 device_handle );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( device_handle != NULL )
+	{
+		device_handle_free(
+		 &device_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_close function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_close(
+     void )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = device_handle_close(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -335,11 +1092,15 @@ int main(
 #endif
 {
 	device_handle_t *device_handle = NULL;
-	libcerror_error_t *error   = NULL;
-	int result                 = 0;
+	libcerror_error_t *error       = NULL;
+	int result                     = 0;
 
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
+
+	EWF_TEST_RUN(
+	 "device_handle_get_track_type",
+	 ewf_test_tools_device_handle_get_track_type );
 
 	EWF_TEST_RUN(
 	 "device_handle_initialize",
@@ -373,6 +1134,72 @@ int main(
 	 "device_handle_signal_abort",
 	 ewf_test_tools_device_handle_signal_abort,
 	 device_handle );
+
+	EWF_TEST_RUN(
+	 "device_handle_open_input",
+	 ewf_test_tools_device_handle_open_input );
+
+	EWF_TEST_RUN(
+	 "device_handle_open_smdev_input",
+	 ewf_test_tools_device_handle_open_smdev_input );
+
+	EWF_TEST_RUN(
+	 "device_handle_open_odraw_input",
+	 ewf_test_tools_device_handle_open_odraw_input );
+
+	EWF_TEST_RUN(
+	 "device_handle_open_smraw_input",
+	 ewf_test_tools_device_handle_open_smraw_input );
+
+	EWF_TEST_RUN(
+	 "device_handle_close",
+	 ewf_test_tools_device_handle_close );
+
+	/* TODO add tests for device_handle_read_storage_media_buffer */
+
+	/* TODO add tests for device_handle_seek_offset */
+
+	/* TODO add tests for device_handle_prompt_for_string */
+
+	/* TODO add tests for device_handle_prompt_for_number_of_error_retries */
+
+	/* TODO add tests for device_handle_prompt_for_zero_buffer_on_error */
+
+	/* TODO add tests for device_handle_get_type */
+
+	/* TODO add tests for device_handle_get_media_size */
+
+	/* TODO add tests for device_handle_get_media_type */
+
+	/* TODO add tests for device_handle_get_bytes_per_sector */
+
+	/* TODO add tests for device_handle_get_information_value */
+
+	/* TODO add tests for device_handle_get_number_of_sessions */
+
+	/* TODO add tests for device_handle_get_session */
+
+	/* TODO add tests for device_handle_get_number_of_tracks */
+
+	/* TODO add tests for device_handle_get_track */
+
+	/* TODO add tests for device_handle_set_string */
+
+	/* TODO add tests for device_handle_set_number_of_error_retries */
+
+	/* TODO add tests for device_handle_set_error_values */
+
+	/* TODO add tests for device_handle_get_number_of_read_errors */
+
+	/* TODO add tests for device_handle_get_read_error */
+
+	/* TODO add tests for device_handle_media_information_fprint */
+
+	/* TODO add tests for device_handle_read_errors_fprint */
+
+	/* TODO add tests for device_handle_sessions_fprint */
+
+	/* TODO add tests for device_handle_tracks_fprint */
 
 	/* Clean up
 	 */

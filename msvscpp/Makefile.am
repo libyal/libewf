@@ -57,11 +57,14 @@ MSVSCPP_FILES = \
 	ewf_test_tools_byte_size_string/ewf_test_tools_byte_size_string.vcproj \
 	ewf_test_tools_device_handle/ewf_test_tools_device_handle.vcproj \
 	ewf_test_tools_digest_hash/ewf_test_tools_digest_hash.vcproj \
+	ewf_test_tools_export_handle/ewf_test_tools_export_handle.vcproj \
 	ewf_test_tools_guid/ewf_test_tools_guid.vcproj \
+	ewf_test_tools_imaging_handle/ewf_test_tools_imaging_handle.vcproj \
 	ewf_test_tools_info_handle/ewf_test_tools_info_handle.vcproj \
 	ewf_test_tools_output/ewf_test_tools_output.vcproj \
 	ewf_test_tools_platform/ewf_test_tools_platform.vcproj \
 	ewf_test_tools_signal/ewf_test_tools_signal.vcproj \
+	ewf_test_tools_system_string/ewf_test_tools_system_string.vcproj \
 	ewf_test_tools_verification_handle/ewf_test_tools_verification_handle.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \
 	ewf_test_value_table/ewf_test_value_table.vcproj \

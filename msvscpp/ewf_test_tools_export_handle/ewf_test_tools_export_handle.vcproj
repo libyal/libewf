@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_filename"
-	ProjectGUID="{945614A0-3B96-4E14-A159-DD5CF8DAFFA3}"
-	RootNamespace="ewf_test_filename"
+	Name="ewf_test_tools_export_handle"
+	ProjectGUID="{B2FF1103-D54A-49EB-A110-AA5C7FDA3131}"
+	RootNamespace="ewf_test_tools_export_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -58,6 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				SubSystem="1"
@@ -134,6 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -176,11 +178,51 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_filename.c"
+				RelativePath="..\..\ewftools\byte_size_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\digest_hash.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfinput.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_system_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\export_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\guid.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\process_status.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_memory.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_tools_export_handle.c"
 				>
 			</File>
 		</Filter>
@@ -189,6 +231,46 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\ewftools\byte_size_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\digest_hash.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfinput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewftools_system_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\export_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\guid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\log_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\process_status.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\storage_media_buffer_queue.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>

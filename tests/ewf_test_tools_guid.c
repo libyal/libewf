@@ -38,6 +38,123 @@
 
 #include "../ewftools/guid.h"
 
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+
+/* Tests the guid_generate function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_guid_generate(
+     void )
+{
+	uint8_t guid[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = guid_generate(
+	          guid,
+	          16,
+	          GUID_TYPE_RANDOM,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = guid_generate(
+	          NULL,
+	          16,
+	          GUID_TYPE_RANDOM,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_generate(
+	          guid,
+	          (size_t) SSIZE_MAX + 1,
+	          GUID_TYPE_RANDOM,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_generate(
+	          guid,
+	          0,
+	          GUID_TYPE_RANDOM,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_generate(
+	          guid,
+	          16,
+	          0xff,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
+
 /* Tests the guid_to_string function
  * Returns 1 if successful or 0 if not
  */
@@ -103,6 +220,126 @@ int ewf_test_tools_guid_to_string(
 	libcerror_error_free(
 	 &error );
 
+	result = guid_to_string(
+	          guid,
+	          (size_t) SSIZE_MAX + 1,
+	          _BYTE_STREAM_ENDIAN_BIG,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_to_string(
+	          guid,
+	          0,
+	          _BYTE_STREAM_ENDIAN_BIG,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_to_string(
+	          guid,
+	          16,
+	          -1,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_to_string(
+	          guid,
+	          16,
+	          _BYTE_STREAM_ENDIAN_BIG,
+	          NULL,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_to_string(
+	          guid,
+	          16,
+	          _BYTE_STREAM_ENDIAN_BIG,
+	          string,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = guid_to_string(
+	          guid,
+	          16,
+	          _BYTE_STREAM_ENDIAN_BIG,
+	          string,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -129,7 +366,13 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-/* TODO add tests for guid_generate */
+#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+
+	EWF_TEST_RUN(
+	 "guid_generate",
+	 ewf_test_tools_guid_generate );
+
+#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
 
 	EWF_TEST_RUN(
 	 "guid_to_string",

@@ -320,6 +320,50 @@ int ewf_test_device_information_generate_utf8_string(
 	 "error",
 	 error );
 
+#if defined( HAVE_EWF_TEST_MEMORY )
+
+	/* Test libewf_device_information_generate_utf8_string with malloc failing
+	 */
+	ewf_test_malloc_attempts_before_fail = 0;
+
+	utf8_string_size = 0;
+
+	result = libewf_device_information_generate_utf8_string(
+	          &utf8_string,
+	          &utf8_string_size,
+	          media_values,
+	          header_values,
+	          &error );
+
+	if( ewf_test_malloc_attempts_before_fail != -1 )
+	{
+		ewf_test_malloc_attempts_before_fail = -1;
+
+		if( utf8_string != NULL )
+		{
+			memory_free(
+			 utf8_string );
+
+			utf8_string = NULL;
+		}
+		utf8_string_size = 0;
+	}
+	else
+	{
+		EWF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		EWF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libewf_media_values_free(

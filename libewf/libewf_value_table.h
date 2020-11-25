@@ -55,6 +55,60 @@ int libewf_value_table_set_value_by_index(
      size_t identifier_size,
      libcerror_error_t **error );
 
+int libewf_value_table_set_value_by_identifier(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_size,
+     const uint8_t *value_string,
+     size_t value_string_size,
+     libcerror_error_t **error );
+
+int libewf_value_table_get_utf8_value_size(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_value_table_get_utf8_value(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libewf_value_table_copy_value_from_utf8_string(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
+int libewf_value_table_get_utf16_value_size(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_value_table_get_utf16_value(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_value_table_copy_value_from_utf16_string(
+     libfvalue_table_t *value_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

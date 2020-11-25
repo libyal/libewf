@@ -39,7 +39,7 @@ void ewf_test_tools_signal_handler(
 	EWF_TEST_UNREFERENCED_PARAMETER( signal )
 }
 
-/* Tests the ewftools_signal_attach and function
+/* Tests the ewftools_signal_attach function
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_tools_signal_attach(
@@ -72,7 +72,7 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the ewftools_signal_detach and function
+/* Tests the ewftools_signal_detach function
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_tools_signal_detach(

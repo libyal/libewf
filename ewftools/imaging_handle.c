@@ -47,6 +47,7 @@
 #include "guid.h"
 #include "imaging_handle.h"
 #include "platform.h"
+#include "process_status.h"
 #include "storage_media_buffer.h"
 #include "storage_media_buffer_queue.h"
 

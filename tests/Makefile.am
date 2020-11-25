@@ -135,11 +135,14 @@ check_PROGRAMS = \
 	ewf_test_tools_byte_size_string \
 	ewf_test_tools_device_handle \
 	ewf_test_tools_digest_hash \
+	ewf_test_tools_export_handle \
 	ewf_test_tools_guid \
+	ewf_test_tools_imaging_handle \
 	ewf_test_tools_info_handle \
 	ewf_test_tools_output \
 	ewf_test_tools_platform \
 	ewf_test_tools_signal \
+	ewf_test_tools_system_string \
 	ewf_test_tools_verification_handle \
 	ewf_test_truncate \
 	ewf_test_value_table \
@@ -1036,6 +1039,49 @@ ewf_test_tools_digest_hash_SOURCES = \
 ewf_test_tools_digest_hash_LDADD = \
 	@LIBCERROR_LIBADD@
 
+ewf_test_tools_export_handle_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	../ewftools/digest_hash.c ../ewftools/digest_hash.h \
+	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	../ewftools/export_handle.c ../ewftools/export_handle.h \
+	../ewftools/guid.c ../ewftools/guid.h \
+	../ewftools/log_handle.c ../ewftools/log_handle.h \
+	../ewftools/process_status.c ../ewftools/process_status.h \
+	../ewftools/storage_media_buffer.c ../ewftools/storage_media_buffer.h \
+	../ewftools/storage_media_buffer_queue.c ../ewftools/storage_media_buffer_queue.h \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_tools_export_handle.c \
+	ewf_test_unused.h
+
+ewf_test_tools_export_handle_LDADD = \
+	@LIBSMRAW_LIBADD@ \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBFDATA_LIBADD@ \
+	@LIBFCACHE_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBUUID_LIBADD@ \
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
+
 ewf_test_tools_guid_SOURCES = \
 	../ewftools/guid.c ../ewftools/guid.h \
 	ewf_test_libcerror.h \
@@ -1046,6 +1092,44 @@ ewf_test_tools_guid_SOURCES = \
 ewf_test_tools_guid_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBUUID_LIBADD@
+
+ewf_test_tools_imaging_handle_SOURCES = \
+	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
+	../ewftools/digest_hash.c ../ewftools/digest_hash.h \
+	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	../ewftools/guid.c ../ewftools/guid.h \
+	../ewftools/imaging_handle.c ../ewftools/imaging_handle.h \
+	../ewftools/platform.c ../ewftools/platform.h \
+	../ewftools/process_status.c ../ewftools/process_status.h \
+	../ewftools/storage_media_buffer.c ../ewftools/storage_media_buffer.h \
+	../ewftools/storage_media_buffer_queue.c ../ewftools/storage_media_buffer_queue.h \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_tools_imaging_handle.c \
+	ewf_test_unused.h
+
+ewf_test_tools_imaging_handle_LDADD = \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATETIME_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBUUID_LIBADD@ \
+	@LIBINTL@ \
+	@PTHREAD_LIBADD@
 
 ewf_test_tools_info_handle_SOURCES = \
 	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
@@ -1104,6 +1188,19 @@ ewf_test_tools_signal_SOURCES = \
 
 ewf_test_tools_signal_LDADD = \
 	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_tools_system_string_SOURCES = \
+	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_tools_system_string.c \
+	ewf_test_unused.h
+
+ewf_test_tools_system_string_LDADD = \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@
 
 ewf_test_tools_verification_handle_SOURCES = \

@@ -390,6 +390,33 @@ int ewf_test_bit_stream_read(
 	 bit_stream->bit_buffer_size,
 	 (uint8_t) 32 );
 
+	bit_stream->byte_stream_offset = 15;
+	bit_stream->bit_buffer_size    = 0;
+
+	result = libewf_bit_stream_read(
+	          bit_stream,
+	          32,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "bit_stream->byte_stream_offset",
+	 bit_stream->byte_stream_offset,
+	 (size_t) 16 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT8(
+	 "bit_stream->bit_buffer_size",
+	 bit_stream->bit_buffer_size,
+	 (uint8_t) 8 );
+
 	/* Test error cases
 	 */
 	result = libewf_bit_stream_read(

@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include <stdio.h>
 
@@ -39,7 +42,7 @@
 
 #include "../ewftools/ewftools_output.h"
 
-/* Tests the ewftools_output_initialize and function
+/* Tests the ewftools_output_initialize function
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_tools_output_initialize(
@@ -48,6 +51,8 @@ int ewf_test_tools_output_initialize(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = ewftools_output_initialize(
 	          _IONBF,
 	          &error );
@@ -61,6 +66,24 @@ int ewf_test_tools_output_initialize(
 	 "error",
 	 error );
 
+	/* Test error cases
+	 */
+	result = ewftools_output_initialize(
+	          -1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -69,6 +92,133 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	return( 0 );
+}
+
+/* Tests the ewftools_output_copyright_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_output_copyright_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream = NULL;
+#endif
+
+	/* Test invocation of function only
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	ewftools_output_copyright_fprint(
+	 stream );
+
+	fclose(
+	 stream );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	ewftools_output_copyright_fprint(
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the ewftools_output_version_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_output_version_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream = NULL;
+#endif
+
+	/* Test invocation of function only
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	ewftools_output_version_fprint(
+	 stream,
+	 _SYSTEM_STRING( "test" ) );
+
+	fclose(
+	 stream );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	ewftools_output_version_fprint(
+	 NULL,
+	 _SYSTEM_STRING( "test" ) );
+
+	ewftools_output_version_fprint(
+	 (FILE *) 0x12345678UL,
+	 NULL );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+/* Tests the ewftools_output_version_detailed_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_output_version_detailed_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream = NULL;
+#endif
+
+	/* Test invocation of function only
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	ewftools_output_version_detailed_fprint(
+	 stream,
+	 _SYSTEM_STRING( "test" ) );
+
+	fclose(
+	 stream );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	ewftools_output_version_detailed_fprint(
+	 NULL,
+	 _SYSTEM_STRING( "test" ) );
+
+	ewftools_output_version_detailed_fprint(
+	 (FILE *) 0x12345678UL,
+	 NULL );
+
+	return( 1 );
+
+on_error:
 	return( 0 );
 }
 
@@ -91,11 +241,17 @@ int main(
 	 "ewftools_output_initialize",
 	 ewf_test_tools_output_initialize )
 
-	/* TODO add tests for ewftools_output_copyright_fprint */
+	EWF_TEST_RUN(
+	 "ewftools_output_copyright_fprint",
+	 ewf_test_tools_output_copyright_fprint )
 
-	/* TODO add tests for ewftools_output_version_fprint */
+	EWF_TEST_RUN(
+	 "ewftools_output_version_fprint",
+	 ewf_test_tools_output_version_fprint )
 
-	/* TODO add tests for ewftools_output_version_detailed_fprint */
+	EWF_TEST_RUN(
+	 "ewftools_output_version_detailed_fprint",
+	 ewf_test_tools_output_version_detailed_fprint )
 
 	return( EXIT_SUCCESS );
 

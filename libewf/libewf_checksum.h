@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
+#if defined( HAVE_ZLIB_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) )
 
 int libewf_checksum_calculate_adler32(
      uint32_t *checksum_value,
@@ -45,7 +45,7 @@ int libewf_checksum_calculate_adler32(
 #define libewf_checksum_calculate_adler32( checksum_value, buffer, size, initial_value, error ) \
 	libewf_deflate_calculate_adler32( checksum_value, buffer, size, initial_value, error )
 
-#endif /* defined( HAVE_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
+#endif /* defined( HAVE_ZLIB_ADLER32 ) && ( defined( HAVE_ZLIB ) || defined( ZLIB_DLL ) ) */
 
 #if defined( __cplusplus )
 }

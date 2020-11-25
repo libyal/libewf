@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_filename"
-	ProjectGUID="{945614A0-3B96-4E14-A159-DD5CF8DAFFA3}"
-	RootNamespace="ewf_test_filename"
+	Name="ewf_test_tools_system_string"
+	ProjectGUID="{BC3E771C-6F54-4851-B44B-BA4C3BFEF97D}"
+	RootNamespace="ewf_test_tools_system_string"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_filename.c"
+				RelativePath="..\..\ewftools\ewftools_system_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
+				RelativePath="..\..\tests\ewf_test_tools_system_string.c"
 				>
 			</File>
 		</Filter>
@@ -190,19 +190,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\ewftools\ewftools_system_string.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libewf.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

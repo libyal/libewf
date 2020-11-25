@@ -199,7 +199,12 @@ int libewf_hash_sections_clone(
 		 "%s: unable to copy source to destination hash sections.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *destination_hash_sections );
+
+		*destination_hash_sections = NULL;
+
+		return( -1 );
 	}
 	( *destination_hash_sections )->xhash      = NULL;
 	( *destination_hash_sections )->xhash_size = 0;

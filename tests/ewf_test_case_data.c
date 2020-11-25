@@ -660,12 +660,11 @@ int ewf_test_case_data_generate(
 
 #if defined( HAVE_EWF_TEST_MEMORY )
 
-/* TODO fix test
- */
-#ifdef TODO
 	/* Test libewf_case_data_generate with malloc failing
 	 */
-	ewf_test_malloc_attempts_before_fail = 1;
+	ewf_test_malloc_attempts_before_fail = 3;
+
+	case_data_size = 0;
 
 	result = libewf_case_data_generate(
 	          &case_data,
@@ -707,7 +706,6 @@ int ewf_test_case_data_generate(
 		libcerror_error_free(
 		 &error );
 	}
-#endif
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
 
 	/* Clean up
