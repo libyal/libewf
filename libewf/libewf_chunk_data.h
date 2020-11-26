@@ -114,6 +114,27 @@ ssize_t libewf_chunk_data_write_buffer(
          size_t buffer_size,
          libcerror_error_t **error );
 
+int libewf_chunk_data_pack_determine_pack_flags(
+     libewf_chunk_data_t *chunk_data,
+     libewf_io_handle_t *io_handle,
+     uint8_t *pack_flags,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_pack_with_64_bit_pattern_fill(
+     libewf_chunk_data_t *chunk_data,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_pack_with_empty_block_compression(
+     libewf_chunk_data_t *chunk_data,
+     const uint8_t *compressed_zero_byte_empty_block,
+     size_t compressed_zero_byte_empty_block_size,
+     libcerror_error_t **error );
+
+int libewf_chunk_data_pack_with_compression(
+     libewf_chunk_data_t *chunk_data,
+     libewf_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
 int libewf_chunk_data_pack(
      libewf_chunk_data_t *chunk_data,
      libewf_io_handle_t *io_handle,

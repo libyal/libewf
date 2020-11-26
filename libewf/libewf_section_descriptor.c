@@ -1256,17 +1256,17 @@ int libewf_section_descriptor_write_data(
 		if( format_version == 1 )
 		{
 			libcnotify_printf(
-			 "%s: type string\t\t\t\t: %s\n",
+			 "%s: type string\t\t\t: %s\n",
 			 function,
 			 (char *) section_descriptor->type_string );
 
 			libcnotify_printf(
-			 "%s: next offset\t\t\t\t: 0x%08" PRIx64 "\n",
+			 "%s: next offset\t\t\t: 0x%08" PRIx64 "\n",
 			 function,
 			 section_descriptor->end_offset );
 
 			libcnotify_printf(
-			 "%s: size\t\t\t\t\t: %" PRIu64 "\n",
+			 "%s: size\t\t\t\t: %" PRIu64 "\n",
 			 function,
 			 section_descriptor->size );
 

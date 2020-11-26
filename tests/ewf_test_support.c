@@ -809,7 +809,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_ENCASE5 );
+	 (uint8_t) LIBEWF_FORMAT_ENCASE5 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -829,7 +829,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_LOGICAL_ENCASE5 );
+	 (uint8_t) LIBEWF_FORMAT_LOGICAL_ENCASE5 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -849,7 +849,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_EWF );
+	 (uint8_t) LIBEWF_FORMAT_EWF );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -869,7 +869,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_SMART );
+	 (uint8_t) LIBEWF_FORMAT_SMART );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -889,7 +889,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_V2_ENCASE7 );
+	 (uint8_t) LIBEWF_FORMAT_V2_ENCASE7 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -909,7 +909,7 @@ int ewf_test_glob_determine_format(
 	EWF_TEST_ASSERT_EQUAL_UINT8(
 	 "format",
 	 format,
-	 LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 );
+	 (uint8_t) LIBEWF_FORMAT_V2_LOGICAL_ENCASE7 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",

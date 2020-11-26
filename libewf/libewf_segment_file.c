@@ -1214,7 +1214,7 @@ ssize_t libewf_segment_file_write_file_header(
 			 ")\n" );
 		}
 		libcnotify_printf(
-		 "%s: segment number\t\t: %" PRIu32 "\n",
+		 "%s: segment number\t\t\t: %" PRIu32 "\n",
 		 function,
 		 segment_file->segment_number );
 
@@ -1994,7 +1994,7 @@ ssize_t libewf_segment_file_write_device_information_section(
 	               0,
 	               segment_file->current_offset,
 	               segment_file->io_handle->compression_method,
-	               LIBEWF_COMPRESSION_DEFAULT,
+	               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 	               *device_information,
 	               *device_information_size - 2,
 	               0,
@@ -2166,7 +2166,7 @@ ssize_t libewf_segment_file_write_case_data_section(
 	               0,
 	               segment_file->current_offset,
 	               segment_file->io_handle->compression_method,
-	               LIBEWF_COMPRESSION_DEFAULT,
+	               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 	               *case_data,
 	               *case_data_size - 2,
 	               0,
@@ -2485,7 +2485,7 @@ ssize_t libewf_segment_file_write_header2_section(
 	               7,
 	               segment_file->current_offset,
 	               segment_file->io_handle->compression_method,
-	               LIBEWF_COMPRESSION_DEFAULT,
+	               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 	               header_sections->header2,
 	               header_sections->header2_size - 2,
 	               0,
@@ -2655,7 +2655,7 @@ ssize_t libewf_segment_file_write_xheader_section(
 	               7,
 	               segment_file->current_offset,
 	               segment_file->io_handle->compression_method,
-	               LIBEWF_COMPRESSION_DEFAULT,
+	               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 	               header_sections->xheader,
 	               header_sections->xheader_size - 1,
 	               0,
@@ -2851,7 +2851,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool,
 		               file_io_pool_entry,
 		               header_sections,
-		               LIBEWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2872,7 +2872,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool,
 		               file_io_pool_entry,
 		               header_sections,
-		               LIBEWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -2944,7 +2944,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool,
 		               file_io_pool_entry,
 		               header_sections,
-		               LIBEWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -3018,7 +3018,7 @@ ssize_t libewf_segment_file_write_header_sections(
 		               file_io_pool,
 		               file_io_pool_entry,
 		               header_sections,
-		               LIBEWF_COMPRESSION_DEFAULT,
+		               LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 		               error );
 
 		if( write_count == -1 )
@@ -4791,7 +4791,7 @@ ssize_t libewf_segment_file_write_hash_sections(
 			       5,
 			       segment_file->current_offset,
 			       segment_file->io_handle->compression_method,
-			       LIBEWF_COMPRESSION_DEFAULT,
+			       LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 			       hash_sections->xhash,
 			       hash_sections->xhash_size - 1,
 			       0,
@@ -5771,7 +5771,7 @@ int libewf_segment_file_write_sections_correction(
 						       0,
 						       section_descriptor->start_offset,
 						       segment_file->io_handle->compression_method,
-						       LIBEWF_COMPRESSION_DEFAULT,
+						       LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 						       *device_information,
 						       *device_information_size - 2,
 						       (size_t) section_descriptor->data_size,
@@ -5853,7 +5853,7 @@ int libewf_segment_file_write_sections_correction(
 						       0,
 						       section_descriptor->start_offset,
 						       segment_file->io_handle->compression_method,
-						       LIBEWF_COMPRESSION_DEFAULT,
+						       LIBEWF_COMPRESSION_LEVEL_DEFAULT,
 						       *case_data,
 						       *case_data_size - 2,
 						       (size_t) section_descriptor->data_size,

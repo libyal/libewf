@@ -93,7 +93,7 @@ int libewf_io_handle_initialize(
 	( *io_handle )->major_version      = 1;
 	( *io_handle )->minor_version      = 0;
 	( *io_handle )->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *io_handle )->compression_level  = LIBEWF_COMPRESSION_NONE;
+	( *io_handle )->compression_level  = LIBEWF_COMPRESSION_LEVEL_NONE;
 	( *io_handle )->zero_on_error      = 1;
 	( *io_handle )->header_codepage    = LIBEWF_CODEPAGE_ASCII;
 
@@ -193,7 +193,7 @@ int libewf_io_handle_clear(
 	io_handle->major_version      = 1;
 	io_handle->minor_version      = 0;
 	io_handle->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	io_handle->compression_level  = LIBEWF_COMPRESSION_NONE;
+	io_handle->compression_level  = LIBEWF_COMPRESSION_LEVEL_NONE;
 	io_handle->zero_on_error      = 1;
 	io_handle->header_codepage    = LIBEWF_CODEPAGE_ASCII;
 

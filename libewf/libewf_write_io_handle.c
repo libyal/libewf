@@ -779,9 +779,9 @@ int libewf_write_io_handle_initialize_values(
 			}
 			compression_level = io_handle->compression_level;
 
-			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			if( compression_level == LIBEWF_COMPRESSION_LEVEL_NONE )
 			{
-				compression_level = LIBEWF_COMPRESSION_DEFAULT;
+				compression_level = LIBEWF_COMPRESSION_LEVEL_DEFAULT;
 			}
 			result = libewf_compress_data(
 				  compressed_zero_byte_empty_block,

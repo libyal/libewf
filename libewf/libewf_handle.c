@@ -10491,9 +10491,9 @@ int libewf_handle_set_compression_values(
 
 		return( -1 );
 	}
-	if( ( compression_level != LIBEWF_COMPRESSION_NONE )
-	 && ( compression_level != LIBEWF_COMPRESSION_FAST )
-	 && ( compression_level != LIBEWF_COMPRESSION_BEST ) )
+	if( ( compression_level != LIBEWF_COMPRESSION_LEVEL_NONE )
+	 && ( compression_level != LIBEWF_COMPRESSION_LEVEL_FAST )
+	 && ( compression_level != LIBEWF_COMPRESSION_LEVEL_BEST ) )
 	{
 		libcerror_error_set(
 		 error,

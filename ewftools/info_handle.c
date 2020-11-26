@@ -2661,15 +2661,15 @@ int info_handle_media_information_fprint(
 		}
 		else
 		{
-			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			if( compression_level == LIBEWF_COMPRESSION_LEVEL_NONE )
 			{
 				value_string = _SYSTEM_STRING( "no compression" );
 			}
-			else if( compression_level == LIBEWF_COMPRESSION_FAST )
+			else if( compression_level == LIBEWF_COMPRESSION_LEVEL_FAST )
 			{
 				value_string = _SYSTEM_STRING( "good (fast) compression" );
 			}
-			else if( compression_level == LIBEWF_COMPRESSION_BEST )
+			else if( compression_level == LIBEWF_COMPRESSION_LEVEL_BEST )
 			{
 				value_string = _SYSTEM_STRING( "best compression" );
 			}

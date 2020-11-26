@@ -554,7 +554,7 @@ int ewfinput_determine_compression_values(
 		     _SYSTEM_STRING( "none" ),
 		     4 ) == 0 )
 		{
-			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_level = LIBEWF_COMPRESSION_LEVEL_NONE;
 			*compression_flags = 0;
 			result             = 1;
 		}
@@ -563,7 +563,7 @@ int ewfinput_determine_compression_values(
 			  _SYSTEM_STRING( "fast" ),
 			  4 ) == 0 )
 		{
-			*compression_level = LIBEWF_COMPRESSION_FAST;
+			*compression_level = LIBEWF_COMPRESSION_LEVEL_FAST;
 			*compression_flags = 0;
 			result             = 1;
 		}
@@ -572,7 +572,7 @@ int ewfinput_determine_compression_values(
 			  _SYSTEM_STRING( "best" ),
 			  4 ) == 0 )
 		{
-			*compression_level = LIBEWF_COMPRESSION_BEST;
+			*compression_level = LIBEWF_COMPRESSION_LEVEL_BEST;
 			*compression_flags = 0;
 			result             = 1;
 		}
@@ -584,7 +584,7 @@ int ewfinput_determine_compression_values(
 		     _SYSTEM_STRING( "empty-block" ),
 		     11 ) == 0 )
 		{
-			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_level = LIBEWF_COMPRESSION_LEVEL_NONE;
 			*compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 			result             = 1;
 		}
@@ -593,7 +593,7 @@ int ewfinput_determine_compression_values(
 			  _SYSTEM_STRING( "empty_block" ),
 			  11 ) == 0 )
 		{
-			*compression_level = LIBEWF_COMPRESSION_NONE;
+			*compression_level = LIBEWF_COMPRESSION_LEVEL_NONE;
 			*compression_flags = LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 			result             = 1;
 		}

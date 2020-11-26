@@ -499,7 +499,7 @@ int libewf_volume_section_e01_write_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: media type\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: media type\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 media_values->media_type );
 
@@ -524,7 +524,7 @@ int libewf_volume_section_e01_write_data(
 		 media_values->number_of_sectors );
 
 		libcnotify_printf(
-		 "%s: media flags\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: media flags\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 media_values->media_flags );
 

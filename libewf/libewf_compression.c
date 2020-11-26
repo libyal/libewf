@@ -111,19 +111,19 @@ int libewf_compress_data(
 	if( compression_method == LIBEWF_COMPRESSION_METHOD_DEFLATE )
 	{
 #if ( defined( HAVE_ZLIB ) && defined( HAVE_ZLIB_COMPRESS2 ) ) || defined( ZLIB_DLL )
-		if( compression_level == LIBEWF_COMPRESSION_DEFAULT )
+		if( compression_level == LIBEWF_COMPRESSION_LEVEL_DEFAULT )
 		{
 			zlib_compression_level = Z_DEFAULT_COMPRESSION;
 		}
-		else if( compression_level == LIBEWF_COMPRESSION_FAST )
+		else if( compression_level == LIBEWF_COMPRESSION_LEVEL_FAST )
 		{
 			zlib_compression_level = Z_BEST_SPEED;
 		}
-		else if( compression_level == LIBEWF_COMPRESSION_BEST )
+		else if( compression_level == LIBEWF_COMPRESSION_LEVEL_BEST )
 		{
 			zlib_compression_level = Z_BEST_COMPRESSION;
 		}
-		else if( compression_level == LIBEWF_COMPRESSION_NONE )
+		else if( compression_level == LIBEWF_COMPRESSION_LEVEL_NONE )
 		{
 			zlib_compression_level = Z_NO_COMPRESSION;
 		}
@@ -246,12 +246,12 @@ int libewf_compress_data(
 	else if( compression_method == LIBEWF_COMPRESSION_METHOD_BZIP2 )
 	{
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
-		if( ( compression_level == LIBEWF_COMPRESSION_DEFAULT )
-		 || ( compression_level == LIBEWF_COMPRESSION_FAST ) )
+		if( ( compression_level == LIBEWF_COMPRESSION_LEVEL_DEFAULT )
+		 || ( compression_level == LIBEWF_COMPRESSION_LEVEL_FAST ) )
 		{
 			bzip2_compression_level = 1;
 		}
-		else if( compression_level == LIBEWF_COMPRESSION_BEST )
+		else if( compression_level == LIBEWF_COMPRESSION_LEVEL_BEST )
 		{
 			bzip2_compression_level = 9;
 		}

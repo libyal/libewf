@@ -2723,7 +2723,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_5 )
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_6 )
 	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_7 )
-	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_8 )
+	 && ( header_string_type != LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2757,10 +2758,10 @@ int libewf_header_values_generate_utf8_header_string(
 
 		return( -1 );
 	}
-	if( ( compression_level != LIBEWF_COMPRESSION_DEFAULT )
-	 && ( compression_level != LIBEWF_COMPRESSION_NONE )
-	 && ( compression_level != LIBEWF_COMPRESSION_FAST )
-	 && ( compression_level != LIBEWF_COMPRESSION_BEST ) )
+	if( ( compression_level != LIBEWF_COMPRESSION_LEVEL_DEFAULT )
+	 && ( compression_level != LIBEWF_COMPRESSION_LEVEL_NONE )
+	 && ( compression_level != LIBEWF_COMPRESSION_LEVEL_FAST )
+	 && ( compression_level != LIBEWF_COMPRESSION_LEVEL_BEST ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -3024,7 +3025,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( libewf_value_table_get_value_utf8_string_length(
 		     header_values,
@@ -3103,16 +3105,16 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 		if( compression_level_string_length == 0 )
 		{
-			if( ( compression_level == LIBEWF_COMPRESSION_DEFAULT )
-			 || ( compression_level == LIBEWF_COMPRESSION_NONE ) )
+			if( ( compression_level == LIBEWF_COMPRESSION_LEVEL_DEFAULT )
+			 || ( compression_level == LIBEWF_COMPRESSION_LEVEL_NONE ) )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_NONE;
 			}
-			else if( compression_level == LIBEWF_COMPRESSION_FAST )
+			else if( compression_level == LIBEWF_COMPRESSION_LEVEL_FAST )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_FAST;
 			}
-			else if( compression_level == LIBEWF_COMPRESSION_BEST )
+			else if( compression_level == LIBEWF_COMPRESSION_LEVEL_BEST )
 			{
 				generated_compression_level = LIBEWF_HEADER_VALUE_COMPRESSION_LEVEL_BEST;
 			}
@@ -3121,7 +3123,8 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( libewf_value_table_get_value_utf8_string_length(
 		     header_values,
@@ -3156,7 +3159,8 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( libewf_value_table_get_value_utf8_string_length(
 		     header_values,
@@ -3193,7 +3197,8 @@ int libewf_header_values_generate_utf8_header_string(
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( libewf_value_table_get_value_utf8_string_length(
 		     header_values,
@@ -3212,7 +3217,8 @@ int libewf_header_values_generate_utf8_header_string(
 			goto on_error;
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( libewf_value_table_get_value_utf8_string_length(
 		     header_values,
@@ -3296,6 +3302,7 @@ int libewf_header_values_generate_utf8_header_string(
 			break;
 
 		case LIBEWF_HEADER_STRING_TYPE_8:
+		case LIBEWF_HEADER_STRING_TYPE_9:
 			/* Reserve space for:
 			 * a <tab> c <tab> n <tab> e <tab> t <tab> md <tab> sn <tab> l <tab> av <tab> ov <tab> m <tab> u <tab> p <tab> pid <tab> dc <tab> ext <newline>
 			 */
@@ -3321,7 +3328,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string_size += acquiry_software_version_string_length
 		                       + acquiry_operating_system_string_length;
@@ -3334,23 +3342,27 @@ int libewf_header_values_generate_utf8_header_string(
 		safe_utf8_string_size += compression_level_string_length;
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string_size += model_string_length
 		                       + serial_number_string_length;
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string_size += device_label_string_length
 		                       + process_identifier_string_length;
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string_size += unknown_dc_string_length;
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string_size += extents_string_length;
 	}
@@ -3366,7 +3378,9 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		generated_srce_section = "srce\n"
 		                         "0\t1\n"
-		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n"
+		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n"
+		                         "0\t0\n"
+		                         "\t\t\t\t\t-1\t-1\t\t\t\n"
 		                         "\n";
 
 		srce_section_string_length = narrow_string_length(
@@ -3378,9 +3392,23 @@ int libewf_header_values_generate_utf8_header_string(
 	{
 		generated_srce_section = "srce\n"
 		                         "0\t1\n"
-		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tsh\tgu\taq\n0\t0\n"
+		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tsh\tgu\taq\n"
 		                         "0\t0\n"
 		                         "\t\t\t\t\t-1\t-1\t00000000000000000000000000000000\t0000000000000000000000000000000000000000\t00000000000000000000000000000000\t\n"
+		                         "\n";
+
+		srce_section_string_length = narrow_string_length(
+		                              generated_srce_section );
+
+		safe_utf8_string_size += srce_section_string_length;
+	}
+	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 )
+	{
+		generated_srce_section = "srce\n"
+		                         "0\t1\n"
+		                         "p\tn\tid\tev\ttb\tlo\tpo\tah\tsh\tgu\tpgu\taq\n"
+		                         "0\t0\n"
+		                         "\t\t\t\t\t-1\t-1\t00000000000000000000000000000000\t0000000000000000000000000000000000000000\t00000000000000000000000000000000\t00000000000000000000000000000000\t\n"
 		                         "\n";
 
 		srce_section_string_length = narrow_string_length(
@@ -3392,11 +3420,13 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 ) )
 	{
+		/* Note that the trailing after the co value is intentional
+		 */
 		generated_sub_section = "sub\n"
 		                        "0\t1\n"
 		                        "p\tn\tid\tnu\tco\tgu\n"
 		                        "0\t0\n"
-		                        "\t\t\t\t1\t\n"
+		                        "\t\t\t\t1 \t\n"
 		                        "\n";
 
 		sub_section_string_length = narrow_string_length(
@@ -3404,13 +3434,16 @@ int libewf_header_values_generate_utf8_header_string(
 
 		safe_utf8_string_size += sub_section_string_length;
 	}
-	else if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	else if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
+		/* Note that the trailing after the co value is intentional
+		 */
 		generated_sub_section = "sub\n"
 		                        "0\t1\n"
 		                        "p\tn\tid\tnu\tco\tgu\n"
 		                        "0\t0\n"
-		                        "\t\t\t\t1\t00000000000000000000000000000000\n"
+		                        "\t\t\t\t1 \t00000000000000000000000000000000\n"
 		                        "\n";
 
 		sub_section_string_length = narrow_string_length(
@@ -3459,7 +3492,8 @@ int libewf_header_values_generate_utf8_header_string(
 	else if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	      || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '3';
 	}
@@ -3484,7 +3518,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'a';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
@@ -3506,7 +3541,8 @@ int libewf_header_values_generate_utf8_header_string(
 	safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 't';
 
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'm';
@@ -3515,7 +3551,8 @@ int libewf_header_values_generate_utf8_header_string(
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 's';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'n';
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'l';
@@ -3526,7 +3563,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'a';
@@ -3548,7 +3586,8 @@ int libewf_header_values_generate_utf8_header_string(
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'r';
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'p';
@@ -3557,13 +3596,15 @@ int libewf_header_values_generate_utf8_header_string(
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'd';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'c';
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) 'e';
@@ -3580,7 +3621,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( description_string_length > 0 )
 		{
@@ -3724,7 +3766,8 @@ int libewf_header_values_generate_utf8_header_string(
 		}
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -3773,7 +3816,8 @@ int libewf_header_values_generate_utf8_header_string(
 			}
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -3805,7 +3849,8 @@ int libewf_header_values_generate_utf8_header_string(
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -4032,7 +4077,8 @@ int libewf_header_values_generate_utf8_header_string(
 			utf8_string_index += compression_level_string_length;
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -4060,7 +4106,8 @@ int libewf_header_values_generate_utf8_header_string(
 	}
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -4086,7 +4133,8 @@ int libewf_header_values_generate_utf8_header_string(
 			}
 		}
 	}
-	if( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		safe_utf8_string[ utf8_string_index++ ] = (uint8_t) '\t';
 
@@ -4145,7 +4193,8 @@ int libewf_header_values_generate_utf8_header_string(
 	if( ( header_string_type == LIBEWF_HEADER_STRING_TYPE_5 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_6 )
 	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_7 )
-	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 ) )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_8 )
+	 || ( header_string_type == LIBEWF_HEADER_STRING_TYPE_9 ) )
 	{
 		if( srce_section_string_length > 0 )
 		{
@@ -4664,8 +4713,10 @@ int libewf_header_values_generate_header2(
      libcerror_error_t **error )
 {
 	uint8_t *header_string     = NULL;
+	uint8_t *safe_header2      = NULL;
 	static char *function      = "libewf_header_values_generate_header2";
 	size_t header_string_size  = 0;
+	size_t safe_header2_size   = 0;
 	uint8_t header_string_type = 0;
 
 	switch( format )
@@ -4684,7 +4735,7 @@ int libewf_header_values_generate_header2(
 			break;
 
 		case LIBEWF_FORMAT_ENCASE7:
-			header_string_type = LIBEWF_HEADER_STRING_TYPE_8;
+			header_string_type = LIBEWF_HEADER_STRING_TYPE_9;
 			break;
 
 		default:
@@ -4754,7 +4805,7 @@ int libewf_header_values_generate_header2(
 	if( libuna_utf16_stream_size_from_utf8(
 	     header_string,
 	     header_string_size,
-	     header2_size,
+	     &safe_header2_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4766,8 +4817,8 @@ int libewf_header_values_generate_header2(
 
 		goto on_error;
 	}
-	if( ( *header2_size == 0 )
-	 || ( *header2_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	if( ( safe_header2_size == 0 )
+	 || ( safe_header2_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -4778,10 +4829,10 @@ int libewf_header_values_generate_header2(
 
 		goto on_error;
 	}
-	*header2 = (uint8_t *) memory_allocate(
-	                        sizeof( uint8_t ) * *header2_size );
+	safe_header2 = (uint8_t *) memory_allocate(
+	                            sizeof( uint8_t ) * safe_header2_size );
 
-	if( *header2 == NULL )
+	if( safe_header2 == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -4793,8 +4844,8 @@ int libewf_header_values_generate_header2(
 		goto on_error;
 	}
 	if( libuna_utf16_stream_copy_from_utf8(
-	     *header2,
-	     *header2_size,
+	     safe_header2,
+	     safe_header2_size,
 	     LIBUNA_ENDIAN_LITTLE,
 	     header_string,
 	     header_string_size,
@@ -4812,6 +4863,9 @@ int libewf_header_values_generate_header2(
 	memory_free(
 	 header_string );
 
+	*header2      = safe_header2;
+	*header2_size = safe_header2_size;
+
 	return( 1 );
 
 on_error:
@@ -4820,15 +4874,11 @@ on_error:
 		memory_free(
 		 header_string );
 	}
-	if( *header2 != NULL )
+	if( safe_header2 != NULL )
 	{
 		memory_free(
-		 header2 );
-
-		*header2 = NULL;
+		 safe_header2 );
 	}
-	*header2_size = 0;
-
 	return( -1 );
 }
 

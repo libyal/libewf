@@ -155,7 +155,8 @@ install:
 - cmd: git clone https://github.com/codecov/codecov-bash.git ..\codecov-bash
 - cmd: if [%BUILD_ENVIRONMENT%]==[msbuild] (
     git clone https://github.com/libyal/vstools.git ..\vstools )
-- ps: .\syncwinflexbison.ps1
+- ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
+    .\syncwinflexbison.ps1 }
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     .\synczlib.ps1 }
 - cmd: git clone https://github.com/joachimmetz/bzip2.git ..\bzip2
@@ -203,9 +204,9 @@ install:
     Else {
       .\builddokan.ps1 -UseLegacyVersion }
     }
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew update; fi
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew install gettext gnu-sed || true; fi
-- sh: if test ${BUILD_ENVIRONMENT} = "python"; then brew python3 || true; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew -q update; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew -q install gettext gnu-sed || true; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "python"; then brew -q install python3 || true; fi
 - ps: If ($env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m pip install -U pip setuptools twine wheel" }
 - cmd: if [%BUILD_ENVIRONMENT%]==[cygwin] (

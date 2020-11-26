@@ -98,9 +98,12 @@ enum LIBEWF_HEADER_STRING_TYPE
 	LIBEWF_HEADER_STRING_TYPE_7	= 7,
 
 	/* header string: linen7
-	 * header2 string: EnCase7
 	 */
-	LIBEWF_HEADER_STRING_TYPE_8	= 8
+	LIBEWF_HEADER_STRING_TYPE_8	= 8,
+
+	/* header2 string: EnCase7
+	 */
+	LIBEWF_HEADER_STRING_TYPE_9	= 9
 };
 
 int libewf_header_values_initialize(

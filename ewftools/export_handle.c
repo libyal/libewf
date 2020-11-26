@@ -194,7 +194,7 @@ int export_handle_initialize(
 	( *export_handle )->calculate_md5            = calculate_md5;
 	( *export_handle )->use_chunk_data_functions = use_chunk_data_functions;
 	( *export_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *export_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+	( *export_handle )->compression_level        = LIBEWF_COMPRESSION_LEVEL_NONE;
 	( *export_handle )->output_format            = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
 	( *export_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 	( *export_handle )->sectors_per_chunk        = 64;
@@ -3858,7 +3858,7 @@ int export_handle_set_output_values(
 
 			return( -1 );
 		}
-		if( ( export_handle->compression_level != LIBEWF_COMPRESSION_NONE )
+		if( ( export_handle->compression_level != LIBEWF_COMPRESSION_LEVEL_NONE )
 		 || ( ( export_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 ) )
 		{
 			export_handle->write_compressed = 1;

@@ -183,7 +183,7 @@ int imaging_handle_initialize(
 	( *imaging_handle )->calculate_md5            = calculate_md5;
 	( *imaging_handle )->use_chunk_data_functions = use_chunk_data_functions;
 	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_NONE;
+	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_LEVEL_NONE;
 	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;
 	( *imaging_handle )->media_type               = LIBEWF_MEDIA_TYPE_FIXED;
 	( *imaging_handle )->media_flags              = LIBEWF_MEDIA_FLAG_PHYSICAL;
@@ -6286,19 +6286,19 @@ int imaging_handle_print_parameters(
 	 imaging_handle->notify_stream,
 	 "Compression level:\t\t\t" );
 
-	if( imaging_handle->compression_level == LIBEWF_COMPRESSION_FAST )
+	if( imaging_handle->compression_level == LIBEWF_COMPRESSION_LEVEL_FAST )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "fast" );
 	}
-	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_BEST )
+	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_LEVEL_BEST )
 	{
 		fprintf(
 		 imaging_handle->notify_stream,
 		 "best" );
 	}
-	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_NONE )
+	else if( imaging_handle->compression_level == LIBEWF_COMPRESSION_LEVEL_NONE )
 	{
 		if( ( imaging_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
 		{
