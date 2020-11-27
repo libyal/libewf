@@ -109,15 +109,6 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
      libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error );
 
-int libewf_chunk_table_chunk_exists_for_offset(
-     libewf_chunk_table_t *chunk_table,
-     uint64_t chunk_index,
-     libbfio_pool_t *file_io_pool,
-     libewf_segment_table_t *segment_table,
-     libfcache_cache_t *chunk_groups_cache,
-     off64_t offset,
-     libcerror_error_t **error );
-
 int libewf_chunk_table_get_chunk_data_by_offset(
      libewf_chunk_table_t *chunk_table,
      uint64_t chunk_index,

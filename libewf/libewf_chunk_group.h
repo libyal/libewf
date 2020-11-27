@@ -61,6 +61,15 @@ int libewf_chunk_group_empty(
      libewf_chunk_group_t *chunk_group,
      libcerror_error_t **error );
 
+int libewf_chunk_group_append_chunk(
+     libewf_chunk_group_t *chunk_group,
+     uint64_t chunk_index,
+     int file_io_pool_entry,
+     off64_t chunk_offset,
+     size64_t chunk_size,
+     uint32_t range_flags,
+     libcerror_error_t **error );
+
 int libewf_chunk_group_fill_v1(
      libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,

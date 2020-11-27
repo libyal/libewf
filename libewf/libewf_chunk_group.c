@@ -177,7 +177,7 @@ int libewf_chunk_group_free(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunkse list.",
+			 "%s: unable to free chunks list.",
 			 function );
 
 			result = -1;
@@ -308,6 +308,55 @@ int libewf_chunk_group_empty(
 		 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
 		 "%s: unable to empty chunks list.",
 		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Appends a chunk to the group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_group_append_chunk(
+     libewf_chunk_group_t *chunk_group,
+     uint64_t chunk_index,
+     int file_io_pool_entry,
+     off64_t chunk_offset,
+     size64_t chunk_size,
+     uint32_t range_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_chunk_group_append_chunk";
+	int element_index     = 0;
+
+	if( chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO re-implement using set by index instead of append ? */
+	if( libfdata_list_append_element(
+	     chunk_group->chunks_list,
+	     &element_index,
+	     file_io_pool_entry,
+	     chunk_offset,
+	     chunk_size,
+	     range_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append chunk: %" PRIu64 " to chunks list.",
+		 function,
+		 chunk_index );
 
 		return( -1 );
 	}
@@ -1258,7 +1307,8 @@ int libewf_chunk_group_correct_v1(
 			libcnotify_printf(
 			 "\n" );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 		if( libfdata_list_get_element_by_index(
 		     chunk_group->chunks_list,
 		     table_entry_index,
@@ -1882,7 +1932,8 @@ int libewf_chunk_group_generate_table_entries_data(
 			libcnotify_printf(
 			 "\n" );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 		table_entries_data += table_entry_data_size;
 
 		chunk_index++;

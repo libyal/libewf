@@ -204,9 +204,9 @@ install:
     Else {
       .\builddokan.ps1 -UseLegacyVersion }
     }
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew -q update; fi
-- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew -q install gettext gnu-sed || true; fi
-- sh: if test ${BUILD_ENVIRONMENT} = "python"; then brew -q install python3 || true; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew update -q; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "xcode" || test ${BUILD_ENVIRONMENT} = "python"; then brew install -q gettext gnu-sed || true; fi
+- sh: if test ${BUILD_ENVIRONMENT} = "python"; then brew install -q python3 || true; fi
 - ps: If ($env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m pip install -U pip setuptools twine wheel" }
 - cmd: if [%BUILD_ENVIRONMENT%]==[cygwin] (

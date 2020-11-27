@@ -2078,6 +2078,12 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
+	}
 	if( write_io_handle != NULL )
 	{
 		libewf_write_io_handle_free(
@@ -2352,6 +2358,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
 	}
 	if( write_io_handle != NULL )
 	{

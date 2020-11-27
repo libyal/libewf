@@ -2911,7 +2911,6 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	uint32_t segment_number             = 0;
 	ssize_t total_write_count           = 0;
 	ssize_t write_count                 = 0;
-	int element_index                   = 0;
 	int file_io_pool_entry              = -1;
 	int result                          = 0;
 
@@ -3367,10 +3366,9 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 	total_write_count += write_count;
 
-/* TODO re-implement using set by index instead of append ? */
-	if( libfdata_list_append_element(
-	     write_io_handle->chunk_group->chunks_list,
-	     &element_index,
+	if( libewf_chunk_group_append_chunk(
+	     write_io_handle->chunk_group,
+	     chunk_index,
 	     file_io_pool_entry,
 	     chunk_offset,
 	     (size64_t) write_count - chunk_data->padding_size,
@@ -3381,7 +3379,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append chunk: %" PRIu64 " in chunks list.",
+		 "%s: unable to append chunk: %" PRIu64 " to chunks list.",
 		 function,
 		 chunk_index );
 

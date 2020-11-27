@@ -1,5 +1,5 @@
 TODO
-* remove old version of libewf_chunk_data_check_for_empty_block
+* ewftools for -q show total duration and speed
 * rename attribute to extended attribute?
 
 * move overlapping/generic header and hash value functions into value table

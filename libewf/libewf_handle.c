@@ -4757,11 +4757,11 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
          libcerror_error_t **error )
 {
 	static char *function     = "libewf_internal_handle_write_buffer_to_file_io_pool";
-	off64_t chunk_data_offset = 0;
 	size_t buffer_offset      = 0;
 	size_t input_data_size    = 0;
 	size_t write_size         = 0;
 	ssize_t write_count       = 0;
+	off64_t chunk_data_offset = 0;
 	uint64_t chunk_index      = 0;
 	int write_chunk           = 0;
 
@@ -4926,7 +4926,7 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: chunk: %" PRIu64 " already set.",
+			 "%s: chunk: %" PRIu64 " already exists.",
 			 function,
 			 chunk_index );
 
@@ -5750,7 +5750,6 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 	static char *function = "libewf_internal_handle_write_data_chunk_to_file_io_pool";
 	size_t data_size      = 0;
 	ssize_t write_count   = 0;
-	int chunk_exists      = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -5878,28 +5877,7 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 		 data_size );
 	}
 #endif
-	chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
-	                internal_handle->chunk_table,
-	                internal_handle->current_chunk_index,
-	                file_io_pool,
-	                internal_handle->segment_table,
-	                internal_handle->chunk_groups_cache,
-	                internal_handle->current_offset,
-			error );
-
-	if( chunk_exists == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
-		 function,
-		 internal_handle->current_chunk_index );
-
-		return( -1 );
-	}
-	else if( chunk_exists != 0 )
+	if( internal_handle->current_chunk_index < internal_handle->write_io_handle->number_of_chunks_written )
 	{
 		libcerror_error_set(
 		 error,
@@ -6048,7 +6026,6 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 	uint64_t chunk_index                = 0;
 	uint32_t number_of_segments         = 0;
 	uint32_t segment_number             = 0;
-	int chunk_exists                    = 0;
 	int file_io_pool_entry              = -1;
 
 	if( internal_handle == NULL )
@@ -6145,28 +6122,7 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 	{
 		chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
-		chunk_exists = libewf_chunk_table_chunk_exists_for_offset(
-				internal_handle->chunk_table,
-				chunk_index,
-				file_io_pool,
-				internal_handle->segment_table,
-				internal_handle->chunk_groups_cache,
-				internal_handle->current_offset,
-				error );
-
-		if( chunk_exists == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if the chunk: %" PRIu64 " exists.",
-			 function,
-			 chunk_index );
-
-			return( -1 );
-		}
-		if( chunk_exists != 0 )
+		if( chunk_index < internal_handle->write_io_handle->number_of_chunks_written )
 		{
 			libcerror_error_set(
 			 error,

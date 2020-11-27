@@ -857,29 +857,12 @@ ssize_t libewf_segment_file_read_file_header_file_io_pool(
 		 function );
 	}
 #endif
-	if( libbfio_pool_seek_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     0,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: 0.",
-		 function );
-
-		return( -1 );
-	}
-	segment_file->current_offset = 0;
-
-	read_count = libbfio_pool_read_buffer(
+	read_count = libbfio_pool_read_buffer_at_offset(
 	              file_io_pool,
 	              file_io_pool_entry,
 	              file_header_data,
 	              8,
+	              0,
 	              error );
 
 	if( read_count != (ssize_t) 8 )
@@ -888,12 +871,12 @@ ssize_t libewf_segment_file_read_file_header_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file header signature.",
+		 "%s: unable to read file header signature at offset 0 (0x00000000).",
 		 function );
 
 		return( -1 );
 	}
-	segment_file->current_offset += read_count;
+	segment_file->current_offset = read_count;
 
 	if( memory_compare(
 	     ewf1_evf_file_signature,

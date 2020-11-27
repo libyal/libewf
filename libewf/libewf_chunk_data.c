@@ -651,10 +651,8 @@ int libewf_chunk_data_pack_determine_pack_flags(
 		}
 		else if( result != 0 )
 		{
-			safe_pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
-			safe_pack_flags &= ~( LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING );
-			safe_pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-			safe_pack_flags |= LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
+			safe_pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM | LIBEWF_PACK_FLAG_ADD_ALIGNMENT_PADDING );
+			safe_pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION | LIBEWF_PACK_FLAG_USE_PATTERN_FILL_COMPRESSION;
 		}
 	}
 	else if( ( ( io_handle->compression_flags & LIBEWF_COMPRESS_FLAG_USE_EMPTY_BLOCK_COMPRESSION ) != 0 )
@@ -680,8 +678,7 @@ int libewf_chunk_data_pack_determine_pack_flags(
 		      && ( chunk_data->data[ 0 ] == 0 ) )
 		{
 			safe_pack_flags &= ~( LIBEWF_PACK_FLAG_CALCULATE_CHECKSUM );
-			safe_pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION;
-			safe_pack_flags |= LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
+			safe_pack_flags |= LIBEWF_PACK_FLAG_FORCE_COMPRESSION | LIBEWF_PACK_FLAG_USE_EMPTY_BLOCK_COMPRESSION;
 		}
 	}
 	*pack_flags = safe_pack_flags;
@@ -1678,114 +1675,6 @@ int libewf_chunk_data_check_for_empty_block(
 	return( 1 );
 }
 
-/* Previous version keep for now */
-#ifdef TEST_EMPTY_BLOCK_MEMCMP
-
-/* Checks if a buffer containing the chunk data is filled with same value bytes (empty-block)
- * Returns 1 if a pattern was found, 0 if not or -1 on error
- */
-int libewf_chunk_data_check_for_empty_block(
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error )
-{
-	libewf_aligned_t *aligned_data_index = NULL;
-	libewf_aligned_t *aligned_data_start = NULL;
-	uint8_t *data_index                  = NULL;
-	uint8_t *data_start                  = NULL;
-	static char *function                = "libewf_chunk_data_check_for_empty_block";
-
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size == 0 )
-	{
-		return( 0 );
-	}
-	else if( data_size == 1 )
-	{
-		return( 1 );
-	}
-	data_start = (uint8_t *) data;
-	data_index = (uint8_t *) data + 1;
-
-	data_size--;
-
-	/* Only optimize for data larger than the alignment
-	 */
-	if( data_size > ( sizeof( libewf_aligned_t ) + sizeof( libewf_aligned_t ) ) )
-	{
-		/* Align the data start
-		 */
-		while( ( (intptr_t) data_start % sizeof( libewf_aligned_t ) ) != 0 )
-		{
-			if( *data_start != *data_index )
-			{
-				return( 0 );
-			}
-			data_start++;
-			data_index++;
-			data_size--;
-		}
-		/* Align the data index
-		 */
-		while( ( (intptr_t) data_index % sizeof( libewf_aligned_t ) ) != 0 )
-		{
-			if( *data_start != *data_index )
-			{
-				return( 0 );
-			}
-			data_index++;
-			data_size--;
-		}
-		aligned_data_start = (libewf_aligned_t *) data_start;
-		aligned_data_index = (libewf_aligned_t *) data_index;
-
-		while( data_size > sizeof( libewf_aligned_t ) )
-		{
-			if( *aligned_data_start != *aligned_data_index )
-			{
-				return( 0 );
-			}
-			aligned_data_index++;
-
-			data_size -= sizeof( libewf_aligned_t );
-		}
-		data_index = (uint8_t *) aligned_data_index;
-	}
-	while( data_size != 0 )
-	{
-		if( *data_start != *data_index )
-		{
-			return( 0 );
-		}
-		data_index++;
-		data_size--;
-	}
-	return( 1 );
-}
-
-#endif /* TEST_EMPTY_BLOCK_MEMCMP */
-
 /* Checks if a buffer containing the chunk data is filled with a 64-bit pattern
  * Returns 1 if a pattern was found, 0 if not or -1 on error
  */
@@ -2238,29 +2127,12 @@ ssize_t libewf_chunk_data_read_from_file_io_pool(
 
 		return( -1 );
 	}
-	if( libbfio_pool_seek_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     chunk_data_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset: %" PRIi64 " in file IO pool entry: %d.",
-		 function,
-		 chunk_data_offset,
-		 file_io_pool_entry );
-
-		return( -1 );
-	}
-	read_count = libbfio_pool_read_buffer(
+	read_count = libbfio_pool_read_buffer_at_offset(
 		      file_io_pool,
 		      file_io_pool_entry,
 		      chunk_data->data,
 		      (size_t) chunk_data_size,
+	              chunk_data_offset,
 		      error );
 
 	if( read_count != (ssize_t) chunk_data_size )
@@ -2269,8 +2141,11 @@ ssize_t libewf_chunk_data_read_from_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk data.",
-		 function );
+		 "%s: unable to read chunk data at offset: %" PRIi64 " (0x%08" PRIx64 ") in file IO pool entry: %d.",
+		 function,
+		 chunk_data_offset,
+		 chunk_data_offset,
+		 file_io_pool_entry );
 
 		return( -1 );
 	}
@@ -2442,7 +2317,8 @@ int libewf_chunk_data_read_element_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libfdata_list_element_set_element_value(
 	     element,
 	     (intptr_t *) file_io_pool,

@@ -1277,10 +1277,10 @@ int ewf_test_session_section_write_file_io_pool(
 	          SEEK_SET,
 	          &error );
 
-	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_INT64(
 	 "offset",
 	 offset,
-	 (int64_t) -1 );
+	 (int64_t) 0 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1315,10 +1315,10 @@ int ewf_test_session_section_write_file_io_pool(
 	          SEEK_SET,
 	          &error );
 
-	EWF_TEST_ASSERT_NOT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_INT64(
 	 "offset",
 	 offset,
-	 (int64_t) -1 );
+	 (int64_t) 0 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1556,6 +1556,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( file_io_pool != NULL )
+	{
+		libbfio_pool_free(
+		 &file_io_pool,
+		 NULL );
 	}
 	if( tracks != NULL )
 	{

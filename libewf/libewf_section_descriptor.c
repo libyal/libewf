@@ -965,34 +965,6 @@ ssize_t libewf_section_descriptor_read_file_io_pool(
 
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading section descriptor from file IO pool entry: %d at offset: 0x%08" PRIx64 "\n",
-		 function,
-		 file_io_pool_entry,
-		 file_offset );
-	}
-#endif
-	if( libbfio_pool_seek_offset(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek section descriptor offset: %" PRIi64 " in file IO pool entry: %d.",
-		 function,
-		 file_offset,
-		 file_io_pool_entry );
-
-		goto on_error;
-	}
 	section_descriptor_data = (uint8_t *) memory_allocate(
 	                                       section_descriptor_data_size );
 
@@ -1007,11 +979,23 @@ ssize_t libewf_section_descriptor_read_file_io_pool(
 
 		goto on_error;
 	}
-	read_count = libbfio_pool_read_buffer(
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading section descriptor from file IO pool entry: %d at offset: %" PRIi64 "(0x%08" PRIx64 ")\n",
+		 function,
+		 file_io_pool_entry,
+		 file_offset,
+		 file_offset );
+	}
+#endif
+	read_count = libbfio_pool_read_buffer_at_offset(
 	              file_io_pool,
 	              file_io_pool_entry,
 	              section_descriptor_data,
 	              section_descriptor_data_size,
+	              file_offset,
 	              error );
 
 	if( read_count != (ssize_t) section_descriptor_data_size )
@@ -1020,8 +1004,10 @@ ssize_t libewf_section_descriptor_read_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read section descriptor data from file IO pool entry: %d.",
+		 "%s: unable to read section descriptor data at offset: %" PRIi64 " (0x%08" PRIx64 ") from file IO pool entry: %d.",
 		 function,
+		 file_offset,
+		 file_offset,
 		 file_io_pool_entry );
 
 		goto on_error;

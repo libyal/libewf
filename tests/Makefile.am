@@ -244,6 +244,8 @@ ewf_test_checksum_LDADD = \
 
 ewf_test_chunk_data_SOURCES = \
 	ewf_test_chunk_data.c \
+	ewf_test_functions.c ewf_test_functions.h \
+	ewf_test_libbfio.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
@@ -251,6 +253,14 @@ ewf_test_chunk_data_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_chunk_data_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
