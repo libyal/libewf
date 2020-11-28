@@ -1352,10 +1352,7 @@ int ewf_test_chunk_table_get_segment_file_chunk_group_by_offset(
 	          NULL,
 	          NULL,
 	          NULL,
-	          NULL,
 	          0,
-	          NULL,
-	          NULL,
 	          NULL,
 	          NULL,
 	          NULL,
@@ -1509,8 +1506,6 @@ int ewf_test_chunk_table_get_chunk_data_by_offset(
 	          NULL,
 	          NULL,
 	          NULL,
-	          NULL,
-	          NULL,
 	          0,
 	          NULL,
 	          NULL,
@@ -1638,13 +1633,15 @@ int main(
 	 "libewf_chunk_table_get_chunk_data_by_offset",
 	 ewf_test_chunk_table_get_chunk_data_by_offset );
 
-	/* TODO: add tests for libewf_chunk_table_set_chunk_data_by_offset */
-
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

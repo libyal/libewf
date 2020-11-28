@@ -442,6 +442,8 @@ int imaging_handle_signal_abort(
 			return( -1 );
 		}
 	}
+	imaging_handle->abort = 1;
+
 	return( 1 );
 }
 
@@ -1056,15 +1058,16 @@ ssize_t imaging_handle_write_storage_media_buffer(
 		 "%s: unable to write storage media buffer.",
 		 function );
 
+/* TODO ask for alternative segment file location and try again
 		if( ( error != NULL )
 		 && ( libcerror_error_matches(
 		       *error,
 		       LIBCERROR_ERROR_DOMAIN_OUTPUT,
-		       LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) == 0 ) )
+		       LIBCERROR_OUTPUT_ERROR_INSUFFICIENT_SPACE ) != 0 ) )
 		{
 			return( -1 );
 		}
-/* TODO ask for alternative segment file location and try again */
+*/
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
@@ -1659,6 +1662,10 @@ int imaging_handle_process_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	if( imaging_handle->abort != 0 )
+	{
+		return( 1 );
+	}
 	process_count = storage_media_buffer_write_process(
 			 storage_media_buffer,
 			 &error );
@@ -1724,10 +1731,16 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( imaging_handle->abort == 0 )
+	{
+		imaging_handle_signal_abort(
+		 imaging_handle,
+		 NULL );
+	}
 	return( -1 );
 }
 
-/* Prepares a storage media buffer for imaging
+/* Prepares a storage media buffer for writing to image file
  * Callback function for the process thread pool
  * Returns 1 if successful or -1 on error
  */
@@ -1764,6 +1777,10 @@ int imaging_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	if( imaging_handle->abort != 0 )
+	{
+		return( 1 );
+	}
 	if( libcdata_list_insert_value(
 	     imaging_handle->output_list,
 	     (intptr_t *) storage_media_buffer,
@@ -1798,6 +1815,10 @@ int imaging_handle_output_storage_media_buffer_callback(
 	}
 	while( element != NULL )
 	{
+		if( imaging_handle->abort != 0 )
+		{
+			break;
+		}
 		if( libcdata_list_element_get_value(
 		     element,
 		     (intptr_t **) &storage_media_buffer,
@@ -1976,6 +1997,12 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
+	}
+	if( imaging_handle->abort == 0 )
+	{
+		imaging_handle_signal_abort(
+		 imaging_handle,
+		 NULL );
 	}
 	return( -1 );
 }

@@ -114,9 +114,9 @@ struct libewf_segment_file
 	 */
 	libfdata_list_t *chunk_groups_list;
 
-	/* The (current) chunk groups index
+	/* The current chunk groups index
 	 */
-	int chunk_groups_index;
+	int current_chunk_group_index;
 
 	/* The storage media size (in the segment file)
 	 */
@@ -141,6 +141,14 @@ struct libewf_segment_file
 	/* Flags
 	 */
 	uint8_t flags;
+
+	/* The range start offset
+	 */
+	off64_t range_start_offset;
+
+	/* The range end offset
+	 */
+	off64_t range_end_offset;
 };
 
 int libewf_segment_file_initialize(

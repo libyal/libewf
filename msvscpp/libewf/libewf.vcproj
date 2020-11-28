@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_chunk_descriptor.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_chunk_group.c"
 				>
 			</File>
@@ -473,6 +477,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_chunk_data.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_chunk_descriptor.h"
 				>
 			</File>
 			<File

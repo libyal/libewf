@@ -35,20 +35,25 @@ TESTS_PYEWF = \
 	test_python_module.sh
 endif
 
-TESTS = \
-	test_library.sh \
-	test_glob.sh \
+if HAVE_WRITE_TESTS
+TESTS_WRITE = \
 	test_write_functions.sh \
-	test_tools.sh \
-	test_ewfinfo.sh \
 	test_ewfexport.sh \
 	test_ewfexport_logical.sh \
-	test_ewfverify.sh \
-	test_ewfverify_logical.sh \
 	test_ewfacquire.sh \
 	test_ewfacquire_optical.sh \
 	test_ewfacquirestream.sh \
-	test_ewfacquire_resume.sh \
+	test_ewfacquire_resume.sh
+endif
+
+TESTS = \
+	test_library.sh \
+	test_glob.sh \
+	test_tools.sh \
+	test_ewfinfo.sh \
+	test_ewfverify.sh \
+	test_ewfverify_logical.sh \
+	$(TESTS_WRITE) \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
@@ -86,6 +91,7 @@ check_PROGRAMS = \
 	ewf_test_case_data \
 	ewf_test_checksum \
 	ewf_test_chunk_data \
+	ewf_test_chunk_descriptor \
 	ewf_test_chunk_group \
 	ewf_test_chunk_table \
 	ewf_test_compression \
@@ -139,9 +145,11 @@ check_PROGRAMS = \
 	ewf_test_tools_guid \
 	ewf_test_tools_imaging_handle \
 	ewf_test_tools_info_handle \
+	ewf_test_tools_log_handle \
 	ewf_test_tools_output \
 	ewf_test_tools_platform \
 	ewf_test_tools_signal \
+	ewf_test_tools_storage_media_buffer \
 	ewf_test_tools_system_string \
 	ewf_test_tools_verification_handle \
 	ewf_test_truncate \
@@ -261,6 +269,18 @@ ewf_test_chunk_data_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_chunk_descriptor_SOURCES = \
+	ewf_test_chunk_descriptor.c \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h
+
+ewf_test_chunk_descriptor_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -1165,6 +1185,17 @@ ewf_test_tools_info_handle_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBUUID_LIBADD@
 
+ewf_test_tools_log_handle_SOURCES = \
+	../ewftools/log_handle.c ../ewftools/log_handle.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_tools_log_handle.c \
+	ewf_test_unused.h
+
+ewf_test_tools_log_handle_LDADD = \
+	@LIBCERROR_LIBADD@
+
 ewf_test_tools_output_SOURCES = \
 	../ewftools/ewftools_output.c ../ewftools/ewftools_output.h \
 	ewf_test_libcerror.h \
@@ -1197,6 +1228,19 @@ ewf_test_tools_signal_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_tools_signal_LDADD = \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_tools_storage_media_buffer_SOURCES = \
+	../ewftools/storage_media_buffer.c ../ewftools/storage_media_buffer.h \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_tools_storage_media_buffer.c \
+	ewf_test_unused.h
+
+ewf_test_tools_storage_media_buffer_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

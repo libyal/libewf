@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20201127],
+ [20201128],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -133,6 +133,29 @@ AX_LIBCAES_CHECK_ENABLE
 
 dnl Check if libewf required headers and functions are available
 AX_LIBEWF_CHECK_LOCAL
+
+AS_IF(
+  [test "x$ac_cv_uncompress" = xzlib],
+  [ac_cv_enable_write_support=yes],
+  [ac_cv_enable_write_support=no])
+
+AS_IF(
+  [test "x$ac_cv_uncompress" = xzlib],
+  [AC_DEFINE(
+    [HAVE_WRITE_SUPPORT],
+    [1],
+    [Define to 1 if write support is available.])
+  AC_SUBST(
+    [HAVE_WRITE_SUPPORT],
+    [1]) ],
+  [AC_SUBST(
+    [HAVE_WRITE_SUPPORT],
+    [0])
+  ])
+
+AM_CONDITIONAL(
+  HAVE_WRITE_TESTS,
+  [test "x$ac_cv_uncompress" = xzlib])
 
 dnl Check if libewf Python bindings (pyewf) required headers and functions are available
 AX_PYTHON_CHECK_ENABLE
@@ -294,6 +317,7 @@ Building:
 Features:
    Multi-threading support:                  $ac_cv_libcthreads_multi_threading
    Wide character type support:              $ac_cv_enable_wide_character_type
+   Write support:                            $ac_cv_enable_write_support
    ewftools are build as static executables: $ac_cv_enable_static_executables
    Python (pyewf) support:                   $ac_cv_enable_python
    Verbose output:                           $ac_cv_enable_verbose_output

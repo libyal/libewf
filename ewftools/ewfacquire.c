@@ -487,7 +487,7 @@ int ewfacquire_determine_sessions(
 			return( -1 );
 		}
 		if( imaging_handle_append_session(
-		     ewfacquire_imaging_handle,
+		     imaging_handle,
 		     (uint64_t) 0,
 		     (uint64_t) number_of_sectors,
 		     error ) != 1 )
@@ -866,7 +866,8 @@ int ewfacquire_read_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( imaging_handle_initialize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -934,7 +935,7 @@ int ewfacquire_read_input(
 
 	while( remaining_aquiry_size > 0 )
 	{
-		if( ewfacquire_abort != 0 )
+		if( ewfacquire_imaging_handle->abort != 0 )
 		{
 			break;
 		}
@@ -968,7 +969,8 @@ int ewfacquire_read_input(
 				goto on_error;
 			}
 		}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 		read_size = process_buffer_size;
 
 		if( remaining_aquiry_size < (size64_t) read_size )
@@ -1172,7 +1174,8 @@ int ewfacquire_read_input(
 			}
 			storage_media_buffer = NULL;
 		}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 		else
 		{
 			process_count = storage_media_buffer_write_process(
@@ -1321,7 +1324,8 @@ int ewfacquire_read_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( imaging_handle_finalize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -1406,7 +1410,7 @@ int ewfacquire_read_input(
 		}
 		imaging_handle->last_offset_written += write_count;
 	}
-	if( ewfacquire_abort != 0 )
+	if( ewfacquire_imaging_handle->abort != 0 )
 	{
 		status = PROCESS_STATUS_ABORTED;
 	}
@@ -1438,11 +1442,11 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( ewfacquire_abort == 0 )
+	if( ewfacquire_imaging_handle->abort == 0 )
 	{
 		if( device_handle_read_errors_fprint(
 		     device_handle,
-		     ewfacquire_imaging_handle->bytes_per_sector,
+		     imaging_handle->bytes_per_sector,
 		     imaging_handle->notify_stream,
 		     error ) != 1 )
 		{
@@ -1473,7 +1477,7 @@ int ewfacquire_read_input(
 		{
 			if( device_handle_read_errors_fprint(
 			     device_handle,
-			     ewfacquire_imaging_handle->bytes_per_sector,
+			     imaging_handle->bytes_per_sector,
 			     log_handle->log_stream,
 			     error ) != 1 )
 			{
@@ -1552,7 +1556,8 @@ on_error:
 		 &( imaging_handle->storage_media_buffer_queue ),
 		 NULL );
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	return( -1 );
 }
 

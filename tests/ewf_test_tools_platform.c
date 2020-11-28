@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <file_stream.h>
 #include <memory.h>
 #include <narrow_string.h>

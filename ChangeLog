@@ -1,4 +1,6 @@
 TODO
+* complete work on corrupted_chunks_list
+** chunk table get chunk from chunk_table->corrupted_chunks_list
 * ewftools for -q show total duration and speed
 * rename attribute to extended attribute?
 
@@ -43,7 +45,6 @@ TODO
 
 * add multi threaded tool support
   - ewfmount - fuse multi thread support ?
-* chunk table get chunk from chunk_table->corrupted_chunks_list
 * throttle the size of the sections list?
 * ewfacquire allow to set the the maximum number of table entries?
 

@@ -64,6 +64,10 @@ struct libewf_segment_table
 	 */
 	libfcache_cache_t *segment_files_cache;
 
+	/* The current segment file
+	 */
+	libewf_segment_file_t *current_segment_file;
+
 	/* Flags
 	 */
 	uint8_t flags;
@@ -86,10 +90,6 @@ int libewf_segment_table_clear(
 int libewf_segment_table_clone(
      libewf_segment_table_t **destination_segment_table,
      libewf_segment_table_t *source_segment_table,
-     libcerror_error_t **error );
-
-int libewf_segment_table_empty(
-     libewf_segment_table_t *segment_table,
      libcerror_error_t **error );
 
 int libewf_segment_table_get_basename_size(

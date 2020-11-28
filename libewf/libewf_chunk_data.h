@@ -85,6 +85,14 @@ struct libewf_chunk_data
 	/* The chunk IO flags
 	 */
 	int8_t chunk_io_flags;
+
+	/* The range start offset
+	 */
+	off64_t range_start_offset;
+
+	/* The range end offset
+	 */
+	off64_t range_end_offset;
 };
 
 int libewf_chunk_data_initialize(

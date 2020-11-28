@@ -41,6 +41,14 @@ struct libewf_chunk_group
 	/* The chunks list
 	 */
 	libfdata_list_t *chunks_list;
+
+	/* The range start offset
+	 */
+	off64_t range_start_offset;
+
+	/* The range end offset
+	 */
+	off64_t range_end_offset;
 };
 
 int libewf_chunk_group_initialize(
@@ -59,15 +67,6 @@ int libewf_chunk_group_clone(
 
 int libewf_chunk_group_empty(
      libewf_chunk_group_t *chunk_group,
-     libcerror_error_t **error );
-
-int libewf_chunk_group_append_chunk(
-     libewf_chunk_group_t *chunk_group,
-     uint64_t chunk_index,
-     int file_io_pool_entry,
-     off64_t chunk_offset,
-     size64_t chunk_size,
-     uint32_t range_flags,
      libcerror_error_t **error );
 
 int libewf_chunk_group_fill_v1(
@@ -106,16 +105,6 @@ int libewf_chunk_group_correct_v1(
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
      uint8_t tainted,
-     libcerror_error_t **error );
-
-int libewf_chunk_group_generate_table_entries_data(
-     libewf_chunk_group_t *chunk_group,
-     uint64_t chunk_index,
-     uint8_t format_version,
-     uint8_t *table_entries_data,
-     size_t table_entries_data_size,
-     uint32_t number_of_entries,
-     off64_t base_offset,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

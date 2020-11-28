@@ -46,6 +46,18 @@ struct libewf_chunk_table
 	 */
 	libewf_io_handle_t *io_handle;
 
+	/* The current chunk group
+	 */
+	libewf_chunk_group_t *current_chunk_group;
+
+	/* The current chunk index
+	 */
+	uint64_t current_chunk_index;
+
+	/* The current chunk data
+	 */
+	libewf_chunk_data_t *current_chunk_data;
+
 	/* The chunk size
 	 */
 	uint32_t chunk_size;
@@ -61,6 +73,14 @@ struct libewf_chunk_table
 	/* The sectors with checksum errors
 	 */
 	libcdata_range_list_t *checksum_errors;
+
+	/* The chunk groups cache
+	 */
+	libfcache_cache_t *chunk_groups_cache;
+
+	/* The chunks (data) cache
+	 */
+	libfcache_cache_t *chunks_cache;
 };
 
 int libewf_chunk_table_initialize(
@@ -99,11 +119,8 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
      libewf_chunk_table_t *chunk_table,
      libbfio_pool_t *file_io_pool,
      libewf_segment_table_t *segment_table,
-     libfcache_cache_t *chunk_groups_cache,
      off64_t offset,
      uint32_t *segment_number,
-     off64_t *segment_file_data_offset,
-     libewf_segment_file_t **segment_file,
      int *chunk_groups_list_index,
      off64_t *chunk_group_data_offset,
      libewf_chunk_group_t **chunk_group,
@@ -116,22 +133,9 @@ int libewf_chunk_table_get_chunk_data_by_offset(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
-     libfcache_cache_t *chunk_groups_cache,
-     libfcache_cache_t *chunks_cache,
      off64_t offset,
-     libewf_chunk_data_t **chunk_data,
      off64_t *chunk_data_offset,
-     libcerror_error_t **error );
-
-int libewf_chunk_table_set_chunk_data_by_offset(
-     libewf_chunk_table_t *chunk_table,
-     uint64_t chunk_index,
-     libbfio_pool_t *file_io_pool,
-     libewf_segment_table_t *segment_table,
-     libfcache_cache_t *chunk_groups_cache,
-     libfcache_cache_t *chunks_cache,
-     off64_t offset,
-     libewf_chunk_data_t *chunk_data,
+     libewf_chunk_data_t **chunk_data,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

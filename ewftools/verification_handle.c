@@ -1106,6 +1106,10 @@ int verification_handle_process_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	if( verification_handle->abort != 0 )
+	{
+		return( 1 );
+	}
 	process_count = storage_media_buffer_read_process(
 			 storage_media_buffer,
 			 &error );
@@ -1192,6 +1196,12 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+	if( verification_handle->abort == 0 )
+	{
+		verification_handle_signal_abort(
+		 verification_handle,
+		 NULL );
+	}
 	return( -1 );
 }
 
@@ -1232,6 +1242,10 @@ int verification_handle_output_storage_media_buffer_callback(
 
 		goto on_error;
 	}
+	if( verification_handle->abort != 0 )
+	{
+		return( 1 );
+	}
 	if( libcdata_list_insert_value(
 	     verification_handle->output_list,
 	     (intptr_t *) storage_media_buffer,
@@ -1266,6 +1280,10 @@ int verification_handle_output_storage_media_buffer_callback(
 	}
 	while( element != NULL )
 	{
+		if( verification_handle->abort != 0 )
+		{
+			break;
+		}
 		if( libcdata_list_element_get_value(
 		     element,
 		     (intptr_t **) &storage_media_buffer,
@@ -1448,6 +1466,12 @@ on_error:
 #endif
 		libcerror_error_free(
 		 &error );
+	}
+	if( verification_handle->abort == 0 )
+	{
+		verification_handle_signal_abort(
+		 verification_handle,
+		 NULL );
 	}
 	return( -1 );
 }
@@ -1771,7 +1795,8 @@ int verification_handle_verify_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( verification_handle_initialize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -2385,7 +2410,8 @@ on_error:
 		 &( verification_handle->storage_media_buffer_queue ),
 		 NULL );
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	return( -1 );
 }
 

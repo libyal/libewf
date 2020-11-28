@@ -983,7 +983,7 @@ ssize_t libewf_section_descriptor_read_file_io_pool(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading section descriptor from file IO pool entry: %d at offset: %" PRIi64 "(0x%08" PRIx64 ")\n",
+		 "%s: reading section descriptor from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 file_io_pool_entry,
 		 file_offset,

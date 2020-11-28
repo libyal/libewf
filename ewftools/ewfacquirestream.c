@@ -344,7 +344,7 @@ ssize_t ewfacquirestream_read_chunk(
 
 		while( input_read_size > 0 )
 		{
-			if( ewfacquirestream_abort != 0 )
+			if( ewfacquirestream_imaging_handle->abort != 0 )
 			{
 				break;
 			}
@@ -746,7 +746,7 @@ int ewfacquirestream_read_input(
 	while( ( imaging_handle->acquiry_size == 0 )
 	    || ( remaining_aquiry_size > 0 ) )
 	{
-		if( ewfacquirestream_abort != 0 )
+		if( ewfacquirestream_imaging_handle->abort != 0 )
 		{
 			break;
 		}
@@ -1084,7 +1084,7 @@ int ewfacquirestream_read_input(
 	}
 	imaging_handle->last_offset_written += write_count;
 
-	if( ewfacquirestream_abort != 0 )
+	if( ewfacquirestream_imaging_handle->abort != 0 )
 	{
 		status = PROCESS_STATUS_ABORTED;
 	}
@@ -1116,7 +1116,7 @@ int ewfacquirestream_read_input(
 
 		goto on_error;
 	}
-	if( ewfacquirestream_abort == 0 )
+	if( ewfacquirestream_imaging_handle->abort == 0 )
 	{
 		if( imaging_handle_print_hashes(
 		     imaging_handle,

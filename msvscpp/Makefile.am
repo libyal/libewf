@@ -8,6 +8,7 @@ MSVSCPP_FILES = \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_checksum/ewf_test_checksum.vcproj \
 	ewf_test_chunk_data/ewf_test_chunk_data.vcproj \
+	ewf_test_chunk_descriptor/ewf_test_chunk_descriptor.vcproj \
 	ewf_test_chunk_group/ewf_test_chunk_group.vcproj \
 	ewf_test_chunk_table/ewf_test_chunk_table.vcproj \
 	ewf_test_compression/ewf_test_compression.vcproj \
@@ -61,9 +62,11 @@ MSVSCPP_FILES = \
 	ewf_test_tools_guid/ewf_test_tools_guid.vcproj \
 	ewf_test_tools_imaging_handle/ewf_test_tools_imaging_handle.vcproj \
 	ewf_test_tools_info_handle/ewf_test_tools_info_handle.vcproj \
+	ewf_test_tools_log_handle/ewf_test_tools_log_handle.vcproj \
 	ewf_test_tools_output/ewf_test_tools_output.vcproj \
 	ewf_test_tools_platform/ewf_test_tools_platform.vcproj \
 	ewf_test_tools_signal/ewf_test_tools_signal.vcproj \
+	ewf_test_tools_storage_media_buffer/ewf_test_tools_storage_media_buffer.vcproj \
 	ewf_test_tools_system_string/ewf_test_tools_system_string.vcproj \
 	ewf_test_tools_verification_handle/ewf_test_tools_verification_handle.vcproj \
 	ewf_test_truncate/ewf_test_truncate.vcproj \

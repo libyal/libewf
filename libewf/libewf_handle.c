@@ -680,40 +680,6 @@ int libewf_handle_clone(
 			goto on_error;
 		}
 	}
-	if( internal_source_handle->chunk_groups_cache != NULL )
-	{
-		if( libfcache_cache_clone(
-		     &( internal_destination_handle->chunk_groups_cache ),
-		     internal_source_handle->chunk_groups_cache,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination chunks groups cache.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( internal_source_handle->chunks_cache != NULL )
-	{
-		if( libfcache_cache_clone(
-		     &( internal_destination_handle->chunks_cache ),
-		     internal_source_handle->chunks_cache,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create destination chunks cache.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( internal_source_handle->hash_sections != NULL )
 	{
 		if( libewf_hash_sections_clone(
@@ -793,18 +759,6 @@ on_error:
 		{
 			libewf_hash_sections_free(
 			 &( internal_destination_handle->hash_sections ),
-			 NULL );
-		}
-		if( internal_destination_handle->chunks_cache != NULL )
-		{
-			libfcache_cache_free(
-			 &( internal_destination_handle->chunks_cache ),
-			 NULL );
-		}
-		if( internal_destination_handle->chunk_groups_cache != NULL )
-		{
-			libfcache_cache_free(
-			 &( internal_destination_handle->chunk_groups_cache ),
 			 NULL );
 		}
 		if( internal_destination_handle->chunk_table != NULL )
@@ -973,6 +927,19 @@ int libewf_handle_open(
 
 		return( -1 );
 	}
+#if !defined( HAVE_WRITE_SUPPORT )
+	if( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: write access currently not supported - compiled without zlib.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_handle->read_write_lock,
@@ -1329,6 +1296,19 @@ int libewf_handle_open_wide(
 
 		return( -1 );
 	}
+#if !defined( HAVE_WRITE_SUPPORT )
+	if( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: write access currently not supported - compiled without zlib.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_handle->read_write_lock,
@@ -3353,28 +3333,6 @@ int libewf_internal_handle_open_file_io_pool(
 
 		return( -1 );
 	}
-	if( internal_handle->chunk_groups_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunks group cache value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunks_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid handle - chunks cache value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->hash_sections != NULL )
 	{
 		libcerror_error_set(
@@ -3465,34 +3423,6 @@ int libewf_internal_handle_open_file_io_pool(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create chunk table.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_handle->chunk_groups_cache ),
-	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk groups cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_handle->chunks_cache ),
-	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunks cache.",
 		 function );
 
 		goto on_error;
@@ -3835,18 +3765,6 @@ on_error:
 		 &( internal_handle->header_values ),
 		 NULL );
 	}
-	if( internal_handle->chunks_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( internal_handle->chunks_cache ),
-		 NULL );
-	}
-	if( internal_handle->chunk_groups_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( internal_handle->chunk_groups_cache ),
-		 NULL );
-	}
 	if( internal_handle->chunk_table != NULL )
 	{
 		libewf_chunk_table_free(
@@ -3905,6 +3823,19 @@ int libewf_handle_open_file_io_pool(
 
 		return( -1 );
 	}
+#if !defined( HAVE_WRITE_SUPPORT )
+	if( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: write access currently not supported - compiled without zlib.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_handle->read_write_lock,
@@ -4146,38 +4077,6 @@ int libewf_handle_close(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk table.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_handle->chunk_groups_cache != NULL )
-	{
-		if( libfcache_cache_free(
-		     &( internal_handle->chunk_groups_cache ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunk groups cache.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_handle->chunks_cache != NULL )
-	{
-		if( libfcache_cache_free(
-		     &( internal_handle->chunks_cache ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunks cache.",
 			 function );
 
 			result = -1;
@@ -4460,11 +4359,9 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 		     file_io_pool,
 		     internal_handle->media_values,
 		     internal_handle->segment_table,
-		     internal_handle->chunk_groups_cache,
-		     internal_handle->chunks_cache,
 		     internal_handle->current_offset,
-		     &chunk_data,
 		     &chunk_data_offset,
+		     &chunk_data,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -5597,11 +5494,9 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 	     file_io_pool,
 	     internal_handle->media_values,
 	     internal_handle->segment_table,
-	     internal_handle->chunk_groups_cache,
-	     internal_handle->chunks_cache,
 	     internal_handle->current_offset,
-	     &chunk_data,
 	     &chunk_data_offset,
+	     &chunk_data,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -6184,30 +6079,19 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 		}
 		write_finalize_count += write_count;
 
-		if( libfcache_cache_set_value_by_index(
-		     internal_handle->chunks_cache,
-		     chunk_index % LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
-		     0,
-		     internal_handle->current_offset,
-		     0,
-		     (intptr_t *) internal_handle->chunk_data,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_chunk_data_free,
-		     LIBFCACHE_CACHE_VALUE_FLAG_MANAGED,
+		if( libewf_chunk_data_free(
+		     &( internal_handle->chunk_data ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set chunk: %" PRIu64 " data.",
-			 function,
-			 chunk_index );
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk data.",
+			 function );
 
 			return( -1 );
 		}
-		/* chunks_cache takes over management of chunk_data
-		 */
-		internal_handle->chunk_data = NULL;
 	}
 	/* Check if all media data has been written
 	 */
@@ -8356,11 +8240,9 @@ int libewf_internal_handle_get_media_values(
 			     internal_handle->file_io_pool,
 			     internal_handle->media_values,
 			     internal_handle->segment_table,
-			     internal_handle->chunk_groups_cache,
-			     internal_handle->chunks_cache,
 			     internal_handle->current_offset,
-			     &chunk_data,
 			     &chunk_data_offset,
+			     &chunk_data,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

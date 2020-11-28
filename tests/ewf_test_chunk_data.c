@@ -5260,6 +5260,8 @@ int main(
 	 "libewf_chunk_data_pack_with_empty_block_compression",
 	 ewf_test_chunk_data_pack_with_empty_block_compression );
 
+#if defined( HAVE_WRITE_SUPPORT )
+
 	EWF_TEST_RUN(
 	 "libewf_chunk_data_pack_with_compression",
 	 ewf_test_chunk_data_pack_with_compression );
@@ -5267,6 +5269,8 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_chunk_data_pack",
 	 ewf_test_chunk_data_pack );
+
+#endif /* defined( HAVE_WRITE_SUPPORT ) */
 
 	EWF_TEST_RUN(
 	 "libewf_chunk_data_unpack",

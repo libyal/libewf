@@ -45,6 +45,7 @@ libewf_la_SOURCES = \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
+	libewf_chunk_descriptor.c libewf_chunk_descriptor.h \
 	libewf_chunk_group.c libewf_chunk_group.h \
 	libewf_chunk_table.c libewf_chunk_table.h \
 	libewf_codepage.h \

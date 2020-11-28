@@ -359,9 +359,9 @@ int libewf_segment_file_clone(
 
 		return( -1 );
 	}
-	( *destination_segment_file )->sections_list      = NULL;
-	( *destination_segment_file )->chunk_groups_list  = NULL;
-	( *destination_segment_file )->chunk_groups_index = 0;
+	( *destination_segment_file )->sections_list             = NULL;
+	( *destination_segment_file )->chunk_groups_list         = NULL;
+	( *destination_segment_file )->current_chunk_group_index = 0;
 
 	if( libfdata_list_initialize(
 	     &( ( *destination_segment_file )->sections_list ),
@@ -1451,7 +1451,7 @@ ssize_t libewf_segment_file_read_table_section(
 
 		if( libfdata_list_append_element_with_mapped_size(
 		     segment_file->chunk_groups_list,
-		     &( segment_file->chunk_groups_index ),
+		     &( segment_file->current_chunk_group_index ),
 		     file_io_pool_entry,
 		     chunk_group_data_offset,
 		     chunk_group_data_size,
@@ -1632,7 +1632,7 @@ ssize_t libewf_segment_file_read_table2_section(
 	}
 	if( libfdata_list_get_element_by_index(
 	     segment_file->chunk_groups_list,
-	     segment_file->chunk_groups_index,
+	     segment_file->current_chunk_group_index,
 	     &chunk_group_file_io_pool_entry,
 	     &chunk_group_data_offset,
 	     &chunk_group_data_size,
@@ -1645,7 +1645,7 @@ ssize_t libewf_segment_file_read_table2_section(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve element: %d from chunk groups list.",
 		 function,
-		 segment_file->chunk_groups_index );
+		 segment_file->current_chunk_group_index );
 
 		goto on_error;
 	}
@@ -1696,7 +1696,7 @@ ssize_t libewf_segment_file_read_table2_section(
 #endif
 			result = libfdata_list_set_element_by_index(
 				  segment_file->chunk_groups_list,
-				  segment_file->chunk_groups_index,
+				  segment_file->current_chunk_group_index,
 				  file_io_pool_entry,
 				  chunk_group_data_offset,
 				  chunk_group_data_size,
@@ -1715,7 +1715,7 @@ ssize_t libewf_segment_file_read_table2_section(
 #endif
 			result = libfdata_list_set_element_by_index(
 				  segment_file->chunk_groups_list,
-				  segment_file->chunk_groups_index,
+				  segment_file->current_chunk_group_index,
 				  chunk_group_file_io_pool_entry,
 				  chunk_group_data_offset,
 				  chunk_group_data_size,
@@ -1730,7 +1730,7 @@ ssize_t libewf_segment_file_read_table2_section(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to set element: %d in chunk groups list.",
 			 function,
-			 segment_file->chunk_groups_index );
+			 segment_file->current_chunk_group_index );
 
 			goto on_error;
 		}
@@ -5421,7 +5421,7 @@ int libewf_segment_file_reopen(
 	{
 		if( libfdata_list_get_mapped_size_by_index(
 		     segment_file->chunk_groups_list,
-		     segment_file->chunk_groups_index,
+		     segment_file->current_chunk_group_index,
 		     &storage_media_size,
 		     error ) != 1 )
 		{
@@ -5431,13 +5431,13 @@ int libewf_segment_file_reopen(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve chunk group: %d mapped size.",
 			 function,
-			 segment_file->chunk_groups_index );
+			 segment_file->current_chunk_group_index );
 
 			return( -1 );
 		}
 		if( libfdata_list_resize(
 		     segment_file->chunk_groups_list,
-		     segment_file->chunk_groups_index,
+		     segment_file->current_chunk_group_index,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -5449,7 +5449,7 @@ int libewf_segment_file_reopen(
 
 			return( -1 );
 		}
-		segment_file->chunk_groups_index -= 1;
+		segment_file->current_chunk_group_index -= 1;
 
 		if( storage_media_size > segment_file->storage_media_size )
 		{
@@ -7175,8 +7175,11 @@ int libewf_segment_file_get_chunk_group_by_offset(
      libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_segment_file_get_chunk_group_by_offset";
-	int result            = 0;
+	libewf_chunk_group_t *safe_chunk_group = NULL;
+	static char *function                  = "libewf_segment_file_get_chunk_group_by_offset";
+	off64_t safe_chunk_group_data_offset   = 0;
+	int result                             = 0;
+	int safe_chunk_group_index             = 0;
 
 	if( segment_file == NULL )
 	{
@@ -7189,14 +7192,47 @@ int libewf_segment_file_get_chunk_group_by_offset(
 
 		return( -1 );
 	}
+	if( chunk_group_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group index.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_group_data_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group data offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_group == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk group.",
+		 function );
+
+		return( -1 );
+	}
 	result = libfdata_list_get_element_value_at_offset(
 		  segment_file->chunk_groups_list,
 		  (intptr_t *) file_io_pool,
 		  (libfdata_cache_t *) chunk_groups_cache,
 		  offset,
-		  chunk_group_index,
-		  chunk_group_data_offset,
-		  (intptr_t **) chunk_group,
+		  &safe_chunk_group_index,
+		  &safe_chunk_group_data_offset,
+		  (intptr_t **) &safe_chunk_group,
 		  0,
 		  error );
 
@@ -7211,6 +7247,44 @@ int libewf_segment_file_get_chunk_group_by_offset(
 		 offset );
 
 		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( safe_chunk_group == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing chunk group.",
+			 function );
+
+			return( -1 );
+		}
+		segment_file->current_chunk_group_index = safe_chunk_group_index;
+
+		if( libfdata_list_get_element_mapped_range(
+		     segment_file->chunk_groups_list,
+		     safe_chunk_group_index,
+		     &( safe_chunk_group->range_start_offset ),
+		     (size64_t *) &( safe_chunk_group->range_end_offset ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve chunks list element: %d mapped range.",
+			 function,
+			 safe_chunk_group_index );
+
+			return( -1 );
+		}
+		safe_chunk_group->range_end_offset += safe_chunk_group->range_start_offset;
+
+		*chunk_group_index       = safe_chunk_group_index;
+		*chunk_group_data_offset = safe_chunk_group_data_offset;
+		*chunk_group             = safe_chunk_group;
 	}
 	return( result );
 }
