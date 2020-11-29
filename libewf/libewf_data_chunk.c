@@ -207,11 +207,11 @@ int libewf_data_chunk_free(
  */
 int libewf_internal_data_chunk_set_chunk_data(
      libewf_internal_data_chunk_t *internal_data_chunk,
-     uint64_t chunk_index,
      libewf_chunk_data_t *chunk_data,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_internal_data_chunk_set_chunk_data";
+	int result            = 1;
 
 	if( internal_data_chunk == NULL )
 	{
@@ -263,25 +263,13 @@ int libewf_internal_data_chunk_set_chunk_data(
 			 "%s: unable to free chunk data.",
 			 function );
 
-			goto on_error;
+			result = -1;
 		}
 	}
-	if( libewf_chunk_data_clone(
-	     &( internal_data_chunk->chunk_data ),
-	     chunk_data,
-	     error ) != 1 )
+	if( result != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to clone chunk data.",
-		 function );
-
-		goto on_error;
+		internal_data_chunk->chunk_data = chunk_data;
 	}
-	internal_data_chunk->chunk_index = chunk_index;
-
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_data_chunk->read_write_lock,
@@ -297,15 +285,7 @@ int libewf_internal_data_chunk_set_chunk_data(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_data_chunk->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Reads a buffer from the data chunk
@@ -376,28 +356,31 @@ ssize_t libewf_data_chunk_read_buffer(
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
 			 "%s: unable to unpack chunk: %" PRIu64 " data.",
 			 function,
-			 internal_data_chunk->chunk_index );
+			 internal_data_chunk->chunk_data->chunk_index );
 
-			goto on_error;
+			read_count = -1;
 		}
 	}
-	read_count = libewf_chunk_data_read_buffer(
-	              internal_data_chunk->chunk_data,
-	              buffer,
-	              buffer_size,
-	              error );
-
-	if( read_count < 0 )
+	if( read_count != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk: %" PRIu64 " data.",
-		 function,
-		 internal_data_chunk->chunk_index );
+		read_count = libewf_chunk_data_read_buffer(
+		              internal_data_chunk->chunk_data,
+		              buffer,
+		              buffer_size,
+		              error );
 
-		goto on_error;
+		if( read_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read chunk: %" PRIu64 " data.",
+			 function,
+			 internal_data_chunk->chunk_data->chunk_index );
+
+			read_count = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -415,14 +398,6 @@ ssize_t libewf_data_chunk_read_buffer(
 	}
 #endif
 	return( read_count );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_data_chunk->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Writes a buffer to the data chunk
@@ -552,9 +527,8 @@ ssize_t libewf_data_chunk_write_buffer(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to pack chunk: %" PRIu64 " data.",
-		 function,
-		 internal_data_chunk->chunk_index );
+		 "%s: unable to pack chunk data.",
+		 function );
 
 		goto on_error;
 	}

@@ -57,7 +57,7 @@
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
+     uint8_t use_data_chunk_functions,
      libcerror_error_t **error )
 {
 	static char *function = "verification_handle_initialize";
@@ -208,7 +208,7 @@ int verification_handle_initialize(
 	}
 	( *verification_handle )->input_format             = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
 	( *verification_handle )->calculate_md5            = calculate_md5;
-	( *verification_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *verification_handle )->use_data_chunk_functions = use_data_chunk_functions;
 	( *verification_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 	( *verification_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
 	( *verification_handle )->notify_stream            = VERIFICATION_HANDLE_NOTIFY_STREAM;
@@ -1706,7 +1706,7 @@ int verification_handle_verify_input(
 
 		goto on_error;
 	}
-	if( verification_handle->use_chunk_data_functions != 0 )
+	if( verification_handle->use_data_chunk_functions != 0 )
 	{
 		process_buffer_size       = verification_handle->chunk_size;
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
@@ -1897,7 +1897,8 @@ int verification_handle_verify_input(
 				goto on_error;
 			}
 		}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 		read_size = process_buffer_size;
 
 		if( remaining_media_size < read_size )
@@ -1957,7 +1958,7 @@ int verification_handle_verify_input(
 			storage_media_buffer = NULL;
 		}
 		else
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 		{
 			process_count = storage_media_buffer_read_process(
 			                 storage_media_buffer,
@@ -2140,7 +2141,8 @@ int verification_handle_verify_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( verification_handle_finalize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -3312,7 +3314,9 @@ int verification_handle_get_integrity_hash_from_input(
 		return( -1 );
 	}
 	verification_handle->stored_md5_hash_available = result;
-#endif
+
+#endif /* defined( USE_LIBEWF_GET_MD5_HASH ) */
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_utf16_hash_value(
 		  verification_handle->input_handle,
@@ -4044,7 +4048,7 @@ int verification_handle_append_read_error(
 
 		return( -1 );
 	}
-	if( verification_handle->use_chunk_data_functions != 0 )
+	if( verification_handle->use_data_chunk_functions != 0 )
 	{
 		start_sector      = start_offset / verification_handle->bytes_per_sector;
 		number_of_sectors = number_of_bytes / verification_handle->bytes_per_sector;

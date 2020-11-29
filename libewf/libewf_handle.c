@@ -4246,7 +4246,6 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_internal_handle_read_buffer_from_file_io_pool";
 	off64_t chunk_data_offset       = 0;
-	uint64_t chunk_index            = 0;
 	size_t buffer_offset            = 0;
 	size_t read_size                = 0;
 
@@ -4348,13 +4347,10 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 	{
 		buffer_size = (size_t) ( internal_handle->media_values->media_size - internal_handle->current_offset );
 	}
-	chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
-
 	while( buffer_size > 0 )
 	{
 		if( libewf_chunk_table_get_chunk_data_by_offset(
 		     internal_handle->chunk_table,
-		     chunk_index,
 		     internal_handle->io_handle,
 		     file_io_pool,
 		     internal_handle->media_values,
@@ -4368,9 +4364,10 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to read chunk: %" PRIu64 " data.",
+			 "%s: unable to retrieve chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
-			 chunk_index );
+			 internal_handle->current_offset,
+			 internal_handle->current_offset );
 
 			return( -1 );
 		}
@@ -4380,9 +4377,10 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing chunk: %" PRIu64 " data.",
+			 "%s: missing chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
-			 chunk_index );
+			 internal_handle->current_offset,
+			 internal_handle->current_offset );
 
 			return( -1 );
 		}
@@ -4394,7 +4392,7 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: chunk: %" PRIu64 " offset exceeds data size.",
 			 function,
-			 chunk_index );
+			 chunk_data->chunk_index );
 
 			return( -1 );
 		}
@@ -4419,13 +4417,12 @@ ssize_t libewf_internal_handle_read_buffer_from_file_io_pool(
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy chunk: %" PRIu64 " data to buffer.",
 			 function,
-			 chunk_index );
+			 chunk_data->chunk_index );
 
 			return( -1 );
 		}
-		buffer_offset    += read_size;
-		buffer_size      -= read_size;
-		chunk_index      += 1;
+		buffer_offset += read_size;
+		buffer_size   -= read_size;
 
 		internal_handle->current_offset += (off64_t) read_size;
 
@@ -4601,7 +4598,7 @@ ssize_t libewf_handle_read_buffer_at_offset(
 
 		read_count = -1;
 	}
-	else
+	if( read_count != -1 )
 	{
 		read_count = libewf_internal_handle_read_buffer_from_file_io_pool(
 		              internal_handle,
@@ -5071,26 +5068,29 @@ ssize_t libewf_handle_write_buffer(
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
-			goto on_error;
+			write_count = -1;
 		}
 	}
-	write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
-	               internal_handle,
-	               internal_handle->file_io_pool,
-	               buffer,
-	               buffer_size,
-	               error );
-
-	if( write_count == -1 )
+	if( write_count != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to write buffer.",
-		 function );
+		write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
+		               internal_handle,
+		               internal_handle->file_io_pool,
+		               buffer,
+		               buffer_size,
+		               error );
 
-		goto on_error;
+		if( write_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to write buffer.",
+			 function );
+
+			write_count = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -5108,14 +5108,6 @@ ssize_t libewf_handle_write_buffer(
 	}
 #endif
 	return( write_count );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Writes (media) data at a specific offset,
@@ -5189,41 +5181,47 @@ ssize_t libewf_handle_write_buffer_at_offset(
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
-			goto on_error;
+			write_count = -1;
 		}
 	}
-	if( libewf_internal_handle_seek_offset(
-	     internal_handle,
-	     offset,
-	     SEEK_SET,
-	     error ) == -1 )
+	if( write_count != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.",
-		 function );
+		if( libewf_internal_handle_seek_offset(
+		     internal_handle,
+		     offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset.",
+			 function );
 
-		goto on_error;
+			write_count = -1;
+		}
 	}
-	write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
-	               internal_handle,
-	               internal_handle->file_io_pool,
-	               buffer,
-	               buffer_size,
-	               error );
-
-	if( write_count == -1 )
+	if( write_count != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to write buffer.",
-		 function );
+		write_count = libewf_internal_handle_write_buffer_to_file_io_pool(
+		               internal_handle,
+		               internal_handle->file_io_pool,
+		               buffer,
+		               buffer_size,
+		               error );
 
-		goto on_error;
+		if( write_count == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to write buffer.",
+			 function );
+
+			write_count = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -5241,14 +5239,6 @@ ssize_t libewf_handle_write_buffer_at_offset(
 	}
 #endif
 	return( write_count );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
 }
 
 /* Retrieves a (media) data chunk
@@ -5261,6 +5251,7 @@ int libewf_handle_get_data_chunk(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_get_data_chunk";
+	int result                                = 1;
 
 	if( handle == NULL )
 	{
@@ -5340,23 +5331,26 @@ int libewf_handle_get_data_chunk(
 			 "%s: unable to initialize write IO handle values.",
 			 function );
 
-			goto on_error;
+			result = -1;
 		}
 	}
-	if( libewf_data_chunk_initialize(
-	     data_chunk,
-	     internal_handle->io_handle,
-	     internal_handle->write_io_handle,
-	     error ) != 1 )
+	if( result != -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data chunk.",
-		 function );
+		if( libewf_data_chunk_initialize(
+		     data_chunk,
+		     internal_handle->io_handle,
+		     internal_handle->write_io_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create data chunk.",
+			 function );
 
-		goto on_error;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -5373,20 +5367,12 @@ int libewf_handle_get_data_chunk(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_handle->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Reads a (media) data chunk at the current offset
  * This function is not multi-thread safe acquire write lock before call
- * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ * Returns the number of bytes in the data chunk, 0 when no longer data can be read or -1 on error
  */
 ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
          libewf_internal_handle_t *internal_handle,
@@ -5397,7 +5383,7 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_internal_handle_read_data_chunk_from_file_io_pool";
 	off64_t chunk_data_offset       = 0;
-	ssize_t read_count              = 0;
+	size_t read_count               = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -5454,42 +5440,12 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->chunk_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid media values - missing chunk size.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_data_chunk == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data chunk.",
-		 function );
-
-		return( -1 );
-	}
 	if( (size64_t) internal_handle->current_offset >= internal_handle->media_values->media_size )
 	{
 		return( 0 );
 	}
-/* TODO remove need to calculate */
-	internal_handle->current_chunk_index = internal_handle->current_offset
-	                                     / internal_handle->media_values->chunk_size;
-
-	internal_handle->current_offset = (off64_t) internal_handle->current_chunk_index
-	                                * (off64_t) internal_handle->media_values->chunk_size;
-
-	if( libewf_chunk_table_get_chunk_data_by_offset(
+	if( libewf_chunk_table_get_chunk_data_by_offset_no_cache(
 	     internal_handle->chunk_table,
-	     internal_handle->current_chunk_index,
 	     internal_handle->io_handle,
 	     file_io_pool,
 	     internal_handle->media_values,
@@ -5503,11 +5459,12 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk: %" PRIu64 " data.",
+		 "%s: unable to retrieve chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 internal_handle->current_chunk_index );
+		 internal_handle->current_offset,
+		 internal_handle->current_offset );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( chunk_data == NULL )
 	{
@@ -5515,17 +5472,17 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing chunk: %" PRIu64 " data.",
+		 "%s: missing chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 internal_handle->current_chunk_index );
+		 internal_handle->current_offset,
+		 internal_handle->current_offset );
 
-		return( -1 );
+		goto on_error;
 	}
-	read_count = (ssize_t) chunk_data->data_size;
-
+	/* data_chunk takes over management of chunk_data
+	 */
 	if( libewf_internal_data_chunk_set_chunk_data(
 	     internal_data_chunk,
-	     internal_handle->current_chunk_index,
 	     chunk_data,
 	     error ) != 1 )
 	{
@@ -5535,19 +5492,29 @@ ssize_t libewf_internal_handle_read_data_chunk_from_file_io_pool(
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set chunk: %" PRIu64 " data in data chunk.",
 		 function,
-		 internal_handle->current_chunk_index );
+		 chunk_data->chunk_index );
 
-		return( -1 );
+		goto on_error;
 	}
-	internal_handle->current_offset += read_count;
+	internal_handle->current_offset = chunk_data->range_end_offset;
 
-	internal_handle->current_chunk_index++;
+	read_count = (ssize_t) ( chunk_data->range_end_offset - chunk_data->range_start_offset );
 
 	return( read_count );
+
+on_error:
+	if( chunk_data != NULL )
+	{
+		libewf_chunk_data_free(
+		 &chunk_data,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Reads a (media) data chunk at the current offset
  * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ * Returns the number of bytes in the data chunk, 0 when no longer data can be read or -1 on error
  */
 ssize_t libewf_handle_read_data_chunk(
          libewf_handle_t *handle,
@@ -5642,9 +5609,10 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
          libewf_internal_data_chunk_t *internal_data_chunk,
          libcerror_error_t **error )
 {
-	static char *function = "libewf_internal_handle_write_data_chunk_to_file_io_pool";
-	size_t data_size      = 0;
-	ssize_t write_count   = 0;
+	static char *function        = "libewf_internal_handle_write_data_chunk_to_file_io_pool";
+	size_t data_size             = 0;
+	ssize_t write_count          = 0;
+	uint64_t current_chunk_index = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -5756,11 +5724,9 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 		}
 	}
 /* TODO remove need to calculate */
-	internal_handle->current_chunk_index = internal_handle->current_offset
-	                                     / internal_handle->media_values->chunk_size;
+	current_chunk_index = internal_handle->current_offset / internal_handle->media_values->chunk_size;
 
-	internal_handle->current_offset = (off64_t) internal_handle->current_chunk_index
-	                                * (off64_t) internal_handle->media_values->chunk_size;
+	internal_handle->current_offset = (off64_t) current_chunk_index * (off64_t) internal_handle->media_values->chunk_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -5768,11 +5734,11 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 		libcnotify_printf(
 		 "%s: writing chunk: %" PRIu64 " of size: %" PRIzd ".\n",
 		 function,
-		 internal_handle->current_chunk_index,
+		 current_chunk_index,
 		 data_size );
 	}
 #endif
-	if( internal_handle->current_chunk_index < internal_handle->write_io_handle->number_of_chunks_written )
+	if( current_chunk_index < internal_handle->write_io_handle->number_of_chunks_written )
 	{
 		libcerror_error_set(
 		 error,
@@ -5780,7 +5746,7 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: chunk: %" PRIu64 " already exists.",
 		 function,
-		 internal_handle->current_chunk_index );
+		 current_chunk_index );
 
 		return( -1 );
 	}
@@ -5796,7 +5762,7 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 	               internal_handle->sessions,
 	               internal_handle->tracks,
 	               internal_handle->acquiry_errors,
-	               internal_handle->current_chunk_index,
+	               current_chunk_index,
 	               internal_data_chunk->chunk_data,
 	               data_size,
 	               error );
@@ -8185,9 +8151,10 @@ int libewf_internal_handle_get_media_values(
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_internal_handle_get_media_values";
-	off64_t chunk_data_offset       = 0;
 	size64_t chunks_data_size       = 0;
 	size64_t sector_data_size       = 0;
+	size32_t chunk_size             = 0;
+	off64_t chunk_data_offset       = 0;
 	uint64_t chunk_index            = 0;
 
 	if( internal_handle == NULL )
@@ -8223,19 +8190,19 @@ int libewf_internal_handle_get_media_values(
 
 		return( -1 );
 	}
-	sector_data_size  = internal_handle->media_values->number_of_sectors;
-	sector_data_size *= internal_handle->media_values->bytes_per_sector;
+	sector_data_size = (size64_t) internal_handle->media_values->number_of_sectors * internal_handle->media_values->bytes_per_sector;
 
 	if( ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_READ ) != 0 )
 	 && ( ( internal_handle->io_handle->access_flags & LIBEWF_ACCESS_FLAG_RESUME ) == 0 ) )
 	{
+		chunk_size = (size32_t) internal_handle->media_values->sectors_per_chunk * internal_handle->media_values->bytes_per_sector;
+
 		if( internal_handle->media_values->number_of_chunks > 0 )
 		{
-			chunk_index = internal_handle->media_values->number_of_chunks - 1;
+			internal_handle->current_offset = ( (off64_t) internal_handle->media_values->number_of_chunks - 1 ) * chunk_size;
 
 			if( libewf_chunk_table_get_chunk_data_by_offset(
 			     internal_handle->chunk_table,
-			     chunk_index,
 			     internal_handle->io_handle,
 			     internal_handle->file_io_pool,
 			     internal_handle->media_values,
@@ -8249,9 +8216,10 @@ int libewf_internal_handle_get_media_values(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve chunk: %" PRIu64 " data.",
+				 "%s: unable to retrieve chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 				 function,
-				 chunk_index );
+				 internal_handle->current_offset,
+				 internal_handle->current_offset );
 
 				return( -1 );
 			}
@@ -8261,18 +8229,14 @@ int libewf_internal_handle_get_media_values(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing chunk: %" PRIu64 " data.",
+				 "%s: missing chunk data for offset: %" PRIi64 " (0x%08" PRIx64 ").",
 				 function,
-				 chunk_index );
+				 internal_handle->current_offset,
+				 internal_handle->current_offset );
 
 				return( -1 );
 			}
-			chunks_data_size = chunk_index
-			                 * internal_handle->media_values->sectors_per_chunk
-			                 * internal_handle->media_values->bytes_per_sector;
-
-			/* The only way to determine the size of the last compressed chunk
-			 * is to decompress it
+			/* The only way to determine the size of the last compressed chunk is to unpack it
 			 */
 			if( libewf_chunk_data_unpack(
 			     chunk_data,
@@ -8289,6 +8253,8 @@ int libewf_internal_handle_get_media_values(
 
 				return( -1 );
 			}
+			chunks_data_size = chunk_index * chunk_size;
+
 			if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) == 0 )
 			{
 				chunks_data_size += chunk_data->data_size;

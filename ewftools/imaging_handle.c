@@ -62,7 +62,7 @@
 int imaging_handle_initialize(
      imaging_handle_t **imaging_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
+     uint8_t use_data_chunk_functions,
      libcerror_error_t **error )
 {
 	static char *function = "imaging_handle_initialize";
@@ -181,7 +181,7 @@ int imaging_handle_initialize(
 		}
 	}
 	( *imaging_handle )->calculate_md5            = calculate_md5;
-	( *imaging_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *imaging_handle )->use_data_chunk_functions = use_data_chunk_functions;
 	( *imaging_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	( *imaging_handle )->compression_level        = LIBEWF_COMPRESSION_LEVEL_NONE;
 	( *imaging_handle )->ewf_format               = LIBEWF_FORMAT_ENCASE6;

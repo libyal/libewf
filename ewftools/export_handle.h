@@ -151,9 +151,9 @@ struct export_handle
 	 */
 	system_character_t *calculated_sha256_hash_string;
 
-	/* Value to indicate if the chunk data instead of the buffered read and write functions should be used
+	/* Value to indicate if the data chunk functions instead of the buffered read and write functions should be used
 	 */
-	uint8_t use_chunk_data_functions;
+	uint8_t use_data_chunk_functions;
 
 	/* The process buffer size
 	 */
@@ -251,7 +251,7 @@ struct export_handle
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
+     uint8_t use_data_chunk_functions,
      libcerror_error_t **error );
 
 int export_handle_free(

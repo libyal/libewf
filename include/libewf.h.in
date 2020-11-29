@@ -403,7 +403,7 @@ int libewf_handle_get_data_chunk(
      libewf_error_t **error );
 
 /* Reads a (media) data chunk at the current offset
- * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
+ * Returns the number of bytes in the data chunk, 0 when no longer data can be read or -1 on error
  */
 LIBEWF_EXTERN \
 ssize_t libewf_handle_read_data_chunk(

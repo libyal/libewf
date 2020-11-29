@@ -1,7 +1,12 @@
 TODO
-* complete work on corrupted_chunks_list
-** chunk table get chunk from chunk_table->corrupted_chunks_list
-* ewftools for -q show total duration and speed
+* handle checksum errors when ewfexport is used with data chunk functions
+* handle checksum errors when ewfverify is used with data chunk functions
+* ensure a multitude of sector size is written
+
+* handle corruption scenarios
+** missing single segment file
+** corrupted single segment file
+
 * rename attribute to extended attribute?
 
 * move overlapping/generic header and hash value functions into value table
@@ -28,7 +33,6 @@ TODO
 * pattern fill chunk support (set chunk table entry, test)
 * complete: libewf_chunk_table_fill_v2
 
-* refactor libewf_internal_data_chunk_set_chunk_data not to clone ?
 * ewfacquire error when both secondary output and resume are set
 * pass zero byte empty block compressed data cache as a pointer
   do not copy data to compressed chunk cache
@@ -333,21 +337,10 @@ Tools:
   - add support for multi threaded logical verify
 
 Unsorted:
-* libewf:
-  - empty caches on close
-
-* check if empty block check or equiv is always done (except for no compression).
 * user header and header2 time difference to calculate the timezone
 
 * fix last_chunk_data_offset calculation for table2
   in combination with libewf_chunk_group_correct_v1
-* chunk data
-  - related calculation into chunk data
-  - change API to have chunk type
-* libewf_chunk_data_check_for_empty_block
-  - use memcmp instead?
-  - write a test at configure time to determine which approach is faster
-  - same for adler32 ?
 
   - sections list on write: cache section descriptors instead of free-ing them?
 
@@ -363,12 +356,6 @@ Unsorted:
   - use mapped offset to determine first chunk index (+/-)
     - what about base offset ?
     - make mapped offsets absolute ?
-
-  - refactor chunk table to:
-    - optimize use of libewf_chunk_table_chunk_exists_for_offset and
-      successive calls to fdata types
-    - refactor libewf_chunk_table_get_chunk_data_by_offset chunk data part
-      back to read IO handle ?
 
   - handle: replace chunk_index calcuations by current_chunk_index tracking ?
   - libewf_filename_create: change to accept ( segment_number - 1 )
@@ -404,6 +391,7 @@ Unsorted:
     (for now use table if number of entries is not 0)
   - tainted table and table2
   - tainted table or table2 (use the one that is not tainted)
+* handle DEFLATE uncompressed block data with copy of uncompressed data size of 0?
 
 * add stream write support for EWF-S01 use fill space solution in table section
 

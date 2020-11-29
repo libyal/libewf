@@ -411,7 +411,6 @@ int ewf_test_internal_data_chunk_set_chunk_data(
 	 */
 	result = libewf_internal_data_chunk_set_chunk_data(
 	          NULL,
-	          0,
 	          chunk_data,
 	          &error );
 
@@ -429,7 +428,6 @@ int ewf_test_internal_data_chunk_set_chunk_data(
 
 	result = libewf_internal_data_chunk_set_chunk_data(
 	          (libewf_internal_data_chunk_t *) data_chunk,
-	          0,
 	          NULL,
 	          &error );
 

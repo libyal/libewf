@@ -62,7 +62,7 @@ int libewf_ltree_section_read_data(
 	uint32_t calculated_checksum = 0;
 	uint32_t stored_checksum     = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT ) || defined( HAVE_VERBOSE_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 	size_t trailing_data_size    = 0;
 #endif
 
@@ -335,10 +335,10 @@ int libewf_ltree_section_read_data(
 		{
 			if( stored_data_size < (uint64_t) data_size )
 			{
+#if defined( HAVE_DEBUG_OUTPUT )
 				data_offset       += stored_data_size;
 				trailing_data_size = data_size - stored_data_size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 				libcnotify_printf(
 				 "%s: trailing data:\n",
 				 function );

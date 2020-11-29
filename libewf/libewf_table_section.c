@@ -158,8 +158,10 @@ int libewf_table_section_read_header_data(
 	uint32_t calculated_checksum       = 0;
 	uint32_t stored_checksum           = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_VERBOSE_OUTPUT )
 	uint32_t maximum_number_of_entries = 0;
+#endif
+#if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t value_32bit               = 0;
 #endif
 

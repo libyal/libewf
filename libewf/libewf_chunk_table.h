@@ -46,13 +46,13 @@ struct libewf_chunk_table
 	 */
 	libewf_io_handle_t *io_handle;
 
+	/* The current chunk group index
+	 */
+	int current_chunk_group_index;
+
 	/* The current chunk group
 	 */
 	libewf_chunk_group_t *current_chunk_group;
-
-	/* The current chunk index
-	 */
-	uint64_t current_chunk_index;
 
 	/* The current chunk data
 	 */
@@ -66,10 +66,6 @@ struct libewf_chunk_table
 	 */
 	uint8_t format_version;
 
-	/* The corrupted chunks list
-	 */
-	libfdata_list_t *corrupted_chunks_list;
-
 	/* The sectors with checksum errors
 	 */
 	libcdata_range_list_t *checksum_errors;
@@ -78,9 +74,13 @@ struct libewf_chunk_table
 	 */
 	libfcache_cache_t *chunk_groups_cache;
 
-	/* The chunks (data) cache
+	/* The chunk data cache
 	 */
-	libfcache_cache_t *chunks_cache;
+	libfcache_cache_t *chunk_data_cache;
+
+	/* The single chunk data cache
+	 */
+	libfcache_cache_t *single_chunk_data_cache;
 };
 
 int libewf_chunk_table_initialize(
@@ -126,9 +126,32 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
      libewf_chunk_group_t **chunk_group,
      libcerror_error_t **error );
 
+int libewf_chunk_table_get_segment_file_chunk_data_by_offset(
+     libewf_chunk_table_t *chunk_table,
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libfcache_cache_t *chunk_data_cache,
+     libewf_media_values_t *media_values,
+     libewf_segment_table_t *segment_table,
+     off64_t offset,
+     off64_t *chunk_data_offset,
+     libewf_chunk_data_t **chunk_data,
+     uint8_t read_flags,
+     libcerror_error_t **error );
+
 int libewf_chunk_table_get_chunk_data_by_offset(
      libewf_chunk_table_t *chunk_table,
-     uint64_t chunk_index,
+     libewf_io_handle_t *io_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_media_values_t *media_values,
+     libewf_segment_table_t *segment_table,
+     off64_t offset,
+     off64_t *chunk_data_offset,
+     libewf_chunk_data_t **chunk_data,
+     libcerror_error_t **error );
+
+int libewf_chunk_table_get_chunk_data_by_offset_no_cache(
+     libewf_chunk_table_t *chunk_table,
      libewf_io_handle_t *io_handle,
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,

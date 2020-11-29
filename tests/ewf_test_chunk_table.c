@@ -1501,7 +1501,6 @@ int ewf_test_chunk_table_get_chunk_data_by_offset(
 	 */
 	result = libewf_chunk_table_get_chunk_data_by_offset(
 	          NULL,
-	          0,
 	          NULL,
 	          NULL,
 	          NULL,

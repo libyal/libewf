@@ -7005,22 +7005,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 
 		goto on_error;
 	}
-/* TODO set mapped offset in chunks list ?
-	if( libfdata_list_get_mapped_offset(
-	     chunk_group->chunks_list,
-	     &storage_media_offset,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve mapped offset from chunks list.",
-		 function );
-
-		goto on_error;
-	}
-*/
 	chunk_index = storage_media_offset / segment_file->io_handle->chunk_size;
 
 	if( segment_file->major_version == 1 )
@@ -7280,7 +7264,8 @@ int libewf_segment_file_get_chunk_group_by_offset(
 
 			return( -1 );
 		}
-		safe_chunk_group->range_end_offset += safe_chunk_group->range_start_offset;
+		safe_chunk_group->range_start_offset += segment_file->range_start_offset;
+		safe_chunk_group->range_end_offset   += safe_chunk_group->range_start_offset;
 
 		*chunk_group_index       = safe_chunk_group_index;
 		*chunk_group_data_offset = safe_chunk_group_data_offset;

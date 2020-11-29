@@ -38,6 +38,10 @@ typedef struct libewf_chunk_data libewf_chunk_data_t;
 
 struct libewf_chunk_data
 {
+	/* The chunk index
+	 */
+	uint64_t chunk_index;
+
 	/* The chunk size
 	 */
 	size32_t chunk_size;
@@ -103,11 +107,6 @@ int libewf_chunk_data_initialize(
 
 int libewf_chunk_data_free(
      libewf_chunk_data_t **chunk_data,
-     libcerror_error_t **error );
-
-int libewf_chunk_data_clone(
-     libewf_chunk_data_t **destination_chunk_data,
-     libewf_chunk_data_t *source_chunk_data,
      libcerror_error_t **error );
 
 ssize_t libewf_chunk_data_read_buffer(

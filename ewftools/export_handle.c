@@ -73,7 +73,7 @@
 int export_handle_initialize(
      export_handle_t **export_handle,
      uint8_t calculate_md5,
-     uint8_t use_chunk_data_functions,
+     uint8_t use_data_chunk_functions,
      libcerror_error_t **error )
 {
 	static char *function = "export_handle_initialize";
@@ -192,7 +192,7 @@ int export_handle_initialize(
 		}
 	}
 	( *export_handle )->calculate_md5            = calculate_md5;
-	( *export_handle )->use_chunk_data_functions = use_chunk_data_functions;
+	( *export_handle )->use_data_chunk_functions = use_data_chunk_functions;
 	( *export_handle )->compression_method       = LIBEWF_COMPRESSION_METHOD_DEFLATE;
 	( *export_handle )->compression_level        = LIBEWF_COMPRESSION_LEVEL_NONE;
 	( *export_handle )->output_format            = EXPORT_HANDLE_OUTPUT_FORMAT_RAW;
@@ -4135,7 +4135,7 @@ int export_handle_append_read_error(
 	{
 		number_of_sectors += 1;
 	}
-	if( export_handle->use_chunk_data_functions != 0 )
+	if( export_handle->use_data_chunk_functions != 0 )
 	{
 		if( libewf_handle_append_checksum_error(
 		     export_handle->input_handle,
@@ -4742,7 +4742,7 @@ int export_handle_output_storage_media_buffer_callback(
 		}
 		export_handle->last_offset_hashed = storage_media_buffer->storage_media_offset + storage_media_buffer->processed_size;
 
-		if( export_handle->use_chunk_data_functions != 0 )
+		if( export_handle->use_data_chunk_functions != 0 )
 		{
 			if( storage_media_buffer_initialize(
 			     &output_storage_media_buffer,
@@ -5188,7 +5188,7 @@ int export_handle_export_input(
 			goto on_error;
 		}
 	}
-	if( export_handle->use_chunk_data_functions != 0 )
+	if( export_handle->use_data_chunk_functions != 0 )
 	{
 		if( export_handle_get_output_chunk_size(
 		     export_handle,
@@ -5557,7 +5557,7 @@ int export_handle_export_input(
 			}
 			export_handle->last_offset_hashed += input_storage_media_buffer->processed_size;
 
-			if( ( export_handle->use_chunk_data_functions != 0 )
+			if( ( export_handle->use_data_chunk_functions != 0 )
 			 && ( output_storage_media_buffer == NULL ) )
 			{
 				if( storage_media_buffer_initialize(

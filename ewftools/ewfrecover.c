@@ -96,8 +96,8 @@ void usage_fprint(
 	fprintf( stream, "\t-t:        specify the target file to recover to (default is recover)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
-	fprintf( stream, "\t-x:        use the chunk data instead of the buffered read and write\n"
-	                 "\t           functions.\n" );
+	fprintf( stream, "\t-x:        use the data chunk functions instead of the buffered read and\n"
+	                 "\t           write functions.\n" );
 }
 
 /* Signal handler for ewfrecover
@@ -169,7 +169,7 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                        = 0;
 	uint8_t calculate_md5                          = 1;
 	uint8_t print_status_information               = 1;
-	uint8_t use_chunk_data_functions               = 0;
+	uint8_t use_data_chunk_functions               = 0;
 	uint8_t verbose                                = 0;
 	int number_of_filenames                        = 0;
 	int result                                     = 1;
@@ -309,7 +309,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_SUCCESS );
 
 			case (system_integer_t) 'x':
-				use_chunk_data_functions = 1;
+				use_data_chunk_functions = 1;
 
 				break;
 		}
@@ -387,7 +387,7 @@ int main( int argc, char * const argv[] )
 	if( export_handle_initialize(
 	     &ewfrecover_export_handle,
 	     calculate_md5,
-	     use_chunk_data_functions,
+	     use_data_chunk_functions,
 	     &error ) != 1 )
 	{
 		fprintf(

@@ -37,7 +37,7 @@ this file type.
 == License
 
 ....
-Copyright (C) 2006-2019, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -143,6 +143,7 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.80 | J.B. Metz | April 2016 | Updates regarding ltree.
 | 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
 | 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to K. Stone.
+| 0.0.83 | J.B. Metz | November 2020 | Additional information about corruption scenario.
 |===
 
 :numbered:
@@ -2961,7 +2962,7 @@ The deflate compressed block header is 3 bits in size and consists of:
 | 3 | | reserved (not used)
 |===
 
-==== Uncompressed block data
+==== [[deflate_uncompressed_block_data]]Uncompressed block data
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -3220,6 +3221,16 @@ This chapter contains several corruption scenarios that have been encountered
 === Corrupt compressed chunk
 
 [yellow-background]*TODO add description*
+
+=== DEFLATE uncompressed block data with copy of uncompressed data size of 0
+
+Seen in combination with some firmware versions of Tableau TD3 forensic imager.
+
+In this corruption scenarion the copy of uncompressed data size value of the
+<<deflate_uncompressed_block_data,DEFLATE uncompressed block data>> is set to 0
+instead of the 1s complement of the uncompressed data size.
+
+Libewf currently does not handle this corruption scenario.
 
 === Corrupt section descriptor
 

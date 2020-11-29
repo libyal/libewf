@@ -208,8 +208,8 @@ void ewfacquire_usage_fprint(
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 	fprintf( stream, "\t-w:     zero sectors on read error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-x:     use the chunk data instead of the buffered read and write\n"
-	                 "\t        functions.\n" );
+	fprintf( stream, "\t-x:     use the data chunk functions instead of the buffered read and\n"
+	                 "\t        write functions.\n" );
 	fprintf( stream, "\t-2:     specify the secondary target file (without extension) to write\n"
 	                 "\t        to\n" );
 }
@@ -581,7 +581,7 @@ int ewfacquire_read_input(
      off64_t resume_acquiry_offset,
      uint8_t swap_byte_pairs,
      uint8_t print_status_information,
-     uint8_t use_chunk_data_functions,
+     uint8_t use_data_chunk_functions,
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
@@ -777,7 +777,7 @@ int ewfacquire_read_input(
 
 		goto on_error;
 	}
-	if( use_chunk_data_functions != 0 )
+	if( use_data_chunk_functions != 0 )
 	{
 		process_buffer_size       = (size_t) chunk_size;
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
@@ -1608,7 +1608,7 @@ int main( int argc, char * const argv[] )
 	uint8_t print_status_information                     = 1;
 	uint8_t resume_acquiry                               = 0;
 	uint8_t swap_byte_pairs                              = 0;
-	uint8_t use_chunk_data_functions                     = 0;
+	uint8_t use_data_chunk_functions                     = 0;
 	uint8_t verbose                                      = 0;
 	uint8_t zero_buffer_on_error                         = 0;
 	int8_t acquiry_parameters_confirmed                  = 0;
@@ -1834,7 +1834,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'x':
-				use_chunk_data_functions = 1;
+				use_data_chunk_functions = 1;
 
 				break;
 
@@ -1995,7 +1995,7 @@ int main( int argc, char * const argv[] )
 	if( imaging_handle_initialize(
 	     &ewfacquire_imaging_handle,
 	     calculate_md5,
-	     use_chunk_data_functions,
+	     use_data_chunk_functions,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -3303,7 +3303,7 @@ int main( int argc, char * const argv[] )
 		  resume_acquiry_offset,
 		  swap_byte_pairs,
 		  print_status_information,
-	          use_chunk_data_functions,
+	          use_data_chunk_functions,
 		  log_handle,
 		  &error );
 

@@ -98,10 +98,6 @@ struct libewf_internal_handle
 	 */
 	off64_t current_offset;
 
-	/* The current (storage media) chunk index
-	 */
-	uint64_t current_chunk_index;
-
 	/* The segment file table
 	 */
 	libewf_segment_table_t *segment_table;
