@@ -1,4 +1,6 @@
 TODO
+* ewfexport bytes per sector tests ?
+
 * handle checksum errors when ewfexport is used with data chunk functions
 * handle checksum errors when ewfverify is used with data chunk functions
 * ensure a multitude of sector size is written
@@ -33,7 +35,10 @@ TODO
 * pattern fill chunk support (set chunk table entry, test)
 * complete: libewf_chunk_table_fill_v2
 
-* ewfacquire error when both secondary output and resume are set
+* move write resume functionality into ewfacquire ?
+* add support for write resume of images with ENCASE1/SMART table sections ?
+* check behavior of ewfacquire resume and specified offset
+
 * pass zero byte empty block compressed data cache as a pointer
   do not copy data to compressed chunk cache
 
@@ -85,7 +90,7 @@ Tests:
   - add non-unattended tests
   - add option sets for single/multi threaded, chunks
   - export of split RAW
-  - test writing to stdout and catch https://github.com/libyal/libewf/issues/23
+  - add support for different input and output chunk sizes?
 * ewfexport_logical:
   - add non-unattended tests
 * ewfinfo:
@@ -161,7 +166,6 @@ Further analysis of the EWF format:
 
 Features
 * add bzip2 support and tests
-* resume write support for ENCASE1/SMART table sections ?
 * implement low memory usage option
   - trade off IO versus memory use
 * disk full check
@@ -202,8 +206,6 @@ Error handling/tollerance
 * handle missing sections
 * handle missing segment files
 * handle corrupt segment files
-* write resume
-  - add support for ENCASE1/SMART table section
 
 Additional (integrity) checks:
 * read: check if successive headers match first header
@@ -298,8 +300,7 @@ Tools:
   - add support for unattended write resume ?
   - improve output when encountering a read error
   - add support to set device label header value
-  - allow for multi stage imaging, where user suspends and resumes
-    imaging process?
+  - allow for multi stage imaging, where user suspends and resumes imaging process?
   - add multi threading support
 * ewfacquirestream
   - implement stream handle
@@ -376,8 +377,6 @@ Unsorted:
 * add support for set identifier change ?
 * check alignment of:
   section_data_read CHS cylinders, SMART logs start sector
-
-* check behavior of ewfacquire resume and specified offset
 
 * complete ewfrecover
   - max segment size

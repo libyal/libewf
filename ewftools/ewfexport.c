@@ -194,7 +194,7 @@ void usage_fprint(
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        zero sectors on checksum error (mimic EnCase like behavior)\n" );
-	fprintf( stream, "\t-x:        use the data chunk functsion instead of the buffered read and\n"
+	fprintf( stream, "\t-x:        use the data chunk functions instead of the buffered read and\n"
 	                 "\t           write functions.\n" );
 }
 
@@ -587,7 +587,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#endif
+#endif /* defined( HAVE_GETRLIMIT ) */
+
 	if( ewftools_signal_attach(
 	     ewfexport_signal_handler,
 	     &error ) != 1 )
@@ -774,8 +775,19 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported sectors per chunk defaulting to: %" PRIu32 ".\n",
-			 ewfexport_export_handle->sectors_per_chunk );
+			 ewfexport_export_handle->output_sectors_per_chunk );
 		}
+		if( use_data_chunk_functions != 0 )
+		{
+			fprintf(
+			 stderr,
+			 "Setting sectors per chunk when using data chunk functions currently not supported defaulting to: %" PRIu32 ".\n",
+			 ewfexport_export_handle->input_sectors_per_chunk );
+		}
+	}
+	if( use_data_chunk_functions != 0 )
+	{
+		ewfexport_export_handle->output_sectors_per_chunk = ewfexport_export_handle->input_sectors_per_chunk;
 	}
 	if( option_maximum_segment_size != NULL )
 	{

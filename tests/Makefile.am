@@ -57,13 +57,8 @@ TESTS = \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
-	create_ewfacquire_optical_option_sets.sh \
-	create_ewfacquire_option_sets.sh \
-	create_ewfacquirestream_option_sets.sh \
-	create_ewfexport_option_sets.sh \
 	pyewf_test_support.py \
 	test_ewfacquire.sh \
-	test_ewfacquire_device.sh \
 	test_ewfacquire_optical.sh \
 	test_ewfacquire_resume.sh \
 	test_ewfacquirestream.sh \

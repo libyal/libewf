@@ -156,7 +156,8 @@ int storage_media_buffer_initialize(
 
 		( *buffer )->raw_buffer_size = size;
 	}
-	if( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	if( ( mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
+	 && ( handle != NULL ) )
 	{
 		if( libewf_handle_get_data_chunk(
 		     handle,

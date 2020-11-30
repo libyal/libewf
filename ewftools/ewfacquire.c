@@ -1887,6 +1887,15 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+	if( ( resume_acquiry != 0 )
+	 && ( option_secondary_target_filename != NULL ) )
+	{
+		fprintf(
+		 stderr,
+		 "Resume acquiry with secondary target file not supported.\n" );
+
+		goto on_error;
+	}
 	if( ( option_target_filename != NULL )
 	 && ( option_secondary_target_filename != NULL ) )
 	{

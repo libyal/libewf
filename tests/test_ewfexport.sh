@@ -1,14 +1,15 @@
 #!/bin/bash
 # Export tool testing script
 #
-# Version: 20190223
+# Version: 20201130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
+PROFILES=("ewfexport" "ewfexport_chunk" "ewfexport_multi" "ewfexport_chunk_multi")
+OPTIONS_PER_PROFILE=("-j0 -q -texport -u" "-j0 -q -texport -u -x" "-j4 -q -texport -u" "-j4 -q -texport -u -x")
 OPTION_SETS="format:encase1 format:encase2 format:encase3 format:encase4 format:encase5 format:encase6 format:encase7 format:encase7-v2 format:ewf format:ewfx format:ftk format:linen5 format:linen6 format:linen7 format:raw format:smart deflate:none deflate:empty-block deflate:fast deflate:best blocksize:16 blocksize:32 blocksize:128 blocksize:256 blocksize:512 blocksize:1024 blocksize:2048 blocksize:4096 blocksize:8192 blocksize:16384 blocksize:32768 hash:sha1 hash:sha256 hash:all";
-OPTIONS=(-q -texport -u);
 
 INPUT_GLOB="*.[Ees]*01";
 
@@ -139,55 +140,68 @@ IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
 RESULT=${EXIT_SUCCESS};
 
-for TEST_SET_INPUT_DIRECTORY in input/*;
+for PROFILE_INDEX in ${!PROFILES[*]};
 do
-	if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
-	then
-		continue;
-	fi
-	if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
-	then
-		continue;
-	fi
+	TEST_PROFILE=${PROFILES[${PROFILE_INDEX}]};
 
-	TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+	TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "${TEST_PROFILE}");
 
-	OLDIFS=${IFS};
+	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	# IFS="\n"; is not supported by all platforms.
-	IFS="
+	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
+
+	RESULT=${EXIT_SUCCESS};
+
+	for TEST_SET_INPUT_DIRECTORY in input/*;
+	do
+		if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
+		then
+			continue;
+		fi
+		if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
+		then
+			continue;
+		fi
+
+		TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+
+		OLDIFS=${IFS};
+
+		# IFS="\n"; is not supported by all platforms.
+		IFS="
 ";
 
-	if test -f "${TEST_SET_DIRECTORY}/files";
-	then
-		for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+		if test -f "${TEST_SET_DIRECTORY}/files";
+		then
+			for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	else
-		for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		else
+			for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	fi
-	IFS=${OLDIFS};
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		fi
+		IFS=${OLDIFS};
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		break;
-	fi
+		if test ${RESULT} -ne ${EXIT_SUCCESS};
+		then
+			break;
+		fi
+	done
 done
 
 exit ${RESULT};

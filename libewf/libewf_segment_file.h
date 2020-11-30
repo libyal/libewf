@@ -149,6 +149,10 @@ struct libewf_segment_file
 	/* The range end offset
 	 */
 	off64_t range_end_offset;
+
+	/* The chunk groups cache
+	 */
+	libfcache_cache_t *chunk_groups_cache;
 };
 
 int libewf_segment_file_initialize(
@@ -425,7 +429,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 int libewf_segment_file_get_chunk_group_by_offset(
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
-     libfcache_cache_t *chunk_groups_cache,
      off64_t offset,
      int *chunk_group_index,
      off64_t *chunk_group_data_offset,

@@ -1,23 +1,29 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20200912
+# Version: 20201130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
+PROFILES=("ewfacquire_resume" "ewfacquire_resume_chunk" "ewfacquire_resume_multi" "ewfacquire_resume_chunk_multi")
+OPTIONS_PER_PROFILE=("-j0" "-j0 -x" "-j4" "-j4 -x")
+OPTION_SETS=""
+
 test_write_resume()
 { 
 	INPUT_FILE=$1;
 	RESUME_OFFSET=$2;
+	shift 2;
+	local ARGUMENTS=("$@");
 
 	TMPDIR="tmp$$";
 
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	run_test_with_input_and_arguments "${ACQUIRE_TOOL}" "${INPUT_FILE}" -b 64 -c deflate:none -C Case -D Description -E Evidence -e Examiner -f encase5 -m removable -M logical -N Notes -q -S 650MB -t ${TMPDIR}/acquire_resume -u > /dev/null;
+	run_test_with_input_and_arguments "${ACQUIRE_TOOL}" "${INPUT_FILE}" ${ARGUMENTS[@]} -b 64 -c deflate:none -C Case -D Description -E Evidence -e Examiner -f encase5 -m removable -M logical -N Notes -q -S 650MB -t ${TMPDIR}/acquire_resume -u > /dev/null;
 
 	RESULT=$?;
 
@@ -37,7 +43,7 @@ test_write_resume()
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		run_test_with_input_and_arguments "${ACQUIRE_TOOL}" "${INPUT_FILE}" -q -R -t ${TMPDIR}/acquire_resume.E01 -u > ${TMPDIR}/output;
+		run_test_with_input_and_arguments "${ACQUIRE_TOOL}" "${INPUT_FILE}" ${ARGUMENTS[@]} -q -R -t ${TMPDIR}/acquire_resume.E01 -u > ${TMPDIR}/output;
 
 		RESULT=$?;
 	fi
@@ -141,61 +147,76 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-test_write_resume "${FILENAME}" 1478560
-RESULT=$?;
+for PROFILE_INDEX in ${!PROFILES[*]};
+do
+	TEST_PROFILE=${PROFILES[${PROFILE_INDEX}]};
 
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
+	TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "${TEST_PROFILE}");
+
+	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
+
+	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
+
+	RESULT=${EXIT_SUCCESS};
+
+	test_write_resume "${FILENAME}" 1478560 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 1477351 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 1478432 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 1477296 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 1477008 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 1476736 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
+	test_write_resume "${FILENAME}" 3584 "${OPTIONS[@]}";
+	RESULT=$?;
+
+	if test ${RESULT} -ne ${EXIT_SUCCESS};
+	then
+		exit ${RESULT};
+	fi
+
 	exit ${RESULT};
-fi
+done
 
-test_write_resume "${FILENAME}" 1477351
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-test_write_resume "${FILENAME}" 1478432
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-test_write_resume "${FILENAME}" 1477296
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-test_write_resume "${FILENAME}" 1477008
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-test_write_resume "${FILENAME}" 1476736
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-test_write_resume "${FILENAME}" 3584
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
-then
-	exit ${RESULT};
-fi
-
-exit ${RESULT};
+exit ${EXIT_SUCCESS};
 

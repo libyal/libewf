@@ -1,14 +1,15 @@
 #!/bin/bash
 # Export tool testing script
 #
-# Version: 20190223
+# Version: 20201130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
+PROFILES=("ewfexport_logical" "ewfexport_logical_chunk" "ewfexport_logical_multi" "ewfexport_logical_chunk_multi")
+OPTIONS_PER_PROFILE=("-ffiles -j0 -q -texport -u" "-ffiles -j0 -q -texport -u -x" "-ffiles -j4 -q -texport -u" "-ffiles -j4 -q -texport -u -x")
 OPTION_SETS="";
-OPTIONS=("-ffiles" "-q" "-texport" "-u");
 
 INPUT_GLOB="*.[Ll]*01";
 
@@ -121,55 +122,68 @@ IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
 RESULT=${EXIT_SUCCESS};
 
-for TEST_SET_INPUT_DIRECTORY in input/*;
+for PROFILE_INDEX in ${!PROFILES[*]};
 do
-	if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
-	then
-		continue;
-	fi
-	if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
-	then
-		continue;
-	fi
+	TEST_PROFILE=${PROFILES[${PROFILE_INDEX}]};
 
-	TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+	TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "${TEST_PROFILE}");
 
-	OLDIFS=${IFS};
+	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	# IFS="\n"; is not supported by all platforms.
-	IFS="
+	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
+
+	RESULT=${EXIT_SUCCESS};
+
+	for TEST_SET_INPUT_DIRECTORY in input/*;
+	do
+		if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
+		then
+			continue;
+		fi
+		if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
+		then
+			continue;
+		fi
+
+		TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+
+		OLDIFS=${IFS};
+
+		# IFS="\n"; is not supported by all platforms.
+		IFS="
 ";
 
-	if test -f "${TEST_SET_DIRECTORY}/files";
-	then
-		for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport_logical" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+		if test -f "${TEST_SET_DIRECTORY}/files";
+		then
+			for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport_logical" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	else
-		for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport_logical" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		else
+			for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfexport_logical" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	fi
-	IFS=${OLDIFS};
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		fi
+		IFS=${OLDIFS};
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		break;
-	fi
+		if test ${RESULT} -ne ${EXIT_SUCCESS};
+		then
+			break;
+		fi
+	done
 done
 
 exit ${RESULT};

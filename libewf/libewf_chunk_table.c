@@ -127,20 +127,6 @@ int libewf_chunk_table_initialize(
 		goto on_error;
 	}
 	if( libfcache_cache_initialize(
-	     &( ( *chunk_table )->chunk_groups_cache ),
-	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create chunk groups cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
 	     &( ( *chunk_table )->chunk_data_cache ),
 	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNKS,
 	     error ) != 1 )
@@ -179,12 +165,6 @@ on_error:
 		{
 			libfcache_cache_free(
 			 &( ( *chunk_table )->chunk_data_cache ),
-			 NULL );
-		}
-		if( ( *chunk_table )->chunk_groups_cache != NULL )
-		{
-			libfcache_cache_free(
-			 &( ( *chunk_table )->chunk_groups_cache ),
 			 NULL );
 		}
 		memory_free(
@@ -228,19 +208,6 @@ int libewf_chunk_table_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free checksum errors range list.",
-			 function );
-
-			result = -1;
-		}
-		if( libfcache_cache_free(
-		     &( ( *chunk_table )->chunk_groups_cache ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free chunk groups cache.",
 			 function );
 
 			result = -1;
@@ -353,7 +320,6 @@ int libewf_chunk_table_clone(
 	( *destination_chunk_table )->current_chunk_group     = NULL;
 	( *destination_chunk_table )->current_chunk_data      = NULL;
 	( *destination_chunk_table )->checksum_errors         = NULL;
-	( *destination_chunk_table )->chunk_groups_cache      = NULL;
 	( *destination_chunk_table )->chunk_data_cache        = NULL;
 	( *destination_chunk_table )->single_chunk_data_cache = NULL;
 
@@ -369,20 +335,6 @@ int libewf_chunk_table_clone(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create destination checksum errors range list.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_clone(
-	     &( ( *destination_chunk_table )->chunk_groups_cache ),
-	     source_chunk_table->chunk_groups_cache,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create destination chunk groups cache.",
 		 function );
 
 		goto on_error;
@@ -424,12 +376,6 @@ on_error:
 		{
 			libfcache_cache_free(
 			 &( ( *destination_chunk_table )->chunk_data_cache ),
-			 NULL );
-		}
-		if( ( *destination_chunk_table )->chunk_groups_cache != NULL )
-		{
-			libfcache_cache_free(
-			 &( ( *destination_chunk_table )->chunk_groups_cache ),
 			 NULL );
 		}
 		if( ( *destination_chunk_table )->checksum_errors != NULL )
@@ -720,7 +666,6 @@ int libewf_chunk_table_get_segment_file_chunk_group_by_offset(
 			result = libewf_segment_file_get_chunk_group_by_offset(
 				  segment_file,
 				  file_io_pool,
-				  chunk_table->chunk_groups_cache,
 				  segment_file_data_offset,
 				  &( chunk_table->current_chunk_group_index ),
 				  &safe_chunk_group_data_offset,

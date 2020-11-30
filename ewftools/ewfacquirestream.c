@@ -353,8 +353,9 @@ ssize_t ewfacquirestream_read_chunk(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: reading buffer at offset: 0x%08" PRIx64 " of size: %" PRIzd ".\n",
+				 "%s: reading buffer at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIzd ".\n",
 				 function,
+				 storage_media_offset + (off64_t) buffer_offset,
 				 storage_media_offset + (off64_t) buffer_offset,
 				 input_read_size );
 			}
@@ -451,12 +452,14 @@ ssize_t ewfacquirestream_read_chunk(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: read error at offset: 0x%08" PRIx64 " when reading %" PRIzd " bytes.\n",
+					 "%s: read error at offset: %" PRIi64 " (0x%08" PRIx64 ") when reading %" PRIzd " bytes.\n",
 					 function,
+					 storage_media_offset + (off64_t) buffer_offset,
 					 storage_media_offset + (off64_t) buffer_offset,
 					 input_read_count );
 				}
-#endif
+#endif /* defined( HAVE_VERBOSE_OUTPUT ) */
+
 				read_number_of_errors++;
 			}
 			if( read_number_of_errors > read_error_retries )
@@ -562,7 +565,8 @@ int ewfacquirestream_read_input(
 
 		return( -1 );
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( imaging_handle_get_chunk_size(
 	     imaging_handle,
 	     &chunk_size,
@@ -677,7 +681,8 @@ int ewfacquirestream_read_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( imaging_handle_initialize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -780,7 +785,8 @@ int ewfacquirestream_read_input(
 				goto on_error;
 			}
 		}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 		read_size = process_buffer_size;
 
 		/* Align with acquiry offset if necessary
@@ -802,7 +808,7 @@ int ewfacquirestream_read_input(
 		              input_file_descriptor,
 		              storage_media_buffer,
 		              storage_media_offset,
-		              storage_media_buffer->raw_buffer_size,
+		              process_buffer_size,
 		              (size32_t) read_size,
 		              read_error_retries,
 		              error );
@@ -907,7 +913,7 @@ int ewfacquirestream_read_input(
 			storage_media_buffer = NULL;
 		}
 		else
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 		{
 			process_count = storage_media_buffer_write_process(
 			                 storage_media_buffer,
@@ -1054,7 +1060,8 @@ int ewfacquirestream_read_input(
 			goto on_error;
 		}
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	if( imaging_handle_finalize_integrity_hash(
 	     imaging_handle,
 	     error ) != 1 )
@@ -1201,7 +1208,8 @@ on_error:
 		 &( imaging_handle->storage_media_buffer_queue ),
 		 NULL );
 	}
-#endif
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
 	return( -1 );
 }
 
@@ -1985,7 +1993,8 @@ int main( int argc, char * const argv[] )
 		 stderr,
 		 "Unsupported number of jobs (threads) defaulting to: %d.\n",
 		 ewfacquirestream_imaging_handle->number_of_threads );
-#endif
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 	}
 	if( option_additional_digest_types != NULL )
 	{

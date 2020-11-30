@@ -83,9 +83,13 @@ struct export_handle
 	 */
 	uint8_t ewf_format;
 
-	/* The number of sectors per chunk
+	/* The number of sectors per chunk of the input
 	 */
-	uint32_t sectors_per_chunk;
+	uint32_t input_sectors_per_chunk;
+
+	/* The number of sectors per chunk of the output
+	 */
+	uint32_t output_sectors_per_chunk;
 
 	/* The maximum segment size
 	 */

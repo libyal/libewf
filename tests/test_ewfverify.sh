@@ -1,16 +1,15 @@
 #!/bin/bash
 # Verify tool testing script
 #
-# Version: 20201129
+# Version: 20201130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 PROFILES=("ewfverify" "ewfverify_chunk" "ewfverify_multi" "ewfverify_chunk_multi");
-OPTIONS_PER_PROFILE=("-j0" "-j0 -x" "-j4" "-j4 -x");
+OPTIONS_PER_PROFILE=("-j0 -q" "-j0 -q -x" "-j4 -q" "-j4 -q -x");
 OPTION_SETS="";
-OPTIONS=(-q);
 
 INPUT_GLOB="*.[Ees]*01";
 
@@ -71,6 +70,8 @@ do
 	TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "${TEST_PROFILE}");
 
 	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
+
+	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
 
 	RESULT=${EXIT_SUCCESS};
 

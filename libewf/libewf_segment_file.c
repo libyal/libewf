@@ -189,7 +189,20 @@ int libewf_segment_file_initialize(
 
 		goto on_error;
 	}
-/* TODO set mapped offset in chunk_groups_list ? */
+	if( libfcache_cache_initialize(
+	     &( ( *segment_file )->chunk_groups_cache ),
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_CHUNK_GROUPS,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create chunk groups cache.",
+		 function );
+
+		goto on_error;
+	}
 	( *segment_file )->io_handle                        = io_handle;
 	( *segment_file )->device_information_section_index = -1;
 	( *segment_file )->previous_last_chunk_filled       = -1;
@@ -268,6 +281,19 @@ int libewf_segment_file_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free chunk groups list.",
+			 function );
+
+			result = -1;
+		}
+		if( libfcache_cache_free(
+		     &( ( *segment_file )->chunk_groups_cache ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free chunk groups cache.",
 			 function );
 
 			result = -1;
@@ -361,6 +387,7 @@ int libewf_segment_file_clone(
 	}
 	( *destination_segment_file )->sections_list             = NULL;
 	( *destination_segment_file )->chunk_groups_list         = NULL;
+	( *destination_segment_file )->chunk_groups_cache        = NULL;
 	( *destination_segment_file )->current_chunk_group_index = 0;
 
 	if( libfdata_list_initialize(
@@ -531,6 +558,20 @@ int libewf_segment_file_clone(
 
 			goto on_error;
 		}
+	}
+	if( libfcache_cache_clone(
+	     &( ( *destination_segment_file )->chunk_groups_cache ),
+	     source_segment_file->chunk_groups_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination chunk groups cache.",
+		 function );
+
+		goto on_error;
 	}
 	return( 1 );
 
@@ -7152,7 +7193,6 @@ on_error:
 int libewf_segment_file_get_chunk_group_by_offset(
      libewf_segment_file_t *segment_file,
      libbfio_pool_t *file_io_pool,
-     libfcache_cache_t *chunk_groups_cache,
      off64_t offset,
      int *chunk_group_index,
      off64_t *chunk_group_data_offset,
@@ -7212,7 +7252,7 @@ int libewf_segment_file_get_chunk_group_by_offset(
 	result = libfdata_list_get_element_value_at_offset(
 		  segment_file->chunk_groups_list,
 		  (intptr_t *) file_io_pool,
-		  (libfdata_cache_t *) chunk_groups_cache,
+		  (libfdata_cache_t *) segment_file->chunk_groups_cache,
 		  offset,
 		  &safe_chunk_group_index,
 		  &safe_chunk_group_data_offset,

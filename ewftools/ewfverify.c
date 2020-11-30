@@ -513,7 +513,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#endif
+#endif /* defined( HAVE_GETRLIMIT ) */
+
 	if( ewftools_signal_attach(
 	     ewfverify_signal_handler,
 	     &error ) != 1 )

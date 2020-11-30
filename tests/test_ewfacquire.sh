@@ -1,14 +1,15 @@
 #!/bin/bash
 # Acquire tool testing script
 #
-# Version: 20190306
+# Version: 20201130
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
+PROFILES=("ewfacquire" "ewfacquire_chunk" "ewfacquire_multi" "ewfacquire_chunk_multi")
+OPTIONS_PER_PROFILE=("-CCase -DDescription -EEvidence -eExaminer -j0 -mremovable -Mlogical -NNotes -q -tacquire -u" "-CCase -DDescription -EEvidence -eExaminer -j0 -mremovable -Mlogical -NNotes -q -tacquire -u -x" "-CCase -DDescription -EEvidence -eExaminer -j4 -mremovable -Mlogical -NNotes -q -tacquire -u" "-CCase -DDescription -EEvidence -eExaminer -j4 -mremovable -Mlogical -NNotes -q -tacquire -u -x")
 OPTION_SETS="format:encase1 format:encase2 format:encase3 format:encase4 format:encase5 format:encase6 format:encase7 format:encase7-v2 format:ewf format:ewfx format:ftk format:linen5 format:linen6 format:linen7 format:raw format:smart deflate:none:encase7 deflate:empty-block:encase7 deflate:fast:encase7 deflate:best:encase7 deflate:none:encase7-v2 deflate:empty-block:encase7-v2 deflate:fast:encase7-v2 deflate:best:encase7-v2 deflate:none:smart deflate:empty-block:smart deflate:fast:smart deflate:best:smart segmentsize:1mib:encase7 segmentsize:1mib:encase7-v2 segmentsize:1mib:smart blocksize:16 blocksize:32 blocksize:128 blocksize:256 blocksize:512 blocksize:1024 blocksize:2048 blocksize:4096 blocksize:8192 blocksize:16384 blocksize:32768 hash:sha1 hash:sha256 hash:all";
-OPTIONS=(-CCase -DDescription -EEvidence -eExaminer -mremovable -Mlogical -NNotes -q -tacquire -u);
 
 INPUT_GLOB="*.[Rr][Aa][Ww]";
 
@@ -116,61 +117,68 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "ewfacquire");
-
-IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
-
-RESULT=${EXIT_SUCCESS};
-
-for TEST_SET_INPUT_DIRECTORY in input/*;
+for PROFILE_INDEX in ${!PROFILES[*]};
 do
-	if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
-	then
-		continue;
-	fi
-	if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
-	then
-		continue;
-	fi
+	TEST_PROFILE=${PROFILES[${PROFILE_INDEX}]};
 
-	TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+	TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "${TEST_PROFILE}");
 
-	OLDIFS=${IFS};
+	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	# IFS="\n"; is not supported by all platforms.
-	IFS="
+	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
+
+	RESULT=${EXIT_SUCCESS};
+
+	for TEST_SET_INPUT_DIRECTORY in input/*;
+	do
+		if ! test -d "${TEST_SET_INPUT_DIRECTORY}";
+		then
+			continue;
+		fi
+		if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
+		then
+			continue;
+		fi
+
+		TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
+
+		OLDIFS=${IFS};
+
+		# IFS="\n"; is not supported by all platforms.
+		IFS="
 ";
 
-	if test -f "${TEST_SET_DIRECTORY}/files";
-	then
-		for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+		if test -f "${TEST_SET_DIRECTORY}/files";
+		then
+			for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	else
-		for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
-		do
-			run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-			RESULT=$?;
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		else
+			for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
+			do
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
+				RESULT=$?;
 
-			if test ${RESULT} -ne ${EXIT_SUCCESS};
-			then
-				break;
-			fi
-		done
-	fi
-	IFS=${OLDIFS};
+				if test ${RESULT} -ne ${EXIT_SUCCESS};
+				then
+					break;
+				fi
+			done
+		fi
+		IFS=${OLDIFS};
 
-	if test ${RESULT} -ne ${EXIT_SUCCESS};
-	then
-		break;
-	fi
+		if test ${RESULT} -ne ${EXIT_SUCCESS};
+		then
+			break;
+		fi
+	done
 done
 
 exit ${RESULT};
