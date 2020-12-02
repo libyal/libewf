@@ -1117,7 +1117,8 @@ int verification_handle_process_storage_media_buffer_callback(
 	if( process_count < 0 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		if( libcnotify_verbose != 0 )
+		if( ( libcnotify_verbose != 0 )
+		 && ( error != NULL ) )
 		{
 			libcnotify_print_error_backtrace(
 			 error );
@@ -1128,23 +1129,7 @@ int verification_handle_process_storage_media_buffer_callback(
 
 		process_count = verification_handle->chunk_size;
 
-		/* Append a read error
-		 */
-		if( verification_handle_append_read_error(
-		     verification_handle,
-		     storage_media_buffer->storage_media_offset,
-		     (size_t) verification_handle->chunk_size,
-		     &error ) != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append read error.",
-			 function );
-
-			goto on_error;
-		}
+		storage_media_buffer->is_corrupted = 1;
 	}
 	if( libcthreads_thread_pool_push(
 	     verification_handle->output_thread_pool,
@@ -1219,6 +1204,7 @@ int verification_handle_output_storage_media_buffer_callback(
 	uint8_t *data                         = NULL;
         static char *function                 = "verification_handle_process_storage_media_buffer_callback";
 	size_t data_size                      = 0;
+	int result                            = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -1314,6 +1300,45 @@ int verification_handle_output_storage_media_buffer_callback(
 		if( storage_media_buffer->storage_media_offset != verification_handle->last_offset_hashed )
 		{
 			break;
+		}
+		result = storage_media_buffer_is_corrupted(
+		          storage_media_buffer,
+		          &error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if storage media buffer is corrupted.",
+			 function );
+
+			storage_media_buffer = NULL;
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			/* Append a read error
+			 */
+			if( verification_handle_append_read_error(
+			     verification_handle,
+			     storage_media_buffer->storage_media_offset,
+			     (size_t) verification_handle->chunk_size,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append read error.",
+				 function );
+
+				storage_media_buffer = NULL;
+
+				goto on_error;
+			}
 		}
 		if( storage_media_buffer_get_data(
 		     storage_media_buffer,
@@ -1619,18 +1644,19 @@ int verification_handle_verify_input(
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	uint8_t *data                                = NULL;
 	static char *function                        = "verification_handle_verify_input";
-	off64_t storage_media_offset                 = 0;
 	size64_t remaining_media_size                = 0;
 	size_t data_size                             = 0;
 	size_t process_buffer_size                   = 0;
 	size_t read_size                             = 0;
 	ssize_t process_count                        = 0;
 	ssize_t read_count                           = 0;
+	off64_t storage_media_offset                 = 0;
 	uint32_t number_of_checksum_errors           = 0;
 	uint8_t storage_media_buffer_mode            = 0;
 	int is_corrupted                             = 0;
 	int maximum_number_of_queued_items           = 0;
 	int md5_hash_compare                         = 0;
+	int result                                   = 0;
 	int sha1_hash_compare                        = 0;
 	int sha256_hash_compare                      = 0;
 	int status                                   = PROCESS_STATUS_COMPLETED;
@@ -1979,6 +2005,25 @@ int verification_handle_verify_input(
 
 				process_count = verification_handle->chunk_size;
 
+				storage_media_buffer->is_corrupted = 1;
+			}
+			result = storage_media_buffer_is_corrupted(
+			          storage_media_buffer,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if storage media buffer is corrupted.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result != 0 )
+			{
 				/* Append a read error
 				 */
 				if( verification_handle_append_read_error(

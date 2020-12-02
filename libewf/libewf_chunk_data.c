@@ -1419,7 +1419,8 @@ int libewf_chunk_data_unpack(
 					 *error );
 				}
 			}
-#endif
+#endif /* defined( HAVE_VERBOSE_OUTPUT ) */
+
 			libcerror_error_free(
 			 error );
 

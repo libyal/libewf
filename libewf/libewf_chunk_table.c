@@ -1061,16 +1061,14 @@ int libewf_chunk_table_get_chunk_data_by_offset(
 			{
 				number_of_sectors = (uint64_t) media_values->number_of_sectors - start_sector;
 			}
-			result = libcdata_range_list_insert_range(
-				  chunk_table->checksum_errors,
-				  start_sector,
-				  number_of_sectors,
-				  NULL,
-				  NULL,
-				  NULL,
-				  error );
-
-			if( result == -1 )
+			if( libcdata_range_list_insert_range(
+			     chunk_table->checksum_errors,
+			     start_sector,
+			     number_of_sectors,
+			     NULL,
+			     NULL,
+			     NULL,
+			     error ) == -1 )
 			{
 				libcerror_error_set(
 				 error,

@@ -346,6 +346,29 @@ int storage_media_buffer_compare(
 	return( LIBCDATA_COMPARE_EQUAL ); 
 }
 
+/* Determines if the storage media buffer is corrupted
+ * Returns 1 if the storage media buffer is corrupted, 0 if not or -1 on error
+ */
+int storage_media_buffer_is_corrupted(
+     storage_media_buffer_t *storage_media_buffer,
+     libcerror_error_t **error )
+{
+	static char *function = "storage_media_buffer_is_corrupted";
+
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	return( (int) storage_media_buffer->is_corrupted );
+}
+
 /* Reads a storage media buffer from the input handle
  * Returns the number of bytes read, 0 when no longer data can be read or -1 on error
  */
@@ -417,6 +440,7 @@ ssize_t storage_media_buffer_read_process(
 {
         static char *function = "storage_media_buffer_read_process";
 	ssize_t process_count = 0;
+	int result            = 0;
 
 	if( storage_media_buffer == NULL )
 	{
@@ -460,6 +484,23 @@ ssize_t storage_media_buffer_read_process(
 			return( -1 );
 		}
 		storage_media_buffer->raw_buffer_data_size = (size_t) process_count;
+
+		result = libewf_data_chunk_is_corrupted(
+		          storage_media_buffer->data_chunk,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if data chunk is corrupted.",
+			 function );
+
+			return( -1 );
+		}
+		storage_media_buffer->is_corrupted = (uint8_t) result;
 	}
 	else
 	{

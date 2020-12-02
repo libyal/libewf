@@ -1511,6 +1511,14 @@ int libewf_data_chunk_free(
      libewf_data_chunk_t **data_chunk,
      libewf_error_t **error );
 
+/* Determines if the data chunk is corrupted
+ * Returns 1 if the data chunk is corrupted, 0 if not or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_data_chunk_is_corrupted(
+     libewf_data_chunk_t *data_chunk,
+     libewf_error_t **error );
+
 /* Reads a buffer from the data chunk
  * It applies decompression if necessary and validates the chunk checksum
  * This function should be used after libewf_handle_read_data_chunk

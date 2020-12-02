@@ -3649,7 +3649,7 @@ int info_handle_acquiry_errors_fprint(
 				}
 				fprintf(
 				 info_handle->notify_stream,
-				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (number: %" PRIu64 ")\n",
 				 start_sector,
 				 last_sector,
 				 number_of_sectors );
@@ -3794,7 +3794,7 @@ int info_handle_sessions_fprint(
 				}
 				fprintf(
 				 info_handle->notify_stream,
-				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (number: %" PRIu64 ")\n",
 				 start_sector,
 				 last_sector,
 				 number_of_sectors );
@@ -3939,7 +3939,7 @@ int info_handle_tracks_fprint(
 				}
 				fprintf(
 				 info_handle->notify_stream,
-				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " number: %" PRIu64 "\n",
+				 "\tat sector(s): %" PRIu64 " - %" PRIu64 " (number: %" PRIu64 ")\n",
 				 start_sector,
 				 last_sector,
 				 number_of_sectors );

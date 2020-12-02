@@ -919,7 +919,6 @@ int libewf_write_io_handle_initialize_resume(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
-     libewf_chunk_table_t *chunk_table,
      libewf_read_io_handle_t *read_io_handle,
      off64_t *current_offset,
      libcerror_error_t **error )
@@ -1655,8 +1654,9 @@ int libewf_write_io_handle_initialize_resume(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: resuming write at offset: 0x%08" PRIx64 " with chunk: %" PRIu64 ".\n",
+		 "%s: resuming write at offset: %" PRIi64 " (0x%08" PRIx64 ") with chunk: %" PRIu64 ".\n",
 		 function,
+		 write_io_handle->input_write_count,
 		 write_io_handle->input_write_count,
 		 write_io_handle->number_of_chunks_written );
 	}

@@ -1,8 +1,8 @@
 TODO
-* ewfexport bytes per sector tests ?
+* clean up libewf_chunk_group_correct_v1
 
-* handle checksum errors when ewfexport is used with data chunk functions
-* handle checksum errors when ewfverify is used with data chunk functions
+* ewfexport test with different bytes per sector between input and ouptput ?
+
 * ensure a multitude of sector size is written
 
 * handle corruption scenarios

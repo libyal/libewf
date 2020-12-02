@@ -3720,7 +3720,6 @@ int libewf_internal_handle_open_file_io_pool(
 		     file_io_pool,
 		     internal_handle->media_values,
 		     segment_table,
-		     internal_handle->chunk_table,
 		     internal_handle->read_io_handle,
 		     &( internal_handle->current_offset ),
 		     error ) != 1 )

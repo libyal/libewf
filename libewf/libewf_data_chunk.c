@@ -288,6 +288,78 @@ int libewf_internal_data_chunk_set_chunk_data(
 	return( result );
 }
 
+/* Determines if the data chunk is corrupted
+ * Returns 1 if the data chunk is corrupted, 0 if not or -1 on error
+ */
+int libewf_data_chunk_is_corrupted(
+     libewf_data_chunk_t *data_chunk,
+     libcerror_error_t **error )
+{
+	libewf_internal_data_chunk_t *internal_data_chunk = NULL;
+	static char *function                             = "libewf_data_chunk_is_corrupted";
+	int result                                        = 0;
+
+	if( data_chunk == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data chunk.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_chunk = (libewf_internal_data_chunk_t *) data_chunk;
+
+	if( internal_data_chunk->chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid data chunk - missing chunk data.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_chunk->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( ( internal_data_chunk->chunk_data->range_flags & LIBEWF_RANGE_FLAG_IS_CORRUPTED ) != 0 )
+	{
+		result = 1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_chunk->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Reads a buffer from the data chunk
  * It applies decompression if necessary and validates the chunk checksum
  * This function should be used after libewf_handle_read_data_chunk

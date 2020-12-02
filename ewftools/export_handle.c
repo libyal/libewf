@@ -4498,7 +4498,8 @@ int export_handle_process_storage_media_buffer_callback(
 	if( process_count < 0 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		if( libcnotify_verbose != 0 )
+		if( ( libcnotify_verbose != 0 )
+		 && ( error != NULL ) )
 		{
 			libcnotify_print_error_backtrace(
 			 error );
@@ -4507,23 +4508,7 @@ int export_handle_process_storage_media_buffer_callback(
 		libcerror_error_free(
 		 &error );
 
-		/* Appends a read error
-		 */
-		if( export_handle_append_read_error(
-		     export_handle,
-		     export_handle->input_offset,
-		     (size_t) export_handle->input_chunk_size,
-		     &error ) != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append read error.",
-			 function );
-
-			goto on_error;
-		}
+		storage_media_buffer->is_corrupted = 1;
 	}
 	if( libcthreads_thread_pool_push(
 	     export_handle->output_thread_pool,
@@ -4600,6 +4585,7 @@ int export_handle_output_storage_media_buffer_callback(
         static char *function                               = "export_handle_process_storage_media_buffer_callback";
 	size_t data_size                                    = 0;
 	ssize_t write_count                                 = 0;
+	int result                                          = 0;
 
 	if( export_handle == NULL )
 	{
@@ -4695,6 +4681,45 @@ int export_handle_output_storage_media_buffer_callback(
 		if( storage_media_buffer->storage_media_offset != export_handle->last_offset_hashed )
 		{
 			break;
+		}
+		result = storage_media_buffer_is_corrupted(
+		          storage_media_buffer,
+		          &error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 &error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if storage media buffer is corrupted.",
+			 function );
+
+			storage_media_buffer = NULL;
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			/* Append a read error
+			 */
+			if( export_handle_append_read_error(
+			     export_handle,
+			     storage_media_buffer->storage_media_offset,
+			     (size_t) export_handle->input_chunk_size,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append read error.",
+				 function );
+
+				storage_media_buffer = NULL;
+
+				goto on_error;
+			}
 		}
 		if( storage_media_buffer_get_data(
 		     storage_media_buffer,
@@ -5092,16 +5117,17 @@ int export_handle_export_input(
 	storage_media_buffer_t *output_storage_media_buffer = NULL;
 	uint8_t *data                                       = NULL;
 	static char *function                               = "export_handle_export_input";
-	off64_t input_storage_media_offset                  = 0;
 	size64_t remaining_export_size                      = 0;
-	size_t process_buffer_size                          = 0;
 	size_t data_size                                    = 0;
+	size_t process_buffer_size                          = 0;
 	size_t read_size                                    = 0;
 	ssize_t process_count                               = 0;
 	ssize_t read_count                                  = 0;
 	ssize_t write_count                                 = 0;
+	off64_t input_storage_media_offset                  = 0;
 	uint8_t storage_media_buffer_mode                   = 0;
 	int maximum_number_of_queued_items                  = 0;
+	int result                                          = 0;
 	int status                                          = PROCESS_STATUS_COMPLETED;
 
 	if( export_handle == NULL )
@@ -5491,11 +5517,30 @@ int export_handle_export_input(
 				libcerror_error_free(
 				 error );
 
+				input_storage_media_buffer->is_corrupted = 1;
+			}
+			result = storage_media_buffer_is_corrupted(
+			          input_storage_media_buffer,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if input storage media buffer is corrupted.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result != 0 )
+			{
 				/* Appends a read error
 				 */
 				if( export_handle_append_read_error(
 				     export_handle,
-				     export_handle->input_offset,
+				     input_storage_media_buffer->storage_media_offset,
 				     (size_t) export_handle->input_chunk_size,
 				     error ) != 1 )
 				{

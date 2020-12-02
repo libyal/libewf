@@ -331,6 +331,7 @@ int libewf_chunk_group_fill_v1(
      libcerror_error_t **error )
 {
 	static char *function          = "libewf_chunk_group_fill_v1";
+	size_t data_offset             = 0;
 	off64_t chunk_data_end_offset  = 0;
 	off64_t last_chunk_data_offset = 0;
 	off64_t last_chunk_data_size   = 0;
@@ -401,10 +402,14 @@ int libewf_chunk_group_fill_v1(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
+	 &( table_entries_data[ data_offset ] ),
 	 stored_offset );
 
-	while( table_entry_index < ( number_of_entries - 1 ) )
+	data_offset += sizeof( ewf_table_entry_v1_t );
+
+	for( table_entry_index = 0;
+	     table_entry_index < ( number_of_entries - 1 );
+	     table_entry_index++ )
 	{
 		if( overflow == 0 )
 		{
@@ -416,8 +421,10 @@ int libewf_chunk_group_fill_v1(
 			current_offset = stored_offset;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index + 1 ] ).chunk_data_offset,
+		 &( table_entries_data[ data_offset ] ),
 		 stored_offset );
+
+		data_offset += sizeof( ewf_table_entry_v1_t );
 
 		if( overflow == 0 )
 		{
@@ -599,13 +606,8 @@ int libewf_chunk_group_fill_v1(
 			overflow      = 1;
 			is_compressed = 0;
 		}
-		table_entry_index++;
 		chunk_index++;
 	}
-	byte_stream_copy_to_uint32_little_endian(
-	 ( ( (ewf_table_entry_v1_t *) table_entries_data )[ table_entry_index ] ).chunk_data_offset,
-	 stored_offset );
-
 	if( overflow == 0 )
 	{
 		is_compressed  = (uint8_t) ( stored_offset >> 31 );
@@ -775,7 +777,8 @@ int libewf_chunk_group_fill_v1(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libfdata_list_append_element_with_mapped_size(
 	     chunk_group->chunks_list,
 	     &element_index,
@@ -815,14 +818,14 @@ int libewf_chunk_group_fill_v2(
      size32_t chunk_size,
      int file_io_pool_entry,
      libewf_section_descriptor_t *table_section,
-     uint32_t number_of_offsets,
+     uint32_t number_of_entries,
      const uint8_t *table_entries_data,
      size_t table_entries_data_size,
      uint8_t tainted,
      libcerror_error_t **error )
 {
 	static char *function      = "libewf_chunk_group_fill_v2";
-	off64_t table_entry_offset = 0;
+	size_t data_offset         = 0;
 	uint64_t chunk_data_offset = 0;
 	uint32_t chunk_data_flags  = 0;
 	uint32_t chunk_data_size   = 0;
@@ -874,21 +877,23 @@ int libewf_chunk_group_fill_v2(
 
 		return( -1 );
 	}
-	table_entry_offset = table_section->start_offset + sizeof( ewf_table_header_v2_t );
-
-	while( table_entries_data_size >= sizeof( ewf_table_entry_v2_t ) )
+	for( table_entry_index = 0;
+	     table_entry_index < number_of_entries;
+	     table_entry_index++ )
 	{
 		byte_stream_copy_to_uint64_little_endian(
-		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_offset,
+		 ( (ewf_table_entry_v2_t *) &( table_entries_data[ data_offset ] ) )->chunk_data_offset,
 		 chunk_data_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_size,
+		 ( (ewf_table_entry_v2_t *) &( table_entries_data[ data_offset ] ) )->chunk_data_size,
 		 chunk_data_size );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (ewf_table_entry_v2_t *) table_entries_data )->chunk_data_flags,
+		 ( (ewf_table_entry_v2_t *) &( table_entries_data[ data_offset ] ) )->chunk_data_flags,
 		 chunk_data_flags );
+
+		data_offset += sizeof( ewf_table_entry_v2_t );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -928,9 +933,7 @@ int libewf_chunk_group_fill_v2(
 			 table_entry_index,
 			 chunk_data_flags );
 		}
-#endif
-		table_entries_data      += sizeof( ewf_table_entry_v2_t );
-		table_entries_data_size -= sizeof( ewf_table_entry_v2_t );
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 		range_flags = 0;
 
@@ -973,11 +976,9 @@ int libewf_chunk_group_fill_v2(
 		}
 		if( ( range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
 		{
-			chunk_data_offset = table_entry_offset;
+			chunk_data_offset = table_section->start_offset + data_offset;
 			chunk_data_size   = 8;
 		}
-		table_entry_offset += sizeof( ewf_table_entry_v2_t );
-
 		if( libfdata_list_append_element_with_mapped_size(
 		     chunk_group->chunks_list,
 		     &element_index,
@@ -998,7 +999,6 @@ int libewf_chunk_group_fill_v2(
 
 			return( -1 );
 		}
-		table_entry_index++;
 		chunk_index++;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1536,7 +1536,8 @@ int libewf_chunk_group_correct_v1(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libfdata_list_get_element_by_index(
 	     chunk_group->chunks_list,
 	     table_entry_index,

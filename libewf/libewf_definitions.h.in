@@ -414,10 +414,10 @@ enum LIBEWF_PACK_FLAGS
  */
 #define LIBEWF_MAXIMUM_TABLE_ENTRIES_ENCASE6			65534
 
-/* The maximum number of table entries allowed by the library (2 MiB / 4)
- * For a 32k chunk this would be 32 KiB x (2 MiB / 4) = 16 GiB
+/* The maximum number of table entries allowed by the library
+ * For a 32k chunk this would be 32 KiB x 524288 = 16 GiB
  */
-#define LIBEWF_MAXIMUM_TABLE_ENTRIES				( ( 2 * 1024 * 1024 ) / 4 )
+#define LIBEWF_MAXIMUM_TABLE_ENTRIES				524288
 
 #if defined( __BORLANDC__ ) && ( __BORLANDC__ < 0x0560 )
 #define LIBEWF_2_TIB						0x20000000000UL

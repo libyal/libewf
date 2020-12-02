@@ -81,6 +81,11 @@ int libewf_internal_data_chunk_set_chunk_data(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_data_chunk_is_corrupted(
+     libewf_data_chunk_t *data_chunk,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 ssize_t libewf_data_chunk_read_buffer(
          libewf_data_chunk_t *data_chunk,
          void *buffer,

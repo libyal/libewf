@@ -73,6 +73,10 @@ struct storage_media_buffer
 	/* The processed size
 	 */
 	size_t processed_size;
+
+	/* Value to indicate the data is corrupted
+	 */
+	uint8_t is_corrupted;
 };
 
 int storage_media_buffer_initialize(
@@ -95,6 +99,10 @@ int storage_media_buffer_get_data(
 int storage_media_buffer_compare(
      storage_media_buffer_t *first_buffer,
      storage_media_buffer_t *second_buffer,
+     libcerror_error_t **error );
+
+int storage_media_buffer_is_corrupted(
+     storage_media_buffer_t *storage_media_buffer,
      libcerror_error_t **error );
 
 ssize_t storage_media_buffer_read_from_handle(

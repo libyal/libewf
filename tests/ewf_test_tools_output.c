@@ -171,9 +171,6 @@ int ewf_test_tools_output_version_fprint(
 	 NULL );
 
 	return( 1 );
-
-on_error:
-	return( 0 );
 }
 
 /* Tests the ewftools_output_version_detailed_fprint function
@@ -217,9 +214,6 @@ int ewf_test_tools_output_version_detailed_fprint(
 	 NULL );
 
 	return( 1 );
-
-on_error:
-	return( 0 );
 }
 
 /* The main program

@@ -248,7 +248,6 @@ int libewf_write_io_handle_initialize_resume(
      libbfio_pool_t *file_io_pool,
      libewf_media_values_t *media_values,
      libewf_segment_table_t *segment_table,
-     libewf_chunk_table_t *chunk_table,
      libewf_read_io_handle_t *read_io_handle,
      off64_t *current_offset,
      libcerror_error_t **error );
