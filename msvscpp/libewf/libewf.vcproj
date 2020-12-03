@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_case_data_section.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_checksum.c"
 				>
 			</File>
@@ -239,6 +243,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_device_information.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_device_information_section.c"
 				>
 			</File>
 			<File
@@ -472,6 +480,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_case_data_section.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_checksum.h"
 				>
 			</File>
@@ -525,6 +537,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_device_information.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_device_information_section.h"
 				>
 			</File>
 			<File

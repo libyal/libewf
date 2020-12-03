@@ -6847,9 +6847,14 @@ int libewf_segment_file_read_chunk_group_element_data(
 	libewf_table_section_t *table_section           = NULL;
 	static char *function                           = "libewf_segment_file_read_chunk_group_element_data";
 	ssize_t read_count                              = 0;
-	off64_t storage_media_offset                    = 0;
 	uint64_t chunk_index                            = 0;
 	int result                                      = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	size64_t chunk_group_range_size                 = 0;
+	off64_t chunk_group_range_offset                = 0;
+	int element_index                               = 0;
+#endif
 
 	LIBEWF_UNREFERENCED_PARAMETER( element_flags )
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
@@ -7045,7 +7050,41 @@ int libewf_segment_file_read_chunk_group_element_data(
 
 		goto on_error;
 	}
-	chunk_index = storage_media_offset / segment_file->io_handle->chunk_size;
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libfdata_list_element_get_element_index(
+	     element,
+	     &element_index,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk group list element index.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_list_get_element_mapped_range(
+	     segment_file->chunk_groups_list,
+	     element_index,
+	     &chunk_group_range_offset,
+	     &chunk_group_range_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk group list element: %d mapped range.",
+		 function,
+		 element_index );
+
+		goto on_error;
+	}
+	chunk_index = ( segment_file->range_start_offset + chunk_group_range_offset ) / segment_file->io_handle->chunk_size;
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 	if( segment_file->major_version == 1 )
 	{

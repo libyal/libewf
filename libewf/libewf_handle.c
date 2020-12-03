@@ -27,6 +27,7 @@
 
 #include "libewf_analytical_data.h"
 #include "libewf_case_data.h"
+#include "libewf_case_data_section.h"
 #include "libewf_chunk_data.h"
 #include "libewf_chunk_table.h"
 #include "libewf_codepage.h"
@@ -35,6 +36,7 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
+#include "libewf_device_information_section.h"
 #include "libewf_digest_section.h"
 #include "libewf_error2_section.h"
 #include "libewf_file_entry.h"
@@ -1625,8 +1627,8 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 	size_t string_data_size                   = 0;
 	ssize_t read_count                        = 0;
 	off64_t section_data_offset               = 0;
-	int header_section_found                  = 0;
-	int initialize_chunk_values               = 0;
+	uint8_t header_section_found              = 0;
+	uint8_t initialize_chunk_values           = 0;
 	int number_of_sections                    = 0;
 	int read_table_sections                   = 0;
 	int result                                = 0;
@@ -1744,127 +1746,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 		goto on_error;
 	}
-	/* Make sure to read the device information section first so we
-	 * have the correct chunk size when reading Lx01 files.
-	 */
-	if( segment_file->device_information_section_index >= 0 )
-	{
-		if( libfdata_list_get_element_value_by_index(
-		     segment_file->sections_list,
-		     (intptr_t *) file_io_pool,
-		     (libfdata_cache_t *) sections_cache,
-		     segment_file->device_information_section_index,
-		     (intptr_t **) &section,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve section: %d from sections list.",
-			 function,
-			 segment_file->device_information_section_index );
-
-			goto on_error;
-		}
-		if( section == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing section: %d.",
-			 function,
-			 segment_file->device_information_section_index );
-
-			goto on_error;
-		}
-		if( libewf_segment_file_seek_offset(
-		     segment_file,
-		     file_io_pool,
-		     file_io_pool_entry,
-		     section->start_offset,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek section: %d data offset: %" PRIu64 ".",
-			 function,
-			 segment_file->device_information_section_index,
-			 section->start_offset );
-
-			goto on_error;
-		}
-		read_count = libewf_section_compressed_string_read(
-			      section,
-			      internal_handle->io_handle,
-			      file_io_pool,
-			      file_io_pool_entry,
-			      internal_handle->io_handle->compression_method,
-			      &string_data,
-			      &string_data_size,
-			      error );
-
-		if( read_count == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read device information file object string.",
-			 function );
-
-			goto on_error;
-		}
-		else if( read_count != 0 )
-		{
-			if( internal_handle->read_io_handle->device_information == NULL )
-			{
-				if( libewf_device_information_parse(
-				     string_data,
-				     string_data_size,
-				     internal_handle->media_values,
-				     internal_handle->header_values,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to parse device information.",
-					 function );
-
-					goto on_error;
-				}
-				internal_handle->read_io_handle->device_information      = string_data;
-				internal_handle->read_io_handle->device_information_size = string_data_size;
-			}
-			else
-			{
-				if( ( internal_handle->read_io_handle->device_information_size != string_data_size )
-				 || ( memory_compare(
-				       internal_handle->read_io_handle->device_information,
-				       string_data,
-				       16 ) != 0 ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_INPUT,
-					 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-					 "%s: device information value mismatch.",
-					 function );
-
-					goto on_error;
-				}
-				memory_free(
-				 string_data );
-			}
-			string_data = NULL;
-		}
-	}
 	for( section_index = 0;
 	     section_index < number_of_sections;
 	     section_index++ )
@@ -1950,90 +1831,42 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					 segment_file->current_offset );
 				}
 			}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 		}
 		if( section->type != 0 )
 		{
 			switch( section->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
-					/* Since we already parsed it nothing to do for the device information section
-					 */
+					read_count = libewf_device_information_section_read_file_io_pool(
+						      section,
+						      internal_handle->io_handle,
+						      file_io_pool,
+						      file_io_pool_entry,
+						      internal_handle->read_io_handle,
+						      internal_handle->media_values,
+						      internal_handle->header_values,
+						      error );
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
 					break;
 
 				case LIBEWF_SECTION_TYPE_CASE_DATA:
-					read_count = libewf_section_compressed_string_read(
+					if( internal_handle->read_io_handle->case_data == NULL )
+					{
+						initialize_chunk_values = 1;
+					}
+					read_count = libewf_case_data_section_read_file_io_pool(
 						      section,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
-						      internal_handle->io_handle->compression_method,
-						      &string_data,
-						      &string_data_size,
+						      internal_handle->read_io_handle,
+						      internal_handle->media_values,
+						      internal_handle->header_values,
 						      error );
 
-					if( read_count == -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read case data file object string.",
-						 function );
-
-						goto on_error;
-					}
-					else if( read_count != 0 )
-					{
-						if( internal_handle->read_io_handle->case_data == NULL )
-						{
-							if( libewf_case_data_parse(
-							     string_data,
-							     string_data_size,
-							     internal_handle->media_values,
-							     internal_handle->header_values,
-							     &( internal_handle->io_handle->format ),
-							     error ) != 1 )
-							{
-								libcerror_error_set(
-								 error,
-								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-								 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-								 "%s: unable to parse case data.",
-								 function );
-
-								goto on_error;
-							}
-							internal_handle->read_io_handle->case_data      = string_data;
-							internal_handle->read_io_handle->case_data_size = string_data_size;
-
-							initialize_chunk_values = 1;
-						}
-						else
-						{
-							if( ( internal_handle->read_io_handle->case_data_size != string_data_size )
-							 || ( memory_compare(
-							       internal_handle->read_io_handle->case_data,
-							       string_data,
-							       16 ) != 0 ) )
-							{
-								libcerror_error_set(
-								 error,
-								 LIBCERROR_ERROR_DOMAIN_INPUT,
-								 LIBCERROR_INPUT_ERROR_VALUE_MISMATCH,
-								 "%s: case data value mismatch.",
-								 function );
-
-								goto on_error;
-							}
-							memory_free(
-							 string_data );
-						}
-						string_data = NULL;
-					}
 #if defined( HAVE_VERBOSE_OUTPUT )
 					known_section = 1;
 #endif
@@ -3028,13 +2861,21 @@ int libewf_internal_handle_open_read_segment_files(
 
 		return( -1 );
 	}
-	if( number_of_segments == 0 )
+	/* Make sure to read the device information section first so we
+	 * have the correct chunk size when reading Lx01 files.
+	 */
+	if( libewf_internal_handle_open_read_device_information(
+	     internal_handle,
+	     file_io_pool,
+	     segment_table,
+	     number_of_segments,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of segments value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read device information.",
 		 function );
 
 		return( -1 );
@@ -3268,6 +3109,242 @@ int libewf_internal_handle_open_read_segment_files(
 		segment_table->flags |= LIBEWF_SEGMENT_TABLE_FLAG_IS_CORRUPTED;
 	}
 	return( 1 );
+}
+
+/* Reads the device information from the segment files
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_internal_handle_open_read_device_information(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_segment_table_t *segment_table,
+     uint32_t number_of_segments,
+     libcerror_error_t **error )
+{
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	libewf_segment_file_t *segment_file             = NULL;
+	libfcache_cache_t *sections_cache               = NULL;
+	static char *function                           = "libewf_internal_handle_open_read_device_information";
+	size64_t segment_file_size                      = 0;
+	ssize_t read_count                              = 0;
+	uint32_t segment_number                         = 0;
+	int file_io_pool_entry                          = 0;
+
+	if( internal_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_segments == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of segments value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_segment_table_get_segment_file_by_index(
+	     segment_table,
+	     segment_number,
+	     file_io_pool,
+	     &segment_file,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
+		 function,
+		 segment_number );
+
+		goto on_error;
+	}
+	if( segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment file: %" PRIu32 ".",
+		 function,
+		 segment_number );
+
+		goto on_error;
+	}
+	if( segment_file->major_version != 2 )
+	{
+		return( 1 );
+	}
+	if( segment_file->device_information_section_index == -1 )
+	{
+		/* Lx01 stores the device information in the last segment file
+		 */
+		segment_number = number_of_segments - 1;
+
+		if( libewf_segment_table_get_segment_file_by_index(
+		     segment_table,
+		     segment_number,
+		     file_io_pool,
+		     &segment_file,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
+			 function,
+			 segment_number );
+
+			goto on_error;
+		}
+		if( segment_file == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing segment file: %" PRIu32 ".",
+			 function,
+			 segment_number );
+
+			goto on_error;
+		}
+	}
+	if( segment_file->device_information_section_index == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: unable to locate a device information section.",
+		 function );
+
+		goto on_error;
+	}
+	if( libewf_segment_table_get_segment_by_index(
+	     segment_table,
+	     segment_number,
+	     &file_io_pool_entry,
+	     &segment_file_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment: %" PRIu32 " from segment table.",
+		 function,
+		 segment_number );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &sections_cache,
+	     LIBEWF_MAXIMUM_CACHE_ENTRIES_SECTIONS,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sections cache.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_list_get_element_value_by_index(
+	     segment_file->sections_list,
+	     (intptr_t *) file_io_pool,
+	     (libfdata_cache_t *) sections_cache,
+	     segment_file->device_information_section_index,
+	     (intptr_t **) &section_descriptor,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve section: %d from sections list.",
+		 function,
+		 segment_file->device_information_section_index );
+
+		goto on_error;
+	}
+	if( libewf_segment_file_seek_offset(
+	     segment_file,
+	     file_io_pool,
+	     file_io_pool_entry,
+	     section_descriptor->start_offset,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to seek section: %d data offset: %" PRIu64 " (0x%08%" PRIx64 ").",
+		 function,
+		 segment_file->device_information_section_index,
+		 section_descriptor->start_offset );
+
+		goto on_error;
+	}
+	read_count = libewf_device_information_section_read_file_io_pool(
+		      section_descriptor,
+		      internal_handle->io_handle,
+		      file_io_pool,
+		      file_io_pool_entry,
+		      internal_handle->read_io_handle,
+		      internal_handle->media_values,
+		      internal_handle->header_values,
+		      error );
+
+	if( read_count == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read device information section: %d.",
+		 function,
+		 segment_file->device_information_section_index );
+
+		goto on_error;
+	}
+	if( libfcache_cache_free(
+	     &sections_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free sections cache.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( sections_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &sections_cache,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
@@ -8035,8 +8112,9 @@ int libewf_internal_handle_get_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve segment at offset: 0x%08" PRIx64 " from segment table.",
+		 "%s: unable to retrieve segment at offset: %" PRIi64 " (0x%08" PRIx64 ") from segment table.",
 		 function,
+		 internal_handle->current_offset,
 		 internal_handle->current_offset );
 
 		return( -1 );

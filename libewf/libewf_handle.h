@@ -199,6 +199,13 @@ int libewf_internal_handle_open_read_segment_files(
      libewf_segment_table_t *segment_table,
      libcerror_error_t **error );
 
+int libewf_internal_handle_open_read_device_information(
+     libewf_internal_handle_t *internal_handle,
+     libbfio_pool_t *file_io_pool,
+     libewf_segment_table_t *segment_table,
+     uint32_t number_of_segments,
+     libcerror_error_t **error );
+
 int libewf_internal_handle_open_file_io_pool(
      libewf_internal_handle_t *internal_handle,
      libbfio_pool_t *file_io_pool,

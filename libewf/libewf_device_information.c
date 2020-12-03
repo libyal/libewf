@@ -1386,7 +1386,7 @@ int libewf_device_information_parse_utf8_string_value(
 						if( libcnotify_verbose != 0 )
 						{
 							libcnotify_printf(
-							"%s: unsupported is drive type.\n",
+							"%s: unsupported drive type.\n",
 							 function );
 						}
 						break;

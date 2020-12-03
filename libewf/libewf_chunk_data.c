@@ -1958,7 +1958,7 @@ ssize_t libewf_chunk_data_read_from_file_io_pool(
 		return( -1 );
 	}
 	if( ( chunk_data_size == (size64_t) 0 )
-	 || ( chunk_data_size > (size64_t) SSIZE_MAX ) )
+	 || ( chunk_data_size > (size64_t) chunk_data->allocated_data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -2080,6 +2080,45 @@ int libewf_chunk_data_read_element_data(
 		 file_io_pool_entry );
 	}
 #endif
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: chunk file IO pool entry\t\t: %d\n",
+		 function,
+		 file_io_pool_entry );
+
+		libcnotify_printf(
+		 "%s: chunk offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
+		 chunk_data_offset,
+		 chunk_data_offset );
+
+		libcnotify_printf(
+		 "%s: chunk size\t\t\t\t: %" PRIu64 "\n",
+		 function,
+		 chunk_data_size );
+
+		libcnotify_printf(
+		 "%s: chunk flags:\n",
+		 function );
+
+		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			libcnotify_printf(
+			 "\tIs compressed\n" );
+		}
+		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
+		{
+			libcnotify_printf(
+			 "\tHas checksum\n" );
+		}
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	read_count = libewf_chunk_data_read_from_file_io_pool(
 		      chunk_data,
 		      file_io_pool,
@@ -2114,50 +2153,21 @@ int libewf_chunk_data_read_element_data(
 
 			goto on_error;
 		}
-		libcnotify_printf(
-		 "%s: chunk file IO pool entry\t\t: %d\n",
-		 function,
-		 file_io_pool_entry );
-
-		libcnotify_printf(
-		 "%s: chunk offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 chunk_data_offset,
-		 chunk_data_offset );
-
-		libcnotify_printf(
-		 "%s: chunk size\t\t\t\t: %" PRIu64 "\n",
-		 function,
-		 chunk_data_size );
-
 		if( ( ( chunk_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
 		 && ( chunk_data->data_size >= 4 ) )
 		{
 			byte_stream_copy_to_uint32_little_endian(
 			 &( ( chunk_data->data )[ chunk_data->data_size - 4 ] ),
 			 chunk_data->checksum );
-		}
-		libcnotify_printf(
-		 "%s: chunk checksum\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 chunk_data->checksum );
 
-		libcnotify_printf(
-		 "%s: chunk flags:\n",
-		 function );
+			libcnotify_printf(
+			 "%s: chunk checksum\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 chunk_data->checksum );
 
-		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-		{
 			libcnotify_printf(
-			 "\tIs compressed\n" );
+			 "\n" );
 		}
-		if( ( chunk_data_flags & LIBEWF_RANGE_FLAG_HAS_CHECKSUM ) != 0 )
-		{
-			libcnotify_printf(
-			 "\tHas checksum\n" );
-		}
-		libcnotify_printf(
-		 "\n" );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

@@ -43,6 +43,7 @@ libewf_la_SOURCES = \
 	libewf_attribute.c libewf_attribute.h \
 	libewf_bit_stream.c libewf_bit_stream.h \
 	libewf_case_data.c libewf_case_data.h \
+	libewf_case_data_section.c libewf_case_data_section.h \
 	libewf_checksum.c libewf_checksum.h \
 	libewf_chunk_data.c libewf_chunk_data.h \
 	libewf_chunk_descriptor.c libewf_chunk_descriptor.h \
@@ -57,6 +58,7 @@ libewf_la_SOURCES = \
 	libewf_definitions.h \
 	libewf_deflate.c libewf_deflate.h \
 	libewf_device_information.c libewf_device_information.h \
+	libewf_device_information_section.c libewf_device_information_section.h \
 	libewf_digest_section.c libewf_digest_section.h \
 	libewf_error.c libewf_error.h \
 	libewf_error2_section.c libewf_error2_section.h \

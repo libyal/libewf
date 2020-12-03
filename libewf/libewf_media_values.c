@@ -277,30 +277,31 @@ int libewf_media_values_calculate_chunk_size(
 
 		return( -1 );
 	}	
-	if( media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
+	if( ( media_values->sectors_per_chunk == 0 )
+	 || ( media_values->sectors_per_chunk > (uint32_t) INT32_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid sectors per chunk value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid sectors per chunk value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( media_values->bytes_per_sector > (uint32_t) INT32_MAX )
+	if( ( media_values->bytes_per_sector == 0 )
+	 || ( media_values->bytes_per_sector > (uint32_t) INT32_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid bytes per sector value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid bytes per sector value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	bytes_per_chunk = (size64_t) media_values->sectors_per_chunk
-	                * (size64_t) media_values->bytes_per_sector;
+	bytes_per_chunk = (size64_t) media_values->sectors_per_chunk * media_values->bytes_per_sector;
 
 	if( bytes_per_chunk > (size64_t) INT32_MAX )
 	{
@@ -338,7 +339,8 @@ int libewf_media_values_calculate_chunk_size(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 }
 
