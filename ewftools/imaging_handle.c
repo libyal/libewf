@@ -51,9 +51,10 @@
 #include "storage_media_buffer.h"
 #include "storage_media_buffer_queue.h"
 
-#define IMAGING_HANDLE_INPUT_BUFFER_SIZE	64
-#define IMAGING_HANDLE_STRING_SIZE		1024
-#define IMAGING_HANDLE_NOTIFY_STREAM		stdout
+#define IMAGING_HANDLE_INPUT_BUFFER_SIZE		64
+#define IMAGING_HANDLE_STRING_SIZE			1024
+#define IMAGING_HANDLE_NOTIFY_STREAM			stdout
+#define IMAGING_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE	64 * 1024 * 1024
 
 /* Creates an imaging handle
  * Make sure the value imaging_handle is referencing, is set to NULL
@@ -1639,6 +1640,233 @@ int imaging_handle_finalize_integrity_hash(
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
 
+/* Starts the threads
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_threads_start(
+     imaging_handle_t *imaging_handle,
+     size_t process_buffer_size,
+     uint8_t storage_media_buffer_mode,
+     libcerror_error_t **error )
+{
+	static char *function              = "imaging_handle_threads_start";
+	int maximum_number_of_queued_items = 0;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	maximum_number_of_queued_items = 1 + (int) ( IMAGING_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE / process_buffer_size );
+
+	if( libcthreads_thread_pool_create(
+	     &( imaging_handle->process_thread_pool ),
+	     NULL,
+	     imaging_handle->number_of_threads,
+	     maximum_number_of_queued_items,
+	     (int (*)(intptr_t *, void *)) &imaging_handle_process_storage_media_buffer_callback,
+	     (void *) imaging_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize process thread pool.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcthreads_thread_pool_create(
+	     &( imaging_handle->output_thread_pool ),
+	     NULL,
+	     1,
+	     maximum_number_of_queued_items,
+	     (int (*)(intptr_t *, void *)) &imaging_handle_output_storage_media_buffer_callback,
+	     (void *) imaging_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize output thread pool.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_list_initialize(
+	     &( imaging_handle->output_list ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create output list.",
+		 function );
+
+		goto on_error;
+	}
+	if( storage_media_buffer_queue_initialize(
+	     &( imaging_handle->storage_media_buffer_queue ),
+	     imaging_handle->output_handle,
+	     maximum_number_of_queued_items,
+	     storage_media_buffer_mode,
+	     process_buffer_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize storage media buffer queue.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( imaging_handle->process_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( imaging_handle->process_thread_pool ),
+		 NULL );
+	}
+	if( imaging_handle->output_thread_pool != NULL )
+	{
+		libcthreads_thread_pool_join(
+		 &( imaging_handle->output_thread_pool ),
+		 NULL );
+	}
+	if( imaging_handle->output_list != NULL )
+	{
+		imaging_handle_empty_output_list(
+		 imaging_handle,
+		 NULL );
+		libcdata_list_free(
+		 &( imaging_handle->output_list ),
+		 NULL,
+		 NULL );
+	}
+	if( imaging_handle->storage_media_buffer_queue != NULL )
+	{
+		storage_media_buffer_queue_free(
+		 &( imaging_handle->storage_media_buffer_queue ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Stops the threads
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_threads_stop(
+     imaging_handle_t *imaging_handle,
+     libcerror_error_t **error )
+{
+	static char *function = "imaging_handle_threads_stop";
+	int result            = 1;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->process_thread_pool != NULL )
+	{
+		if( libcthreads_thread_pool_join(
+		     &( imaging_handle->process_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join process thread pool.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( imaging_handle->output_thread_pool != NULL )
+	{
+		if( libcthreads_thread_pool_join(
+		     &( imaging_handle->output_thread_pool ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to join output thread pool.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( imaging_handle->output_list != NULL )
+	{
+		if( imaging_handle_empty_output_list(
+		     imaging_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to empty output list.",
+			 function );
+
+			result = -1;
+		}
+		if( libcdata_list_free(
+		     &( imaging_handle->output_list ),
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free output list.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( imaging_handle->storage_media_buffer_queue != NULL )
+	{
+		if( storage_media_buffer_queue_free(
+		     &( imaging_handle->storage_media_buffer_queue ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free storage media buffer queue.",
+			 function );
+
+			result = -1;
+		}
+	}
+	return( result );
+}
+
 /* Prepares a storage media buffer for imaging
  * Callback function for the process thread pool
  * Returns 1 if successful or -1 on error
@@ -1942,7 +2170,7 @@ int imaging_handle_output_storage_media_buffer_callback(
 			result = process_status_update_unknown_total(
 			          imaging_handle->process_status,
 			          imaging_handle->last_offset_written,
-		        	  &error );
+			          &error );
 		}
 		else
 		{
@@ -1950,7 +2178,7 @@ int imaging_handle_output_storage_media_buffer_callback(
 			          imaging_handle->process_status,
 			          imaging_handle->last_offset_written,
 			          imaging_handle->acquiry_size,
-		        	  &error );
+			          &error );
 		}
 		if( result != 1 )
 		{
@@ -2138,15 +2366,17 @@ int imaging_handle_empty_output_list(
 
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
-/* Retrieves the chunk size
+/* Retrieves the process buffer size
  * Returns 1 if successful or -1 on error
  */
-int imaging_handle_get_chunk_size(
+int imaging_handle_get_process_buffer_size(
      imaging_handle_t *imaging_handle,
-     size32_t *chunk_size,
+     uint8_t use_data_chunk_functions,
+     size_t *process_buffer_size,
      libcerror_error_t **error )
 {
-	static char *function = "imaging_handle_get_chunk_size";
+	static char *function = "imaging_handle_get_process_buffer_size";
+	uint32_t chunk_size   = 0;
 
 	if( imaging_handle == NULL )
 	{
@@ -2159,30 +2389,53 @@ int imaging_handle_get_chunk_size(
 
 		return( -1 );
 	}
-	if( chunk_size == NULL )
+	if( process_buffer_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk size.",
+		 "%s: invalid process buffer size.",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_handle_get_chunk_size(
 	     imaging_handle->output_handle,
-	     chunk_size,
+	     &chunk_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk size.",
+		 "%s: unable to retrieve output chunk size.",
 		 function );
 
 		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing chunk size.",
+		 function );
+
+		return( -1 );
+	}
+	if( use_data_chunk_functions != 0 )
+	{
+		*process_buffer_size = (size_t) chunk_size;
+	}
+	else if( imaging_handle->process_buffer_size == 0 )
+	{
+		*process_buffer_size = (size_t) chunk_size;
+	}
+	else
+	{
+		*process_buffer_size = imaging_handle->process_buffer_size;
 	}
 	return( 1 );
 }
@@ -5790,14 +6043,271 @@ int imaging_handle_append_track(
 	return( 1 );
 }
 
-/* Finalizes the imaging handle
- * Returns the number of input bytes written or -1 on error
+/* Starts the imaging handle
+ * Returns 1 if successful or -1 on error
  */
-ssize_t imaging_handle_finalize(
-         imaging_handle_t *imaging_handle,
-         libcerror_error_t **error )
+int imaging_handle_start(
+     imaging_handle_t *imaging_handle,
+     uint8_t print_status_information,
+     libcerror_error_t **error )
 {
-	static char *function         = "imaging_handle_finalize";
+	static char *function = "imaging_handle_start";
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle_initialize_integrity_hash(
+	     imaging_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize integrity hash(es).",
+		 function );
+
+		goto on_error;
+        }
+	if( process_status_initialize(
+	     &( imaging_handle->process_status ),
+	     _SYSTEM_STRING( "Acquiry" ),
+	     _SYSTEM_STRING( "acquired" ),
+	     _SYSTEM_STRING( "Written" ),
+	     stdout,
+	     print_status_information,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create process status",
+		 function );
+
+		goto on_error;
+	}
+	if( process_status_start(
+	     imaging_handle->process_status,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to start process status",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( imaging_handle->sha1_context != NULL )
+	{
+		libhmac_sha1_free(
+		 &( imaging_handle->sha1_context ),
+		 NULL );
+	}
+	if( imaging_handle->md5_context != NULL )
+	{
+		libhmac_md5_free(
+		 &( imaging_handle->md5_context ),
+		 NULL );
+	}
+	if( imaging_handle->process_status != NULL )
+	{
+		process_status_free(
+		 &( imaging_handle->process_status ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Updates the imaging handle
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_update(
+     imaging_handle_t *imaging_handle,
+     storage_media_buffer_t *storage_media_buffer,
+     ssize_t read_count,
+     off64_t resume_acquiry_offset,
+     uint8_t swap_byte_pairs,
+     libcerror_error_t **error )
+{
+	uint8_t *data         = NULL;
+	static char *function = "imaging_handle_update";
+	size_t data_size      = 0;
+	ssize_t process_count = 0;
+	ssize_t write_count   = 0;
+	int result            = 0;
+
+	if( imaging_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer_get_data(
+	     storage_media_buffer,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve storage media buffer data.",
+		 function );
+
+		return( -1 );
+	}
+	/* Swap byte pairs
+	 */
+	if( ( swap_byte_pairs == 1 )
+	 && ( imaging_handle->last_offset_written >= resume_acquiry_offset ) )
+	{
+		if( imaging_handle_swap_byte_pairs(
+		     imaging_handle,
+		     data,
+		     (size_t) read_count,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBCERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to swap byte pairs.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	/* Integrity (digest) hashes are calcultated after swap
+	 */
+	if( imaging_handle_update_integrity_hash(
+	     imaging_handle,
+	     data,
+	     (size_t) read_count,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to update integrity hash(es).",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->last_offset_written < resume_acquiry_offset )
+	{
+		imaging_handle->last_offset_written += (off64_t) read_count;
+	}
+	else if( imaging_handle->number_of_threads == 0 )
+	{
+		process_count = storage_media_buffer_write_process(
+				 storage_media_buffer,
+				 error );
+
+		if( process_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to prepare storage media buffer before write.",
+			 function );
+
+			return( -1 );
+		}
+		write_count = imaging_handle_write_storage_media_buffer(
+			       imaging_handle,
+			       storage_media_buffer,
+			       storage_media_buffer->processed_size,
+			       error );
+
+		if( write_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write storage media buffer.",
+			 function );
+
+			return( -1 );
+		}
+		imaging_handle->last_offset_written += process_count;
+	}
+	if( ( imaging_handle->last_offset_written < resume_acquiry_offset )
+	 || ( imaging_handle->number_of_threads == 0 ) )
+	{
+		if( imaging_handle->acquiry_size == 0 )
+		{
+			result = process_status_update_unknown_total(
+			          imaging_handle->process_status,
+			          imaging_handle->last_offset_written,
+			          error );
+		}
+		else
+		{
+			result = process_status_update(
+			          imaging_handle->process_status,
+			          imaging_handle->last_offset_written,
+			          imaging_handle->acquiry_size,
+			          error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update process status.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Strops the imaging handle
+ * Returns 1 if successful or -1 on error
+ */
+int imaging_handle_stop(
+     imaging_handle_t *imaging_handle,
+     off64_t resume_acquiry_offset,
+     int status,
+     libcerror_error_t **error )
+{
+	static char *function         = "imaging_handle_stop";
 	ssize_t secondary_write_count = 0;
 	ssize_t write_count           = 0;
 
@@ -5812,100 +6322,149 @@ ssize_t imaging_handle_finalize(
 
 		return( -1 );
 	}
-	if( imaging_handle->calculate_md5 != 0 )
-	{
-		if( imaging_handle_set_hash_value(
-		     imaging_handle,
-		     "MD5",
-		     3,
-		     imaging_handle->calculated_md5_hash_string,
-		     32,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: MD5.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( imaging_handle->calculate_sha1 != 0 )
-	{
-		if( imaging_handle_set_hash_value(
-		     imaging_handle,
-		     "SHA1",
-		     4,
-		     imaging_handle->calculated_sha1_hash_string,
-		     40,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: SHA1.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( imaging_handle->calculate_sha256 != 0 )
-	{
-		if( imaging_handle_set_hash_value(
-		     imaging_handle,
-		     "SHA256",
-		     6,
-		     imaging_handle->calculated_sha256_hash_string,
-		     64,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set hash value: SHA256.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	write_count = libewf_handle_write_finalize(
-	               imaging_handle->output_handle,
-	               error );
-
-	if( write_count == -1 )
+	if( imaging_handle_finalize_integrity_hash(
+	     imaging_handle,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize output handle.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to finalize integrity hash(es).",
 		 function );
 
 		return( -1 );
 	}
-	if( imaging_handle->secondary_output_handle != NULL )
+	if( imaging_handle->last_offset_written >= resume_acquiry_offset )
 	{
-		secondary_write_count = libewf_handle_write_finalize(
-		                         imaging_handle->secondary_output_handle,
-		                         error );
+		if( imaging_handle->calculate_md5 != 0 )
+		{
+			if( imaging_handle_set_hash_value(
+			     imaging_handle,
+			     "MD5",
+			     3,
+			     imaging_handle->calculated_md5_hash_string,
+			     32,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set hash value: MD5.",
+				 function );
 
-		if( secondary_write_count == -1 )
+				return( -1 );
+			}
+		}
+		if( imaging_handle->calculate_sha1 != 0 )
+		{
+			if( imaging_handle_set_hash_value(
+			     imaging_handle,
+			     "SHA1",
+			     4,
+			     imaging_handle->calculated_sha1_hash_string,
+			     40,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set hash value: SHA1.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		if( imaging_handle->calculate_sha256 != 0 )
+		{
+			if( imaging_handle_set_hash_value(
+			     imaging_handle,
+			     "SHA256",
+			     6,
+			     imaging_handle->calculated_sha256_hash_string,
+			     64,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to set hash value: SHA256.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		write_count = libewf_handle_write_finalize(
+		               imaging_handle->output_handle,
+		               error );
+
+		if( write_count == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to finalize secondary output handle.",
+			 "%s: unable to finalize output handle.",
 			 function );
 
 			return( -1 );
 		}
+		if( imaging_handle->secondary_output_handle != NULL )
+		{
+			secondary_write_count = libewf_handle_write_finalize(
+			                         imaging_handle->secondary_output_handle,
+			                         error );
+
+			if( secondary_write_count == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to finalize secondary output handle.",
+				 function );
+
+				return( -1 );
+			}
+		}
+		imaging_handle->last_offset_written += write_count;
 	}
-	return( write_count );
+	if( imaging_handle->abort != 0 )
+	{
+		status = PROCESS_STATUS_ABORTED;
+	}
+	if( process_status_stop(
+	     imaging_handle->process_status,
+	     imaging_handle->last_offset_written,
+	     status,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to stop process status",
+		 function );
+
+		return( -1 );
+	}
+	if( process_status_free(
+	     &( imaging_handle->process_status ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free process status",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Prints an overview of the parameters

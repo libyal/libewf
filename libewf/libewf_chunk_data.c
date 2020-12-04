@@ -1566,7 +1566,7 @@ int libewf_chunk_data_check_for_64_bit_pattern_fill(
 		return( -1 );
 	}
 	if( ( data_size <= 8 )
-	 || ( data_size % 8 ) != 0 )
+	 || ( ( data_size % 8 ) != 0 ) )
 	{
 		return( 0 );
 	}
