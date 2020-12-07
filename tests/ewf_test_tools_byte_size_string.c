@@ -345,28 +345,31 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	system_character_t byte_size_string3[ 5 ]  = {
 		'8', ' ', 'k', 'B', 0 };
 
-	system_character_t byte_size_string4[ 5 ]  = {
-		'8', ' ', 'M', 'B', 0 };
+	system_character_t byte_size_string4[ 8 ] = {
+		'8', '.', '9', ' ', 'K', 'i', 'B', 0 };
 
 	system_character_t byte_size_string5[ 5 ]  = {
-		'8', ' ', 'G', 'B', 0 };
+		'8', ' ', 'M', 'B', 0 };
 
 	system_character_t byte_size_string6[ 5 ]  = {
-		'8', ' ', 'T', 'B', 0 };
+		'8', ' ', 'G', 'B', 0 };
 
 	system_character_t byte_size_string7[ 5 ]  = {
-		'8', ' ', 'P', 'B', 0 };
+		'8', ' ', 'T', 'B', 0 };
 
 	system_character_t byte_size_string8[ 5 ]  = {
-		'8', ' ', 'E', 'B', 0 };
+		'8', ' ', 'P', 'B', 0 };
 
 	system_character_t byte_size_string9[ 5 ]  = {
+		'8', ' ', 'E', 'B', 0 };
+
+	system_character_t byte_size_string10[ 5 ]  = {
 		'8', ' ', 'Z', 'B', 0 };
 
-	system_character_t byte_size_string10[ 5 ] = {
+	system_character_t byte_size_string11[ 5 ] = {
 		'8', ' ', 'Y', 'B', 0 };
 
-	system_character_t byte_size_string11[ 5 ] = {
+	system_character_t byte_size_string12[ 5 ] = {
 		'8', ' ', 'k', 'g', 0 };
 
 	libcerror_error_t *error                   = NULL;
@@ -440,7 +443,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 
 	result = byte_size_string_convert_with_decimal_point(
 	          byte_size_string4,
-	          4,
+	          7,
 	          (int) '.',
 	          &size,
 	          &error );
@@ -453,7 +456,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 );
+	 (uint64_t) 9092 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -474,7 +477,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 * 1000 );
+	 (uint64_t) 8000 * 1000 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -495,7 +498,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 * 1000 * 1000 );
+	 (uint64_t) 8000 * 1000 * 1000 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -516,7 +519,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 );
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -537,7 +540,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -558,7 +561,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	EWF_TEST_ASSERT_EQUAL_UINT64(
 	 "size",
 	 size,
-	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -566,6 +569,27 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 
 	result = byte_size_string_convert_with_decimal_point(
 	          byte_size_string10,
+	          4,
+	          (int) '.',
+	          &size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "size",
+	 size,
+	 (uint64_t) 8000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = byte_size_string_convert_with_decimal_point(
+	          byte_size_string11,
 	          4,
 	          (int) '.',
 	          &size,
@@ -626,7 +650,7 @@ int ewf_test_tools_byte_size_string_convert_with_decimal_point(
 	 &error );
 
 	result = byte_size_string_convert_with_decimal_point(
-	          byte_size_string11,
+	          byte_size_string12,
 	          4,
 	          (int) '.',
 	          &size,

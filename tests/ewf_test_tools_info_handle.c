@@ -47,7 +47,7 @@ int ewf_test_tools_info_handle_initialize(
 	int result                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 1;
+	int number_of_malloc_fail_tests = 2;
 	int number_of_memset_fail_tests = 1;
 	int test_number                 = 0;
 #endif
@@ -322,6 +322,290 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the info_handle_dfxml_header_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_info_handle_dfxml_header_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream             = NULL;
+#endif
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	result = info_handle_dfxml_header_fprint(
+	          stream,
+	          &error );
+
+	fclose(
+	 stream );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	result = info_handle_dfxml_header_fprint(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the info_handle_dfxml_footer_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_info_handle_dfxml_footer_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream             = NULL;
+#endif
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	result = info_handle_dfxml_footer_fprint(
+	          stream,
+	          &error );
+
+	fclose(
+	 stream );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	result = info_handle_dfxml_footer_fprint(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the info_handle_dfxml_build_environment_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_info_handle_dfxml_build_environment_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream             = NULL;
+#endif
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	result = info_handle_dfxml_build_environment_fprint(
+	          stream,
+	          &error );
+
+	fclose(
+	 stream );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	result = info_handle_dfxml_build_environment_fprint(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the info_handle_dfxml_execution_environment_fprint function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_info_handle_dfxml_execution_environment_fprint(
+     void )
+{
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+	char string[ 1024 ];
+
+	FILE *stream             = NULL;
+#endif
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
+
+	stream = fmemopen(
+	          string,
+	          1024,
+	          "w+");
+
+	result = info_handle_dfxml_execution_environment_fprint(
+	          stream,
+	          &error );
+
+	fclose(
+	 stream );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
+
+	/* Test error cases
+	 */
+	result = info_handle_dfxml_execution_environment_fprint(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -373,6 +657,96 @@ int main(
 	 "info_handle_signal_abort",
 	 ewf_test_tools_info_handle_signal_abort,
 	 info_handle );
+
+	/* TODO add tests for info_handle_set_bodyfile */
+
+	/* TODO add tests for info_handle_set_maximum_number_of_open_handles */
+
+	/* TODO add tests for info_handle_open_input */
+
+	/* TODO add tests for info_handle_close */
+
+	/* TODO add tests for info_handle_set_output_format */
+
+	/* TODO add tests for info_handle_set_date_format */
+
+	/* TODO add tests for info_handle_set_header_codepage */
+
+	/* TODO add tests for info_handle_posix_time_value_fprint */
+
+	/* TODO add tests for info_handle_section_header_fprint */
+
+	/* TODO add tests for info_handle_section_footer_fprint */
+
+	/* TODO add tests for info_handle_section_value_string_fprint */
+
+	/* TODO add tests for info_handle_section_value_32bit_fprint */
+
+	/* TODO add tests for info_handle_section_value_64bit_fprint */
+
+	/* TODO add tests for info_handle_section_value_size_fprint */
+
+	/* TODO add tests for info_handle_section_value_boolean_fprint */
+
+	/* TODO add tests for info_handle_sub_section_header_fprint */
+
+	/* TODO add tests for info_handle_sub_section_footer_fprint */
+
+	/* TODO add tests for info_handle_header_value_fprint */
+
+	/* TODO add tests for info_handle_header_values_fprint */
+
+	/* TODO add tests for info_handle_header_value_password_fprint */
+
+	/* TODO add tests for info_handle_header_value_compression_level_fprint */
+
+	/* TODO add tests for info_handle_header_value_extents_fprint */
+
+	/* TODO add tests for info_handle_media_information_fprint */
+
+	/* TODO add tests for info_handle_hash_value_fprint */
+
+	/* TODO add tests for info_handle_hash_values_fprint */
+
+	/* TODO add tests for info_handle_acquiry_errors_fprint */
+
+	/* TODO add tests for info_handle_sessions_fprint */
+
+	/* TODO add tests for info_handle_tracks_fprint */
+
+	/* TODO add tests for info_handle_access_control_entry_value_fprint */
+
+	/* TODO add tests for info_handle_attribute_value_fprint */
+
+	/* TODO add tests for info_handle_source_value_fprint */
+
+	/* TODO add tests for info_handle_file_entry_value_fprint */
+
+	/* TODO add tests for info_handle_logical_files_hierarchy_fprint_file_entry */
+
+	/* TODO add tests for info_handle_file_entry_fprint_by_path */
+
+	/* TODO add tests for info_handle_logical_files_hierarchy_fprint */
+
+	/* TODO add tests for info_handle_file_entry_fprint */
+
+	/* TODO add tests for info_handle_image_fprint */
+
+	EWF_TEST_RUN(
+	 "info_handle_dfxml_header_fprint",
+	 ewf_test_tools_info_handle_dfxml_header_fprint );
+
+	EWF_TEST_RUN(
+	 "info_handle_dfxml_footer_fprint",
+	 ewf_test_tools_info_handle_dfxml_footer_fprint );
+
+	EWF_TEST_RUN(
+	 "info_handle_dfxml_build_environment_fprint",
+	 ewf_test_tools_info_handle_dfxml_build_environment_fprint );
+
+	EWF_TEST_RUN(
+	 "info_handle_dfxml_execution_environment_fprint",
+	 ewf_test_tools_info_handle_dfxml_execution_environment_fprint );
 
 	/* Clean up
 	 */

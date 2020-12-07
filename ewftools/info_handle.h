@@ -283,18 +283,18 @@ int info_handle_image_fprint(
      libcerror_error_t **error );
 
 int info_handle_dfxml_header_fprint(
-     info_handle_t *info_handle,
-     libcerror_error_t **error );
-
-int info_handle_dfxml_footer_fprint(
-     info_handle_t *info_handle,
-     libcerror_error_t **error );
-
-int dfxml_build_environment_fprint(
      FILE *stream,
      libcerror_error_t **error );
 
-int dfxml_execution_environment_fprint(
+int info_handle_dfxml_footer_fprint(
+     FILE *stream,
+     libcerror_error_t **error );
+
+int info_handle_dfxml_build_environment_fprint(
+     FILE *stream,
+     libcerror_error_t **error );
+
+int info_handle_dfxml_execution_environment_fprint(
      FILE *stream,
      libcerror_error_t **error );
 

@@ -68,6 +68,21 @@ int ewf_test_tools_guid_generate(
 	 "error",
 	 error );
 
+	result = guid_generate(
+	          guid,
+	          16,
+	          GUID_TYPE_TIME,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = guid_generate(
@@ -191,6 +206,33 @@ int ewf_test_tools_guid_to_string(
 	result = memory_compare(
 	          string,
 	          "d074eb89-79fe-4e3d-919f-95bf46f7f55f",
+	          37 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = guid_to_string(
+	          guid,
+	          16,
+	          _BYTE_STREAM_ENDIAN_LITTLE,
+	          string,
+	          64,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = memory_compare(
+	          string,
+	          "89eb74d0-fe79-3d4e-919f-95bf46f7f55f",
 	          37 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

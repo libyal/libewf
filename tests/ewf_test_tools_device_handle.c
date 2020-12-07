@@ -1079,6 +1079,520 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the device_handle_get_type function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_type(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t type             = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = device_handle_get_type(
+	          handle,
+	          &type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = device_handle_get_type(
+	          NULL,
+	          &type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_type(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_media_size function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_media_size(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	size64_t media_size      = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO fix test
+	result = device_handle_get_media_size(
+	          handle,
+	          &media_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+	/* Test error cases
+	 */
+	result = device_handle_get_media_size(
+	          NULL,
+	          &media_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_media_size(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_media_type function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_media_type(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t media_type       = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = device_handle_get_media_type(
+	          handle,
+	          &media_type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = device_handle_get_media_type(
+	          NULL,
+	          &media_type,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_media_type(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_bytes_per_sector function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_bytes_per_sector(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error  = NULL;
+	uint32_t bytes_per_sector = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+/* TODO fix test
+	result = device_handle_get_bytes_per_sector(
+	          handle,
+	          &bytes_per_sector,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	result = device_handle_get_bytes_per_sector(
+	          NULL,
+	          &bytes_per_sector,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_bytes_per_sector(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_number_of_sessions function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_number_of_sessions(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	int number_of_sessions   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = device_handle_get_number_of_sessions(
+	          handle,
+	          &number_of_sessions,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = device_handle_get_number_of_sessions(
+	          NULL,
+	          &number_of_sessions,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_number_of_sessions(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_number_of_tracks function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_number_of_tracks(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	int number_of_tracks     = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = device_handle_get_number_of_tracks(
+	          handle,
+	          &number_of_tracks,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = device_handle_get_number_of_tracks(
+	          NULL,
+	          &number_of_tracks,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_number_of_tracks(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the device_handle_get_number_of_read_errors function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_device_handle_get_number_of_read_errors(
+     device_handle_t *handle )
+{
+	libcerror_error_t *error  = NULL;
+	int number_of_read_errors = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = device_handle_get_number_of_read_errors(
+	          handle,
+	          &number_of_read_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = device_handle_get_number_of_read_errors(
+	          NULL,
+	          &number_of_read_errors,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = device_handle_get_number_of_read_errors(
+	          handle,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -1130,6 +1644,8 @@ int main(
 	 "error",
 	 error );
 
+	device_handle->type = DEVICE_HANDLE_TYPE_FILE;
+
 	EWF_TEST_RUN_WITH_ARGS(
 	 "device_handle_signal_abort",
 	 ewf_test_tools_device_handle_signal_abort,
@@ -1165,21 +1681,39 @@ int main(
 
 	/* TODO add tests for device_handle_prompt_for_zero_buffer_on_error */
 
-	/* TODO add tests for device_handle_get_type */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_type",
+	 ewf_test_tools_device_handle_get_type,
+	 device_handle );
 
-	/* TODO add tests for device_handle_get_media_size */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_media_size",
+	 ewf_test_tools_device_handle_get_media_size,
+	 device_handle );
 
-	/* TODO add tests for device_handle_get_media_type */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_media_type",
+	 ewf_test_tools_device_handle_get_media_type,
+	 device_handle );
 
-	/* TODO add tests for device_handle_get_bytes_per_sector */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_bytes_per_sector",
+	 ewf_test_tools_device_handle_get_bytes_per_sector,
+	 device_handle );
 
 	/* TODO add tests for device_handle_get_information_value */
 
-	/* TODO add tests for device_handle_get_number_of_sessions */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_number_of_sessions",
+	 ewf_test_tools_device_handle_get_number_of_sessions,
+	 device_handle );
 
 	/* TODO add tests for device_handle_get_session */
 
-	/* TODO add tests for device_handle_get_number_of_tracks */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_number_of_tracks",
+	 ewf_test_tools_device_handle_get_number_of_tracks,
+	 device_handle );
 
 	/* TODO add tests for device_handle_get_track */
 
@@ -1189,7 +1723,10 @@ int main(
 
 	/* TODO add tests for device_handle_set_error_values */
 
-	/* TODO add tests for device_handle_get_number_of_read_errors */
+	EWF_TEST_RUN_WITH_ARGS(
+	 "device_handle_get_number_of_read_errors",
+	 ewf_test_tools_device_handle_get_number_of_read_errors,
+	 device_handle );
 
 	/* TODO add tests for device_handle_get_read_error */
 

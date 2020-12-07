@@ -42,14 +42,14 @@
 int ewf_test_tools_imaging_handle_initialize(
      void )
 {
-	libcerror_error_t *error                   = NULL;
 	imaging_handle_t *imaging_handle = NULL;
-	int result                                 = 0;
+	libcerror_error_t *error         = NULL;
+	int result                       = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests            = 1;
-	int number_of_memset_fail_tests            = 1;
-	int test_number                            = 0;
+	int number_of_malloc_fail_tests  = 3;
+	int number_of_memset_fail_tests  = 2;
+	int test_number                  = 0;
 #endif
 
 	/* Test regular cases
@@ -385,6 +385,126 @@ int main(
 	 "imaging_handle_signal_abort",
 	 ewf_test_tools_imaging_handle_signal_abort,
 	 imaging_handle );
+
+	/* TODO add tests for imaging_handle_check_write_access */
+
+	/* TODO add tests for imaging_handle_open_output */
+
+	/* TODO add tests for imaging_handle_open_secondary_output */
+
+	/* TODO add tests for imaging_handle_open_output_resume */
+
+	/* TODO add tests for imaging_handle_close */
+
+	/* TODO add tests for imaging_handle_write_storage_media_buffer */
+
+	/* TODO add tests for imaging_handle_seek_offset */
+
+	/* TODO add tests for imaging_handle_get_offset */
+
+	/* TODO add tests for imaging_handle_swap_byte_pairs */
+
+	/* TODO add tests for imaging_handle_initialize_integrity_hash */
+
+	/* TODO add tests for imaging_handle_update_integrity_hash */
+
+	/* TODO add tests for imaging_handle_finalize_integrity_hash */
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+	/* TODO add tests for imaging_handle_threads_start */
+
+	/* TODO add tests for imaging_handle_threads_stop */
+
+	/* TODO add tests for imaging_handle_process_storage_media_buffer_callback */
+
+	/* TODO add tests for imaging_handle_output_storage_media_buffer_callback */
+
+	/* TODO add tests for imaging_handle_empty_output_list */
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
+	/* TODO add tests for imaging_handle_get_process_buffer_size */
+
+	/* TODO add tests for imaging_handle_prompt_for_string */
+
+	/* TODO add tests for imaging_handle_prompt_for_compression_method */
+
+	/* TODO add tests for imaging_handle_prompt_for_compression_level */
+
+	/* TODO add tests for imaging_handle_prompt_for_format */
+
+	/* TODO add tests for imaging_handle_prompt_for_media_type */
+
+	/* TODO add tests for imaging_handle_prompt_for_media_flags */
+
+	/* TODO add tests for imaging_handle_prompt_for_bytes_per_sector */
+
+	/* TODO add tests for imaging_handle_prompt_for_sectors_per_chunk */
+
+	/* TODO add tests for imaging_handle_prompt_for_sector_error_granularity */
+
+	/* TODO add tests for imaging_handle_prompt_for_maximum_segment_size */
+
+	/* TODO add tests for imaging_handle_prompt_for_acquiry_offset */
+
+	/* TODO add tests for imaging_handle_prompt_for_acquiry_size */
+
+	/* TODO add tests for imaging_handle_get_output_values */
+
+	/* TODO add tests for imaging_handle_set_string */
+
+	/* TODO add tests for imaging_handle_set_compression_values */
+
+	/* TODO add tests for imaging_handle_set_format */
+
+	/* TODO add tests for imaging_handle_set_media_type */
+
+	/* TODO add tests for imaging_handle_set_media_flags */
+
+	/* TODO add tests for imaging_handle_set_bytes_per_sector */
+
+	/* TODO add tests for imaging_handle_set_sectors_per_chunk */
+
+	/* TODO add tests for imaging_handle_set_sector_error_granularity */
+
+	/* TODO add tests for imaging_handle_set_maximum_segment_size */
+
+	/* TODO add tests for imaging_handle_set_acquiry_offset */
+
+	/* TODO add tests for imaging_handle_set_acquiry_size */
+
+	/* TODO add tests for imaging_handle_set_header_codepage */
+
+	/* TODO add tests for imaging_handle_set_process_buffer_size */
+
+	/* TODO add tests for imaging_handle_set_number_of_threads */
+
+	/* TODO add tests for imaging_handle_set_additional_digest_types */
+
+	/* TODO add tests for imaging_handle_set_output_values */
+
+	/* TODO add tests for imaging_handle_get_header_value */
+
+	/* TODO add tests for imaging_handle_set_header_value */
+
+	/* TODO add tests for imaging_handle_set_hash_value */
+
+	/* TODO add tests for imaging_handle_append_read_error */
+
+	/* TODO add tests for imaging_handle_append_session */
+
+	/* TODO add tests for imaging_handle_append_track */
+
+	/* TODO add tests for imaging_handle_start */
+
+	/* TODO add tests for imaging_handle_update */
+
+	/* TODO add tests for imaging_handle_stop */
+
+	/* TODO add tests for imaging_handle_print_parameters */
+
+	/* TODO add tests for imaging_handle_print_hashes */
 
 	/* Clean up
 	 */

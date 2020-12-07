@@ -1,4 +1,5 @@
 TODO
+* info_handle: move dfxml functions to seperate file
 * clean up libewf_chunk_group_correct_v1
 
 * ewfexport test with different bytes per sector between input and ouptput ?

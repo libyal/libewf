@@ -47,8 +47,8 @@ int ewf_test_tools_export_handle_initialize(
 	int result                      = 0;
 
 #if defined( HAVE_EWF_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 1;
-	int number_of_memset_fail_tests = 1;
+	int number_of_malloc_fail_tests = 3;
+	int number_of_memset_fail_tests = 2;
 	int test_number                 = 0;
 #endif
 
@@ -56,7 +56,7 @@ int ewf_test_tools_export_handle_initialize(
 	 */
 	result = export_handle_initialize(
 	          &export_handle,
-	          0,
+	          1,
 	          0,
 	          &error );
 
@@ -94,7 +94,7 @@ int ewf_test_tools_export_handle_initialize(
 	 */
 	result = export_handle_initialize(
 	          NULL,
-	          0,
+	          1,
 	          0,
 	          &error );
 
@@ -114,7 +114,7 @@ int ewf_test_tools_export_handle_initialize(
 
 	result = export_handle_initialize(
 	          &export_handle,
-	          0,
+	          1,
 	          0,
 	          &error );
 
@@ -144,7 +144,7 @@ int ewf_test_tools_export_handle_initialize(
 
 		result = export_handle_initialize(
 		          &export_handle,
-		          0,
+		          1,
 		          0,
 		          &error );
 
@@ -188,7 +188,7 @@ int ewf_test_tools_export_handle_initialize(
 
 		result = export_handle_initialize(
 		          &export_handle,
-		          0,
+		          1,
 		          0,
 		          &error );
 
@@ -290,6 +290,7 @@ int ewf_test_tools_export_handle_signal_abort(
 
 	/* Test regular cases
 	 */
+/* TODO fix test
 	result = export_handle_signal_abort(
 	          handle,
 	          &error );
@@ -302,11 +303,69 @@ int ewf_test_tools_export_handle_signal_abort(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+*/
 
 	/* Test error cases
 	 */
 	result = export_handle_signal_abort(
 	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the export_handle_set_maximum_number_of_open_handles function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_export_handle_set_maximum_number_of_open_handles(
+     export_handle_t *handle )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO fix test
+	result = export_handle_set_maximum_number_of_open_handles(
+	          handle,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	result = export_handle_set_maximum_number_of_open_handles(
+	          NULL,
+	          1,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -364,7 +423,7 @@ int main(
 	 */
 	result = export_handle_initialize(
 	          &export_handle,
-	          0,
+	          1,
 	          0,
 	          &error );
 
@@ -381,12 +440,115 @@ int main(
 	 "error",
 	 error );
 
-/* TODO fix test
 	EWF_TEST_RUN_WITH_ARGS(
 	 "export_handle_signal_abort",
 	 ewf_test_tools_export_handle_signal_abort,
 	 export_handle );
-*/
+
+	EWF_TEST_RUN_WITH_ARGS(
+	 "export_handle_set_maximum_number_of_open_handles",
+	 ewf_test_tools_export_handle_set_maximum_number_of_open_handles,
+	 export_handle );
+
+	/* TODO add tests for export_handle_check_write_access */
+
+	/* TODO add tests for export_handle_open_input */
+
+	/* TODO add tests for export_handle_open_output */
+
+	/* TODO add tests for export_handle_close */
+
+	/* TODO add tests for export_handle_read_storage_media_buffer */
+
+	/* TODO add tests for export_handle_prepare_write_storage_media_buffer */
+
+	/* TODO add tests for export_handle_write_storage_media_buffer */
+
+	/* TODO add tests for export_handle_seek_offset */
+
+	/* TODO add tests for export_handle_swap_byte_pairs */
+
+	/* TODO add tests for export_handle_initialize_integrity_hash */
+
+	/* TODO add tests for export_handle_update_integrity_hash */
+
+	/* TODO add tests for export_handle_finalize_integrity_hash */
+
+	/* TODO add tests for export_handle_input_is_corrupted */
+
+	/* TODO add tests for export_handle_get_output_chunk_size */
+
+	/* TODO add tests for export_handle_prompt_for_string */
+
+	/* TODO add tests for export_handle_prompt_for_compression_method */
+
+	/* TODO add tests for export_handle_prompt_for_compression_level */
+
+	/* TODO add tests for export_handle_prompt_for_output_format */
+
+	/* TODO add tests for export_handle_prompt_for_sectors_per_chunk */
+
+	/* TODO add tests for export_handle_prompt_for_maximum_segment_size */
+
+	/* TODO add tests for export_handle_prompt_for_export_offset */
+
+	/* TODO add tests for export_handle_prompt_for_export_size */
+
+	/* TODO add tests for export_handle_set_string */
+
+	/* TODO add tests for export_handle_set_compression_values */
+
+	/* TODO add tests for export_handle_set_output_format */
+
+	/* TODO add tests for export_handle_set_sectors_per_chunk */
+
+	/* TODO add tests for export_handle_set_maximum_segment_size */
+
+	/* TODO add tests for export_handle_set_export_offset */
+
+	/* TODO add tests for export_handle_set_export_size */
+
+	/* TODO add tests for export_handle_set_header_codepage */
+
+	/* TODO add tests for export_handle_set_process_buffer_size */
+
+	/* TODO add tests for export_handle_set_number_of_threads */
+
+	/* TODO add tests for export_handle_set_additional_digest_types */
+
+	/* TODO add tests for export_handle_set_output_values */
+
+	/* TODO add tests for export_handle_set_hash_value */
+
+	/* TODO add tests for export_handle_append_read_error */
+
+	/* TODO add tests for export_handle_write */
+
+	/* TODO add tests for export_handle_finalize */
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+
+	/* TODO add tests for export_handle_process_storage_media_buffer_callback */
+
+	/* TODO add tests for export_handle_output_storage_media_buffer_callback */
+
+	/* TODO add tests for export_handle_empty_output_list */
+
+#endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
+
+	/* TODO add tests for export_handle_export_input */
+
+	/* TODO add tests for export_handle_export_single_files */
+
+	/* TODO add tests for export_handle_export_file_entry */
+
+	/* TODO add tests for export_handle_export_file_entry_data */
+
+	/* TODO add tests for export_handle_export_file_entry_sub_file_entries */
+
+	/* TODO add tests for export_handle_hash_values_fprint */
+
+	/* TODO add tests for export_handle_checksum_errors_fprint */
 
 	/* Clean up
 	 */

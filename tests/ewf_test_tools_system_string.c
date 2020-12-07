@@ -43,11 +43,15 @@
 int ewf_test_tools_system_string_decimal_copy_to_64_bit(
      void )
 {
-	system_character_t system_string1[ 2 ] = { '1', 0 };
-	system_character_t system_string2[ 3 ] = { '-', '1', 0 };
-	libcerror_error_t *error               = NULL;
-	uint64_t value_64bit                   = 0;
-	int result                             = 0;
+	system_character_t system_string1[ 2 ]  = { '1', 0 };
+	system_character_t system_string2[ 3 ]  = { '-', '1', 0 };
+	system_character_t system_string3[ 3 ]  = { '+', '1', 0 };
+	system_character_t system_string4[ 25 ] = {
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2', '3', '4', '5', '6',
+		'7', '8', '9', '0', '1', '2', '3', '4', 0 };
+	libcerror_error_t *error                = NULL;
+	uint64_t value_64bit                    = 0;
+	int result                              = 0;
 
 	/* Test regular cases
 	 */
@@ -86,6 +90,26 @@ int ewf_test_tools_system_string_decimal_copy_to_64_bit(
 	 "value_64bit",
 	 value_64bit,
 	 (uint64_t) 0xffffffffffffffffUL );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = ewftools_system_string_decimal_copy_to_64_bit(
+	          system_string3,
+	          3,
+	          &value_64bit,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "value_64bit",
+	 value_64bit,
+	 (uint64_t) 1 );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -152,6 +176,46 @@ int ewf_test_tools_system_string_decimal_copy_to_64_bit(
 	          2,
 	          NULL,
 	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = ewftools_system_string_decimal_copy_to_64_bit(
+	          system_string4,
+	          24,
+	          &value_64bit,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	system_string4[ 6 ] = 'Z';
+
+	result = ewftools_system_string_decimal_copy_to_64_bit(
+	          system_string4,
+	          24,
+	          &value_64bit,
+	          &error );
+
+	system_string4[ 6 ] = '7';
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",

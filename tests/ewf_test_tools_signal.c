@@ -48,6 +48,8 @@ int ewf_test_tools_signal_attach(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = ewftools_signal_attach(
 	          ewf_test_tools_signal_handler,
 	          &error );
@@ -60,6 +62,24 @@ int ewf_test_tools_signal_attach(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	/* Test error cases
+	 */
+	result = ewftools_signal_attach(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
