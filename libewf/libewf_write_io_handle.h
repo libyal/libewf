@@ -168,6 +168,10 @@ struct libewf_write_io_handle
          */
         int current_file_io_pool_entry;
 
+        /* The current segment number
+         */
+        uint32_t current_segment_number;
+
         /* The current segment file
          */
         libewf_segment_file_t *current_segment_file;
@@ -203,10 +207,6 @@ struct libewf_write_io_handle
 	/* Value to indicate a new chunks section should be created
 	 */
 	uint8_t create_chunks_section;
-
-	/* The offset in the segment file from which to resume write
-	 */
-	off64_t resume_segment_file_offset;
 
 	/* Value to indicate if the write has been finalized
 	 */

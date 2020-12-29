@@ -182,13 +182,6 @@ int libewf_segment_table_get_segment_file_at_offset(
      libewf_segment_file_t **segment_file,
      libcerror_error_t **error );
 
-int libewf_segment_table_set_segment_file_by_index(
-     libewf_segment_table_t *segment_table,
-     libbfio_pool_t *file_io_pool,
-     uint32_t segment_number,
-     libewf_segment_file_t *segment_file,
-     libcerror_error_t **error );
-
 int libewf_segment_table_append_segment_by_segment_file(
      libewf_segment_table_t *segment_table,
      libewf_segment_file_t *segment_file,

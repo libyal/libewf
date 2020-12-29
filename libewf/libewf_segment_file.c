@@ -5313,24 +5313,6 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file->number_of_chunks = number_of_chunks_written_to_segment_file;
 
-	/* Make sure the next time the file is opened it is not truncated
-	 */
-	if( libbfio_pool_reopen(
-	     file_io_pool,
-	     file_io_pool_entry,
-	     LIBBFIO_OPEN_READ_WRITE,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to reopen segment file: %" PRIu16 ".",
-		 function,
-		 segment_file->segment_number );
-
-		goto on_error;
-	}
 	if( libbfio_pool_close(
 	     file_io_pool,
 	     file_io_pool_entry,
@@ -6192,6 +6174,26 @@ int libewf_segment_file_read_element_data(
 		 function );
 
 		goto on_error;
+	}
+	if( segment_file_size == 0 )
+	{
+		/* segment_file_size is 0 on write correction
+		 */
+		if( libbfio_pool_get_size(
+		     file_io_pool,
+		     file_io_pool_entry,
+		     &segment_file_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment file size.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	read_count = libewf_segment_file_read_file_header_file_io_pool(
 		      segment_file,

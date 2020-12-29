@@ -5962,7 +5962,6 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 	ssize_t write_finalize_count        = 0;
 	uint64_t chunk_index                = 0;
 	uint32_t number_of_segments         = 0;
-	uint32_t segment_number             = 0;
 	int file_io_pool_entry              = -1;
 
 	if( internal_handle == NULL )
@@ -6215,13 +6214,13 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 		}
 		write_finalize_count += write_count;
 	}
-	else
+	/* Check if the last segment file is still open for writing
+	 */
+	else if( internal_handle->write_io_handle->current_segment_file != NULL )
 	{
-		segment_number = number_of_segments - 1;
-
 		if( libewf_segment_table_get_segment_by_index(
 		     internal_handle->segment_table,
-		     segment_number,
+		     internal_handle->write_io_handle->current_segment_number,
 		     &file_io_pool_entry,
 		     &segment_file_size,
 		     error ) != 1 )
@@ -6232,68 +6231,10 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve segment: %" PRIu32 " from segment table.",
 			 function,
-			 segment_number );
+			 internal_handle->write_io_handle->current_segment_number );
 
 			return( -1 );
 		}
-		if( libewf_segment_table_get_segment_file_by_index(
-		     internal_handle->segment_table,
-		     segment_number,
-		     file_io_pool,
-		     &segment_file,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve segment file: %" PRIu32 " from segment table.",
-			 function,
-			 segment_number );
-
-			return( -1 );
-		}
-		if( segment_file == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing segment file: %" PRIu32 ".",
-			 function,
-			 segment_number );
-
-			return( -1 );
-		}
-	}
-	/* Set segment file to the correct offset if write is resumed
-	 */
-	if( internal_handle->write_io_handle->resume_segment_file_offset > 0 )
-	{
-		if( libbfio_pool_seek_offset(
-		     file_io_pool,
-		     file_io_pool_entry,
-		     internal_handle->write_io_handle->resume_segment_file_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek resume segment file offset: %" PRIi64 " in segment file: %" PRIu32 ".",
-			 function,
-			 internal_handle->write_io_handle->resume_segment_file_offset,
-			 segment_number );
-
-			return( -1 );
-		}
-		internal_handle->write_io_handle->resume_segment_file_offset = 0;
-	}
-	/* Check if the last segment file is still open for writing
-	 */
-	if( ( segment_file->flags & LIBEWF_SEGMENT_FILE_FLAG_WRITE_OPEN ) != 0 )
-	{
 		/* Check if chunks section needs to be corrected
 		 */
 		if( internal_handle->write_io_handle->chunks_section_offset != 0 )
@@ -6303,7 +6244,7 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 			               internal_handle->io_handle,
 				       file_io_pool,
 				       file_io_pool_entry,
-			               segment_file,
+			               internal_handle->write_io_handle->current_segment_file,
 			               error );
 
 			if( write_count == -1 )
@@ -6312,8 +6253,9 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write chunks section end.",
-				 function );
+				 "%s: unable to write chunks section end: %" PRIu32 ".",
+				 function,
+				 internal_handle->write_io_handle->current_segment_number );
 
 				return( -1 );
 			}
@@ -6325,12 +6267,13 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: closing last segment file.\n",
-			 function );
+			 "%s: closing last segment file: %" PRIu32 ".\n",
+			 function,
+			 internal_handle->write_io_handle->current_segment_number );
 		}
 #endif
 		write_count = libewf_segment_file_write_close(
-		               segment_file,
+		               internal_handle->write_io_handle->current_segment_file,
 		               file_io_pool,
 		               file_io_pool_entry,
 		               internal_handle->write_io_handle->number_of_chunks_written_to_segment_file,
@@ -6350,12 +6293,15 @@ ssize_t libewf_internal_handle_write_finalize_file_io_pool(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to close segment file.",
-			 function );
+			 "%s: unable to close segment file: %" PRIu32 ".",
+			 function,
+			 internal_handle->write_io_handle->current_segment_number );
 
 			return( -1 );
 		}
 		write_finalize_count += write_count;
+
+		internal_handle->write_io_handle->current_segment_file = NULL;
 	}
 	/* Correct the media values if streamed write was used
 	 */
