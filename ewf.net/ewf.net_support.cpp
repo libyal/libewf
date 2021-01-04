@@ -1,7 +1,7 @@
 /*
  * Support function of libewf .net managed wrapper
  *
- * Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2021, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -43,7 +43,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
 [assembly:AssemblyProductAttribute("ewf.net")];
-[assembly:AssemblyCopyrightAttribute("Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>")];
+[assembly:AssemblyCopyrightAttribute("Copyright (C) 2006-2021, Joachim Metz <joachim.metz@gmail.com>")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

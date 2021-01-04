@@ -24,7 +24,7 @@ BEGIN
       VALUE "FileDescription",		"Library to access the Expert Witness Compression Format (EWF) format\0"
       VALUE "FileVersion",		"@VERSION@" "\0"
       VALUE "InternalName",		"libewf.dll\0"
-      VALUE "LegalCopyright",		"(C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>\0"
+      VALUE "LegalCopyright",		"(C) 2006-2021, Joachim Metz <joachim.metz@gmail.com>\0"
       VALUE "OriginalFilename",		"libewf.dll\0"
       VALUE "ProductName",		"libewf\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
