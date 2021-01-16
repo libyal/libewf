@@ -221,10 +221,6 @@
 				RelativePath="..\..\pyewf\pyewf_media_types.c"
 				>
 			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_metadata.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -297,10 +293,6 @@
 			</File>
 			<File
 				RelativePath="..\..\pyewf\pyewf_media_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\pyewf\pyewf_metadata.h"
 				>
 			</File>
 			<File

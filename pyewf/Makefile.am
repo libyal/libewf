@@ -32,7 +32,6 @@ pyewf_la_SOURCES = \
 	pyewf_libewf.h \
 	pyewf_media_flags.c pyewf_media_flags.h \
 	pyewf_media_types.c pyewf_media_types.h \
-	pyewf_metadata.c pyewf_metadata.h \
 	pyewf_python.h \
 	pyewf_unused.h
 
