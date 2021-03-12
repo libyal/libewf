@@ -33,11 +33,53 @@
 
 #include "../ewftools/ewftools_signal.h"
 
-void ewf_test_tools_signal_handler(
+void ewf_test_tools_signal_handler_function(
       ewftools_signal_t signal EWF_TEST_ATTRIBUTE_UNUSED )
 {
 	EWF_TEST_UNREFERENCED_PARAMETER( signal )
 }
+
+#if defined( WINAPI )
+
+/* Tests the ewftools_signal_handler function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_tools_signal_handler(
+     void )
+{
+	BOOL result = 0;
+
+	/* Test regular cases
+	 */
+	result = ewftools_signal_handler(
+	          CTRL_C_EVENT );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 (int) TRUE );
+
+	result = ewftools_signal_handler(
+	          CTRL_LOGOFF_EVENT );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 (int) FALSE );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+#if defined( _MSC_VER )
+
+	/* TODO add tests for ewftools_signal_initialize_memory_debug */
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* defined( WINAPI ) */
 
 /* Tests the ewftools_signal_attach function
  * Returns 1 if successful or 0 if not
@@ -51,7 +93,7 @@ int ewf_test_tools_signal_attach(
 	/* Test regular cases
 	 */
 	result = ewftools_signal_attach(
-	          ewf_test_tools_signal_handler,
+	          ewf_test_tools_signal_handler_function,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -101,6 +143,8 @@ int ewf_test_tools_signal_detach(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Test regular cases
+	 */
 	result = ewftools_signal_detach(
 	          &error );
 
@@ -141,13 +185,17 @@ int main(
 
 #if defined( WINAPI )
 
-	/* TODO add tests for ewftools_signal_handler */
-#endif
+	EWF_TEST_RUN(
+	 "ewftools_signal_handler",
+	 ewf_test_tools_signal_handler )
 
-#if defined( WINAPI ) && defined( _MSC_VER )
+#if defined( _MSC_VER )
 
 	/* TODO add tests for ewftools_signal_initialize_memory_debug */
-#endif
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* defined( WINAPI ) */
 
 	EWF_TEST_RUN(
 	 "ewftools_signal_attach",
