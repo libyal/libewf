@@ -14986,7 +14986,7 @@ int libewf_handle_get_number_of_hash_values(
 	*number_of_values = (uint32_t) number_of_hash_values;
 
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
+	if( libcthreads_read_write_lock_release_for_write(
 	     internal_handle->read_write_lock,
 	     error ) != 1 )
 	{
@@ -14994,7 +14994,7 @@ int libewf_handle_get_number_of_hash_values(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );

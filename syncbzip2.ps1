@@ -1,6 +1,6 @@
 # Script that synchronizes bzip2.
 #
-# Version: 20200229
+# Version: 20210405
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -29,9 +29,9 @@ Function ExtractTarGz($Filename)
 	Remove-Item -Path ${Filename} -Force
 }
 
-$Version = "1.0.6"
+$Version = "1.0.8"
 $Filename = "${pwd}\bzip2-${Version}.tar.gz"
-$Url = "http://www.bzip.org/${Version}/bzip2-${Version}.tar.gz"
+$Url = "https://sourceware.org/pub/bzip2/bzip2-${Version}.tar.gz"
 $ExtractedPath = "bzip2-${Version}"
 $DestinationPath = "..\bzip2"
 
