@@ -37,18 +37,20 @@ class SupportFunctionsTests(unittest.TestCase):
 
   def test_check_file_signature(self):
     """Tests the check_file_signature function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    result = pyewf.check_file_signature(unittest.source)
+    result = pyewf.check_file_signature(test_source)
     self.assertTrue(result)
 
   def test_check_file_signature_file_object(self):
     """Tests the check_file_signature_file_object function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       result = pyewf.check_file_signature_file_object(file_object)
       self.assertTrue(result)
 

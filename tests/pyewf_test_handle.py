@@ -39,10 +39,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open(self):
     """Tests the open function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -59,13 +60,14 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open_file_objects(self):
     """Tests the open_file_objects function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
     file_objects = [open(filename, "rb") for filename in filenames]
 
     ewf_handle = pyewf.handle()
@@ -86,7 +88,8 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_close(self):
     """Tests the close function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     ewf_handle = pyewf.handle()
@@ -97,10 +100,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open_close(self):
     """Tests the open and close functions."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       return
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -112,8 +116,8 @@ class HandleTypeTests(unittest.TestCase):
     ewf_handle.open(filenames)
     ewf_handle.close()
 
-    if os.path.isfile(unittest.source):
-      with open(unittest.source, "rb") as file_object:
+    if os.path.isfile(test_source):
+      with open(test_source, "rb") as file_object:
 
         # Test open_file_objects and close.
         ewf_handle.open_file_objects([file_object])
@@ -130,10 +134,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer(self):
     """Tests the read_buffer function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -210,15 +215,16 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer_file_object(self):
     """Tests the read_buffer function on a file-like object."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
     ewf_handle = pyewf.handle()
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       ewf_handle.open_file_objects([file_object])
 
       media_size = ewf_handle.get_media_size()
@@ -233,10 +239,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer_at_offset(self):
     """Tests the read_buffer_at_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -302,10 +309,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_seek_offset(self):
     """Tests the seek_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -363,15 +371,16 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_seek_offset_file_object(self):
     """Tests the seek_offset function on a file-like object."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
     ewf_handle = pyewf.handle()
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       ewf_handle.open_file_objects([file_object])
 
       offset = ewf_handle.get_offset()
@@ -386,10 +395,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_offset(self):
     """Tests the get_offset function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -402,12 +412,13 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_root_file_entry(self):
     """Tests the get_root_file_entry function and root_file_entry property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
     # TODO: check media type and skip if not LEF
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -422,10 +433,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_sectors_per_chunk(self):
     """Tests the get_sectors_per_chunk function and sectors_per_chunk property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -440,10 +452,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_bytes_per_sector(self):
     """Tests the get_bytes_per_sector function and bytes_per_sector property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -458,10 +471,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_number_of_sectors(self):
     """Tests the get_number_of_sectors function and number_of_sectors property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -476,10 +490,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_chunk_size(self):
     """Tests the get_chunk_size function and chunk_size property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -494,10 +509,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_error_granularity(self):
     """Tests the get_error_granularity function and error_granularity property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -512,10 +528,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_compression_method(self):
     """Tests the get_compression_method function and compression_method property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -530,10 +547,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_size(self):
     """Tests the get_media_size function and media_size property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -548,10 +566,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_type(self):
     """Tests the get_media_type function and media_type property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -566,10 +585,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_flags(self):
     """Tests the get_media_flags function and media_flags property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -584,10 +604,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_format(self):
     """Tests the get_format function and format property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 
@@ -602,10 +623,11 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_header_codepage(self):
     """Tests the get_header_codepage function and header_codepage property."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    filenames = pyewf.glob(unittest.source)
+    filenames = pyewf.glob(test_source)
 
     ewf_handle = pyewf.handle()
 

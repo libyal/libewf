@@ -159,10 +159,10 @@ install:
     git clone https://github.com/libyal/vstools.git ..\vstools )
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild" -or ($env:BUILD_ENVIRONMENT -eq "python" -and $isWindows)) {
     .\syncwinflexbison.ps1 }
-- cmd: if [%BUILD_ENVIRONMENT%]==[msbuild] (
-    git clone https://github.com/joachimmetz/bzip2.git ..\bzip2 )
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     .\synczlib.ps1 }
+- cmd: if [%BUILD_ENVIRONMENT%]==[msbuild] (
+    git clone https://github.com/joachimmetz/bzip2.git ..\bzip2 )
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     If (($env:TARGET -eq "vs2017") -Or ($env:TARGET -eq "vs2019")) {
       .\syncdokan.ps1 }
