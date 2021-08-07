@@ -542,24 +542,36 @@ void pyewf_handle_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libewf_handle_free(
-	          &( pyewf_handle->handle ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyewf_handle->file_io_pool != NULL )
 	{
-		pyewf_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free handle.",
-		 function );
+		if( pyewf_handle_close(
+		     pyewf_handle,
+		     NULL ) == NULL )
+		{
+			return;
+		}
+	}
+	if( pyewf_handle->handle != NULL )
+	{
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libewf_handle_free(
+		          &( pyewf_handle->handle ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyewf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free handle.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyewf_handle );

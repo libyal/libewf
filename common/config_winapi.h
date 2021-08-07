@@ -84,6 +84,12 @@
 #define HAVE_MULTI_THREAD_SUPPORT	1
 #endif
 
+/* If not controlled by config.h enable write support
+ */
+#if !defined( HAVE_CONFIG_H ) && !defined( HAVE_WRITE_SUPPORT )
+#define HAVE_WRITE_SUPPORT	1
+#endif
+
 #endif /* defined( WINAPI ) */
 
 #endif /* !defined( _CONFIG_WINAPI_H ) */
