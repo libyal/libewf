@@ -56,7 +56,6 @@
  */
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
-     uint8_t calculate_md5,
      uint8_t use_data_chunk_functions,
      libcerror_error_t **error )
 {
@@ -147,23 +146,6 @@ int verification_handle_initialize(
 		goto on_error;
 	}
 #endif
-	if( calculate_md5 != 0 )
-	{
-		( *verification_handle )->calculated_md5_hash_string = system_string_allocate(
-									33 );
-
-		if( ( *verification_handle )->calculated_md5_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated MD5 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	( *verification_handle )->stored_md5_hash_string = system_string_allocate(
 							    33 );
 
@@ -207,7 +189,6 @@ int verification_handle_initialize(
 		goto on_error;
 	}
 	( *verification_handle )->input_format             = VERIFICATION_HANDLE_INPUT_FORMAT_RAW;
-	( *verification_handle )->calculate_md5            = calculate_md5;
 	( *verification_handle )->use_data_chunk_functions = use_data_chunk_functions;
 	( *verification_handle )->header_codepage          = LIBEWF_CODEPAGE_ASCII;
 	( *verification_handle )->process_buffer_size      = EWFCOMMON_PROCESS_BUFFER_SIZE;
@@ -235,11 +216,6 @@ on_error:
 		{
 			memory_free(
 			 ( *verification_handle )->stored_md5_hash_string );
-		}
-		if( ( *verification_handle )->calculated_md5_hash_string != NULL )
-		{
-			memory_free(
-			 ( *verification_handle )->calculated_md5_hash_string );
 		}
 		if( ( *verification_handle )->input_handle != NULL )
 		{
@@ -709,6 +685,18 @@ int verification_handle_initialize_integrity_hash(
 
 		return( -1 );
 	}
+	if( verification_handle->digest_types_set == 0 )
+	{
+		verification_handle->calculate_md5    = verification_handle->stored_md5_hash_available;
+		verification_handle->calculate_sha1   = verification_handle->stored_sha1_hash_available;
+		verification_handle->calculate_sha256 = verification_handle->stored_sha256_hash_available;
+	}
+	if( ( verification_handle->calculate_md5 == 0 )
+	 && ( verification_handle->calculate_sha1 == 0 )
+	 && ( verification_handle->calculate_sha256 == 0 ) )
+	{
+		verification_handle->calculate_md5 = 1;
+	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
 		if( libhmac_md5_initialize(
@@ -904,18 +892,54 @@ int verification_handle_finalize_integrity_hash(
 
 		return( -1 );
 	}
+	if( verification_handle->calculated_md5_hash_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid verification handle - calculated MD5 digest hash string value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle->calculated_sha1_hash_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid verification handle - calculated SHA1 digest hash string value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle->calculated_sha256_hash_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid verification handle - calculated SHA256 digest hash string value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
+		verification_handle->calculated_md5_hash_string = system_string_allocate(
+		                                                   33 );
+
 		if( verification_handle->calculated_md5_hash_string == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid verification handle - missing calculated MD5 hash string.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated MD5 digest hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_md5_finalize(
 		     verification_handle->md5_context,
@@ -930,7 +954,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to finalize MD5 hash.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_md5_free(
 		     &( verification_handle->md5_context ),
@@ -943,7 +967,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to free MD5 context.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_md5_hash,
@@ -959,21 +983,24 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to set calculated MD5 hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
+		verification_handle->calculated_sha1_hash_string = system_string_allocate(
+		                                                    41 );
+
 		if( verification_handle->calculated_sha1_hash_string == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid verification handle - missing calculated SHA1 hash string.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA1 digest hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_sha1_finalize(
 		     verification_handle->sha1_context,
@@ -988,7 +1015,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to finalize SHA1 hash.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_sha1_free(
 		     &( verification_handle->sha1_context ),
@@ -1001,7 +1028,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to free SHA1 context.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha1_hash,
@@ -1017,21 +1044,24 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to create calculated SHA1 hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( verification_handle->calculate_sha256 != 0 )
 	{
+		verification_handle->calculated_sha256_hash_string = system_string_allocate(
+		                                                      65 );
+
 		if( verification_handle->calculated_sha256_hash_string == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid verification handle - missing calculated SHA256 hash string.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create calculated SHA256 digest hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_sha256_finalize(
 		     verification_handle->sha256_context,
@@ -1046,7 +1076,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to finalize SHA256 hash.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libhmac_sha256_free(
 		     &( verification_handle->sha256_context ),
@@ -1059,7 +1089,7 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to free SHA256 context.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( digest_hash_copy_to_string(
 		     calculated_sha256_hash,
@@ -1075,10 +1105,34 @@ int verification_handle_finalize_integrity_hash(
 			 "%s: unable to create calculated SHA256 hash string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( verification_handle->calculated_sha256_hash_string != NULL )
+	{
+		memory_free(
+		 verification_handle->calculated_sha256_hash_string );
+
+		verification_handle->calculated_sha256_hash_string = NULL;
+	}
+	if( verification_handle->calculated_sha1_hash_string != NULL )
+	{
+		memory_free(
+		 verification_handle->calculated_sha1_hash_string );
+
+		verification_handle->calculated_sha1_hash_string = NULL;
+	}
+	if( verification_handle->calculated_md5_hash_string != NULL )
+	{
+		memory_free(
+		 verification_handle->calculated_md5_hash_string );
+
+		verification_handle->calculated_md5_hash_string = NULL;
+	}
+	return( -1 );
 }
 
 #if defined( HAVE_MULTI_THREAD_SUPPORT )
@@ -1823,6 +1877,22 @@ int verification_handle_verify_input(
 	}
 #endif /* defined( HAVE_MULTI_THREAD_SUPPORT ) */
 
+	/* Get the integrity hashes from the input first to determine
+	 * which digest (hash) types are used.
+	 */
+	if( verification_handle_get_integrity_hash_from_input(
+	     verification_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to retrieve integrity hash(es) from input.",
+		 function );
+
+		goto on_error;
+	}
 	if( verification_handle_initialize_integrity_hash(
 	     verification_handle,
 	     error ) != 1 )
@@ -2197,19 +2267,6 @@ int verification_handle_verify_input(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to finalize integrity hash(es).",
-		 function );
-
-		goto on_error;
-	}
-	if( verification_handle_get_integrity_hash_from_input(
-	     verification_handle,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to retrieve integrity hash(es) from input.",
 		 function );
 
 		goto on_error;
@@ -2855,6 +2912,7 @@ int verification_handle_verify_file_entry(
 
 			goto on_error;
 		}
+/* TODO determine digest (hash) types */
 		if( verification_handle_initialize_integrity_hash(
 		     verification_handle,
 		     error ) != 1 )
@@ -3722,18 +3780,19 @@ int verification_handle_set_number_of_threads(
 	return( result );
 }
 
-/* Sets the additional digest types
+/* Sets the digest (hash) types
  * Returns 1 if successful or -1 on error
  */
-int verification_handle_set_additional_digest_types(
+int verification_handle_set_digest_types(
      verification_handle_t *verification_handle,
      const system_character_t *string,
      libcerror_error_t **error )
 {
 	system_character_t *string_segment               = NULL;
-	static char *function                            = "verification_handle_set_additional_digest_types";
+	static char *function                            = "verification_handle_set_digest_types";
 	size_t string_length                             = 0;
 	size_t string_segment_size                       = 0;
+	uint8_t calculate_md5                            = 0;
 	uint8_t calculate_sha1                           = 0;
 	uint8_t calculate_sha256                         = 0;
 	int number_of_segments                           = 0;
@@ -3848,7 +3907,24 @@ int verification_handle_set_additional_digest_types(
 
 			goto on_error;
 		}
-		if( string_segment_size == 5 )
+		if( string_segment_size == 4 )
+		{
+			if( system_string_compare(
+			     string_segment,
+			     _SYSTEM_STRING( "md5" ),
+			     3 ) == 0 )
+			{
+				calculate_md5 = 1;
+			}
+			else if( system_string_compare(
+			          string_segment,
+			          _SYSTEM_STRING( "MD5" ),
+			          3 ) == 0 )
+			{
+				calculate_md5 = 1;
+			}
+		}
+		else if( string_segment_size == 5 )
 		{
 			if( system_string_compare(
 			     string_segment,
@@ -3945,42 +4021,19 @@ int verification_handle_set_additional_digest_types(
 			}
 		}
 	}
+	if( ( calculate_md5 != 0 )
+	 && ( verification_handle->calculate_md5 == 0 ) )
+	{
+		verification_handle->calculate_md5 = 1;
+	}
 	if( ( calculate_sha1 != 0 )
 	 && ( verification_handle->calculate_sha1 == 0 ) )
 	{
-		verification_handle->calculated_sha1_hash_string = system_string_allocate(
-		                                                    41 );
-
-		if( verification_handle->calculated_sha1_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated SHA1 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
 		verification_handle->calculate_sha1 = 1;
 	}
 	if( ( calculate_sha256 != 0 )
 	 && ( verification_handle->calculate_sha256 == 0 ) )
 	{
-		verification_handle->calculated_sha256_hash_string = system_string_allocate(
-		                                                      65 );
-
-		if( verification_handle->calculated_sha256_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create calculated SHA256 digest hash string.",
-			 function );
-
-			goto on_error;
-		}
 		verification_handle->calculate_sha256 = 1;
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -4002,6 +4055,8 @@ int verification_handle_set_additional_digest_types(
 
 		goto on_error;
 	}
+	verification_handle->digest_types_set = 1;
+
 	return( result );
 
 on_error:

@@ -8,7 +8,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 PROFILES=("ewfverify" "ewfverify_chunk" "ewfverify_multi" "ewfverify_chunk_multi");
-OPTIONS_PER_PROFILE=("-j0 -q" "-j0 -q -x" "-j4 -q" "-j4 -q -x");
+OPTIONS_PER_PROFILE=("-dmd5 -j0 -q" "-dmd5 -j0 -q -x" "-dmd5 -j4 -q" "-dmd5 -j4 -q -x");
 OPTION_SETS="";
 
 INPUT_GLOB="*.[Ees]*01";

@@ -82,8 +82,9 @@ void usage_fprint(
 	                 "\t           windows-950, windows-1250, windows-1251, windows-1252,\n"
 	                 "\t           windows-1253, windows-1254, windows-1255, windows-1256,\n"
 	                 "\t           windows-1257 or windows-1258\n" );
-	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5,\n"
-	                 "\t           options: sha1, sha256\n" );
+	fprintf( stream, "\t-d:        calculate digest (hash) types, options: md5, sha1, sha256.\n"
+	                 "\t           By default ewfverify will calculate the digest (hash) types\n"
+	                 "\t           that are stored in the EWF segment files or MD5 if none.\n" );
 	fprintf( stream, "\t-f:        specify the input format, options: raw (default),\n"
 	                 "\t           files (restricted to logical volume files)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
@@ -157,27 +158,26 @@ int main( int argc, char * const argv[] )
 	struct rlimit limit_data;
 #endif
 
-	system_character_t * const *source_filenames       = NULL;
-	libcerror_error_t *error                           = NULL;
-	log_handle_t *log_handle                           = NULL;
-	system_character_t *log_filename                   = NULL;
-	system_character_t *option_additional_digest_types = NULL;
-	system_character_t *option_format                  = NULL;
-	system_character_t *option_header_codepage         = NULL;
-	system_character_t *option_number_of_jobs          = NULL;
-	system_character_t *option_process_buffer_size     = NULL;
-	system_character_t *program                        = _SYSTEM_STRING( "ewfverify" );
-	system_integer_t option                            = 0;
-	uint8_t calculate_md5                              = 1;
-	uint8_t print_status_information                   = 1;
-	uint8_t use_data_chunk_functions                   = 0;
-	uint8_t verbose                                    = 0;
-	uint8_t zero_chunk_on_error                        = 0;
-	int number_of_filenames                            = 0;
-	int result                                         = 0;
+	system_character_t * const *source_filenames   = NULL;
+	libcerror_error_t *error                       = NULL;
+	log_handle_t *log_handle                       = NULL;
+	system_character_t *log_filename               = NULL;
+	system_character_t *option_digest_types        = NULL;
+	system_character_t *option_format              = NULL;
+	system_character_t *option_header_codepage     = NULL;
+	system_character_t *option_number_of_jobs      = NULL;
+	system_character_t *option_process_buffer_size = NULL;
+	system_character_t *program                    = _SYSTEM_STRING( "ewfverify" );
+	system_integer_t option                        = 0;
+	uint8_t print_status_information               = 1;
+	uint8_t use_data_chunk_functions               = 0;
+	uint8_t verbose                                = 0;
+	uint8_t zero_chunk_on_error                    = 0;
+	int number_of_filenames                        = 0;
+	int result                                     = 0;
 
 #if !defined( HAVE_GLOB_H )
-	ewftools_glob_t *glob                            = NULL;
+	ewftools_glob_t *glob                          = NULL;
 #endif
 
 	libcnotify_stream_set(
@@ -235,7 +235,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'd':
-				option_additional_digest_types = optarg;
+				option_digest_types = optarg;
 
 				break;
 
@@ -315,7 +315,6 @@ int main( int argc, char * const argv[] )
 #endif
 	if( verification_handle_initialize(
 	     &ewfverify_verification_handle,
-	     calculate_md5,
 	     use_data_chunk_functions,
 	     &error ) != 1 )
 	{
@@ -429,18 +428,18 @@ int main( int argc, char * const argv[] )
 		 ewfverify_verification_handle->number_of_threads );
 #endif
 	}
-	if( option_additional_digest_types != NULL )
+	if( option_digest_types != NULL )
 	{
-		result = verification_handle_set_additional_digest_types(
+		result = verification_handle_set_digest_types(
 			  ewfverify_verification_handle,
-			  option_additional_digest_types,
+			  option_digest_types,
 			  &error );
 
 		if( result == -1 )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to set additional digest types.\n" );
+			 "Unable to set digest types.\n" );
 
 			goto on_error;
 		}

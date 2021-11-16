@@ -56,7 +56,6 @@ int ewf_test_tools_verification_handle_initialize(
 	 */
 	result = verification_handle_initialize(
 	          &verification_handle,
-	          1,
 	          0,
 	          &error );
 
@@ -94,7 +93,6 @@ int ewf_test_tools_verification_handle_initialize(
 	 */
 	result = verification_handle_initialize(
 	          NULL,
-	          1,
 	          0,
 	          &error );
 
@@ -114,7 +112,6 @@ int ewf_test_tools_verification_handle_initialize(
 
 	result = verification_handle_initialize(
 	          &verification_handle,
-	          1,
 	          0,
 	          &error );
 
@@ -144,7 +141,6 @@ int ewf_test_tools_verification_handle_initialize(
 
 		result = verification_handle_initialize(
 		          &verification_handle,
-		          1,
 		          0,
 		          &error );
 
@@ -188,7 +184,6 @@ int ewf_test_tools_verification_handle_initialize(
 
 		result = verification_handle_initialize(
 		          &verification_handle,
-		          1,
 		          0,
 		          &error );
 
@@ -364,7 +359,6 @@ int main(
 	 */
 	result = verification_handle_initialize(
 	          &verification_handle,
-	          1,
 	          0,
 	          &error );
 

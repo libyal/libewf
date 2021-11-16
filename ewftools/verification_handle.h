@@ -57,6 +57,10 @@ struct verification_handle
 	 */
 	int header_codepage;
 
+	/* Value to indicate if the digest types were set by the user
+	 */
+	uint8_t digest_types_set;
+
 	/* Value to indicate if the MD5 digest hash should be calculated
 	 */
 	uint8_t calculate_md5;
@@ -196,7 +200,6 @@ struct verification_handle
 
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
-     uint8_t calculate_md5,
      uint8_t use_data_chunk_functions,
      libcerror_error_t **error );
 
@@ -315,7 +318,7 @@ int verification_handle_set_number_of_threads(
      const system_character_t *string,
      libcerror_error_t **error );
 
-int verification_handle_set_additional_digest_types(
+int verification_handle_set_digest_types(
      verification_handle_t *verification_handle,
      const system_character_t *string,
      libcerror_error_t **error );
