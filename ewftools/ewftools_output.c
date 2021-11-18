@@ -238,11 +238,21 @@ void ewftools_output_version_detailed_fprint(
 	 LIBHMAC_VERSION_STRING );
 
 #if defined( HAVE_LIBCRYPTO )
+#if defined( SHLIB_VERSION_NUMBER )
 	fprintf(
 	 stream,
 	 " (libcrypto %s)",
 	 SHLIB_VERSION_NUMBER );
-#endif
+
+#elif defined( OPENSSL_VERSION_MAJOR ) && defined( OPENSSL_VERSION_MINOR )
+	fprintf(
+	 stream,
+	 " (libcrypto %d.%d)",
+	 OPENSSL_VERSION_MAJOR,
+	 OPENSSL_VERSION_MINOR );
+
+#endif /* defined( SHLIB_VERSION_NUMBER ) */
+#endif /* defined( HAVE_LIBCRYPTO ) */
 #endif /* defined( HAVE_LIBHMAC ) || defined( HAVE_LOCAL_LIBHMAC ) */
 
 #if defined( HAVE_LIBODRAW ) || defined( HAVE_LOCAL_LIBODRAW )
