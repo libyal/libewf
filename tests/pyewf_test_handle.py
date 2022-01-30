@@ -2,7 +2,7 @@
 #
 # Python-bindings handle type test script
 #
-# Copyright (C) 2006-2021, Joachim Metz <joachim.metz@gmail.com>
+# Copyright (C) 2006-2022, Joachim Metz <joachim.metz@gmail.com>
 #
 # Refer to AUTHORS for acknowledgements.
 #
