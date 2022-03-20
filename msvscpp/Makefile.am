@@ -30,7 +30,6 @@ MSVSCPP_FILES = \
 	ewf_test_hash_values/ewf_test_hash_values.vcproj \
 	ewf_test_header_sections/ewf_test_header_sections.vcproj \
 	ewf_test_header_values/ewf_test_header_values.vcproj \
-	ewf_test_huffman_tree/ewf_test_huffman_tree.vcproj \
 	ewf_test_io_handle/ewf_test_io_handle.vcproj \
 	ewf_test_lef_extended_attribute/ewf_test_lef_extended_attribute.vcproj \
 	ewf_test_lef_file_entry/ewf_test_lef_file_entry.vcproj \

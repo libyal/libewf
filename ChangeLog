@@ -20,7 +20,6 @@ TODO
 * move use of libfvalue_table_get_value_by_identifier out of header_values and hash_values
 * refactor libewf_hash_sections_set_digest_from_hash_values move into hash_values?
 
-* is libewf_huffman_tree.[ch] still used ? remove ?
 * change single files tree to B-tree
 * access control entry / permission group add get_owner and get_group functions
 * file entry add 0 if not set support for values

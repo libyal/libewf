@@ -191,6 +191,46 @@ int ewf_test_case_data_section_read_file_io_pool(
 
 	/* Test regular cases
 	 */
+
+	/* Test read of case data section without case data set in read IO handle
+	 */
+	read_count = libewf_case_data_section_read_file_io_pool(
+	              section_descriptor,
+	              io_handle,
+	              file_io_pool,
+	              0,
+	              read_io_handle,
+	              media_values,
+	              header_values,
+	              &error );
+
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 160 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test read of case data section with case data set in read IO handle
+	 */
+	offset = libbfio_pool_seek_offset(
+	          file_io_pool,
+	          0,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	read_count = libewf_case_data_section_read_file_io_pool(
 	              section_descriptor,
 	              io_handle,

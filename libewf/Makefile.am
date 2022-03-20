@@ -70,7 +70,6 @@ libewf_la_SOURCES = \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \
-	libewf_huffman_tree.c libewf_huffman_tree.h \
 	libewf_io_handle.c libewf_io_handle.h \
 	libewf_libbfio.h \
 	libewf_libcaes.h \

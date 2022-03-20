@@ -290,10 +290,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_huffman_tree.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_io_handle.c"
 				>
 			</File>
@@ -585,10 +581,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_header_values.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_huffman_tree.h"
 				>
 			</File>
 			<File
