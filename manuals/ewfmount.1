@@ -1,4 +1,4 @@
-.Dd January 19, 2014
+.Dd April  3, 2022
 .Dt ewfmount
 .Os libewf
 .Sh NAME
@@ -10,6 +10,7 @@
 .Op Fl X Ar extended_options
 .Op Fl hvV
 .Ar ewf_files
+.Ar mount_point
 .Sh DESCRIPTION
 .Nm ewfmount
 is a utility to mount data stored in EWF files.
@@ -47,8 +48,8 @@ None
 .Bd -literal
 # ewfmount floppy.E01 floppy/
 ewfmount 20110918
-
-
+.sp
+.sp
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.

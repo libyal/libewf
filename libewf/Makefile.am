@@ -41,7 +41,6 @@ libewf_la_SOURCES = \
 	libewf_access_control_entry.c libewf_access_control_entry.h \
 	libewf_analytical_data.c libewf_analytical_data.h \
 	libewf_attribute.c libewf_attribute.h \
-	libewf_bit_stream.c libewf_bit_stream.h \
 	libewf_case_data.c libewf_case_data.h \
 	libewf_case_data_section.c libewf_case_data_section.h \
 	libewf_checksum.c libewf_checksum.h \

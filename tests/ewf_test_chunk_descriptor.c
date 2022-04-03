@@ -539,6 +539,311 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libewf_chunk_descriptor_write_data function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_descriptor_write_data(
+     void )
+{
+	uint8_t table_entries_data[ 16 ];
+
+	libcerror_error_t *error                    = NULL;
+	libewf_chunk_descriptor_t *chunk_descriptor = NULL;
+	int result                                  = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_chunk_descriptor_initialize(
+	          &chunk_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_descriptor",
+	 chunk_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	chunk_descriptor->data_offset = 2048;
+	chunk_descriptor->data_size   = 1024;
+
+	/* Test regular cases
+	 */
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          4,
+	          1024,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          16,
+	          1024,
+	          2,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_descriptor_write_data(
+	          NULL,
+	          table_entries_data,
+	          4,
+	          1024,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          NULL,
+	          4,
+	          1024,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          (size_t) SSIZE_MAX + 1,
+	          1024,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          0,
+	          1024,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          4,
+	          -1,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          4,
+	          1024,
+	          99,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error cases - chunk data offset before base offset
+	 */
+	chunk_descriptor->data_offset = 0;
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          4,
+	          1024,
+	          1,
+	          &error );
+
+	chunk_descriptor->data_offset = 2048;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	chunk_descriptor->data_offset = -1;
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          16,
+	          1024,
+	          2,
+	          &error );
+
+	chunk_descriptor->data_offset = 2048;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error cases - chunk data size value out of bounds
+	 */
+	chunk_descriptor->data_size = (size64_t) UINT32_MAX + 1;
+
+	result = libewf_chunk_descriptor_write_data(
+	          chunk_descriptor,
+	          table_entries_data,
+	          16,
+	          1024,
+	          2,
+	          &error );
+
+	chunk_descriptor->data_size = 1024;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_descriptor_free(
+	          &chunk_descriptor,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_descriptor",
+	 chunk_descriptor );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( chunk_descriptor != NULL )
+	{
+		libewf_chunk_descriptor_free(
+		 &chunk_descriptor,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
@@ -570,7 +875,9 @@ int main(
 	 "libewf_chunk_descriptor_clone",
 	 ewf_test_chunk_descriptor_clone );
 
-	/* TODO add tests for libewf_chunk_descriptor_write_data */
+	EWF_TEST_RUN(
+	 "libewf_chunk_descriptor_write_data",
+	 ewf_test_chunk_descriptor_write_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 

@@ -186,10 +186,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_bit_stream.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_case_data.c"
 				>
 			</File>
@@ -465,10 +461,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_attribute.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_bit_stream.h"
 				>
 			</File>
 			<File

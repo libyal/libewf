@@ -4,7 +4,6 @@ MSVSCPP_FILES = \
 	ewf_test_access_control_entry/ewf_test_access_control_entry.vcproj \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
 	ewf_test_attribute/ewf_test_attribute.vcproj \
-	ewf_test_bit_stream/ewf_test_bit_stream.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_case_data_section/ewf_test_case_data_section.vcproj \
 	ewf_test_checksum/ewf_test_checksum.vcproj \

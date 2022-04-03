@@ -82,7 +82,6 @@ check_PROGRAMS = \
 	ewf_test_access_control_entry \
 	ewf_test_analytical_data \
 	ewf_test_attribute \
-	ewf_test_bit_stream \
 	ewf_test_case_data \
 	ewf_test_case_data_section \
 	ewf_test_checksum \
@@ -201,18 +200,6 @@ ewf_test_attribute_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
-
-ewf_test_bit_stream_SOURCES = \
-	ewf_test_bit_stream.c \
-	ewf_test_libcerror.h \
-	ewf_test_libewf.h \
-	ewf_test_macros.h \
-	ewf_test_memory.c ewf_test_memory.h \
-	ewf_test_unused.h
-
-ewf_test_bit_stream_LDADD = \
-	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
 
 ewf_test_case_data_SOURCES = \
 	ewf_test_case_data.c \
