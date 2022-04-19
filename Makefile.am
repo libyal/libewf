@@ -45,7 +45,6 @@ DPKG_FILES = \
 	dpkg/rules \
 	dpkg/libewf.install \
 	dpkg/libewf-dev.install \
-	dpkg/libewf-python.install \
 	dpkg/libewf-python3.install \
 	dpkg/libewf-tools.install \
 	dpkg/source/format

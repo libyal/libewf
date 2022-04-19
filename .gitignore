@@ -163,7 +163,6 @@ stamp-h[1-9]
 /tests/ewf_test_hash_values
 /tests/ewf_test_header_sections
 /tests/ewf_test_header_values
-/tests/ewf_test_huffman_tree
 /tests/ewf_test_io_handle
 /tests/ewf_test_lef_extended_attribute
 /tests/ewf_test_lef_file_entry
