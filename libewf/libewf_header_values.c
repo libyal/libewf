@@ -2643,7 +2643,7 @@ on_error:
 	if( *header != NULL )
 	{
 		memory_free(
-		 header );
+		 *header );
 
 		*header = NULL;
 	}
