@@ -138,6 +138,7 @@ stamp-h[1-9]
 /tests/ewf_test_access_control_entry
 /tests/ewf_test_analytical_data
 /tests/ewf_test_attribute
+/tests/ewf_test_bit_stream
 /tests/ewf_test_case_data
 /tests/ewf_test_case_data_section
 /tests/ewf_test_checksum
@@ -163,6 +164,7 @@ stamp-h[1-9]
 /tests/ewf_test_hash_values
 /tests/ewf_test_header_sections
 /tests/ewf_test_header_values
+/tests/ewf_test_huffman_tree
 /tests/ewf_test_io_handle
 /tests/ewf_test_lef_extended_attribute
 /tests/ewf_test_lef_file_entry
