@@ -422,6 +422,9 @@ ewf_test_device_information_section_SOURCES = \
 	ewf_test_unused.h
 
 ewf_test_device_information_section_LDADD = \
+	@LIBFVALUE_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

@@ -1197,11 +1197,9 @@ int libewf_handle_open(
 		internal_handle->file_io_pool_created_in_library = 1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	result = libcthreads_read_write_lock_release_for_write(
-	          internal_handle->read_write_lock,
-	          error );
-
-	if( result != 1 )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1562,11 +1560,9 @@ int libewf_handle_open_wide(
 		internal_handle->file_io_pool_created_in_library = 1;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	result = libcthreads_read_write_lock_release_for_write(
-	          internal_handle->read_write_lock,
-	          error );
-
-	if( result != 1 )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3948,11 +3944,9 @@ int libewf_handle_open_file_io_pool(
 		internal_handle->file_io_pool = file_io_pool;
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
-	result = libcthreads_read_write_lock_release_for_write(
-	          internal_handle->read_write_lock,
-	          error );
-
-	if( result != 1 )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_handle->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3960,6 +3954,8 @@ int libewf_handle_open_file_io_pool(
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to release read/write lock for writing.",
 		 function );
+
+		result = -1;
 	}
 #endif
 	if( result != 1 )
