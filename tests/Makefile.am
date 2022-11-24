@@ -57,6 +57,7 @@ TESTS = \
 	$(TESTS_PYEWF)
 
 check_SCRIPTS = \
+	pyewf_test_handle.py \
 	pyewf_test_support.py \
 	test_ewfacquire.sh \
 	test_ewfacquire_optical.sh \
