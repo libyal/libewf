@@ -27,7 +27,7 @@
 #include <sys/utsname.h>
 #endif
 
-#if defined( WINAPI ) && ( WINVER >= 0x0a00 )
+#if defined( WINAPI ) && ( WINVER >= 0x0a00 ) && defined( _MSC_VER )
 #include <VersionHelpers.h>
 #endif
 
@@ -73,7 +73,7 @@ int platform_get_operating_system(
 
 		return( -1 );
 	}
-#if defined( WINAPI ) && ( WINVER >= 0x0a00 )
+#if defined( WINAPI ) && ( WINVER >= 0x0a00 ) && defined( _MSC_VER )
 
 /* TODO consider detecting Windows server version with IsWindowsServer() */
 

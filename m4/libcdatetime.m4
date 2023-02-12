@@ -1,6 +1,6 @@
 dnl Checks for libcdatetime required headers and functions
 dnl
-dnl Version: 20190308
+dnl Version: 20230115
 
 dnl Function to detect if libcdatetime is available
 dnl ac_libcdatetime_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -332,9 +332,7 @@ dnl Function to detect if libcdatetime dependencies are available
 AC_DEFUN([AX_LIBCDATETIME_CHECK_LOCAL],
   [dnl Headers included in libcdatetime/libcdatetime_elements.c
   dnl and libcdatetime/libcdatetime_timestamp.c
-  AC_CHECK_HEADERS([errno.h])
-
-  AC_HEADER_TIME
+  AC_CHECK_HEADERS([errno.h sys/time.h])
 
   dnl Types used in libcdatetime/libcdatetime_elements.c
   AC_STRUCT_TM

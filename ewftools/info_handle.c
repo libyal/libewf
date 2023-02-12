@@ -4626,35 +4626,39 @@ int info_handle_attribute_value_fprint(
 			goto on_error;
 		}
 	}
-	if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
+	if( ( name_string != NULL )
+	 && ( value_string != NULL ) )
 	{
-		fprintf(
-		 info_handle->notify_stream,
-		 "\t\t\t\t<attribute name=\"%" PRIs_SYSTEM "\">%" PRIs_SYSTEM "</attribute>\n",
-		 name_string,
-		 value_string );
-	}
-	else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
-	{
-		fprintf(
-		 info_handle->notify_stream,
-		 "\t\t%s",
-		 name_string );
-
-		do
+		if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_DFXML )
 		{
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t" );
-
-			name_string_size += 8;
+			 "\t\t\t\t<attribute name=\"%" PRIs_SYSTEM "\">%" PRIs_SYSTEM "</attribute>\n",
+			 name_string,
+			 value_string );
 		}
-		while( name_string_size <= 24 );
+		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\t%s",
+			 name_string );
 
-		fprintf(
-		 info_handle->notify_stream,
-		 ": %" PRIs_SYSTEM "\n",
-		 value_string );
+			do
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t" );
+
+				name_string_size += 8;
+			}
+			while( name_string_size <= 24 );
+
+			fprintf(
+			 info_handle->notify_stream,
+			 ": %" PRIs_SYSTEM "\n",
+			 value_string );
+		}
 	}
 	if( value_string != NULL )
 	{
