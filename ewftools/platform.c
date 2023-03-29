@@ -117,7 +117,7 @@ int platform_get_operating_system(
 	{
 		operating_system = "Windows 7 SP1";
 	}
-	else if( Windows8Point1OrGreater() == FALSE )
+	else if( IsWindows8Point1OrGreater() == FALSE )
 	{
 		operating_system = "Windows 8.0";
 	}
