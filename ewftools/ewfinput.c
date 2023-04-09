@@ -41,7 +41,7 @@
 #include "ewftools_libewf.h"
 #include "ewftools_system_string.h"
 
-/* Input selection defintions
+/* Input selection definitions
  */
 #if defined( HAVE_BZIP2_SUPPORT )
 system_character_t *ewfinput_compression_methods[ 2 ] = {
