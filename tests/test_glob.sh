@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Library glob testing script
 #
-# Version: 20180317
+# Version: 20230410
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;

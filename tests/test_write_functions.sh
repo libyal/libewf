@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Library API write functions testing script
 #
-# Version: 20171107
+# Version: 20230410
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
