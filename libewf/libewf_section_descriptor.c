@@ -843,6 +843,17 @@ int libewf_section_descriptor_read_data(
 			}
 			else
 			{
+				if( file_offset > ( (off64_t) INT64_MAX - section_descriptor->size ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid file offset value out of bounds.",
+					 function );
+
+					return( -1 );
+				}
 				file_offset += (off64_t) section_descriptor->size;
 
 				if( section_descriptor->end_offset != file_offset )
