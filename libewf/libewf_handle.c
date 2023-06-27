@@ -8604,7 +8604,7 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 	libewf_lef_file_entry_t *lef_file_entry     = NULL;
 	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
 	uint8_t *utf8_string_segment                = NULL;
-	static char *function                       = "libewf_handle_get_file_entry_by_utf8_path";
+	static char *function                       = "libewf_internal_handle_get_file_entry_by_utf8_path";
 	size_t utf8_string_index                    = 0;
 	size_t utf8_string_segment_length           = 0;
 	int result                                  = 0;
@@ -8905,7 +8905,7 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 	libewf_lef_file_entry_t *lef_file_entry     = NULL;
 	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
 	uint16_t *utf16_string_segment              = NULL;
-	static char *function                       = "libewf_handle_get_file_entry_by_utf16_path";
+	static char *function                       = "libewf_internal_handle_get_file_entry_by_utf16_path";
 	size_t utf16_string_index                   = 0;
 	size_t utf16_string_segment_length          = 0;
 	int result                                  = 0;

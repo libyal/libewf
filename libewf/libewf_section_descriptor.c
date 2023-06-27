@@ -843,7 +843,7 @@ int libewf_section_descriptor_read_data(
 			}
 			else
 			{
-				if( file_offset > ( (off64_t) INT64_MAX - section_descriptor->size ) )
+				if( (uint64_t) file_offset > ( (uint64_t) INT64_MAX - section_descriptor->size ) )
 				{
 					libcerror_error_set(
 					 error,
