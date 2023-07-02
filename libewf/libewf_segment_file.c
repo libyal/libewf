@@ -48,6 +48,7 @@
 #include "libewf_libfdata.h"
 #include "libewf_libfguid.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libuna.h"
 #include "libewf_md5_hash_section.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
@@ -2564,6 +2565,7 @@ ssize_t libewf_segment_file_write_header2_section(
 		     "Header2",
 		     header_sections->header2,
 		     header_sections->header2_size,
+		     LIBUNA_ENDIAN_LITTLE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

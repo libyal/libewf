@@ -18,9 +18,8 @@ The EWF format was succeeded by the Expert Witness Compression Format version 2
 in EnCase 7 (EWF2-Ex01 and EWF2-Lx01). EnCase 7 also uses a different version
 of EWF-L01 then its predecessors.
 
-This document is intended as a working document for the EWF specification.
-Which should allow existing Open Source forensic tooling to be able to process
-this file type.
+This document is intended as a working document of the data format specification
+for the libewf project.
 
 [preface]
 == Document information
@@ -37,7 +36,7 @@ this file type.
 == License
 
 ....
-Copyright (C) 2006-2020, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2006-2023, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -144,6 +143,7 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.81 | Z. Travis | May 2017 | Details of AD encryption
 | 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to K. Stone.
 | 0.0.83 | J.B. Metz | November 2020 | Additional information about corruption scenario.
+| 0.0.84 | J.B. Metz | July 2023 | Additional information about encoding and special characters in ltree names with thanks to J. Dua and P. Livingstone.
 |===
 
 :numbered:
@@ -1809,8 +1809,9 @@ Adler-32 of all the data within the ltree header where the checksum value itself
 
 ==== Ltree data
 
-The ltree data string consists of an UTF-16 little-endian encoded string
-without the UTF-16 endian byte order mark.
+The ltree data string consists of an UTF-16 little-endian encoded string without
+byte order mark. The ltree data is not strict UTF-16 since it allows for unpaired
+surrogates, such as "U+d800" and "U+dc00".
 
 The ltree data string contains the following information:
 
@@ -2258,7 +2259,8 @@ The 1st line of the file entry consists of the following 2 values:
 | 1 | p | Is parent +
 1 => if the entry is a directory +
 (empty) => if the entry is a file
-| 2 | n | Name
+| 2 | n | Name +
+See section: <<file_entry_name,File entry name>> +
 | 3 | id | Identifier +
 Contains an integer identifying the file entry
 | 4 | opr | Flags +
@@ -2361,7 +2363,8 @@ See section: <<short_name,Short name>> +
 | 15 | p | Is parent +
 1 => if the entry is a directory +
 (empty) => if the entry is a file
-| 16 | n | Name
+| 16 | n | Name +
+See section: <<file_entry_name,File entry name>> +
 | 17 | du | Duplicate data offset +
 Relative from the start of the media data
 | 18 | lo | Logical offset +
@@ -2400,6 +2403,17 @@ See section: <<extended_attributes,Extended attributes value>> +
 If the "ha" value contains "00000000000000000000000000000000" this means the
 MD5 hash is not set. The same applies for the "sha" value when it contains
 "0000000000000000000000000000000000000000" the SHA1 has is not set.
+
+====== [[file_entry_name]]File entry name
+
+A file entry name ("n" value):
+
+* can contain path segment separator characters like "\\" and "/"
+* uses the "MIDDLE DOT" Unicode character (U+00b7) as a (NTFS) alternative data stream (ADS) name seperator
+
+[NOTE]
+Note that a regular "MIDDLE DOT" Unicode character will be encoded in the same
+way so no real way to reliably tell the difference.
 
 ====== [[short_name]]Short name
 

@@ -3727,7 +3727,7 @@ int libewf_single_files_read_data(
 	if( libuna_utf8_string_size_from_utf16_stream(
 	     data,
 	     data_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     &utf8_string_size,
 	     error ) != 1 )
 	{
@@ -3771,7 +3771,7 @@ int libewf_single_files_read_data(
 	     utf8_string_size,
 	     data,
 	     data_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

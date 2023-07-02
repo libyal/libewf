@@ -34,6 +34,7 @@
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
 #include "libewf_libhmac.h"
+#include "libewf_libuna.h"
 #include "libewf_ltree_section.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
@@ -273,6 +274,7 @@ int libewf_ltree_section_read_data(
 		     "single files data",
 		     *single_files_data,
 		     *single_files_data_size,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

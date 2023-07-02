@@ -12,9 +12,8 @@ In EnCase 7 Guidance Software introduced a version 2 of the Expert Witness
 Compression Format (EWF). Although at high-level both version 1 and 2 are quite
 similar in the details both versions differ significantly.
 
-This document is intended as a working document for the EWF2 specification.
-Which should allow existing Open Source forensic tooling to be able to process
-this file type.
+This document is intended as a working document of the data format specification
+for the libewf project.
 
 [preface]
 == Document information

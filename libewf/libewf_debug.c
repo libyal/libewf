@@ -634,6 +634,7 @@ int libewf_debug_utf16_stream_print(
      const char *header_string,
      const uint8_t *utf16_stream,
      size_t utf16_stream_size,
+     int byte_order,
      libcerror_error_t **error )
 {
 	system_character_t *string = NULL;
@@ -667,14 +668,14 @@ int libewf_debug_utf16_stream_print(
 	result = libuna_utf16_string_size_from_utf16_stream(
 	          utf16_stream,
 	          utf16_stream_size,
-	          LIBUNA_ENDIAN_LITTLE,
+	          byte_order,
 	          &string_size,
 	          error );
 #else
 	result = libuna_utf8_string_size_from_utf16_stream(
 	          utf16_stream,
 	          utf16_stream_size,
-	          LIBUNA_ENDIAN_LITTLE,
+	          byte_order,
 	          &string_size,
 	          error );
 #endif
@@ -709,7 +710,7 @@ int libewf_debug_utf16_stream_print(
 	          string_size,
 	          utf16_stream,
 	          utf16_stream_size,
-	          LIBUNA_ENDIAN_LITTLE,
+	          byte_order,
 	          error );
 #else
 	result = libuna_utf8_string_copy_from_utf16_stream(
@@ -717,7 +718,7 @@ int libewf_debug_utf16_stream_print(
 	          string_size,
 	          utf16_stream,
 	          utf16_stream_size,
-	          LIBUNA_ENDIAN_LITTLE,
+	          byte_order,
 	          error );
 #endif
 	if( result != 1 )

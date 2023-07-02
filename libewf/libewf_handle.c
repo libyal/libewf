@@ -55,6 +55,7 @@
 #include "libewf_libfcache.h"
 #include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
+#include "libewf_libuna.h"
 #include "libewf_ltree_section.h"
 #include "libewf_md5_hash_section.h"
 #include "libewf_restart_data.h"
@@ -2465,6 +2466,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					     "Header2",
 					     string_data,
 					     string_data_size,
+					     LIBUNA_ENDIAN_LITTLE,
 					     error ) != 1 )
 					{
 						libcerror_error_set(

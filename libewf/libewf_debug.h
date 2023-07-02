@@ -75,6 +75,7 @@ int libewf_debug_utf16_stream_print(
      const char *header_string,
      const uint8_t *utf16_stream,
      size_t utf16_stream_size,
+     int byte_order,
      libcerror_error_t **error );
 
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
