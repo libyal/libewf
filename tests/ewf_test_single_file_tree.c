@@ -30,9 +30,11 @@
 #include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libfdata.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_data_stream.h"
 #include "../libewf/libewf_lef_file_entry.h"
 #include "../libewf/libewf_single_file_tree.h"
 #include "../libewf/libewf_single_files.h"
@@ -413,6 +415,7 @@ int ewf_test_single_file_tree_get_sub_node_by_utf8_name(
 	libcerror_error_t *error                    = NULL;
 	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
 	libewf_single_files_t *single_files         = NULL;
+	libfdata_stream_t *data_stream              = NULL;
 	size64_t media_size                         = 0;
 	uint8_t format                              = 0;
 	int result                                  = 0;
@@ -436,10 +439,29 @@ int ewf_test_single_file_tree_get_sub_node_by_utf8_name(
 	 "error",
 	 error );
 
-	result = libewf_single_files_read_data(
-	          single_files,
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
 	          ewf_test_single_files_data1,
 	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          single_files,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -448,6 +470,23 @@ int ewf_test_single_file_tree_get_sub_node_by_utf8_name(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -606,6 +645,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
+		 NULL );
 	}
 	if( single_files != NULL )
 	{
@@ -629,6 +674,7 @@ int ewf_test_single_file_tree_get_sub_node_by_utf16_name(
 	libcerror_error_t *error                    = NULL;
 	libewf_lef_file_entry_t *sub_lef_file_entry = NULL;
 	libewf_single_files_t *single_files         = NULL;
+	libfdata_stream_t *data_stream              = NULL;
 	size64_t media_size                         = 0;
 	uint8_t format                              = 0;
 	int result                                  = 0;
@@ -652,10 +698,29 @@ int ewf_test_single_file_tree_get_sub_node_by_utf16_name(
 	 "error",
 	 error );
 
-	result = libewf_single_files_read_data(
-	          single_files,
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
 	          ewf_test_single_files_data1,
 	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          single_files,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -664,6 +729,23 @@ int ewf_test_single_file_tree_get_sub_node_by_utf16_name(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -822,6 +904,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
+		 NULL );
 	}
 	if( single_files != NULL )
 	{
@@ -863,7 +951,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

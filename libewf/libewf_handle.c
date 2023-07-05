@@ -33,6 +33,7 @@
 #include "libewf_codepage.h"
 #include "libewf_compression.h"
 #include "libewf_data_chunk.h"
+#include "libewf_data_stream.h"
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_device_information.h"
@@ -1612,28 +1613,25 @@ int libewf_internal_handle_open_read_segment_file_section_data(
      int file_io_pool_entry,
      libcerror_error_t **error )
 {
-	libewf_header_sections_t *header_sections = NULL;
-	libewf_section_descriptor_t *section      = NULL;
-	libfcache_cache_t *sections_cache         = NULL;
-	uint8_t *single_files_data                = NULL;
-	uint8_t *single_files_section_data        = NULL;
-	uint8_t *string_data                      = NULL;
-	static char *function                     = "libewf_internal_handle_open_read_segment_file_section_data";
-	size_t single_files_data_size             = 0;
-	size_t single_files_section_data_size     = 0;
-	size_t string_data_size                   = 0;
-	ssize_t read_count                        = 0;
-	off64_t section_data_offset               = 0;
-	uint8_t header_section_found              = 0;
-	uint8_t initialize_chunk_values           = 0;
-	int number_of_sections                    = 0;
-	int read_table_sections                   = 0;
-	int result                                = 0;
-	int section_index                         = 0;
-	int set_identifier_change                 = 0;
+	libewf_header_sections_t *header_sections       = NULL;
+	libewf_section_descriptor_t *section_descriptor = NULL;
+	libfcache_cache_t *sections_cache               = NULL;
+	libfdata_stream_t *single_files_data_stream     = NULL;
+	uint8_t *string_data                            = NULL;
+	static char *function                           = "libewf_internal_handle_open_read_segment_file_section_data";
+	size_t string_data_size                         = 0;
+	ssize_t read_count                              = 0;
+	off64_t section_data_offset                     = 0;
+	uint8_t header_section_found                    = 0;
+	uint8_t initialize_chunk_values                 = 0;
+	int number_of_sections                          = 0;
+	int read_table_sections                         = 0;
+	int result                                      = 0;
+	int section_index                               = 0;
+	int set_identifier_change                       = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	int known_section                         = 0;
+	int known_section                               = 0;
 #endif
 
 	if( internal_handle == NULL )
@@ -1752,7 +1750,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 		     (intptr_t *) file_io_pool,
 		     (libfdata_cache_t *) sections_cache,
 		     section_index,
-		     (intptr_t **) &section,
+		     (intptr_t **) &section_descriptor,
 		     0,
 		     error ) != 1 )
 		{
@@ -1760,14 +1758,14 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve section: %d from sections list.",
+			 "%s: unable to retrieve section: %d descriptor from list.",
 			 function,
 			 section_index );
 
 			goto on_error;
 		}
-		result = libewf_section_get_data_offset(
-		          section,
+		result = libewf_section_descriptor_get_data_offset(
+		          section_descriptor,
 		          segment_file->major_version,
 		          &section_data_offset,
 		          error );
@@ -1812,7 +1810,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					libcnotify_printf(
 					 "%s: reading %s section data from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
 					 function,
-					 (char *) section->type_string,
+					 (char *) section_descriptor->type_string,
 					 file_io_pool_entry,
 					 segment_file->current_offset,
 					 segment_file->current_offset );
@@ -1822,7 +1820,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					libcnotify_printf(
 					 "%s: reading 0x%08" PRIx32 " section data from file IO pool entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
 					 function,
-					 section->type,
+					 section_descriptor->type,
 					 file_io_pool_entry,
 					 segment_file->current_offset,
 					 segment_file->current_offset );
@@ -1830,13 +1828,13 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 			}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 		}
-		if( section->type != 0 )
+		if( section_descriptor->type != 0 )
 		{
-			switch( section->type )
+			switch( section_descriptor->type )
 			{
 				case LIBEWF_SECTION_TYPE_DEVICE_INFORMATION:
 					read_count = libewf_device_information_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -1855,7 +1853,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 						initialize_chunk_values = 1;
 					}
 					read_count = libewf_case_data_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -1900,7 +1898,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					{
 						read_count = libewf_segment_file_read_table_section(
 							      segment_file,
-							      section,
+							      section_descriptor,
 							      file_io_pool,
 							      file_io_pool_entry,
 							      internal_handle->media_values->chunk_size,
@@ -1924,7 +1922,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					}
 #endif
 					read_count = libewf_error2_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -1950,7 +1948,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					}
 #endif
 					read_count = libewf_session_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -1973,7 +1971,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 				case LIBEWF_SECTION_TYPE_MD5_HASH:
 					read_count = libewf_md5_hash_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -1988,7 +1986,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 				case LIBEWF_SECTION_TYPE_SHA1_HASH:
 					read_count = libewf_sha1_hash_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -2002,7 +2000,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 				case LIBEWF_SECTION_TYPE_RESTART_DATA:
 					read_count = libewf_section_compressed_string_read(
-						      section,
+						      section_descriptor,
 					              internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -2082,7 +2080,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 				case LIBEWF_SECTION_TYPE_ANALYTICAL_DATA:
 					read_count = libewf_section_compressed_string_read(
-						      section,
+						      section_descriptor,
 					              internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
@@ -2142,15 +2140,12 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					}
 #endif
 					read_count = libewf_ltree_section_read_file_io_pool(
-						      section,
+						      section_descriptor,
 						      internal_handle->io_handle,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      segment_file->major_version,
-						      &single_files_section_data,
-						      &single_files_section_data_size,
-						      &single_files_data,
-						      &single_files_data_size,
+						      &single_files_data_stream,
 						      error );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -2159,10 +2154,10 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					break;
 			}
 		}
-		else if( section->type_string_length == 4 )
+		else if( section_descriptor->type_string_length == 4 )
 		{
 			if( memory_compare(
-			     (void *) section->type_string,
+			     (void *) section_descriptor->type_string,
 			     (void *) "data",
 			     4 ) == 0 )
 			{
@@ -2178,7 +2173,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				}
 #endif
 				read_count = libewf_section_data_read(
-					      section,
+					      section_descriptor,
 					      internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2203,13 +2198,13 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 			else if( memory_compare(
-				  (void *) section->type_string,
+				  (void *) section_descriptor->type_string,
 				  (void *) "disk",
 				  4 ) == 0 )
 			{
 				read_count = libewf_segment_file_read_volume_section(
 					      segment_file,
-					      section,
+					      section_descriptor,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
@@ -2222,10 +2217,10 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 		}
-		else if( section->type_string_length == 5 )
+		else if( section_descriptor->type_string_length == 5 )
 		{
 			if( memory_compare(
-			     (void *) section->type_string,
+			     (void *) section_descriptor->type_string,
 			     (void *) "xhash",
 			     5 ) == 0 )
 			{
@@ -2241,7 +2236,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				}
 #endif
 				read_count = libewf_section_compressed_string_read(
-					      section,
+					      section_descriptor,
 				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2297,10 +2292,10 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 		}
-		else if( section->type_string_length == 6 )
+		else if( section_descriptor->type_string_length == 6 )
 		{
 			if( memory_compare(
-			     (void *) section->type_string,
+			     (void *) section_descriptor->type_string,
 			     (void *) "digest",
 			     6 ) == 0 )
 			{
@@ -2316,7 +2311,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				}
 #endif
 				read_count = libewf_digest_section_read_file_io_pool(
-					      section,
+					      section_descriptor,
 				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2328,12 +2323,12 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 			else if( memory_compare(
-				  (void *) section->type_string,
+				  (void *) section_descriptor->type_string,
 				  (void *) "header",
 				  6 ) == 0 )
 			{
 				read_count = libewf_section_compressed_string_read(
-					      section,
+					      section_descriptor,
 				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2394,7 +2389,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 			else if( memory_compare(
-				  (void *) section->type_string,
+				  (void *) section_descriptor->type_string,
 				  (void *) "table2",
 				  6 ) == 0 )
 			{
@@ -2402,7 +2397,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				{
 					read_count = libewf_segment_file_read_table2_section(
 						      segment_file,
-						      section,
+						      section_descriptor,
 						      file_io_pool,
 						      file_io_pool_entry,
 						      error );
@@ -2412,13 +2407,13 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 			else if( memory_compare(
-				  (void *) section->type_string,
+				  (void *) section_descriptor->type_string,
 				  (void *) "volume",
 				  6 ) == 0 )
 			{
 				read_count = libewf_segment_file_read_volume_section(
 					      segment_file,
-					      section,
+					      section_descriptor,
 					      file_io_pool,
 					      file_io_pool_entry,
 					      internal_handle->media_values,
@@ -2431,15 +2426,15 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 		}
-		else if( section->type_string_length == 7 )
+		else if( section_descriptor->type_string_length == 7 )
 		{
 			if( memory_compare(
-			     (void *) section->type_string,
+			     (void *) section_descriptor->type_string,
 			     (void *) "header2",
 			     7 ) == 0 )
 			{
 				read_count = libewf_section_compressed_string_read(
-					      section,
+					      section_descriptor,
 				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2501,12 +2496,12 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 #endif
 			}
 			else if( memory_compare(
-				  (void *) section->type_string,
+				  (void *) section_descriptor->type_string,
 				  (void *) "xheader",
 				  7 ) == 0 )
 			{
 				read_count = libewf_section_compressed_string_read(
-					      section,
+					      section_descriptor,
 				              internal_handle->io_handle,
 					      file_io_pool,
 					      file_io_pool_entry,
@@ -2577,21 +2572,21 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 					libcnotify_printf(
 					 "%s: unsupported section type: %s.\n",
 					 function,
-					 (char *) section->type_string );
+					 (char *) section_descriptor->type_string );
 				}
 				else if( segment_file->major_version == 2 )
 				{
 					libcnotify_printf(
 					 "%s: unsupported section type: 0x%08" PRIx32 ".\n",
 					 function,
-					 section->type );
+					 section_descriptor->type );
 				}
 			}
 		}
 #endif
 		if( read_count == -1 )
 		{
-			if( section->type_string_length > 0 )
+			if( section_descriptor->type_string_length > 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -2599,7 +2594,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section: %s.",
 				 function,
-				 (char *) section->type_string );
+				 (char *) section_descriptor->type_string );
 			}
 			else
 			{
@@ -2609,7 +2604,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 				 LIBCERROR_IO_ERROR_READ_FAILED,
 				 "%s: unable to read section: 0x%08" PRIx32 ".",
 				 function,
-				 section->type );
+				 section_descriptor->type );
 			}
 			goto on_error;
 		}
@@ -2671,7 +2666,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 			goto on_error;
 		}
 	}
-	if( single_files_data != NULL )
+	if( single_files_data_stream != NULL )
 	{
 		if( libewf_single_files_initialize(
 		     &( internal_handle->single_files ),
@@ -2686,10 +2681,10 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 			goto on_error;
 		}
-		if( libewf_single_files_read_data(
+		if( libewf_single_files_read_data_stream(
 		     internal_handle->single_files,
-		     single_files_data,
-		     single_files_data_size,
+		     single_files_data_stream,
+		     file_io_pool,
 		     &( internal_handle->media_values->media_size ),
 		     &( internal_handle->io_handle->format ),
 		     error ) != 1 )
@@ -2703,11 +2698,6 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 			goto on_error;
 		}
-		memory_free(
-		 single_files_section_data );
-
-		single_files_section_data = NULL;
-
 		if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
 		{
 			if( internal_handle->io_handle->format == LIBEWF_FORMAT_LOGICAL_ENCASE7 )
@@ -2721,6 +2711,19 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 		if( ( internal_handle->media_values->media_size % internal_handle->media_values->bytes_per_sector ) != 0 )
 		{
 			internal_handle->media_values->number_of_sectors += 1;
+		}
+		if( libfdata_stream_free(
+		     &single_files_data_stream,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free single files data stream.",
+			 function );
+
+			goto on_error;
 		}
 	}
 	if( libewf_header_sections_free(
@@ -2758,10 +2761,11 @@ on_error:
 		 &( internal_handle->single_files ),
 		 NULL );
 	}
-	if( single_files_section_data != NULL )
+	if( single_files_data_stream != NULL )
 	{
-		memory_free(
-		 single_files_section_data );
+		libfdata_stream_free(
+		 &single_files_data_stream,
+		 NULL );
 	}
 	if( string_data != NULL )
 	{
@@ -3770,7 +3774,8 @@ int libewf_internal_handle_open_file_io_pool(
 	if( ( ( access_flags & LIBEWF_ACCESS_FLAG_WRITE ) != 0 )
 	 && ( ( access_flags & LIBEWF_ACCESS_FLAG_RESUME ) != 0 ) )
 	{
-		if( internal_handle->write_io_handle->values_initialized == 0 )
+		if( ( internal_handle->write_io_handle != NULL )
+		 && ( internal_handle->write_io_handle->values_initialized == 0 ) )
 		{
 			if( libewf_write_io_handle_initialize_values(
 			     internal_handle->write_io_handle,
@@ -3849,13 +3854,13 @@ on_error:
 	{
 		libewf_write_io_handle_free(
 		 &( internal_handle->write_io_handle ),
-		 error );
+		 NULL );
 	}
 	if( internal_handle->read_io_handle != NULL )
 	{
 		libewf_read_io_handle_free(
 		 &( internal_handle->read_io_handle ),
-		 error );
+		 NULL );
 	}
 	return( -1 );
 }
@@ -4809,7 +4814,7 @@ ssize_t libewf_internal_handle_write_buffer_to_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.",
+		 "%s: invalid handle - missing write IO handle.",
 		 function );
 
 		return( -1 );
@@ -5760,7 +5765,7 @@ ssize_t libewf_internal_handle_write_data_chunk_to_file_io_pool(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.",
+		 "%s: invalid handle - missing write IO handle.",
 		 function );
 
 		return( -1 );

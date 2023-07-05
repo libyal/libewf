@@ -235,6 +235,22 @@ int libewf_write_io_handle_free(
 
 			result = -1;
 		}
+		if( ( *write_io_handle )->managed_segment_file != NULL )
+		{
+			if( libewf_segment_file_free(
+			     &( ( *write_io_handle )->managed_segment_file ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free managed segment file.",
+				 function );
+
+				result = -1;
+			}
+		}
 		memory_free(
 		 *write_io_handle );
 
@@ -322,6 +338,7 @@ int libewf_write_io_handle_clone(
 	( *destination_write_io_handle )->chunks_section             = NULL;
 	( *destination_write_io_handle )->current_file_io_pool_entry = -1;
 	( *destination_write_io_handle )->current_segment_file       = NULL;
+	( *destination_write_io_handle )->managed_segment_file       = NULL;
 
 	if( source_write_io_handle->case_data != NULL )
 	{
@@ -3478,6 +3495,17 @@ ssize_t libewf_write_io_handle_write_new_chunk_create_chunk(
 
 		return( -1 );
 	}
+	if( write_io_handle->current_segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing current segment file.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file == NULL )
 	{
 		libcerror_error_set(
@@ -3598,10 +3626,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t input_data_size,
          libcerror_error_t **error )
 {
-	static char *function     = "libewf_write_io_handle_write_new_chunk";
-	ssize_t total_write_count = 0;
-	ssize_t write_count       = 0;
-	int result                = 0;
+	libewf_segment_file_t *safe_segment_file = NULL;
+	static char *function                    = "libewf_write_io_handle_write_new_chunk";
+	ssize_t total_write_count                = 0;
+	ssize_t write_count                      = 0;
+	int result                               = 0;
 
 	if( write_io_handle == NULL )
 	{
@@ -3694,7 +3723,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			       header_values,
 			       write_io_handle->current_segment_number,
 			       &( write_io_handle->current_file_io_pool_entry ),
-			       &( write_io_handle->current_segment_file ),
+			       &safe_segment_file,
 			       error );
 
 		if( write_count < 0 )
@@ -3707,8 +3736,11 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 function,
 			 write_io_handle->current_segment_number );
 
-			return( -1 );
+			goto on_error;
 		}
+		write_io_handle->current_segment_file = safe_segment_file;
+		write_io_handle->managed_segment_file = safe_segment_file;
+
 		total_write_count += write_count;
 	}
 	/* Check if a chunks section should be created
@@ -3734,7 +3766,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 function,
 			 write_io_handle->current_segment_number );
 
-			return( -1 );
+			goto on_error;
 		}
 		total_write_count += write_count;
 	}
@@ -3761,7 +3793,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 chunk_index,
 		 write_io_handle->current_segment_number );
 
-		return( -1 );
+		goto on_error;
 	}
 	total_write_count += write_count;
 
@@ -3769,6 +3801,17 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 */
 	write_io_handle->remaining_segment_file_size -= write_io_handle->chunk_table_entries_reserved_size;
 
+	if( write_io_handle->current_segment_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid write IO handle - missing current segment file.",
+		 function );
+
+		return( -1 );
+	}
 	/* Check if the current chunks section is full, if so close the current section
 	 */
 	result = libewf_write_io_handle_test_chunks_section_full(
@@ -3788,7 +3831,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		 "%s: unable to determine if chunks section is full.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( result == 1 )
 	{
@@ -3809,7 +3852,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 "%s: unable to write chunks section end.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		total_write_count += write_count;
 
@@ -3834,7 +3877,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 			 "%s: unable to determine if segment file is full.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 1 )
 		{
@@ -3879,17 +3922,45 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 					 function,
 					 write_io_handle->current_segment_number );
 
-					return( -1 );
+					goto on_error;
 				}
 				total_write_count += write_count;
 
+				if( write_io_handle->managed_segment_file != NULL )
+				{
+					if( libewf_segment_file_free(
+					     &( write_io_handle->managed_segment_file ),
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 "%s: unable to free managed segment file.",
+						 function );
+
+						goto on_error;
+					}
+				}
 				write_io_handle->current_file_io_pool_entry = -1;
-				write_io_handle->current_segment_file       = NULL;
 				write_io_handle->current_segment_number    += 1;
+				write_io_handle->current_segment_file       = NULL;
 			}
 		}
 	}
 	return( total_write_count );
+
+on_error:
+	if( safe_segment_file != NULL )
+	{
+		libewf_segment_file_free(
+		 &safe_segment_file,
+		 NULL );
+
+		write_io_handle->current_segment_file = NULL;
+		write_io_handle->managed_segment_file = NULL;
+	}
+	return( -1 );
 }
 
 /* Corrects sections after streamed write

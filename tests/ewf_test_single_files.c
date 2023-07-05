@@ -30,11 +30,14 @@
 #include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libfdata.h"
 #include "ewf_test_libfvalue.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_data_stream.h"
+#include "../libewf/libewf_line_reader.h"
 #include "../libewf/libewf_single_files.h"
 
 /* UTF-16 little-endian encoded single files data
@@ -398,189 +401,6 @@ uint8_t ewf_test_single_files_data1[ 5700 ] = {
 	0x30, 0x00, 0x30, 0x00, 0x30, 0x00, 0x30, 0x00, 0x30, 0x00, 0x30, 0x00, 0x09, 0x00, 0x09, 0x00,
 	0x0a, 0x00, 0x0a, 0x00 };
 
-/* UTF-8 encoded single files data
- */
-uint8_t ewf_test_single_files_data2[ 2851 ] = {
-	0x35, 0x0a, 0x72, 0x65, 0x63, 0x0a, 0x74, 0x62, 0x09, 0x63, 0x6c, 0x09, 0x6e, 0x09, 0x66, 0x70,
-	0x09, 0x70, 0x67, 0x09, 0x6c, 0x67, 0x09, 0x69, 0x67, 0x09, 0x63, 0x64, 0x09, 0x77, 0x64, 0x09,
-	0x6d, 0x64, 0x09, 0x61, 0x64, 0x0a, 0x32, 0x36, 0x31, 0x39, 0x39, 0x32, 0x34, 0x37, 0x30, 0x09,
-	0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x09, 0x09, 0x0a, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x0a,
-	0x31, 0x09, 0x31, 0x0a, 0x70, 0x09, 0x6e, 0x09, 0x73, 0x09, 0x70, 0x72, 0x09, 0x6e, 0x74, 0x61,
-	0x09, 0x6e, 0x74, 0x69, 0x0a, 0x30, 0x09, 0x31, 0x0a, 0x31, 0x09, 0x09, 0x09, 0x31, 0x30, 0x09,
-	0x09, 0x0a, 0x30, 0x09, 0x30, 0x0a, 0x31, 0x09, 0x09, 0x09, 0x31, 0x30, 0x09, 0x09, 0x0a, 0x0a,
-	0x73, 0x72, 0x63, 0x65, 0x0a, 0x31, 0x09, 0x31, 0x0a, 0x70, 0x09, 0x6e, 0x09, 0x69, 0x64, 0x09,
-	0x65, 0x76, 0x09, 0x64, 0x6f, 0x09, 0x6c, 0x6f, 0x63, 0x09, 0x73, 0x65, 0x09, 0x6d, 0x66, 0x72,
-	0x09, 0x6d, 0x6f, 0x09, 0x74, 0x62, 0x09, 0x6c, 0x6f, 0x09, 0x70, 0x6f, 0x09, 0x61, 0x68, 0x09,
-	0x73, 0x68, 0x09, 0x67, 0x75, 0x09, 0x70, 0x67, 0x75, 0x09, 0x61, 0x71, 0x09, 0x69, 0x70, 0x09,
-	0x73, 0x69, 0x09, 0x6d, 0x61, 0x09, 0x64, 0x74, 0x0a, 0x30, 0x09, 0x31, 0x0a, 0x31, 0x09, 0x09,
-	0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x2d, 0x31, 0x09, 0x2d, 0x31, 0x09, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x66, 0x0a, 0x30, 0x09, 0x30, 0x0a,
-	0x09, 0x46, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0xd0, 0x89, 0x5f, 0x30, 0x09, 0x09, 0x46, 0x6c,
-	0x61, 0x73, 0x68, 0x20, 0x44, 0x69, 0x73, 0x6b, 0x09, 0x32, 0x36, 0x32, 0x31, 0x34, 0x34, 0x30,
-	0x30, 0x30, 0x09, 0x2d, 0x31, 0x09, 0x2d, 0x31, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x09, 0x37, 0x37, 0x39, 0x30, 0x30, 0x42, 0x39, 0x32, 0x41, 0x35, 0x38, 0x43, 0x38,
-	0x37, 0x43, 0x34, 0x38, 0x30, 0x41, 0x33, 0x30, 0x46, 0x42, 0x43, 0x35, 0x39, 0x45, 0x33, 0x31,
-	0x41, 0x36, 0x35, 0x09, 0x37, 0x37, 0x39, 0x30, 0x30, 0x42, 0x39, 0x32, 0x41, 0x35, 0x38, 0x43,
-	0x38, 0x37, 0x43, 0x34, 0x38, 0x30, 0x41, 0x33, 0x30, 0x46, 0x42, 0x43, 0x35, 0x39, 0x45, 0x33,
-	0x31, 0x41, 0x36, 0x35, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x09, 0x72, 0x0a, 0x0a, 0x73, 0x75, 0x62, 0x0a, 0x30, 0x09, 0x31, 0x0a,
-	0x70, 0x09, 0x6e, 0x09, 0x69, 0x64, 0x09, 0x6e, 0x75, 0x09, 0x63, 0x6f, 0x09, 0x67, 0x75, 0x0a,
-	0x30, 0x09, 0x30, 0x0a, 0x09, 0x09, 0x09, 0x09, 0x31, 0x20, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x0a, 0x0a, 0x65, 0x6e, 0x74,
-	0x72, 0x79, 0x0a, 0x36, 0x09, 0x31, 0x0a, 0x6d, 0x69, 0x64, 0x09, 0x6c, 0x73, 0x09, 0x62, 0x65,
-	0x09, 0x69, 0x64, 0x09, 0x63, 0x72, 0x09, 0x61, 0x63, 0x09, 0x77, 0x72, 0x09, 0x6d, 0x6f, 0x09,
-	0x64, 0x6c, 0x09, 0x73, 0x69, 0x67, 0x09, 0x68, 0x61, 0x09, 0x73, 0x68, 0x61, 0x09, 0x65, 0x6e,
-	0x74, 0x09, 0x73, 0x6e, 0x68, 0x09, 0x70, 0x09, 0x6e, 0x09, 0x64, 0x75, 0x09, 0x6c, 0x6f, 0x09,
-	0x70, 0x6f, 0x09, 0x70, 0x6d, 0x09, 0x6f, 0x65, 0x73, 0x09, 0x73, 0x70, 0x74, 0x68, 0x09, 0x6f,
-	0x70, 0x72, 0x09, 0x73, 0x72, 0x63, 0x09, 0x73, 0x75, 0x62, 0x09, 0x63, 0x69, 0x64, 0x09, 0x6a,
-	0x71, 0x09, 0x61, 0x6c, 0x74, 0x09, 0x65, 0x70, 0x09, 0x61, 0x71, 0x09, 0x63, 0x66, 0x69, 0x09,
-	0x73, 0x67, 0x09, 0x65, 0x61, 0x09, 0x6c, 0x70, 0x74, 0x0a, 0x32, 0x36, 0x09, 0x36, 0x0a, 0x41,
-	0x44, 0x31, 0x43, 0x34, 0x31, 0x42, 0x42, 0x33, 0x46, 0x31, 0x42, 0x37, 0x34, 0x38, 0x43, 0x39,
-	0x30, 0x45, 0x34, 0x38, 0x34, 0x44, 0x32, 0x46, 0x31, 0x37, 0x43, 0x31, 0x33, 0x39, 0x44, 0x09,
-	0x09, 0x30, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x09, 0x42, 0x09, 0x31, 0x20, 0x09, 0x31, 0x09, 0x4c, 0x6f, 0x67, 0x69, 0x63,
-	0x61, 0x6c, 0x45, 0x6e, 0x74, 0x72, 0x69, 0x65, 0x73, 0x09, 0x09, 0x09, 0x09, 0x2d, 0x31, 0x09,
-	0x09, 0x31, 0x20, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x0a,
-	0x32, 0x36, 0x09, 0x30, 0x0a, 0x35, 0x38, 0x30, 0x42, 0x41, 0x33, 0x30, 0x44, 0x42, 0x38, 0x34,
-	0x32, 0x41, 0x39, 0x38, 0x45, 0x39, 0x44, 0x46, 0x31, 0x31, 0x32, 0x34, 0x30, 0x34, 0x37, 0x46,
-	0x42, 0x36, 0x30, 0x36, 0x41, 0x09, 0x09, 0x31, 0x20, 0x30, 0x20, 0x31, 0x09, 0x09, 0x31, 0x35,
-	0x37, 0x37, 0x36, 0x38, 0x39, 0x37, 0x36, 0x38, 0x09, 0x31, 0x35, 0x37, 0x37, 0x36, 0x36, 0x30,
-	0x34, 0x30, 0x30, 0x09, 0x31, 0x35, 0x37, 0x37, 0x36, 0x38, 0x39, 0x37, 0x36, 0x38, 0x09, 0x09,
-	0x09, 0x38, 0x20, 0x31, 0x62, 0x09, 0x44, 0x34, 0x31, 0x44, 0x38, 0x43, 0x44, 0x39, 0x38, 0x46,
-	0x30, 0x30, 0x42, 0x32, 0x30, 0x34, 0x45, 0x39, 0x38, 0x30, 0x30, 0x39, 0x39, 0x38, 0x45, 0x43,
-	0x46, 0x38, 0x34, 0x32, 0x37, 0x45, 0x09, 0x44, 0x41, 0x33, 0x39, 0x41, 0x33, 0x45, 0x45, 0x35,
-	0x45, 0x36, 0x42, 0x34, 0x42, 0x30, 0x44, 0x33, 0x32, 0x35, 0x35, 0x42, 0x46, 0x45, 0x46, 0x39,
-	0x35, 0x36, 0x30, 0x31, 0x38, 0x39, 0x30, 0x41, 0x46, 0x44, 0x38, 0x30, 0x37, 0x30, 0x39, 0x09,
-	0x45, 0x09, 0x31, 0x20, 0x09, 0x09, 0x54, 0x65, 0x73, 0x74, 0x09, 0x09, 0x09, 0x09, 0x09, 0x31,
-	0x20, 0x20, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x66, 0x66, 0x66, 0x66, 0x66,
-	0x66, 0x66, 0x66, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x66, 0x66, 0x66, 0x66,
-	0x66, 0x66, 0x66, 0x66, 0x20, 0x20, 0x34, 0x33, 0x20, 0x09, 0x31, 0x20, 0x09, 0x09, 0x31, 0x09,
-	0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x0a, 0x32, 0x36, 0x09, 0x30, 0x0a, 0x41,
-	0x39, 0x46, 0x42, 0x44, 0x32, 0x44, 0x41, 0x42, 0x31, 0x30, 0x45, 0x41, 0x38, 0x38, 0x33, 0x38,
-	0x46, 0x36, 0x35, 0x32, 0x39, 0x46, 0x41, 0x34, 0x45, 0x34, 0x44, 0x39, 0x37, 0x41, 0x38, 0x09,
-	0x32, 0x30, 0x09, 0x31, 0x20, 0x31, 0x20, 0x31, 0x34, 0x09, 0x31, 0x09, 0x31, 0x35, 0x37, 0x37,
-	0x36, 0x38, 0x39, 0x38, 0x32, 0x33, 0x09, 0x31, 0x35, 0x37, 0x37, 0x36, 0x36, 0x30, 0x34, 0x30,
-	0x30, 0x09, 0x31, 0x35, 0x37, 0x37, 0x36, 0x38, 0x39, 0x38, 0x31, 0x36, 0x09, 0x09, 0x09, 0x38,
-	0x20, 0x38, 0x09, 0x35, 0x44, 0x44, 0x33, 0x39, 0x43, 0x41, 0x42, 0x31, 0x43, 0x35, 0x33, 0x43,
-	0x32, 0x43, 0x37, 0x37, 0x43, 0x44, 0x33, 0x35, 0x32, 0x39, 0x38, 0x33, 0x46, 0x39, 0x36, 0x34,
-	0x31, 0x45, 0x31, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x42, 0x09, 0x31,
-	0x33, 0x20, 0x54, 0x45, 0x53, 0x54, 0x46, 0x49, 0x4c, 0x45, 0x2e, 0x54, 0x58, 0x54, 0x09, 0x09,
-	0x74, 0x65, 0x73, 0x74, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x74, 0x78, 0x74, 0x09, 0x09, 0x09, 0x32,
-	0x38, 0x36, 0x37, 0x32, 0x30, 0x09, 0x09, 0x31, 0x20, 0x31, 0x34, 0x20, 0x31, 0x30, 0x30, 0x30,
-	0x20, 0x34, 0x36, 0x30, 0x30, 0x30, 0x20, 0x32, 0x33, 0x30, 0x20, 0x20, 0x34, 0x33, 0x20, 0x31,
-	0x20, 0x34, 0x36, 0x30, 0x30, 0x30, 0x20, 0x31, 0x30, 0x30, 0x30, 0x20, 0x33, 0x20, 0x31, 0x20,
-	0x32, 0x33, 0x30, 0x20, 0x38, 0x09, 0x31, 0x20, 0x09, 0x34, 0x31, 0x39, 0x34, 0x33, 0x31, 0x32,
-	0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x0a, 0x32, 0x36, 0x09,
-	0x30, 0x0a, 0x41, 0x44, 0x39, 0x39, 0x36, 0x35, 0x46, 0x34, 0x34, 0x36, 0x30, 0x34, 0x33, 0x37,
-	0x38, 0x43, 0x39, 0x45, 0x45, 0x30, 0x43, 0x30, 0x30, 0x33, 0x46, 0x44, 0x32, 0x33, 0x31, 0x34,
-	0x45, 0x34, 0x09, 0x34, 0x30, 0x39, 0x36, 0x09, 0x31, 0x20, 0x31, 0x35, 0x20, 0x31, 0x30, 0x30,
-	0x30, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x38, 0x20, 0x31, 0x62, 0x09, 0x43, 0x39, 0x30,
-	0x41, 0x33, 0x41, 0x33, 0x35, 0x46, 0x31, 0x38, 0x35, 0x41, 0x45, 0x43, 0x37, 0x38, 0x41, 0x43,
-	0x31, 0x36, 0x46, 0x31, 0x31, 0x34, 0x44, 0x38, 0x36, 0x34, 0x38, 0x41, 0x32, 0x09, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x42, 0x09, 0x31, 0x20, 0x09, 0x09, 0x56, 0x6f, 0x6c,
-	0x75, 0x6d, 0x65, 0x20, 0x42, 0x6f, 0x6f, 0x74, 0x09, 0x09, 0x09, 0x09, 0x09, 0x31, 0x20, 0x31,
-	0x30, 0x30, 0x30, 0x20, 0x31, 0x30, 0x30, 0x30, 0x20, 0x20, 0x20, 0x20, 0x35, 0x33, 0x20, 0x31,
-	0x20, 0x20, 0x31, 0x30, 0x30, 0x30, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x66,
-	0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x20, 0x20, 0x38, 0x09, 0x31, 0x20, 0x09, 0x34,
-	0x31, 0x39, 0x34, 0x33, 0x30, 0x34, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x09, 0x09, 0x0a, 0x32, 0x36, 0x09, 0x30, 0x0a, 0x44, 0x31, 0x46, 0x45, 0x36, 0x45, 0x42, 0x39,
-	0x30, 0x33, 0x39, 0x45, 0x38, 0x38, 0x38, 0x44, 0x41, 0x38, 0x35, 0x44, 0x32, 0x30, 0x41, 0x31,
-	0x37, 0x33, 0x43, 0x43, 0x31, 0x43, 0x41, 0x42, 0x09, 0x31, 0x33, 0x31, 0x30, 0x37, 0x32, 0x09,
-	0x31, 0x20, 0x31, 0x30, 0x31, 0x35, 0x20, 0x32, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x09, 0x09,
-	0x09, 0x09, 0x09, 0x38, 0x20, 0x31, 0x62, 0x09, 0x37, 0x46, 0x32, 0x46, 0x31, 0x38, 0x36, 0x38,
-	0x43, 0x33, 0x30, 0x30, 0x44, 0x36, 0x35, 0x44, 0x32, 0x31, 0x30, 0x33, 0x34, 0x39, 0x45, 0x33,
-	0x46, 0x43, 0x43, 0x46, 0x46, 0x33, 0x35, 0x35, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x09, 0x42, 0x09, 0x31, 0x20, 0x09, 0x09, 0x50, 0x72, 0x69, 0x6d, 0x61, 0x72, 0x79, 0x20,
-	0x46, 0x41, 0x54, 0x09, 0x09, 0x09, 0x34, 0x30, 0x39, 0x36, 0x09, 0x09, 0x31, 0x20, 0x32, 0x30,
-	0x30, 0x30, 0x30, 0x20, 0x32, 0x30, 0x30, 0x30, 0x30, 0x20, 0x31, 0x30, 0x30, 0x30, 0x20, 0x38,
-	0x20, 0x20, 0x35, 0x33, 0x20, 0x31, 0x20, 0x31, 0x30, 0x30, 0x30, 0x20, 0x32, 0x30, 0x30, 0x30,
-	0x30, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66,
-	0x66, 0x66, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x66, 0x66, 0x66, 0x66, 0x66,
-	0x66, 0x66, 0x66, 0x20, 0x38, 0x20, 0x31, 0x30, 0x30, 0x09, 0x31, 0x20, 0x09, 0x34, 0x31, 0x39,
-	0x34, 0x33, 0x30, 0x34, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09,
-	0x0a, 0x32, 0x36, 0x09, 0x30, 0x0a, 0x35, 0x39, 0x42, 0x42, 0x39, 0x34, 0x30, 0x43, 0x31, 0x39,
-	0x38, 0x39, 0x35, 0x44, 0x38, 0x39, 0x42, 0x32, 0x31, 0x34, 0x34, 0x37, 0x42, 0x37, 0x44, 0x35,
-	0x38, 0x37, 0x45, 0x37, 0x33, 0x32, 0x09, 0x31, 0x33, 0x31, 0x30, 0x37, 0x32, 0x09, 0x31, 0x20,
-	0x32, 0x31, 0x30, 0x31, 0x35, 0x20, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x38, 0x20,
-	0x31, 0x62, 0x09, 0x37, 0x46, 0x32, 0x46, 0x31, 0x38, 0x36, 0x38, 0x43, 0x33, 0x30, 0x30, 0x44,
-	0x36, 0x35, 0x44, 0x32, 0x31, 0x30, 0x33, 0x34, 0x39, 0x45, 0x33, 0x46, 0x43, 0x43, 0x46, 0x46,
-	0x33, 0x35, 0x35, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x42, 0x09, 0x31,
-	0x20, 0x09, 0x09, 0x53, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x61, 0x72, 0x79, 0x20, 0x46, 0x41, 0x54,
-	0x09, 0x34, 0x31, 0x31, 0x37, 0x09, 0x09, 0x31, 0x33, 0x35, 0x31, 0x36, 0x38, 0x09, 0x09, 0x31,
-	0x20, 0x32, 0x30, 0x30, 0x30, 0x30, 0x20, 0x32, 0x30, 0x30, 0x30, 0x30, 0x20, 0x32, 0x31, 0x30,
-	0x30, 0x30, 0x20, 0x31, 0x30, 0x38, 0x20, 0x20, 0x35, 0x33, 0x20, 0x31, 0x20, 0x32, 0x31, 0x30,
-	0x30, 0x30, 0x20, 0x32, 0x30, 0x30, 0x30, 0x30, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x20, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x20, 0x31, 0x30, 0x38, 0x20, 0x31,
-	0x30, 0x30, 0x09, 0x31, 0x20, 0x09, 0x37, 0x31, 0x33, 0x30, 0x33, 0x31, 0x36, 0x38, 0x09, 0x31,
-	0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09, 0x09, 0x0a, 0x32, 0x36, 0x09, 0x30, 0x0a,
-	0x37, 0x30, 0x43, 0x37, 0x37, 0x36, 0x33, 0x35, 0x44, 0x32, 0x39, 0x45, 0x45, 0x42, 0x38, 0x32,
-	0x38, 0x36, 0x37, 0x39, 0x33, 0x45, 0x38, 0x42, 0x37, 0x45, 0x44, 0x37, 0x36, 0x34, 0x30, 0x36,
-	0x09, 0x32, 0x36, 0x31, 0x38, 0x35, 0x37, 0x32, 0x38, 0x30, 0x09, 0x31, 0x20, 0x32, 0x31, 0x30,
-	0x31, 0x36, 0x20, 0x66, 0x39, 0x62, 0x61, 0x30, 0x30, 0x30, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09,
-	0x09, 0x38, 0x20, 0x31, 0x62, 0x09, 0x32, 0x39, 0x39, 0x37, 0x44, 0x44, 0x36, 0x31, 0x39, 0x30,
-	0x38, 0x44, 0x33, 0x44, 0x31, 0x38, 0x30, 0x36, 0x37, 0x38, 0x44, 0x33, 0x31, 0x41, 0x44, 0x35,
-	0x45, 0x42, 0x34, 0x32, 0x41, 0x38, 0x09, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09,
-	0x42, 0x09, 0x31, 0x20, 0x09, 0x09, 0x55, 0x6e, 0x61, 0x6c, 0x6c, 0x6f, 0x63, 0x61, 0x74, 0x65,
-	0x64, 0x20, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x73, 0x09, 0x09, 0x09, 0x32, 0x38, 0x32,
-	0x36, 0x32, 0x34, 0x09, 0x09, 0x31, 0x20, 0x66, 0x39, 0x62, 0x61, 0x30, 0x30, 0x30, 0x20, 0x66,
-	0x39, 0x62, 0x61, 0x30, 0x30, 0x30, 0x20, 0x34, 0x35, 0x30, 0x30, 0x30, 0x20, 0x32, 0x32, 0x38,
-	0x20, 0x20, 0x34, 0x33, 0x20, 0x32, 0x20, 0x34, 0x35, 0x30, 0x30, 0x30, 0x20, 0x31, 0x30, 0x30,
-	0x30, 0x20, 0x32, 0x20, 0x31, 0x20, 0x32, 0x32, 0x38, 0x20, 0x38, 0x20, 0x34, 0x37, 0x30, 0x30,
-	0x30, 0x20, 0x66, 0x39, 0x62, 0x39, 0x30, 0x30, 0x30, 0x20, 0x34, 0x20, 0x66, 0x39, 0x62, 0x39,
-	0x20, 0x32, 0x33, 0x38, 0x20, 0x37, 0x63, 0x64, 0x63, 0x38, 0x09, 0x31, 0x20, 0x09, 0x36, 0x32,
-	0x39, 0x31, 0x34, 0x35, 0x36, 0x09, 0x31, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x09, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x09,
-	0x09, 0x0a, 0x0a };
-
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 /* Tests the libewf_single_files_initialize function
@@ -825,6 +645,7 @@ int ewf_test_single_files_clone(
 	libcerror_error_t *error                        = NULL;
 	libewf_single_files_t *destination_single_files = NULL;
 	libewf_single_files_t *source_single_files      = NULL;
+	libfdata_stream_t *data_stream                  = NULL;
 	size64_t media_size                             = 0;
 	uint8_t format                                  = 0;
 	int result                                      = 0;
@@ -857,10 +678,29 @@ int ewf_test_single_files_clone(
 	 "error",
 	 error );
 
-	result = libewf_single_files_read_data(
-	          source_single_files,
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
 	          ewf_test_single_files_data1,
 	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          source_single_files,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -869,6 +709,23 @@ int ewf_test_single_files_clone(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1095,6 +952,12 @@ on_error:
 		 &destination_single_files,
 		 NULL );
 	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
+		 NULL );
+	}
 	if( source_single_files != NULL )
 	{
 		libewf_single_files_free(
@@ -1104,187 +967,29 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libewf_single_files_parse_line function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_single_files_parse_line(
-     void )
-{
-	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	uint8_t *line_string                 = NULL;
-	size_t line_string_size              = 0;
-	int result                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	result = libewf_single_files_parse_line(
-	          lines,
-	          1,
-	          &line_string,
-	          &line_string_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_single_files_parse_line(
-	          NULL,
-	          1,
-	          &line_string,
-	          &line_string_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_line(
-	          lines,
-	          -1,
-	          &line_string,
-	          &line_string_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_line(
-	          lines,
-	          1,
-	          NULL,
-	          &line_string_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_line(
-	          lines,
-	          1,
-	          &line_string,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	return( 0 );
-}
-
 /* Tests the libewf_single_files_parse_category_number_of_entries function
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_category_number_of_entries(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int number_of_entries                = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	int number_of_entries    = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1293,8 +998,8 @@ int ewf_test_single_files_parse_category_number_of_entries(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1302,13 +1007,15 @@ int ewf_test_single_files_parse_category_number_of_entries(
 
 	/* Test regular cases
 	 */
-	line_index = 6;
+	line_reader->buffer_offset = 0x140;
+	line_reader->line_index    = 6;
 
 	result = libewf_single_files_parse_category_number_of_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &number_of_entries,
 	          &error );
+EWF_TEST_FPRINT_ERROR( error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1321,11 +1028,12 @@ int ewf_test_single_files_parse_category_number_of_entries(
 
 	/* Test error cases
 	 */
-	line_index = 6;
+	line_reader->buffer_offset = 0x140;
+	line_reader->line_index    = 6;
 
 	result = libewf_single_files_parse_category_number_of_entries(
 	          NULL,
-	          &line_index,
+	          line_reader,
 	          &number_of_entries,
 	          &error );
 
@@ -1342,7 +1050,7 @@ int ewf_test_single_files_parse_category_number_of_entries(
 	 &error );
 
 	result = libewf_single_files_parse_category_number_of_entries(
-	          lines,
+	          single_files,
 	          NULL,
 	          &number_of_entries,
 	          &error );
@@ -1360,8 +1068,8 @@ int ewf_test_single_files_parse_category_number_of_entries(
 	 &error );
 
 	result = libewf_single_files_parse_category_number_of_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -1376,21 +1084,6 @@ int ewf_test_single_files_parse_category_number_of_entries(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -1399,12 +1092,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1413,21 +1100,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_category_types(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
 	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
 	libfvalue_split_utf8_string_t *types = NULL;
-	int line_index                       = 0;
+	uint8_t *line_string                 = NULL;
+	size_t line_string_size              = 0;
 	int result                           = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1436,8 +1127,8 @@ int ewf_test_single_files_parse_category_types(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1445,11 +1136,12 @@ int ewf_test_single_files_parse_category_types(
 
 	/* Test regular cases
 	 */
-	line_index = 7;
+	line_reader->buffer_offset = 0x148;
+	line_reader->line_index    = 7;
 
 	result = libewf_single_files_parse_category_types(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &types,
 	          &error );
 
@@ -1479,11 +1171,12 @@ int ewf_test_single_files_parse_category_types(
 
 	/* Test error cases
 	 */
-	line_index = 7;
+	line_reader->buffer_offset = 0x148;
+	line_reader->line_index    = 7;
 
 	result = libewf_single_files_parse_category_types(
 	          NULL,
-	          &line_index,
+	          line_reader,
 	          &types,
 	          &error );
 
@@ -1500,7 +1193,7 @@ int ewf_test_single_files_parse_category_types(
 	 &error );
 
 	result = libewf_single_files_parse_category_types(
-	          lines,
+	          single_files,
 	          NULL,
 	          &types,
 	          &error );
@@ -1518,8 +1211,8 @@ int ewf_test_single_files_parse_category_types(
 	 &error );
 
 	result = libewf_single_files_parse_category_types(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -1534,21 +1227,6 @@ int ewf_test_single_files_parse_category_types(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -1562,12 +1240,6 @@ on_error:
 	{
 		libfvalue_split_utf8_string_free(
 		 &types,
-		 NULL );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
 		 NULL );
 	}
 	return( 0 );
@@ -1577,21 +1249,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_number_of_entries(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int number_of_entries                = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	int number_of_entries    = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1600,8 +1276,8 @@ int ewf_test_single_files_parse_number_of_entries(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1609,11 +1285,12 @@ int ewf_test_single_files_parse_number_of_entries(
 
 	/* Test regular cases
 	 */
-	line_index = 8;
+	line_reader->buffer_offset = 0x16a;
+	line_reader->line_index    = 8;
 
 	result = libewf_single_files_parse_number_of_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &number_of_entries,
 	          &error );
 
@@ -1628,11 +1305,12 @@ int ewf_test_single_files_parse_number_of_entries(
 
 	/* Test error cases
 	 */
-	line_index = 8;
+	line_reader->buffer_offset = 0x16a;
+	line_reader->line_index    = 8;
 
 	result = libewf_single_files_parse_number_of_entries(
 	          NULL,
-	          &line_index,
+	          line_reader,
 	          &number_of_entries,
 	          &error );
 
@@ -1649,7 +1327,7 @@ int ewf_test_single_files_parse_number_of_entries(
 	 &error );
 
 	result = libewf_single_files_parse_number_of_entries(
-	          lines,
+	          single_files,
 	          NULL,
 	          &number_of_entries,
 	          &error );
@@ -1667,8 +1345,8 @@ int ewf_test_single_files_parse_number_of_entries(
 	 &error );
 
 	result = libewf_single_files_parse_number_of_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -1683,21 +1361,6 @@ int ewf_test_single_files_parse_number_of_entries(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -1707,12 +1370,6 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
 	return( 0 );
 }
 
@@ -1720,22 +1377,26 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_format(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
 	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
 	libfvalue_split_utf8_string_t *types = NULL;
+	uint8_t *line_string                 = NULL;
+	size_t line_string_size              = 0;
 	uint8_t format                       = 0;
-	int line_index                       = 0;
 	int result                           = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1744,18 +1405,19 @@ int ewf_test_single_files_parse_format(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	line_index = 7;
+	line_reader->buffer_offset = 0x148;
+	line_reader->line_index    = 7;
 
 	result = libewf_single_files_parse_category_types(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &types,
 	          &error );
 
@@ -1835,19 +1497,6 @@ int ewf_test_single_files_parse_format(
 	 "types",
 	 types );
 
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
-
 	return( 1 );
 
 on_error:
@@ -1862,12 +1511,6 @@ on_error:
 		 &types,
 		 NULL );
 	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
 	return( 0 );
 }
 
@@ -1875,22 +1518,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_rec_category(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libewf_single_files_t *single_files  = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	size64_t media_size                  = 0;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size64_t media_size      = 0;
+	size_t line_string_size  = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1899,25 +1545,8 @@ int ewf_test_single_files_parse_rec_category(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1925,12 +1554,12 @@ int ewf_test_single_files_parse_rec_category(
 
 	/* Test regular cases
 	 */
-	line_index = 1;
+	line_reader->buffer_offset = 0x4;
+	line_reader->line_index    = 1;
 
 	result = libewf_single_files_parse_rec_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &media_size,
 	          &error );
 
@@ -1945,12 +1574,12 @@ int ewf_test_single_files_parse_rec_category(
 
 	/* Test error cases
 	 */
-	line_index = 1;
+	line_reader->buffer_offset = 0x4;
+	line_reader->line_index    = 1;
 
 	result = libewf_single_files_parse_rec_category(
 	          NULL,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &media_size,
 	          &error );
 
@@ -1969,7 +1598,6 @@ int ewf_test_single_files_parse_rec_category(
 	result = libewf_single_files_parse_rec_category(
 	          single_files,
 	          NULL,
-	          &line_index,
 	          &media_size,
 	          &error );
 
@@ -1987,27 +1615,7 @@ int ewf_test_single_files_parse_rec_category(
 
 	result = libewf_single_files_parse_rec_category(
 	          single_files,
-	          lines,
-	          NULL,
-	          &media_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_rec_category(
-	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -2025,12 +1633,12 @@ int ewf_test_single_files_parse_rec_category(
 
 	/* Test unsupported category header
 	 */
-	line_index = 5;
+	line_reader->buffer_offset = 0x136;
+	line_reader->line_index    = 5;
 
 	result = libewf_single_files_parse_rec_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &media_size,
 	          &error );
 
@@ -2046,38 +1654,6 @@ int ewf_test_single_files_parse_rec_category(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
-
 	return( 1 );
 
 on_error:
@@ -2085,18 +1661,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2105,21 +1669,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_record_values(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	size64_t media_size                  = 0;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size64_t media_size      = 0;
+	size_t line_string_size  = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2128,8 +1696,8 @@ int ewf_test_single_files_parse_record_values(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2137,11 +1705,12 @@ int ewf_test_single_files_parse_record_values(
 
 	/* Test regular cases
 	 */
-	line_index = 2;
+	line_reader->buffer_offset = 0xc;
+	line_reader->line_index    = 2;
 
 	result = libewf_single_files_parse_record_values(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &media_size,
 	          &error );
 
@@ -2156,11 +1725,12 @@ int ewf_test_single_files_parse_record_values(
 
 	/* Test error cases
 	 */
-	line_index = 2;
+	line_reader->buffer_offset = 0xc;
+	line_reader->line_index    = 2;
 
 	result = libewf_single_files_parse_record_values(
 	          NULL,
-	          &line_index,
+	          line_reader,
 	          &media_size,
 	          &error );
 
@@ -2177,7 +1747,7 @@ int ewf_test_single_files_parse_record_values(
 	 &error );
 
 	result = libewf_single_files_parse_record_values(
-	          lines,
+	          single_files,
 	          NULL,
 	          &media_size,
 	          &error );
@@ -2195,8 +1765,8 @@ int ewf_test_single_files_parse_record_values(
 	 &error );
 
 	result = libewf_single_files_parse_record_values(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -2211,21 +1781,6 @@ int ewf_test_single_files_parse_record_values(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -2234,12 +1789,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2248,21 +1797,24 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_perm_category(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libewf_single_files_t *single_files  = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2271,25 +1823,8 @@ int ewf_test_single_files_parse_perm_category(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2297,12 +1832,12 @@ int ewf_test_single_files_parse_perm_category(
 
 	/* Test regular cases
 	 */
-	line_index = 5;
+	line_reader->buffer_offset = 0x136;
+	line_reader->line_index    = 5;
 
 	result = libewf_single_files_parse_perm_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2316,12 +1851,12 @@ int ewf_test_single_files_parse_perm_category(
 
 	/* Test error cases
 	 */
-	line_index = 5;
+	line_reader->buffer_offset = 0x136;
+	line_reader->line_index    = 5;
 
 	result = libewf_single_files_parse_perm_category(
 	          NULL,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2339,7 +1874,6 @@ int ewf_test_single_files_parse_perm_category(
 	result = libewf_single_files_parse_perm_category(
 	          single_files,
 	          NULL,
-	          &line_index,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2353,56 +1887,6 @@ int ewf_test_single_files_parse_perm_category(
 
 	libcerror_error_free(
 	 &error );
-
-	result = libewf_single_files_parse_perm_category(
-	          single_files,
-	          lines,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -2412,18 +1896,6 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
-	}
 	return( 0 );
 }
 
@@ -2431,23 +1903,26 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_permission_group(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
 	libcerror_error_t *error                    = NULL;
 	libewf_permission_group_t *permission_group = NULL;
-	libewf_single_files_t *single_files         = NULL;
-	libfvalue_split_utf8_string_t *lines        = NULL;
 	libfvalue_split_utf8_string_t *types        = NULL;
-	int line_index                              = 0;
+	uint8_t *line_string                        = NULL;
+	size_t line_string_size                     = 0;
 	int result                                  = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2456,25 +1931,8 @@ int ewf_test_single_files_parse_permission_group(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2486,13 +1944,13 @@ int ewf_test_single_files_parse_permission_group(
 
 	/* Test error cases
 	 */
-	line_index = 7;
+	line_reader->buffer_offset = 0x148;
+	line_reader->line_index    = 7;
 
 	result = libewf_single_files_parse_permission_group(
 	          single_files,
-	          lines,
+	          line_reader,
 	          types,
-	          &line_index,
 	          permission_group,
 	          &error );
 
@@ -2510,8 +1968,45 @@ int ewf_test_single_files_parse_permission_group(
 
 	result = libewf_single_files_parse_permission_group(
 	          NULL,
-	          lines,
+	          line_reader,
 	          types,
+	          permission_group,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_single_files_parse_permission_group(
+	          single_files,
+	          NULL,
+	          types,
+	          permission_group,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_single_files_parse_permission_group(
+	          single_files,
+	          line_reader,
 	          NULL,
 	          permission_group,
 	          &error );
@@ -2528,37 +2023,24 @@ int ewf_test_single_files_parse_permission_group(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
+	result = libewf_single_files_parse_permission_group(
+	          single_files,
+	          line_reader,
+	          types,
+	          NULL,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
+	EWF_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
 
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -2567,18 +2049,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2587,21 +2057,24 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_srce_category(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libewf_single_files_t *single_files  = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2610,25 +2083,8 @@ int ewf_test_single_files_parse_srce_category(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2636,12 +2092,12 @@ int ewf_test_single_files_parse_srce_category(
 
 	/* Test regular cases
 	 */
-	line_index = 13;
+	line_reader->buffer_offset = 0x1a0;
+	line_reader->line_index    = 13;
 
 	result = libewf_single_files_parse_srce_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2655,12 +2111,12 @@ int ewf_test_single_files_parse_srce_category(
 
 	/* Test error cases
 	 */
-	line_index = 13;
+	line_reader->buffer_offset = 0x1a0;
+	line_reader->line_index    = 13;
 
 	result = libewf_single_files_parse_srce_category(
 	          NULL,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2678,7 +2134,6 @@ int ewf_test_single_files_parse_srce_category(
 	result = libewf_single_files_parse_srce_category(
 	          single_files,
 	          NULL,
-	          &line_index,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2692,56 +2147,6 @@ int ewf_test_single_files_parse_srce_category(
 
 	libcerror_error_free(
 	 &error );
-
-	result = libewf_single_files_parse_srce_category(
-	          single_files,
-	          lines,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -2750,18 +2155,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2770,21 +2163,24 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_sub_category(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libewf_single_files_t *single_files  = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2793,25 +2189,8 @@ int ewf_test_single_files_parse_sub_category(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2819,12 +2198,12 @@ int ewf_test_single_files_parse_sub_category(
 
 	/* Test regular cases
 	 */
-	line_index = 21;
+	line_reader->buffer_offset = 0x52e;
+	line_reader->line_index    = 21;
 
 	result = libewf_single_files_parse_sub_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2838,12 +2217,12 @@ int ewf_test_single_files_parse_sub_category(
 
 	/* Test error cases
 	 */
-	line_index = 21;
+	line_reader->buffer_offset = 0x52e;
+	line_reader->line_index    = 21;
 
 	result = libewf_single_files_parse_sub_category(
 	          NULL,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2861,7 +2240,6 @@ int ewf_test_single_files_parse_sub_category(
 	result = libewf_single_files_parse_sub_category(
 	          single_files,
 	          NULL,
-	          &line_index,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2875,56 +2253,6 @@ int ewf_test_single_files_parse_sub_category(
 
 	libcerror_error_free(
 	 &error );
-
-	result = libewf_single_files_parse_sub_category(
-	          single_files,
-	          lines,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -2933,18 +2261,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2953,22 +2269,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_entry_category(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libewf_single_files_t *single_files  = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	uint8_t format                       = 0;
-	int line_index                       = 0;
-	int result                           = 0;
+	libcerror_error_t *error = NULL;
+	uint8_t *line_string     = NULL;
+	size_t line_string_size  = 0;
+	uint8_t format           = 0;
+	int result               = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -2977,25 +2296,8 @@ int ewf_test_single_files_parse_entry_category(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3003,12 +2305,12 @@ int ewf_test_single_files_parse_entry_category(
 
 	/* Test regular cases
 	 */
-	line_index = 27;
+	line_reader->buffer_offset = 0x5b8;
+	line_reader->line_index    = 27;
 
 	result = libewf_single_files_parse_entry_category(
 	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &format,
 	          &error );
 
@@ -3023,12 +2325,12 @@ int ewf_test_single_files_parse_entry_category(
 
 	/* Test error cases
 	 */
-	line_index = 27;
+	line_reader->buffer_offset = 0x5b8;
+	line_reader->line_index    = 27;
 
 	result = libewf_single_files_parse_entry_category(
 	          NULL,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          &format,
 	          &error );
 
@@ -3047,7 +2349,6 @@ int ewf_test_single_files_parse_entry_category(
 	result = libewf_single_files_parse_entry_category(
 	          single_files,
 	          NULL,
-	          &line_index,
 	          &format,
 	          &error );
 
@@ -3065,27 +2366,7 @@ int ewf_test_single_files_parse_entry_category(
 
 	result = libewf_single_files_parse_entry_category(
 	          single_files,
-	          lines,
-	          NULL,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_entry_category(
-	          single_files,
-	          lines,
-	          &line_index,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -3100,38 +2381,6 @@ int ewf_test_single_files_parse_entry_category(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -3140,18 +2389,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -3160,21 +2397,25 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
-     void )
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader )
 {
-	libcerror_error_t *error             = NULL;
-	libfvalue_split_utf8_string_t *lines = NULL;
-	int line_index                       = 0;
-	int number_of_sub_entries            = 0;
-	int result                           = 0;
+	libcerror_error_t *error  = NULL;
+	uint8_t *line_string      = NULL;
+	size_t line_string_size   = 0;
+	int number_of_sub_entries = 0;
+	int result                = 0;
 
 	/* Initialize test
 	 */
-	result = libfvalue_utf8_string_split(
-	          ewf_test_single_files_data2,
-	          2851,
-	          (uint8_t) '\n',
-	          &lines,
+	line_reader->stream_offset = 0;
+	line_reader->buffer_offset = 0;
+	line_reader->line_index    = 0;
+
+	result = libewf_line_reader_read_line(
+	          line_reader,
+	          &line_string,
+	          &line_string_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -3183,8 +2424,8 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 	 1 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "lines",
-	 lines );
+	 "line_string",
+	 line_string );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3192,11 +2433,12 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 
 	/* Test regular cases
 	 */
-	line_index = 36;
+	line_reader->buffer_offset = 0xcb8;
+	line_reader->line_index    = 36;
 
 	result = libewf_single_files_parse_file_entry_number_of_sub_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          &number_of_sub_entries,
 	          &error );
 
@@ -3211,11 +2453,12 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 
 	/* Test error cases
 	 */
-	line_index = 36;
+	line_reader->buffer_offset = 0xcb8;
+	line_reader->line_index    = 36;
 
 	result = libewf_single_files_parse_file_entry_number_of_sub_entries(
 	          NULL,
-	          &line_index,
+	          line_reader,
 	          &number_of_sub_entries,
 	          &error );
 
@@ -3232,7 +2475,7 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 	 &error );
 
 	result = libewf_single_files_parse_file_entry_number_of_sub_entries(
-	          lines,
+	          single_files,
 	          NULL,
 	          &number_of_sub_entries,
 	          &error );
@@ -3250,8 +2493,8 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 	 &error );
 
 	result = libewf_single_files_parse_file_entry_number_of_sub_entries(
-	          lines,
-	          &line_index,
+	          single_files,
+	          line_reader,
 	          NULL,
 	          &error );
 
@@ -3266,21 +2509,6 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 
 	libcerror_error_free(
 	 &error );
-
-	/* Clean up
-	 */
-	result = libfvalue_split_utf8_string_free(
-	          &lines,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "lines",
-	 lines );
 
 	return( 1 );
 
@@ -3290,23 +2518,18 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( lines != NULL )
-	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
-		 NULL );
-	}
 	return( 0 );
 }
 
-/* Tests the libewf_single_files_parse_utf8_string function
+/* Tests the libewf_single_files_read_data_stream function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_single_files_parse_utf8_string(
+int ewf_test_single_files_read_data_stream(
      void )
 {
 	libcerror_error_t *error            = NULL;
 	libewf_single_files_t *single_files = NULL;
+	libfdata_stream_t *data_stream      = NULL;
 	size64_t media_size                 = 0;
 	uint8_t format                      = 0;
 	int result                          = 0;
@@ -3330,12 +2553,31 @@ int ewf_test_single_files_parse_utf8_string(
 	 "error",
 	 error );
 
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
+	          ewf_test_single_files_data1,
+	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
-	result = libewf_single_files_parse_utf8_string(
+	result = libewf_single_files_read_data_stream(
 	          single_files,
-	          ewf_test_single_files_data2,
-	          2851,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -3351,10 +2593,10 @@ int ewf_test_single_files_parse_utf8_string(
 
 	/* Test error cases
 	 */
-	result = libewf_single_files_parse_utf8_string(
+	result = libewf_single_files_read_data_stream(
 	          NULL,
-	          ewf_test_single_files_data2,
-	          2851,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -3371,10 +2613,10 @@ int ewf_test_single_files_parse_utf8_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_single_files_parse_utf8_string(
+	result = libewf_single_files_read_data_stream(
 	          single_files,
 	          NULL,
-	          2851,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -3391,50 +2633,10 @@ int ewf_test_single_files_parse_utf8_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_single_files_parse_utf8_string(
+	result = libewf_single_files_read_data_stream(
 	          single_files,
-	          ewf_test_single_files_data2,
-	          (size_t) SSIZE_MAX + 1,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_utf8_string(
-	          single_files,
-	          ewf_test_single_files_data2,
-	          0,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_parse_utf8_string(
-	          single_files,
-	          ewf_test_single_files_data2,
-	          2851,
+	          data_stream,
+	          NULL,
 	          NULL,
 	          &format,
 	          &error );
@@ -3451,10 +2653,10 @@ int ewf_test_single_files_parse_utf8_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_single_files_parse_utf8_string(
+	result = libewf_single_files_read_data_stream(
 	          single_files,
-	          ewf_test_single_files_data2,
-	          2851,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          NULL,
 	          &error );
@@ -3473,6 +2675,23 @@ int ewf_test_single_files_parse_utf8_string(
 
 	/* Clean up
 	 */
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_single_files_free(
 	          &single_files,
 	          &error );
@@ -3498,213 +2717,11 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( single_files != NULL )
+	if( data_stream != NULL )
 	{
-		libewf_single_files_free(
-		 &single_files,
+		libfdata_stream_free(
+		 &data_stream,
 		 NULL );
-	}
-	return( 0 );
-}
-
-/* Tests the libewf_single_files_read_data function
- * Returns 1 if successful or 0 if not
- */
-int ewf_test_single_files_read_data(
-     void )
-{
-	libcerror_error_t *error            = NULL;
-	libewf_single_files_t *single_files = NULL;
-	size64_t media_size                 = 0;
-	uint8_t format                      = 0;
-	int result                          = 0;
-
-	/* Initialize test
-	 */
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          5700,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libewf_single_files_read_data(
-	          NULL,
-	          ewf_test_single_files_data1,
-	          5700,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          NULL,
-	          5700,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          (size_t) SSIZE_MAX + 1,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          0,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          5700,
-	          NULL,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          5700,
-	          &media_size,
-	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
 	}
 	if( single_files != NULL )
 	{
@@ -3719,50 +2736,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int ewf_test_single_files_get_file_entry_tree_root_node(
-     void )
+     libewf_single_files_t *single_files )
 {
-	libcdata_tree_node_t *root_node     = NULL;
-	libcerror_error_t *error            = NULL;
-	libewf_single_files_t *single_files = NULL;
-	size64_t media_size                 = 0;
-	uint8_t format                      = 0;
-	int result                          = 0;
-
-	/* Initialize test
-	 */
-	result = libewf_single_files_initialize(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libewf_single_files_read_data(
-	          single_files,
-	          ewf_test_single_files_data1,
-	          5700,
-	          &media_size,
-	          &format,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcdata_tree_node_t *root_node = NULL;
+	libcerror_error_t *error        = NULL;
+	int result                      = 0;
 
 	/* Test regular cases
 	 */
@@ -3820,25 +2798,6 @@ int ewf_test_single_files_get_file_entry_tree_root_node(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libewf_single_files_free(
-	          &single_files,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "single_files",
-	 single_files );
-
-	EWF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -3846,12 +2805,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( single_files != NULL )
-	{
-		libewf_single_files_free(
-		 &single_files,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -3870,6 +2823,18 @@ int main(
      char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
+	libcerror_error_t *error            = NULL;
+	libewf_line_reader_t *line_reader   = NULL;
+	libewf_single_files_t *single_files = NULL;
+	libfdata_stream_t *data_stream      = NULL;
+	size64_t media_size                 = 0;
+	uint8_t format                      = 0;
+	int result                          = 0;
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
+
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -3887,81 +2852,326 @@ int main(
 	 "libewf_single_files_clone",
 	 ewf_test_single_files_clone );
 
-	EWF_TEST_RUN(
-	 "libewf_single_files_parse_line",
-	 ewf_test_single_files_parse_line );
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
-	EWF_TEST_RUN(
+	/* Initialize single_files for tests
+	 */
+	result = libewf_single_files_initialize(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
+	          ewf_test_single_files_data1,
+	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_line_reader_initialize(
+	          &line_reader,
+	          data_stream,
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "line_reader",
+	 line_reader );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_category_number_of_entries",
-	 ewf_test_single_files_parse_category_number_of_entries );
+	 ewf_test_single_files_parse_category_number_of_entries,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_category_types",
-	 ewf_test_single_files_parse_category_types );
+	 ewf_test_single_files_parse_category_types,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_number_of_entries",
-	 ewf_test_single_files_parse_number_of_entries );
+	 ewf_test_single_files_parse_number_of_entries,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_format",
-	 ewf_test_single_files_parse_format );
+	 ewf_test_single_files_parse_format,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_rec_category",
-	 ewf_test_single_files_parse_rec_category );
+	 ewf_test_single_files_parse_rec_category,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_record_values",
-	 ewf_test_single_files_parse_record_values );
+	 ewf_test_single_files_parse_record_values,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_perm_category",
-	 ewf_test_single_files_parse_perm_category );
+	 ewf_test_single_files_parse_perm_category,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_permission_group",
-	 ewf_test_single_files_parse_permission_group );
+	 ewf_test_single_files_parse_permission_group,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_srce_category",
-	 ewf_test_single_files_parse_srce_category );
+	 ewf_test_single_files_parse_srce_category,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_sub_category",
-	 ewf_test_single_files_parse_sub_category );
+	 ewf_test_single_files_parse_sub_category,
+	 single_files,
+	 line_reader );
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_entry_category",
-	 ewf_test_single_files_parse_entry_category );
+	 ewf_test_single_files_parse_entry_category,
+	 single_files,
+	 line_reader );
 
 	/* TODO: add tests for libewf_single_files_parse_file_entry */
 
-	EWF_TEST_RUN(
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_parse_file_entry_number_of_sub_entries",
-	 ewf_test_single_files_parse_file_entry_number_of_sub_entries );
+	 ewf_test_single_files_parse_file_entry_number_of_sub_entries,
+	 single_files,
+	 line_reader );
+
+	/* Clean up
+	 */
+	result = libewf_line_reader_free(
+	          &line_reader,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "line_reader",
+	 line_reader );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_free(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 	EWF_TEST_RUN(
-	 "libewf_single_files_parse_utf8_string",
-	 ewf_test_single_files_parse_utf8_string );
+	 "libewf_single_files_read_data_stream",
+	 ewf_test_single_files_read_data_stream );
 
-	EWF_TEST_RUN(
-	 "libewf_single_files_read_data",
-	 ewf_test_single_files_read_data );
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
-	EWF_TEST_RUN(
+	/* Initialize single_files for tests
+	 */
+	result = libewf_single_files_initialize(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
+	          ewf_test_single_files_data1,
+	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          single_files,
+	          data_stream,
+	          NULL,
+	          &media_size,
+	          &format,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	EWF_TEST_RUN_WITH_ARGS(
 	 "libewf_single_files_get_file_entry_tree_root_node",
-	 ewf_test_single_files_get_file_entry_tree_root_node );
+	 ewf_test_single_files_get_file_entry_tree_root_node,
+	 single_files );
 
 	/* TODO: add tests for libewf_single_files_get_source_by_index */
 
+	/* Clean up
+	 */
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_free(
+	          &single_files,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "single_files",
+	 single_files );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
-
 on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
+		 NULL );
+	}
+	if( single_files != NULL )
+	{
+		libewf_single_files_free(
+		 &single_files,
+		 NULL );
+	}
 	return( EXIT_FAILURE );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */

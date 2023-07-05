@@ -190,6 +190,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_buffer_data_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_case_data.c"
 				>
 			</File>
@@ -223,6 +227,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_data_chunk.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_data_stream.c"
 				>
 			</File>
 			<File
@@ -318,6 +326,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_line_reader.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_ltree_section.c"
 				>
 			</File>
@@ -347,6 +359,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_section.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_section_data_handle.c"
 				>
 			</File>
 			<File
@@ -476,6 +492,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_buffer_data_handle.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_case_data.h"
 				>
 			</File>
@@ -513,6 +533,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_data_chunk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_data_stream.h"
 				>
 			</File>
 			<File
@@ -668,6 +692,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_line_reader.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_ltree_section.h"
 				>
 			</File>
@@ -697,6 +725,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_section.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_section_data_handle.h"
 				>
 			</File>
 			<File

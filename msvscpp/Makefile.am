@@ -5,6 +5,7 @@ MSVSCPP_FILES = \
 	ewf_test_analytical_data/ewf_test_analytical_data.vcproj \
 	ewf_test_attribute/ewf_test_attribute.vcproj \
 	ewf_test_bit_stream/ewf_test_bit_stream.vcproj \
+	ewf_test_buffer_data_handle/ewf_test_buffer_data_handle.vcproj \
 	ewf_test_case_data/ewf_test_case_data.vcproj \
 	ewf_test_case_data_section/ewf_test_case_data_section.vcproj \
 	ewf_test_checksum/ewf_test_checksum.vcproj \
@@ -37,6 +38,7 @@ MSVSCPP_FILES = \
 	ewf_test_lef_permission/ewf_test_lef_permission.vcproj \
 	ewf_test_lef_source/ewf_test_lef_source.vcproj \
 	ewf_test_lef_subject/ewf_test_lef_subject.vcproj \
+	ewf_test_line_reader/ewf_test_line_reader.vcproj \
 	ewf_test_ltree_section/ewf_test_ltree_section.vcproj \
 	ewf_test_md5_hash_section/ewf_test_md5_hash_section.vcproj \
 	ewf_test_media_values/ewf_test_media_values.vcproj \
@@ -44,6 +46,7 @@ MSVSCPP_FILES = \
 	ewf_test_permission_group/ewf_test_permission_group.vcproj \
 	ewf_test_read_io_handle/ewf_test_read_io_handle.vcproj \
 	ewf_test_restart_data/ewf_test_restart_data.vcproj \
+	ewf_test_section_data_handle/ewf_test_section_data_handle.vcproj \
 	ewf_test_section_descriptor/ewf_test_section_descriptor.vcproj \
 	ewf_test_sector_range/ewf_test_sector_range.vcproj \
 	ewf_test_sector_range_list/ewf_test_sector_range_list.vcproj \

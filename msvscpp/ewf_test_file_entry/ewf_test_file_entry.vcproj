@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\ewf_test_libfdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
 				>
 			</File>

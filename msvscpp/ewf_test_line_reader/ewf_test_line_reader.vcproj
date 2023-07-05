@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_single_file_tree"
-	ProjectGUID="{6CB6381D-A10D-4798-A6AC-049636879243}"
-	RootNamespace="ewf_test_single_file_tree"
+	Name="ewf_test_line_reader"
+	ProjectGUID="{492B5652-7E6B-4133-A9D8-66FFBAE9E983}"
+	RootNamespace="ewf_test_line_reader"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_single_file_tree.c"
+				RelativePath="..\..\tests\ewf_test_line_reader.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

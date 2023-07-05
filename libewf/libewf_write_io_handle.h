@@ -173,6 +173,10 @@ struct libewf_write_io_handle
          */
         libewf_segment_file_t *current_segment_file;
 
+        /* The managed segment file
+         */
+        libewf_segment_file_t *managed_segment_file;
+
         /* The number of chunks written of the current segment file
          */
         uint64_t number_of_chunks_written_to_segment_file;

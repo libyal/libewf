@@ -28,30 +28,26 @@
 #include "libewf_io_handle.h"
 #include "libewf_libbfio.h"
 #include "libewf_libcerror.h"
+#include "libewf_libfdata.h"
 #include "libewf_section_descriptor.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_ltree_section_read_data(
+int libewf_ltree_section_read_header_data(
      const uint8_t *data,
      size_t data_size,
-     uint8_t format_version,
-     uint8_t **single_files_data,
-     size_t *single_files_data_size,
+     uint64_t *single_files_data_size,
      libcerror_error_t **error );
 
 ssize_t libewf_ltree_section_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
-          libewf_io_handle_t *io_handle,
+         libewf_io_handle_t *io_handle,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
-         uint8_t **section_data,
-         size_t *section_data_size,
-         uint8_t **single_files_data,
-         size_t *single_files_data_size,
+         libfdata_stream_t **data_stream,
          libcerror_error_t **error );
 
 ssize_t libewf_ltree_section_write_file_io_pool(

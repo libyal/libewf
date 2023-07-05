@@ -132,6 +132,12 @@ ssize_t libewf_section_descriptor_write_file_io_pool(
          uint8_t format_version,
          libcerror_error_t **error );
 
+int libewf_section_descriptor_get_data_offset(
+     libewf_section_descriptor_t *section_descriptor,
+     uint8_t format_version,
+     off64_t *data_offset,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

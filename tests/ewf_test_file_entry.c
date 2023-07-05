@@ -36,11 +36,13 @@
 #include "ewf_test_libcdata.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libfdata.h"
 #include "ewf_test_libfvalue.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_data_stream.h"
 #include "../libewf/libewf_file_entry.h"
 #include "../libewf/libewf_single_files.h"
 
@@ -417,6 +419,7 @@ int ewf_test_file_entry_initialize(
 	libcerror_error_t *error                   = NULL;
 	libewf_file_entry_t *file_entry            = NULL;
 	libewf_single_files_t *single_files        = NULL;
+	libfdata_stream_t *data_stream             = NULL;
 	size64_t media_size                        = 0;
 	uint8_t format                             = 0;
 	int result                                 = 0;
@@ -446,10 +449,29 @@ int ewf_test_file_entry_initialize(
 	 "error",
 	 error );
 
-	result = libewf_single_files_read_data(
-	          single_files,
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
 	          ewf_test_file_entry_data1,
 	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          single_files,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -458,6 +480,23 @@ int ewf_test_file_entry_initialize(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -708,6 +747,12 @@ on_error:
 	{
 		libewf_file_entry_free(
 		 &file_entry,
+		 NULL );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
 		 NULL );
 	}
 	if( single_files != NULL )
@@ -2913,6 +2958,7 @@ int main(
 	libcerror_error_t *error                   = NULL;
 	libewf_file_entry_t *file_entry            = NULL;
 	libewf_single_files_t *single_files        = NULL;
+	libfdata_stream_t *data_stream             = NULL;
 	size64_t media_size                        = 0;
 	uint8_t format                             = 0;
 	int result                                 = 0;
@@ -2956,10 +3002,29 @@ int main(
 	 "error",
 	 error );
 
-	result = libewf_single_files_read_data(
-	          single_files,
+	result = libewf_data_stream_initialize_from_buffer(
+	          &data_stream,
 	          ewf_test_file_entry_data1,
 	          5700,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_single_files_read_data_stream(
+	          single_files,
+	          data_stream,
+	          NULL,
 	          &media_size,
 	          &format,
 	          &error );
@@ -2968,6 +3033,23 @@ int main(
 	 "result",
 	 result,
 	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3219,6 +3301,12 @@ on_error:
 	{
 		libewf_file_entry_free(
 		 &file_entry,
+		 NULL );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
 		 NULL );
 	}
 	if( single_files != NULL )

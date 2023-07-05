@@ -6537,7 +6537,7 @@ int libewf_segment_file_read_element_data(
 
 				goto on_error;
 			}
-			result = libewf_section_get_data_offset(
+			result = libewf_section_descriptor_get_data_offset(
 			          section_descriptor,
 			          segment_file->major_version,
 			          &section_data_offset,

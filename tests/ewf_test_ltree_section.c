@@ -32,6 +32,7 @@
 #include "ewf_test_libbfio.h"
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libewf.h"
+#include "ewf_test_libfdata.h"
 #include "ewf_test_macros.h"
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
@@ -404,27 +405,21 @@ uint8_t ewf_test_ltree_section_data1[ 5748 ] = {
 
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
-/* Tests the libewf_ltree_section_read_data function
+/* Tests the libewf_ltree_section_read_header_data function
  * Returns 1 if successful or 0 if not
  */
-int ewf_test_ltree_section_read_data(
+int ewf_test_ltree_section_read_header_data(
      void )
 {
-	libcerror_error_t *error      = NULL;
-	uint8_t *single_files_data    = NULL;
-	size_t single_files_data_size = 0;
-	int result                    = 0;
+	libcerror_error_t *error        = NULL;
+	uint64_t single_files_data_size = 0;
+	int result                      = 0;
 
 	/* Test regular cases
 	 */
-	single_files_data      = NULL;
-	single_files_data_size = 0;
-
-	result = libewf_ltree_section_read_data(
+	result = libewf_ltree_section_read_header_data(
 	          ewf_test_ltree_section_data1,
 	          5748,
-	          1,
-	          &single_files_data,
 	          &single_files_data_size,
 	          &error );
 
@@ -433,20 +428,20 @@ int ewf_test_ltree_section_read_data(
 	 result,
 	 1 );
 
+	EWF_TEST_ASSERT_EQUAL_UINT64(
+	 "single_files_data_size",
+	 single_files_data_size,
+	 (uint64_t) 5700 );
+
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
 	/* Test error cases
 	 */
-	single_files_data      = NULL;
-	single_files_data_size = 0;
-
-	result = libewf_ltree_section_read_data(
+	result = libewf_ltree_section_read_header_data(
 	          NULL,
 	          5748,
-	          1,
-	          &single_files_data,
 	          &single_files_data_size,
 	          &error );
 
@@ -462,11 +457,9 @@ int ewf_test_ltree_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_ltree_section_read_data(
+	result = libewf_ltree_section_read_header_data(
 	          ewf_test_ltree_section_data1,
 	          (size_t) SSIZE_MAX + 1,
-	          1,
-	          &single_files_data,
 	          &single_files_data_size,
 	          &error );
 
@@ -482,11 +475,9 @@ int ewf_test_ltree_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_ltree_section_read_data(
+	result = libewf_ltree_section_read_header_data(
 	          ewf_test_ltree_section_data1,
 	          0,
-	          1,
-	          &single_files_data,
 	          &single_files_data_size,
 	          &error );
 
@@ -502,75 +493,9 @@ int ewf_test_ltree_section_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libewf_ltree_section_read_data(
+	result = libewf_ltree_section_read_header_data(
 	          ewf_test_ltree_section_data1,
 	          5748,
-	          0,
-	          &single_files_data,
-	          &single_files_data_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_ltree_section_read_data(
-	          ewf_test_ltree_section_data1,
-	          5748,
-	          1,
-	          NULL,
-	          &single_files_data_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	single_files_data = (uint8_t *) 0x12345678UL;
-
-	result = libewf_ltree_section_read_data(
-	          ewf_test_ltree_section_data1,
-	          5748,
-	          1,
-	          &single_files_data,
-	          &single_files_data_size,
-	          &error );
-
-	single_files_data = NULL;
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libewf_ltree_section_read_data(
-	          ewf_test_ltree_section_data1,
-	          5748,
-	          1,
-	          &single_files_data,
 	          NULL,
 	          &error );
 
@@ -585,65 +510,6 @@ int ewf_test_ltree_section_read_data(
 
 	libcerror_error_free(
 	 &error );
-
-	result = libewf_ltree_section_read_data(
-	          ewf_test_ltree_section_data1,
-	          0,
-	          1,
-	          &single_files_data,
-	          &single_files_data_size,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-/* TODO disabled for now, since this test causes a SIGSEGV within openssl */
-#if defined( SKIP_TEST )
-
-#if defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
-
-	/* Test libewf_ltree_section_read_data with memcpy failing
-	 */
-	ewf_test_memcpy_attempts_before_fail = 0;
-
-	result = libewf_ltree_section_read_data(
-	          ewf_test_ltree_section_data1,
-	          5748,
-	          1,
-	          &single_files_data,
-	          &single_files_data_size,
-	          &error );
-
-	if( ewf_test_memcpy_attempts_before_fail != -1 )
-	{
-		ewf_test_memcpy_attempts_before_fail = -1;
-	}
-	else
-	{
-		EWF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		EWF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_EWF_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
-
-#endif /* defined( SKIP_TEST ) */
 
 	return( 1 );
 
@@ -666,10 +532,7 @@ int ewf_test_ltree_section_read_file_io_pool(
 	libcerror_error_t *error                        = NULL;
 	libewf_io_handle_t *io_handle                   = NULL;
 	libewf_section_descriptor_t *section_descriptor = NULL;
-	uint8_t *section_data                           = NULL;
-	uint8_t *single_files_data                      = NULL;
-	size_t section_data_size                        = 0;
-	size_t single_files_data_size                   = 0;
+	libfdata_stream_t *data_stream                  = NULL;
 	ssize_t read_count                              = 0;
 	int result                                      = 0;
 
@@ -735,38 +598,44 @@ int ewf_test_ltree_section_read_file_io_pool(
 
 	/* Test regular cases
 	 */
-	single_files_data      = NULL;
-	single_files_data_size = 0;
-
 	read_count = libewf_ltree_section_read_file_io_pool(
 	              section_descriptor,
 	              io_handle,
 	              file_io_pool,
 	              0,
 	              2,
-	              &section_data,
-	              &section_data_size,
-	              &single_files_data,
-	              &single_files_data_size,
+	              &data_stream,
 	              &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
-	 (ssize_t) 5748 );
+	 (ssize_t) 0 );
 
 	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "section_data",
-	 section_data );
+	 "data_stream",
+	 data_stream );
 
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	memory_free(
-	 section_data );
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
 
-	section_data = NULL;
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -776,10 +645,7 @@ int ewf_test_ltree_section_read_file_io_pool(
 	              file_io_pool,
 	              0,
 	              2,
-	              &section_data,
-	              &section_data_size,
-	              &single_files_data,
-	              &single_files_data_size,
+	              &data_stream,
 	              &error );
 
 	EWF_TEST_ASSERT_EQUAL_SSIZE(
@@ -804,10 +670,7 @@ int ewf_test_ltree_section_read_file_io_pool(
 	              file_io_pool,
 	              0,
 	              2,
-	              &section_data,
-	              &section_data_size,
-	              &single_files_data,
-	              &single_files_data_size,
+	              &data_stream,
 	              &error );
 
 	section_descriptor->data_size = 5748;
@@ -1186,8 +1049,8 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
 
 	EWF_TEST_RUN(
-	 "libewf_ltree_section_read_data",
-	 ewf_test_ltree_section_read_data );
+	 "libewf_ltree_section_read_header_data",
+	 ewf_test_ltree_section_read_header_data );
 
 	EWF_TEST_RUN(
 	 "libewf_ltree_section_read_file_io_pool",

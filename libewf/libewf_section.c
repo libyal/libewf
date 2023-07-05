@@ -46,6 +46,7 @@
 #include "libewf_unused.h"
 
 #include "ewf_data.h"
+#include "ewf_section.h"
 
 /* Tests if a buffer entirely consists of zero values
  * Returns 1 if zero, 0 if not, or -1 on error
@@ -88,54 +89,6 @@ int libewf_section_test_zero(
 		{
 			return( 0 );
 		}
-	}
-	return( 1 );
-}
-
-/* Retrieves the section data offset
- * Returns 1 if successful, 0 if the section contains no data or -1 on error
- */
-int libewf_section_get_data_offset(
-     libewf_section_descriptor_t *section_descriptor,
-     uint8_t format_version,
-     off64_t *data_offset,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_section_get_data_offset";
-
-	if( section_descriptor == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section descriptor.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data offset.",
-		 function );
-
-		return( -1 );
-	}
-	if( section_descriptor->data_size == 0 )
-	{
-		return( 0 );
-	}
-	if( format_version == 1 )
-	{
-		*data_offset = section_descriptor->start_offset + sizeof( ewf_section_descriptor_v1_t );
-	}
-	else
-	{
-		*data_offset = section_descriptor->start_offset;
 	}
 	return( 1 );
 }
@@ -321,7 +274,14 @@ ssize_t libewf_section_read_data(
 		memory_free(
 		 safe_section_data );
 
-		return( 0 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: invalid section descriptor - encrypted section currently not supported.",
+		 function );
+
+		return( -1 );
 	}
 	*section_data      = safe_section_data;
 	*section_data_size = (size_t) section_descriptor->data_size;

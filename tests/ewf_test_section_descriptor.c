@@ -1509,11 +1509,17 @@ int main(
 	 "libewf_section_descriptor_write_file_io_pool",
 	 ewf_test_section_descriptor_write_file_io_pool );
 
+/* TODO add tests for libewf_section_descriptor_get_data_offset */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 }
 

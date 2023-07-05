@@ -1,4 +1,9 @@
 TODO
+* change ltree path segment separator
+* calculate the MD5 while incremental ltree read, use line reader instead?
+
+* escape unpaired surrogates in bodyfile
+
 * info_handle: move dfxml functions to seperate file
 * clean up libewf_chunk_group_correct_v1
 

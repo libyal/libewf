@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_single_file_tree"
-	ProjectGUID="{6CB6381D-A10D-4798-A6AC-049636879243}"
-	RootNamespace="ewf_test_single_file_tree"
+	Name="ewf_test_buffer_data_handle"
+	ProjectGUID="{91899A5C-3A5A-4CAB-9606-D74BF66DCECF}"
+	RootNamespace="ewf_test_buffer_data_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\ewf_test_single_file_tree.c"
+				RelativePath="..\..\tests\ewf_test_buffer_data_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\ewf_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -194,11 +198,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libfdata.h"
+				RelativePath="..\..\tests\ewf_test_macros.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_macros.h"
+				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

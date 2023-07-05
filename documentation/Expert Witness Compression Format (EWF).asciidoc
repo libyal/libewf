@@ -1794,7 +1794,7 @@ The ltree section consists of:
 
 ==== Ltree header
 
-The ltree header is 6 bytes of size and consists of:
+The ltree header is 48 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1828,7 +1828,7 @@ See section: <<permissions_category3,Permissions category>>
 | ... | srce | Information about acquisition sources +
 See section: <<sources_category3,Sources category>>
 | ... | | (an empty line)
-|...22 | sub | Information about [yellow-background]*unknown* +
+| ... | sub | Information about [yellow-background]*unknown* +
 See section: <<subjects_category3,Subjects category>>
 | ... | | (an empty line)
 | ... | entry | Information about file entries +

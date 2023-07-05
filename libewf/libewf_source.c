@@ -162,6 +162,8 @@ int libewf_source_free(
 		internal_source = (libewf_internal_source_t *) *source;
 		*source         = NULL;
 
+		/* The lef_source reference is freed elsewhere
+		 */
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 		if( libcthreads_read_write_lock_free(
 		     &( internal_source->read_write_lock ),
@@ -177,8 +179,6 @@ int libewf_source_free(
 			result = -1;
 		}
 #endif
-		/* The lef_source references is freed elsewhere
-		 */
 		memory_free(
 		 internal_source );
 	}

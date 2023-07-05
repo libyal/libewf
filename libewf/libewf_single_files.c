@@ -29,11 +29,14 @@
 #include "libewf_lef_permission.h"
 #include "libewf_lef_source.h"
 #include "libewf_lef_subject.h"
+#include "libewf_libbfio.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
+#include "libewf_libfdata.h"
 #include "libewf_libfvalue.h"
 #include "libewf_libuna.h"
+#include "libewf_line_reader.h"
 #include "libewf_permission_group.h"
 #include "libewf_single_files.h"
 
@@ -173,40 +176,6 @@ int libewf_single_files_free(
 	}
 	if( *single_files != NULL )
 	{
-		if( ( *single_files )->permission_groups != NULL )
-		{
-			if( libcdata_array_free(
-			     &( ( *single_files )->permission_groups ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_permission_group_free,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free permission groups array.",
-				 function );
-
-				result = -1;
-			}
-		}
-		if( ( *single_files )->sources != NULL )
-		{
-			if( libcdata_array_free(
-			     &( ( *single_files )->sources ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_source_free,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free sources array.",
-				 function );
-
-				result = -1;
-			}
-		}
 		if( ( *single_files )->file_entry_tree_root_node != NULL )
 		{
 			if( libcdata_tree_node_free(
@@ -223,6 +192,34 @@ int libewf_single_files_free(
 
 				result = -1;
 			}
+		}
+		if( libcdata_array_free(
+		     &( ( *single_files )->sources ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_source_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sources array.",
+			 function );
+
+			result = -1;
+		}
+		if( libcdata_array_free(
+		     &( ( *single_files )->permission_groups ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_permission_group_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free permission groups array.",
+			 function );
+
+			result = -1;
 		}
 		memory_free(
 		 *single_files );
@@ -348,94 +345,12 @@ on_error:
 	return( -1 );
 }
 
-/* Parses a line
- * Returns 1 if successful or -1 on error
- */
-int libewf_single_files_parse_line(
-     libfvalue_split_utf8_string_t *lines,
-     int line_index,
-     uint8_t **line_string,
-     size_t *line_string_size,
-     libcerror_error_t **error )
-{
-	uint8_t *safe_line_string    = NULL;
-	static char *function        = "libewf_single_files_parse_line";
-	size_t safe_line_string_size = 0;
-
-	if( line_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line string.",
-		 function );
-
-		return( -1 );
-	}
-	if( line_string_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line string size.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfvalue_split_utf8_string_get_segment_by_index(
-	     lines,
-	     line_index,
-	     &safe_line_string,
-	     &safe_line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
-		 function,
-		 line_index );
-
-		return( -1 );
-	}
-	if( safe_line_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing line string: %d.",
-		 function,
-		 line_index );
-
-		return( -1 );
-	}
-	/* Remove trailing carriage return
-	 */
-	if( safe_line_string_size >= 2 )
-	{
-		if( safe_line_string[ safe_line_string_size - 2 ] == (uint8_t) '\r' )
-		{
-			safe_line_string[ safe_line_string_size - 2 ] = 0;
-
-			safe_line_string_size -= 1;
-		}
-	}
-	*line_string      = safe_line_string;
-	*line_string_size = safe_line_string_size;
-
-	return( 1 );
-}
-
 /* Parses the number of entries in a category
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_category_number_of_entries(
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      int *number_of_entries,
      libcerror_error_t **error )
 {
@@ -447,15 +362,25 @@ int libewf_single_files_parse_category_number_of_entries(
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
 	int number_of_values                  = 0;
-	int safe_line_index                   = 0;
 
-	if( line_index == NULL )
+	if( single_files == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
@@ -471,22 +396,19 @@ int libewf_single_files_parse_category_number_of_entries(
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -503,12 +425,10 @@ int libewf_single_files_parse_category_number_of_entries(
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split line: %d string into values.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_get_number_of_segments(
 	     values,
 	     &number_of_values,
@@ -620,7 +540,6 @@ int libewf_single_files_parse_category_number_of_entries(
 
 		goto on_error;
 	}
-	*line_index        = safe_line_index;
 	*number_of_entries = (int) value_64bit;
 
 	return( 1 );
@@ -639,43 +558,50 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_category_types(
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      libfvalue_split_utf8_string_t **types,
      libcerror_error_t **error )
 {
 	uint8_t *line_string    = NULL;
 	static char *function   = "libewf_single_files_parse_category_types";
 	size_t line_string_size = 0;
-	int safe_line_index     = 0;
 
-	if( line_index == NULL )
+	if( single_files == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid single files.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
+		 function );
 
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+		return( -1 );
+	}
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		return( -1 );
 	}
@@ -691,14 +617,11 @@ int libewf_single_files_parse_category_types(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split line: %d into types.",
-		 function );
+		 function,
+		 line_reader->line_index - 1 );
 
 		return( -1 );
 	}
-	safe_line_index += 1;
-
-	*line_index = safe_line_index;
-
 	return( 1 );
 }
 
@@ -706,8 +629,8 @@ int libewf_single_files_parse_category_types(
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_number_of_entries(
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      int *number_of_entries,
      libcerror_error_t **error )
 {
@@ -719,15 +642,25 @@ int libewf_single_files_parse_number_of_entries(
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
 	int number_of_values                  = 0;
-	int safe_line_index                   = 0;
 
-	if( line_index == NULL )
+	if( single_files == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
@@ -743,24 +676,21 @@ int libewf_single_files_parse_number_of_entries(
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libfvalue_utf8_string_split(
 	     line_string,
@@ -775,12 +705,10 @@ int libewf_single_files_parse_number_of_entries(
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split line: %d string into values.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_get_number_of_segments(
 	     values,
 	     &number_of_values,
@@ -892,7 +820,6 @@ int libewf_single_files_parse_number_of_entries(
 
 		goto on_error;
 	}
-	*line_index        = safe_line_index;
 	*number_of_entries = (int) value_64bit;
 
 	return( 1 );
@@ -1013,15 +940,13 @@ int libewf_single_files_parse_format(
  */
 int libewf_single_files_parse_rec_category(
      libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_line_reader_t *line_reader,
      size64_t *media_size,
      libcerror_error_t **error )
 {
 	uint8_t *line_string    = NULL;
 	static char *function   = "libewf_single_files_parse_rec_category";
 	size_t line_string_size = 0;
-	int safe_line_index     = 0;
 
 	if( single_files == NULL )
 	{
@@ -1034,38 +959,33 @@ int libewf_single_files_parse_rec_category(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		return( -1 );
 	}
-	safe_line_index += 1;
-
 	if( ( line_string_size != 4 )
 	 || ( line_string[ 0 ] != (uint8_t) 'r' )
 	 || ( line_string[ 1 ] != (uint8_t) 'e' )
@@ -1081,8 +1001,8 @@ int libewf_single_files_parse_rec_category(
 		return( -1 );
 	}
 	if( libewf_single_files_parse_record_values(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     media_size,
 	     error ) != 1 )
 	{
@@ -1097,20 +1017,19 @@ int libewf_single_files_parse_rec_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		return( -1 );
 	}
@@ -1123,14 +1042,10 @@ int libewf_single_files_parse_rec_category(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported empty line string: %d - not empty.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		return( -1 );
 	}
-	safe_line_index += 1;
-
-	*line_index = safe_line_index;
-
 	return( 1 );
 }
 
@@ -1138,8 +1053,8 @@ int libewf_single_files_parse_rec_category(
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_record_values(
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      size64_t *media_size,
      libcerror_error_t **error )
 {
@@ -1155,16 +1070,26 @@ int libewf_single_files_parse_record_values(
 	uint64_t value_64bit                  = 0;
 	int number_of_types                   = 0;
 	int number_of_values                  = 0;
-	int safe_line_index                   = 0;
 	int value_index                       = 0;
 
-	if( line_index == NULL )
+	if( single_files == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
@@ -1180,27 +1105,22 @@ int libewf_single_files_parse_record_values(
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_utf8_string_split(
 	     line_string,
 	     line_string_size,
@@ -1231,25 +1151,22 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_utf8_string_split(
 	     line_string,
 	     line_string_size,
@@ -1440,8 +1357,6 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -1465,8 +1380,7 @@ on_error:
  */
 int libewf_single_files_parse_perm_category(
      libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_line_reader_t *line_reader,
      libcerror_error_t **error )
 {
 	libewf_lef_permission_t *lef_permission     = NULL;
@@ -1479,7 +1393,6 @@ int libewf_single_files_parse_perm_category(
 	int entry_index                             = 0;
 	int number_of_permission_groups             = 0;
 	int permission_group_index                  = 0;
-	int safe_line_index                         = 0;
 
 	if( single_files == NULL )
 	{
@@ -1492,38 +1405,33 @@ int libewf_single_files_parse_perm_category(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( ( line_string_size != 5 )
 	 || ( line_string[ 0 ] != (uint8_t) 'p' )
 	 || ( line_string[ 1 ] != (uint8_t) 'e' )
@@ -1540,8 +1448,8 @@ int libewf_single_files_parse_perm_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_permission_groups,
 	     error ) != 1 )
 	{
@@ -1551,13 +1459,13 @@ int libewf_single_files_parse_perm_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of permission groups in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_types(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &types,
 	     error ) != 1 )
 	{
@@ -1567,13 +1475,13 @@ int libewf_single_files_parse_perm_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse types in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &copy_of_number_of_permission_groups,
 	     error ) != 1 )
 	{
@@ -1583,7 +1491,7 @@ int libewf_single_files_parse_perm_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of permission groups in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -1600,20 +1508,19 @@ int libewf_single_files_parse_perm_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -1641,13 +1548,11 @@ int libewf_single_files_parse_perm_category(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read permission",
+		 "%s: unable to read permission.",
 		 function );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( lef_permission->property_type != 10 )
 	{
 		libcerror_error_set(
@@ -1691,9 +1596,8 @@ int libewf_single_files_parse_perm_category(
 		}
 		if( libewf_single_files_parse_permission_group(
 		     single_files,
+		     line_reader,
 		     types,
-		     lines,
-		     &safe_line_index,
 		     permission_group,
 		     error ) != 1 )
 		{
@@ -1727,20 +1631,19 @@ int libewf_single_files_parse_perm_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -1753,12 +1656,10 @@ int libewf_single_files_parse_perm_category(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported empty line string: %d - not empty.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -1772,8 +1673,6 @@ int libewf_single_files_parse_perm_category(
 
 		goto on_error;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -1803,9 +1702,8 @@ on_error:
  */
 int libewf_single_files_parse_permission_group(
      libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      libfvalue_split_utf8_string_t *types,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
      libewf_permission_group_t *permission_group,
      libcerror_error_t **error )
 {
@@ -1816,7 +1714,6 @@ int libewf_single_files_parse_permission_group(
 	int number_of_entries                   = 0;
 	int number_of_permissions               = 0;
 	int permission_index                    = 0;
-	int safe_line_index                     = 0;
 
 	if( single_files == NULL )
 	{
@@ -1829,22 +1726,20 @@ int libewf_single_files_parse_permission_group(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
 	if( libewf_single_files_parse_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_permissions,
 	     error ) != 1 )
 	{
@@ -1854,26 +1749,25 @@ int libewf_single_files_parse_permission_group(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of permissions in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	/* Parse the permission group entry
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -1906,8 +1800,6 @@ int libewf_single_files_parse_permission_group(
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( lef_permission->property_type != 10 )
 	{
 		libcerror_error_set(
@@ -1937,8 +1829,8 @@ int libewf_single_files_parse_permission_group(
 	     permission_index++ )
 	{
 		if( libewf_single_files_parse_number_of_entries(
-		     lines,
-		     &safe_line_index,
+		     single_files,
+		     line_reader,
 		     &number_of_entries,
 		     error ) != 1 )
 		{
@@ -1948,7 +1840,7 @@ int libewf_single_files_parse_permission_group(
 			 LIBCERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to parse number of entries in line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -1965,20 +1857,19 @@ int libewf_single_files_parse_permission_group(
 		}
 		/* Parse the permission entry
 		 */
-		if( libewf_single_files_parse_line(
-		     lines,
-		     safe_line_index,
+		if( libewf_line_reader_read_line(
+		     line_reader,
 		     &line_string,
 		     &line_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve line string: %d.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2013,8 +1904,6 @@ int libewf_single_files_parse_permission_group(
 
 			goto on_error;
 		}
-		safe_line_index += 1;
-
 		if( libewf_permission_group_append_permission(
 		     permission_group,
 		     lef_permission,
@@ -2032,8 +1921,6 @@ int libewf_single_files_parse_permission_group(
 		}
 		lef_permission = NULL;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -2051,8 +1938,7 @@ on_error:
  */
 int libewf_single_files_parse_srce_category(
      libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_line_reader_t *line_reader,
      libcerror_error_t **error )
 {
 	libewf_lef_source_t *lef_source      = NULL;
@@ -2064,7 +1950,6 @@ int libewf_single_files_parse_srce_category(
 	int entry_index                      = 0;
 	int number_of_entries                = 0;
 	int number_of_sources                = 0;
-	int safe_line_index                  = 0;
 	int source_identifier                = 0;
 	int source_index                     = 0;
 
@@ -2079,38 +1964,33 @@ int libewf_single_files_parse_srce_category(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( ( line_string_size != 5 )
 	 || ( line_string[ 0 ] != (uint8_t) 's' )
 	 || ( line_string[ 1 ] != (uint8_t) 'r' )
@@ -2127,8 +2007,8 @@ int libewf_single_files_parse_srce_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_sources,
 	     error ) != 1 )
 	{
@@ -2138,13 +2018,13 @@ int libewf_single_files_parse_srce_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of sources in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_types(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &types,
 	     error ) != 1 )
 	{
@@ -2154,13 +2034,13 @@ int libewf_single_files_parse_srce_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse types in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &copy_of_number_of_sources,
 	     error ) != 1 )
 	{
@@ -2170,7 +2050,7 @@ int libewf_single_files_parse_srce_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of sources in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2187,20 +2067,19 @@ int libewf_single_files_parse_srce_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2233,8 +2112,6 @@ int libewf_single_files_parse_srce_category(
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	/* Append the category root so that the source identifiers and array entries align
 	 */
 	if( libcdata_array_append_entry(
@@ -2259,8 +2136,8 @@ int libewf_single_files_parse_srce_category(
 	     source_index++ )
 	{
 		if( libewf_single_files_parse_number_of_entries(
-		     lines,
-		     &safe_line_index,
+		     single_files,
+		     line_reader,
 		     &number_of_entries,
 		     error ) != 1 )
 		{
@@ -2270,7 +2147,7 @@ int libewf_single_files_parse_srce_category(
 			 LIBCERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to parse number of entries in line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2287,20 +2164,19 @@ int libewf_single_files_parse_srce_category(
 		}
 		/* Parse the source entry
 		 */
-		if( libewf_single_files_parse_line(
-		     lines,
-		     safe_line_index,
+		if( libewf_line_reader_read_line(
+		     line_reader,
 		     &line_string,
 		     &line_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve line string: %d.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2335,8 +2211,6 @@ int libewf_single_files_parse_srce_category(
 
 			goto on_error;
 		}
-		safe_line_index += 1;
-
 		if( libewf_lef_source_get_identifier(
 		     lef_source,
 		     &source_identifier,
@@ -2348,7 +2222,7 @@ int libewf_single_files_parse_srce_category(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve source: %d identifier.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2383,20 +2257,19 @@ int libewf_single_files_parse_srce_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2409,12 +2282,10 @@ int libewf_single_files_parse_srce_category(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported empty line string: %d - not empty.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -2428,8 +2299,6 @@ int libewf_single_files_parse_srce_category(
 
 		goto on_error;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -2453,8 +2322,7 @@ on_error:
  */
 int libewf_single_files_parse_sub_category(
      libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_line_reader_t *line_reader,
      libcerror_error_t **error )
 {
 	libewf_lef_subject_t *lef_subject    = NULL;
@@ -2465,7 +2333,6 @@ int libewf_single_files_parse_sub_category(
 	int copy_of_number_of_subjects       = 0;
 	int number_of_entries                = 0;
 	int number_of_subjects               = 0;
-	int safe_line_index                  = 0;
 	int subject_index                    = 0;
 
 	if( single_files == NULL )
@@ -2479,38 +2346,33 @@ int libewf_single_files_parse_sub_category(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( ( line_string_size != 4 )
 	 || ( line_string[ 0 ] != (uint8_t) 's' )
 	 || ( line_string[ 1 ] != (uint8_t) 'u' )
@@ -2526,8 +2388,8 @@ int libewf_single_files_parse_sub_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_subjects,
 	     error ) != 1 )
 	{
@@ -2537,13 +2399,13 @@ int libewf_single_files_parse_sub_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of subjects in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_types(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &types,
 	     error ) != 1 )
 	{
@@ -2553,13 +2415,13 @@ int libewf_single_files_parse_sub_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse types in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &copy_of_number_of_subjects,
 	     error ) != 1 )
 	{
@@ -2569,7 +2431,7 @@ int libewf_single_files_parse_sub_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of subjects in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2586,20 +2448,19 @@ int libewf_single_files_parse_sub_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2632,9 +2493,7 @@ int libewf_single_files_parse_sub_category(
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
-/* TODO */
+/* TODO implement */
 
 	if( libewf_lef_subject_free(
 	     &lef_subject,
@@ -2654,8 +2513,8 @@ int libewf_single_files_parse_sub_category(
 	     subject_index++ )
 	{
 		if( libewf_single_files_parse_number_of_entries(
-		     lines,
-		     &safe_line_index,
+		     single_files,
+		     line_reader,
 		     &number_of_entries,
 		     error ) != 1 )
 		{
@@ -2665,7 +2524,7 @@ int libewf_single_files_parse_sub_category(
 			 LIBCERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to parse number of entries in line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2682,20 +2541,19 @@ int libewf_single_files_parse_sub_category(
 		}
 		/* Parse the subject entry
 		 */
-		if( libewf_single_files_parse_line(
-		     lines,
-		     safe_line_index,
+		if( libewf_line_reader_read_line(
+		     line_reader,
 		     &line_string,
 		     &line_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve line string: %d.",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read line: %d.",
 			 function,
-			 safe_line_index );
+			 line_reader->line_index );
 
 			goto on_error;
 		}
@@ -2730,8 +2588,6 @@ int libewf_single_files_parse_sub_category(
 
 			goto on_error;
 		}
-		safe_line_index += 1;
-
 /* TODO implement append subject to array */
 
 		if( libewf_lef_subject_free(
@@ -2750,20 +2606,19 @@ int libewf_single_files_parse_sub_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2776,12 +2631,10 @@ int libewf_single_files_parse_sub_category(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported empty line string: %d - not empty.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -2795,8 +2648,6 @@ int libewf_single_files_parse_sub_category(
 
 		goto on_error;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -2820,8 +2671,7 @@ on_error:
  */
 int libewf_single_files_parse_entry_category(
      libewf_single_files_t *single_files,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_line_reader_t *line_reader,
      uint8_t *format,
      libcerror_error_t **error )
 {
@@ -2830,7 +2680,6 @@ int libewf_single_files_parse_entry_category(
 	static char *function                = "libewf_single_files_parse_entry_category";
 	size_t line_string_size              = 0;
 	int number_of_sub_entries            = 0;
-	int safe_line_index                  = 0;
 
 	if( single_files == NULL )
 	{
@@ -2854,38 +2703,33 @@ int libewf_single_files_parse_entry_category(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
+	if( line_reader == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( ( line_string_size != 6 )
 	 || ( line_string[ 0 ] != (uint8_t) 'e' )
 	 || ( line_string[ 1 ] != (uint8_t) 'n' )
@@ -2903,8 +2747,8 @@ int libewf_single_files_parse_entry_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_sub_entries,
 	     error ) != 1 )
 	{
@@ -2914,13 +2758,13 @@ int libewf_single_files_parse_entry_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse number of entries in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
 	if( libewf_single_files_parse_category_types(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &types,
 	     error ) != 1 )
 	{
@@ -2930,7 +2774,7 @@ int libewf_single_files_parse_entry_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse types in line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -2962,10 +2806,10 @@ int libewf_single_files_parse_entry_category(
 		goto on_error;
 	}
 	if( libewf_single_files_parse_file_entry(
+	     single_files,
+	     line_reader,
 	     single_files->file_entry_tree_root_node,
 	     types,
-	     lines,
-	     &safe_line_index,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2979,20 +2823,19 @@ int libewf_single_files_parse_entry_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -3005,12 +2848,10 @@ int libewf_single_files_parse_entry_category(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported empty line string: %d - not empty.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -3024,8 +2865,6 @@ int libewf_single_files_parse_entry_category(
 
 		goto on_error;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -3049,10 +2888,10 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_file_entry(
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *types,
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
      libcerror_error_t **error )
 {
 	libcdata_tree_node_t *file_entry_node   = NULL;
@@ -3061,11 +2900,31 @@ int libewf_single_files_parse_file_entry(
 	uint8_t *line_string                    = NULL;
 	static char *function                   = "libewf_single_files_parse_file_entry";
 	size_t line_string_size                 = 0;
-	int number_of_lines                     = 0;
 	int number_of_sub_entries               = 0;
-	int safe_line_index                     = 0;
 	int sub_entry_index                     = 0;
 
+	if( single_files == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
+		 function );
+
+		return( -1 );
+	}
 	if( parent_file_entry_node == NULL )
 	{
 		libcerror_error_set(
@@ -3077,22 +2936,9 @@ int libewf_single_files_parse_file_entry(
 
 		return( -1 );
 	}
-	if( line_index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
-		 function );
-
-		return( -1 );
-	}
-	safe_line_index = *line_index;
-
 	if( libewf_single_files_parse_file_entry_number_of_sub_entries(
-	     lines,
-	     &safe_line_index,
+	     single_files,
+	     line_reader,
 	     &number_of_sub_entries,
 	     error ) != 1 )
 	{
@@ -3105,25 +2951,22 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libewf_lef_file_entry_initialize(
 	     &lef_file_entry,
 	     error ) != 1 )
@@ -3169,32 +3012,6 @@ int libewf_single_files_parse_file_entry(
 	}
 	lef_file_entry = NULL;
 
-	if( libfvalue_split_utf8_string_get_number_of_segments(
-	     lines,
-	     &number_of_lines,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of lines",
-		 function );
-
-		goto on_error;
-	}
-	if( ( safe_line_index > number_of_lines )
-	 || ( number_of_sub_entries > ( number_of_lines - safe_line_index ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: number of sub entries exceed the number of available lines.",
-		 function );
-
-		goto on_error;
-	}
 	for( sub_entry_index = 0;
 	     sub_entry_index < number_of_sub_entries;
 	     sub_entry_index++ )
@@ -3214,10 +3031,10 @@ int libewf_single_files_parse_file_entry(
 			goto on_error;
 		}
 		if( libewf_single_files_parse_file_entry(
+		     single_files,
+		     line_reader,
 		     file_entry_node,
 		     types,
-		     lines,
-		     &safe_line_index,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3247,8 +3064,6 @@ int libewf_single_files_parse_file_entry(
 		}
 		file_entry_node = NULL;
 	}
-	*line_index = safe_line_index;
-
 	return( 1 );
 
 on_error:
@@ -3278,8 +3093,8 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libewf_single_files_parse_file_entry_number_of_sub_entries(
-     libfvalue_split_utf8_string_t *lines,
-     int *line_index,
+     libewf_single_files_t *single_files,
+     libewf_line_reader_t *line_reader,
      int *number_of_sub_entries,
      libcerror_error_t **error )
 {
@@ -3291,15 +3106,25 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
 	int number_of_values                  = 0;
-	int safe_line_index                   = 0;
 
-	if( line_index == NULL )
+	if( single_files == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line index.",
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
 		 function );
 
 		return( -1 );
@@ -3315,27 +3140,22 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 
 		return( -1 );
 	}
-	safe_line_index = *line_index;
-
-	if( libewf_single_files_parse_line(
-	     lines,
-	     safe_line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 safe_line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
-	safe_line_index += 1;
-
 	if( libfvalue_utf8_string_split(
 	     line_string,
 	     line_string_size,
@@ -3506,7 +3326,6 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 
 		goto on_error;
 	}
-	*line_index            = safe_line_index;
 	*number_of_sub_entries = (int) value_64bit;
 
 	return( 1 );
@@ -3521,22 +3340,21 @@ on_error:
 	return( -1 );
 }
 
-/* Parses an UTF-8 encoded single files string
+/* Reads the single files
  * Returns 1 if successful or -1 on error
  */
-int libewf_single_files_parse_utf8_string(
+int libewf_single_files_read_data_stream(
      libewf_single_files_t *single_files,
-     const uint8_t *utf8_string,
-     size_t utf8_string_size,
+     libfdata_stream_t *data_stream,
+     libbfio_pool_t *file_io_pool,
      size64_t *media_size,
      uint8_t *format,
      libcerror_error_t **error )
 {
-	libfvalue_split_utf8_string_t *lines = NULL;
-	uint8_t *line_string                 = NULL;
-	static char *function                = "libewf_single_files_parse_utf8_string";
-	size_t line_string_size              = 0;
-	int line_index                       = 0;
+	libewf_line_reader_t *line_reader = NULL;
+	uint8_t *line_string              = NULL;
+	static char *function             = "libewf_single_files_read_data_stream";
+	size_t line_string_size           = 0;
 
 	if( single_files == NULL )
 	{
@@ -3549,36 +3367,34 @@ int libewf_single_files_parse_utf8_string(
 
 		return( -1 );
 	}
-	if( libfvalue_utf8_string_split(
-	     utf8_string,
-	     utf8_string_size,
-	     (uint8_t) '\n',
-	     &lines,
+	if( libewf_line_reader_initialize(
+	     &line_reader,
+	     data_stream,
+	     file_io_pool,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to split string into lines.",
+		 "%s: unable to create line reader.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_line(
-	     lines,
-	     line_index,
+	if( libewf_line_reader_read_line(
+	     line_reader,
 	     &line_string,
 	     &line_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve line string: %d.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line: %d.",
 		 function,
-		 line_index );
+		 line_reader->line_index );
 
 		goto on_error;
 	}
@@ -3594,12 +3410,9 @@ int libewf_single_files_parse_utf8_string(
 
 		goto on_error;
 	}
-	line_index += 1;
-
 	if( libewf_single_files_parse_rec_category(
 	     single_files,
-	     lines,
-	     &line_index,
+	     line_reader,
 	     media_size,
 	     error ) != 1 )
 	{
@@ -3614,8 +3427,7 @@ int libewf_single_files_parse_utf8_string(
 	}
 	if( libewf_single_files_parse_perm_category(
 	     single_files,
-	     lines,
-	     &line_index,
+	     line_reader,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3629,8 +3441,7 @@ int libewf_single_files_parse_utf8_string(
 	}
 	if( libewf_single_files_parse_srce_category(
 	     single_files,
-	     lines,
-	     &line_index,
+	     line_reader,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3644,8 +3455,7 @@ int libewf_single_files_parse_utf8_string(
 	}
 	if( libewf_single_files_parse_sub_category(
 	     single_files,
-	     lines,
-	     &line_index,
+	     line_reader,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3659,8 +3469,7 @@ int libewf_single_files_parse_utf8_string(
 	}
 	if( libewf_single_files_parse_entry_category(
 	     single_files,
-	     lines,
-	     &line_index,
+	     line_reader,
 	     format,
 	     error ) != 1 )
 	{
@@ -3673,15 +3482,15 @@ int libewf_single_files_parse_utf8_string(
 
 		goto on_error;
 	}
-	if( libfvalue_split_utf8_string_free(
-	     &lines,
+	if( libewf_line_reader_free(
+	     &line_reader,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free split lines.",
+		 "%s: unable to free line reader.",
 		 function );
 
 		goto on_error;
@@ -3689,127 +3498,11 @@ int libewf_single_files_parse_utf8_string(
 	return( 1 );
 
 on_error:
-	if( lines != NULL )
+	if( line_reader != NULL )
 	{
-		libfvalue_split_utf8_string_free(
-		 &lines,
+		libewf_line_reader_free(
+		 &line_reader,
 		 NULL );
-	}
-	return( -1 );
-}
-
-/* Reads the single files
- * Returns 1 if successful or -1 on error
- */
-int libewf_single_files_read_data(
-     libewf_single_files_t *single_files,
-     const uint8_t *data,
-     size_t data_size,
-     size64_t *media_size,
-     uint8_t *format,
-     libcerror_error_t **error )
-{
-	uint8_t *utf8_string    = NULL;
-	static char *function   = "libewf_single_files_read_data";
-	size_t utf8_string_size = 0;
-
-	if( single_files == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single files.",
-		 function );
-
-		return( -1 );
-	}
-	if( libuna_utf8_string_size_from_utf16_stream(
-	     data,
-	     data_size,
-	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
-	     &utf8_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 string size.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( utf8_string_size == 0 )
-	 || ( utf8_string_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid UTF-8 string size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	utf8_string = (uint8_t *) memory_allocate(
-	                           sizeof( uint8_t ) * (size_t) utf8_string_size );
-
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libuna_utf8_string_copy_from_utf16_stream(
-	     utf8_string,
-	     utf8_string_size,
-	     data,
-	     data_size,
-	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_single_files_parse_utf8_string(
-	     single_files,
-	     utf8_string,
-	     utf8_string_size,
-	     media_size,
-	     format,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse UTF-8 string.",
-		 function );
-
-		goto on_error;
-	}
-	memory_free(
-	 utf8_string );
-
-	return( 1 );
-
-on_error:
-	if( utf8_string != NULL )
-	{
-		memory_free(
-		 utf8_string );
 	}
 	return( -1 );
 }

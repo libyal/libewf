@@ -1835,6 +1835,48 @@ int ewf_test_chunk_data_pack_with_compression(
 	 "error",
 	 error );
 
+	/* Clean up
+	 */
+	result = libewf_chunk_data_free(
+	          &chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_chunk_data_initialize(
+	          &chunk_data,
+	          512,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	chunk_data->data_size = 512;
+
 	/* Test error cases
 	 */
 	result = libewf_chunk_data_pack_with_compression(
