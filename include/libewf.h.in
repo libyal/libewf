@@ -1476,7 +1476,8 @@ int libewf_handle_get_root_file_entry(
      libewf_error_t **error );
 
 /* Retrieves the (single) file entry for the specific UTF-8 encoded path
- * The path separator is the \ character
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1488,7 +1489,8 @@ int libewf_handle_get_file_entry_by_utf8_path(
      libewf_error_t **error );
 
 /* Retrieves the (single) file entry for the specific UTF-16 encoded path
- * The path separator is the \ character
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1610,6 +1612,7 @@ int libewf_file_entry_get_duplicate_media_data_offset(
      libewf_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1620,6 +1623,7 @@ int libewf_file_entry_get_utf8_name_size(
      libewf_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1631,6 +1635,7 @@ int libewf_file_entry_get_utf8_name(
      libewf_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1641,6 +1646,7 @@ int libewf_file_entry_get_utf16_name_size(
      libewf_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1867,7 +1873,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
      libewf_error_t **error );
 
 /* Retrieves the sub file entry for the specific UTF-8 encoded path
- * The path separator is the \ character
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 LIBEWF_EXTERN \
@@ -1890,7 +1897,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
      libewf_error_t **error );
 
 /* Retrieves the sub file entry for the specific UTF-16 encoded path
- * The path separator is the \ character
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 LIBEWF_EXTERN \

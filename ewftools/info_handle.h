@@ -55,6 +55,10 @@ struct info_handle
 	 */
 	int header_codepage;
 
+	/* The path segment separator
+	 */
+	system_character_t path_segment_separator;
+
 	/* The libewf input handle
 	 */
 	libewf_handle_t *input_handle;
@@ -111,6 +115,11 @@ int info_handle_set_date_format(
      libcerror_error_t **error );
 
 int info_handle_set_header_codepage(
+     info_handle_t *info_handle,
+     const system_character_t *string,
+     libcerror_error_t **error );
+
+int info_handle_set_path_segment_separator(
      info_handle_t *info_handle,
      const system_character_t *string,
      libcerror_error_t **error );

@@ -1,4 +1,4 @@
-.Dd December 28, 2019
+.Dd July  5, 2023
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -11,6 +11,7 @@
 .Op Fl d Ar date_format
 .Op Fl f Ar format
 .Op Fl F Ar file_entry
+.Op Fl s Ar separator
 .Op Fl ehHimvV
 .Ar ewf_files
 .Sh DESCRIPTION
@@ -49,6 +50,8 @@ shows the logical files hierarchy
 only show EWF acquiry information
 .It Fl m
 only show EWF media information
+.It Fl s Ar separator
+Path segment separator, options: / (default), \\
 .It Fl v
 verbose output to stderr
 .It Fl V

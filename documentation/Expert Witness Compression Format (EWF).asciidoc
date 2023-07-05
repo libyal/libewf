@@ -1813,6 +1813,18 @@ The ltree data string consists of an UTF-16 little-endian encoded string without
 byte order mark. The ltree data is not strict UTF-16 since it allows for unpaired
 surrogates, such as "U+d800" and "U+dc00".
 
+Other observed characteristics where the names in the ltree deviate from
+the original source:
+
+* [U+0001-U+0008] were converted to U+00ba
+* [U+0009, U+000a] were stripped
+* [U+000b, U+000c] were converted to U+0020
+* U+000d was converted to U+0002
+* U+00ba remained the same
+
+Note that this behavior could be related to Encase as well and might not be
+specific for EWF-L01.
+
 The ltree data string contains the following information:
 
 [cols="1,1,5",options="header"]

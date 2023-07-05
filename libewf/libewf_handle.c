@@ -8594,7 +8594,8 @@ int libewf_handle_get_root_file_entry(
 }
 
 /* Retrieves the (single) file entry for the specific UTF-8 encoded path
- * The path separator is the \ character
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * This function is not multi-thread safe acquire write lock before call
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
@@ -8818,7 +8819,8 @@ int libewf_internal_handle_get_file_entry_by_utf8_path(
 }
 
 /* Retrieves the (single) file entry for the specific UTF-8 encoded path
- * The path separator is the \ character
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libewf_handle_get_file_entry_by_utf8_path(
@@ -8895,7 +8897,8 @@ int libewf_handle_get_file_entry_by_utf8_path(
 }
 
 /* Retrieves the (single) file entry for the specific UTF-16 encoded path
- * The path separator is the \ character
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * This function is not multi-thread safe acquire write lock before call
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
@@ -9119,7 +9122,8 @@ int libewf_internal_handle_get_file_entry_by_utf16_path(
 }
 
 /* Retrieves the (single) file entry for the specific UTF-16 encoded path
- * The path separator is the \ character
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libewf_handle_get_file_entry_by_utf16_path(

@@ -1847,6 +1847,13 @@ int libewf_header_values_parse_utf8_header_string(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -1972,10 +1979,18 @@ int libewf_header_values_parse_utf8_header_string_value(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: type: %s with value: %s.\n",
+		 "%s: type: %3s with value\t:",
 		 function,
-		 (char *) type_string,
-		 (char *) value_string );
+		 (char *) type_string );
+
+		if( value_string != NULL )
+		{
+			libcnotify_printf(
+			 " %s",
+			 (char *) value_string );
+		}
+		libcnotify_printf(
+		 "\n" );
 	}
 #endif
 	identifier      = NULL;
@@ -2148,7 +2163,7 @@ int libewf_header_values_parse_utf8_header_string_value(
 					  &date_time_values_string_size,
 					  error );
 			}
-			if( result != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,

@@ -1,8 +1,8 @@
 TODO
-* change ltree path segment separator
+* handle path segment separator in ewfinfo -F
+* change ltree to preserve UTF-16, limit file name functions to support chars beyond Unicode
+* change ltree to read directory entries on demand
 * calculate the MD5 while incremental ltree read, use line reader instead?
-
-* escape unpaired surrogates in bodyfile
 
 * info_handle: move dfxml functions to seperate file
 * clean up libewf_chunk_group_correct_v1

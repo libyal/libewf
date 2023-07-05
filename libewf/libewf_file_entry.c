@@ -714,6 +714,7 @@ int libewf_file_entry_get_duplicate_media_data_offset(
 }
 
 /* Retrieves the size of the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -787,6 +788,7 @@ int libewf_file_entry_get_utf8_name_size(
 }
 
 /* Retrieves the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -862,6 +864,7 @@ int libewf_file_entry_get_utf8_name(
 }
 
 /* Retrieves the size of the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -935,6 +938,7 @@ int libewf_file_entry_get_utf16_name_size(
 }
 
 /* Retrieves the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -3007,7 +3011,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf8_name(
 }
 
 /* Retrieves the sub file entry for the specific UTF-8 encoded path
- * The path separator is the \ character
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libewf_file_entry_get_sub_file_entry_by_utf8_path(
@@ -3337,7 +3342,8 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_name(
 }
 
 /* Retrieves the sub file entry for the specific UTF-16 encoded path
- * The path separator is the \ character
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
+ * The path separator is defined by LIBEWF_SEPARATOR
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libewf_file_entry_get_sub_file_entry_by_utf16_path(

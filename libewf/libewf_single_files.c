@@ -1278,21 +1278,19 @@ int libewf_single_files_parse_record_values(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			if( value_string == NULL )
+			libcnotify_printf(
+			 "%s: type: %3s with value\t\t:",
+			 function,
+			 (char *) type_string );
+
+			if( value_string != NULL )
 			{
 				libcnotify_printf(
-				 "%s: type: %s with value: (empty)\n",
-				 function,
-				 (char *) type_string );
-			}
-			else
-			{
-				libcnotify_printf(
-				 "%s: type: %s with value: %s\n",
-				 function,
-				 (char *) type_string,
+				 " %s",
 				 (char *) value_string );
 			}
+			libcnotify_printf(
+			 "\n" );
 		}
 #endif
 		/* Ignore empty values
@@ -1357,6 +1355,13 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	return( 1 );
 
 on_error:

@@ -239,7 +239,7 @@ enum LIBEWF_FILE_ENTRY_FLAGS
 
 /* The (single) file entry name separator
  */
-#define LIBEWF_SEPARATOR					'\\'
+#define LIBEWF_SEPARATOR					'\x09'
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

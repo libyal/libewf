@@ -77,7 +77,8 @@ void usage_fprint(
 	                 "Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfinfo [ -A codepage ] [ -B bodyfile ] [ -d date_format ]\n"
-	                 "               [ -f format ]  [ -F path ] [ -ehHimvVx ] ewf_files\n\n" );
+	                 "               [ -f format ] [ -F path ] [ -s separator ] [ -ehHimvVx ]\n"
+	                 "               ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -97,6 +98,7 @@ void usage_fprint(
 	fprintf( stream, "\t-H:        shows the logical files hierarchy\n" );
 	fprintf( stream, "\t-i:        only show EWF acquiry information\n" );
 	fprintf( stream, "\t-m:        only show EWF media information\n" );
+	fprintf( stream, "\t-s:        path segment separator, options: / (default), \\\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 }
@@ -107,7 +109,7 @@ void ewfinfo_signal_handler(
       ewftools_signal_t signal EWFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "ewfinfo_signal_handler";
+	static char *function    = "ewfinfo_signal_handler";
 
 	EWFTOOLS_UNREFERENCED_PARAMETER( signal )
 
@@ -155,24 +157,25 @@ int main( int argc, char * const argv[] )
 	struct rlimit limit_data;
 #endif
 
-	system_character_t * const *source_filenames = NULL;
-	libcerror_error_t *error                     = NULL;
-	system_character_t *option_bodyfile          = NULL;
-	system_character_t *option_date_format       = NULL;
-	system_character_t *option_file_entry        = NULL;
-	system_character_t *option_header_codepage   = NULL;
-	system_character_t *option_output_format     = NULL;
-	system_character_t *program                  = _SYSTEM_STRING( "ewfinfo" );
-	system_integer_t option                      = 0;
-	uint8_t verbose                              = 0;
-	int number_of_filenames                      = 0;
-	int option_mode                              = EWFINFO_MODE_IMAGE;
-	int print_header                             = 1;
-	int result                                   = 0;
-	char info_option                             = 'a';
+	system_character_t * const *source_filenames      = NULL;
+	libcerror_error_t *error                          = NULL;
+	system_character_t *option_bodyfile               = NULL;
+	system_character_t *option_date_format            = NULL;
+	system_character_t *option_file_entry             = NULL;
+	system_character_t *option_header_codepage        = NULL;
+	system_character_t *option_output_format          = NULL;
+	system_character_t *option_path_segment_separator = NULL;
+	system_character_t *program                       = _SYSTEM_STRING( "ewfinfo" );
+	system_integer_t option                           = 0;
+	uint8_t verbose                                   = 0;
+	int number_of_filenames                           = 0;
+	int option_mode                                   = EWFINFO_MODE_IMAGE;
+	int print_header                                  = 1;
+	int result                                        = 0;
+	char info_option                                  = 'a';
 
 #if !defined( HAVE_GLOB_H )
-	ewftools_glob_t *glob                        = NULL;
+	ewftools_glob_t *glob                             = NULL;
 #endif
 
 	libcnotify_stream_set(
@@ -208,7 +211,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "A:B:d:ef:F:hHimvV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "A:B:d:ef:F:hHims:vV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -332,6 +335,11 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 				info_option = 'm';
+
+				break;
+
+			case (system_integer_t) 's':
+				option_path_segment_separator = optarg;
 
 				break;
 
@@ -520,6 +528,38 @@ int main( int argc, char * const argv[] )
 			fprintf(
 			 stderr,
 			 "Unsupported header codepage defaulting to: ascii.\n" );
+		}
+	}
+	if( option_path_segment_separator != NULL )
+	{
+		result = info_handle_set_path_segment_separator(
+		          ewfinfo_info_handle,
+		          option_path_segment_separator,
+		          &error );
+
+		if( result == -1 )
+		{
+			ewftools_output_version_fprint(
+			 stderr,
+			 program );
+
+			fprintf(
+			 stderr,
+			 "Unable to set path segment separator.\n" );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			ewftools_output_version_fprint(
+			 stderr,
+			 program );
+
+			print_header = 0;
+
+			fprintf(
+			 stderr,
+			 "Unsupported path segment separator defaulting to: /.\n" );
 		}
 	}
 #if !defined( HAVE_GLOB_H )

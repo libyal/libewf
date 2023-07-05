@@ -423,10 +423,18 @@ int libewf_lef_subject_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: type: %s with value: %s\n",
+			 "%s: type: %3s with value\t\t:",
 			 function,
-			 (char *) type_string,
-			 (char *) value_string );
+			 (char *) type_string );
+
+			if( value_string != NULL )
+			{
+				libcnotify_printf(
+				 " %s",
+				 (char *) value_string );
+			}
+			libcnotify_printf(
+			 "\n" );
 		}
 #endif
 		if( ( value_string == NULL )
