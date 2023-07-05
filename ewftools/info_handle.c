@@ -35,6 +35,7 @@
 #include "digest_hash.h"
 #include "ewfinput.h"
 #include "ewftools_libcerror.h"
+#include "ewftools_libcpath.h"
 #include "ewftools_libcsplit.h"
 #include "ewftools_libewf.h"
 #include "ewftools_libfdatetime.h"
@@ -837,6 +838,406 @@ int info_handle_set_path_segment_separator(
 		return( -1 );
 	}
 	return( result );
+}
+
+/* Retrieves the file entry path from the path
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_get_ewf_file_entry_path_from_path(
+     info_handle_t *info_handle,
+     const system_character_t *path,
+     size_t path_length,
+     system_character_t **ewf_file_entry_path,
+     size_t *ewf_file_entry_path_size,
+     libcerror_error_t **error )
+{
+	system_character_t *safe_ewf_file_entry_path = NULL;
+	static char *function                        = "info_handle_get_ewf_file_entry_path_from_path";
+	libuna_unicode_character_t unicode_character = 0;
+	system_character_t character                 = 0;
+	system_character_t escape_character          = 0;
+	system_character_t hex_digit                 = 0;
+	size_t ewf_file_entry_path_index             = 0;
+	size_t path_index                            = 0;
+	size_t safe_ewf_file_entry_path_size         = 0;
+	uint8_t hex_value                            = 0;
+	int result                                   = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_length == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path length.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid path length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( ewf_file_entry_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry path.",
+		 function );
+
+		return( -1 );
+	}
+	if( ewf_file_entry_path_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry path size.",
+		 function );
+
+		return( -1 );
+	}
+	*ewf_file_entry_path      = NULL;
+	*ewf_file_entry_path_size = 0;
+
+	safe_ewf_file_entry_path_size = path_length + 1;
+
+	if( safe_ewf_file_entry_path_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid file entry path size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	safe_ewf_file_entry_path = system_string_allocate(
+	                            safe_ewf_file_entry_path_size );
+
+	if( safe_ewf_file_entry_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create file entry path.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( WINAPI )
+	escape_character = (system_character_t) '^';
+#else
+	escape_character = (system_character_t) '\\';
+#endif
+
+	while( path_index < path_length )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libuna_unicode_character_copy_from_utf16(
+		          &unicode_character,
+		          (libuna_utf16_character_t *) path,
+		          path_length,
+		          &path_index,
+		          error );
+#else
+		result = libuna_unicode_character_copy_from_utf8(
+		          &unicode_character,
+		          (libuna_utf8_character_t *) path,
+		          path_length,
+		          &path_index,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+			 "%s: unable to copy Unicode character from path.",
+			 function );
+
+			goto on_error;
+		}
+		/* On Windows replace:
+		 *   ^^ by ^
+		 *   ^x5c by \
+		 *   ^x## by control characters ([U+1-U+1f, U+7f-U+9f])
+		 *
+		 * On other platforms replace:
+		 *   \\ by \
+		 *   \x2f by /
+		 *   \x## by control characters ([U+1-U+1f, U+7f-U+9f])
+		 *   / by \
+		 */
+		if( unicode_character == (libuna_unicode_character_t) info_handle->path_segment_separator )
+		{
+			unicode_character = (libuna_unicode_character_t) LIBEWF_SEPARATOR;
+		}
+		if( unicode_character == (libuna_unicode_character_t) escape_character )
+		{
+			if( ( path_index + 1 ) > path_length )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid path index value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			character = path[ path_index++ ];
+
+#if defined( WINAPI )
+			if( ( character != escape_character )
+			 && ( character != (system_character_t) 'X' )
+			 && ( character != (system_character_t) 'x' ) )
+#else
+			if( ( character != escape_character )
+			 && ( character != (system_character_t) 'x' ) )
+#endif
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported path - invalid character: %" PRIc_SYSTEM " after escape character.",
+				 function,
+				 character );
+
+				goto on_error;
+			}
+			if( character == escape_character )
+			{
+				if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid file entry path index value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = escape_character;
+			}
+			else
+			{
+				if( ( path_index + 2 ) > path_length )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid path index value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				hex_digit = path[ path_index++ ];
+
+				if( ( hex_digit >= (system_character_t) '0' )
+				 && ( hex_digit <= (system_character_t) '9' ) )
+				{
+					hex_value = (uint8_t) ( hex_digit - (system_character_t) '0' );
+				}
+#if defined( WINAPI )
+				else if( ( hex_digit >= (system_character_t) 'A' )
+				      && ( hex_digit <= (system_character_t) 'F' ) )
+				{
+					hex_value = (uint8_t) ( hex_digit - (system_character_t) 'A' + 10 );
+				}
+#endif
+				else if( ( hex_digit >= (system_character_t) 'a' )
+				      && ( hex_digit <= (system_character_t) 'f' ) )
+				{
+					hex_value = (uint8_t) ( hex_digit - (system_character_t) 'a' + 10 );
+				}
+				else
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: unsupported path - invalid hexadecimal character: %" PRIc_SYSTEM " after escape character.",
+					 function,
+					 hex_digit );
+
+					goto on_error;
+				}
+				hex_value <<= 4;
+
+				hex_digit = path[ path_index++ ];
+
+				if( ( hex_digit >= (system_character_t) '0' )
+				 && ( hex_digit <= (system_character_t) '9' ) )
+				{
+					hex_value |= (uint8_t) ( hex_digit - (system_character_t) '0' );
+				}
+#if defined( WINAPI )
+				else if( ( hex_digit >= (system_character_t) 'A' )
+				      && ( hex_digit <= (system_character_t) 'F' ) )
+				{
+					hex_value |= (uint8_t) ( hex_digit - (system_character_t) 'A' + 10 );
+				}
+#endif
+				else if( ( hex_digit >= (system_character_t) 'a' )
+				      && ( hex_digit <= (system_character_t) 'f' ) )
+				{
+					hex_value |= (uint8_t) ( hex_digit - (system_character_t) 'a' + 10 );
+				}
+				else
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+					 "%s: unsupported path - invalid hexadecimal character: %" PRIc_SYSTEM " after escape character.",
+					 function,
+					 hex_digit );
+
+					goto on_error;
+				}
+				if( ( ( hex_value >= 0x01 )
+				  &&  ( hex_value <= 0x1f ) )
+				 || ( hex_value == (uint8_t) LIBCPATH_SEPARATOR )
+				 || ( ( hex_value >= 0x7f )
+				  &&  ( hex_value <= 0x9f ) ) )
+				{
+				}
+				else
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid escaped character value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid file entry path index value out of bounds.",
+					 function );
+
+					goto on_error;
+				}
+				safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = (system_character_t) hex_value;
+			}
+		}
+#if !defined( WINAPI )
+		else if( unicode_character == (system_character_t) '/' )
+		{
+			if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid file entry path index value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = (system_character_t) '\\';
+		}
+#endif
+		else
+		{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libuna_unicode_character_copy_to_utf16(
+			          unicode_character,
+			          (libuna_utf16_character_t *) safe_ewf_file_entry_path,
+			          safe_ewf_file_entry_path_size,
+			          &ewf_file_entry_path_index,
+			          error );
+#else
+			result = libuna_unicode_character_copy_to_utf8(
+			          unicode_character,
+			          (libuna_utf8_character_t *) safe_ewf_file_entry_path,
+			          safe_ewf_file_entry_path_size,
+			          &ewf_file_entry_path_index,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+				 "%s: unable to copy Unicode character to file entry path.",
+				 function );
+
+				goto on_error;
+			}
+		}
+	}
+	if( ewf_file_entry_path_index >= safe_ewf_file_entry_path_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid file entry path index value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	safe_ewf_file_entry_path[ ewf_file_entry_path_index ] = 0;
+
+	*ewf_file_entry_path      = safe_ewf_file_entry_path;
+	*ewf_file_entry_path_size = safe_ewf_file_entry_path_size;
+
+	return( 1 );
+
+on_error:
+	if( safe_ewf_file_entry_path != NULL )
+	{
+		memory_free(
+		 safe_ewf_file_entry_path );
+	}
+	return( -1 );
 }
 
 /* Prints a file entry or data stream name
@@ -6366,7 +6767,7 @@ int info_handle_file_entry_value_fprint(
      const system_character_t *path,
      libcerror_error_t **error )
 {
-	char file_mode_string[ 11 ]                         = { '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 0 };
+	char file_mode_string[ 11 ]                         = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
 	libewf_access_control_entry_t *access_control_entry = NULL;
 	libewf_attribute_t *attribute                       = NULL;
@@ -6384,6 +6785,7 @@ int info_handle_file_entry_value_fprint(
 	int64_t deletion_time                               = 0;
 	int64_t entry_modification_time                     = 0;
 	int64_t modification_time                           = 0;
+	uint32_t file_entry_flags                           = 0;
 	uint32_t group_identifier                           = 0;
 	uint32_t owner_identifier                           = 0;
 	int access_control_entry_index                      = 0;
@@ -6558,6 +6960,35 @@ int info_handle_file_entry_value_fprint(
 	}
 	if( info_handle->bodyfile_stream != NULL )
 	{
+		if( libewf_file_entry_get_flags(
+		     file_entry,
+		     &file_entry_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve flags.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( file_entry_flags & 0x00000010UL ) != 0 ) 
+		{
+			file_mode_string[ 0 ] = 'l';
+		}
+		else if( ( file_entry_flags & 0x02000000UL ) != 0 ) 
+		{
+			file_mode_string[ 0 ] = 'd';
+		}
+		if( ( ( file_entry_flags & 0x00000001UL ) != 0 )
+		 || ( ( file_entry_flags & 0x00000004UL ) != 0 ) )
+		{
+			file_mode_string[ 2 ] = '-';
+			file_mode_string[ 5 ] = '-';
+			file_mode_string[ 8 ] = '-';
+		}
 		/* Colums in a Sleuthkit 3.x and later bodyfile
 		 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
 		 */
@@ -6602,7 +7033,6 @@ int info_handle_file_entry_value_fprint(
 			}
 		}
 /* TODO print data stream name */
-/* TODO determine mode as string */
 /* TODO determine owner and group */
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 
@@ -6665,6 +7095,9 @@ int info_handle_file_entry_value_fprint(
 
 				goto on_error;
 			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "\n" );
 		}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libewf_file_entry_get_utf16_short_name_size(
@@ -7284,11 +7717,6 @@ int info_handle_logical_files_hierarchy_fprint_file_entry(
 				 info_handle->notify_stream,
 				 " name=\"" );
 			}
-			fprintf(
-			 info_handle->notify_stream,
-			 "%" PRIs_SYSTEM "",
-			 path );
-
 			if( info_handle_name_value_fprint(
 			     info_handle,
 			     path,
@@ -7515,11 +7943,14 @@ int info_handle_file_entry_fprint_by_path(
      const system_character_t *path,
      libcerror_error_t **error )
 {
-	libewf_file_entry_t *file_entry = NULL;
-	static char *function           = "info_handle_file_entry_fprint_by_path";
-	size_t path_index               = 0;
-	size_t path_length              = 0;
-	int result                      = 0;
+	libewf_file_entry_t *file_entry         = NULL;
+	system_character_t *ewf_file_entry_path = NULL;
+	static char *function                   = "info_handle_file_entry_fprint_by_path";
+	size_t ewf_file_entry_path_length       = 0;
+	size_t ewf_file_entry_path_size         = 0;
+	size_t path_index                       = 0;
+	size_t path_length                      = 0;
+	int result                              = 0;
 
 	if( info_handle == NULL )
 	{
@@ -7555,18 +7986,49 @@ int info_handle_file_entry_fprint_by_path(
 			break;
 		}
 	}
+	if( info_handle_get_ewf_file_entry_path_from_path(
+	     info_handle,
+	     path,
+	     path_length,
+	     &ewf_file_entry_path,
+	     &ewf_file_entry_path_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry path from path.",
+		 function );
+
+		goto on_error;
+	}
+	if( ewf_file_entry_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing file entry path.",
+		 function );
+
+		goto on_error;
+	}
+	ewf_file_entry_path_length = system_string_length(
+	                              ewf_file_entry_path );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libewf_handle_get_file_entry_by_utf16_path(
 	          info_handle->input_handle,
-	          (uint16_t *) path,
-	          path_length,
+	          (uint16_t *) ewf_file_entry_path,
+	          ewf_file_entry_path_length,
 	          &file_entry,
 	          error );
 #else
 	result = libewf_handle_get_file_entry_by_utf8_path(
 	          info_handle->input_handle,
-	          (uint8_t *) path,
-	          path_length,
+	          (uint8_t *) ewf_file_entry_path,
+	          ewf_file_entry_path_length,
 	          &file_entry,
 	          error );
 #endif
@@ -7592,6 +8054,11 @@ int info_handle_file_entry_fprint_by_path(
 
 		goto on_error;
 	}
+	memory_free(
+	 ewf_file_entry_path );
+
+	ewf_file_entry_path = NULL;
+
 	if( info_handle_section_header_fprint(
 	     info_handle,
 	     "single_file",
@@ -7657,6 +8124,11 @@ on_error:
 		libewf_file_entry_free(
 		 &file_entry,
 		 NULL );
+	}
+	if( ewf_file_entry_path != NULL )
+	{
+		memory_free(
+		 ewf_file_entry_path );
 	}
 	return( -1 );
 }

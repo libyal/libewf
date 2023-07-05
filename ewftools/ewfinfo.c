@@ -74,7 +74,7 @@ void usage_fprint(
 		return;
 	}
 	fprintf( stream, "Use ewfinfo to determine information about the EWF format (Expert Witness\n"
-	                 "Compression Format).\n\n" );
+	                 " Compression Format).\n\n" );
 
 	fprintf( stream, "Usage: ewfinfo [ -A codepage ] [ -B bodyfile ] [ -d date_format ]\n"
 	                 "               [ -f format ] [ -F path ] [ -s separator ] [ -ehHimvVx ]\n"

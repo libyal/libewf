@@ -124,6 +124,14 @@ int info_handle_set_path_segment_separator(
      const system_character_t *string,
      libcerror_error_t **error );
 
+int info_handle_get_ewf_file_entry_path_from_path(
+     info_handle_t *info_handle,
+     const system_character_t *path,
+     size_t path_length,
+     system_character_t **file_entry_path,
+     size_t *file_entry_path_size,
+     libcerror_error_t **error );
+
 int info_handle_name_value_fprint(
      info_handle_t *info_handle,
      const system_character_t *value_string,

@@ -144,6 +144,7 @@ Updated the information regarding Logicube products and the data section checksu
 | 0.0.82 | J.B. Metz | December 2019 | Formatting changes and additional information regarding L01 files with thanks to K. Stone.
 | 0.0.83 | J.B. Metz | November 2020 | Additional information about corruption scenario.
 | 0.0.84 | J.B. Metz | July 2023 | Additional information about encoding and special characters in ltree names with thanks to J. Dua and P. Livingstone.
+| 0.0.85 | J.B. Metz | July 2023 | Additional information regarding ltree.
 |===
 
 :numbered:
@@ -2427,6 +2428,8 @@ A file entry name ("n" value):
 Note that a regular "MIDDLE DOT" Unicode character will be encoded in the same
 way so no real way to reliably tell the difference.
 
+An empty name has been observed to be represented as "NoName".
+
 ====== [[short_name]]Short name
 
 The short name ("snh") value contains 2 values:
@@ -2468,16 +2471,29 @@ The entries of files and directories:
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
+| 0x00000001 | | [yellow-background]*Unknown (Is read-only?)*
+| 0x00000002 | Hidden | Is hidden
+| 0x00000004 | System | Is system
+| 0x00000008 | Archive | Is archive
+| 0x00000010 | Sym Link | Is symbolic link, junction or reparse point
 | | |
-| 0x00000008 | | Archive
+| 0x00000080 | Deleted | Is deleted
 | | |
-| 0x00400000 | | [yellow-background]*Unknown (is file?)*
+| 0x00001000 | Hard Linked | Is hard link
+| 0x00002000 | Stream | Is stream
+| | |
+| 0x00100000 | Internal | Is internal (used in combination with 0x00000006?)
+| | |
+| 0x00200000 | Unallocated Clusters | [yellow-background]*Unknown*
+| 0x00400000 | | [yellow-background]*Unknown*
 | | |
 | 0x01000000 | | [yellow-background]*Unknown*
-| 0x02000000 | | [yellow-background]*Unknown*
+| 0x02000000 | Folder | Is folder
 | 0x04000000 | | Data is sparse +
 See remarks below.
 |===
+
+If 0x00002000 or 0x02000000 are not set the file entry is of type "File".
 
 If the sparse data flag is set:
 

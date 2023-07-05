@@ -1265,7 +1265,7 @@ int libewf_lef_file_entry_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: type: %3s with value\t\t\t:",
+			 "%s: type: %3s with value\t\t\t\t:",
 			 function,
 			 (char *) type_string );
 

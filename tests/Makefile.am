@@ -51,6 +51,8 @@ TESTS = \
 	test_glob.sh \
 	test_tools.sh \
 	test_ewfinfo.sh \
+	test_ewfinfo_logical.sh \
+	test_ewfinfo_logical_bodyfile.sh \
 	test_ewfverify.sh \
 	test_ewfverify_logical.sh \
 	$(TESTS_WRITE) \
@@ -66,6 +68,8 @@ check_SCRIPTS = \
 	test_ewfexport.sh \
 	test_ewfexport_logical.sh \
 	test_ewfinfo.sh \
+	test_ewfinfo_logical.sh \
+	test_ewfinfo_logical_bodyfile.sh \
 	test_ewfverify_logical.sh \
 	test_ewfverify.sh \
 	test_glob.sh \
