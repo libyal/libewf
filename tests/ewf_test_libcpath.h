@@ -1,7 +1,7 @@
 /*
- * Crypographic digest hash
+ * The internal libcpath header
  *
- * Copyright (C) 2006-2023, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,28 +19,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _DIGEST_HASH_H )
-#define _DIGEST_HASH_H
+#if !defined( _EWF_TEST_LIBCPATH_H )
+#define _EWF_TEST_LIBCPATH_H
 
 #include <common.h>
-#include <types.h>
 
-#include "ewftools_libcerror.h"
+/* Define HAVE_LOCAL_LIBCPATH for local use of libcpath
+ */
+#if defined( HAVE_LOCAL_LIBCPATH )
 
-#if defined( __cplusplus )
-extern "C" {
+#include <libcpath_definitions.h>
+#include <libcpath_path.h>
+
+#else
+
+/* If libtool DLL support is enabled set LIBCPATH_DLL_IMPORT
+ * before including libcpath.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#define LIBCPATH_DLL_IMPORT
 #endif
 
-int digest_hash_copy_to_string(
-     const uint8_t *digest_hash,
-     size_t digest_hash_size,
-     char *string,
-     size_t string_size,
-     libcerror_error_t **error );
+#include <libcpath.h>
 
-#if defined( __cplusplus )
-}
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
 
-#endif /* !defined( _DIGEST_HASH_H ) */
+#endif /* !defined( _EWF_TEST_LIBCPATH_H ) */
 

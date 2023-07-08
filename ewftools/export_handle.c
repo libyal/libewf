@@ -176,7 +176,7 @@ int export_handle_initialize(
 	}
 	if( calculate_md5 != 0 )
 	{
-		( *export_handle )->calculated_md5_hash_string = system_string_allocate(
+		( *export_handle )->calculated_md5_hash_string = narrow_string_allocate(
 								  33 );
 
 		if( ( *export_handle )->calculated_md5_hash_string == NULL )
@@ -210,16 +210,6 @@ int export_handle_initialize(
 on_error:
 	if( *export_handle != NULL )
 	{
-		if( ( *export_handle )->calculated_sha1_hash_string != NULL )
-		{
-			memory_free(
-			 ( *export_handle )->calculated_sha1_hash_string );
-		}
-		if( ( *export_handle )->calculated_md5_hash_string != NULL )
-		{
-			memory_free(
-			 ( *export_handle )->calculated_md5_hash_string );
-		}
 		if( ( *export_handle )->input_buffer != NULL )
 		{
 			memory_free(
@@ -1534,17 +1524,6 @@ int export_handle_finalize_integrity_hash(
 	}
 	if( export_handle->calculate_md5 != 0 )
 	{
-		if( export_handle->calculated_md5_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid export handle - missing calculated MD5 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_md5_finalize(
 		     export_handle->md5_context,
 		     calculated_md5_hash,
@@ -1579,17 +1558,6 @@ int export_handle_finalize_integrity_hash(
 	}
 	if( export_handle->calculate_sha1 != 0 )
 	{
-		if( export_handle->calculated_sha1_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid export handle - missing calculated SHA1 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_sha1_finalize(
 		     export_handle->sha1_context,
 		     calculated_sha1_hash,
@@ -1624,17 +1592,6 @@ int export_handle_finalize_integrity_hash(
 	}
 	if( export_handle->calculate_sha256 != 0 )
 	{
-		if( export_handle->calculated_sha256_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid export handle - missing calculated SHA256 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_sha256_finalize(
 		     export_handle->sha256_context,
 		     calculated_sha256_hash,
@@ -3468,7 +3425,7 @@ int export_handle_set_additional_digest_types(
 	if( ( calculate_sha1 != 0 )
 	 && ( export_handle->calculate_sha1 == 0 ) )
 	{
-		export_handle->calculated_sha1_hash_string = system_string_allocate(
+		export_handle->calculated_sha1_hash_string = narrow_string_allocate(
 		                                              41 );
 
 		if( export_handle->calculated_sha1_hash_string == NULL )
@@ -3487,7 +3444,7 @@ int export_handle_set_additional_digest_types(
 	if( ( calculate_sha256 != 0 )
 	 && ( export_handle->calculate_sha256 == 0 ) )
 	{
-		export_handle->calculated_sha256_hash_string = system_string_allocate(
+		export_handle->calculated_sha256_hash_string = narrow_string_allocate(
 		                                                65 );
 
 		if( export_handle->calculated_sha256_hash_string == NULL )
@@ -4020,12 +3977,11 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     char *hash_value,
      size_t hash_value_length,
      libcerror_error_t **error )
 {
 	static char *function = "export_handle_set_hash_value";
-	int result            = 0;
 
 	if( export_handle == NULL )
 	{
@@ -4040,24 +3996,13 @@ int export_handle_set_hash_value(
 	}
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libewf_handle_set_utf16_hash_value(
-		          export_handle->ewf_output_handle,
-		          (uint8_t *) hash_value_identifier,
-		          hash_value_identifier_length,
-		          (uint16_t *) hash_value,
-		          hash_value_length,
-		          error );
-#else
-		result = libewf_handle_set_utf8_hash_value(
-		          export_handle->ewf_output_handle,
-		          (uint8_t *) hash_value_identifier,
-		          hash_value_identifier_length,
-		          (uint8_t *) hash_value,
-		          hash_value_length,
-		          error );
-#endif
-		if( result != 1 )
+		if( libewf_handle_set_utf8_hash_value(
+		     export_handle->ewf_output_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_length,
+		     (uint8_t *) hash_value,
+		     hash_value_length,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4073,25 +4018,13 @@ int export_handle_set_hash_value(
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )
 	      && ( export_handle->use_stdout == 0 ) )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libsmraw_handle_set_utf16_integrity_hash_value(
-		          export_handle->raw_output_handle,
-		          (uint8_t *) hash_value_identifier,
-		          hash_value_identifier_length,
-		          (uint16_t *) hash_value,
-		          hash_value_length,
-		          error );
-#else
-		result = libsmraw_handle_set_utf8_integrity_hash_value(
-		          export_handle->raw_output_handle,
-		          (uint8_t *) hash_value_identifier,
-		          hash_value_identifier_length,
-		          (uint8_t *) hash_value,
-		          hash_value_length,
-		          error );
-#endif
-
-		if( result != 1 )
+		if( libsmraw_handle_set_utf8_integrity_hash_value(
+		     export_handle->raw_output_handle,
+		     (uint8_t *) hash_value_identifier,
+		     hash_value_identifier_length,
+		     (uint8_t *) hash_value,
+		     hash_value_length,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -6997,7 +6930,7 @@ int export_handle_hash_values_fprint(
 		}
 		fprintf(
 		 stream,
-		 "MD5 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t\t%s\n",
 		 export_handle->calculated_md5_hash_string );
 	}
 	if( export_handle->calculate_sha1 != 0 )
@@ -7015,7 +6948,7 @@ int export_handle_hash_values_fprint(
 		}
 		fprintf(
 		 stream,
-		 "SHA1 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t\t%s\n",
 		 export_handle->calculated_sha1_hash_string );
 	}
 	if( export_handle->calculate_sha256 != 0 )
@@ -7033,7 +6966,7 @@ int export_handle_hash_values_fprint(
 		}
 		fprintf(
 		 stream,
-		 "SHA256 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "SHA256 hash calculated over data:\t%s\n",
 		 export_handle->calculated_sha256_hash_string );
 	}
 	return( 1 );

@@ -255,6 +255,7 @@ ewfexport_LDADD = \
 	@PTHREAD_LIBADD@
 
 ewfinfo_SOURCES = \
+	bodyfile.c bodyfile.h \
 	byte_size_string.c byte_size_string.h \
 	digest_hash.c digest_hash.h \
 	ewfinfo.c \
@@ -280,6 +281,7 @@ ewfinfo_SOURCES = \
 	ewftools_unused.h \
 	guid.c guid.h \
 	info_handle.c info_handle.h \
+	path_string.c path_string.h \
 	platform.c platform.h
 
 ewfinfo_LDADD = \
@@ -324,6 +326,7 @@ ewfmount_SOURCES = \
 	mount_file_system.c mount_file_system.h \
 	mount_fuse.c mount_fuse.h \
 	mount_handle.c mount_handle.h \
+	mount_path_string.c mount_path_string.h \
 	platform.c platform.h
 
 ewfmount_LDADD = \

@@ -75,7 +75,7 @@ struct verification_handle
 
 	/* The calculated MD5 digest hash string
 	 */
-	system_character_t *calculated_md5_hash_string;
+	char *calculated_md5_hash_string;
 
 	/* Value to indicate a stored MD5 digest hash is available
 	 */
@@ -83,7 +83,7 @@ struct verification_handle
 
 	/* The stored MD5 digest hash string
 	 */
-	system_character_t *stored_md5_hash_string;
+	char *stored_md5_hash_string;
 
 	/* Value to indicate if the SHA1 digest hash should be calculated
 	 */
@@ -99,7 +99,7 @@ struct verification_handle
 
 	/* The calculated SHA1 digest hash string
 	 */
-	system_character_t *calculated_sha1_hash_string;
+	char *calculated_sha1_hash_string;
 
 	/* Value to indicate a stored SHA1 digest hash is available
 	 */
@@ -107,7 +107,7 @@ struct verification_handle
 
 	/* The stored SHA1 digest hash string
 	 */
-	system_character_t *stored_sha1_hash_string;
+	char *stored_sha1_hash_string;
 
 	/* Value to indicate if the SHA256 digest hash should be calculated
 	 */
@@ -123,7 +123,7 @@ struct verification_handle
 
 	/* The calculated SHA256 digest hash string
 	 */
-	system_character_t *calculated_sha256_hash_string;
+	char *calculated_sha256_hash_string;
 
 	/* Value to indicate a stored SHA256 digest hash is available
 	 */
@@ -131,7 +131,7 @@ struct verification_handle
 
 	/* The stored SHA256 digest hash string
 	 */
-	system_character_t *stored_sha256_hash_string;
+	char *stored_sha256_hash_string;
 
 	/* Value to indicate if the data chunk functions instead of the buffered read and write functions should be used
 	 */

@@ -31,6 +31,7 @@
 #include <sys/utsname.h>
 #endif
 
+#include "bodyfile.h"
 #include "byte_size_string.h"
 #include "digest_hash.h"
 #include "ewfinput.h"
@@ -42,6 +43,7 @@
 #include "ewftools_libuna.h"
 #include "guid.h"
 #include "info_handle.h"
+#include "path_string.h"
 #include "platform.h"
 
 #define INFO_HANDLE_VALUE_SIZE			512
@@ -840,406 +842,6 @@ int info_handle_set_path_segment_separator(
 	return( result );
 }
 
-/* Retrieves the file entry path from the path
- * Returns 1 if successful or -1 on error
- */
-int info_handle_get_ewf_file_entry_path_from_path(
-     info_handle_t *info_handle,
-     const system_character_t *path,
-     size_t path_length,
-     system_character_t **ewf_file_entry_path,
-     size_t *ewf_file_entry_path_size,
-     libcerror_error_t **error )
-{
-	system_character_t *safe_ewf_file_entry_path = NULL;
-	static char *function                        = "info_handle_get_ewf_file_entry_path_from_path";
-	libuna_unicode_character_t unicode_character = 0;
-	system_character_t character                 = 0;
-	system_character_t escape_character          = 0;
-	system_character_t hex_digit                 = 0;
-	size_t ewf_file_entry_path_index             = 0;
-	size_t path_index                            = 0;
-	size_t safe_ewf_file_entry_path_size         = 0;
-	uint8_t hex_value                            = 0;
-	int result                                   = 0;
-
-	if( info_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( path == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid path.",
-		 function );
-
-		return( -1 );
-	}
-	if( path_length == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid path length.",
-		 function );
-
-		return( -1 );
-	}
-	if( path_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid path length value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_file_entry_path == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry path.",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_file_entry_path_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry path size.",
-		 function );
-
-		return( -1 );
-	}
-	*ewf_file_entry_path      = NULL;
-	*ewf_file_entry_path_size = 0;
-
-	safe_ewf_file_entry_path_size = path_length + 1;
-
-	if( safe_ewf_file_entry_path_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid file entry path size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	safe_ewf_file_entry_path = system_string_allocate(
-	                            safe_ewf_file_entry_path_size );
-
-	if( safe_ewf_file_entry_path == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create file entry path.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( WINAPI )
-	escape_character = (system_character_t) '^';
-#else
-	escape_character = (system_character_t) '\\';
-#endif
-
-	while( path_index < path_length )
-	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_utf16(
-		          &unicode_character,
-		          (libuna_utf16_character_t *) path,
-		          path_length,
-		          &path_index,
-		          error );
-#else
-		result = libuna_unicode_character_copy_from_utf8(
-		          &unicode_character,
-		          (libuna_utf8_character_t *) path,
-		          path_length,
-		          &path_index,
-		          error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-			 "%s: unable to copy Unicode character from path.",
-			 function );
-
-			goto on_error;
-		}
-		/* On Windows replace:
-		 *   ^^ by ^
-		 *   ^x5c by \
-		 *   ^x## by control characters ([U+1-U+1f, U+7f-U+9f])
-		 *
-		 * On other platforms replace:
-		 *   \\ by \
-		 *   \x2f by /
-		 *   \x## by control characters ([U+1-U+1f, U+7f-U+9f])
-		 *   / by \
-		 */
-		if( unicode_character == (libuna_unicode_character_t) info_handle->path_segment_separator )
-		{
-			unicode_character = (libuna_unicode_character_t) LIBEWF_SEPARATOR;
-		}
-		if( unicode_character == (libuna_unicode_character_t) escape_character )
-		{
-			if( ( path_index + 1 ) > path_length )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid path index value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
-			character = path[ path_index++ ];
-
-#if defined( WINAPI )
-			if( ( character != escape_character )
-			 && ( character != (system_character_t) 'X' )
-			 && ( character != (system_character_t) 'x' ) )
-#else
-			if( ( character != escape_character )
-			 && ( character != (system_character_t) 'x' ) )
-#endif
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: unsupported path - invalid character: %" PRIc_SYSTEM " after escape character.",
-				 function,
-				 character );
-
-				goto on_error;
-			}
-			if( character == escape_character )
-			{
-				if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid file entry path index value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = escape_character;
-			}
-			else
-			{
-				if( ( path_index + 2 ) > path_length )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid path index value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				hex_digit = path[ path_index++ ];
-
-				if( ( hex_digit >= (system_character_t) '0' )
-				 && ( hex_digit <= (system_character_t) '9' ) )
-				{
-					hex_value = (uint8_t) ( hex_digit - (system_character_t) '0' );
-				}
-#if defined( WINAPI )
-				else if( ( hex_digit >= (system_character_t) 'A' )
-				      && ( hex_digit <= (system_character_t) 'F' ) )
-				{
-					hex_value = (uint8_t) ( hex_digit - (system_character_t) 'A' + 10 );
-				}
-#endif
-				else if( ( hex_digit >= (system_character_t) 'a' )
-				      && ( hex_digit <= (system_character_t) 'f' ) )
-				{
-					hex_value = (uint8_t) ( hex_digit - (system_character_t) 'a' + 10 );
-				}
-				else
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-					 "%s: unsupported path - invalid hexadecimal character: %" PRIc_SYSTEM " after escape character.",
-					 function,
-					 hex_digit );
-
-					goto on_error;
-				}
-				hex_value <<= 4;
-
-				hex_digit = path[ path_index++ ];
-
-				if( ( hex_digit >= (system_character_t) '0' )
-				 && ( hex_digit <= (system_character_t) '9' ) )
-				{
-					hex_value |= (uint8_t) ( hex_digit - (system_character_t) '0' );
-				}
-#if defined( WINAPI )
-				else if( ( hex_digit >= (system_character_t) 'A' )
-				      && ( hex_digit <= (system_character_t) 'F' ) )
-				{
-					hex_value |= (uint8_t) ( hex_digit - (system_character_t) 'A' + 10 );
-				}
-#endif
-				else if( ( hex_digit >= (system_character_t) 'a' )
-				      && ( hex_digit <= (system_character_t) 'f' ) )
-				{
-					hex_value |= (uint8_t) ( hex_digit - (system_character_t) 'a' + 10 );
-				}
-				else
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-					 "%s: unsupported path - invalid hexadecimal character: %" PRIc_SYSTEM " after escape character.",
-					 function,
-					 hex_digit );
-
-					goto on_error;
-				}
-				if( ( ( hex_value >= 0x01 )
-				  &&  ( hex_value <= 0x1f ) )
-				 || ( hex_value == (uint8_t) LIBCPATH_SEPARATOR )
-				 || ( ( hex_value >= 0x7f )
-				  &&  ( hex_value <= 0x9f ) ) )
-				{
-				}
-				else
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid escaped character value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid file entry path index value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = (system_character_t) hex_value;
-			}
-		}
-#if !defined( WINAPI )
-		else if( unicode_character == (system_character_t) '/' )
-		{
-			if( ( ewf_file_entry_path_index + 1 ) > safe_ewf_file_entry_path_size )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid file entry path index value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
-			safe_ewf_file_entry_path[ ewf_file_entry_path_index++ ] = (system_character_t) '\\';
-		}
-#endif
-		else
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_unicode_character_copy_to_utf16(
-			          unicode_character,
-			          (libuna_utf16_character_t *) safe_ewf_file_entry_path,
-			          safe_ewf_file_entry_path_size,
-			          &ewf_file_entry_path_index,
-			          error );
-#else
-			result = libuna_unicode_character_copy_to_utf8(
-			          unicode_character,
-			          (libuna_utf8_character_t *) safe_ewf_file_entry_path,
-			          safe_ewf_file_entry_path_size,
-			          &ewf_file_entry_path_index,
-			          error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy Unicode character to file entry path.",
-				 function );
-
-				goto on_error;
-			}
-		}
-	}
-	if( ewf_file_entry_path_index >= safe_ewf_file_entry_path_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid file entry path index value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	safe_ewf_file_entry_path[ ewf_file_entry_path_index ] = 0;
-
-	*ewf_file_entry_path      = safe_ewf_file_entry_path;
-	*ewf_file_entry_path_size = safe_ewf_file_entry_path_size;
-
-	return( 1 );
-
-on_error:
-	if( safe_ewf_file_entry_path != NULL )
-	{
-		memory_free(
-		 safe_ewf_file_entry_path );
-	}
-	return( -1 );
-}
-
 /* Prints a file entry or data stream name
  * Returns 1 if successful or -1 on error
  */
@@ -1249,14 +851,9 @@ int info_handle_name_value_fprint(
      size_t value_string_length,
      libcerror_error_t **error )
 {
-	system_character_t *escaped_value_string     = NULL;
-	static char *function                        = "info_handle_name_value_fprint";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t escaped_value_string_index            = 0;
-	size_t escaped_value_string_size             = 0;
-	size_t value_string_index                    = 0;
-	int print_count                              = 0;
-	int result                                   = 0;
+	system_character_t *escaped_value_string = NULL;
+	static char *function                    = "info_handle_name_value_fprint";
+	size_t escaped_value_string_size         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1269,196 +866,33 @@ int info_handle_name_value_fprint(
 
 		return( -1 );
 	}
-	if( value_string == NULL )
+	if( path_string_copy_from_file_entry_path(
+	     &escaped_value_string,
+	     &escaped_value_string_size,
+	     value_string,
+	     value_string_length,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value string.",
-		 function );
-
-		return( -1 );
-	}
-	/* To ensure normalization in the escaped string is handled correctly
-	 * it stored in a temporary variable. Note that there is a worst-case of
-	 * a 1 to 4 ratio for each escaped character.
-	 */
-	if( value_string_length > (size_t) ( ( SSIZE_MAX - 1 ) / ( sizeof( system_character_t ) * 4 ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid value string length value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	escaped_value_string_size = ( value_string_length * 4 ) + 1;
-
-	escaped_value_string = (system_character_t *) memory_allocate(
-	                                               sizeof( system_character_t ) * escaped_value_string_size );
-
-	if( escaped_value_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create escaped value string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy path from file entry path.",
 		 function );
 
 		goto on_error;
 	}
-	/* Using UCS-2 or RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
-	 */
-	while( value_string_index < value_string_length )
+	if( escaped_value_string == NULL )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_ucs2(
-		          &unicode_character,
-		          (libuna_utf16_character_t *) value_string,
-		          value_string_length,
-		          &value_string_index,
-		          error );
-#else
-		result = libuna_unicode_character_copy_from_utf8_rfc2279(
-		          &unicode_character,
-		          (libuna_utf8_character_t *) value_string,
-		          value_string_length,
-		          &value_string_index,
-		          error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-			 "%s: unable to copy Unicode character from value string.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing escaped value string.",
+		 function );
 
-			goto on_error;
-		}
-		/* Replace:
-		 *   Control characters ([U+0-U+1f, U+7f-U+9f]) by \x##
-		 */
-		if( ( unicode_character <= 0x1f )
-		 || ( ( unicode_character >= 0x7f )
-		  &&  ( unicode_character <= 0x9f ) ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\x%02" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		/* Replace:
-		 *   Unicode surrogate characters ([U+d800-U+dfff]) by \u####
-		 *   Undefined Unicode characters ([U+fdd0-U+fddf, U+fffe-U+ffff]) by \u####
-		 */
-		else if( ( ( unicode_character >= 0x0000d800UL )
-		       &&  ( unicode_character <= 0x0000dfffUL ) )
-		      || ( ( unicode_character >= 0x0000fdd0UL )
-		       &&  ( unicode_character <= 0x0000fddfUL ) )
-		      || ( ( unicode_character >= 0x0000fffeUL )
-		       &&  ( unicode_character <= 0x0000ffffUL ) ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\u%04" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		/* Replace:
-		 *   Undefined Unicode characters ([
-		 *       U+1fffe-U+1ffff, U+2fffe-U+2ffff, U+3fffe-U+3ffff, U+4fffe-U+4ffff,
-		 *       U+5fffe-U+5ffff, U+6fffe-U+6ffff, U+7fffe-U+7ffff, U+8fffe-U+8ffff,
-		 *       U+9fffe-U+9ffff, U+afffe-U+affff, U+bfffe-U+bffff, U+cfffe-U+cffff,
-		 *       U+dfffe-U+dffff, U+efffe-U+effff, U+ffffe-U+fffff, U+10fffe-U+ffffffff]) by \U########
-		 */
-		else if( ( ( ( unicode_character & 0x0000ffffUL ) >= 0x0000fffeUL )
-		       &&  ( ( unicode_character & 0x0000ffffUL ) <= 0x0000ffffUL ) )
-		      || ( unicode_character > 0x0010fffeUL ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\U%08" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		else
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_unicode_character_copy_to_utf16(
-			          unicode_character,
-			          (libuna_utf16_character_t *) escaped_value_string,
-			          escaped_value_string_size,
-			          &escaped_value_string_index,
-			          error );
-#else
-			result = libuna_unicode_character_copy_to_utf8(
-			          unicode_character,
-			          (libuna_utf8_character_t *) escaped_value_string,
-			          escaped_value_string_size,
-			          &escaped_value_string_index,
-			          error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-		}
+		goto on_error;
 	}
-	escaped_value_string[ escaped_value_string_index ] = 0;
-
 	fprintf(
 	 info_handle->notify_stream,
 	 "%" PRIs_SYSTEM "",
@@ -1608,14 +1042,9 @@ int info_handle_bodyfile_name_value_fprint(
      size_t value_string_length,
      libcerror_error_t **error )
 {
-	system_character_t *escaped_value_string     = NULL;
-	static char *function                        = "info_handle_bodyfile_name_value_fprint";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t escaped_value_string_index            = 0;
-	size_t escaped_value_string_size             = 0;
-	size_t value_string_index                    = 0;
-	int print_count                              = 0;
-	int result                                   = 0;
+	system_character_t *escaped_value_string = NULL;
+	static char *function                    = "info_handle_bodyfile_name_value_fprint";
+	size_t escaped_value_string_size         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1628,222 +1057,33 @@ int info_handle_bodyfile_name_value_fprint(
 
 		return( -1 );
 	}
-	if( value_string == NULL )
+	if( bodyfile_path_string_copy_from_file_entry_path(
+	     &escaped_value_string,
+	     &escaped_value_string_size,
+	     value_string,
+	     value_string_length,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value string.",
-		 function );
-
-		return( -1 );
-	}
-	/* To ensure normalization in the escaped string is handled correctly
-	 * it stored in a temporary variable. Note that there is a worst-case of
-	 * a 1 to 4 ratio for each escaped character.
-	 */
-	if( value_string_length > (size_t) ( ( SSIZE_MAX - 1 ) / ( sizeof( system_character_t ) * 4 ) ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid value string length value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	escaped_value_string_size = ( value_string_length * 4 ) + 1;
-
-	escaped_value_string = (system_character_t *) memory_allocate(
-	                                               sizeof( system_character_t ) * escaped_value_string_size );
-
-	if( escaped_value_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create escaped value string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy path from file entry path.",
 		 function );
 
 		goto on_error;
 	}
-	/* Using UCS-2 or RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
-	 */
-	while( value_string_index < value_string_length )
+	if( escaped_value_string == NULL )
 	{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_ucs2(
-		          &unicode_character,
-		          (libuna_utf16_character_t *) value_string,
-		          value_string_length,
-		          &value_string_index,
-		          error );
-#else
-		result = libuna_unicode_character_copy_from_utf8_rfc2279(
-		          &unicode_character,
-		          (libuna_utf8_character_t *) value_string,
-		          value_string_length,
-		          &value_string_index,
-		          error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-			 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-			 "%s: unable to copy Unicode character from value string.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing escaped value string.",
+		 function );
 
-			goto on_error;
-		}
-		/* Replace:
-		 *   Control characters ([U+0-U+1f, U+7f-U+9f]) by \x##
-		 */
-		if( ( unicode_character <= 0x1f )
-		 || ( ( unicode_character >= 0x7f )
-		  &&  ( unicode_character <= 0x9f ) ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\x%02" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		/* Replace:
-		 *   Unicode surrogate characters ([U+d800-U+dfff]) by \u####
-		 *   Undefined Unicode characters ([U+fdd0-U+fddf, U+fffe-U+ffff]) by \u####
-		 */
-		else if( ( ( unicode_character >= 0x0000d800UL )
-		       &&  ( unicode_character <= 0x0000dfffUL ) )
-		      || ( ( unicode_character >= 0x0000fdd0UL )
-		       &&  ( unicode_character <= 0x0000fddfUL ) )
-		      || ( ( unicode_character >= 0x0000fffeUL )
-		       &&  ( unicode_character <= 0x0000ffffUL ) ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\u%04" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		/* Replace:
-		 *   Undefined Unicode characters ([
-		 *       U+1fffe-U+1ffff, U+2fffe-U+2ffff, U+3fffe-U+3ffff, U+4fffe-U+4ffff,
-		 *       U+5fffe-U+5ffff, U+6fffe-U+6ffff, U+7fffe-U+7ffff, U+8fffe-U+8ffff,
-		 *       U+9fffe-U+9ffff, U+afffe-U+affff, U+bfffe-U+bffff, U+cfffe-U+cffff,
-		 *       U+dfffe-U+dffff, U+efffe-U+effff, U+ffffe-U+fffff, U+10fffe-U+ffffffff]) by \U########
-		 */
-		else if( ( ( ( unicode_character & 0x0000ffffUL ) >= 0x0000fffeUL )
-		       &&  ( ( unicode_character & 0x0000ffffUL ) <= 0x0000ffffUL ) )
-		      || ( unicode_character > 0x0010fffeUL ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\U%08" PRIx32 "",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		/* Replace:
-		 *   Escape character (\) by \\
-		 *   Bodyfile value seperator (|) by \|
-		 */
-		else if( ( unicode_character == '\\' )
-		      || ( unicode_character == '|' ) )
-		{
-			print_count = system_string_sprintf(
-			               &( escaped_value_string[ escaped_value_string_index ] ),
-			               escaped_value_string_size - escaped_value_string_index,
-			               "\\%c",
-			               unicode_character );
-
-			if( print_count < 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy escaped Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-			escaped_value_string_index += print_count;
-		}
-		else
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_unicode_character_copy_to_utf16(
-			          unicode_character,
-			          (libuna_utf16_character_t *) escaped_value_string,
-			          escaped_value_string_size,
-			          &escaped_value_string_index,
-			          error );
-#else
-			result = libuna_unicode_character_copy_to_utf8(
-			          unicode_character,
-			          (libuna_utf8_character_t *) escaped_value_string,
-			          escaped_value_string_size,
-			          &escaped_value_string_index,
-			          error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
-				 "%s: unable to copy Unicode character to escaped value string.",
-				 function );
-
-				goto on_error;
-			}
-		}
+		goto on_error;
 	}
-	escaped_value_string[ escaped_value_string_index ] = 0;
-
 	fprintf(
 	 info_handle->bodyfile_stream,
 	 "%" PRIs_SYSTEM "",
@@ -4237,17 +3477,17 @@ int info_handle_hash_values_fprint(
 {
 	char hash_value_identifier[ INFO_HANDLE_VALUE_IDENTIFIER_SIZE ];
 
-	static char *function                      = "info_handle_hash_values_fprint";
-	size_t hash_value_identifier_size          = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
-	uint32_t hash_value_iterator               = 0;
-	uint32_t number_of_values                  = 0;
-	uint8_t print_section_header               = 1;
-	int result                                 = 1;
+	static char *function             = "info_handle_hash_values_fprint";
+	size_t hash_value_identifier_size = INFO_HANDLE_VALUE_IDENTIFIER_SIZE;
+	uint32_t hash_value_iterator      = 0;
+	uint32_t number_of_values         = 0;
+	uint8_t print_section_header      = 1;
+	int result                        = 1;
 
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 
-	system_character_t *stored_md5_hash_string = NULL;
+	char *stored_md5_hash_string      = NULL;
 #endif
 
 	if( info_handle == NULL )
@@ -4281,7 +3521,7 @@ int info_handle_hash_values_fprint(
 	}
 	else if( result == 1 )
 	{
-		stored_md5_hash_string = system_string_allocate(
+		stored_md5_hash_string = narrow_string_allocate(
 		                          DIGEST_HASH_STRING_SIZE_MD5 );
 
 		if( stored_md5_hash_string == NULL )
@@ -4340,20 +3580,23 @@ int info_handle_hash_values_fprint(
 		{
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t\t<hashdigest type=\"md5\" coding=\"base16\">%" PRIs_SYSTEM "</hashdigest>\n",
+			 "\t\t<hashdigest type=\"md5\" coding=\"base16\">%s</hashdigest>\n",
 			 stored_md5_hash_string );
 		}
 		else if( info_handle->output_format == INFO_HANDLE_OUTPUT_FORMAT_TEXT )
 		{
 			fprintf(
 			 info_handle->notify_stream,
-			 "\tMD5:\t\t\t%" PRIs_SYSTEM "\n",
+			 "\tMD5:\t\t\t%s\n",
 			 stored_md5_hash_string );
 		}
 		memory_free(
 		 stored_md5_hash_string );
+
+		stored_md5_hash_string = NULL;
 	}
-#endif
+#endif /* defined( USE_LIBEWF_GET_MD5_HASH ) */
+
 	if( libewf_handle_get_number_of_hash_values(
 	     info_handle->input_handle,
 	     &number_of_values,
@@ -7062,23 +6305,20 @@ int info_handle_file_entry_value_fprint(
 			 info_handle->notify_stream,
 			 "\tName\t\t\t\t: " );
 
-			if( path != NULL )
+			if( info_handle_name_value_fprint(
+			     info_handle,
+			     path,
+			     path_length,
+			     error ) != 1 )
 			{
-				if( info_handle_name_value_fprint(
-				     info_handle,
-				     path,
-				     path_length,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-					 "%s: unable to print path string.",
-					 function );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print path string.",
+				 function );
 
-					goto on_error;
-				}
+				goto on_error;
 			}
 			if( info_handle_name_value_fprint(
 			     info_handle,
@@ -7986,10 +7226,10 @@ int info_handle_file_entry_fprint_by_path(
 			break;
 		}
 	}
-	if( info_handle_get_ewf_file_entry_path_from_path(
-	     info_handle,
+	if( path_string_copy_to_file_entry_path(
 	     path,
 	     path_length,
+	     info_handle->path_segment_separator,
 	     &ewf_file_entry_path,
 	     &ewf_file_entry_path_size,
 	     error ) != 1 )
@@ -7997,8 +7237,8 @@ int info_handle_file_entry_fprint_by_path(
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry path from path.",
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy path to file entry path.",
 		 function );
 
 		goto on_error;
@@ -8140,6 +7380,8 @@ int info_handle_logical_files_hierarchy_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
+	system_character_t root_path[ 2 ];
+
 	libewf_file_entry_t *file_entry = NULL;
 	static char *function           = "info_handle_logical_files_hierarchy_fprint";
 	int result                      = 0;
@@ -8188,11 +7430,14 @@ int info_handle_logical_files_hierarchy_fprint(
 
 			goto on_error;
 		}
+		root_path[ 0 ] = info_handle->path_segment_separator;
+		root_path[ 1 ] = 0;
+
 		if( info_handle_logical_files_hierarchy_fprint_file_entry(
 		     info_handle,
 		     file_entry,
-		     _SYSTEM_STRING( "" ),
-		     1,
+		     root_path,
+		     2,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

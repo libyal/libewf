@@ -178,6 +178,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\ewftools\bodyfile.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\byte_size_string.c"
 				>
 			</File>
@@ -222,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\path_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
@@ -231,6 +239,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\ewftools\bodyfile.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\ewftools\byte_size_string.h"
 				>
@@ -325,6 +337,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\info_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\path_string.h"
 				>
 			</File>
 			<File

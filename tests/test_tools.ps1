@@ -6,7 +6,7 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$ToolsTests = "byte_size_string device_handle digest_hash export_handle guid imaging_handle info_handle log_handle output platform signal storage_media_buffer system_string verification_handle"
+$ToolsTests = "bodyfile byte_size_string device_handle digest_hash export_handle guid imaging_handle info_handle log_handle mount_path_string output path_string platform signal storage_media_buffer system_string verification_handle"
 $ToolsTestsWithInput = ""
 
 $InputGlob = "*.[Ees]*01"

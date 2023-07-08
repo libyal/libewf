@@ -166,7 +166,7 @@ int imaging_handle_initialize(
 	}
 	if( calculate_md5 != 0 )
 	{
-		( *imaging_handle )->calculated_md5_hash_string = system_string_allocate(
+		( *imaging_handle )->calculated_md5_hash_string = narrow_string_allocate(
 								   33 );
 
 		if( ( *imaging_handle )->calculated_md5_hash_string == NULL )
@@ -204,16 +204,6 @@ int imaging_handle_initialize(
 on_error:
 	if( *imaging_handle != NULL )
 	{
-		if( ( *imaging_handle )->calculated_sha1_hash_string != NULL )
-		{
-			memory_free(
-			 ( *imaging_handle )->calculated_sha1_hash_string );
-		}
-		if( ( *imaging_handle )->calculated_md5_hash_string != NULL )
-		{
-			memory_free(
-			 ( *imaging_handle )->calculated_md5_hash_string );
-		}
 		if( ( *imaging_handle )->output_handle != NULL )
 		{
 			libewf_handle_free(
@@ -1502,17 +1492,6 @@ int imaging_handle_finalize_integrity_hash(
 	}
 	if( imaging_handle->calculate_md5 != 0 )
 	{
-		if( imaging_handle->calculated_md5_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid imaging handle - missing calculated MD5 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_md5_finalize(
 		     imaging_handle->md5_context,
 		     calculated_md5_hash,
@@ -1547,17 +1526,6 @@ int imaging_handle_finalize_integrity_hash(
 	}
 	if( imaging_handle->calculate_sha1 != 0 )
 	{
-		if( imaging_handle->calculated_sha1_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid imaging handle - missing calculated SHA1 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_sha1_finalize(
 		     imaging_handle->sha1_context,
 		     calculated_sha1_hash,
@@ -1592,17 +1560,6 @@ int imaging_handle_finalize_integrity_hash(
 	}
 	if( imaging_handle->calculate_sha256 != 0 )
 	{
-		if( imaging_handle->calculated_sha256_hash_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid imaging handle - missing calculated SHA256 hash string.",
-			 function );
-
-			return( -1 );
-		}
 		if( libhmac_sha256_finalize(
 		     imaging_handle->sha256_context,
 		     calculated_sha256_hash,
@@ -4750,7 +4707,7 @@ int imaging_handle_set_additional_digest_types(
 	if( ( calculate_sha1 != 0 )
 	 && ( imaging_handle->calculate_sha1 == 0 ) )
 	{
-		imaging_handle->calculated_sha1_hash_string = system_string_allocate(
+		imaging_handle->calculated_sha1_hash_string = narrow_string_allocate(
 		                                               41 );
 
 		if( imaging_handle->calculated_sha1_hash_string == NULL )
@@ -4769,7 +4726,7 @@ int imaging_handle_set_additional_digest_types(
 	if( ( calculate_sha256 != 0 )
 	 && ( imaging_handle->calculate_sha256 == 0 ) )
 	{
-		imaging_handle->calculated_sha256_hash_string = system_string_allocate(
+		imaging_handle->calculated_sha256_hash_string = narrow_string_allocate(
 		                                                 65 );
 
 		if( imaging_handle->calculated_sha256_hash_string == NULL )
@@ -5732,13 +5689,11 @@ int imaging_handle_set_hash_value(
      imaging_handle_t *imaging_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     char *hash_value,
      size_t hash_value_length,
      libcerror_error_t **error )
 {
-	uint8_t *utf8_hash_value    = NULL;
-	static char *function       = "imaging_handle_set_hash_value";
-	size_t utf8_hash_value_size = 0;
+	static char *function = "imaging_handle_set_hash_value";
 
 	if( imaging_handle == NULL )
 	{
@@ -5751,57 +5706,12 @@ int imaging_handle_set_hash_value(
 
 		return( -1 );
 	}
-	if( ewftools_string_size_to_utf8_string(
-	     hash_value,
-	     hash_value_length + 1,
-	     &utf8_hash_value_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine UTF-8 hash value size.",
-		 function );
-
-		goto on_error;
-	}
-	utf8_hash_value = (uint8_t *) memory_allocate(
-	                               sizeof( uint8_t ) * utf8_hash_value_size );
-
-	if( utf8_hash_value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 hash value.",
-		 function );
-
-		goto on_error;
-	}
-	if( ewftools_string_copy_to_utf8_string(
-	     hash_value,
-	     hash_value_length + 1,
-	     utf8_hash_value,
-	     utf8_hash_value_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 hash value.",
-		 function );
-
-		goto on_error;
-	}
 	if( libewf_handle_set_utf8_hash_value(
 	     imaging_handle->output_handle,
 	     (uint8_t *) hash_value_identifier,
 	     hash_value_identifier_length,
-	     utf8_hash_value,
-	     utf8_hash_value_size - 1,
+	     (uint8_t *) hash_value,
+	     hash_value_length,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -5812,7 +5722,7 @@ int imaging_handle_set_hash_value(
 		 function,
 		 hash_value_identifier );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
 	{
@@ -5820,8 +5730,8 @@ int imaging_handle_set_hash_value(
 		     imaging_handle->secondary_output_handle,
 		     (uint8_t *) hash_value_identifier,
 		     hash_value_identifier_length,
-		     utf8_hash_value,
-		     utf8_hash_value_size - 1,
+		     (uint8_t *) hash_value,
+		     hash_value_length,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -5832,21 +5742,10 @@ int imaging_handle_set_hash_value(
 			 function,
 			 hash_value_identifier );
 
-			goto on_error;
+			return( -1 );
 		}
 	}
-	memory_free(
-	 utf8_hash_value );
-
 	return( 1 );
-
-on_error:
-	if( utf8_hash_value != NULL )
-	{
-		memory_free(
-		 utf8_hash_value );
-	}
-	return( -1 );
 }
 
 /* Appends a read error to the output handle
@@ -7066,23 +6965,56 @@ int imaging_handle_print_hashes(
 	}
 	if( imaging_handle->calculate_md5 != 0 )
 	{
+		if( imaging_handle->calculated_md5_hash_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
 		fprintf(
 		 stream,
-		 "MD5 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
+		 "MD5 hash calculated over data:\t\t%s\n",
 		 imaging_handle->calculated_md5_hash_string );
 	}
 	if( imaging_handle->calculate_sha1 != 0 )
 	{
+		if( imaging_handle->calculated_sha1_hash_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
 		fprintf(
 		 stream,
-		 "SHA1 hash calculated over data:\t\t%" PRIs_SYSTEM "\n",
+		 "SHA1 hash calculated over data:\t\t%s\n",
 		 imaging_handle->calculated_sha1_hash_string );
 	}
 	if( imaging_handle->calculate_sha256 != 0 )
 	{
+		if( imaging_handle->calculated_sha256_hash_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid export handle - missing calculated SHA256 hash string.",
+			 function );
+
+			return( -1 );
+		}
 		fprintf(
 		 stream,
-		 "SHA256 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		 "SHA256 hash calculated over data:\t%s\n",
 		 imaging_handle->calculated_sha256_hash_string );
 	}
 	return( 1 );

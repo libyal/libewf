@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="ewf_test_tools_info_handle"
-	ProjectGUID="{55EE4CB1-CDF8-4CB9-B7A6-75B2A2D2BF38}"
-	RootNamespace="ewf_test_tools_info_handle"
+	Name="ewf_test_tools_bodyfile"
+	ProjectGUID="{EE1FC2C1-70CA-4DA4-9DCC-9326A611BB52}"
+	RootNamespace="ewf_test_tools_bodyfile"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -58,7 +58,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				SubSystem="1"
@@ -135,7 +134,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -182,39 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfinput.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewftools_system_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\guid.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\info_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\path_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\platform.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_tools_info_handle.c"
+				RelativePath="..\..\tests\ewf_test_tools_bodyfile.c"
 				>
 			</File>
 		</Filter>
@@ -228,47 +194,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\byte_size_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfinput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewftools_system_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\guid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\info_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\path_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\platform.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\ewf_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\ewf_test_libewf.h"
+				RelativePath="..\..\tests\ewf_test_libcpath.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\ewf_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\ewf_test_memory.h"
 				>
 			</File>
 			<File

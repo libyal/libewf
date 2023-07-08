@@ -111,27 +111,11 @@ int mount_file_system_get_path_from_handle_index(
      size_t path_size,
      libcerror_error_t **error );
 
-int mount_file_system_get_ewf_file_entry_path_from_path(
-     mount_file_system_t *file_system,
-     const system_character_t *path,
-     size_t path_length,
-     system_character_t **file_entry_path,
-     size_t *file_entry_path_size,
-     libcerror_error_t **error );
-
 int mount_file_system_get_file_entry_by_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
      libewf_file_entry_t **ewf_file_entry,
-     libcerror_error_t **error );
-
-int mount_file_system_get_filename_from_name(
-     mount_file_system_t *file_system,
-     const system_character_t *name,
-     size_t name_length,
-     system_character_t **filename,
-     size_t *filename_size,
      libcerror_error_t **error );
 
 int mount_file_system_get_filename_from_file_entry(

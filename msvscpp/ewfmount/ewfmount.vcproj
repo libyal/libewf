@@ -238,6 +238,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\mount_path_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\platform.c"
 				>
 			</File>
@@ -361,6 +365,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\mount_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\mount_path_string.h"
 				>
 			</File>
 			<File

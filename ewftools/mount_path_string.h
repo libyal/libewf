@@ -1,5 +1,5 @@
 /*
- * Crypographic digest hash
+ * Mount path string functions
  *
  * Copyright (C) 2006-2023, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _DIGEST_HASH_H )
-#define _DIGEST_HASH_H
+#if !defined( _MOUNT_PATH_STRING_H )
+#define _MOUNT_PATH_STRING_H
 
 #include <common.h>
 #include <types.h>
@@ -31,16 +31,29 @@
 extern "C" {
 #endif
 
-int digest_hash_copy_to_string(
-     const uint8_t *digest_hash,
-     size_t digest_hash_size,
-     char *string,
+int mount_path_string_copy_hexadecimal_to_integer_32_bit(
+     const system_character_t *string,
      size_t string_size,
+     uint32_t *value_32bit,
+     libcerror_error_t **error );
+
+int mount_path_string_copy_from_file_entry_path(
+     system_character_t **path,
+     size_t *path_size,
+     const system_character_t *file_entry_path,
+     size_t file_entry_path_length,
+     libcerror_error_t **error );
+
+int mount_path_string_copy_to_file_entry_path(
+     const system_character_t *path,
+     size_t path_length,
+     system_character_t **file_entry_path,
+     size_t *file_entry_path_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _DIGEST_HASH_H ) */
+#endif /* !defined( _MOUNT_PATH_STRING_H ) */
 

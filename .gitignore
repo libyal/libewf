@@ -195,6 +195,7 @@ stamp-h[1-9]
 /tests/ewf_test_source
 /tests/ewf_test_support
 /tests/ewf_test_table_section
+/tests/ewf_test_tools_bodyfile
 /tests/ewf_test_tools_byte_size_string
 /tests/ewf_test_tools_device_handle
 /tests/ewf_test_tools_digest_hash
@@ -203,7 +204,9 @@ stamp-h[1-9]
 /tests/ewf_test_tools_imaging_handle
 /tests/ewf_test_tools_info_handle
 /tests/ewf_test_tools_log_handle
+/tests/ewf_test_tools_mount_path_string
 /tests/ewf_test_tools_output
+/tests/ewf_test_tools_path_string
 /tests/ewf_test_tools_platform
 /tests/ewf_test_tools_signal
 /tests/ewf_test_tools_storage_media_buffer

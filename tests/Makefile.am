@@ -143,6 +143,7 @@ check_PROGRAMS = \
 	ewf_test_source \
 	ewf_test_support \
 	ewf_test_table_section \
+	ewf_test_tools_bodyfile \
 	ewf_test_tools_byte_size_string \
 	ewf_test_tools_device_handle \
 	ewf_test_tools_digest_hash \
@@ -151,7 +152,9 @@ check_PROGRAMS = \
 	ewf_test_tools_imaging_handle \
 	ewf_test_tools_info_handle \
 	ewf_test_tools_log_handle \
+	ewf_test_tools_mount_path_string \
 	ewf_test_tools_output \
+	ewf_test_tools_path_string \
 	ewf_test_tools_platform \
 	ewf_test_tools_signal \
 	ewf_test_tools_storage_media_buffer \
@@ -1118,6 +1121,19 @@ ewf_test_table_section_LDADD = \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
+ewf_test_tools_bodyfile_SOURCES = \
+	../ewftools/bodyfile.c ../ewftools/bodyfile.h \
+	ewf_test_libcerror.h \
+	ewf_test_libcpath.h \
+	ewf_test_macros.h \
+	ewf_test_tools_bodyfile.c \
+	ewf_test_unused.h
+
+ewf_test_tools_bodyfile_LDADD = \
+	@LIBUNA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_tools_byte_size_string_SOURCES = \
 	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
 	ewf_test_libcerror.h \
@@ -1264,11 +1280,13 @@ ewf_test_tools_imaging_handle_LDADD = \
 	@PTHREAD_LIBADD@
 
 ewf_test_tools_info_handle_SOURCES = \
+	../ewftools/bodyfile.c ../ewftools/bodyfile.h \
 	../ewftools/byte_size_string.c ../ewftools/byte_size_string.h \
 	../ewftools/ewfinput.c ../ewftools/ewfinput.h \
 	../ewftools/ewftools_system_string.c ../ewftools/ewftools_system_string.h \
 	../ewftools/guid.c ../ewftools/guid.h \
 	../ewftools/info_handle.c ../ewftools/info_handle.h \
+	../ewftools/path_string.c ../ewftools/path_string.h \
 	../ewftools/platform.c ../ewftools/platform.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
@@ -1298,6 +1316,18 @@ ewf_test_tools_log_handle_SOURCES = \
 ewf_test_tools_log_handle_LDADD = \
 	@LIBCERROR_LIBADD@
 
+ewf_test_tools_mount_path_string_SOURCES = \
+	../ewftools/mount_path_string.c ../ewftools/mount_path_string.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_tools_mount_path_string.c \
+	ewf_test_unused.h
+
+ewf_test_tools_mount_path_string_LDADD = \
+	@LIBUNA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
 ewf_test_tools_output_SOURCES = \
 	../ewftools/ewftools_output.c ../ewftools/ewftools_output.h \
 	ewf_test_libcerror.h \
@@ -1307,6 +1337,18 @@ ewf_test_tools_output_SOURCES = \
 
 ewf_test_tools_output_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCERROR_LIBADD@
+
+ewf_test_tools_path_string_SOURCES = \
+	../ewftools/path_string.c ../ewftools/path_string.h \
+	ewf_test_libcerror.h \
+	ewf_test_macros.h \
+	ewf_test_tools_path_string.c \
+	ewf_test_unused.h
+
+ewf_test_tools_path_string_LDADD = \
+	@LIBUNA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 

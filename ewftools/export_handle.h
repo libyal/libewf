@@ -121,7 +121,7 @@ struct export_handle
 
 	/* The calculated MD5 digest hash string
 	 */
-	system_character_t *calculated_md5_hash_string;
+	char *calculated_md5_hash_string;
 
 	/* Value to indicate if the SHA1 digest hash should be calculated
 	 */
@@ -137,7 +137,7 @@ struct export_handle
 
 	/* The calculated SHA1 digest hash string
 	 */
-	system_character_t *calculated_sha1_hash_string;
+	char *calculated_sha1_hash_string;
 
 	/* Value to indicate if the SHA256 digest hash should be calculated
 	 */
@@ -153,7 +153,7 @@ struct export_handle
 
 	/* The calculated SHA256 digest hash string
 	 */
-	system_character_t *calculated_sha256_hash_string;
+	char *calculated_sha256_hash_string;
 
 	/* Value to indicate if the data chunk functions instead of the buffered read and write functions should be used
 	 */
@@ -455,7 +455,7 @@ int export_handle_set_hash_value(
      export_handle_t *export_handle,
      char *hash_value_identifier,
      size_t hash_value_identifier_length,
-     system_character_t *hash_value,
+     char *hash_value,
      size_t hash_value_length,
      libcerror_error_t **error );
 
