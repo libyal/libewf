@@ -63,9 +63,13 @@ struct libewf_lef_file_entry
 	 */
 	libewf_serialized_string_t *guid;
 
-	/* The name string
+	/* The name data
 	 */
-	libewf_serialized_string_t *name;
+	uint8_t *name_data;
+
+	/* The name data size
+	 */
+	size_t name_data_size;
 
 	/* The short name string
 	 */
@@ -252,6 +256,12 @@ int libewf_lef_file_entry_get_utf8_name(
      size_t utf8_string_size,
      libcerror_error_t **error );
 
+int libewf_lef_file_entry_compare_name_with_utf8_string(
+     libewf_lef_file_entry_t *lef_file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
 int libewf_lef_file_entry_get_utf16_name_size(
      libewf_lef_file_entry_t *lef_file_entry,
      size_t *utf16_string_size,
@@ -261,6 +271,12 @@ int libewf_lef_file_entry_get_utf16_name(
      libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_compare_name_with_utf16_string(
+     libewf_lef_file_entry_t *lef_file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_utf8_short_name_size(

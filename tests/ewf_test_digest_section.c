@@ -109,8 +109,6 @@ int ewf_test_digest_section_read_data(
 	          hash_sections,
 	          &error );
 
-EWF_TEST_FPRINT_ERROR( error );
-
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,

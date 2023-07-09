@@ -98,18 +98,6 @@ int libewf_serialized_string_get_utf16_string(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libewf_serialized_string_compare_with_utf8_string(
-     libewf_serialized_string_t *serialized_string,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcerror_error_t **error );
-
-int libewf_serialized_string_compare_with_utf16_string(
-     libewf_serialized_string_t *serialized_string,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libcerror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

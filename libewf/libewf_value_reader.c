@@ -101,19 +101,18 @@ int libewf_value_reader_initialize(
 
 		return( -1 );
 	}
-/* TODO remove after refactor */
-	( *value_reader )->utf8_string_size = 1 * 1024 * 1024;
+	( *value_reader )->value_data_size = 1 * 1024 * 1024;
 
-	( *value_reader )->utf8_string = (uint8_t *) memory_allocate(
-	                                              ( *value_reader )->utf8_string_size );
+	( *value_reader )->value_data = (uint8_t *) memory_allocate(
+	                                             ( *value_reader )->value_data_size );
 
-	if( ( *value_reader )->utf8_string == NULL )
+	if( ( *value_reader )->value_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create UTF-8 string.",
+		 "%s: unable to create value data.",
 		 function );
 
 		goto on_error;
@@ -156,9 +155,8 @@ int libewf_value_reader_free(
 	{
 		/* The buffer reference is freed elsewhere
 		 */
-/* TODO remove after refactor */
 		memory_free(
-		 ( *value_reader )->utf8_string );
+		 ( *value_reader )->value_data );
 
 		memory_free(
 		 *value_reader );
@@ -344,6 +342,127 @@ int libewf_value_reader_read_data(
 	}
 	*value_data      = safe_value_data;
 	*value_data_size = safe_value_data_size;
+
+	return( 1 );
+}
+
+/* Reads a base-16 encoded data
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_value_reader_read_byte_stream_base16(
+     libewf_value_reader_t *value_reader,
+     uint8_t **byte_stream,
+     size_t *byte_stream_size,
+     libcerror_error_t **error )
+{
+	uint8_t *safe_byte_stream    = NULL;
+	const uint8_t *value_data    = NULL;
+	static char *function        = "libewf_value_reader_read_byte_stream_base16";
+	size_t safe_byte_stream_size = 0;
+	size_t value_data_size       = 0;
+
+	if( value_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value reader.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( byte_stream_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte stream size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_value_reader_read_data(
+	     value_reader,
+	     &value_data,
+	     &value_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read value: %d data.",
+		 function,
+		 value_reader->value_index );
+
+		return( -1 );
+	}
+	if( value_data_size > 0 )
+	{
+		if( libuna_base16_stream_size_to_byte_stream(
+		     value_data,
+		     value_data_size,
+		     &safe_byte_stream_size,
+		     LIBUNA_BASE16_VARIANT_RFC4648 | LIBUNA_BASE16_VARIANT_ENCODING_UTF16_LITTLE_ENDIAN,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine byte stream size of base16 encoded data.",
+			 function );
+
+			return( -1 );
+		}
+		if( safe_byte_stream_size > value_reader->value_data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid byte stream size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		safe_byte_stream = value_reader->value_data;
+
+		if( libuna_base16_stream_copy_to_byte_stream(
+		     value_data,
+		     value_data_size,
+		     safe_byte_stream,
+		     safe_byte_stream_size,
+		     LIBUNA_BASE16_VARIANT_RFC4648 | LIBUNA_BASE16_VARIANT_ENCODING_UTF16_LITTLE_ENDIAN,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to copy base16 encoded data to byte stream.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	*byte_stream      = safe_byte_stream;
+	*byte_stream_size = safe_byte_stream_size;
 
 	return( 1 );
 }
@@ -832,7 +951,7 @@ int libewf_value_reader_read_utf8_string(
 
 			return( -1 );
 		}
-		if( safe_utf8_string_size > value_reader->utf8_string_size )
+		if( safe_utf8_string_size > value_reader->value_data_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -843,7 +962,7 @@ int libewf_value_reader_read_utf8_string(
 
 			return( -1 );
 		}
-		safe_utf8_string = value_reader->utf8_string;
+		safe_utf8_string = value_reader->value_data;
 
 		if( libuna_utf8_string_copy_from_utf16_stream(
 		     safe_utf8_string,

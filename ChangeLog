@@ -1,5 +1,4 @@
 TODO
-* change ltree to preserve UTF-16, limit file name functions to support chars beyond Unicode
 * change ltree to read directory entries on demand
 * calculate the MD5 while incremental ltree read, use line reader instead?
 * ewfinfo -H complete bodyfile support

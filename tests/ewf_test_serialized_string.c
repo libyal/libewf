@@ -1644,10 +1644,6 @@ int main(
 	 ewf_test_serialized_string_get_utf16_string,
 	 serialized_string );
 
-/* TODO add tests for libewf_serialized_string_compare_with_utf8_string */
-
-/* TODO add tests for libewf_serialized_string_compare_with_utf16_string */
-
 	/* Clean up
 	 */
 	result = libewf_serialized_string_free(

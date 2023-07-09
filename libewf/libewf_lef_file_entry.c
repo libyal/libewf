@@ -120,19 +120,6 @@ int libewf_lef_file_entry_initialize(
 		goto on_error;
 	}
 	if( libewf_serialized_string_initialize(
-	     &( ( *lef_file_entry )->name ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create name string.",
-		 function );
-
-		goto on_error;
-	}
-	if( libewf_serialized_string_initialize(
 	     &( ( *lef_file_entry )->short_name ),
 	     error ) != 1 )
 	{
@@ -212,12 +199,6 @@ on_error:
 			 &( ( *lef_file_entry )->short_name ),
 			 NULL );
 		}
-		if( ( *lef_file_entry )->name != NULL )
-		{
-			libewf_serialized_string_free(
-			 &( ( *lef_file_entry )->name ),
-			 NULL );
-		}
 		if( ( *lef_file_entry )->guid != NULL )
 		{
 			libewf_serialized_string_free(
@@ -271,21 +252,10 @@ int libewf_lef_file_entry_free(
 				result = -1;
 			}
 		}
-		if( ( *lef_file_entry )->name != NULL )
+		if( ( *lef_file_entry )->name_data != NULL )
 		{
-			if( libewf_serialized_string_free(
-			     &( ( *lef_file_entry )->name ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free name string.",
-				 function );
-
-				result = -1;
-			}
+			memory_free(
+			 ( *lef_file_entry )->name_data );
 		}
 		if( ( *lef_file_entry )->short_name != NULL )
 		{
@@ -432,7 +402,7 @@ int libewf_lef_file_entry_clone(
 		return( -1 );
 	}
 	( *destination_lef_file_entry )->guid                = NULL;
-	( *destination_lef_file_entry )->name                = NULL;
+	( *destination_lef_file_entry )->name_data           = NULL;
 	( *destination_lef_file_entry )->short_name          = NULL;
 	( *destination_lef_file_entry )->md5_hash            = NULL;
 	( *destination_lef_file_entry )->sha1_hash           = NULL;
@@ -452,16 +422,30 @@ int libewf_lef_file_entry_clone(
 
 		goto on_error;
 	}
-	if( libewf_serialized_string_clone(
-	     &( ( *destination_lef_file_entry )->name ),
-	     source_lef_file_entry->name,
-	     error ) != 1 )
+	( *destination_lef_file_entry )->name_data = (uint8_t *) memory_allocate(
+	                                                          source_lef_file_entry->name_data_size );
+
+	if( ( *destination_lef_file_entry )->name_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to clone destination name string.",
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination name data.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     ( *destination_lef_file_entry )->name_data,
+	     source_lef_file_entry->name_data,
+	     source_lef_file_entry->name_data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy source to destination name data.",
 		 function );
 
 		goto on_error;
@@ -731,10 +715,8 @@ int libewf_lef_file_entry_read_extended_attributes(
      libcerror_error_t **error )
 {
 	libewf_lef_extended_attribute_t *lef_extended_attribute = NULL;
-	uint8_t *byte_stream                                    = NULL;
 	static char *function                                   = "libewf_lef_file_entry_read_extended_attributes";
-	size_t byte_stream_offset                               = 0;
-	size_t byte_stream_size                                 = 0;
+	size_t data_offset                                      = 0;
 	ssize_t read_count                                      = 0;
 	int entry_index                                         = 0;
 
@@ -749,66 +731,28 @@ int libewf_lef_file_entry_read_extended_attributes(
 
 		return( -1 );
 	}
-	if( libuna_base16_stream_size_to_byte_stream(
-	     data,
-	     data_size,
-	     &byte_stream_size,
-	     LIBUNA_BASE16_VARIANT_RFC4648 | LIBUNA_BASE16_VARIANT_ENCODING_UTF16_LITTLE_ENDIAN,
-	     0,
-	     error ) != 1 )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine byte stream size of base16 encoded data.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( ( byte_stream_size == 0 )
-	 || ( byte_stream_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	if( ( data_size < 37 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid byte stream size value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
-		goto on_error;
-	}
-	byte_stream = (uint8_t *) memory_allocate(
-	                           sizeof( uint8_t ) * byte_stream_size );
-
-	if( byte_stream == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create byte stream.",
-		 function );
-
-		goto on_error;
-	}
-	if( libuna_base16_stream_copy_to_byte_stream(
-	     data,
-	     data_size,
-	     byte_stream,
-	     byte_stream_size,
-	     LIBUNA_BASE16_VARIANT_RFC4648 | LIBUNA_BASE16_VARIANT_ENCODING_UTF16_LITTLE_ENDIAN,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to copy base16 encoded data to byte stream.",
-		 function );
-
-		goto on_error;
+		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -817,16 +761,15 @@ int libewf_lef_file_entry_read_extended_attributes(
 	 	 "%s: extended attributes data:\n",
 		 function );
 		libcnotify_print_data(
-		 byte_stream,
-		 byte_stream_size,
+		 data,
+		 data_size,
 		 0 );
 	}
 #endif
-	if( ( byte_stream_size < 37 )
-	 || ( memory_compare(
-	       libewf_lef_extended_attributes_header,
-	       byte_stream,
-	       37 ) != 0 ) )
+	if( memory_compare(
+	     libewf_lef_extended_attributes_header,
+	     data,
+	     37 ) != 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -837,7 +780,7 @@ int libewf_lef_file_entry_read_extended_attributes(
 
 		goto on_error;
 	}
-	while( byte_stream_offset < byte_stream_size )
+	while( data_offset < data_size )
 	{
 		if( libewf_lef_extended_attribute_initialize(
 		     &lef_extended_attribute,
@@ -854,8 +797,8 @@ int libewf_lef_file_entry_read_extended_attributes(
 		}
 		read_count = libewf_lef_extended_attribute_read_data(
 		              lef_extended_attribute,
-		              &( byte_stream[ byte_stream_offset ] ),
-		              byte_stream_size - byte_stream_offset,
+		              &( data[ data_offset ] ),
+		              data_size - data_offset,
 		              error );
 
 		if( read_count == -1 )
@@ -869,7 +812,7 @@ int libewf_lef_file_entry_read_extended_attributes(
 
 			goto on_error;
 		}
-		byte_stream_offset += read_count;
+		data_offset += read_count;
 
 		if( lef_extended_attribute->is_branch == 0 )
 		{
@@ -907,9 +850,6 @@ int libewf_lef_file_entry_read_extended_attributes(
 			}
 		}
 	}
-	memory_free(
-	 byte_stream );
-
 	return( 1 );
 
 on_error:
@@ -918,11 +858,6 @@ on_error:
 		libewf_lef_extended_attribute_free(
 		 &lef_extended_attribute,
 		 NULL );
-	}
-	if( byte_stream != NULL )
-	{
-		memory_free(
-		 byte_stream );
 	}
 	return( -1 );
 }
@@ -1112,13 +1047,15 @@ int libewf_lef_file_entry_read_data(
      libcerror_error_t **error )
 {
 	libewf_value_reader_t *value_reader = NULL;
+	uint8_t *byte_stream                = NULL;
 	uint8_t *type_string                = NULL;
 	uint8_t *utf8_string                = NULL;
-	const uint8_t *value_string         = NULL;
+	const uint8_t *value_data           = NULL;
 	static char *function               = "libewf_lef_file_entry_read_data";
+	size_t byte_stream_size             = 0;
 	size_t type_string_size             = 0;
 	size_t utf8_string_size             = 0;
-	size_t value_string_size            = 0;
+	size_t value_data_size              = 0;
 	uint64_t value_64bit_unsigned       = 0;
 	int64_t value_64bit_signed          = 0;
 	int known_value                     = 0;
@@ -1133,6 +1070,17 @@ int libewf_lef_file_entry_read_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( lef_file_entry->name_data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry - name data value already set.",
 		 function );
 
 		return( -1 );
@@ -1792,10 +1740,10 @@ int libewf_lef_file_entry_read_data(
 			else if( ( type_string[ 0 ] == (uint8_t) 'e' )
 			      && ( type_string[ 1 ] == (uint8_t) 'a' ) )
 			{
-				if( libewf_value_reader_read_data(
+				if( libewf_value_reader_read_byte_stream_base16(
 				     value_reader,
-				     &value_string,
-				     &value_string_size,
+				     &byte_stream,
+				     &byte_stream_size,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1815,18 +1763,18 @@ int libewf_lef_file_entry_read_data(
 					 function,
 					 (char *) type_string );
 					libcnotify_print_data(
-					 value_string,
-					 value_string_size,
+					 byte_stream,
+					 byte_stream_size,
 					 0 );
 				}
 #endif
-				if( ( value_string != NULL )
-				 && ( value_string_size > 0 ) )
+				if( ( byte_stream != NULL )
+				 && ( byte_stream_size > 0 ) )
 				{
 					if( libewf_lef_file_entry_read_extended_attributes(
 					     lef_file_entry,
-					     value_string,
-					     value_string_size,
+					     byte_stream,
+					     byte_stream_size,
 					     error ) != 1 )
 					{
 						libcerror_error_set(
@@ -2174,18 +2122,17 @@ int libewf_lef_file_entry_read_data(
 		{
 			if( type_string[ 0 ] == (uint8_t) 'n' )
 			{
-				result = libewf_value_reader_read_serialized_string(
-				          value_reader,
-				          lef_file_entry->name,
-				          error );
-
-				if( result == -1 )
+				if( libewf_value_reader_read_data(
+				     value_reader,
+				     &value_data,
+				     &value_data_size,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read read name string value.",
+					 "%s: unable to read read name value data.",
 					 function );
 
 					goto on_error;
@@ -2198,19 +2145,53 @@ int libewf_lef_file_entry_read_data(
 					 function,
 					 (char *) type_string );
 					libcnotify_print_data(
-					 lef_file_entry->name->data,
-					 lef_file_entry->name->data_size,
+					 value_data,
+					 value_data_size,
 					 0 );
 				}
 #endif
+				if( ( value_data != NULL )
+				 && ( value_data_size > 0 ) )
+				{
+					lef_file_entry->name_data = (uint8_t *) memory_allocate(
+					                                         value_data_size );
+
+					if( lef_file_entry->name_data == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+						 "%s: unable to create name data.",
+						 function );
+
+						goto on_error;
+					}
+					lef_file_entry->name_data_size = value_data_size;
+
+					if( memory_copy(
+					     lef_file_entry->name_data,
+					     value_data,
+					     value_data_size ) == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+						 "%s: unable to copy name data.",
+						 function );
+
+						goto on_error;
+					}
+				}
 				known_value = 1;
 			}
 			else if( type_string[ 0 ] == (uint8_t) 'p' )
 			{
 				if( libewf_value_reader_read_data(
 				     value_reader,
-				     &value_string,
-				     &value_string_size,
+				     &value_data,
+				     &value_data_size,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -2230,21 +2211,21 @@ int libewf_lef_file_entry_read_data(
 					 function,
 					 (char *) type_string );
 					libcnotify_print_data(
-					 value_string,
-					 value_string_size,
+					 value_data,
+					 value_data_size,
 					 0 );
 				}
 #endif
 				/* p = 1 if directory
 				 * p = empty if file
 				 */
-				if( value_string == NULL )
+				if( value_data == NULL )
 				{
 					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
 				}
-				else if( ( value_string_size == 2 )
-				      && ( value_string[ 0 ] == (uint8_t) '1' )
-				      && ( value_string[ 1 ] == 0 ) )
+				else if( ( value_data_size == 2 )
+				      && ( value_data[ 0 ] == (uint8_t) '1' )
+				      && ( value_data[ 1 ] == 0 ) )
 				{
 					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
 				}
@@ -2255,8 +2236,8 @@ int libewf_lef_file_entry_read_data(
 		{
 			if( libewf_value_reader_read_data(
 			     value_reader,
-			     &value_string,
-			     &value_string_size,
+			     &value_data,
+			     &value_data_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2277,8 +2258,8 @@ int libewf_lef_file_entry_read_data(
 				 function,
 				 (char *) type_string );
 				libcnotify_print_data(
-				 value_string,
-				 value_string_size,
+				 value_data,
+				 value_data_size,
 				 0 );
 			}
 #endif
@@ -2319,6 +2300,15 @@ int libewf_lef_file_entry_read_data(
 	return( 1 );
 
 on_error:
+	if( lef_file_entry->name_data != NULL )
+	{
+		memory_free(
+		 lef_file_entry->name_data );
+
+		lef_file_entry->name_data = NULL;
+	}
+	lef_file_entry->name_data_size = 0;
+
 	if( value_reader != NULL )
 	{
 		libewf_value_reader_free(
@@ -2806,8 +2796,8 @@ int libewf_lef_file_entry_get_utf8_name_size(
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_lef_file_entry_get_utf8_name_size";
-	int result            = 0;
+	static char *function        = "libewf_lef_file_entry_get_utf8_name_size";
+	size_t safe_utf8_string_size = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -2820,22 +2810,39 @@ int libewf_lef_file_entry_get_utf8_name_size(
 
 		return( -1 );
 	}
-	result = libewf_serialized_string_get_utf8_string_size(
-	          lef_file_entry->name,
-	          utf8_string_size,
-	          error );
-
-	if( result == -1 )
+	if( utf8_string_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name UTF-8 string size.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string size.",
 		 function );
 
 		return( -1 );
 	}
+	if( ( lef_file_entry->name_data != NULL )
+	 && ( lef_file_entry->name_data_size > 0 ) )
+	{
+		if( libuna_utf8_string_size_from_utf16_stream(
+		     lef_file_entry->name_data,
+		     lef_file_entry->name_data_size,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		     &safe_utf8_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	*utf8_string_size = safe_utf8_string_size;
+
 	return( 1 );
 }
 
@@ -2851,6 +2858,48 @@ int libewf_lef_file_entry_get_utf8_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_utf8_name";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libuna_utf8_string_copy_from_utf16_stream(
+	     utf8_string,
+	     utf8_string_size,
+	     lef_file_entry->name_data,
+	     lef_file_entry->name_data_size,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Compares an UTF-8 string with a file entry name
+ * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
+ */
+int libewf_lef_file_entry_compare_name_with_utf8_string(
+     libewf_lef_file_entry_t *lef_file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_compare_name_with_utf8_string";
 	int result            = 0;
 
 	if( lef_file_entry == NULL )
@@ -2864,24 +2913,26 @@ int libewf_lef_file_entry_get_utf8_name(
 
 		return( -1 );
 	}
-	result = libewf_serialized_string_get_utf8_string(
-	          lef_file_entry->name,
-	          utf8_string,
-	          utf8_string_size,
-	          error );
+	result = libuna_utf8_string_compare_with_utf16_stream(
+		  utf8_string,
+		  utf8_string_length,
+	          lef_file_entry->name_data,
+	          lef_file_entry->name_data_size,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		  error );
 
 	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy name to UTF-8 string.",
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare name with UTF-8 string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -2894,8 +2945,8 @@ int libewf_lef_file_entry_get_utf16_name_size(
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_lef_file_entry_get_utf16_name_size";
-	int result            = 0;
+	static char *function         = "libewf_lef_file_entry_get_utf16_name_size";
+	size_t safe_utf16_string_size = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -2908,22 +2959,39 @@ int libewf_lef_file_entry_get_utf16_name_size(
 
 		return( -1 );
 	}
-	result = libewf_serialized_string_get_utf16_string_size(
-	          lef_file_entry->name,
-	          utf16_string_size,
-	          error );
-
-	if( result == -1 )
+	if( utf16_string_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name UTF-16 string size.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 string size.",
 		 function );
 
 		return( -1 );
 	}
+	if( ( lef_file_entry->name_data != NULL )
+	 && ( lef_file_entry->name_data_size > 0 ) )
+	{
+		if( libuna_utf16_string_size_from_utf16_stream(
+		     lef_file_entry->name_data,
+		     lef_file_entry->name_data_size,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		     &safe_utf16_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	*utf16_string_size = safe_utf16_string_size;
+
 	return( 1 );
 }
 
@@ -2939,6 +3007,48 @@ int libewf_lef_file_entry_get_utf16_name(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_lef_file_entry_get_utf16_name";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libuna_utf16_string_copy_from_utf16_stream(
+	     utf16_string,
+	     utf16_string_size,
+	     lef_file_entry->name_data,
+	     lef_file_entry->name_data_size,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Compares an UTF-16 string with a file entry name
+ * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
+ */
+int libewf_lef_file_entry_compare_name_with_utf16_string(
+     libewf_lef_file_entry_t *lef_file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_compare_name_with_utf16_string";
 	int result            = 0;
 
 	if( lef_file_entry == NULL )
@@ -2952,24 +3062,26 @@ int libewf_lef_file_entry_get_utf16_name(
 
 		return( -1 );
 	}
-	result = libewf_serialized_string_get_utf16_string(
-	          lef_file_entry->name,
-	          utf16_string,
-	          utf16_string_size,
-	          error );
+	result = libuna_utf16_string_compare_with_utf16_stream(
+		  utf16_string,
+		  utf16_string_length,
+	          lef_file_entry->name_data,
+	          lef_file_entry->name_data_size,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		  error );
 
 	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-		 "%s: unable to copy name to UTF-16 string.",
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare name with UTF-16 string.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the size of the UTF-8 encoded short name

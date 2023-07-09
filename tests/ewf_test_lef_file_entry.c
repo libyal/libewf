@@ -34,7 +34,9 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_definitions.h"
 #include "../libewf/libewf_lef_file_entry.h"
+#include "../libewf/libewf_value_reader.h"
 
 uint8_t ewf_test_lef_file_entry_types_data1[ 107 ] = {
 	0x6d, 0x69, 0x64, 0x09, 0x6c, 0x73, 0x09, 0x62, 0x65, 0x09, 0x69, 0x64, 0x09, 0x63, 0x72, 0x09,
@@ -1440,6 +1442,9 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 {
 	libcerror_error_t *error                = NULL;
 	libewf_lef_file_entry_t *lef_file_entry = NULL;
+	libewf_value_reader_t *value_reader     = NULL;
+	uint8_t *byte_stream                    = NULL;
+	size_t byte_stream_size                 = 0;
 	int result                              = 0;
 
 	/* Initialize test
@@ -1461,12 +1466,72 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 	 "error",
 	 error );
 
+	result = libewf_value_reader_initialize(
+	          &value_reader,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "value_reader",
+	 value_reader );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libewf_value_reader_set_buffer(
+	          value_reader,
+	          334,
+	          ewf_test_lef_file_entry_values_data1,
+	          9620,
+	          LIBEWF_VALUE_DATA_TYPE_UTF16,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	value_reader->buffer_offset = 334;
+
+	result = libewf_value_reader_read_byte_stream_base16(
+	          value_reader,
+	          &byte_stream,
+	          &byte_stream_size,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "byte_stream",
+	 byte_stream );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "byte_stream_size",
+	 byte_stream_size,
+	 (size_t) 2320 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test regular cases
 	 */
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 334 ] ),
-	          9280,
+	          byte_stream,
+	          byte_stream_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1482,8 +1547,8 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 	 */
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          NULL,
-	          &( ewf_test_lef_file_entry_values_data1[ 334 ] ),
-	          9280,
+	          byte_stream,
+	          byte_stream_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1501,7 +1566,7 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          lef_file_entry,
 	          NULL,
-	          9280,
+	          byte_stream_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1518,7 +1583,25 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 334 ] ),
+	          byte_stream,
+	          0,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libewf_lef_file_entry_read_extended_attributes(
+	          lef_file_entry,
+	          byte_stream,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -1542,8 +1625,8 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 334 ] ),
-	          9280,
+	          byte_stream,
+	          byte_stream_size,
 	          &error );
 
 	if( ewf_test_malloc_attempts_before_fail != -1 )
@@ -1570,8 +1653,8 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 
 	result = libewf_lef_file_entry_read_extended_attributes(
 	          lef_file_entry,
-	          &( ewf_test_lef_file_entry_values_data1[ 334 ] ),
-	          9280,
+	          byte_stream,
+	          byte_stream_size,
 	          &error );
 
 	if( ewf_test_malloc_attempts_before_fail != -1 )
@@ -1596,6 +1679,23 @@ int ewf_test_lef_file_entry_read_extended_attributes(
 
 	/* Clean up
 	 */
+	result = libewf_value_reader_free(
+	          &value_reader,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "value_reader",
+	 value_reader );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libewf_lef_file_entry_free(
 	          &lef_file_entry,
 	          &error );
@@ -1620,6 +1720,12 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( value_reader != NULL )
+	{
+		libewf_value_reader_free(
+		 &value_reader,
+		 NULL );
 	}
 	if( lef_file_entry != NULL )
 	{

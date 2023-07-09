@@ -61,13 +61,13 @@ struct libewf_value_reader
 	 */
 	int data_type;
 
-	/* The UTF-8 string
+	/* The value data
 	 */
-	uint8_t *utf8_string;
+	uint8_t *value_data;
 
-	/* The UTF-8 string size
+	/* The value data size
 	 */
-	size_t utf8_string_size;
+	size_t value_data_size;
 };
 
 int libewf_value_reader_initialize(
@@ -90,6 +90,12 @@ int libewf_value_reader_read_data(
      libewf_value_reader_t *value_reader,
      const uint8_t **value_data,
      size_t *value_data_size,
+     libcerror_error_t **error );
+
+int libewf_value_reader_read_byte_stream_base16(
+     libewf_value_reader_t *value_reader,
+     uint8_t **byte_stream,
+     size_t *byte_stream_size,
      libcerror_error_t **error );
 
 int libewf_value_reader_read_integer_signed(
