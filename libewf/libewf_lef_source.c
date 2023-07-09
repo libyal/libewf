@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_definitions.h"
 #include "libewf_lef_source.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
@@ -1057,6 +1058,7 @@ int libewf_lef_source_read_data(
 				     lef_source->location,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1077,6 +1079,7 @@ int libewf_lef_source_read_data(
 				     lef_source->manufacturer,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1097,6 +1100,7 @@ int libewf_lef_source_read_data(
 				     lef_source->primary_device_guid,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1119,6 +1123,7 @@ int libewf_lef_source_read_data(
 				     lef_source->md5_hash,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1160,6 +1165,7 @@ int libewf_lef_source_read_data(
 				     lef_source->domain,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1195,6 +1201,7 @@ int libewf_lef_source_read_data(
 				     lef_source->evidence_number,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1248,6 +1255,7 @@ int libewf_lef_source_read_data(
 				     lef_source->ip_address,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1267,6 +1275,7 @@ int libewf_lef_source_read_data(
 				     lef_source->device_guid,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1308,6 +1317,7 @@ int libewf_lef_source_read_data(
 				     lef_source->mac_address,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1327,6 +1337,7 @@ int libewf_lef_source_read_data(
 				     lef_source->model,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1368,6 +1379,7 @@ int libewf_lef_source_read_data(
 				     lef_source->serial_number,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1387,6 +1399,7 @@ int libewf_lef_source_read_data(
 				     lef_source->sha1_hash,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -1435,6 +1448,7 @@ int libewf_lef_source_read_data(
 				     lef_source->name,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(

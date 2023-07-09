@@ -986,7 +986,7 @@ int ewf_test_single_files_parse_category_number_of_entries(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1115,7 +1115,7 @@ int ewf_test_single_files_parse_category_types(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1264,7 +1264,7 @@ int ewf_test_single_files_parse_number_of_entries(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1393,7 +1393,7 @@ int ewf_test_single_files_parse_format(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1533,7 +1533,7 @@ int ewf_test_single_files_parse_rec_category(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1684,7 +1684,7 @@ int ewf_test_single_files_parse_record_values(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1811,7 +1811,7 @@ int ewf_test_single_files_parse_perm_category(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -1919,7 +1919,7 @@ int ewf_test_single_files_parse_permission_group(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -2071,7 +2071,7 @@ int ewf_test_single_files_parse_srce_category(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -2177,7 +2177,7 @@ int ewf_test_single_files_parse_sub_category(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -2284,7 +2284,7 @@ int ewf_test_single_files_parse_entry_category(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,
@@ -2412,7 +2412,7 @@ int ewf_test_single_files_parse_file_entry_number_of_sub_entries(
 	line_reader->buffer_offset = 0;
 	line_reader->line_index    = 0;
 
-	result = libewf_line_reader_read_line(
+	result = libewf_line_reader_read_utf8_string(
 	          line_reader,
 	          &line_string,
 	          &line_string_size,

@@ -250,22 +250,22 @@ int libewf_line_reader_free(
 	return( result );
 }
 
-/* Reads a line
+/* Reads a line as data
  * Returns 1 if successful or -1 on error
  */
-int libewf_line_reader_read_line(
+int libewf_line_reader_read_data(
      libewf_line_reader_t *line_reader,
-     uint8_t **line_string,
-     size_t *line_string_size,
+     const uint8_t **line_data,
+     size_t *line_data_size,
      libcerror_error_t **error )
 {
-	static char *function     = "libewf_line_reader_read_line";
-	size_t end_of_line_offset = 0;
-	size_t line_data_size     = 0;
-	size_t read_size          = 0;
-	size_t utf16_stream_size  = 0;
-	size_t utf8_string_size   = 0;
-	ssize_t read_count        = 0;
+	const uint8_t *safe_line_data = NULL;
+	static char *function         = "libewf_line_reader_read_data";
+	size_t end_of_line_offset     = 0;
+	size_t read_size              = 0;
+	size_t safe_line_data_size    = 0;
+	ssize_t read_count            = 0;
+	int safe_line_index           = 0;
 
 	if( line_reader == NULL )
 	{
@@ -289,24 +289,24 @@ int libewf_line_reader_read_line(
 
 		return( -1 );
 	}
-	if( line_string == NULL )
+	if( line_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line string.",
+		 "%s: invalid line data.",
 		 function );
 
 		return( -1 );
 	}
-	if( line_string_size == NULL )
+	if( line_data_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line string size.",
+		 "%s: invalid line data size.",
 		 function );
 
 		return( -1 );
@@ -405,6 +405,9 @@ int libewf_line_reader_read_line(
 			line_reader->buffer_offset = 0;
 		}
 	}
+	read_size       = 0;
+	safe_line_index = line_reader->line_index;
+
 	for( end_of_line_offset = line_reader->buffer_offset;
 	     end_of_line_offset < line_reader->buffer_size;
 	     end_of_line_offset += 2 )
@@ -412,7 +415,9 @@ int libewf_line_reader_read_line(
 		if( ( line_reader->buffer[ end_of_line_offset ] == (uint8_t) '\n' )
 		 && ( line_reader->buffer[ end_of_line_offset + 1 ] == 0 ) )
 		{
-			line_data_size = ( end_of_line_offset + 2 ) - line_reader->buffer_offset;
+			read_size = ( end_of_line_offset + 2 ) - line_reader->buffer_offset;
+
+			safe_line_index++;
 
 			break;
 		}
@@ -427,20 +432,118 @@ int libewf_line_reader_read_line(
 			end_of_line_offset -= 2;
 		}
 	}
-	utf16_stream_size = end_of_line_offset - line_reader->buffer_offset;
+	safe_line_data_size = end_of_line_offset - line_reader->buffer_offset;
 
+	if( read_size == 0 )
+	{
+		read_size = safe_line_data_size;
+	}
+	if( safe_line_data_size > 0 )
+	{
+		safe_line_data = &( line_reader->buffer[ line_reader->buffer_offset ] );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: line: %d data at offset: %" PRIi64 " (0x%08" PRIx64 "):\n",
+			 function,
+			 line_reader->line_index,
+			 line_reader->line_offset,
+			 line_reader->line_offset );
+			libcnotify_print_data(
+			 safe_line_data,
+			 safe_line_data_size,
+			 0 );
+		}
+#endif
+	}
+	line_reader->buffer_offset += read_size;
+	line_reader->line_offset   += read_size;
+	line_reader->line_index     = safe_line_index;
+
+	*line_data      = safe_line_data;
+	*line_data_size = safe_line_data_size;
+
+	return( 1 );
+}
+
+/* Reads a line as UTF-8 string
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_line_reader_read_utf8_string(
+     libewf_line_reader_t *line_reader,
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	const uint8_t *utf16_stream  = NULL;
+	static char *function        = "libewf_line_reader_read_utf8_string";
+	size_t safe_utf8_string_size = 0;
+	size_t utf16_stream_size     = 0;
+
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_line_reader_read_data(
+	     line_reader,
+	     &utf16_stream,
+	     &utf16_stream_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read line data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 line_reader->stream_offset,
+		 line_reader->stream_offset );
+
+		return( -1 );
+	}
 	if( utf16_stream_size == 0 )
 	{
 		line_reader->utf8_string[ 0 ] = 0;
-		utf8_string_size              = 1;
+		safe_utf8_string_size         = 1;
 	}
 	else
 	{
 		if( libuna_utf8_string_size_from_utf16_stream(
-		     &( line_reader->buffer[ line_reader->buffer_offset ] ),
+		     utf16_stream,
 		     utf16_stream_size,
 		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
-		     &utf8_string_size,
+		     &safe_utf8_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -452,7 +555,7 @@ int libewf_line_reader_read_line(
 
 			return( -1 );
 		}
-		if( utf8_string_size > line_reader->utf8_string_size )
+		if( safe_utf8_string_size > line_reader->utf8_string_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -463,25 +566,10 @@ int libewf_line_reader_read_line(
 
 			return( -1 );
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: line: %d string data at offset: %" PRIi64 " (0x%08" PRIx64 "):\n",
-			 function,
-			 line_reader->line_index,
-			 line_reader->line_offset,
-			 line_reader->line_offset );
-			libcnotify_print_data(
-			 &( line_reader->buffer[ line_reader->buffer_offset ] ),
-			 utf16_stream_size,
-			 0 );
-		}
-#endif
 		if( libuna_utf8_string_copy_from_utf16_stream(
 		     line_reader->utf8_string,
-		     utf8_string_size,
-		     &( line_reader->buffer[ line_reader->buffer_offset ] ),
+		     safe_utf8_string_size,
+		     utf16_stream,
 		     utf16_stream_size,
 		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
@@ -496,12 +584,8 @@ int libewf_line_reader_read_line(
 			return( -1 );
 		}
 	}
-	line_reader->buffer_offset += line_data_size;
-	line_reader->line_offset   += line_data_size;
-	line_reader->line_index    += 1;
-
-	*line_string      = line_reader->utf8_string;
-	*line_string_size = utf8_string_size;
+	*utf8_string      = line_reader->utf8_string;
+	*utf8_string_size = safe_utf8_string_size;
 
 	return( 1 );
 }

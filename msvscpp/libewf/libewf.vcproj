@@ -418,6 +418,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_value_reader.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_value_table.c"
 				>
 			</File>
@@ -789,6 +793,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_unused.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_value_reader.h"
 				>
 			</File>
 			<File

@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_definitions.h"
 #include "libewf_lef_subject.h"
 #include "libewf_libcerror.h"
 #include "libewf_libcnotify.h"
@@ -451,6 +452,7 @@ int libewf_lef_subject_read_data(
 				     lef_subject->name,
 				     value_string,
 				     value_string_size - 1,
+				     LIBEWF_VALUE_DATA_TYPE_UTF8,
 				     error ) != 1 )
 				{
 					libcerror_error_set(

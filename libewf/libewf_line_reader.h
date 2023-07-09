@@ -97,10 +97,16 @@ int libewf_line_reader_free(
      libewf_line_reader_t **line_reader,
      libcerror_error_t **error );
 
-int libewf_line_reader_read_line(
+int libewf_line_reader_read_data(
      libewf_line_reader_t *line_reader,
-     uint8_t **line_string,
-     size_t *line_string_size,
+     const uint8_t **line_data,
+     size_t *line_data_size,
+     libcerror_error_t **error );
+
+int libewf_line_reader_read_utf8_string(
+     libewf_line_reader_t *line_reader,
+     uint8_t **utf8_string,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 int libewf_line_reader_finalize(

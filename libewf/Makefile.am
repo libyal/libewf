@@ -117,6 +117,7 @@ libewf_la_SOURCES = \
 	libewf_table_section.c libewf_table_section.h \
 	libewf_types.h \
 	libewf_unused.h \
+	libewf_value_reader.c libewf_value_reader.h \
 	libewf_value_table.c libewf_value_table.h \
 	libewf_volume_section.c libewf_volume_section.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h

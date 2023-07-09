@@ -34,6 +34,7 @@
 #include "ewf_test_memory.h"
 #include "ewf_test_unused.h"
 
+#include "../libewf/libewf_definitions.h"
 #include "../libewf/libewf_serialized_string.h"
 
 uint8_t ewf_test_serialized_string_values_data1[ 33 ] = {
@@ -327,6 +328,7 @@ int ewf_test_serialized_string_clone(
 	          source_serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -603,6 +605,7 @@ int ewf_test_serialized_string_read_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -658,6 +661,7 @@ int ewf_test_serialized_string_read_data(
 	          serialized_string,
 	          NULL,
 	          0,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -716,6 +720,7 @@ int ewf_test_serialized_string_read_data(
 	          NULL,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -734,6 +739,7 @@ int ewf_test_serialized_string_read_data(
 	          serialized_string,
 	          NULL,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -752,6 +758,7 @@ int ewf_test_serialized_string_read_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          (size_t) SSIZE_MAX + 1,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -776,6 +783,7 @@ int ewf_test_serialized_string_read_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	if( ewf_test_malloc_attempts_before_fail != -1 )
@@ -869,6 +877,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -924,6 +933,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data2,
 	          32,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -979,6 +989,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data3,
 	          32,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1034,6 +1045,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          NULL,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1052,6 +1064,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          (size_t) SSIZE_MAX + 1,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1076,6 +1089,7 @@ int ewf_test_serialized_string_read_hexadecimal_data(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	if( ewf_test_malloc_attempts_before_fail != -1 )
@@ -1596,6 +1610,7 @@ int main(
 	          serialized_string,
 	          ewf_test_serialized_string_values_data1,
 	          33,
+	          LIBEWF_VALUE_DATA_TYPE_UTF8,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(

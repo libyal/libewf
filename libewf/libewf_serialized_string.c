@@ -20,9 +20,11 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_definitions.h"
 #include "libewf_libcerror.h"
 #include "libewf_libuna.h"
 #include "libewf_serialized_string.h"
@@ -265,6 +267,7 @@ int libewf_serialized_string_read_data(
      libewf_serialized_string_t *serialized_string,
      const uint8_t *data,
      size_t data_size,
+     int data_type,
      libcerror_error_t **error )
 {
 	static char *function = "libewf_serialized_string_read_data";
@@ -333,6 +336,7 @@ int libewf_serialized_string_read_data(
 		goto on_error;
 	}
 	serialized_string->data_size = data_size + 1;
+	serialized_string->data_type = data_type;
 
 	if( memory_copy(
 	     serialized_string->data,
@@ -372,11 +376,14 @@ int libewf_serialized_string_read_hexadecimal_data(
      libewf_serialized_string_t *serialized_string,
      const uint8_t *data,
      size_t data_size,
+     int data_type,
      libcerror_error_t **error )
 {
-	static char *function = "libewf_serialized_string_read_hexadecimal_data";
-	size_t data_offset    = 0;
-	int zero_values_only  = 0;
+	static char *function       = "libewf_serialized_string_read_hexadecimal_data";
+	size_t data_offset          = 0;
+	size_t internal_data_offset = 0;
+	uint16_t character_value    = 0;
+	int zero_values_only        = 0;
 
 	if( serialized_string == NULL )
 	{
@@ -422,66 +429,142 @@ int libewf_serialized_string_read_hexadecimal_data(
 
 		return( -1 );
 	}
-	if( ( data_size >= 1 )
-	 && ( data[ data_size - 1 ] == 0 ) )
+	if( data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
 	{
-		data_size -= 1;
-	}
-	serialized_string->data = (uint8_t *) memory_allocate(
-	                                       sizeof( uint8_t ) * ( data_size + 1 ) );
-
-	if( serialized_string->data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create data.",
-		 function );
-
-		goto on_error;
-	}
-	serialized_string->data_size = data_size + 1;
-
-	zero_values_only = 1;
-
-	for( data_offset = 0;
-	     data_offset < data_size;
-	     data_offset++ )
-	{
-		if( data[ data_offset ] != (uint8_t) '0' )
+		if( ( data_size >= 1 )
+		 && ( data[ data_size - 1 ] == 0 ) )
 		{
-			zero_values_only = 0;
+			data_size -= 1;
 		}
-		if( ( data[ data_offset ] >= (uint8_t) '0' )
-		 && ( data[ data_offset ] <= (uint8_t) '9' ) )
-		{
-			serialized_string->data[ data_offset ] = data[ data_offset ];
-		}
-		else if( ( data[ data_offset ] >= (uint8_t) 'A' )
-		      && ( data[ data_offset ] <= (uint8_t) 'F' ) )
-		{
-			serialized_string->data[ data_offset ] = (uint8_t) ( 'a' - 'A' ) + data[ data_offset ];
-		}
-		else if( ( data[ data_offset ] >= (uint8_t) 'a' )
-		      && ( data[ data_offset ] <= (uint8_t) 'f' ) )
-		{
-			serialized_string->data[ data_offset ] = data[ data_offset ];
-		}
-		else
+		serialized_string->data_size = data_size + 1;
+
+		serialized_string->data = (uint8_t *) memory_allocate(
+		                                       sizeof( uint8_t ) * serialized_string->data_size );
+
+		if( serialized_string->data == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character in hexadecimal string.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
 			 function );
 
 			goto on_error;
 		}
-	}
-	serialized_string->data[ data_offset ] = 0;
+		serialized_string->data_type = LIBEWF_VALUE_DATA_TYPE_UTF8;
 
+		zero_values_only = 1;
+
+		for( data_offset = 0;
+		     data_offset < data_size;
+		     data_offset++ )
+		{
+			if( data[ data_offset ] != (uint8_t) '0' )
+			{
+				zero_values_only = 0;
+			}
+			if( ( data[ data_offset ] >= (uint8_t) '0' )
+			 && ( data[ data_offset ] <= (uint8_t) '9' ) )
+			{
+				serialized_string->data[ data_offset ] = data[ data_offset ];
+			}
+			else if( ( data[ data_offset ] >= (uint8_t) 'A' )
+			      && ( data[ data_offset ] <= (uint8_t) 'F' ) )
+			{
+				serialized_string->data[ data_offset ] = (uint8_t) ( 'a' - 'A' ) + data[ data_offset ];
+			}
+			else if( ( data[ data_offset ] >= (uint8_t) 'a' )
+			      && ( data[ data_offset ] <= (uint8_t) 'f' ) )
+			{
+				serialized_string->data[ data_offset ] = data[ data_offset ];
+			}
+			else
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported character in hexadecimal string at offset: %" PRIzd ".",
+				 function,
+				 data_offset );
+
+				goto on_error;
+			}
+		}
+		serialized_string->data[ data_offset ] = 0;
+	}
+	else
+	{
+		if( ( data_size >= 2 )
+		 && ( data[ data_size - 2 ] == 0 )
+		 && ( data[ data_size - 1 ] == 0 ) )
+		{
+			data_size -= 2;
+		}
+		serialized_string->data_size = ( data_size / 2 ) + 1;
+
+		serialized_string->data = (uint8_t *) memory_allocate(
+		                                       sizeof( uint8_t ) * serialized_string->data_size );
+
+		if( serialized_string->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
+			 function );
+
+			goto on_error;
+		}
+		serialized_string->data_type = LIBEWF_VALUE_DATA_TYPE_UTF8;
+
+		zero_values_only = 1;
+
+		for( data_offset = 0;
+		     data_offset < data_size;
+		     data_offset += 2 )
+		{
+			byte_stream_copy_to_uint16_little_endian(
+			 &( data[ data_offset ] ),
+			 character_value );
+
+			if( character_value != (uint8_t) '0' )
+			{
+				zero_values_only = 0;
+			}
+			if( ( character_value >= (uint8_t) '0' )
+			 && ( character_value <= (uint8_t) '9' ) )
+			{
+				serialized_string->data[ internal_data_offset ] = (uint8_t) character_value;
+			}
+			else if( ( character_value >= (uint8_t) 'A' )
+			      && ( character_value <= (uint8_t) 'F' ) )
+			{
+				serialized_string->data[ internal_data_offset ] = (uint8_t) ( 'a' - 'A' ) + (uint8_t) character_value;
+			}
+			else if( ( character_value >= (uint8_t) 'a' )
+			      && ( character_value <= (uint8_t) 'f' ) )
+			{
+				serialized_string->data[ internal_data_offset ] = (uint8_t) character_value;
+			}
+			else
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported character in hexadecimal string at offset: %" PRIzd ".",
+				 function,
+				 data_offset );
+
+				goto on_error;
+			}
+			internal_data_offset++;
+		}
+		serialized_string->data[ internal_data_offset ] = 0;
+	}
 	if( zero_values_only != 0 )
 	{
 		memory_free(
@@ -515,6 +598,7 @@ int libewf_serialized_string_get_utf8_string_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_serialized_string_get_utf8_string_size";
+	int result            = 0;
 
 	if( serialized_string == NULL )
 	{
@@ -545,8 +629,34 @@ int libewf_serialized_string_get_utf8_string_size(
 
 		return( 0 );
 	}
-	*utf8_string_size = serialized_string->data_size;
+	if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
+	{
+		result = libuna_utf8_string_size_from_utf8_stream(
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          utf8_string_size,
+		          error );
+	}
+	else
+	{
+		result = libuna_utf8_string_size_from_utf16_stream(
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		          utf8_string_size,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string size.",
+		 function );
 
+		return( -1 );
+	}
 	return( 1 );
 }
 
@@ -561,6 +671,7 @@ int libewf_serialized_string_get_utf8_string(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_serialized_string_get_utf8_string";
+	int result            = 0;
 
 	if( serialized_string == NULL )
 	{
@@ -613,27 +724,32 @@ int libewf_serialized_string_get_utf8_string(
 
 		return( 0 );
 	}
-	if( utf8_string_size < serialized_string->data_size )
+	if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid UTF-8 string size value too small.",
-		 function );
-
-		return( -1 );
+		result = libuna_utf8_string_copy_from_utf8_stream(
+		          utf8_string,
+		          utf8_string_size,
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          error );
 	}
-	if( memory_copy(
-	     utf8_string,
-	     serialized_string->data,
-	     serialized_string->data_size ) == NULL )
+	else
+	{
+		result = libuna_utf8_string_copy_from_utf16_stream(
+		          utf8_string,
+		          utf8_string_size,
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set UTF-8 string.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy string to UTF-8 string.",
 		 function );
 
 		return( -1 );
@@ -651,6 +767,7 @@ int libewf_serialized_string_get_utf16_string_size(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_serialized_string_get_utf16_string_size";
+	int result            = 0;
 
 	if( serialized_string == NULL )
 	{
@@ -681,11 +798,24 @@ int libewf_serialized_string_get_utf16_string_size(
 
 		return( 0 );
 	}
-	if( libuna_utf16_string_size_from_utf8(
-	     serialized_string->data,
-	     serialized_string->data_size,
-	     utf16_string_size,
-	     error ) != 1 )
+	if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
+	{
+		result = libuna_utf16_string_size_from_utf8_stream(
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          utf16_string_size,
+		          error );
+	}
+	else
+	{
+		result = libuna_utf16_string_size_from_utf16_stream(
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		          utf16_string_size,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -710,6 +840,7 @@ int libewf_serialized_string_get_utf16_string(
      libcerror_error_t **error )
 {
 	static char *function = "libewf_serialized_string_get_utf16_string";
+	int result            = 0;
 
 	if( serialized_string == NULL )
 	{
@@ -762,12 +893,26 @@ int libewf_serialized_string_get_utf16_string(
 
 		return( 0 );
 	}
-	if( libuna_utf16_string_copy_from_utf8(
-	     utf16_string,
-	     utf16_string_size,
-	     serialized_string->data,
-	     serialized_string->data_size,
-	     error ) != 1 )
+	if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
+	{
+		result = libuna_utf16_string_copy_from_utf8_stream(
+		          utf16_string,
+		          utf16_string_size,
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          error );
+	}
+	else
+	{
+		result = libuna_utf16_string_copy_from_utf16_stream(
+		          utf16_string,
+		          utf16_string_size,
+		          serialized_string->data,
+		          serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -809,13 +954,23 @@ int libewf_serialized_string_compare_with_utf8_string(
 	{
 		result = LIBUNA_COMPARE_GREATER;
 	}
-	else
+	else if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
 	{
 		result = libuna_utf8_string_compare_with_utf8_stream(
 			  utf8_string,
 			  utf8_string_length,
 			  serialized_string->data,
 			  serialized_string->data_size,
+			  error );
+	}
+	else
+	{
+		result = libuna_utf8_string_compare_with_utf16_stream(
+			  utf8_string,
+			  utf8_string_length,
+			  serialized_string->data,
+			  serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  error );
 	}
 	if( result == -1 )
@@ -860,13 +1015,23 @@ int libewf_serialized_string_compare_with_utf16_string(
 	{
 		result = LIBUNA_COMPARE_GREATER;
 	}
-	else
+	else if( serialized_string->data_type == LIBEWF_VALUE_DATA_TYPE_UTF8 )
 	{
 		result = libuna_utf16_string_compare_with_utf8_stream(
 			  utf16_string,
 			  utf16_string_length,
 			  serialized_string->data,
 			  serialized_string->data_size,
+			  error );
+	}
+	else
+	{
+		result = libuna_utf16_string_compare_with_utf16_stream(
+			  utf16_string,
+			  utf16_string_length,
+			  serialized_string->data,
+			  serialized_string->data_size,
+		          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  error );
 	}
 	if( result == -1 )

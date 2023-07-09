@@ -396,7 +396,7 @@ int libewf_single_files_parse_category_number_of_entries(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -589,7 +589,7 @@ int libewf_single_files_parse_category_types(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -676,7 +676,7 @@ int libewf_single_files_parse_number_of_entries(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -970,7 +970,7 @@ int libewf_single_files_parse_rec_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1017,7 +1017,7 @@ int libewf_single_files_parse_rec_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1105,7 +1105,7 @@ int libewf_single_files_parse_record_values(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1151,7 +1151,7 @@ int libewf_single_files_parse_record_values(
 
 		goto on_error;
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1421,7 +1421,7 @@ int libewf_single_files_parse_perm_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1513,7 +1513,7 @@ int libewf_single_files_parse_perm_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1636,7 +1636,7 @@ int libewf_single_files_parse_perm_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1760,7 +1760,7 @@ int libewf_single_files_parse_permission_group(
 	}
 	/* Parse the permission group entry
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -1862,7 +1862,7 @@ int libewf_single_files_parse_permission_group(
 		}
 		/* Parse the permission entry
 		 */
-		if( libewf_line_reader_read_line(
+		if( libewf_line_reader_read_utf8_string(
 		     line_reader,
 		     &line_string,
 		     &line_string_size,
@@ -1980,7 +1980,7 @@ int libewf_single_files_parse_srce_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2072,7 +2072,7 @@ int libewf_single_files_parse_srce_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2169,7 +2169,7 @@ int libewf_single_files_parse_srce_category(
 		}
 		/* Parse the source entry
 		 */
-		if( libewf_line_reader_read_line(
+		if( libewf_line_reader_read_utf8_string(
 		     line_reader,
 		     &line_string,
 		     &line_string_size,
@@ -2262,7 +2262,7 @@ int libewf_single_files_parse_srce_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2362,7 +2362,7 @@ int libewf_single_files_parse_sub_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2453,7 +2453,7 @@ int libewf_single_files_parse_sub_category(
 	}
 	/* Parse the category root entry
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2546,7 +2546,7 @@ int libewf_single_files_parse_sub_category(
 		}
 		/* Parse the subject entry
 		 */
-		if( libewf_line_reader_read_line(
+		if( libewf_line_reader_read_utf8_string(
 		     line_reader,
 		     &line_string,
 		     &line_string_size,
@@ -2611,7 +2611,7 @@ int libewf_single_files_parse_sub_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2719,7 +2719,7 @@ int libewf_single_files_parse_entry_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2828,7 +2828,7 @@ int libewf_single_files_parse_entry_category(
 	}
 	/* The category should be followed by an empty line
 	 */
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -2902,9 +2902,9 @@ int libewf_single_files_parse_file_entry(
 	libcdata_tree_node_t *file_entry_node   = NULL;
 	libewf_lef_file_entry_t *lef_file_entry = NULL;
 	libfvalue_split_utf8_string_t *values   = NULL;
-	uint8_t *line_string                    = NULL;
+	const uint8_t *line_data                = NULL;
 	static char *function                   = "libewf_single_files_parse_file_entry";
-	size_t line_string_size                 = 0;
+	size_t line_data_size                   = 0;
 	int number_of_sub_entries               = 0;
 	int sub_entry_index                     = 0;
 
@@ -2956,17 +2956,17 @@ int libewf_single_files_parse_file_entry(
 
 		goto on_error;
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_data(
 	     line_reader,
-	     &line_string,
-	     &line_string_size,
+	     &line_data,
+	     &line_data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
+		 "%s: unable to read line: %d data.",
 		 function,
 		 line_reader->line_index );
 
@@ -2988,8 +2988,8 @@ int libewf_single_files_parse_file_entry(
 	if( libewf_lef_file_entry_read_data(
 	     lef_file_entry,
 	     types,
-	     line_string,
-	     line_string_size,
+	     line_data,
+	     line_data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3145,7 +3145,7 @@ int libewf_single_files_parse_file_entry_number_of_sub_entries(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,
@@ -3387,7 +3387,7 @@ int libewf_single_files_read_data_stream(
 
 		goto on_error;
 	}
-	if( libewf_line_reader_read_line(
+	if( libewf_line_reader_read_utf8_string(
 	     line_reader,
 	     &line_string,
 	     &line_string_size,

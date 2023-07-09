@@ -213,6 +213,7 @@ stamp-h[1-9]
 /tests/ewf_test_tools_system_string
 /tests/ewf_test_tools_verification_handle
 /tests/ewf_test_truncate
+/tests/ewf_test_value_reader
 /tests/ewf_test_value_table
 /tests/ewf_test_volume_section
 /tests/ewf_test_write

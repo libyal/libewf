@@ -543,6 +543,8 @@ int main(
 	 "libewf_line_reader_free",
 	 ewf_test_line_reader_free );
 
+	/* TODO add tests for libewf_line_reader_read_line_data */
+
 	/* TODO add tests for libewf_line_reader_read_line
 
 	EWF_TEST_RUN(

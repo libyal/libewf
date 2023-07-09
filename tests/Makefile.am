@@ -161,6 +161,7 @@ check_PROGRAMS = \
 	ewf_test_tools_system_string \
 	ewf_test_tools_verification_handle \
 	ewf_test_truncate \
+	ewf_test_value_reader \
 	ewf_test_value_table \
 	ewf_test_volume_section \
 	ewf_test_write \
@@ -1448,6 +1449,18 @@ ewf_test_truncate_LDADD = \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@
+
+ewf_test_value_reader_SOURCES = \
+	ewf_test_libcerror.h \
+	ewf_test_libewf.h \
+	ewf_test_macros.h \
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_unused.h \
+	ewf_test_value_reader.c
+
+ewf_test_value_reader_LDADD = \
+	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
 ewf_test_value_table_SOURCES = \

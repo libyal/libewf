@@ -42,6 +42,11 @@ struct libewf_serialized_string
 	/* The data size
 	 */
 	size_t data_size;
+
+/* TODO remove after refactor */
+	/* The data type
+	 */
+	int data_type;
 };
 
 int libewf_serialized_string_initialize(
@@ -61,12 +66,14 @@ int libewf_serialized_string_read_data(
      libewf_serialized_string_t *serialized_string,
      const uint8_t *data,
      size_t data_size,
+     int data_type,
      libcerror_error_t **error );
 
 int libewf_serialized_string_read_hexadecimal_data(
      libewf_serialized_string_t *serialized_string,
      const uint8_t *data,
      size_t data_size,
+     int data_type,
      libcerror_error_t **error );
 
 int libewf_serialized_string_get_utf8_string_size(
