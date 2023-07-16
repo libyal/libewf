@@ -79,7 +79,7 @@ struct verification_handle
 
 	/* Value to indicate a stored MD5 digest hash is available
 	 */
-	int stored_md5_hash_available;
+	uint8_t stored_md5_hash_available;
 
 	/* The stored MD5 digest hash string
 	 */
@@ -103,7 +103,7 @@ struct verification_handle
 
 	/* Value to indicate a stored SHA1 digest hash is available
 	 */
-	int stored_sha1_hash_available;
+	uint8_t stored_sha1_hash_available;
 
 	/* The stored SHA1 digest hash string
 	 */
@@ -127,7 +127,7 @@ struct verification_handle
 
 	/* Value to indicate a stored SHA256 digest hash is available
 	 */
-	int stored_sha256_hash_available;
+	uint8_t stored_sha256_hash_available;
 
 	/* The stored SHA256 digest hash string
 	 */

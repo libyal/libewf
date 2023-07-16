@@ -1380,7 +1380,6 @@ PyObject *pyewf_file_entry_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyewf_file_entry_get_name";
 	size_t name_size         = 0;
@@ -1433,7 +1432,7 @@ PyObject *pyewf_file_entry_get_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -1469,7 +1468,7 @@ PyObject *pyewf_file_entry_get_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );
@@ -1494,7 +1493,6 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *hash_value      = NULL;
 	static char *function    = "pyewf_file_entry_get_hash_value_md5";
 	size_t hash_value_size   = 33;
@@ -1517,7 +1515,7 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 	if( hash_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create hash value.",
 		 function );
 
@@ -1553,7 +1551,7 @@ PyObject *pyewf_file_entry_get_hash_value_md5(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) hash_value,
 			 (Py_ssize_t) hash_value_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 hash_value );
@@ -1578,7 +1576,6 @@ PyObject *pyewf_file_entry_get_hash_value_sha1(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *hash_value      = NULL;
 	static char *function    = "pyewf_file_entry_get_hash_value_sha1";
 	size_t hash_value_size   = 41;
@@ -1601,7 +1598,7 @@ PyObject *pyewf_file_entry_get_hash_value_sha1(
 	if( hash_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create hash value.",
 		 function );
 
@@ -1637,7 +1634,7 @@ PyObject *pyewf_file_entry_get_hash_value_sha1(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) hash_value,
 			 (Py_ssize_t) hash_value_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 hash_value );

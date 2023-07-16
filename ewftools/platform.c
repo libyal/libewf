@@ -56,7 +56,7 @@ int platform_get_operating_system(
 	static char *function        = "platform_get_operating_system";
 	size_t operating_system_size = 0;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) && ( ( WINVER < 0x0a00 ) || !defined( _MSC_VER ))
 	DWORD windows_version        = 0;
 	DWORD windows_major_version  = 0;
 	DWORD windows_minor_version  = 0;
@@ -117,7 +117,7 @@ int platform_get_operating_system(
 	{
 		operating_system = "Windows 7 SP1";
 	}
-	else if( Windows8Point1OrGreater() == FALSE )
+	else if( IsWindows8Point1OrGreater() == FALSE )
 	{
 		operating_system = "Windows 8.0";
 	}

@@ -295,7 +295,7 @@ int info_handle_set_bodyfile(
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	info_handle->bodyfile_stream = file_stream_open_wide(
 	                                filename,
-	                                "wb" );
+	                                L"wb" );
 #else
 	info_handle->bodyfile_stream = file_stream_open(
 	                                filename,
@@ -4850,7 +4850,7 @@ int info_handle_attribute_value_fprint(
 		{
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t\t%s",
+			 "\t\t%" PRIs_SYSTEM "",
 			 name_string );
 
 			do

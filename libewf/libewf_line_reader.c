@@ -627,8 +627,8 @@ int libewf_line_reader_finalize(
 		              (intptr_t *) line_reader->file_io_pool,
 		              line_reader->buffer,
 		              read_size,
-		              0,
 		              line_reader->stream_offset,
+		              0,
 		              error );
 
 		if( read_count != (ssize_t) read_size )

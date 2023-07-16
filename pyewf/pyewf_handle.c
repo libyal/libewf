@@ -635,20 +635,20 @@ PyObject *pyewf_handle_open(
            PyObject *keywords )
 {
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	PyObject *filename_string_object = NULL;
+	const wchar_t *filename_wide     = NULL;
 	wchar_t *filename                = NULL;
 	wchar_t **filenames              = NULL;
-	const char *errors               = NULL;
 	char *narrow_string              = NULL;
 	size_t narrow_string_size        = 0;
 	int is_unicode_string            = 0;
 #else
+	PyObject *utf8_string_object     = NULL;
 	char *filename                   = NULL;
 	char **filenames                 = NULL;
 #endif
-	PyObject *filename_string_object = NULL;
 	PyObject *sequence_object        = NULL;
 	PyObject *string_object          = NULL;
-	PyObject *utf8_string_object     = NULL;
 	libcerror_error_t *error         = NULL;
 	static char *function            = "pyewf_handle_open";
 	static char *keyword_list[]      = { "filenames", "mode", NULL };
@@ -863,8 +863,16 @@ PyObject *pyewf_handle_open(
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		if( is_unicode_string != 0 )
 		{
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+			filename_wide = (wchar_t *) PyUnicode_AsWideCharString(
+			                             string_object,
+			                             NULL );
+
+			filename = filename_wide;
+#else
 			filename = (wchar_t *) PyUnicode_AsUnicode(
 			                        string_object );
+#endif
 		}
 		else
 		{
@@ -885,7 +893,7 @@ PyObject *pyewf_handle_open(
 						  narrow_string,
 						  narrow_string_size,
 						  PyUnicode_GetDefaultEncoding(),
-						  errors );
+						  NULL );
 
 			if( filename_string_object == NULL )
 			{
@@ -968,13 +976,13 @@ PyObject *pyewf_handle_open(
 		}
 		( filenames[ filename_index ] )[ filename_length ] = 0;
 
-		if( utf8_string_object != NULL )
-		{
-			Py_DecRef(
-			 utf8_string_object );
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		PyMem_Free(
+		 filename_wide );
 
-			utf8_string_object = NULL;
-		}
+		filename_wide = NULL;
+#endif
 		if( filename_string_object != NULL )
 		{
 			Py_DecRef(
@@ -982,6 +990,15 @@ PyObject *pyewf_handle_open(
 
 			filename_string_object = NULL;
 		}
+#else
+		if( utf8_string_object != NULL )
+		{
+			Py_DecRef(
+			 utf8_string_object );
+
+			utf8_string_object = NULL;
+		}
+#endif
 		/* The string object was reference by PySequence_GetItem
 		 */
 		Py_DecRef(
@@ -1037,11 +1054,18 @@ PyObject *pyewf_handle_open(
 	return( Py_None );
 
 on_error:
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( filename_string_object != NULL )
 	{
 		Py_DecRef(
 		 filename_string_object );
 	}
+	if( filename_wide != NULL )
+	{
+		PyMem_Free(
+		 filename_wide );
+	}
+#endif
 	if( string_object != NULL )
 	{
 		Py_DecRef(
@@ -2719,7 +2743,6 @@ PyObject *pyewf_handle_get_header_value(
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_value";
 	static char *keyword_list[]           = { "identifier", NULL };
-	const char *errors                    = NULL;
 	char *header_value_identifier         = NULL;
 	char *header_value                    = NULL;
 	size_t header_value_identifier_length = 0;
@@ -2838,7 +2861,7 @@ PyObject *pyewf_handle_get_header_value(
 	string_object = PyUnicode_DecodeUTF8(
 	                 header_value,
 	                 (Py_ssize_t) header_value_size - 1,
-	                 errors );
+	                 NULL );
 
 	if( string_object == NULL )
 	{
@@ -2875,7 +2898,6 @@ PyObject *pyewf_handle_get_header_values(
 	PyObject *dictionary_object           = NULL;
 	PyObject *string_object               = NULL;
 	static char *function                 = "pyewf_handle_get_header_values";
-	const char *errors                    = NULL;
 	char *header_value                    = NULL;
 	char *header_value_identifier         = NULL;
 	size_t header_value_identifier_length = 0;
@@ -3063,7 +3085,7 @@ PyObject *pyewf_handle_get_header_values(
 			string_object = PyUnicode_DecodeUTF8(
 			                 header_value,
 			                 header_value_size - 1,
-			                 errors );
+			                 NULL );
 
 			if( string_object == NULL )
 			{
@@ -3138,7 +3160,6 @@ PyObject *pyewf_handle_get_hash_value(
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_value";
 	static char *keyword_list[]         = { "identifier", NULL };
-	const char *errors                  = NULL;
 	char *hash_value_identifier         = NULL;
 	char *hash_value                    = NULL;
 	size_t hash_value_identifier_length = 0;
@@ -3257,7 +3278,7 @@ PyObject *pyewf_handle_get_hash_value(
 	string_object = PyUnicode_DecodeUTF8(
 	                 hash_value,
 	                 (Py_ssize_t) hash_value_size - 1,
-	                 errors );
+	                 NULL );
 
 	if( string_object == NULL )
 	{
@@ -3294,7 +3315,6 @@ PyObject *pyewf_handle_get_hash_values(
 	PyObject *dictionary_object         = NULL;
 	PyObject *string_object             = NULL;
 	static char *function               = "pyewf_handle_get_hash_values";
-	const char *errors                  = NULL;
 	char *hash_value                    = NULL;
 	char *hash_value_identifier         = NULL;
 	size_t hash_value_identifier_length = 0;
@@ -3482,7 +3502,7 @@ PyObject *pyewf_handle_get_hash_values(
 			string_object = PyUnicode_DecodeUTF8(
 			                 hash_value,
 			                 hash_value_size - 1,
-			                 errors );
+			                 NULL );
 
 			if( string_object == NULL )
 			{

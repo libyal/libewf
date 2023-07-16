@@ -3370,7 +3370,7 @@ int verification_handle_get_integrity_hash_from_input(
 
 		return( -1 );
 	}
-	verification_handle->stored_md5_hash_available = result;
+	verification_handle->stored_md5_hash_available = (uint8_t) result;
 
 	if( digest_hash_copy_to_string(
 	     md5_hash,
@@ -3407,7 +3407,7 @@ int verification_handle_get_integrity_hash_from_input(
 
 		return( -1 );
 	}
-	verification_handle->stored_md5_hash_available = result;
+	verification_handle->stored_md5_hash_available = (uint8_t) result;
 
 #endif /* defined( USE_LIBEWF_GET_MD5_HASH ) */
 
@@ -3430,7 +3430,7 @@ int verification_handle_get_integrity_hash_from_input(
 
 		return( -1 );
 	}
-	verification_handle->stored_sha1_hash_available = result;
+	verification_handle->stored_sha1_hash_available = (uint8_t) result;
 
 	result = libewf_handle_get_utf8_hash_value(
 	          verification_handle->input_handle,
@@ -3451,7 +3451,7 @@ int verification_handle_get_integrity_hash_from_input(
 
 		return( -1 );
 	}
-	verification_handle->stored_sha256_hash_available = result;
+	verification_handle->stored_sha256_hash_available = (uint8_t) result;
 
 	return( 1 );
 }
@@ -3506,10 +3506,8 @@ int verification_handle_get_integrity_hash_from_file_entry(
 
 		return( -1 );
 	}
-	verification_handle->stored_md5_hash_available = result;
-
-	verification_handle->stored_sha1_hash_available = 0;
-
+	verification_handle->stored_md5_hash_available    = (uint8_t) result;
+	verification_handle->stored_sha1_hash_available   = 0;
 	verification_handle->stored_sha256_hash_available = 0;
 
 	return( 1 );
