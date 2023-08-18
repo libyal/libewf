@@ -302,7 +302,7 @@ int mount_path_string_copy_from_file_entry_path(
 			}
 			path_index += print_count;
 		}
-		/* Replace by \U########:
+		/* Replace by \U######## (or ^U######## on Windows):
 		 *   Unicode surrogate characters ([U+d800-U+dfff])
 		 *   Undefined Unicode characters ([
 		 *       U+fdd0-U+fddf, U+fffe-U+ffff, U+1fffe-U+1ffff, U+2fffe-U+2ffff,

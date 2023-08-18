@@ -147,7 +147,7 @@ int main( int argc, char * const argv[] )
 	system_character_t *option_extended_options = NULL;
 	system_character_t *option_format           = NULL;
 	const system_character_t *path_prefix       = NULL;
-	char *program                               = _SYSTEM_STRING( "ewfmount" );
+	system_character_t *program                 = _SYSTEM_STRING( "ewfmount" );
 	system_integer_t option                     = 0;
 	size_t path_prefix_size                     = 0;
 	int number_of_sources                       = 0;
@@ -562,10 +562,14 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	ewfmount_dokan_options.Version     = DOKAN_VERSION;
-	ewfmount_dokan_options.ThreadCount = 0;
-	ewfmount_dokan_options.MountPoint  = mount_point;
+	ewfmount_dokan_options.Version    = DOKAN_VERSION;
+	ewfmount_dokan_options.MountPoint = mount_point;
 
+#if DOKAN_MINIMUM_COMPATIBLE_VERSION >= 200
+	ewfmount_dokan_options.SingleThread = TRUE;
+#else
+	ewfmount_dokan_options.ThreadCount  = 0;
+#endif
 	if( verbose != 0 )
 	{
 		ewfmount_dokan_options.Options |= DOKAN_OPTION_STDERR;
@@ -635,10 +639,16 @@ int main( int argc, char * const argv[] )
 
 #endif /* ( DOKAN_VERSION >= 600 ) && ( DOKAN_VERSION < 800 ) */
 
+#if DOKAN_MINIMUM_COMPATIBLE_VERSION >= 200
+	DokanInit();
+#endif
 	result = DokanMain(
 	          &ewfmount_dokan_options,
 	          &ewfmount_dokan_operations );
 
+#if DOKAN_MINIMUM_COMPATIBLE_VERSION >= 200
+	DokanShutdown();
+#endif
 	switch( result )
 	{
 		case DOKAN_SUCCESS:

@@ -50,6 +50,12 @@ extern mount_handle_t *ewfmount_mount_handle;
 
 #endif /* ( DOKAN_VERSION >= 600 ) && ( DOKAN_VERSION < 800 ) */
 
+#if defined( HAVE_DOKAN_LONG_PATHS )
+#define DOKAN_MAX_PATH 32768
+#else
+#define DOKAN_MAX_PATH MAX_PATH
+#endif
+
 /* Sets the values in a file information structure
  * The time values contain an unsigned 64-bit FILETIME timestamp
  * Returns 1 if successful or -1 on error
@@ -193,7 +199,7 @@ int mount_dokan_filldir(
 
 		return( -1 );
 	}
-	if( name_size > (size_t) MAX_PATH )
+	if( name_size > (size_t) DOKAN_MAX_PATH )
 	{
 		libcerror_error_set(
 		 error,
