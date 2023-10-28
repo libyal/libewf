@@ -57,6 +57,9 @@ PKGCONFIG_FILES = \
 	libewf.pc.in
 
 SETUP_PY_FILES = \
+	pyproject.toml \
+	setup.cfg \
+	setup.cfg.in \
 	setup.py
 
 SPEC_FILES = \
@@ -106,45 +109,16 @@ library:
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
 
 distclean: clean
-	/bin/rm -f Makefile
-	/bin/rm -f config.status
-	/bin/rm -f config.cache
-	/bin/rm -f config.log
-	/bin/rm -f libewf.pc
-	/bin/rm -f libewf.spec
-	/bin/rm -f dpkg/changelog
-	/bin/rm -f dpkg/shlibs.local.ex
+	-rm -f Makefile
+	-rm -f config.status
+	-rm -f config.cache
+	-rm -f config.log
+	-rm -f libewf.pc
+	-rm -f libewf.spec
+	-rm -f dpkg/changelog
+	-rm -f dpkg/shlibs.local.ex
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \
 		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
 	done && test -z "$$fail"
-
-splint:
-	(cd $(srcdir)/libcerror && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcthreads && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcdata && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcdatetime && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libclocale && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcnotify && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsplit && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libuna && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcfile && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcpath && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libbfio && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfcache && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfdata && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfdatetime && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfguid && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfvalue && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libhmac && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcaes && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libodraw && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libsmdev && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libsmraw && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/pyewf && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/tests && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/ossfuzz && $(MAKE) splint $(AM_MAKEFLAGS))
 

@@ -19,9 +19,9 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libewf.h
-	/bin/rm -f libewf/definitions.h
-	/bin/rm -f libewf/features.h
-	/bin/rm -f libewf/types.h
-	/bin/rm -f Makefile
+	-rm -f libewf.h
+	-rm -f libewf/definitions.h
+	-rm -f libewf/features.h
+	-rm -f libewf/types.h
+	-rm -f Makefile
 

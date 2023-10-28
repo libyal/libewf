@@ -1,6 +1,6 @@
 [metadata]
 name = libewf-python
-version = 20231028
+version = @VERSION@
 description = Python bindings module for libewf
 long_description = Python bindings module for libewf
 author = Joachim Metz

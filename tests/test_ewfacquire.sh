@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Acquire tool testing script
 #
-# Version: 20230410
+# Version: 20231005
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -125,7 +125,7 @@ do
 
 	IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
-	IFS=" " read -a OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
+	IFS=" " read -a PROFILE_OPTIONS <<< ${OPTIONS_PER_PROFILE[${PROFILE_INDEX}]};
 
 	RESULT=${EXIT_SUCCESS};
 
@@ -135,45 +135,63 @@ do
 		then
 			continue;
 		fi
-		if check_for_directory_in_ignore_list "${TEST_SET_INPUT_DIRECTORY}" "${IGNORE_LIST}";
+		TEST_SET=`basename ${TEST_SET_INPUT_DIRECTORY}`;
+
+		if check_for_test_set_in_ignore_list "${TEST_SET}" "${IGNORE_LIST}";
 		then
 			continue;
 		fi
-
 		TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
 
-		OLDIFS=${IFS};
-
-		# IFS="\n"; is not supported by all platforms.
-		IFS="
-";
+		RESULT=${EXIT_SUCCESS};
 
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then
-			for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
-			do
-				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-				RESULT=$?;
-
-				if test ${RESULT} -ne ${EXIT_SUCCESS};
-				then
-					break;
-				fi
-			done
+			IFS="" read -a INPUT_FILES <<< $(cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?");
 		else
-			for INPUT_FILE in `ls -1 ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
-			do
-				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${OPTIONS[@]}";
-				RESULT=$?;
+			IFS="" read -a INPUT_FILES <<< $(ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB});
+		fi
+		for INPUT_FILE in "${INPUT_FILES[@]}";
+		do
+			TESTED_WITH_OPTIONS=0;
 
-				if test ${RESULT} -ne ${EXIT_SUCCESS};
+			for OPTION_SET in ${OPTION_SETS[@]};
+			do
+				TEST_DATA_OPTION_FILE=$(get_test_data_option_file "${TEST_SET_DIRECTORY}" "${INPUT_FILE}" "${OPTION_SET}");
+
+				if test -f ${TEST_DATA_OPTION_FILE};
 				then
-					break;
+					TESTED_WITH_OPTIONS=1;
+
+					IFS=" " read -a OPTIONS <<< $(read_test_data_option_file "${TEST_SET_DIRECTORY}" "${INPUT_FILE}" "${OPTION_SET}");
+
+					run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "${OPTION_SET}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}" "${OPTIONS[@]}";
+					RESULT=$?;
+
+					if test ${RESULT} -ne ${EXIT_SUCCESS};
+					then
+						break;
+					fi
 				fi
 			done
-		fi
-		IFS=${OLDIFS};
 
+			if test ${TESTED_WITH_OPTIONS} -eq 0;
+			then
+				run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfacquire" "with_callback" "" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}";
+				RESULT=$?;
+			fi
+
+			if test ${RESULT} -ne ${EXIT_SUCCESS};
+			then
+				break;
+			fi
+		done
+
+		# Ignore failures due to corrupted data.
+		if test "${TEST_SET}" = "corrupted";
+		then
+			RESULT=${EXIT_SUCCESS};
+		fi
 		if test ${RESULT} -ne ${EXIT_SUCCESS};
 		then
 			break;

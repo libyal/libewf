@@ -905,8 +905,16 @@ PyObject *pyewf_handle_open(
 
 				goto on_error;
 			}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+			filename_wide = (wchar_t *) PyUnicode_AsWideCharString(
+			                             filename_string_object,
+			                             NULL );
+
+			filename = filename_wide;
+#else
 			filename = (wchar_t *) PyUnicode_AsUnicode(
 			                        filename_string_object );
+#endif
 		}
 		filename_length = wide_string_length(
 		                   filename );
@@ -1064,6 +1072,12 @@ on_error:
 	{
 		PyMem_Free(
 		 filename_wide );
+	}
+#else
+	if( utf8_string_object != NULL )
+	{
+		Py_DecRef(
+		 utf8_string_object );
 	}
 #endif
 	if( string_object != NULL )
