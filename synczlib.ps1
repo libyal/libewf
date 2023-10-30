@@ -1,6 +1,6 @@
 # Script that synchronizes zlib.
 #
-# Version: 20221022
+# Version: 20230926
 
 Function ExtractZip($Filename)
 {
@@ -27,9 +27,9 @@ Function ExtractZip($Filename)
 	}
 }
 
-$Filename = "${pwd}\zlib1213.zip"
-$Url = "http://zlib.net/zlib1213.zip"
-$ExtractedPath = "zlib-1.2.13"
+$Filename = "${pwd}\zlib13.zip"
+$Url = "http://zlib.net/zlib13.zip"
+$ExtractedPath = "zlib-1.3"
 $DestinationPath = "..\zlib"
 
 If (Test-Path ${Filename})
