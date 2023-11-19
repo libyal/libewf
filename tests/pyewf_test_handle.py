@@ -39,7 +39,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open(self):
     """Tests the open function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -60,7 +60,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open_file_objects(self):
     """Tests the open_file_objects function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -88,7 +88,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_close(self):
     """Tests the close function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -100,7 +100,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_open_close(self):
     """Tests the open and close functions."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       return
 
@@ -134,7 +134,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer(self):
     """Tests the read_buffer function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -215,7 +215,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer_file_object(self):
     """Tests the read_buffer function on a file-like object."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -239,7 +239,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_read_buffer_at_offset(self):
     """Tests the read_buffer_at_offset function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -309,7 +309,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_seek_offset(self):
     """Tests the seek_offset function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -371,7 +371,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_seek_offset_file_object(self):
     """Tests the seek_offset function on a file-like object."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -395,7 +395,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_offset(self):
     """Tests the get_offset function."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -412,7 +412,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_root_file_entry(self):
     """Tests the get_root_file_entry function and root_file_entry property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -433,7 +433,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_sectors_per_chunk(self):
     """Tests the get_sectors_per_chunk function and sectors_per_chunk property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -452,7 +452,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_bytes_per_sector(self):
     """Tests the get_bytes_per_sector function and bytes_per_sector property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -471,7 +471,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_number_of_sectors(self):
     """Tests the get_number_of_sectors function and number_of_sectors property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -490,7 +490,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_chunk_size(self):
     """Tests the get_chunk_size function and chunk_size property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -509,7 +509,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_error_granularity(self):
     """Tests the get_error_granularity function and error_granularity property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -528,7 +528,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_compression_method(self):
     """Tests the get_compression_method function and compression_method property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -547,7 +547,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_size(self):
     """Tests the get_media_size function and media_size property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -566,7 +566,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_type(self):
     """Tests the get_media_type function and media_type property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -585,7 +585,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_media_flags(self):
     """Tests the get_media_flags function and media_flags property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -604,7 +604,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_format(self):
     """Tests the get_format function and format property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
@@ -623,7 +623,7 @@ class HandleTypeTests(unittest.TestCase):
 
   def test_get_header_codepage(self):
     """Tests the get_header_codepage function and header_codepage property."""
-    test_source = unittest.source
+    test_source = getattr(unittest, "source", None)
     if not test_source:
       raise unittest.SkipTest("missing source")
 
