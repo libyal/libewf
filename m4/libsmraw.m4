@@ -1,6 +1,6 @@
 dnl Checks for libsmraw required headers and functions
 dnl
-dnl Version: 20200726
+dnl Version: 20240308
 
 dnl Function to detect if libsmraw is available
 dnl ac_libsmraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -10,8 +10,10 @@ AC_DEFUN([AX_LIBSMRAW_CHECK_LOCAL],
     [ac_cv_libsmraw=no],
     [ac_cv_libsmraw=check
     dnl Check if the directory provided as parameter exists
+    dnl For both --with-libsmraw which returns "yes" and --with-libsmraw= which returns ""
+    dnl treat them as auto-detection.
     AS_IF(
-      [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xauto-detect],
+      [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xauto-detect && test "x$ac_cv_with_libsmraw" != xyes],
       [AS_IF(
         [test -d "$ac_cv_with_libsmraw"],
         [CFLAGS="$CFLAGS -I${ac_cv_with_libsmraw}/include"
@@ -148,8 +150,9 @@ AC_DEFUN([AX_LIBSMRAW_CHECK_LOCAL],
 
         ac_cv_libsmraw_LIBADD="-lsmraw"])
       ])
+
     AS_IF(
-      [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xauto-detect && test "x$ac_cv_libsmraw" != xyes],
+      [test "x$ac_cv_with_libsmraw" != x && test "x$ac_cv_with_libsmraw" != xauto-detect && test "x$ac_cv_with_libsmraw" != xyes],
       [AC_MSG_FAILURE(
         [unable to find supported libsmraw in directory: $ac_cv_with_libsmraw],
         [1])

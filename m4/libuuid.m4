@@ -1,6 +1,6 @@
 dnl Functions for libuuid
 dnl
-dnl Version: 20190308
+dnl Version: 20240308
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],
@@ -9,8 +9,10 @@ AC_DEFUN([AX_LIBUUID_CHECK_LIB],
     [ac_cv_libuuid=no],
     [ac_cv_libuuid=check
     dnl Check if the directory provided as parameter exists
+    dnl For both --with-libuuid which returns "yes" and --with-libuuid= which returns ""
+    dnl treat them as auto-detection.
     AS_IF(
-      [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xauto-detect],
+      [test "x$ac_cv_with_libuuid" != x && test "x$ac_cv_with_libuuid" != xauto-detect && test "x$ac_cv_with_libuuid" != xyes],
       [AS_IF(
         [test -d "$ac_cv_with_libuuid"],
         [CFLAGS="$CFLAGS -I${ac_cv_with_libuuid}/include"

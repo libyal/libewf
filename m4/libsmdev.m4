@@ -1,6 +1,6 @@
 dnl Checks for libsmdev required headers and functions
 dnl
-dnl Version: 20190308
+dnl Version: 20240308
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -10,8 +10,10 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
     [ac_cv_libsmdev=no],
     [ac_cv_libsmdev=check
     dnl Check if the directory provided as parameter exists
+    dnl For both --with-libsmdev which returns "yes" and --with-libsmdev= which returns ""
+    dnl treat them as auto-detection.
     AS_IF(
-      [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect],
+      [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
       [AS_IF(
         [test -d "$ac_cv_with_libsmdev"],
         [CFLAGS="$CFLAGS -I${ac_cv_with_libsmdev}/include"
@@ -194,8 +196,9 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
 
         ac_cv_libsmdev_LIBADD="-lsmdev"])
       ])
+
     AS_IF(
-      [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_libsmdev" != xyes],
+      [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
       [AC_MSG_FAILURE(
         [unable to find supported libsmdev in directory: $ac_cv_with_libsmdev],
         [1])

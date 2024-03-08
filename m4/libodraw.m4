@@ -1,6 +1,6 @@
 dnl Checks for libodraw required headers and functions
 dnl
-dnl Version: 20230218
+dnl Version: 20240308
 
 dnl Function to detect if libodraw is available
 dnl ac_libodraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -10,8 +10,10 @@ AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
     [ac_cv_libodraw=no],
     [ac_cv_libodraw=check
     dnl Check if the directory provided as parameter exists
+    dnl For both --with-libodraw which returns "yes" and --with-libodraw= which returns ""
+    dnl treat them as auto-detection.
     AS_IF(
-      [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect],
+      [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect && test "x$ac_cv_with_libodraw" != xyes],
       [AS_IF(
         [test -d "$ac_cv_with_libodraw"],
         [CFLAGS="$CFLAGS -I${ac_cv_with_libodraw}/include"
@@ -168,8 +170,9 @@ AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
 
         ac_cv_libodraw_LIBADD="-lodraw"])
       ])
+
     AS_IF(
-      [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect && test "x$ac_cv_libodraw" != xyes],
+      [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect && test "x$ac_cv_with_libodraw" != xyes],
       [AC_MSG_FAILURE(
         [unable to find supported libodraw in directory: $ac_cv_with_libodraw],
         [1])
