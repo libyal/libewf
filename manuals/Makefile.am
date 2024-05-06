@@ -18,9 +18,7 @@ EXTRA_DIST = \
 	ewfverify.1 \
 	libewf.3
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f Makefile
 

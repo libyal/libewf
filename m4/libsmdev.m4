@@ -1,6 +1,6 @@
 dnl Checks for libsmdev required headers and functions
 dnl
-dnl Version: 20240308
+dnl Version: 20240413
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -198,7 +198,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
       ])
 
     AS_IF(
-      [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
+      [test "x$ac_cv_libsmdev" != xyes && test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
       [AC_MSG_FAILURE(
         [unable to find supported libsmdev in directory: $ac_cv_with_libsmdev],
         [1])
@@ -364,7 +364,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LOCAL],
     [test "x$ac_cv_enable_winapi" = xyes],
     [AX_LIBSMDEV_CHECK_HEADER_WINIOCTL_H_STORAGE_BUS_TYPE])
 
-  ac_cv_libsmdev_CPPFLAGS="-I../libsmdev";
+  ac_cv_libsmdev_CPPFLAGS="-I../libsmdev -I\$(top_srcdir)/libsmdev";
   ac_cv_libsmdev_LIBADD="../libsmdev/libsmdev.la";
 
   ac_cv_libsmdev=local

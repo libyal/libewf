@@ -223,6 +223,7 @@ stamp-h[1-9]
 /tests/ewf_test_write_chunk
 /tests/ewf_test_write_io_handle
 /tests/input
+/tests/notify_stream.log
 /tests/tmp*
 
 # Local library dependencies specific files

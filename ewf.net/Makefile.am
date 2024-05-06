@@ -8,9 +8,7 @@ EXTRA_DIST = \
 	ewf.net.rc \
 	ewf.net.rc.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f Makefile
 
