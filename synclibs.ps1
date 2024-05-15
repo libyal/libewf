@@ -74,7 +74,7 @@ ForEach (${LocalLib} in ${LocalLibs})
 			$OutputFile = ${DirectoryElement} -Replace ".l$",".c"
 
 			$NamePrefix = Split-Path -path ${DirectoryElement} -leaf
-			$NamePrefix = ${NamePrefix} -Replace "^${LocalLib}_",""
+			#$NamePrefix = ${NamePrefix} -Replace "^${LocalLib}_",""
 			$NamePrefix = ${NamePrefix} -Replace ".l$","_"
 
 			# PowerShell will raise NativeCommandError if win_flex writes to stdout or stderr
