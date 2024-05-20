@@ -885,11 +885,11 @@ NTSTATUS __stdcall mount_dokan_ReadFile(
 		goto on_error;
 	}
 	read_count = mount_file_entry_read_buffer_at_offset(
-		      (mount_file_entry_t *) file_info->Context,
-		      buffer,
-		      (size_t) number_of_bytes_to_read,
-		      (off64_t) offset,
-		      &error );
+	              (mount_file_entry_t *) file_info->Context,
+	              buffer,
+	              (size_t) number_of_bytes_to_read,
+	              (off64_t) offset,
+	              &error );
 
 	if( read_count < 0 )
 	{
@@ -897,7 +897,7 @@ NTSTATUS __stdcall mount_dokan_ReadFile(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read from mount handle.",
+		 "%s: unable to read from file entry.",
 		 function );
 
 		result = MOUNT_DOKAN_ERROR_READ_FAULT;

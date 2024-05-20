@@ -1,5 +1,5 @@
 /*
- * Mounts an Expert Witness Compression Format (EWF) image file
+ * Mounts an Expert Witness Compression Format (EWF) image file.
  *
  * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -158,12 +158,20 @@ int main( int argc, char * const argv[] )
 	ewftools_glob_t *glob                       = NULL;
 #endif
 
-#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
 
-	struct fuse_args ewfmount_fuse_arguments    = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *ewfmount_fuse_channel     = NULL;
-	struct fuse *ewfmount_fuse_handle           = NULL;
+#if defined( HAVE_LIBFUSE3 )
+	/* Need to set this to 1 even if there no arguments, otherwise this causes
+	 * fuse: empty argv passed to fuse_session_new()
+	 */
+	char *fuse_argv[ 2 ]                         = { program, NULL };
+	struct fuse_args ewfmount_fuse_arguments     = FUSE_ARGS_INIT(1, fuse_argv);
+#else
+	struct fuse_args ewfmount_fuse_arguments     = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *ewfmount_fuse_channel      = NULL;
+#endif
+	struct fuse *ewfmount_fuse_handle            = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS ewfmount_dokan_operations;
@@ -425,7 +433,7 @@ int main( int argc, char * const argv[] )
 		goto on_error;
 	}
 #endif
-#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	if( option_extended_options != NULL )
 	{
 		/* This argument is required but ignored
@@ -481,6 +489,34 @@ int main( int argc, char * const argv[] )
 	ewfmount_fuse_operations.getattr    = &mount_fuse_getattr;
 	ewfmount_fuse_operations.destroy    = &mount_fuse_destroy;
 
+#if defined( HAVE_LIBFUSE3 )
+	ewfmount_fuse_handle = fuse_new(
+	                        &ewfmount_fuse_arguments,
+	                        &ewfmount_fuse_operations,
+	                        sizeof( struct fuse_operations ),
+	                        ewfmount_mount_handle );
+
+	if( ewfmount_fuse_handle == NULL )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to create fuse handle.\n" );
+
+		goto on_error;
+	}
+	result = fuse_mount(
+	          ewfmount_fuse_handle,
+	          mount_point );
+
+	if( result != 0 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to fuse mount file system.\n" );
+
+		goto on_error;
+	}
+#else
 	ewfmount_fuse_channel = fuse_mount(
 	                         mount_point,
 	                         &ewfmount_fuse_arguments );
@@ -508,6 +544,8 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#endif /* defined( HAVE_LIBFUSE3 ) */
+
 	if( verbose == 0 )
 	{
 		if( fuse_daemonize(
@@ -706,7 +744,7 @@ int main( int argc, char * const argv[] )
 
 	return( EXIT_FAILURE );
 
-#endif /* defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE ) */
+#endif /* defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE ) */
 
 on_error:
 	if( error != NULL )
@@ -716,7 +754,7 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	if( ewfmount_fuse_handle != NULL )
 	{
 		fuse_destroy(
