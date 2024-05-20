@@ -1130,10 +1130,12 @@ on_error:
 int ewf_test_chunk_data_pack_with_64_bit_pattern_fill(
      void )
 {
-	libcerror_error_t *error        = NULL;
-	libewf_chunk_data_t *chunk_data = NULL;
-	uint8_t *data                   = NULL;
-	int result                      = 0;
+	uint8_t expected_compressed_data1[ 8 ] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	libcerror_error_t *error               = NULL;
+	libewf_chunk_data_t *chunk_data        = NULL;
+	uint8_t *data                          = NULL;
+	size_t data_offset                     = 0;
+	int result                             = 0;
 
 	/* Initialize test
 	 */
@@ -1158,6 +1160,12 @@ int ewf_test_chunk_data_pack_with_64_bit_pattern_fill(
 
 	chunk_data->data_size = 512;
 
+	for( data_offset = 0;
+	     data_offset < 512;
+	     data_offset++ )
+	{
+		chunk_data->data[ data_offset ] = 1 + ( data_offset % 8 );
+	}
 	/* Test regular cases
 	 */
 	result = libewf_chunk_data_pack_with_64_bit_pattern_fill(
@@ -1181,6 +1189,16 @@ int ewf_test_chunk_data_pack_with_64_bit_pattern_fill(
 	 "chunk_data->compressed_data_size",
 	 chunk_data->compressed_data_size,
 	 (size_t) 8 );
+
+	result = memory_compare(
+	          expected_compressed_data1,
+	          chunk_data->compressed_data,
+	          chunk_data->compressed_data_size );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	/* Clean up
 	 */
@@ -1342,6 +1360,215 @@ int ewf_test_chunk_data_pack_with_64_bit_pattern_fill(
 	}
 #endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_EWF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libewf_chunk_data_free(
+	          &chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( chunk_data != NULL )
+	{
+		libewf_chunk_data_free(
+		 &chunk_data,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libewf_chunk_data_unpack_with_64_bit_pattern_fill function
+ * Returns 1 if successful or 0 if not
+ */
+int ewf_test_chunk_data_unpack_with_64_bit_pattern_fill(
+     void )
+{
+	uint8_t expected_data1[ 8 ]     = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	libcerror_error_t *error        = NULL;
+	libewf_chunk_data_t *chunk_data = NULL;
+	uint8_t *data                   = NULL;
+	int result                      = 0;
+
+	/* Initialize test
+	 */
+	result = libewf_chunk_data_initialize(
+	          &chunk_data,
+	          519,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	chunk_data->compressed_data = (uint8_t *) memory_allocate(
+	                                           sizeof( uint8_t ) * 8 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_data->compressed_data",
+	 chunk_data->compressed_data );
+
+	chunk_data->compressed_data[ 0 ] = 1;
+	chunk_data->compressed_data[ 1 ] = 2;
+	chunk_data->compressed_data[ 2 ] = 3;
+	chunk_data->compressed_data[ 3 ] = 4;
+	chunk_data->compressed_data[ 4 ] = 5;
+	chunk_data->compressed_data[ 5 ] = 6;
+	chunk_data->compressed_data[ 6 ] = 7;
+	chunk_data->compressed_data[ 7 ] = 8;
+
+	chunk_data->compressed_data_size = 8;
+
+	/* Test regular cases
+	 */
+	result = libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+	          chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	EWF_TEST_ASSERT_EQUAL_SIZE(
+	 "chunk_data->data_size",
+	 chunk_data->data_size,
+	 (size_t) 519 );
+
+	result = memory_compare(
+	          expected_data1,
+	          chunk_data->data,
+	          8 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	result = memory_compare(
+	          expected_data1,
+	          &( chunk_data->data[ 512 ] ),
+	          7 );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	/* Clean up
+	 */
+	result = libewf_chunk_data_free(
+	          &chunk_data,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libewf_chunk_data_initialize(
+	          &chunk_data,
+	          512,
+	          1,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "chunk_data",
+	 chunk_data );
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	chunk_data->data_size = 512;
+
+	/* Test error cases
+	 */
+	result = libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+	          NULL,
+	          &error );
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	data = chunk_data->data;
+
+	chunk_data->data = NULL;
+
+	result = libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+	          chunk_data,
+	          &error );
+
+	chunk_data->data = data;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	/* Clean up
 	 */
@@ -5014,6 +5241,10 @@ int main(
 	EWF_TEST_RUN(
 	 "libewf_chunk_data_pack_with_64_bit_pattern_fill",
 	 ewf_test_chunk_data_pack_with_64_bit_pattern_fill );
+
+	EWF_TEST_RUN(
+	 "libewf_chunk_data_unpack_with_64_bit_pattern_fill",
+	 ewf_test_chunk_data_unpack_with_64_bit_pattern_fill );
 
 	EWF_TEST_RUN(
 	 "libewf_chunk_data_pack_with_empty_block_compression",

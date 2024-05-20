@@ -43,6 +43,10 @@ struct libewf_chunk_descriptor
 	 */
 	size64_t data_size;
 
+	/* The (chunk data) pattern fill
+	 */
+	uint8_t pattern_fill[ 8 ];
+
 	/* The (chunk data) range flags
 	 */
 	uint32_t range_flags;

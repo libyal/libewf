@@ -1,6 +1,6 @@
 dnl Checks for libodraw required headers and functions
 dnl
-dnl Version: 20240413
+dnl Version: 20240520
 
 dnl Function to detect if libodraw is available
 dnl ac_libodraw_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -14,15 +14,7 @@ AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
     dnl treat them as auto-detection.
     AS_IF(
       [test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect && test "x$ac_cv_with_libodraw" != xyes],
-      [AS_IF(
-        [test -d "$ac_cv_with_libodraw"],
-        [CFLAGS="$CFLAGS -I${ac_cv_with_libodraw}/include"
-        LDFLAGS="$LDFLAGS -L${ac_cv_with_libodraw}/lib"],
-        [AC_MSG_FAILURE(
-          [no such directory: $ac_cv_with_libodraw],
-          [1])
-        ])
-      ],
+      [AX_CHECK_LIB_DIRECTORY_EXISTS([libodraw])],
       [dnl Check for a pkg-config file
       AS_IF(
         [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
@@ -46,137 +38,44 @@ AC_DEFUN([AX_LIBODRAW_CHECK_LIB],
       AS_IF(
         [test "x$ac_cv_header_libodraw_h" = xno],
         [ac_cv_libodraw=no],
-        [dnl Check for the individual functions
-        ac_cv_libodraw=yes
+        [ac_cv_libodraw=yes
 
-        AC_CHECK_LIB(
-          odraw,
-          libodraw_get_version,
-          [ac_cv_libodraw_dummy=yes],
-          [ac_cv_libodraw=no])
+        AX_CHECK_LIB_FUNCTIONS(
+          [libodraw],
+          [odraw],
+          [[libodraw_get_version],
+           [libodraw_handle_initialize],
+           [libodraw_handle_free],
+           [libodraw_handle_signal_abort],
+           [libodraw_handle_open],
+           [libodraw_handle_open_data_files],
+           [libodraw_handle_close],
+           [libodraw_handle_read_buffer],
+           [libodraw_handle_seek_offset],
+           [libodraw_handle_get_bytes_per_sector],
+           [libodraw_handle_get_data_file],
+           [libodraw_handle_get_media_size],
+           [libodraw_handle_get_number_of_data_files],
+           [libodraw_handle_get_number_of_sessions],
+           [libodraw_handle_get_session],
+           [libodraw_handle_get_number_of_tracks],
+           [libodraw_handle_get_track],
+           [libodraw_data_file_free],
+           [libodraw_data_file_set_filename]])
 
-       dnl Handle functions
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_initialize,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_free,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_signal_abort,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_open,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_open_data_files,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_close,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_read_buffer,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_seek_offset,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-
-       AS_IF(
-         [test "x$ac_cv_enable_wide_character_type" != xno],
-         [AC_CHECK_LIB(
-           odraw,
-           libodraw_handle_open_wide,
-           [ac_cv_libodraw_dummy=yes],
-           [ac_cv_libodraw=no])
-         ])
-
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_bytes_per_sector,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_data_file,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_media_size,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_number_of_data_files,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_number_of_sessions,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_session,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_number_of_tracks,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_handle_get_track,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-
-       dnl Data file functions
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_data_file_free,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-       AC_CHECK_LIB(
-         odraw,
-         libodraw_data_file_set_filename,
-         [ac_cv_libodraw_dummy=yes],
-         [ac_cv_libodraw=no])
-
-       AS_IF(
-         [test "x$ac_cv_enable_wide_character_type" != xno],
-         [AC_CHECK_LIB(
-           odraw,
-           libodraw_data_file_set_filename_wide,
-           [ac_cv_libodraw_dummy=yes],
-           [ac_cv_libodraw=no])
-         ])
+        AS_IF(
+          [test "x$ac_cv_enable_wide_character_type" != xno],
+          [AX_CHECK_LIB_FUNCTIONS(
+            [libodraw],
+            [odraw],
+            [[libodraw_handle_open_wide],
+             [libodraw_data_file_set_filename_wide]])
+          ])
 
         ac_cv_libodraw_LIBADD="-lodraw"])
       ])
 
-    AS_IF(
-      [test "x$ac_cv_libodraw" != xyes && test "x$ac_cv_with_libodraw" != x && test "x$ac_cv_with_libodraw" != xauto-detect && test "x$ac_cv_with_libodraw" != xyes],
-      [AC_MSG_FAILURE(
-        [unable to find supported libodraw in directory: $ac_cv_with_libodraw],
-        [1])
-      ])
+    AX_CHECK_LIB_DIRECTORY_MSG_ON_FAILURE([libodraw])
     ])
 
   AS_IF(

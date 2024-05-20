@@ -2829,6 +2829,11 @@ int libewf_write_io_handle_generate_table_entries_data(
 				libcnotify_printf(
 				 "\tHas checksum\n" );
 			}
+			if( ( chunk_descriptor->range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
+			{
+				libcnotify_printf(
+				 "\tUses pattern fill\n" );
+			}
 			libcnotify_printf(
 			 "\n" );
 		}
@@ -3567,6 +3572,23 @@ ssize_t libewf_write_io_handle_write_new_chunk_create_chunk(
 	chunk_descriptor->data_size   = (size64_t) write_count - chunk_data->padding_size;
 	chunk_descriptor->range_flags = chunk_data->range_flags;
 
+	if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
+	{
+		if( memory_copy(
+		     chunk_descriptor->pattern_fill,
+		     chunk_data->data,
+		     8 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy pattern fill.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	if( libcdata_array_append_entry(
 	     write_io_handle->chunks_section,
 	     &entry_index,

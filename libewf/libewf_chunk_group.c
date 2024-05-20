@@ -802,13 +802,6 @@ int libewf_chunk_group_fill_v1(
 
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
 	return( 1 );
 }
 
@@ -1022,14 +1015,6 @@ int libewf_chunk_group_fill_v2(
 			return( -1 );
 		}
 		chunk_index++;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
 	}
 	return( 1 );
 }

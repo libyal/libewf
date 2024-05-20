@@ -294,9 +294,9 @@ int libewf_chunk_descriptor_write_data(
 
 		return( -1 );
 	}
-	chunk_data_offset  = chunk_descriptor->data_offset;
-	chunk_data_size    = chunk_descriptor->data_size;
-	range_flags        = chunk_descriptor->range_flags;
+	chunk_data_offset = chunk_descriptor->data_offset;
+	chunk_data_size   = chunk_descriptor->data_size;
+	range_flags       = chunk_descriptor->range_flags;
 
 	if( format_version == 1 )
 	{
@@ -360,12 +360,28 @@ int libewf_chunk_descriptor_write_data(
 		}
 		if( ( range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
 		{
+			if( memory_copy(
+			     ( (ewf_table_entry_v2_t *) data )->chunk_data_offset,
+			     chunk_descriptor->pattern_fill,
+			     8 ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy pattern fill.",
+				 function );
+
+				return( -1 );
+			}
 			chunk_data_flags |= LIBEWF_CHUNK_DATA_FLAG_USES_PATTERN_FILL;
 		}
-		byte_stream_copy_from_uint64_little_endian(
-		 ( (ewf_table_entry_v2_t *) data )->chunk_data_offset,
-		 chunk_data_offset );
-
+		else
+		{
+			byte_stream_copy_from_uint64_little_endian(
+			 ( (ewf_table_entry_v2_t *) data )->chunk_data_offset,
+			 chunk_data_offset );
+		}
 		byte_stream_copy_from_uint32_little_endian(
 		 ( (ewf_table_entry_v2_t *) data )->chunk_data_size,
 		 (uint32_t) chunk_data_size );

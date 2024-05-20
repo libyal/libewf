@@ -131,6 +131,10 @@ int libewf_chunk_data_pack_with_64_bit_pattern_fill(
      libewf_chunk_data_t *chunk_data,
      libcerror_error_t **error );
 
+int libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+     libewf_chunk_data_t *chunk_data,
+     libcerror_error_t **error );
+
 int libewf_chunk_data_pack_with_empty_block_compression(
      libewf_chunk_data_t *chunk_data,
      const uint8_t *compressed_zero_byte_empty_block,

@@ -616,6 +616,108 @@ on_error:
 	return( -1 );
 }
 
+/* Unpacks the chunk data using 64-bit pattern fill
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+     libewf_chunk_data_t *chunk_data,
+     libcerror_error_t **error )
+{
+	static char *function       = "libewf_chunk_data_unpack_with_64_bit_pattern_fill";
+	size_t remaining_chunk_size = 0;
+
+	if( chunk_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk data - missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data->compressed_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk data - missing compressed data.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data->compressed_data_size < (size_t) 8 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid chunk data - compressed data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	remaining_chunk_size = (size_t) chunk_data->chunk_size;
+
+	switch( remaining_chunk_size % 8 )
+	{
+		case 7:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 6 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 6:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 5 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 5:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 4 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 4:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 3 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 3:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 2 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 2:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 1 ];
+
+		LIBEWF_ATTRIBUTE_FALLTHROUGH;
+		case 1:
+			( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 0 ];
+	}
+	while( remaining_chunk_size > 0 )
+	{
+/* TODO make this memory aligned ? */
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 7 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 6 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 5 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 4 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 3 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 2 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 1 ];
+		( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 0 ];
+	}
+	chunk_data->data_size = chunk_data->chunk_size;
+
+	return( 1 );
+}
+
 /* Packs the chunk data using empty block compression
  * Returns 1 if successful or -1 on error
  */
@@ -1157,7 +1259,6 @@ int libewf_chunk_data_unpack(
      libcerror_error_t **error )
 {
 	static char *function        = "libewf_chunk_data_unpack";
-	size_t remaining_chunk_size  = 0;
 	uint32_t calculated_checksum = 0;
 
 	if( chunk_data == NULL )
@@ -1269,60 +1370,18 @@ int libewf_chunk_data_unpack(
 
 		if( ( chunk_data->range_flags & LIBEWF_RANGE_FLAG_USES_PATTERN_FILL ) != 0 )
 		{
-/* TODO move into libewf_chunk_data_unpack_with_64_bit_pattern_fill */
-			if( chunk_data->compressed_data_size < (size_t) 8 )
+			if( libewf_chunk_data_unpack_with_64_bit_pattern_fill(
+			     chunk_data,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid chunk data - compressed data size value out of bounds.",
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_COMPRESS_FAILED,
+				 "%s: unable to decompress chunk data using 64-bit pattern fill.",
 				 function );
 
 				goto on_error;
-			}
-			remaining_chunk_size = (size_t) chunk_data->chunk_size;
-
-			switch( remaining_chunk_size % 8 )
-			{
-				case 7:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 7 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 6:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 6 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 5:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 5 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 4:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 4 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 3:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 3 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 2:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 2 ];
-
-				LIBEWF_ATTRIBUTE_FALLTHROUGH;
-				case 1:
-					( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 1 ];
-			}
-			while( remaining_chunk_size > 0 )
-			{
-/* TODO make this memory aligned ? */
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 7 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 6 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 5 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 4 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 3 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 2 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 1 ];
-				( chunk_data->data )[ --remaining_chunk_size ] = ( chunk_data->compressed_data )[ 0 ];
 			}
 		}
 		else
@@ -1468,7 +1527,7 @@ on_error:
 }
 
 /* Checks if a buffer containing the chunk data is filled with same value bytes (empty-block)
- * Returns 1 if a pattern was found, 0 if not or -1 on error
+ * Returns 1 if an empty block was found, 0 if not or -1 on error
  */
 int libewf_chunk_data_check_for_empty_block(
      const uint8_t *data,

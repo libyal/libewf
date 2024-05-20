@@ -1278,7 +1278,7 @@ int libewf_section_descriptor_write_data(
 		else if( format_version == 2 )
 		{
 			libcnotify_printf(
-			 "%s: type\t\t\t\t\t: 0x%08" PRIx32 " (",
+			 "%s: type\t\t\t\t: 0x%08" PRIx32 " (",
 			 function,
 			 section_descriptor->type );
 			libewf_debug_print_section_type(
@@ -1287,7 +1287,7 @@ int libewf_section_descriptor_write_data(
 			 ")\n" );
 
 			libcnotify_printf(
-			 "%s: data flags\t\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: data flags\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 section_descriptor->data_flags );
 			libewf_debug_print_section_data_flags(
@@ -1311,7 +1311,7 @@ int libewf_section_descriptor_write_data(
 			 data_size );
 
 			libcnotify_printf(
-			 "%s: padding size\t\t\t\t: %" PRIu32 "\n",
+			 "%s: padding size\t\t\t: %" PRIu32 "\n",
 			 function,
 			 section_descriptor->padding_size );
 

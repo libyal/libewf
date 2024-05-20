@@ -1,6 +1,6 @@
 dnl Checks for libsmdev required headers and functions
 dnl
-dnl Version: 20240413
+dnl Version: 20240520
 
 dnl Function to detect if libsmdev is available
 dnl ac_libsmdev_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -14,15 +14,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
     dnl treat them as auto-detection.
     AS_IF(
       [test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
-      [AS_IF(
-        [test -d "$ac_cv_with_libsmdev"],
-        [CFLAGS="$CFLAGS -I${ac_cv_with_libsmdev}/include"
-        LDFLAGS="$LDFLAGS -L${ac_cv_with_libsmdev}/lib"],
-        [AC_MSG_FAILURE(
-          [no such directory: $ac_cv_with_libsmdev],
-          [1])
-        ])
-      ],
+      [AX_CHECK_LIB_DIRECTORY_EXISTS([libsmdev])],
       [dnl Check for a pkg-config file
       AS_IF(
         [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
@@ -46,163 +38,49 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
       AS_IF(
         [test "x$ac_cv_header_libsmdev_h" = xno],
         [ac_cv_libsmdev=no],
-        [dnl Check for the individual functions
-        ac_cv_libsmdev=yes
+        [ac_cv_libsmdev=yes
 
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_get_version,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_check_device,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
+        AX_CHECK_LIB_FUNCTIONS(
+          [libsmdev],
+          [smdev],
+          [[libsmdev_get_version],
+           [libsmdev_check_device],
+           [libsmdev_handle_initialize],
+           [libsmdev_handle_free],
+           [libsmdev_handle_signal_abort],
+           [libsmdev_handle_open],
+           [libsmdev_handle_close],
+           [libsmdev_handle_read_buffer],
+           [libsmdev_handle_seek_offset],
+           [libsmdev_handle_get_bus_type],
+           [libsmdev_handle_get_bytes_per_sector],
+           [libsmdev_handle_get_error],
+           [libsmdev_handle_get_utf8_information_value],
+           [libsmdev_handle_get_utf16_information_value],
+           [libsmdev_handle_get_media_size],
+           [libsmdev_handle_get_media_type],
+           [libsmdev_handle_get_number_of_errors],
+           [libsmdev_handle_get_number_of_sessions],
+           [libsmdev_handle_get_session],
+           [libsmdev_handle_get_number_of_tracks],
+           [libsmdev_handle_get_track],
+           [libsmdev_handle_set_error_flags],
+           [libsmdev_handle_set_error_granularity],
+           [libsmdev_handle_set_number_of_error_retries]])
   
         AS_IF(
           [test "x$ac_cv_enable_wide_character_type" != xno],
-          [AC_CHECK_LIB(
-           smdev,
-           libsmdev_check_device_wide,
-           [ac_cv_libsmdev_dummy=yes],
-           [ac_cv_libsmdev=no])
+          [AX_CHECK_LIB_FUNCTIONS(
+            [libsmdev],
+            [smdev],
+            [[libsmdev_check_device_wide],
+             [libsmdev_handle_open_wide]])
           ])
-  
-        dnl Handle functions
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_initialize,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_free,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_signal_abort,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-  
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_open,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_close,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_read_buffer,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_seek_offset,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-  
-        AS_IF(
-          [test "x$ac_cv_enable_wide_character_type" != xno],
-          [AC_CHECK_LIB(
-           smdev,
-           libsmdev_handle_open_wide,
-           [ac_cv_libsmdev_dummy=yes],
-           [ac_cv_libsmdev=no])
-          ])
-  
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_bus_type,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_bytes_per_sector,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_error,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_utf8_information_value,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_utf16_information_value,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_media_size,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_media_type,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_number_of_errors,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_number_of_sessions,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_session,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_number_of_tracks,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_get_track,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-  
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_set_error_flags,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_set_error_granularity,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
-        AC_CHECK_LIB(
-          smdev,
-          libsmdev_handle_set_number_of_error_retries,
-          [ac_cv_libsmdev_dummy=yes],
-          [ac_cv_libsmdev=no])
 
         ac_cv_libsmdev_LIBADD="-lsmdev"])
       ])
 
-    AS_IF(
-      [test "x$ac_cv_libsmdev" != xyes && test "x$ac_cv_with_libsmdev" != x && test "x$ac_cv_with_libsmdev" != xauto-detect && test "x$ac_cv_with_libsmdev" != xyes],
-      [AC_MSG_FAILURE(
-        [unable to find supported libsmdev in directory: $ac_cv_with_libsmdev],
-        [1])
-      ])
+    AX_CHECK_LIB_DIRECTORY_MSG_ON_FAILURE([libsmdev])
     ])
 
   AS_IF(

@@ -1320,6 +1320,7 @@ ewf_test_tools_log_handle_LDADD = \
 ewf_test_tools_mount_path_string_SOURCES = \
 	../ewftools/mount_path_string.c ../ewftools/mount_path_string.h \
 	ewf_test_libcerror.h \
+	ewf_test_libcpath.h \
 	ewf_test_macros.h \
 	ewf_test_tools_mount_path_string.c \
 	ewf_test_unused.h
