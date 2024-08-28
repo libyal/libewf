@@ -1914,7 +1914,7 @@ int ewf_test_glob_wide_get_segment_filename(
 	libcerror_error_free(
 	 &error );
 
-	segment_filename = (char *) 0x12345678UL;
+	segment_filename = (wchar_t *) 0x12345678UL;
 
 	result = libewf_glob_wide_get_segment_filename(
 	          L"test.E01",

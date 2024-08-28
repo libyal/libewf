@@ -15,7 +15,7 @@ jobs:
         mem: 4096
         # Note that the test scripts require bash
         prepare: |
-          pkg install -y autoconf automake bash byacc flex fusefs-libs gettext git libtool openssl pkgconf
+          pkg install -y autoconf automake bash fusefs-libs gettext git libtool openssl pkgconf
         run: |
           tests/build.sh
           tests/runtests.sh
