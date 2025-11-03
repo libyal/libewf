@@ -364,7 +364,7 @@ section types were found:
 * Sectors section
 * Table2 section
 * Data section
-* Errors2 section
+* Error2 section
 * Session section
 * Hash section
 * Digest section
@@ -1102,7 +1102,7 @@ In the next paragraphs the various versions of the volume section are described.
 
 The specification according to `[ASR02]`.
 
-The additional volume section data is 94 bytes of size and consists of:
+The volume section data is 94 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1123,7 +1123,7 @@ Contains 512 per default
 | 85 | 5 | | Signature (Reserved) +
 Contains the EWF file header signature
 | 90 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the volume section data.
 |===
 
 The chunk count is a 32-bit value this means it maximum of addressable chunks
@@ -1146,7 +1146,7 @@ In SMART the signature (reverse) value is the string "SMART" (0x53 0x4d 0x41
 
 The specification for FTK Imager, EnCase 1 to 7 and linen 5 to 7.
 
-The additional volume section data is 1052 bytes of size and consists of:
+The volume section data is 1052 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1181,7 +1181,7 @@ E.g. a value of 10 would refer to sector = number of sectors - 10
 (Introduced in EnCase 5) +
 See section: <<compression_level,Compression level>>
 | 53 | 3 | 0x00 | [yellow-background]*Unknown (empty values)* +
-these values seem to be part of the compression type
+these values seem to be part of the compression level
 | 56 | 4 | | The sector error granularity +
 Contains the error block size +
 (Introduced in EnCase 5)
@@ -1193,7 +1193,7 @@ Contains a GUID/UUID generated on the acquiry system probably used to uniquely i
 | 1043 | 5 | | Signature (Reserved) +
 Contains 0x00
 | 1048 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the volume section data.
 |===
 
 [yellow-background]*TODO a value that could be in the volume is the raid stripe size*
@@ -1448,7 +1448,7 @@ The table header is 24 bytes of size and consists of:
 [yellow-background]*Note that according to `[ASR02]` it contains 0x01*
 | 4 | 16 | 0x00 | Padding
 | 20 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the table header data.
 |===
 
 According to `[ASR02]` the table can hold 16375 entries if more entries are
@@ -1516,7 +1516,7 @@ The table header is 24 bytes of size and consists of:
 | 0 | 4 | | The number of entries
 | 4 | 16 | 0x00 | Padding
 | 20 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the table header data.
 |===
 
 The table can hold 16375 entries if more entries are required an additional table section should be created.
@@ -1598,7 +1598,7 @@ The sector table header is 24 bytes of size and consists of:
 | 0 | 4 | | The number of entries
 | 4 | 16 | 0x00 | Padding
 | 20 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the table header data.
 |===
 
 The table section can hold 16375 entries. A new table section should be created
@@ -1661,7 +1661,7 @@ The sector table header is 24 bytes of size and consists of:
 | 8 | 8 | | The table base offset
 | 16 | 4 | 0x00 | Padding
 | 20 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional volume section data.
+Adler-32 of all the previous data within the table header data.
 |===
 
 As of EnCase 6 the number of entries is no longer restricted to 16375 entries.
@@ -2751,7 +2751,7 @@ Some aspects of this section are:
 
 The digest section contains a MD5 and/or SHA1 hash of the data within the chunks.
 
-The additional digest section data is 80 byte of size and consists of:
+The digest section data is 80 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2760,7 +2760,7 @@ The additional digest section data is 80 byte of size and consists of:
 | 16 | 20 | | SHA1 hash of the media data
 | 36 | 40 | 0x00 | Padding
 | 76 | 4 | | Checksum +
-Adler-32 of all the previous data within the additional digest section data.
+Adler-32 of all the previous data within the digest section data.
 |===
 
 === Hash section
@@ -2775,7 +2775,7 @@ aspects of this section are:
 
 The hash section contains a MD5 hash of the data within the chunks.
 
-The additional digest section data is 36 byte of size and consists of:
+The hash section data is 36 byte of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===

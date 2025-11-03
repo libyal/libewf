@@ -1,7 +1,7 @@
 /*
  * Handle functions
  *
- * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -2631,7 +2631,7 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 /* TODO refactor */
 			internal_handle->io_handle->chunk_size = internal_handle->media_values->chunk_size;
 
-			/* Do a preliminary dection of the EWF format for reading the sector table section
+			/* Do a preliminary detection of the EWF format for reading the sector table section
 			 */
 			if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1 )
 			{

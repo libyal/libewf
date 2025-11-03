@@ -1,7 +1,7 @@
 /*
  * Library header_values type test program
  *
- * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -422,7 +422,7 @@ int ewf_test_convert_date_header_value(
 	 */
 	result = libewf_convert_date_header_value(
 	          (uint8_t *) "2006 4 1 999 47 44",
-	          20,
+	          19,
 	          &date_time_values_string,
 	          &date_time_values_string_size,
 	          &error );
@@ -443,7 +443,7 @@ int ewf_test_convert_date_header_value(
 	 */
 	result = libewf_convert_date_header_value(
 	          (uint8_t *) "2006 4 1 20 999 44",
-	          20,
+	          19,
 	          &date_time_values_string,
 	          &date_time_values_string_size,
 	          &error );
@@ -464,7 +464,7 @@ int ewf_test_convert_date_header_value(
 	 */
 	result = libewf_convert_date_header_value(
 	          (uint8_t *) "2006 4 1 20 47 999",
-	          20,
+	          19,
 	          &date_time_values_string,
 	          &date_time_values_string_size,
 	          &error );

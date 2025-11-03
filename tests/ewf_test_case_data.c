@@ -1,7 +1,7 @@
 /*
  * Library case_data type test program
  *
- * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -820,7 +820,7 @@ int ewf_test_case_data_parse_utf8_string(
 	 */
 	result = libewf_case_data_parse_utf8_string(
 	          utf8_string,
-	          137,
+	          135,
 	          media_values,
 	          header_values,
 	          &format,
@@ -839,7 +839,7 @@ int ewf_test_case_data_parse_utf8_string(
 	 */
 	result = libewf_case_data_parse_utf8_string(
 	          NULL,
-	          137,
+	          135,
 	          media_values,
 	          header_values,
 	          &format,
@@ -879,7 +879,7 @@ int ewf_test_case_data_parse_utf8_string(
 
 	result = libewf_case_data_parse_utf8_string(
 	          utf8_string,
-	          137,
+	          135,
 	          NULL,
 	          header_values,
 	          &format,
@@ -899,7 +899,7 @@ int ewf_test_case_data_parse_utf8_string(
 
 	result = libewf_case_data_parse_utf8_string(
 	          utf8_string,
-	          137,
+	          135,
 	          media_values,
 	          NULL,
 	          &format,
@@ -919,7 +919,7 @@ int ewf_test_case_data_parse_utf8_string(
 
 	result = libewf_case_data_parse_utf8_string(
 	          utf8_string,
-	          137,
+	          135,
 	          media_values,
 	          header_values,
 	          NULL,

@@ -1,7 +1,7 @@
 /*
  * EWF volume section
  *
- * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,7 +37,7 @@ struct ewf_volume
 {
 	/* The media type
 	 * consists of 1 byte
-	 * 0x00 => remobable disk
+	 * 0x00 => removeable disk
 	 * 0x01 => fixed disk
 	 * 0x03 => optical disk
 	 * 0x0e => LVF

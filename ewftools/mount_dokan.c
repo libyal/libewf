@@ -1,7 +1,7 @@
 /*
  * Mount tool dokan functions
  *
- * Copyright (C) 2006-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2006-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -701,7 +701,7 @@ on_error:
 
 #endif /* ( DOKAN_VERSION >= 600 ) && ( DOKAN_VERSION < 800 ) */
 
-/* Closes a file or direcotry
+/* Closes a file or directory
  * Returns 0 if successful or an error code otherwise
  */
 #if ( DOKAN_VERSION >= 600 ) && ( DOKAN_VERSION < 800 )
@@ -1015,7 +1015,7 @@ NTSTATUS __stdcall mount_dokan_FindFiles(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set find data.",
+		 "%s: unable to set self find data.",
 		 function );
 
 		result = MOUNT_DOKAN_ERROR_GENERIC_FAILURE;
@@ -1053,7 +1053,7 @@ NTSTATUS __stdcall mount_dokan_FindFiles(
 		 &error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set find data.",
+		 "%s: unable to set parent find data.",
 		 function );
 
 		result = MOUNT_DOKAN_ERROR_GENERIC_FAILURE;
@@ -1177,7 +1177,7 @@ NTSTATUS __stdcall mount_dokan_FindFiles(
 			 &error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set find data for sub file entry: %d.",
+			 "%s: unable to set sub file entry: %d find data.",
 			 function,
 			 sub_file_entry_index );
 
