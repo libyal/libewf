@@ -1,7 +1,9 @@
 # Script that synchronizes the local test data
 #
-# Version: 20230709
+# Version: 20251217
 
+$Repository = "log2timeline/dfvfs"
+$TestDataPath = "test_data"
 $TestSet = "public"
 $TestInputDirectory = "tests/input"
 $TestFiles = "ext2.E01"
@@ -16,7 +18,7 @@ If (-Not (Test-Path "${TestInputDirectory}\${TestSet}"))
 }
 ForEach ($TestFile in ${TestFiles} -split " ")
 {
-	$Url = "https://github.com/log2timeline/dfvfs/blob/main/test_data/${TestFile}?raw=true"
+	$Url = "https://raw.githubusercontent.com/${Repository}/refs/heads/main/${TestDataPath}/${TestFile}"
 
 	Invoke-WebRequest -Uri ${Url} -OutFile "${TestInputDirectory}\${TestSet}\${TestFile}"
 }

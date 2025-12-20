@@ -1,6 +1,6 @@
 # Info tool testing script
 #
-# Version: 20230410
+# Version: 20251219
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -133,7 +133,19 @@ For ($ProfileIndex = 0; $ProfileIndex -le ($Profiles.length - 1); $ProfileIndex 
 					{
 						Continue
 					}
-					$InputOptions = Get-content -Path "${TestDataOptionFile}" -First 1
+					$OptionsHeader = Get-content -Path "${TestDataOptionFile}" -First 1
+
+					If (-Not (${OptionsHeader} -match "^# libyal test data options"))
+					{
+						Continue
+					}
+					$InputOptions = Get-content -Path "${TestDataOptionFile}" | Select-Object -Skip 1
+
+					$InputOptions = $InputOptions -replace "^offset=","-o"
+					$InputOptions = $InputOptions -replace "^password=","-p"
+					$InputOptions = $InputOptions -replace "^recovery_password=","-r"
+					$InputOptions = $InputOptions -replace "^startup_key=","-s"
+					$InputOptions = $InputOptions -replace "^virtual_address=","-v"
 
 					$TestLog = "${InputFileName}-${OptionSet}.log"
 
