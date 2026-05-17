@@ -3,7 +3,7 @@ libewf is a library to access the Expert Witness Compression Format (EWF).
 Project information:
 
 * Status: experimental
-* Licence: LGPLv3+
+* Licence: LGPL-3.0-or-later
 
 Read or write supported EWF formats:
 

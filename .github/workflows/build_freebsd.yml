@@ -3,10 +3,10 @@ name: build_freebsd
 on: [push]
 permissions: read-all
 jobs:
-  build_freebsd:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Building from source
       id: build_freebsd
       uses: vmactions/freebsd-vm@v1
@@ -15,7 +15,7 @@ jobs:
         mem: 4096
         # Note that the test scripts require bash
         prepare: |
-          pkg install -y autoconf automake bash fusefs-libs gettext git libtool openssl pkgconf
+          pkg install -y autoconf automake bash byacc flex fusefs-libs gettext git libtool openssl pkgconf
         run: |
           tests/build.sh
           tests/runtests.sh

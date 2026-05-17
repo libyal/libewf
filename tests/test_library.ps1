@@ -1,6 +1,6 @@
 # Tests library functions and types.
 #
-# Version: 20251219
+# Version: 20251224
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -47,7 +47,7 @@ Function ReadIgnoreList
 	$IgnoreFile = "${TestProfileDirectory}\ignore"
 	$IgnoreList = ""
 
-	If (Test-Path -Path ${IgnoreFile} -PathType "Leaf")
+	If (Test-Path -Path ${IgnoreFile} -PathType Leaf)
 	{
 		$IgnoreList = Get-Content -Path ${IgnoreFile} | Where {$_ -notmatch '^#.*'}
 	}
@@ -61,7 +61,7 @@ Function RunTest
 	$TestDescription = "Testing: ${TestName}"
 	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
 
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType "Leaf"))
+	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
 	{
 		Write-Host "${TestDescription} (" -nonewline
 		Write-Host "SKIP" -foreground Cyan -nonewline
@@ -98,7 +98,7 @@ Function RunTestWithInput
 	$TestDescription = "Testing: ${TestName}"
 	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
 
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType "Leaf"))
+	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
 	{
 		Write-Host "${TestDescription} (" -nonewline
 		Write-Host "SKIP" -foreground Cyan -nonewline
@@ -108,7 +108,7 @@ Function RunTestWithInput
 	}
 	$TestProfileDirectory = "input\.libewf"
 
-	If (-Not (Test-Path -Path ${TestProfileDirectory} -PathType "Container"))
+	If (-Not (Test-Path -Path ${TestProfileDirectory} -PathType Container))
 	{
 		New-Item -ItemType "directory" -Path ${TestProfileDirectory}
 	}
@@ -118,7 +118,7 @@ Function RunTestWithInput
 
 	ForEach ($TestSetInputDirectory in Get-ChildItem -Path "input" -Exclude ".*")
 	{
-		If (-Not (Test-Path -Path ${TestSetInputDirectory} -PathType "Container"))
+		If (-Not (Test-Path -Path ${TestSetInputDirectory} -PathType Container))
 		{
 			Continue
 		}
@@ -128,9 +128,10 @@ Function RunTestWithInput
 		}
 		$TestSetName = ${TestSetInputDirectory}.Name
 
-		If (Test-Path -Path "${TestProfileDirectory}\${TestSetName}\files" -PathType "Leaf")
+		If (Test-Path -Path "${TestProfileDirectory}\${TestSetName}\files" -PathType Leaf)
 		{
 			$InputFiles = Get-Content -Path "${TestProfileDirectory}\${TestSetName}\files" | Where {$_ -ne ""}
+			$InputFiles = $InputFiles -replace "^","${TestSetInputDirectory}\"
 		}
 		Else
 		{
@@ -145,7 +146,7 @@ Function RunTestWithInput
 				$InputFileName = ${InputFile}.Name
 				$TestDataOptionFile = "${TestProfileDirectory}\${TestSetName}\${InputFileName}.${OptionSet}"
 
-				If (-Not (Test-Path -Path "${TestDataOptionFile}" -PathType "Leaf"))
+				If (-Not (Test-Path -Path "${TestDataOptionFile}" -PathType Leaf))
 				{
 					Continue
 				}
@@ -239,7 +240,7 @@ Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 	{
 		Continue
 	}
-	If (Test-Path -Path "input" -PathType "Container")
+	If (Test-Path -Path "input" -PathType Container)
 	{
 		$Result = RunTestWithInput ${TestName}
 	}
