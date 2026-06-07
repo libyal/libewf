@@ -276,7 +276,7 @@ int libewf_media_values_calculate_chunk_size(
 		 function );
 
 		return( -1 );
-	}	
+	}
 	if( ( media_values->sectors_per_chunk == 0 )
 	 || ( media_values->sectors_per_chunk > (uint32_t) INT32_MAX ) )
 	{

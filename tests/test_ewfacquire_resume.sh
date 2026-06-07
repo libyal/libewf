@@ -12,7 +12,7 @@ OPTIONS_PER_PROFILE=("-j0" "-j0 -x" "-j4" "-j4 -x")
 OPTION_SETS=""
 
 test_write_resume()
-{ 
+{
 	INPUT_FILE=$1;
 	RESUME_OFFSET=$2;
 	shift 2;

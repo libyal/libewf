@@ -28,16 +28,20 @@
 #include <sys/resource.h>
 #endif
 
-#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
-#include <stdlib.h>
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
+#include <fcntl.h>
+#endif
+
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
 #endif
 
 #if defined( HAVE_IO_H ) || defined( WINAPI )
 #include <io.h>
 #endif
 
-#if defined( HAVE_GLOB_H )
-#include <glob.h>
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
 #endif
 
 #include "byte_size_string.h"
@@ -176,6 +180,11 @@ int main( int argc, char * const argv[] )
 
 #if !defined( HAVE_GLOB_H )
 	ewftools_glob_t *glob                             = NULL;
+#endif
+
+#if defined( __MINGW32__ ) && defined( HAVE_MINGW_BINMODE )
+	_setmode( _fileno( stdout ), _O_BINARY );
+	_setmode( _fileno( stderr ), _O_BINARY );
 #endif
 
 	libcnotify_stream_set(
@@ -399,6 +408,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( __clang_analyzer__ )
+	__builtin_assume( ewfinfo_info_handle != NULL );
+#endif
 	if( option_bodyfile != NULL )
 	{
 		if( info_handle_set_bodyfile(
@@ -468,8 +480,6 @@ int main( int argc, char * const argv[] )
 				ewftools_output_version_fprint(
 				 stderr,
 				 program );
-
-				print_header = 0;
 			}
 			fprintf(
 			 stderr,
@@ -506,8 +516,6 @@ int main( int argc, char * const argv[] )
 				ewftools_output_version_fprint(
 				 stderr,
 				 program );
-
-				print_header = 0;
 			}
 			fprintf(
 			 stderr,
@@ -572,8 +580,6 @@ int main( int argc, char * const argv[] )
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -592,8 +598,6 @@ int main( int argc, char * const argv[] )
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -657,8 +661,6 @@ int main( int argc, char * const argv[] )
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -683,8 +685,6 @@ int main( int argc, char * const argv[] )
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -702,8 +702,6 @@ int main( int argc, char * const argv[] )
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -725,8 +723,6 @@ int main( int argc, char * const argv[] )
 					ewftools_output_version_fprint(
 					 stderr,
 					 program );
-
-					print_header = 0;
 				}
 				fprintf(
 				 stderr,
@@ -746,8 +742,6 @@ int main( int argc, char * const argv[] )
 					ewftools_output_version_fprint(
 					 stderr,
 					 program );
-
-					print_header = 0;
 				}
 				fprintf(
 				 stderr,
@@ -768,8 +762,6 @@ int main( int argc, char * const argv[] )
 					ewftools_output_version_fprint(
 					 stderr,
 					 program );
-
-					print_header = 0;
 				}
 				fprintf(
 				 stderr,
@@ -789,8 +781,6 @@ on_abort:
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -806,8 +796,6 @@ on_abort:
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -824,8 +812,6 @@ on_abort:
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stderr,
@@ -840,8 +826,6 @@ on_abort:
 			ewftools_output_version_fprint(
 			 stderr,
 			 program );
-
-			print_header = 0;
 		}
 		fprintf(
 		 stdout,

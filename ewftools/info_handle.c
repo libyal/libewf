@@ -6217,11 +6217,11 @@ int info_handle_file_entry_value_fprint(
 
 			goto on_error;
 		}
-		if( ( file_entry_flags & 0x00000010UL ) != 0 ) 
+		if( ( file_entry_flags & 0x00000010UL ) != 0 )
 		{
 			file_mode_string[ 0 ] = 'l';
 		}
-		else if( ( file_entry_flags & 0x02000000UL ) != 0 ) 
+		else if( ( file_entry_flags & 0x02000000UL ) != 0 )
 		{
 			file_mode_string[ 0 ] = 'd';
 		}
@@ -7872,13 +7872,13 @@ int info_handle_dfxml_build_environment_fprint(
 #if defined( __MINGW64_VERSION_MAJOR ) && defined( __MINGW64_VERSION_MINOR )
 	fprintf(
 	 stream,
-	 "\t\t\t<compiler>MinGW64 %d.%d</compiler>\n",
+	 "\t\t\t<compiler>MinGW-w64 %d.%d</compiler>\n",
 	 __MINGW64_VERSION_MAJOR,
 	 __MINGW64_VERSION_MINOR );
 #elif defined( __MINGW32_MAJOR_VERSION ) && defined( __MINGW32_MINOR_VERSION )
 	fprintf(
 	 stream,
-	 "\t\t\t<compiler>MinGW32 %d.%d</compiler>\n",
+	 "\t\t\t<compiler>MinGW %d.%d</compiler>\n",
 	 __MINGW32_MAJOR_VERSION,
 	 __MINGW32_MINOR_VERSION );
 #endif

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Library glob testing script
 #
-# Version: 20240413
+# Version: 20260606
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -12,7 +12,128 @@ chr()
 	local CHR_VALUE=`expr \( \( $1 / 64 \) \* 100 \) + \( \( \( $1 % 64 \) / 8 \) \* 10 \) + \( $1 % 8 \)`;
 
 	printf \\${CHR_VALUE};
-} 
+}
+
+if ! command -v seq >/dev/null 2>&1;
+then
+	seq()
+	{
+		local VALUE=$1;
+		local SEQUENCE="";
+
+		while test ${VALUE} -le $2;
+		do
+			SEQUENCE="${SEQUENCE} ${VALUE}";
+
+			VALUE=`expr ${VALUE} + 1`;
+		done
+
+		echo ${SEQUENCE};
+	}
+fi
+
+test_generate_test_files()
+{
+	TMPDIR=$1;
+	FILENAMES=$2;
+	INPUT=$3;
+
+	TEST_PATH="${TMPDIR}/${BASENAME}";
+	TEST_FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?;s? ? ${TMPDIR}/?g"`;
+
+	touch ${TEST_FILENAMES};
+
+	OSTYPE_LOWER=`echo "$OSTYPE" | tr '[A-Z]' '[a-z]'`;
+	case "${OSTYPE_LOWER}" in
+		cygwin*|msys*)
+			if test "${TESTS_USE_WINAPI}" = "yes" || test "${MSYSTEM}" = "MINGW32" || test "${MSYSTEM}" = "MINGW64";
+			then
+				WINDOWS_FILENAMES="";
+
+				for TEST_FILENAME in ${TEST_FILENAMES};
+				do
+					cygpath -w "${TEST_FILENAME}" >> ${INPUT};
+				done
+
+				TEST_PATH=`cygpath -w "${TEST_PATH}"`;
+			else
+				echo "${TEST_FILENAMES}" | tr ' ' '\n' > ${INPUT};
+			fi
+			;;
+
+		linux-gnu*)
+			if test -n "$WSL_DISTRO_NAME" || grep -qi "microsoft" /proc/version 2>/dev/null;
+			then
+				echo "WSL currently not supported";
+
+				exit ${EXIT_IGNORE};
+			fi
+			if ! test -x ${OBJDUMP};
+			then
+				echo "Missing executable: ${OBJDUMP}";
+
+				exit ${EXIT_IGNORE};
+			fi
+			if test "${TESTS_USE_WINAPI}" = "yes" || ${OBJDUMP} -f "${TEST_EXECUTABLE}" 2>&1 | grep -q "pei-";
+			then
+				WINDOWS_FILENAMES="";
+
+				for TEST_FILENAME in ${TEST_FILENAMES};
+				do
+					winepath -w "${TEST_FILENAME}" >> ${INPUT} 2>/dev/null;
+				done
+
+				TEST_PATH=`winepath -w "${TEST_PATH}" 2>/dev/null`;
+			else
+				echo "${TEST_FILENAMES}" | tr ' ' '\n' > ${INPUT};
+			fi
+			;;
+
+		*)
+			if test "${TESTS_USE_WINAPI}" = "yes";
+			then
+				echo "WINAPI not supported on ${OSTYPE}";
+
+				exit ${EXIT_IGNORE};
+			else
+				echo "${TEST_FILENAMES}" | tr ' ' '\n' > ${INPUT};
+			fi
+			;;
+	esac
+}
+
+test_compare()
+{
+	INPUT=$1;
+	OUTPUT=$2;
+
+	OSTYPE_LOWER=`echo "$OSTYPE" | tr '[A-Z]' '[a-z]'`;
+	case "${OSTYPE_LOWER}" in
+		cygwin*|msys*)
+			if test "${TESTS_USE_WINAPI}" = "yes" || test "${MSYSTEM}" = "MINGW32" || test "${MSYSTEM}" = "MINGW64";
+			then
+				sed -i'~' 's/\r$//' ${OUTPUT};
+			fi
+			;;
+
+		linux-gnu*)
+			if test "${TESTS_USE_WINAPI}" = "yes" || ${OBJDUMP} -f "${TEST_EXECUTABLE}" 2>&1 | grep -q "pei-";
+			then
+				sed -i'~' 's/\r$//' ${OUTPUT};
+			fi
+			;;
+
+		*)
+			;;
+	esac
+	if ! cmp -s ${INPUT} ${OUTPUT};
+	then
+		diff ${INPUT} ${OUTPUT};
+
+		return ${EXIT_FAILURE};
+	fi
+	return ${EXIT_SUCCESS};
+}
 
 seq()
 {
@@ -37,43 +158,28 @@ seq()
 }
 
 test_glob_sequence2()
-{ 
-	local TEST_EXECUTABLE=$1;
-	local BASENAME=$2;
-	local SCHEMA=$3;
-	local FILENAMES=$4;
+{
+	local EXPECTED_RESULT=$1;
+	local TEST_EXECUTABLE=$2;
+	local BASENAME=$3;
+	local SCHEMA=$4;
+	local FILENAMES=$5;
 
 	local TMPDIR="tmp$$";
 
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if test "${OSTYPE}" = "msys";
-	then
-		TEST_PATH="${TMPDIR}\\${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
-	else
-		TEST_PATH="${TMPDIR}/${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-	fi
-	echo ${FILENAMES} > ${TMPDIR}/input;
+	test_generate_test_files "${TMPDIR}" "${FILENAMES}" "${TMPDIR}/input";
 
-	touch ${FILENAMES};
-
-	TEST_DESCRIPTION="";
-
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
+	run_test_with_arguments "" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
-
-		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
-		then
-			RESULT=${EXIT_FAILURE};
-		fi
+		test_compare "${TMPDIR}/input" "${TMPDIR}/output";
+		RESULT=$?;
 	fi
 
 	rm -rf ${TMPDIR};
@@ -90,12 +196,13 @@ test_glob_sequence2()
 }
 
 test_glob_sequence3()
-{ 
-	local TEST_EXECUTABLE=$1;
-	local BASENAME=$2;
-	local SCHEMA=$3;
-	local FILENAME=$4;
-	local LAST=$5;
+{
+	local EXPECTED_RESULT=$1;
+	local TEST_EXECUTABLE=$2;
+	local BASENAME=$3;
+	local SCHEMA=$4;
+	local FILENAME=$5;
+	local LAST=$6;
 
 	local RESULT=`echo ${SCHEMA} | egrep "^[.][esEL]01$"`;
 	local IS_VALID=$?;
@@ -227,32 +334,16 @@ test_glob_sequence3()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if test "${OSTYPE}" = "msys";
-	then
-		TEST_PATH="${TMPDIR}\\${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
-	else
-		TEST_PATH="${TMPDIR}/${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-	fi
-	echo ${FILENAMES} > ${TMPDIR}/input;
+	test_generate_test_files "${TMPDIR}" "${FILENAMES}" "${TMPDIR}/input";
 
-	touch ${FILENAMES};
-
-	TEST_DESCRIPTION="";
-
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
+	run_test_with_arguments "" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
-
-		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
-		then
-			RESULT=${EXIT_FAILURE};
-		fi
+		test_compare "${TMPDIR}/input" "${TMPDIR}/output";
+		RESULT=$?;
 	fi
 
 	rm -rf ${TMPDIR};
@@ -269,12 +360,13 @@ test_glob_sequence3()
 }
 
 test_glob_sequence4()
-{ 
-	local TEST_EXECUTABLE=$1;
-	local BASENAME=$2;
-	local SCHEMA=$3;
-	local FILENAME=$4;
-	local LAST=$5;
+{
+	local EXPECTED_RESULT=$1;
+	local TEST_EXECUTABLE=$2;
+	local BASENAME=$3;
+	local SCHEMA=$4;
+	local FILENAME=$5;
+	local LAST=$6;
 
 	local RESULT=`echo ${SCHEMA} | egrep "^[.][EL]x01$"`;
 	local IS_VALID=$?;
@@ -373,32 +465,16 @@ test_glob_sequence4()
 	rm -rf ${TMPDIR};
 	mkdir ${TMPDIR};
 
-	if test "${OSTYPE}" = "msys";
-	then
-		TEST_PATH="${TMPDIR}\\${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}\\\\\\\\?" | sed "s? ? ${TMPDIR}\\\\\\\\?g"`;
-	else
-		TEST_PATH="${TMPDIR}/${BASENAME}";
-		FILENAMES=`echo ${FILENAMES} | sed "s?^?${TMPDIR}/?" | sed "s? ? ${TMPDIR}/?g"`;
-	fi
-	echo ${FILENAMES} > ${TMPDIR}/input;
+	test_generate_test_files "${TMPDIR}" "${FILENAMES}" "${TMPDIR}/input";
 
-	touch ${FILENAMES};
-
-	TEST_DESCRIPTION="";
-
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
+	run_test_with_arguments "" "${TEST_EXECUTABLE}" "${TEST_PATH}" > ${TMPDIR}/output;
 
 	RESULT=$?;
 
 	if test ${RESULT} -eq ${EXIT_SUCCESS};
 	then
-		sed 's/\r\n/\n/' -i ${TMPDIR}/output;
-
-		if ! cmp -s ${TMPDIR}/input ${TMPDIR}/output;
-		then
-			RESULT=${EXIT_FAILURE};
-		fi
+		test_compare "${TMPDIR}/input" "${TMPDIR}/output";
+		RESULT=$?;
 	fi
 
 	rm -rf ${TMPDIR};
@@ -416,15 +492,6 @@ test_glob_sequence4()
 
 if ! test -z ${SKIP_LIBRARY_TESTS};
 then
-	exit ${EXIT_IGNORE};
-fi
-
-OPERATING_SYSTEM=`uname -o 2> /dev/null`;
-
-if test "${OPERATING_SYSTEM}" = "Cygwin" || test "${OPERATING_SYSTEM}" = "Msys";
-then
-	# The glob tests run very slow on Cygwin and Msys.
-
 	exit ${EXIT_IGNORE};
 fi
 
@@ -457,252 +524,162 @@ source ${TEST_RUNNER};
 
 # .e01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01 PREFIX.e02 PREFIX.e03 PREFIX.e04 PREFIX.e05 PREFIX.e06 PREFIX.e07 PREFIX.e08 PREFIX.e09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01 PREFIX.e02 PREFIX.e03 PREFIX.e04 PREFIX.e05 PREFIX.e06 PREFIX.e07 PREFIX.e08 PREFIX.e09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01 PREFIX.e02 PREFIX.e03 PREFIX.e04 PREFIX.e05 PREFIX.e06 PREFIX.e07 PREFIX.e08 PREFIX.e09 PREFIX.e10 PREFIX.e11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX.e01 PREFIX.e02 PREFIX.e03 PREFIX.e04 PREFIX.e05 PREFIX.e06 PREFIX.e07 PREFIX.e08 PREFIX.e09 PREFIX.e10 PREFIX.e11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX" "eba";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX" "eba";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX" "faa";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.e01" ".e01" "PREFIX" "faa";
 then
 	exit ${EXIT_FAILURE};
 fi
 
 # .s01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01 PREFIX.s02 PREFIX.s03 PREFIX.s04 PREFIX.s05 PREFIX.s06 PREFIX.s07 PREFIX.s08 PREFIX.s09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01 PREFIX.s02 PREFIX.s03 PREFIX.s04 PREFIX.s05 PREFIX.s06 PREFIX.s07 PREFIX.s08 PREFIX.s09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01 PREFIX.s02 PREFIX.s03 PREFIX.s04 PREFIX.s05 PREFIX.s06 PREFIX.s07 PREFIX.s08 PREFIX.s09 PREFIX.s10 PREFIX.s11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX.s01 PREFIX.s02 PREFIX.s03 PREFIX.s04 PREFIX.s05 PREFIX.s06 PREFIX.s07 PREFIX.s08 PREFIX.s09 PREFIX.s10 PREFIX.s11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX" "sba";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX" "sba";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX" "taa";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.s01" ".s01" "PREFIX" "taa";
 then
 	exit ${EXIT_FAILURE};
 fi
 
 # .E01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01 PREFIX.E02 PREFIX.E03 PREFIX.E04 PREFIX.E05 PREFIX.E06 PREFIX.E07 PREFIX.E08 PREFIX.E09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01 PREFIX.E02 PREFIX.E03 PREFIX.E04 PREFIX.E05 PREFIX.E06 PREFIX.E07 PREFIX.E08 PREFIX.E09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01 PREFIX.E02 PREFIX.E03 PREFIX.E04 PREFIX.E05 PREFIX.E06 PREFIX.E07 PREFIX.E08 PREFIX.E09 PREFIX.E10 PREFIX.E11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX.E01 PREFIX.E02 PREFIX.E03 PREFIX.E04 PREFIX.E05 PREFIX.E06 PREFIX.E07 PREFIX.E08 PREFIX.E09 PREFIX.E10 PREFIX.E11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX" "EBA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX" "EBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX" "FAA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.E01" ".E01" "PREFIX" "FAA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
 # .L01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09 PREFIX.L10 PREFIX.L11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX.L01 PREFIX.L02 PREFIX.L03 PREFIX.L04 PREFIX.L05 PREFIX.L06 PREFIX.L07 PREFIX.L08 PREFIX.L09 PREFIX.L10 PREFIX.L11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX" "LBA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX" "LBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence3 "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX" "MAA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence3 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.L01" ".L01" "PREFIX" "MAA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
 # .Ex01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09 PREFIX.Ex10 PREFIX.Ex11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX.Ex01 PREFIX.Ex02 PREFIX.Ex03 PREFIX.Ex04 PREFIX.Ex05 PREFIX.Ex06 PREFIX.Ex07 PREFIX.Ex08 PREFIX.Ex09 PREFIX.Ex10 PREFIX.Ex11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence4 "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX" "ExBA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence4 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX" "ExBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence4 "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX" "EyAA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence4 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Ex01" ".Ex01" "PREFIX" "EyAA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
 # .Lx01
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence2 "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09 PREFIX.Lx10 PREFIX.Lx11";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence2 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX.Lx01 PREFIX.Lx02 PREFIX.Lx03 PREFIX.Lx04 PREFIX.Lx05 PREFIX.Lx06 PREFIX.Lx07 PREFIX.Lx08 PREFIX.Lx09 PREFIX.Lx10 PREFIX.Lx11";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence4 "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX" "LxBA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence4 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX" "LxBA";
 then
 	exit ${EXIT_FAILURE};
 fi
 
-test_glob_sequence4 "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX" "LyAA";
-RESULT=$?;
-
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if ! test_glob_sequence4 ${EXIT_SUCCESS} "${TEST_EXECUTABLE}" "PREFIX.Lx01" ".Lx01" "PREFIX" "LyAA";
 then
 	exit ${EXIT_FAILURE};
 fi

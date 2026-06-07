@@ -418,7 +418,7 @@ int imaging_handle_signal_abort(
 		return( -1 );
 	}
 	if( imaging_handle->secondary_output_handle != NULL )
-	{	
+	{
 		if( libewf_handle_signal_abort(
 		     imaging_handle->output_handle,
 		     error ) != 1 )
@@ -1949,7 +1949,7 @@ int imaging_handle_output_storage_media_buffer_callback(
 		 "%s: invalid imaging handle.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( storage_media_buffer == NULL )
 	{
@@ -1960,7 +1960,7 @@ int imaging_handle_output_storage_media_buffer_callback(
 		 "%s: invalid storage media buffer.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( imaging_handle->abort != 0 )
 	{
@@ -3749,8 +3749,6 @@ int imaging_handle_set_compression_values(
 			if( imaging_handle->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
 			{
 				imaging_handle->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-
-				result = 0;
 			}
 		}
 		segment_index++;
@@ -4444,9 +4442,6 @@ int imaging_handle_set_number_of_threads(
 
 		return( -1 );
 	}
-	string_length = system_string_length(
-	                 string );
-
 	if( string[ 0 ] != (system_character_t) '-' )
 	{
 		string_length = system_string_length(

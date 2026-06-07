@@ -14,7 +14,7 @@ OPTION_SETS="format:encase1 format:encase2 format:encase3 format:encase4 format:
 INPUT_GLOB="*.[Rr][Aa][Ww]";
 
 test_callback()
-{ 
+{
 	local TMPDIR=$1;
 	local TEST_SET_DIRECTORY=$2;
 	local TEST_OUTPUT=$3;

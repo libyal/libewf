@@ -30,6 +30,10 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
+AM_TESTS_ENVIRONMENT = \
+	export PYTHON="@PYTHON@"; \
+	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
+
 if HAVE_PYTHON_TESTS
 TESTS_PYEWF = \
 	test_python_module.sh
@@ -525,6 +529,7 @@ ewf_test_file_entry_SOURCES = \
 
 ewf_test_file_entry_LDADD = \
 	@LIBFDATA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -543,6 +548,7 @@ ewf_test_filename_LDADD = \
 ewf_test_glob_SOURCES = \
 	ewf_test_glob.c \
 	ewf_test_libewf.h \
+	ewf_test_macros.h \
 	ewf_test_unused.h
 
 ewf_test_glob_LDADD = \
@@ -759,6 +765,7 @@ ewf_test_line_reader_SOURCES = \
 
 ewf_test_line_reader_LDADD = \
 	@LIBFDATA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
 
@@ -1028,6 +1035,7 @@ ewf_test_single_file_tree_SOURCES = \
 
 ewf_test_single_file_tree_LDADD = \
 	@LIBFDATA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@
@@ -1340,7 +1348,8 @@ ewf_test_tools_output_SOURCES = \
 ewf_test_tools_output_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	../libewf/libewf.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
 
 ewf_test_tools_path_string_SOURCES = \
 	../ewftools/path_string.c ../ewftools/path_string.h \
@@ -1478,6 +1487,7 @@ ewf_test_value_table_LDADD = \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libewf/libewf.la \
 	@LIBCERROR_LIBADD@

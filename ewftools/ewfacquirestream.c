@@ -30,16 +30,16 @@
 #include <errno.h>
 #endif
 
-#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
-#include <stdlib.h>
-#endif
-
 #if defined( HAVE_FCNTL_H ) || defined( WINAPI )
 #include <fcntl.h>
 #endif
 
 #if defined( HAVE_IO_H ) || defined( WINAPI )
 #include <io.h>
+#endif
+
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
 #endif
 
 #include "byte_size_string.h"
@@ -931,6 +931,11 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                                      = 0;
 	int result                                           = 0;
 
+#if defined( __MINGW32__ ) && defined( HAVE_MINGW_BINMODE )
+	_setmode( _fileno( stdout ), _O_BINARY );
+	_setmode( _fileno( stderr ), _O_BINARY );
+#endif
+
 	libcnotify_stream_set(
 	 stderr,
 	 NULL );
@@ -1206,6 +1211,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( __clang_analyzer__ )
+	__builtin_assume( ewfacquirestream_imaging_handle != NULL );
+#endif
 	if( option_header_codepage != NULL )
 	{
 		result = imaging_handle_set_header_codepage(

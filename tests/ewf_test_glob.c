@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 
+#include "ewf_test_macros.h"
 #include "ewf_test_libewf.h"
 
 /* The main program
@@ -42,15 +43,17 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wchar_t **filenames        = NULL;
+	wchar_t **filenames       = NULL;
+	wchar_t *glob_string      = NULL;
 #else
-	char **filenames           = NULL;
+	char **filenames          = NULL;
+	char *glob_string         = NULL;
 #endif
 	libewf_error_t *error      = NULL;
-	system_character_t *source = NULL;
-	size_t string_length       = 0;
-	int filename_index         = 0;
-	int number_of_filenames    = 0;
+	size_t glob_string_length = 0;
+	int filename_index        = 0;
+	int number_of_filenames   = 0;
+	int result                = 0;
 
 	if( argc < 2 )
 	{
@@ -60,51 +63,53 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	source = argv[ 1 ];
+	glob_string = argv[ 1 ];
 
-	string_length = system_string_length(
-	                 source );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "glob_string",
+	 glob_string );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libewf_glob_wide(
-	     source,
-	     string_length,
-	     LIBEWF_FORMAT_UNKNOWN,
-	     &filenames,
-	     &number_of_filenames,
-	     &error ) != 1 )
+	glob_string_length = wide_string_length(
+	                      glob_string );
+
+	result = libewf_glob_wide(
+	          glob_string,
+	          glob_string_length,
+	          LIBEWF_FORMAT_UNKNOWN,
+	          &filenames,
+	          &number_of_filenames,
+	          &error );
 #else
-	if( libewf_glob(
-	     source,
-	     string_length,
-	     LIBEWF_FORMAT_UNKNOWN,
-	     &filenames,
-	     &number_of_filenames,
-	     &error ) != 1 )
+	glob_string_length = narrow_string_length(
+	                      argv[ 1 ] );
+
+	result = libewf_glob(
+	          glob_string,
+	          glob_string_length,
+	          LIBEWF_FORMAT_UNKNOWN,
+	          &filenames,
+	          &number_of_filenames,
+	          &error );
 #endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to glob filenames.\n" );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
-	if( number_of_filenames < 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Invalid number of filenames.\n" );
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "filenames",
+	 filenames );
 
-		return( EXIT_FAILURE );
-	}
-	else if( number_of_filenames == 0 )
-	{
-		fprintf(
-		 stderr,
-		 "Glob missing filenames.\n" );
+	EWF_TEST_ASSERT_GREATER_THAN_INT(
+	 "number_of_filenames",
+	 number_of_filenames,
+	 0 );
 
-		return( EXIT_FAILURE );
-	}
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	for( filename_index = 0;
 	     filename_index < number_of_filenames;
 	     filename_index++ )
@@ -112,48 +117,54 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		fprintf(
 		 stdout,
-		 "%ls",
+		 "%ls\n",
 		 filenames[ filename_index ] );
 #else
 		fprintf(
 		 stdout,
-		 "%s",
+		 "%s\n",
 		 filenames[ filename_index ] );
 #endif
-		if( filename_index == ( number_of_filenames - 1 ) )
-		{
-			fprintf(
-			 stdout,
-			 "\n" );
-		}
-		else
-		{
-			fprintf(
-			 stdout,
-			 " " );
-		}
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libewf_glob_wide_free(
-	     filenames,
-	     number_of_filenames,
-	     &error ) != 1 )
+	result = libewf_glob_wide_free(
+	          filenames,
+	          number_of_filenames,
+	          &error );
 #else
-	if( libewf_glob_free(
-	     filenames,
-	     number_of_filenames,
-	     &error ) != 1 )
+	result = libewf_glob_free(
+	          filenames,
+	          number_of_filenames,
+	          &error );
 #endif
-	{
-		fprintf(
-		 stderr,
-		 "Unable to free glob.\n" );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
-		goto on_error;
-	}
+	filenames = NULL;
+
+	EWF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( EXIT_SUCCESS );
 
 on_error:
+	if( filenames != NULL )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		libewf_glob_wide_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#else
+		libewf_glob_free(
+		 filenames,
+		 number_of_filenames,
+		 NULL );
+#endif
+	}
 	if( error != NULL )
 	{
 		libewf_error_backtrace_fprint(

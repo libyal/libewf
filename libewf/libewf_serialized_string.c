@@ -563,6 +563,17 @@ int libewf_serialized_string_read_hexadecimal_data(
 			}
 			internal_data_offset++;
 		}
+		if( internal_data_offset >= serialized_string->data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid internal data offset value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		serialized_string->data[ internal_data_offset ] = 0;
 	}
 	if( zero_values_only != 0 )

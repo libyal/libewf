@@ -6526,11 +6526,11 @@ off64_t libewf_internal_handle_seek_offset(
 		return( -1 );
 	}
 	if( whence == SEEK_CUR )
-	{	
+	{
 		offset += internal_handle->current_offset;
 	}
 	else if( whence == SEEK_END )
-	{	
+	{
 		offset += (off64_t) internal_handle->media_values->media_size;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )

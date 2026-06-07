@@ -977,13 +977,13 @@ int libewf_glob(
 			memory_free(
 			 segment_filename );
 
+			segment_filename = NULL;
+
 			break;
 		}
-		safe_number_of_filenames += 1;
-
 		reallocation = memory_reallocate(
 		                safe_filenames,
-		                sizeof( char * ) * safe_number_of_filenames );
+		                sizeof( char * ) * ( safe_number_of_filenames + 1 ) );
 
 		if( reallocation == NULL )
 		{
@@ -998,7 +998,7 @@ int libewf_glob(
 		}
 		safe_filenames = (char **) reallocation;
 
-		safe_filenames[ safe_number_of_filenames - 1 ] = segment_filename;
+		safe_filenames[ safe_number_of_filenames++ ] = segment_filename;
 
 		segment_filename = NULL;
 	}
@@ -1583,13 +1583,13 @@ int libewf_glob_wide(
 			memory_free(
 			 segment_filename );
 
+			segment_filename = NULL;
+
 			break;
 		}
-		safe_number_of_filenames += 1;
-
 		reallocation = memory_reallocate(
 		                safe_filenames,
-		                sizeof( wchar_t * ) * safe_number_of_filenames );
+		                sizeof( wchar_t * ) * ( safe_number_of_filenames + 1 ) );
 
 		if( reallocation == NULL )
 		{
@@ -1604,7 +1604,7 @@ int libewf_glob_wide(
 		}
 		safe_filenames = (wchar_t **) reallocation;
 
-		safe_filenames[ safe_number_of_filenames - 1 ] = segment_filename;
+		safe_filenames[ safe_number_of_filenames++ ] = segment_filename;
 
 		segment_filename = NULL;
 	}

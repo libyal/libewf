@@ -871,8 +871,9 @@ ssize_t libewf_table_section_read_file_io_pool(
 
 				goto on_error;
 			}
+#if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
 			data_offset += table_footer_data_size;
-
+#endif
 			if( stored_checksum != calculated_checksum )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -1070,7 +1071,9 @@ int libewf_table_section_write_header_data(
 		 ( (ewf_table_header_v2_t *) data )->checksum,
 		 calculated_checksum );
 
+#if defined( HAVE_DEBUG_OUTPUT )
 		header_data_size += 12;
+#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

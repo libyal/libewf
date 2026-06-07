@@ -1687,8 +1687,6 @@ ssize_t libewf_segment_file_read_table2_section(
 
 		goto on_error;
 	}
-	result = 1;
-
 	if( table_section->entries_corrupted != 0 )
 	{
 		segment_file->flags |= LIBEWF_SEGMENT_FILE_FLAG_IS_CORRUPTED;
@@ -6954,7 +6952,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 
 			goto on_error;
 		}
-		chunk_group_data_size -= read_count;
 	}
 	else if( segment_file->major_version == 2 )
 	{
@@ -7027,7 +7024,6 @@ int libewf_segment_file_read_chunk_group_element_data(
 		goto on_error;
 	}
 	segment_file->current_offset += read_count;
-	chunk_group_data_size        -= read_count;
 
 	if( table_section->number_of_entries == 0 )
 	{

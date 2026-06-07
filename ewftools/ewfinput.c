@@ -1243,15 +1243,15 @@ int ewfinput_get_string_variable(
 				while( end_of_input == NULL )
 				{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
-					                 stdin,
-					                 string_variable,
-					                 (int) ( string_variable_size - 1 ) );
+					file_stream_get_string_wide(
+					 stdin,
+					 string_variable,
+					 (int) ( string_variable_size - 1 ) );
 #else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 string_variable,
-					                 (int) ( string_variable_size - 1 ) );
+					file_stream_get_string(
+					 stdin,
+					 string_variable,
+					 (int) ( string_variable_size - 1 ) );
 #endif
 					end_of_input = system_string_search_character(
 					                string_variable,
@@ -1406,15 +1406,15 @@ int ewfinput_get_size_variable(
 				while( end_of_input == NULL )
 				{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string_wide(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #endif
 					end_of_input = system_string_search_character(
 					                input_buffer,
@@ -1639,15 +1639,15 @@ int ewfinput_get_byte_size_variable(
 				while( end_of_input == NULL )
 				{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string_wide(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #endif
 					end_of_input = system_string_search_character(
 					                input_buffer,
@@ -1847,21 +1847,20 @@ int ewfinput_get_fixed_string_variable(
 				while( end_of_input == NULL )
 				{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-					result_string = file_stream_get_string_wide(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string_wide(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #else
-					result_string = file_stream_get_string(
-					                 stdin,
-					                 input_buffer,
-					                 (int) ( input_buffer_size - 1 ) );
+					file_stream_get_string(
+					 stdin,
+					 input_buffer,
+					 (int) ( input_buffer_size - 1 ) );
 #endif
 					end_of_input = system_string_search_character(
 					                input_buffer,
 					                (system_character_t) '\n',
 					                input_buffer_size );
-
 				}
 				return( -1 );
 			}

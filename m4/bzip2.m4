@@ -1,6 +1,6 @@
 dnl Checks for bzip2 required headers and functions
 dnl
-dnl Version: 20240308
+dnl Version: 20240314
 
 dnl Function to detect if bzip2 is available
 AC_DEFUN([AX_BZIP2_CHECK_LIB],
@@ -66,9 +66,9 @@ AC_DEFUN([AX_BZIP2_CHECK_LIB],
       ])
 
     AS_IF(
-      [test "x$ac_cv_with_bzip2" != x && test "x$ac_cv_with_bzip2" != xauto-detect && test "x$ac_cv_with_bzip2" != xyes],
+      [test "x$ac_cv_bzip2" != xyes && test "x$ac_cv_with_bzip2" != x && test "x$ac_cv_with_bzip2" != xauto-detect && test "x$ac_cv_with_bzip2" != xyes],
       [AC_MSG_FAILURE(
-        [unable to find supported bzip2 in directory: $ac_cv_with_bzip2],
+        [unable to find supported bzlib in directory: $ac_cv_with_bzip2],
         [1])
       ])
     ])

@@ -2633,8 +2633,6 @@ int export_handle_set_compression_values(
 			if( export_handle->compression_method != LIBEWF_COMPRESSION_METHOD_DEFLATE )
 			{
 				export_handle->compression_method = LIBEWF_COMPRESSION_METHOD_DEFLATE;
-
-				result = 0;
 			}
 		}
 		segment_index++;
@@ -3162,9 +3160,6 @@ int export_handle_set_number_of_threads(
 
 		return( -1 );
 	}
-	string_length = system_string_length(
-	                 string );
-
 	if( string[ 0 ] != (system_character_t) '-' )
 	{
 		string_length = system_string_length(
@@ -4142,7 +4137,6 @@ ssize_t export_handle_write(
          size_t input_size,
          libcerror_error_t **error )
 {
-	uint8_t *input_buffer = NULL;
 	static char *function = "export_handle_write";
 	size_t write_size     = 0;
 	ssize_t process_count = 0;
@@ -4170,20 +4164,6 @@ ssize_t export_handle_write(
 
 		return( -1 );
 	}
-	if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
-	{
-		if( output_storage_media_buffer == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid output storage media buffer.",
-			 function );
-
-			return( -1 );
-		}
-	}
 	while( input_size > 0 )
 	{
 		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
@@ -4196,28 +4176,32 @@ ssize_t export_handle_write(
 			{
 				write_size = (size_t) input_size;
 			}
-			if( ( output_storage_media_buffer->raw_buffer_data_size + write_size ) > export_handle->output_chunk_size )
-			{
-				write_size = export_handle->output_chunk_size - output_storage_media_buffer->raw_buffer_data_size;
-			}
-			input_buffer = input_storage_media_buffer->raw_buffer;
-
-			if( memory_copy(
-			     &( output_storage_media_buffer->raw_buffer[ output_storage_media_buffer->raw_buffer_data_size ] ),
-			     input_buffer,
-			     write_size ) == NULL )
+			if( storage_media_buffer_add_data(
+			     output_storage_media_buffer,
+			     input_storage_media_buffer->raw_buffer,
+			     write_size,
+			     error ) == -1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy data from input buffer to output raw buffer.",
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to add data from input buffer to storage media buffer.",
 				 function );
 
 				return( -1 );
 			}
-			output_storage_media_buffer->raw_buffer_data_size += write_size;
+			if( output_storage_media_buffer == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid output storage media buffer.",
+				 function );
 
+				return( -1 );
+			}
 			/* Make sure the output chunk is filled upto the output chunk size
 			 */
 			if( ( export_handle->last_offset_hashed < (off64_t) export_handle->export_size )
@@ -4287,7 +4271,19 @@ ssize_t export_handle_write(
 
 		if( input_storage_media_buffer->mode == STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA )
 		{
-			output_storage_media_buffer->raw_buffer_data_size = 0;
+			if( storage_media_buffer_empty(
+			     output_storage_media_buffer,
+			     error ) == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to empty storage media buffer.",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	return( write_count );
@@ -4529,7 +4525,7 @@ int export_handle_output_storage_media_buffer_callback(
 		 "%s: invalid export handle.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( storage_media_buffer == NULL )
 	{
@@ -4540,7 +4536,7 @@ int export_handle_output_storage_media_buffer_callback(
 		 "%s: invalid storage media buffer.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( export_handle->abort != 0 )
 	{
@@ -7038,7 +7034,7 @@ int export_handle_checksum_errors_fprint(
 		 stream,
 		 "\ttotal number: %" PRIu32 "\n",
 		 number_of_errors );
-		
+
 		for( error_index = 0;
 		     error_index < number_of_errors;
 		     error_index++ )
@@ -7192,6 +7188,7 @@ int export_handle_checksum_errors_fprint(
 						memory_free(
 						 filename );
 					}
+					filename = NULL;
 				}
 				start_sector += export_handle->input_chunk_size;
 			}

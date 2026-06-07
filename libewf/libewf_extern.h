@@ -24,21 +24,28 @@
 
 #include <common.h>
 
+#if !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute )
+#if __has_attribute( visibility )
+#define LIBEWF_INTERNAL	__attribute__((visibility("hidden"))) extern
+
+#else
+#define LIBEWF_INTERNAL	extern
+
+#endif /* __has_attribute( visibility ) */
+#else
+#define LIBEWF_INTERNAL	extern
+
+#endif /* !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute ) */
+
 /* Define HAVE_LOCAL_LIBEWF for local use of libewf
  */
 #if !defined( HAVE_LOCAL_LIBEWF )
 
 #include <libewf/extern.h>
 
-#if defined( __CYGWIN__ ) || defined( __MINGW32__ )
-#define LIBEWF_EXTERN_VARIABLE	extern
-#else
-#define LIBEWF_EXTERN_VARIABLE	LIBEWF_EXTERN
-#endif
-
 #else
 #define LIBEWF_EXTERN		/* extern */
-#define LIBEWF_EXTERN_VARIABLE	extern
+#define LIBEWF_EXTERN_VARIABLE	LIBEWF_INTERNAL
 
 #endif /* !defined( HAVE_LOCAL_LIBEWF ) */
 

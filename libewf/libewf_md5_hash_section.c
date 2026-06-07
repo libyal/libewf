@@ -458,7 +458,9 @@ int libewf_md5_hash_section_write_data(
 		 ( (ewf_md5_hash_t *) data )->checksum,
 		 calculated_checksum );
 
+#if defined( HAVE_DEBUG_OUTPUT )
 		data_size += 12;
+#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

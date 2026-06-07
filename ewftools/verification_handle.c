@@ -207,11 +207,6 @@ on_error:
 			memory_free(
 			 ( *verification_handle )->stored_sha1_hash_string );
 		}
-		if( ( *verification_handle )->stored_sha1_hash_string != NULL )
-		{
-			memory_free(
-			 ( *verification_handle )->stored_sha1_hash_string );
-		}
 		if( ( *verification_handle )->stored_md5_hash_string != NULL )
 		{
 			memory_free(
@@ -1181,8 +1176,6 @@ int verification_handle_process_storage_media_buffer_callback(
 		libcerror_error_free(
 		 &error );
 
-		process_count = verification_handle->chunk_size;
-
 		storage_media_buffer->is_corrupted = 1;
 	}
 	if( libcthreads_thread_pool_push(
@@ -1269,7 +1262,7 @@ int verification_handle_output_storage_media_buffer_callback(
 		 "%s: invalid verification handle.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( storage_media_buffer == NULL )
 	{
@@ -1280,7 +1273,7 @@ int verification_handle_output_storage_media_buffer_callback(
 		 "%s: invalid storage media buffer.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( verification_handle->abort != 0 )
 	{
@@ -3707,9 +3700,6 @@ int verification_handle_set_number_of_threads(
 
 		return( -1 );
 	}
-	string_length = system_string_length(
-	                 string );
-
 	if( string[ 0 ] != (system_character_t) '-' )
 	{
 		string_length = system_string_length(

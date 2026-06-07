@@ -908,13 +908,13 @@ int ewf_test_compress_data(
 
 #endif /* defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL ) */
 
+/* TODO fix tests
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
 	maximum_data_size = (size_t) INT_MAX;
 #else
 	maximum_data_size = 0;
 #endif
 
-/* TODO fix tests
 	if( maximum_data_size > 0 )
 	{
 		compressed_data_size = maximum_data_size + 1;
@@ -1168,13 +1168,13 @@ int ewf_test_decompress_data(
 	libcerror_error_free(
 	 &error );
 
+/* TODO fix tests
 #if defined( HAVE_LIBBZ2 ) || defined( BZIP2_DLL )
 	maximum_data_size = (size_t) INT_MAX;
 #else
 	maximum_data_size = 0;
 #endif
 
-/* TODO fix tests
 	if( maximum_data_size > 0 )
 	{
 		result = libewf_decompress_data(

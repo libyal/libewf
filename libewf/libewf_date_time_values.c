@@ -796,7 +796,7 @@ int libewf_utf8_string_day_of_week_copy_from_time_elements(
 		return( -1 );
 	}
 	string_index = *utf8_string_index;
-	
+
 	switch( time_elements->tm_wday )
 	{
 		case 0:

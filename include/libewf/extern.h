@@ -31,14 +31,17 @@
  */
 #if defined( LIBEWF_DLL_EXPORT )
 #define LIBEWF_EXTERN __declspec(dllexport)
+#define LIBEWF_EXTERN_VARIABLE extern __declspec(dllexport)
 
 #elif defined( LIBEWF_DLL_IMPORT )
-#define LIBEWF_EXTERN extern __declspec(dllimport)
+#define LIBEWF_EXTERN __declspec(dllimport)
+#define LIBEWF_EXTERN_VARIABLE extern __declspec(dllimport)
 
 #else
 #define LIBEWF_EXTERN extern
+#define LIBEWF_EXTERN_VARIABLE extern
 
-#endif
+#endif /* defined( LIBEWF_DLL_EXPORT ) */
 
 #endif /* !defined( _LIBEWF_EXTERN_H ) */
 

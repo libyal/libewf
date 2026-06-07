@@ -1,6 +1,6 @@
 dnl Checks for libcdatetime required headers and functions
 dnl
-dnl Version: 20240514
+dnl Version: 20260527
 
 dnl Function to detect if libcdatetime is available
 dnl ac_libcdatetime_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -118,23 +118,23 @@ AC_DEFUN([AX_LIBCDATETIME_CHECK_FUNC_CTIME],
         [[ctime_r( NULL, NULL, 0 )]] )],
         [AC_MSG_RESULT(
           [with additional size argument])
-        ac_cv_cv_ctime_r_size=yes],
-        [ac_cv_cv_ctime_r_size=no])
+        ac_cv_ctime_r_size=yes],
+        [ac_cv_ctime_r_size=no])
 
     AS_IF(
-      [test "x$ac_cv_cv_ctime_r_size" = xno],
+      [test "x$ac_cv_ctime_r_size" = xno],
       [AC_LINK_IFELSE(
         [AC_LANG_PROGRAM(
           [[#include <time.h>]],
           [[ctime_r( NULL, NULL )]] )],
         [AC_MSG_RESULT(
           [with two arguments])
-        ac_cv_cv_ctime_r_posix=yes],
-        [ac_cv_cv_ctime_r_posix=no])
+        ac_cv_ctime_r_posix=yes],
+        [ac_cv_ctime_r_posix=no])
       ])
 
     AS_IF(
-      [test "x$ac_cv_cv_ctime_r_posix" = xno],
+      [test "x$ac_cv_ctime_r_posix" = xno],
       [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
       AC_LINK_IFELSE(
         [AC_LANG_PROGRAM(
@@ -142,14 +142,14 @@ AC_DEFUN([AX_LIBCDATETIME_CHECK_FUNC_CTIME],
           [[ctime_r( NULL, NULL )]] )],
         [AC_MSG_RESULT(
           [with two arguments and definition _POSIX_PTHREAD_SEMANTICS])
-          ac_cv_cv_ctime_r_posix=yes],
-        [ac_cv_cv_ctime_r_posix=no])
+          ac_cv_ctime_r_posix=yes],
+        [ac_cv_ctime_r_posix=no])
       ])
 
     AC_LANG_POP(C)
 
     AS_IF(
-      [test "x$ac_cv_cv_ctime_r_size" = xno && test "x$ac_cv_cv_ctime_r_posix" = xno],
+      [test "x$ac_cv_ctime_r_size" = xno && test "x$ac_cv_ctime_r_posix" = xno],
       [AC_MSG_WARN(
         [unknown])
       ac_cv_func_ctime_r=no])
@@ -159,11 +159,11 @@ AC_DEFUN([AX_LIBCDATETIME_CHECK_FUNC_CTIME],
       [AC_DEFINE(
         [HAVE_CTIME_R],
         [1],
-        [Define to 1 if you have the ctime_r function.])
+        [Define to 1 if you have the `ctime_r' function.])
       ])
 
     AS_IF(
-      [test "x$ac_cv_cv_ctime_r_size" = xyes],
+      [test "x$ac_cv_ctime_r_size" = xyes],
       [AC_DEFINE(
         [HAVE_CTIME_R_SIZE],
         [1],

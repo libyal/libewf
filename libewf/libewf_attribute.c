@@ -714,7 +714,7 @@ int libewf_attribute_get_utf16_value_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded 
+/* Retrieves the UTF-16 encoded value
  * The size should include the end of string character
  * Returns 1 if successful, 0 if not set or -1 on error
  */

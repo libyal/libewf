@@ -26,10 +26,11 @@
 #include <types.h>
 #include <wide_string.h>
 
-#if defined( WINAPI )
+#if defined( HAVE_RPCDCE_H ) && ( defined( HAVE_LIBRPCRT4 ) || defined( WINAPI ) )
 #include <rpcdce.h>
+#endif
 
-#elif defined( HAVE_UUID_UUID_H )
+#if defined( HAVE_UUID_UUID_H ) || defined( HAVE_LIBUUID )
 #include <uuid/uuid.h>
 #endif
 
@@ -47,7 +48,7 @@ int guid_generate(
      uint8_t guid_type,
      libcerror_error_t **error )
 {
-#if defined( WINAPI )
+#if defined( HAVE_LIBRPCRT4 ) || defined( WINAPI )
 	UUID uuid             = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 #endif
 
@@ -90,7 +91,7 @@ int guid_generate(
 	}
 	if( guid_type == GUID_TYPE_RANDOM )
 	{
-#if defined( WINAPI )
+#if defined( HAVE_LIBRPCRT4 ) || defined( WINAPI )
 		UuidCreate(
 		 &uuid );
 
@@ -113,7 +114,7 @@ int guid_generate(
 		 guid );
 #endif
 	}
-#if defined( WINAPI )
+#if defined( HAVE_LIBRPCRT4 ) || defined( WINAPI )
 	byte_stream_copy_from_uint32_little_endian(
 	 guid,
 	 uuid.Data1 );
@@ -141,7 +142,7 @@ int guid_generate(
 	guid[ 6 ] = uuid.Data4[ 6 ];
 	guid[ 7 ] = uuid.Data4[ 7 ];
 
-#endif /* defined( WINAPI ) */
+#endif /* defined( HAVE_LIBRPCRT4 ) || defined( WINAPI ) */
 
 	return( 1 );
 }

@@ -276,6 +276,12 @@ void ewftools_output_version_detailed_fprint(
 	 LIBSMRAW_VERSION_STRING );
 #endif
 
+#if defined( HAVE_LIBRPCRT4 )
+	fprintf(
+	 stream,
+	 ", librpcrt4" );
+#endif
+
 #if defined( HAVE_LIBUUID )
 	fprintf(
 	 stream,

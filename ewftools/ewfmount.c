@@ -25,7 +25,19 @@
 #include <system_string.h>
 #include <types.h>
 
+#if defined( HAVE_SYS_RESOURCE_H )
+#include <sys/resource.h>
+#endif
+
 #include <stdio.h>
+
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
+#include <fcntl.h>
+#endif
+
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
 
 #if defined( HAVE_IO_H ) || defined( WINAPI )
 #include <io.h>
@@ -37,10 +49,6 @@
 
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
-#endif
-
-#if defined( HAVE_SYS_RESOURCE_H )
-#include <sys/resource.h>
 #endif
 
 #include "ewftools_getopt.h"
@@ -71,7 +79,11 @@ void usage_fprint(
 	}
 	fprintf( stream, "Use ewfmount to mount an Expert Witness Compression Format (EWF) image file\n\n" );
 
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	fprintf( stream, "Usage: ewfmount [ -f format ] [ -X extended_options ] [ -hvV ] image mount_point\n\n" );
+#else
+	fprintf( stream, "Usage: ewfmount [ -f format ] [ -hvV ] image mount_point\n\n" );
+#endif
 
 	fprintf( stream, "\timage:       an Expert Witness Compression Format (EWF) image file\n\n" );
 	fprintf( stream, "\tmount_point: the directory to serve as mount point\n\n" );
@@ -82,7 +94,10 @@ void usage_fprint(
 	fprintf( stream, "\t-v:          verbose output to stderr, while ewfmount will remain running in the\n"
 	                 "\t             foreground\n" );
 	fprintf( stream, "\t-V:          print version\n" );
+
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	fprintf( stream, "\t-X:          extended options to pass to sub system\n" );
+#endif
 }
 
 /* Signal handler for ewfmount
@@ -143,9 +158,8 @@ int main( int argc, char * const argv[] )
 
 	system_character_t * const *sources         = NULL;
 	libewf_error_t *error                       = NULL;
-	system_character_t *mount_point             = NULL;
-	system_character_t *option_extended_options = NULL;
 	system_character_t *option_format           = NULL;
+	system_character_t *options                 = NULL;
 	const system_character_t *path_prefix       = NULL;
 	system_character_t *program                 = _SYSTEM_STRING( "ewfmount" );
 	system_integer_t option                     = 0;
@@ -158,8 +172,14 @@ int main( int argc, char * const argv[] )
 	ewftools_glob_t *glob                       = NULL;
 #endif
 
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE ) || defined( HAVE_LIBDOKAN )
+	system_character_t *mount_point             = NULL;
+#endif
+
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations ewfmount_fuse_operations;
+
+	system_character_t *option_extended_options = NULL;
 
 #if defined( HAVE_LIBFUSE3 )
 	/* Need to set this to 1 even if there no arguments, otherwise this causes
@@ -176,6 +196,11 @@ int main( int argc, char * const argv[] )
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS ewfmount_dokan_operations;
 	DOKAN_OPTIONS ewfmount_dokan_options;
+#endif
+
+#if defined( __MINGW32__ ) && defined( HAVE_MINGW_BINMODE )
+	_setmode( _fileno( stdout ), _O_BINARY );
+	_setmode( _fileno( stderr ), _O_BINARY );
 #endif
 
 	libcnotify_stream_set(
@@ -208,10 +233,15 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
+	options = _SYSTEM_STRING( "f:hvVX:" );
+#else
+	options = _SYSTEM_STRING( "f:hvV" );
+#endif
 	while( ( option = ewftools_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "f:hvVX:" ) ) ) != (system_integer_t) -1 )
+	                   options ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -249,10 +279,12 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 			case (system_integer_t) 'X':
 				option_extended_options = optarg;
 
 				break;
+#endif
 		}
 	}
 	if( optind == argc )
@@ -277,8 +309,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE ) || defined( HAVE_LIBDOKAN )
 	mount_point = argv[ argc - 1 ];
-
+#endif
 	libcnotify_verbose_set(
 	 verbose );
 	libewf_notify_set_stream(

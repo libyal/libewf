@@ -407,7 +407,9 @@ ssize_t libewf_lef_extended_attribute_read_data(
 		}
 		value_size *= 2;
 
+#if defined( HAVE_DEBUG_OUTPUT )
 		data_offset += value_size;
+#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

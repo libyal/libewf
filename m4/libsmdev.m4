@@ -67,7 +67,7 @@ AC_DEFUN([AX_LIBSMDEV_CHECK_LIB],
            [libsmdev_handle_set_error_flags],
            [libsmdev_handle_set_error_granularity],
            [libsmdev_handle_set_number_of_error_retries]])
-  
+
         AS_IF(
           [test "x$ac_cv_enable_wide_character_type" != xno],
           [AX_CHECK_LIB_FUNCTIONS(

@@ -129,8 +129,6 @@ int libewf_session_section_read_data(
 
 		return( -1 );
 	}
-	session_data = data;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -350,9 +348,7 @@ int libewf_session_section_read_data(
 				 0 );
 			}
 		}
-#endif
-		session_data      += session_footer_data_size;
-		data_size -= session_footer_data_size;
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 		if( stored_checksum != calculated_checksum )
 		{
@@ -368,6 +364,9 @@ int libewf_session_section_read_data(
 			goto on_error;
 		}
 #if defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT )
+		session_data += session_footer_data_size;
+		data_size    -= session_footer_data_size;
+
 		if( libcnotify_verbose != 0 )
 		{
 			if( data_size > 0 )
@@ -388,7 +387,8 @@ int libewf_session_section_read_data(
 #endif
 			}
 		}
-#endif
+#endif /* defined( HAVE_VERBOSE_OUTPUT ) || defined( HAVE_DEBUG_OUTPUT ) */
+
 		if( libcdata_array_empty(
 		     sessions,
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_sector_range_free,

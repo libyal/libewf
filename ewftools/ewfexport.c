@@ -24,10 +24,6 @@
 #include <system_string.h>
 #include <types.h>
 
-#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
-#include <stdlib.h>
-#endif
-
 #if defined( HAVE_SYS_RESOURCE_H )
 #include <sys/resource.h>
 #endif
@@ -36,12 +32,16 @@
 #include <fcntl.h>
 #endif
 
+#if defined( HAVE_GLOB_H )
+#include <glob.h>
+#endif
+
 #if defined( HAVE_IO_H ) || defined( WINAPI )
 #include <io.h>
 #endif
 
-#if defined( HAVE_GLOB_H )
-#include <glob.h>
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
 #endif
 
 #include "byte_size_string.h"
@@ -287,6 +287,11 @@ int main( int argc, char * const argv[] )
 
 #if !defined( HAVE_GLOB_H )
 	ewftools_glob_t *glob                            = NULL;
+#endif
+
+#if defined( __MINGW32__ ) && defined( HAVE_MINGW_BINMODE )
+	_setmode( _fileno( stdout ), _O_BINARY );
+	_setmode( _fileno( stderr ), _O_BINARY );
 #endif
 
 	libcnotify_stream_set(
@@ -559,6 +564,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( __clang_analyzer__ )
+	__builtin_assume( ewfexport_export_handle != NULL );
+#endif
 #if defined( HAVE_GETRLIMIT )
 	if( getrlimit(
             RLIMIT_NOFILE,

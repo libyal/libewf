@@ -368,7 +368,7 @@ int ewf_test_write_chunk(
 	 chunk_buffer );
 
 	chunk_buffer = NULL;
-	
+
 	if( libewf_data_chunk_free(
 	     &data_chunk,
 	     error ) != 1 )

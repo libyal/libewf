@@ -14,7 +14,7 @@ OPTION_SETS="format:encase5 format:encase6 format:encase7 format:encase7-v2";
 INPUT_GLOB="*.[Cc][Uu][Ee]";
 
 test_callback()
-{ 
+{
 	local TMPDIR=$1;
 	local TEST_SET_DIRECTORY=$2;
 	local TEST_OUTPUT=$3;

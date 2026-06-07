@@ -649,6 +649,7 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
 {
 	uint8_t *section_data     = NULL;
 	static char *function     = "libewf_volume_section_e01_write_file_io_pool";
+	size_t section_data_size  = 0;
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
 
@@ -736,8 +737,10 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
 	}
 	total_write_count += write_count;
 
+	section_data_size = sizeof( ewf_volume_t );
+
 	section_data = (uint8_t *) memory_allocate(
-	                            sizeof( ewf_volume_t ) );
+	                            section_data_size );
 
 	if( section_data == NULL )
 	{
@@ -752,7 +755,7 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
 	}
 	if( libewf_volume_section_e01_write_data(
 	     section_data,
-	     sizeof( ewf_volume_t ),
+	     section_data_size,
 	     io_handle,
 	     media_values,
 	     error ) != 1 )
@@ -772,7 +775,7 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               section_data,
-	               sizeof( ewf_volume_t ),
+	               section_data_size,
 	               error );
 
 	if( write_count == -1 )
@@ -784,7 +787,7 @@ ssize_t libewf_volume_section_e01_write_file_io_pool(
 		 "%s: unable to write section data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	total_write_count += write_count;
 
@@ -1265,6 +1268,7 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
 {
 	uint8_t *section_data     = NULL;
 	static char *function     = "libewf_volume_section_s01_write_file_io_pool";
+	size_t section_data_size  = 0;
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
 
@@ -1352,8 +1356,10 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
 	}
 	total_write_count += write_count;
 
+	section_data_size = sizeof( ewf_volume_smart_t );
+
 	section_data = (uint8_t *) memory_allocate(
-	                            sizeof( ewf_volume_smart_t ) );
+	                            section_data_size );
 
 	if( section_data == NULL )
 	{
@@ -1368,7 +1374,7 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
 	}
 	if( libewf_volume_section_s01_write_data(
 	     section_data,
-	     sizeof( ewf_volume_smart_t ),
+	     section_data_size,
 	     io_handle,
 	     media_values,
 	     error ) != 1 )
@@ -1388,7 +1394,7 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
 	               file_io_pool,
 	               file_io_pool_entry,
 	               section_data,
-	               sizeof( ewf_volume_smart_t ),
+	               section_data_size,
 	               error );
 
 	if( write_count == -1 )
@@ -1400,7 +1406,7 @@ ssize_t libewf_volume_section_s01_write_file_io_pool(
 		 "%s: unable to write section data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	total_write_count += write_count;
 

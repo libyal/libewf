@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Library API write functions testing script
 #
-# Version: 20240413
+# Version: 20260607
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -11,7 +11,7 @@ TEST_FUNCTIONS="write write_chunk";
 OPTION_SETS="";
 
 test_api_write_function()
-{ 
+{
 	local TEST_FUNCTION=$1;
 	shift 1;
 	local ARGUMENTS=("$@");
@@ -38,12 +38,45 @@ test_api_write_function()
 
 	TEST_DESCRIPTION="Testing write function: libewf_${TEST_FUNCTION}";
 
-	if test "${OSTYPE}" = "msys";
-	then
-		OUTPUT_FILE="${TMPDIR}\\write";
-	else
-		OUTPUT_FILE="${TMPDIR}/write";
-	fi
+	OUTPUT_FILE="${TMPDIR}/write";
+
+	OSTYPE_LOWER=`echo "$OSTYPE" | tr '[A-Z]' '[a-z]'`;
+	case "${OSTYPE_LOWER}" in
+		cygwin*|msys*)
+			if test "${TESTS_USE_WINAPI}" = "yes" || test "${MSYSTEM}" = "MINGW32" || test "${MSYSTEM}" = "MINGW64";
+			then
+				OUTPUT_FILE=`cygpath -w "${OUTPUT_FILE}"`;
+			fi
+			;;
+
+		linux-gnu*)
+			if test -n "$WSL_DISTRO_NAME" || grep -qi "microsoft" /proc/version 2>/dev/null;
+			then
+				echo "WSL currently not supported";
+
+				exit ${EXIT_IGNORE};
+			fi
+			if ! test -x ${OBJDUMP};
+			then
+				echo "Missing executable: ${OBJDUMP}";
+
+				exit ${EXIT_IGNORE};
+			fi
+			if test "${TESTS_USE_WINAPI}" = "yes" || ${OBJDUMP} -f "${TEST_EXECUTABLE}" 2>&1 | grep -q "pei-";
+			then
+				OUTPUT_FILE=`winepath -w "${OUTPUT_FILE}" 2>/dev/null`;
+			fi
+			;;
+
+		*)
+			if test "${TESTS_USE_WINAPI}" = "yes";
+			then
+				echo "WINAPI not supported on ${OSTYPE}";
+
+				exit ${EXIT_IGNORE};
+			fi
+			;;
+	esac
 	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}" ${ARGUMENTS[@]} "${OUTPUT_FILE}";
 
 	RESULT=$?;
