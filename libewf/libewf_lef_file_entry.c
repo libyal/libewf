@@ -26,6 +26,7 @@
 #include "libewf_debug.h"
 #include "libewf_definitions.h"
 #include "libewf_lef_extended_attribute.h"
+#include "libewf_lef_extent.h"
 #include "libewf_lef_file_entry.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
@@ -159,6 +160,20 @@ int libewf_lef_file_entry_initialize(
 		goto on_error;
 	}
 	if( libcdata_array_initialize(
+	     &( ( *lef_file_entry )->extents ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create extents array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_initialize(
 	     &( ( *lef_file_entry )->extended_attributes ),
 	     0,
 	     error ) != 1 )
@@ -172,7 +187,6 @@ int libewf_lef_file_entry_initialize(
 
 		goto on_error;
 	}
-	( *lef_file_entry )->data_offset            = -1;
 	( *lef_file_entry )->duplicate_data_offset  = -1;
 	( *lef_file_entry )->permission_group_index = 0;
 
@@ -181,6 +195,13 @@ int libewf_lef_file_entry_initialize(
 on_error:
 	if( *lef_file_entry != NULL )
 	{
+		if( ( *lef_file_entry )->extents != NULL )
+		{
+			libcdata_array_free(
+			 &( ( *lef_file_entry )->extents ),
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extent_free,
+			 NULL );
+		}
 		if( ( *lef_file_entry )->sha1_hash != NULL )
 		{
 			libewf_serialized_string_free(
@@ -305,6 +326,23 @@ int libewf_lef_file_entry_free(
 				result = -1;
 			}
 		}
+		if( ( *lef_file_entry )->extents != NULL )
+		{
+			if( libcdata_array_free(
+			     &( ( *lef_file_entry )->extents ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extent_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free extents array.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *lef_file_entry )->extended_attributes != NULL )
 		{
 			if( libcdata_array_free(
@@ -406,6 +444,7 @@ int libewf_lef_file_entry_clone(
 	( *destination_lef_file_entry )->short_name          = NULL;
 	( *destination_lef_file_entry )->md5_hash            = NULL;
 	( *destination_lef_file_entry )->sha1_hash           = NULL;
+	( *destination_lef_file_entry )->extents             = NULL;
 	( *destination_lef_file_entry )->extended_attributes = NULL;
 
 	if( libewf_serialized_string_clone(
@@ -493,6 +532,22 @@ int libewf_lef_file_entry_clone(
 		goto on_error;
 	}
 	if( libcdata_array_clone(
+	     &( ( *destination_lef_file_entry )->extents ),
+	     source_lef_file_entry->extents,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extent_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libewf_lef_extent_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination extents array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_clone(
 	     &( ( *destination_lef_file_entry )->extended_attributes ),
 	     source_lef_file_entry->extended_attributes,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libewf_lef_extended_attribute_free,
@@ -529,12 +584,16 @@ int libewf_lef_file_entry_read_binary_extents(
      size_t data_size,
      libcerror_error_t **error )
 {
+	libewf_lef_extent_t *lef_extent       = NULL;
 	libfvalue_split_utf8_string_t *values = NULL;
 	uint8_t *value_string                 = NULL;
 	static char *function                 = "libewf_lef_file_entry_read_binary_extents";
 	size_t value_string_size              = 0;
 	uint64_t value_64bit                  = 0;
+	int entry_index                       = 0;
+	int number_of_extents                 = 0;
 	int number_of_values                  = 0;
+	int value_index                       = 0;
 
 	if( lef_file_entry == NULL )
 	{
@@ -577,8 +636,7 @@ int libewf_lef_file_entry_read_binary_extents(
 
 		goto on_error;
 	}
-	if( ( number_of_values != 1 )
-	 && ( number_of_values != 3 ) )
+	if( number_of_values == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -589,11 +647,72 @@ int libewf_lef_file_entry_read_binary_extents(
 
 		goto on_error;
 	}
-	if( number_of_values == 3 )
+	if( libfvalue_split_utf8_string_get_segment_by_index(
+	     values,
+	     0,
+	     &value_string,
+	     &value_string_size,
+	     error ) != 1 )
 	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value string: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfvalue_utf8_string_copy_to_integer(
+	     value_string,
+	     value_string_size,
+	     &value_64bit,
+	     64,
+	     LIBFVALUE_INTEGER_FORMAT_TYPE_HEXADECIMAL | LIBFVALUE_INTEGER_FORMAT_FLAG_NO_BASE_INDICATOR,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to set data offset.",
+		 function );
+
+		goto on_error;
+	}
+	if( value_64bit > (uint64_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of extents value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	number_of_extents = (int) value_64bit;
+
+	value_index = 1;
+
+	while( value_index < number_of_values )
+	{
+		if( libewf_lef_extent_initialize(
+		     &lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create extent.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     values,
-		     1,
+		     value_index,
 		     &value_string,
 		     &value_string_size,
 		     error ) != 1 )
@@ -602,10 +721,38 @@ int libewf_lef_file_entry_read_binary_extents(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value string: 1.",
-			 function );
+			 "%s: unable to retrieve value string: %d.",
+			 function,
+			 value_index );
 
 			goto on_error;
+		}
+		if( ( value_string != NULL )
+		 && ( value_string_size == 2 )
+		 && ( value_string[ 0 ] == 'S' )
+		 && ( value_string[ 1 ] == 0 ) )
+		{
+			lef_extent->data_flags |= LIBEWF_EXTENT_DATA_FLAG_IS_SPARSE;
+
+			value_index += 1;
+
+			if( libfvalue_split_utf8_string_get_segment_by_index(
+			     values,
+			     value_index,
+			     &value_string,
+			     &value_string_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve value string: %d.",
+				 function,
+				 value_index );
+
+				goto on_error;
+			}
 		}
 		if( libfvalue_utf8_string_copy_to_integer(
 		     value_string,
@@ -624,11 +771,13 @@ int libewf_lef_file_entry_read_binary_extents(
 
 			goto on_error;
 		}
-		lef_file_entry->data_offset = (off64_t) value_64bit;
+		lef_extent->data_offset = (off64_t) value_64bit;
+
+		value_index += 1;
 
 		if( libfvalue_split_utf8_string_get_segment_by_index(
 		     values,
-		     2,
+		     value_index,
 		     &value_string,
 		     &value_string_size,
 		     error ) != 1 )
@@ -637,8 +786,9 @@ int libewf_lef_file_entry_read_binary_extents(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value string: 2.",
-			 function );
+			 "%s: unable to retrieve value string: %d.",
+			 function,
+			 value_index );
 
 			goto on_error;
 		}
@@ -659,7 +809,9 @@ int libewf_lef_file_entry_read_binary_extents(
 
 			goto on_error;
 		}
-		lef_file_entry->data_size = (size64_t) value_64bit;
+		lef_extent->data_size = (size64_t) value_64bit;
+
+		value_index += 1;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -667,18 +819,34 @@ int libewf_lef_file_entry_read_binary_extents(
 			libcnotify_printf(
 			 "%s: data offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
 			 function,
-			 lef_file_entry->data_offset,
-			 lef_file_entry->data_offset );
+			 lef_extent->data_offset,
+			 lef_extent->data_offset );
 
 			libcnotify_printf(
 			 "%s: data size\t\t\t: %" PRIu64 "\n",
 			 function,
-			 lef_file_entry->size );
+			 lef_extent->data_size );
 
 			libcnotify_printf(
 			 "\n" );
 		}
 #endif
+		if( libcdata_array_append_entry(
+		     lef_file_entry->extents,
+		     &entry_index,
+		     (intptr_t *) lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append extent to array.",
+			 function );
+
+			goto on_error;
+		}
+		lef_extent = NULL;
 	}
 	if( libfvalue_split_utf8_string_free(
 	     &values,
@@ -696,6 +864,12 @@ int libewf_lef_file_entry_read_binary_extents(
 	return( 1 );
 
 on_error:
+	if( lef_extent != NULL )
+	{
+		libewf_lef_extent_free(
+		 &lef_extent,
+		 NULL );
+	}
 	if( values != NULL )
 	{
 		libfvalue_split_utf8_string_free(
@@ -826,7 +1000,7 @@ int libewf_lef_file_entry_read_extended_attributes(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append entry to extended attributes array.",
+				 "%s: unable to append extended attributes to array.",
 				 function );
 
 				goto on_error;
@@ -1599,7 +1773,9 @@ int libewf_lef_file_entry_read_data(
 				if( ( utf8_string != NULL )
 				 && ( utf8_string_size > 0 ) )
 				{
-/* Note that libfvalue_utf8_string_split expects the value string size including the end-of-string character */
+					/* Note that libfvalue_utf8_string_split expects the value string size
+					 * including the end-of-string character
+					 */
 					if( libewf_lef_file_entry_read_binary_extents(
 					     lef_file_entry,
 					     utf8_string,
@@ -2431,80 +2607,6 @@ int libewf_lef_file_entry_get_flags(
 		return( -1 );
 	}
 	*flags = lef_file_entry->flags;
-
-	return( 1 );
-}
-
-/* Retrieves the data offset
- * Returns 1 if successful or -1 on error
- */
-int libewf_lef_file_entry_get_data_offset(
-     libewf_lef_file_entry_t *lef_file_entry,
-     off64_t *data_offset,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_lef_file_entry_get_data_offset";
-
-	if( lef_file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data offset.",
-		 function );
-
-		return( -1 );
-	}
-	*data_offset = lef_file_entry->data_offset;
-
-	return( 1 );
-}
-
-/* Retrieves the data size
- * Returns 1 if successful or -1 on error
- */
-int libewf_lef_file_entry_get_data_size(
-     libewf_lef_file_entry_t *lef_file_entry,
-     size64_t *data_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libewf_lef_file_entry_get_data_size";
-
-	if( lef_file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data size.",
-		 function );
-
-		return( -1 );
-	}
-	*data_size = lef_file_entry->data_size;
 
 	return( 1 );
 }
@@ -3765,6 +3867,85 @@ int libewf_lef_file_entry_get_utf16_hash_value_sha1(
 		return( -1 );
 	}
 	return( result );
+}
+
+/* Retrieves the number of extents
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_number_of_extents(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_number_of_extents";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     lef_file_entry->extents,
+	     number_of_extents,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from extents array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific extent from the group
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_file_entry_get_extent_by_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int extent_index,
+     libewf_lef_extent_t **lef_extent,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_file_entry_get_extent_by_index";
+
+	if( lef_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     lef_file_entry->extents,
+	     extent_index,
+	     (intptr_t **) lef_extent,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from extents array.",
+		 function,
+		 extent_index );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Retrieves the number of extended attributes

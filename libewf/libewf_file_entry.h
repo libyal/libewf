@@ -334,6 +334,19 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      libcerror_error_t **error );
 
 LIBEWF_EXTERN \
+int libewf_file_entry_get_number_of_extents(
+     libewf_file_entry_t *file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
+int libewf_file_entry_get_extent(
+     libewf_file_entry_t *file_entry,
+     int extent_index,
+     libewf_extent_t **extent,
+     libcerror_error_t **error );
+
+LIBEWF_EXTERN \
 int libewf_file_entry_get_number_of_attributes(
      libewf_file_entry_t *file_entry,
      int *number_of_attributes,

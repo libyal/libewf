@@ -1,4 +1,4 @@
-.Dd June  5, 2026
+.Dd June  8, 2026
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -357,6 +357,10 @@ File entry functions
 .Ft int
 .Fn libewf_file_entry_get_sub_file_entry_by_utf16_path "libewf_file_entry_t *file_entry" "const uint16_t *utf16_string" "size_t utf16_string_length" "libewf_file_entry_t **sub_file_entry" "libewf_error_t **error"
 .Ft int
+.Fn libewf_file_entry_get_number_of_extents "libewf_file_entry_t *file_entry" "int *number_of_extents" "libewf_error_t **error"
+.Ft int
+.Fn libewf_file_entry_get_extent "libewf_file_entry_t *file_entry" "int extent_index" "libewf_extent_t **extent" "libewf_error_t **error"
+.Ft int
 .Fn libewf_file_entry_get_number_of_attributes "libewf_file_entry_t *file_entry" "int *number_of_attributes" "libewf_error_t **error"
 .Ft int
 .Fn libewf_file_entry_get_attribute "libewf_file_entry_t *file_entry" "int attribute_index" "libewf_attribute_t **attribute" "libewf_error_t **error"
@@ -412,6 +416,10 @@ Access control entry functions
 .Fn libewf_access_control_entry_get_access_mask "libewf_access_control_entry_t *access_control_entry" "uint32_t *access_mask" "libewf_error_t **error"
 .Ft int
 .Fn libewf_access_control_entry_get_flags "libewf_access_control_entry_t *access_control_entry" "uint32_t *flags" "libewf_error_t **error"
+.Pp
+Extent functions
+.Ft int
+.Fn libewf_extent_free "libewf_extent_t **extent" "libewf_error_t **error"
 .Pp
 Source functions
 .Ft int

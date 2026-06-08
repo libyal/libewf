@@ -2516,21 +2516,15 @@ stored.
 
 ===== [[binary_extents]]Binary extents value
 
-The binary extents value contains 3 values separated by a space:
+The binary extents value contains multiple values separated by a space, where:
 
-....
-Unknown Offset Size
-....
-
-Where:
-
-* unknown always is 1 ([yellow-background]*could this be the number of extents?*)
-* extent data offset, relative from the start of the media data
-* extent data size
+* the first value contains the number of extents
+* per extent
+  * optional values that contains extent type such as S for sparse
+  * values that contains extent data offset, relative from the start of the media data
+  * values that contains extent data size
 
 The offset and size are specified in hexadecimal values.
-
-[yellow-background]*Note: Contains 1 value for the first single file entry.*
 
 ===== [[extended_attributes]]Extended attributes value
 

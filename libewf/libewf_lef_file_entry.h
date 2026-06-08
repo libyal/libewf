@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_lef_extended_attribute.h"
+#include "libewf_lef_extent.h"
 #include "libewf_libcdata.h"
 #include "libewf_libcerror.h"
 #include "libewf_libfvalue.h"
@@ -50,14 +51,6 @@ struct libewf_lef_file_entry
 	/* The flags
 	 */
 	uint32_t flags;
-
-	/* The data offset
-	 */
-	off64_t data_offset;
-
-	/* The data size
-	 */
-	size64_t data_size;
 
 	/* The GUID string
 	 */
@@ -140,6 +133,10 @@ struct libewf_lef_file_entry
 	 */
 	libewf_serialized_string_t *sha1_hash;
 
+	/* The extents array
+	 */
+	libcdata_array_t *extents;
+
 	/* The extended attributes array
 	 */
 	libcdata_array_t *extended_attributes;
@@ -196,16 +193,6 @@ int libewf_lef_file_entry_get_type(
 int libewf_lef_file_entry_get_flags(
      libewf_lef_file_entry_t *lef_file_entry,
      uint32_t *flags,
-     libcerror_error_t **error );
-
-int libewf_lef_file_entry_get_data_offset(
-     libewf_lef_file_entry_t *lef_file_entry,
-     off64_t *data_offset,
-     libcerror_error_t **error );
-
-int libewf_lef_file_entry_get_data_size(
-     libewf_lef_file_entry_t *lef_file_entry,
-     size64_t *data_size,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_logical_offset(
@@ -368,6 +355,17 @@ int libewf_lef_file_entry_get_utf16_hash_value_sha1(
      libewf_lef_file_entry_t *lef_file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_number_of_extents(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error );
+
+int libewf_lef_file_entry_get_extent_by_index(
+     libewf_lef_file_entry_t *lef_file_entry,
+     int extent_index,
+     libewf_lef_extent_t **lef_extent,
      libcerror_error_t **error );
 
 int libewf_lef_file_entry_get_number_of_extended_attributes(

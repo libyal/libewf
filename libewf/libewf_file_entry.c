@@ -26,8 +26,10 @@
 #include "libewf_access_control_entry.h"
 #include "libewf_attribute.h"
 #include "libewf_definitions.h"
+#include "libewf_extent.h"
 #include "libewf_file_entry.h"
 #include "libewf_handle.h"
+#include "libewf_lef_extent.h"
 #include "libewf_lef_file_entry.h"
 #include "libewf_lef_source.h"
 #include "libewf_libcdata.h"
@@ -524,7 +526,9 @@ int libewf_file_entry_get_media_data_offset(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_lef_extent_t *lef_extent                   = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_offset";
+	int number_of_extents                             = 0;
 	int result                                        = 1;
 
 	if( file_entry == NULL )
@@ -540,6 +544,17 @@ int libewf_file_entry_get_media_data_offset(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+	if( media_data_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media data offset.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file_entry->read_write_lock,
@@ -555,19 +570,63 @@ int libewf_file_entry_get_media_data_offset(
 		return( -1 );
 	}
 #endif
-	if( libewf_lef_file_entry_get_data_offset(
+	if( libewf_lef_file_entry_get_number_of_extents(
 	     internal_file_entry->lef_file_entry,
-	     media_data_offset,
+	     &number_of_extents,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data offset.",
+		 "%s: unable to retrieve number of extents.",
 		 function );
 
 		result = -1;
+	}
+	if( number_of_extents > 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: more than 1 extents not supported.",
+		 function );
+
+		result = -1;
+	}
+	else if( number_of_extents == 1 )
+	{
+		if( libewf_lef_file_entry_get_extent_by_index(
+		     internal_file_entry->lef_file_entry,
+		     0,
+		     &lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve extent: 0.",
+			 function );
+
+			result = -1;
+		}
+		else if( lef_extent == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing extent: 0.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			*media_data_offset = lef_extent->data_offset;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -596,7 +655,9 @@ int libewf_file_entry_get_media_data_size(
      libcerror_error_t **error )
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_lef_extent_t *lef_extent                   = NULL;
 	static char *function                             = "libewf_file_entry_get_media_data_size";
+	int number_of_extents                             = 0;
 	int result                                        = 1;
 
 	if( file_entry == NULL )
@@ -612,6 +673,17 @@ int libewf_file_entry_get_media_data_size(
 	}
 	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
 
+	if( media_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media data size.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file_entry->read_write_lock,
@@ -627,19 +699,63 @@ int libewf_file_entry_get_media_data_size(
 		return( -1 );
 	}
 #endif
-	if( libewf_lef_file_entry_get_data_size(
+	if( libewf_lef_file_entry_get_number_of_extents(
 	     internal_file_entry->lef_file_entry,
-	     media_data_size,
+	     &number_of_extents,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
+		 "%s: unable to retrieve number of extents.",
 		 function );
 
 		result = -1;
+	}
+	if( number_of_extents > 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: more than 1 extents not supported.",
+		 function );
+
+		result = -1;
+	}
+	else if( number_of_extents == 1 )
+	{
+		if( libewf_lef_file_entry_get_extent_by_index(
+		     internal_file_entry->lef_file_entry,
+		     0,
+		     &lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve extent: 0.",
+			 function );
+
+			result = -1;
+		}
+		else if( lef_extent == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing extent: 0.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			*media_data_size = lef_extent->data_size;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -2093,14 +2209,16 @@ ssize_t libewf_internal_file_entry_read_buffer(
          size_t buffer_size,
          libcerror_error_t **error )
 {
-	static char *function         = "libewf_internal_file_entry_read_buffer";
-	size64_t data_size            = 0;
-	size64_t size                 = 0;
-	size_t read_size              = 0;
-	ssize_t read_count            = 0;
-	off64_t data_offset           = 0;
-	off64_t duplicate_data_offset = 0;
-	uint32_t flags                = 0;
+	libewf_lef_extent_t *lef_extent = NULL;
+	static char *function           = "libewf_internal_file_entry_read_buffer";
+	size64_t data_size              = 0;
+	size64_t size                   = 0;
+	size_t read_size                = 0;
+	ssize_t read_count              = 0;
+	off64_t data_offset             = 0;
+	off64_t duplicate_data_offset   = 0;
+	uint32_t flags                  = 0;
+	int number_of_extents           = 0;
 
 	if( internal_file_entry == NULL )
 	{
@@ -2160,33 +2278,61 @@ ssize_t libewf_internal_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	if( libewf_lef_file_entry_get_data_offset(
-	     lef_file_entry,
-	     &data_offset,
+	if( libewf_lef_file_entry_get_number_of_extents(
+	     internal_file_entry->lef_file_entry,
+	     &number_of_extents,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data offset.",
+		 "%s: unable to retrieve number of extents.",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_lef_file_entry_get_data_size(
-	     lef_file_entry,
-	     &data_size,
-	     error ) != 1 )
+	if( number_of_extents > 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: more than 1 extents not supported.",
 		 function );
 
 		return( -1 );
+	}
+	else if( number_of_extents == 1 )
+	{
+		if( libewf_lef_file_entry_get_extent_by_index(
+		     internal_file_entry->lef_file_entry,
+		     0,
+		     &lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve extent: 0.",
+			 function );
+
+			return( -1 );
+		}
+		if( lef_extent == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing extent: 0.",
+			 function );
+
+			return( -1 );
+		}
+		data_offset = lef_extent->data_offset;
+		data_size   = lef_extent->data_size;
 	}
 	if( libewf_lef_file_entry_get_flags(
 	     lef_file_entry,
@@ -3568,6 +3714,205 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the number of extents
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_number_of_extents(
+     libewf_file_entry_t *file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                             = "libewf_file_entry_get_number_of_extents";
+	int result                                        = 1;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( number_of_extents == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of extents.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_file_entry_get_number_of_extents(
+	     internal_file_entry->lef_file_entry,
+	     number_of_extents,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of extents.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the extent for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_entry_get_extent(
+     libewf_file_entry_t *file_entry,
+     int extent_index,
+     libewf_extent_t **extent,
+     libcerror_error_t **error )
+{
+	libewf_internal_file_entry_t *internal_file_entry = NULL;
+	libewf_lef_extent_t *lef_extent                   = NULL;
+	static char *function                             = "libewf_file_entry_get_extent";
+	int result                                        = 1;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libewf_internal_file_entry_t *) file_entry;
+
+	if( extent == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent.",
+		 function );
+
+		return( -1 );
+	}
+	if( *extent != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: extent already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_file_entry_get_extent_by_index(
+	     internal_file_entry->lef_file_entry,
+	     extent_index,
+	     &lef_extent,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve extent: %d.",
+		 function,
+		 extent_index );
+
+		result = -1;
+	}
+	else
+	{
+		if( libewf_extent_initialize(
+		     extent,
+		     lef_extent,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize extent: %d.",
+			 function,
+			 extent_index );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the number of attributes
  * Returns 1 if successful or -1 on error
  */
@@ -3731,20 +4076,23 @@ int libewf_file_entry_get_attribute(
 
 		result = -1;
 	}
-	else if( libewf_attribute_initialize(
-	          attribute,
-	          lef_extended_attribute,
-	          error ) != 1 )
+	else
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize attribute: %d.",
-		 function,
-		 attribute_index );
+		if( libewf_attribute_initialize(
+		     attribute,
+		     lef_extended_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize attribute: %d.",
+			 function,
+			 attribute_index );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

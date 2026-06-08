@@ -1585,8 +1585,12 @@ int libewf_file_entry_get_flags(
      libewf_error_t **error );
 
 /* Retrieves the media data offset
+ *
+ * This value has been deprecated use extents functions instead
+ *
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \
 int libewf_file_entry_get_media_data_offset(
      libewf_file_entry_t *file_entry,
@@ -1594,8 +1598,12 @@ int libewf_file_entry_get_media_data_offset(
      libewf_error_t **error );
 
 /* Retrieves the media data size
+ *
+ * This value has been deprecated use extents functions instead
+ *
  * Returns 1 if successful or -1 on error
  */
+LIBEWF_DEPRECATED \
 LIBEWF_EXTERN \
 int libewf_file_entry_get_media_data_size(
      libewf_file_entry_t *file_entry,
@@ -1909,6 +1917,25 @@ int libewf_file_entry_get_sub_file_entry_by_utf16_path(
      libewf_file_entry_t **sub_file_entry,
      libewf_error_t **error );
 
+/* Retrieves the number of extents
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_number_of_extents(
+     libewf_file_entry_t *file_entry,
+     int *number_of_extents,
+     libewf_error_t **error );
+
+/* Retrieves the extent for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_file_entry_get_extent(
+     libewf_file_entry_t *file_entry,
+     int extent_index,
+     libewf_extent_t **extent,
+     libewf_error_t **error );
+
 /* Retrieves the number of attributes
  * Returns 1 if successful or -1 on error
  */
@@ -2174,6 +2201,18 @@ LIBEWF_EXTERN \
 int libewf_access_control_entry_get_flags(
      libewf_access_control_entry_t *access_control_entry,
      uint32_t *flags,
+     libewf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Extent functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an extent
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_extent_free(
+     libewf_extent_t **extent,
      libewf_error_t **error );
 
 /* -------------------------------------------------------------------------

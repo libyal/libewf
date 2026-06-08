@@ -29,7 +29,7 @@
 #include "libewf_libcthreads.h"
 #include "libewf_types.h"
 
-/* Creates a attribute
+/* Creates an attribute
  * Make sure the value attribute is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -135,7 +135,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a attribute
+/* Frees an attribute
  * Returns 1 if successful or -1 on error
  */
 int libewf_attribute_free(
@@ -143,8 +143,8 @@ int libewf_attribute_free(
      libcerror_error_t **error )
 {
 	libewf_internal_attribute_t *internal_attribute = NULL;
-	static char *function                                             = "libewf_attribute_free";
-	int result                                                        = 1;
+	static char *function                           = "libewf_attribute_free";
+	int result                                      = 1;
 
 	if( attribute == NULL )
 	{

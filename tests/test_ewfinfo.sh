@@ -88,7 +88,7 @@ do
 
 		RESULT=${EXIT_SUCCESS};
 
-		local INPUT_FILES=()
+		INPUT_FILES=()
 
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then

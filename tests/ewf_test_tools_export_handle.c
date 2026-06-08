@@ -288,6 +288,10 @@ int ewf_test_tools_export_handle_signal_abort(
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
+
 	/* Test regular cases
 	 */
 /* TODO fix test
@@ -342,6 +346,10 @@ int ewf_test_tools_export_handle_set_maximum_number_of_open_handles(
 {
 	libcerror_error_t *error = NULL;
 	int result               = 0;
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "handle",
+	 handle );
 
 	/* Test regular cases
 	 */
@@ -403,9 +411,11 @@ int main(
      char * const argv[] EWF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	export_handle_t *export_handle = NULL;
 	libcerror_error_t *error       = NULL;
 	int result                     = 0;
+#endif
 
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
@@ -573,6 +583,8 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
 on_error:
 	if( error != NULL )
 	{
@@ -586,5 +598,7 @@ on_error:
 		 NULL );
 	}
 	return( EXIT_FAILURE );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 }
 

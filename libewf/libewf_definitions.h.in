@@ -444,5 +444,14 @@ enum LIBEWF_VALUE_DATA_TYPES
 	LIBEWF_VALUE_DATA_TYPE_UTF16
 };
 
+/* The extent data flag definitions
+ */
+enum LIBEWF_EXTENT_DATA_FLAGS
+{
+	/* The extent is sparse
+	 */
+        LIBEWF_EXTENT_DATA_FLAG_IS_SPARSE			= 0x00000001UL
+};
+
 #endif /* !defined( _LIBEWF_INTERNAL_DEFINITIONS_H ) */
 
