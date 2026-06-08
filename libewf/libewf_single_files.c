@@ -3549,6 +3549,44 @@ int libewf_single_files_get_file_entry_tree_root_node(
 	return( 1 );
 }
 
+/* Retrieves the number of permission groups
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_single_files_get_number_of_permission_groups(
+     libewf_single_files_t *single_files,
+     int *number_of_permission_groups,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_single_files_get_number_of_permission_groups";
+
+	if( single_files == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid single files.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     single_files->permission_groups,
+	     number_of_permission_groups,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries of permission groups array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves a specific permission group
  * Returns 1 if successful or -1 on error
  */

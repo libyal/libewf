@@ -160,6 +160,11 @@ int libewf_single_files_get_file_entry_tree_root_node(
      libcdata_tree_node_t **root_node,
      libcerror_error_t **error );
 
+int libewf_single_files_get_number_of_permission_groups(
+     libewf_single_files_t *single_files,
+     int *number_of_permission_groups,
+     libcerror_error_t **error );
+
 int libewf_single_files_get_permission_group_by_index(
      libewf_single_files_t *single_files,
      int permission_group_index,

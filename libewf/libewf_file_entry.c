@@ -52,6 +52,7 @@ int libewf_file_entry_initialize(
 {
 	libewf_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                             = "libewf_file_entry_initialize";
+	int number_of_permission_groups                   = 0;
 	int permission_group_index                        = 0;
 	int source_identifier                             = 0;
 
@@ -149,21 +150,38 @@ int libewf_file_entry_initialize(
 	}
 	if( permission_group_index >= 0 )
 	{
-		if( libewf_single_files_get_permission_group_by_index(
+		if( libewf_single_files_get_number_of_permission_groups(
 		     single_files,
-		     permission_group_index,
-		     &( internal_file_entry->permission_group ),
+		     &number_of_permission_groups,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve permission group: %d.",
-			 function,
-			 permission_group_index );
+			 "%s: unable to retrieve nubmer of permission groups.",
+			 function );
 
 			goto on_error;
+		}
+		if( permission_group_index < number_of_permission_groups )
+		{
+			if( libewf_single_files_get_permission_group_by_index(
+			     single_files,
+			     permission_group_index,
+			     &( internal_file_entry->permission_group ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve permission group: %d.",
+				 function,
+				 permission_group_index );
+
+				goto on_error;
+			}
 		}
 	}
 	if( libewf_lef_file_entry_get_source_identifier(

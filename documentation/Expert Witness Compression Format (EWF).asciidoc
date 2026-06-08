@@ -2321,6 +2321,15 @@ means the MD5 hash is not set.
 [NOTE]
 A p value of 0 has been observed in an FTK imager generated L01 image.
 
+[NOTE]
+In a FEX Imager generated L01 image an empty pm value. Encase appears to
+interpret as a value of 0.
+
+[NOTE]
+In a FEX Imager generated L01 image a pm value that exceeded the number of
+permissions groups have been observed. Encase generated error messages while
+reading this image and did not show permissions for the file entry.
+
 ====== Ltree file entries
 
 The ltree entries of files and directories consist of entries starting with: 0
