@@ -39,6 +39,7 @@
 #include "libewf_ltree_section.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
+#include "libewf_unused.h"
 
 #include "ewf_ltree.h"
 
@@ -184,7 +185,7 @@ int libewf_ltree_section_read_header_data(
  */
 ssize_t libewf_ltree_section_read_file_io_pool(
          libewf_section_descriptor_t *section_descriptor,
-         libewf_io_handle_t *io_handle,
+         libewf_io_handle_t *io_handle LIBEWF_ATTRIBUTE_UNUSED,
          libbfio_pool_t *file_io_pool,
          int file_io_pool_entry,
          uint8_t format_version,
@@ -199,6 +200,8 @@ ssize_t libewf_ltree_section_read_file_io_pool(
 	ssize_t read_count                  = 0;
 	off64_t data_offset                 = 0;
 	uint64_t single_files_data_size     = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( io_handle )
 
 	if( section_descriptor == NULL )
 	{

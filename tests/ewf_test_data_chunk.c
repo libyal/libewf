@@ -56,7 +56,7 @@ int ewf_test_data_chunk_initialize(
 	int test_number                 = 0;
 #endif
 
-#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 	number_of_malloc_fail_tests += 1;
 #endif
 

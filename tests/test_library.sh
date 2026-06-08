@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tests library functions and types.
 #
-# Version: 20260531
+# Version: 20260606
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -98,7 +98,6 @@ run_test_with_input()
 				fi
 			done
 		fi
-echo "INPUT_FILES=${INPUT_FILES}"
 		for INPUT_FILE in "${INPUT_FILES[@]}";
 		do
 			OPTION_INPUT_FILE="${INPUT_FILE}";

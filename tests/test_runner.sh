@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bash functions to run an executable for testing.
 #
-# Version: 20260606
+# Version: 20260607
 #
 # When CHECK_WITH_STDERR is set to a non-empty value the test executable
 # is run with error output to stderr.

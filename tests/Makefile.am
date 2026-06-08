@@ -174,6 +174,7 @@ check_PROGRAMS = \
 
 ewf_test_access_control_entry_SOURCES = \
 	ewf_test_access_control_entry.c \
+	ewf_test_extern.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_libfvalue.h \
@@ -207,6 +208,7 @@ ewf_test_analytical_data_LDADD = \
 
 ewf_test_attribute_SOURCES = \
 	ewf_test_attribute.c \
+	ewf_test_extern.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
@@ -373,6 +375,7 @@ ewf_test_compression_LDADD = \
 
 ewf_test_data_chunk_SOURCES = \
 	ewf_test_data_chunk.c \
+	ewf_test_extern.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_macros.h \
@@ -555,6 +558,7 @@ ewf_test_glob_LDADD = \
 	../libewf/libewf.la
 
 ewf_test_handle_SOURCES = \
+	ewf_test_extern.h \
 	ewf_test_functions.c ewf_test_functions.h \
 	ewf_test_getopt.c ewf_test_getopt.h \
 	ewf_test_handle.c \
@@ -565,7 +569,8 @@ ewf_test_handle_SOURCES = \
 	ewf_test_libewf.h \
 	ewf_test_libuna.h \
 	ewf_test_macros.h \
-	ewf_test_memory.c ewf_test_memory.h
+	ewf_test_memory.c ewf_test_memory.h \
+	ewf_test_rwlock.c ewf_test_rwlock.h
 
 ewf_test_handle_LDADD = \
 	@LIBBFIO_LIBADD@ \
@@ -1062,6 +1067,7 @@ ewf_test_single_files_LDADD = \
 	@LIBCERROR_LIBADD@
 
 ewf_test_source_SOURCES = \
+	ewf_test_extern.h \
 	ewf_test_libcerror.h \
 	ewf_test_libewf.h \
 	ewf_test_libfvalue.h \

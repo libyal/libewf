@@ -2217,17 +2217,23 @@ int libewf_lef_file_entry_read_data(
 				}
 #endif
 				/* p = 1 if directory
-				 * p = empty if file
+				 * p = empty or 0 if file
 				 */
 				if( value_data == NULL )
 				{
 					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
 				}
 				else if( ( value_data_size == 2 )
-				      && ( value_data[ 0 ] == (uint8_t) '1' )
 				      && ( value_data[ 1 ] == 0 ) )
 				{
-					lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
+					if( value_data[ 0 ] == (uint8_t) '0' )
+					{
+						lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_FILE;
+					}
+					else if( value_data[ 0 ] == (uint8_t) '1' )
+					{
+						lef_file_entry->type = LIBEWF_FILE_ENTRY_TYPE_DIRECTORY;
+					}
 				}
 				known_value = 1;
 			}

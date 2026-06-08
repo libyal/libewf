@@ -1,6 +1,6 @@
 # Script that synchronizes bzip2.
 #
-# Version: 20210405
+# Version: 20260607
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -39,6 +39,7 @@ If (Test-Path ${Filename})
 {
 	Remove-Item -Path ${Filename} -Force
 }
+$ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri ${Url} -OutFile ${Filename}
 
 If (Test-Path ${ExtractedPath})

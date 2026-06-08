@@ -24,29 +24,41 @@
 
 #include <common.h>
 
+#include "ewf_test_extern.h"
 #include "ewf_test_libewf.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( LIBEWF_HAVE_MULTI_THREAD_SUPPORT ) && defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
-#define HAVE_EWF_TEST_RWLOCK		1
+#if defined( LIBEWF_HAVE_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) && !defined( __CYGWIN__ )
+#define HAVE_EWF_TEST_RWLOCK_HOOK	1
+#endif
 #endif
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
-extern int ewf_test_pthread_rwlock_init_attempts_before_fail;
+EWF_TEST_INTERNAL \
+int ewf_test_pthread_rwlock_init_attempts_before_fail;
 
-extern int ewf_test_pthread_rwlock_destroy_attempts_before_fail;
+EWF_TEST_INTERNAL \
+int ewf_test_pthread_rwlock_destroy_attempts_before_fail;
 
-extern int ewf_test_pthread_rwlock_rdlock_attempts_before_fail;
+EWF_TEST_INTERNAL \
+int ewf_test_pthread_rwlock_rdlock_attempts_before_fail;
 
-extern int ewf_test_pthread_rwlock_wrlock_attempts_before_fail;
+EWF_TEST_INTERNAL \
+int ewf_test_pthread_rwlock_wrlock_attempts_before_fail;
 
-extern int ewf_test_pthread_rwlock_unlock_attempts_before_fail;
+#if defined( HAVE_PTHREAD_RWLOCK_UNLOCK_HOOK )
 
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+EWF_TEST_INTERNAL \
+int ewf_test_pthread_rwlock_unlock_attempts_before_fail;
+
+#endif /* defined( HAVE_PTHREAD_RWLOCK_UNLOCK_HOOK ) */
+
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 #if defined( __cplusplus )
 }

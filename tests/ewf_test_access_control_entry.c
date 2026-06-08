@@ -68,7 +68,7 @@ int ewf_test_access_control_entry_initialize(
 	int test_number                                     = 0;
 #endif
 
-#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_MEMORY ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 	number_of_malloc_fail_tests += 1;
 #endif
 
@@ -328,7 +328,7 @@ int ewf_test_access_control_entry_free(
 	libcerror_error_t *error                            = NULL;
 	int result                                          = 0;
 
-#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 	libewf_access_control_entry_t *access_control_entry = NULL;
 	libewf_lef_permission_t *lef_permission             = NULL;
 #endif
@@ -351,7 +351,7 @@ int ewf_test_access_control_entry_free(
 	libcerror_error_free(
 	 &error );
 
-#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Initialize test
 	 */
@@ -439,7 +439,7 @@ int ewf_test_access_control_entry_free(
 	 "error",
 	 error );
 
-#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -449,7 +449,7 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) && defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 	if( access_control_entry != NULL )
 	{
 		libewf_access_control_entry_free(
@@ -530,7 +530,7 @@ int ewf_test_access_control_entry_get_type(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_type with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -586,7 +586,7 @@ int ewf_test_access_control_entry_get_type(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -666,7 +666,7 @@ int ewf_test_access_control_entry_get_utf8_identifier_size(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf8_identifier_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -722,7 +722,7 @@ int ewf_test_access_control_entry_get_utf8_identifier_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -842,7 +842,7 @@ int ewf_test_access_control_entry_get_utf8_identifier(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf8_identifier with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -900,7 +900,7 @@ int ewf_test_access_control_entry_get_utf8_identifier(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -980,7 +980,7 @@ int ewf_test_access_control_entry_get_utf16_identifier_size(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf16_identifier_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1036,7 +1036,7 @@ int ewf_test_access_control_entry_get_utf16_identifier_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1156,7 +1156,7 @@ int ewf_test_access_control_entry_get_utf16_identifier(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf16_identifier with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1214,7 +1214,7 @@ int ewf_test_access_control_entry_get_utf16_identifier(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1294,7 +1294,7 @@ int ewf_test_access_control_entry_get_utf8_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1350,7 +1350,7 @@ int ewf_test_access_control_entry_get_utf8_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1470,7 +1470,7 @@ int ewf_test_access_control_entry_get_utf8_name(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1528,7 +1528,7 @@ int ewf_test_access_control_entry_get_utf8_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1608,7 +1608,7 @@ int ewf_test_access_control_entry_get_utf16_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf16_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1664,7 +1664,7 @@ int ewf_test_access_control_entry_get_utf16_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1784,7 +1784,7 @@ int ewf_test_access_control_entry_get_utf16_name(
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_utf16_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1842,7 +1842,7 @@ int ewf_test_access_control_entry_get_utf16_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1917,7 +1917,7 @@ int ewf_test_access_control_entry_get_access_mask(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_access_mask with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1973,7 +1973,7 @@ int ewf_test_access_control_entry_get_access_mask(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2048,7 +2048,7 @@ int ewf_test_access_control_entry_get_flags(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_access_control_entry_get_flags with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -2104,7 +2104,7 @@ int ewf_test_access_control_entry_get_flags(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 

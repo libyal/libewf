@@ -91,6 +91,62 @@ jobs:
     - name: Run tests
       run: |
         make distcheck VERBOSE=1
+  build_fuse:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-24.04
+          compiler: 'gcc'
+          configure_options: ''
+    steps:
+    - uses: actions/checkout@v6
+    - name: Install build dependencies
+      run: |
+        sudo apt -y update
+        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config zlib1g-dev libfuse-dev
+    - name: Download test data
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
+    - name: Build from source
+      env:
+        CC: ${{ matrix.compiler }}
+      run: |
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
+    - name: Run tests
+      run: |
+        tests/runtests.sh CHECK_WITH_STDERR=1
+  build_fuse3:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-24.04
+          compiler: 'gcc'
+          configure_options: ''
+    steps:
+    - uses: actions/checkout@v6
+    - name: Install build dependencies
+      run: |
+        sudo apt -y update
+        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config zlib1g-dev libfuse3-dev
+    - name: Download test data
+      run: |
+        if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
+    - name: Build from source
+      env:
+        CC: ${{ matrix.compiler }}
+      run: |
+        ./synclibs.sh --use-head
+        ./autogen.sh
+        ./configure ${{ matrix.configure_options }}
+        make > /dev/null
+    - name: Run tests
+      run: |
+        tests/runtests.sh CHECK_WITH_STDERR=1
   build_python:
     runs-on: ${{ matrix.os }}
     strategy:

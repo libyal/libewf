@@ -34,6 +34,7 @@
 #include "libewf_libfdata.h"
 #include "libewf_section.h"
 #include "libewf_section_descriptor.h"
+#include "libewf_unused.h"
 
 #include "ewf_table.h"
 
@@ -1025,7 +1026,7 @@ int libewf_chunk_group_fill_v2(
 int libewf_chunk_group_correct_v1(
      libewf_chunk_group_t *chunk_group,
      uint64_t chunk_index,
-     size32_t chunk_size,
+     size32_t chunk_size LIBEWF_ATTRIBUTE_UNUSED,
      int file_io_pool_entry,
      libewf_section_descriptor_t *table_section,
      off64_t base_offset,
@@ -1053,6 +1054,8 @@ int libewf_chunk_group_correct_v1(
 	uint8_t overflow                   = 0;
 	uint8_t update_data_range          = 0;
 	int previous_file_io_pool_entry    = 0;
+
+	LIBEWF_UNREFERENCED_PARAMETER( chunk_size )
 
 	if( chunk_group == NULL )
 	{

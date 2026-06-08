@@ -2002,7 +2002,7 @@ int ewf_test_handle_read_buffer(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_handle_read_buffer with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2060,7 +2060,7 @@ int ewf_test_handle_read_buffer(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2326,7 +2326,7 @@ int ewf_test_handle_read_buffer_at_offset(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_handle_read_buffer_at_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2386,7 +2386,7 @@ int ewf_test_handle_read_buffer_at_offset(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2665,7 +2665,7 @@ int ewf_test_handle_seek_offset(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_EWF_TEST_RWLOCK )
+#if defined( HAVE_EWF_TEST_RWLOCK_HOOK )
 
 	/* Test libewf_handle_seek_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2723,7 +2723,7 @@ int ewf_test_handle_seek_offset(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_EWF_TEST_RWLOCK ) */
+#endif /* defined( HAVE_EWF_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
