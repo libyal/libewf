@@ -2122,31 +2122,34 @@ int imaging_handle_output_storage_media_buffer_callback(
 		}
 		storage_media_buffer = NULL;
 
-		if( imaging_handle->acquiry_size == 0 )
+		if( imaging_handle->process_status != NULL )
 		{
-			result = process_status_update_unknown_total(
-			          imaging_handle->process_status,
-			          imaging_handle->last_offset_written,
-			          &error );
-		}
-		else
-		{
-			result = process_status_update(
-			          imaging_handle->process_status,
-			          imaging_handle->last_offset_written,
-			          imaging_handle->acquiry_size,
-			          &error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to update process status.",
-			 function );
+			if( imaging_handle->acquiry_size == 0 )
+			{
+				result = process_status_update_unknown_total(
+				          imaging_handle->process_status,
+				          imaging_handle->last_offset_written,
+				          &error );
+			}
+			else
+			{
+				result = process_status_update(
+				          imaging_handle->process_status,
+				          imaging_handle->last_offset_written,
+				          imaging_handle->acquiry_size,
+				          &error );
+			}
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to update process status.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 	}
 	return( 1 );

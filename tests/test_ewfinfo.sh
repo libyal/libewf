@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Info tool testing script
 #
-# Version: 20260606
+# Version: 20260608
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;

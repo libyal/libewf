@@ -2520,9 +2520,9 @@ The binary extents value contains multiple values separated by a space, where:
 
 * the first value contains the number of extents
 * per extent
-  * optional values that contains extent type such as S for sparse
-  * values that contains extent data offset, relative from the start of the media data
-  * values that contains extent data size
+** optional values that contains extent type such as S for sparse
+** values that contains extent data offset, relative from the start of the media data
+** values that contains extent data size
 
 The offset and size are specified in hexadecimal values.
 

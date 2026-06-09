@@ -7,7 +7,7 @@ REPOSITORY="log2timeline/dfvfs";
 TEST_DATA_PATH="test_data";
 TEST_SET="public";
 TEST_INPUT_DIRECTORY="tests/input";
-TEST_FILES="ext2.E01";
+TEST_FILES="ext2.E01 ext2.raw";
 
 mkdir -p "${TEST_INPUT_DIRECTORY}/${TEST_SET}";
 

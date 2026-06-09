@@ -693,6 +693,18 @@ int libewf_lef_file_entry_read_binary_extents(
 	}
 	number_of_extents = (int) value_64bit;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: number of extents\t\t: %d\n",
+		 function,
+		 number_of_extents );
+
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	value_index = 1;
 
 	while( value_index < number_of_values )
@@ -847,6 +859,19 @@ int libewf_lef_file_entry_read_binary_extents(
 			goto on_error;
 		}
 		lef_extent = NULL;
+
+		entry_index += 1;
+	}
+	if( entry_index != number_of_extents )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: mismatch in number of extents.",
+		 function );
+
+		goto on_error;
 	}
 	if( libfvalue_split_utf8_string_free(
 	     &values,

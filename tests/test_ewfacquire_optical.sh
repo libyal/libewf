@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Acquire tool testing script
 #
-# Version: 20240413
+# Version: 20260609
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -145,11 +145,25 @@ do
 
 		RESULT=${EXIT_SUCCESS};
 
+		INPUT_FILES=()
+
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then
-			IFS="" read -a INPUT_FILES <<< $(cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?");
+			while IFS= read -r FILENAME;
+			do
+				if test -n "${FILENAME}}";
+				then
+					INPUT_FILES+=("${TEST_SET_INPUT_DIRECTORY}/${FILENAME}")
+				fi
+			done < "${TEST_SET_DIRECTORY}/files"
 		else
-			IFS="" read -a INPUT_FILES <<< $(ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB});
+			for FILENAME in ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB};
+			do
+				if test -e "${FILENAME}";
+				then
+					INPUT_FILES+=("${FILENAME}")
+				fi
+			done
 		fi
 		for INPUT_FILE in "${INPUT_FILES[@]}";
 		do

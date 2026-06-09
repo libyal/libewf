@@ -203,6 +203,10 @@ struct export_handle
 	 */
 	libewf_handle_t *ewf_output_handle;
 
+	/* The input format
+	 */
+	uint8_t input_format;
+
 	/* The input chunk size
 	 */
 	size32_t input_chunk_size;

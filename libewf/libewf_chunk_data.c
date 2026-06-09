@@ -2076,6 +2076,7 @@ int libewf_chunk_data_read_element_data(
 {
 	libewf_chunk_data_t *chunk_data = NULL;
 	static char *function           = "libewf_chunk_data_read_element_data";
+	size32_t chunk_size             = 0;
 	ssize_t read_count              = 0;
 
 	LIBEWF_UNREFERENCED_PARAMETER( read_flags )
@@ -2113,9 +2114,17 @@ int libewf_chunk_data_read_element_data(
 
 		return( -1 );
 	}
+	chunk_size = io_handle->chunk_size;
+
+	if( io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF1_SMART )
+	{
+		/* In EWF-S01 (SMART) the size of a stored chunk can be larger than the chunk size
+		 */
+		chunk_size *= 2;
+	}
 	if( libewf_chunk_data_initialize(
 	     &chunk_data,
-	     io_handle->chunk_size,
+	     chunk_size,
 	     0,
 	     error ) != 1 )
 	{

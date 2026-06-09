@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Info tool testing script
 #
-# Version: 20240413
+# Version: 20260609
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -124,11 +124,25 @@ do
 
 		RESULT=${EXIT_SUCCESS};
 
+		INPUT_FILES=()
+
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then
-			IFS="" read -a INPUT_FILES <<< $(cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?");
+			while IFS= read -r FILENAME;
+			do
+				if test -n "${FILENAME}}";
+				then
+					INPUT_FILES+=("${TEST_SET_INPUT_DIRECTORY}/${FILENAME}")
+				fi
+			done < "${TEST_SET_DIRECTORY}/files"
 		else
-			IFS="" read -a INPUT_FILES <<< $(ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB});
+			for FILENAME in ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB};
+			do
+				if test -e "${FILENAME}";
+				then
+					INPUT_FILES+=("${FILENAME}")
+				fi
+			done
 		fi
 		for INPUT_FILE in "${INPUT_FILES[@]}";
 		do
@@ -144,7 +158,7 @@ do
 
 					IFS=" " read -a OPTIONS <<< $(read_test_data_option_file "${TEST_SET_DIRECTORY}" "${INPUT_FILE}" "${OPTION_SET}");
 
-					run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfinfo" "with_callback" "${OPTION_SET}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}" "${OPTIONS[@]}";
+					run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfinfo_logical_bodyfile" "with_callback" "${OPTION_SET}" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}" "${OPTIONS[@]}";
 					RESULT=$?;
 
 					if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -156,7 +170,7 @@ do
 
 			if test ${TESTED_WITH_OPTIONS} -eq 0;
 			then
-				run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfinfo" "with_callback" "" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}";
+				run_test_on_input_file "${TEST_SET_DIRECTORY}" "ewfinfo_logical_bodyfile" "with_callback" "" "${TEST_EXECUTABLE}" "${INPUT_FILE}" "${PROFILE_OPTIONS[@]}";
 				RESULT=$?;
 			fi
 

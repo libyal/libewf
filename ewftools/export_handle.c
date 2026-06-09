@@ -656,6 +656,20 @@ int export_handle_open_input(
 
 		return( -1 );
 	}
+	if( libewf_handle_get_format(
+	     export_handle->input_handle,
+	     &( export_handle->input_format ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve format.",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_handle_get_chunk_size(
 	     export_handle->input_handle,
 	     &( export_handle->input_chunk_size ),
@@ -4511,7 +4525,7 @@ int export_handle_output_storage_media_buffer_callback(
         libcerror_error_t *error                            = NULL;
 	storage_media_buffer_t *output_storage_media_buffer = NULL;
 	uint8_t *data                                       = NULL;
-        static char *function                               = "export_handle_process_storage_media_buffer_callback";
+        static char *function                               = "export_handle_output_storage_media_buffer_callback";
 	size_t data_size                                    = 0;
 	ssize_t write_count                                 = 0;
 	int result                                          = 0;
@@ -4835,20 +4849,23 @@ int export_handle_output_storage_media_buffer_callback(
 		}
 		element = next_element;
 
-		if( process_status_update(
-		     export_handle->process_status,
-		     export_handle->last_offset_hashed,
-		     export_handle->input_media_size,
-		     &error ) != 1 )
+		if( export_handle->process_status != NULL )
 		{
-			libcerror_error_set(
-			 &error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to update process status.",
-			 function );
+			if( process_status_update(
+			     export_handle->process_status,
+			     export_handle->last_offset_hashed,
+			     export_handle->input_media_size,
+			     &error ) != 1 )
+			{
+				libcerror_error_set(
+				 &error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to update process status.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 	}
 	return( 1 );
@@ -5177,6 +5194,14 @@ int export_handle_export_input(
 		}
 		process_buffer_size       = (size_t) export_handle->input_chunk_size;
 		storage_media_buffer_mode = STORAGE_MEDIA_BUFFER_MODE_CHUNK_DATA;
+
+		if( ( export_handle->input_format == LIBEWF_FORMAT_SMART )
+		 || ( export_handle->input_format == LIBEWF_FORMAT_FTK_IMAGER ) )
+		{
+			/* In EWF-S01 (SMART) the size of a stored chunk can be larger than the chunk size
+			 */
+			process_buffer_size *= 2;
+		}
 	}
 	else
 	{

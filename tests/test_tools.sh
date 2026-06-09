@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tests tools functions and types.
 #
-# Version: 20260606
+# Version: 20260608
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -78,7 +78,7 @@ run_test_with_input()
 
 		local TEST_SET_DIRECTORY=$(get_test_set_directory "${TEST_PROFILE_DIRECTORY}" "${TEST_SET_INPUT_DIRECTORY}");
 
-		local INPUT_FILES=()
+		INPUT_FILES=()
 
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then

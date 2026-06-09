@@ -169,6 +169,10 @@ struct verification_handle
 	 */
 	libewf_handle_t *input_handle;
 
+	/* The format
+	 */
+	uint8_t format;
+
 	/* The media size
 	 */
 	size64_t media_size;

@@ -1042,8 +1042,6 @@ int ewf_test_file_entry_get_media_data_offset(
 	          &media_data_offset,
 	          &error );
 
-EWF_TEST_FPRINT_ERROR( error );
-
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,

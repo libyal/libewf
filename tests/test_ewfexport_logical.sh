@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Export tool testing script
 #
-# Version: 20240413
+# Version: 20260609
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -33,9 +33,9 @@ test_callback()
 
 	if test "${PLATFORM}" = "Darwin";
 	then
-		(cd ${TMPDIR} && find export -type f -exec md5 {} \; | sort -k2 > "${TEST_LOG}");
+		(cd ${TMPDIR} && find export -type f -exec md5 {} \; | LC_ALL=C sort -k2,2 -k1,1 > "${TEST_LOG}");
 	else
-		(cd ${TMPDIR} && find export -type f -exec md5sum {} \; | sort -k2 > "${TEST_LOG}");
+		(cd ${TMPDIR} && find export -type f -exec md5sum {} \; | LC_ALL=C sort -k2,2 -k1,1 > "${TEST_LOG}");
 	fi
 
 	local TEST_RESULTS="${TMPDIR}/${TEST_LOG}";
@@ -141,11 +141,25 @@ do
 
 		RESULT=${EXIT_SUCCESS};
 
+		INPUT_FILES=()
+
 		if test -f "${TEST_SET_DIRECTORY}/files";
 		then
-			IFS="" read -a INPUT_FILES <<< $(cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?");
+			while IFS= read -r FILENAME;
+			do
+				if test -n "${FILENAME}}";
+				then
+					INPUT_FILES+=("${TEST_SET_INPUT_DIRECTORY}/${FILENAME}")
+				fi
+			done < "${TEST_SET_DIRECTORY}/files"
 		else
-			IFS="" read -a INPUT_FILES <<< $(ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB});
+			for FILENAME in ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB};
+			do
+				if test -e "${FILENAME}";
+				then
+					INPUT_FILES+=("${FILENAME}")
+				fi
+			done
 		fi
 		for INPUT_FILE in "${INPUT_FILES[@]}";
 		do
