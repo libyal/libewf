@@ -352,7 +352,7 @@ void ewftools_getopt_usage_fprint(
 		string_length = 8 + narrow_string_length(
 		                     option->name );
 
-		if( ( line_length - string_length ) > maximum_line_length )
+		if( ( line_length + string_length ) > maximum_line_length )
 		{
 			fprintf(
 			 stream,
@@ -376,7 +376,7 @@ void ewftools_getopt_usage_fprint(
 	{
 		string_length += 6 + number_of_options_without_name;
 
-		if( ( line_length - string_length ) > maximum_line_length )
+		if( ( line_length + string_length ) > maximum_line_length )
 		{
 			fprintf(
 			 stream,

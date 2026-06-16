@@ -901,41 +901,13 @@ int verification_handle_finalize_integrity_hash(
 
 		return( -1 );
 	}
-	if( verification_handle->calculated_md5_hash_string != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid verification handle - calculated MD5 digest hash string value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->calculated_sha1_hash_string != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid verification handle - calculated SHA1 digest hash string value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->calculated_sha256_hash_string != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid verification handle - calculated SHA256 digest hash string value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( verification_handle->calculate_md5 != 0 )
 	{
+		if( verification_handle->calculated_md5_hash_string != NULL )
+		{
+			memory_free(
+			 verification_handle->calculated_md5_hash_string );
+		}
 		verification_handle->calculated_md5_hash_string = narrow_string_allocate(
 		                                                   33 );
 
@@ -997,6 +969,11 @@ int verification_handle_finalize_integrity_hash(
 	}
 	if( verification_handle->calculate_sha1 != 0 )
 	{
+		if( verification_handle->calculated_sha1_hash_string != NULL )
+		{
+			memory_free(
+			 verification_handle->calculated_sha1_hash_string );
+		}
 		verification_handle->calculated_sha1_hash_string = narrow_string_allocate(
 		                                                    41 );
 
@@ -1058,6 +1035,11 @@ int verification_handle_finalize_integrity_hash(
 	}
 	if( verification_handle->calculate_sha256 != 0 )
 	{
+		if( verification_handle->calculated_sha256_hash_string != NULL )
+		{
+			memory_free(
+			 verification_handle->calculated_sha256_hash_string );
+		}
 		verification_handle->calculated_sha256_hash_string = narrow_string_allocate(
 		                                                      65 );
 
@@ -1718,12 +1700,15 @@ int verification_handle_verify_input(
 	uint32_t number_of_checksum_errors           = 0;
 	uint8_t storage_media_buffer_mode            = 0;
 	int is_corrupted                             = 0;
-	int maximum_number_of_queued_items           = 0;
 	int md5_hash_compare                         = 0;
 	int result                                   = 0;
 	int sha1_hash_compare                        = 0;
 	int sha256_hash_compare                      = 0;
 	int status                                   = PROCESS_STATUS_COMPLETED;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	int maximum_number_of_queued_items           = 0;
+#endif
 
 	if( verification_handle == NULL )
 	{

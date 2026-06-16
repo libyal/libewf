@@ -492,7 +492,8 @@ int main( int argc, char * const argv[] )
 				break;
 		}
 	}
-	if( optind == argc )
+	if( ( optind == argc )
+	 || ( argv[ optind ] == NULL ) )
 	{
 		fprintf(
 		 stderr,

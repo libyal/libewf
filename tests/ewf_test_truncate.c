@@ -25,11 +25,11 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include <stdio.h>
+
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 #include "ewf_test_libcerror.h"
 #include "ewf_test_libcfile.h"

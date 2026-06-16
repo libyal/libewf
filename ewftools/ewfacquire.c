@@ -897,7 +897,7 @@ int ewfacquire_read_input(
 
 				goto on_error;
 			}
-			if( read_count == 0 )
+			else if( read_count == 0 )
 			{
 				libcerror_error_set(
 				 error,
@@ -928,7 +928,7 @@ int ewfacquire_read_input(
 
 				goto on_error;
 			}
-			if( process_count > (ssize_t) read_size )
+			else if( process_count > (ssize_t) read_size )
 			{
 				libcerror_error_set(
 				 error,
@@ -963,7 +963,7 @@ int ewfacquire_read_input(
 
 				goto on_error;
 			}
-			if( read_count == 0 )
+			else if( read_count == 0 )
 			{
 				libcerror_error_set(
 				 error,

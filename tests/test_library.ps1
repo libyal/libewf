@@ -1,6 +1,6 @@
 # Tests library functions and types.
 #
-# Version: 20260608
+# Version: 20260614
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -187,7 +187,7 @@ Function RunTestWithInput
 				$InputOptions = $InputOptions -replace "^offset=","-o"
 				$InputOptions = $InputOptions -replace "^password=","-p"
 				$InputOptions = $InputOptions -replace "^recovery_password=","-r"
-				$InputOptions = $InputOptions -replace "^startup_key=","-s"
+				$InputOptions = $InputOptions -replace "^startup_key=","-sinput\${TestSetName}\"
 				$InputOptions = $InputOptions -replace "^virtual_address=","-v"
 
 				$Output = Invoke-Expression "${TestExecutable} ${InputOptions} ${InputFile}"

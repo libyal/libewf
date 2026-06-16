@@ -59,10 +59,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
   build_dist:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -87,10 +87,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        make distcheck VERBOSE=1
+        make distcheck AM_MAKEFLAGS="-j4" VERBOSE=1
   build_fuse:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -115,10 +115,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
   build_fuse3:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -143,10 +143,10 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
   build_python:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -172,12 +172,12 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       env:
         PYTHON_VERSION: ${{ matrix.python_version }}
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1
   build_pyproject:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -199,7 +199,7 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Build Python module
       run: |
         python -m build
@@ -233,7 +233,7 @@ jobs:
         ./synclibs.sh --use-head
         ./autogen.sh
         ./configure ${{ matrix.configure_options }}
-        make > /dev/null
+        make -j4 > /dev/null
     - name: Run tests
       run: |
-        tests/runtests.sh CHECK_WITH_STDERR=1
+        tests/runtests.sh -j4 VERBOSE=1

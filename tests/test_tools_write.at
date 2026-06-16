@@ -1,0 +1,722 @@
+m4_include([package.m4])
+m4_include([test_macros.at])
+
+include_test_inputs([ewfacquire])
+include_test_inputs([ewfacquire_optical])
+include_test_inputs([ewfacquirestream])
+include_test_inputs([ewfexport_write])
+
+AT_TEST_HELPER_FN(
+  [run_ewftools_binary],
+  [path arguments],
+  [Resolves and runs a ewftools binary],
+  [if test -x "$abs_top_builddir/ewftools/$[]1"; then
+    BINARY="$abs_top_builddir/ewftools/$[]1"
+  elif test -x "$abs_top_builddir/ewftools/$[]1.exe"; then
+    # Prevent wine debug messages failing the test.
+    WINEDEBUG=-all
+
+    BINARY="$abs_top_builddir/ewftools/$[]1.exe"
+  else
+    echo "Missing binary: $[]1"
+    exit 127
+  fi
+  shift
+
+  $BINARY "$[]@"
+  ])
+
+AT_TEST_HELPER_FN(
+  [run_ewfacquire_and_verify_file],
+  [test_profile options_set arguments test_file],
+  [Runs ewfacquire and verifies the resulting files with ewfverify],
+  [TEST_PROFILE="$[]1"
+  shift
+  OPTION_SET="$[]1"
+  shift
+
+  ath_fn_run_ewftools_binary ewfacquire -CCase -DDescription -EEvidence -eExaminer -Mlogical -NNotes -q -tacquire -u "$[]@" > /dev/null
+  STATUS=$?
+
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_ewftools_binary ewfverify -q acquire.*01 > /dev/null
+    STATUS=$?
+  fi
+  return $STATUS
+  ])
+
+AT_TEST_HELPER_FN(
+  [run_ewfacquire_resume_and_verify_file],
+  [test_profile options_set arguments test_file],
+  [Runs ewfacquire and verifies the resulting files with ewfverify],
+  [TEST_PROFILE="$[]1"
+  shift
+  OPTION_SET="$[]1"
+  shift
+  RESUME_OFFSET="$[]1"
+  shift
+
+  ath_fn_run_ewftools_binary ewfacquire -b64 -CCase -cdeflate:none -DDescription -EEvidence -eExaminer -fencase5 -Mlogical -mremovable -NNotes -q -S650MB -tacquire_resume -u "$[]@" > /dev/null
+  STATUS=$?
+
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_test_binary ewf_test_truncate ${RESUME_OFFSET} acquire_resume.E01
+    STATUS=$?
+  fi
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_ewftools_binary ewfacquire -q -R -tacquire_resume.E01 -u "$[]@" > /dev/null
+    STATUS=$?
+  fi
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_ewftools_binary ewfverify -q acquire_resume.*01 > /dev/null
+    STATUS=$?
+  fi
+  return $STATUS
+  ])
+
+AT_TEST_HELPER_FN(
+  [run_ewfacquirestream_and_verify_file],
+  [test_profile options_set arguments test_file],
+  [Runs ewfacquirestream and verifies the resulting files with ewfverify],
+  [TEST_PROFILE="$[]1"
+  shift
+  OPTION_SET="$[]1"
+  shift
+
+  ath_fn_run_ewftools_binary ewfacquirestream -CCase -DDescription -EEvidence -eExaminer -mremovable -Mlogical -NNotes -q -tacquirestream "$[]@" - > /dev/null
+  STATUS=$?
+
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_ewftools_binary ewfverify -q acquirestream.*01 > /dev/null
+    STATUS=$?
+  fi
+  return $STATUS
+  ])
+
+AT_TEST_HELPER_FN(
+  [run_ewfexport_and_verify_file],
+  [test_profile options_set arguments test_file],
+  [Runs ewfexport and verifies the resulting files with ewfverify],
+  [TEST_PROFILE="$[]1"
+  shift
+  OPTION_SET="$[]1"
+  shift
+
+  # Note that ewfexport outputs to stderr
+  ath_fn_run_ewftools_binary ewfexport -q -texport -u "$[]@" > /dev/null 2>&1
+  STATUS=$?
+
+  if test ${STATUS} -eq 0; then
+    ath_fn_run_ewftools_binary ewfverify -q export.*01 > /dev/null
+    STATUS=$?
+  fi
+  return $STATUS
+  ])
+
+dnl Runs ewfacquire on a disk/volume image and verifies the resulting files with ewfverify
+dnl Arguments:
+dnl   test_profile
+dnl   test_options
+dnl   test_inputs
+m4_define([RUN_WRITE_TEST_EWFACQUIRE],
+  [m4_foreach_w(
+    [test_input],
+    [$3],
+    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+
+    m4_ifblank(option_set, m4_define([option_set], [.]))
+
+    m4_define([sanitized_test_file],
+      [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+    dnl Test with different output formats. Note that encase7, encase7-v2 and smart are tested next.
+    m4_foreach_w(
+      [format],
+      [encase1 encase2 encase3 encase4 encase5 encase6 ewf ewfx ftk linen5 linen6 linen7],
+      [m4_define([ewfacquire_options], m4_normalize($2 test_options -cdeflate:empty-block -f[]format))
+       
+      AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -mremovable "${TEST_FILE}")
+
+      AT_CLEANUP])
+
+    dnl Test various options with encase7, encase7-v2 and smart.
+    m4_foreach_w(
+      [format],
+      [encase7 encase7-v2 smart],
+      [dnl Test with different compression levels.
+      m4_foreach_w(
+        [compression_level],
+        [deflate:none deflate:empty-block deflate:fast deflate:best],
+        [m4_define([ewfacquire_options], m4_normalize($2 test_options -c[]compression_level -f[]format))
+
+        AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -mremovable "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with different block sizes.
+      m4_foreach_w(
+        [block_size],
+        [16 32 64 128 256 512 1024 2048 4096 8192 16384 32768],
+        [m4_define([ewfacquire_options], m4_normalize($2 test_options -b[]block_size -cdeflate:empty-block -f[]format))
+
+        AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -mremovable "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with a small segment file size and no compression.
+      m4_define([ewfacquire_options], m4_normalize($2 test_options -cdeflate:none -f[]format -S1MiB))
+
+      AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -mremovable "${TEST_FILE}")
+
+      AT_CLEANUP
+      ])
+
+    dnl Test with different digest hasher. Note that md5 is the default.
+    m4_foreach_w(
+      [digest_hash],
+      [sha1 sha256],
+      [m4_define([ewfacquire_options], m4_normalize($2 test_options -cdeflate:empty-block -d[]digest_hash -fencase7))
+
+      AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -mremovable "${TEST_FILE}")
+
+      AT_CLEANUP])
+    ])
+  ])
+
+dnl Runs ewfacquire on an optical disc image and verifies the resulting files with ewfverify
+dnl Arguments:
+dnl   test_profile
+dnl   test_options
+dnl   test_inputs
+m4_define([RUN_WRITE_TEST_EWFACQUIRE_OPTICAL],
+  [m4_foreach_w(
+    [test_input],
+    [$3],
+    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+
+    m4_ifblank(option_set, m4_define([option_set], [.]))
+
+    m4_define([sanitized_test_file],
+      [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+    dnl Test with different output formats.
+    m4_foreach_w(
+      [format],
+      [encase5 encase6 encase7 encase7-v2],
+      [m4_define([ewfacquire_options], m4_normalize($2 test_options -cdeflate:none -f[]format))
+
+      AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      # TODO: set the .cue file via the test_options via the generate script
+      AT_CHECK(ath_fn_run_ewfacquire_and_verify_file $1 "option_set" ewfacquire_options -moptical "${TEST_FILE}" )
+
+      AT_CLEANUP
+      ])
+    ])
+  ])
+
+dnl Runs ewfacquire resume on a disk/volume image and verifies the resulting files with ewfverify
+dnl Arguments:
+dnl   test_profile
+dnl   test_options
+dnl   test_inputs
+m4_define([RUN_WRITE_TEST_EWFACQUIRE_RESUME],
+  [m4_foreach_w(
+    [test_input],
+    [$3],
+    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+
+    m4_ifblank(option_set, m4_define([option_set], [.]))
+
+    m4_define([sanitized_test_file],
+      [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+    dnl Test with resume.
+    m4_define([ewfacquire_options], m4_normalize($2 test_options))
+
+    AT_SETUP(ewfacquire resume with options: 'ewfacquire_options' and input: 'sanitized_test_file')
+
+    AT_SKIP_IF(
+      [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+    TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+    FILE_SIZE=`ls -ln "${TEST_FILE}" | sed 's/^[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*//;s/[ ].*$//'`
+
+    dnl TODO: calculate different resume points based on file size
+    AT_SKIP_IF(
+      [test -z "${FILE_SIZE}" || test ${FILE_SIZE} -ne 1474560])
+
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1478560 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1477351 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1478432 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1477296 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1477008 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 1476736 ewfacquire_options "${TEST_FILE}")
+    AT_CHECK(ath_fn_run_ewfacquire_resume_and_verify_file $1 "option_set" 3584 ewfacquire_options "${TEST_FILE}")
+
+    AT_CLEANUP
+    ])
+  ])
+
+dnl Runs ewfacquirestream on a disk/volume image and verifies the resulting files with ewfverify
+dnl Arguments:
+dnl   test_profile
+dnl   test_options
+dnl   test_inputs
+m4_define([RUN_WRITE_TEST_EWFACQUIRESTREAM],
+  [m4_foreach_w(
+    [test_input],
+    [$3],
+    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+
+    m4_ifblank(option_set, m4_define([option_set], [.]))
+
+    m4_define([sanitized_test_file],
+      [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+    dnl Test with different output formats. Note that encase7 and encase7-v2 are tested next.
+    m4_foreach_w(
+      [format],
+      [encase2 encase3 encase4 encase5 encase6 ewfx ftk linen5 linen6 linen7],
+      [m4_define([ewfacquirestream_options], m4_normalize($2 test_options -cdeflate:empty-block -f[]format))
+
+      AT_SETUP(acquirestream with options: 'ewfacquirestream_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquirestream_and_verify_file $1 "option_set" ewfacquirestream_options < "${TEST_FILE}")
+
+      AT_CLEANUP])
+
+    dnl Test various options with encase7 and encase7-v2.
+    m4_foreach_w(
+      [format],
+      [encase7 encase7-v2],
+      [dnl Test with different compression levels.
+      m4_foreach_w(
+        [compression_level],
+        [deflate:none deflate:empty-block deflate:fast deflate:best],
+        [m4_define([ewfacquirestream_options], m4_normalize($2 test_options -c[]compression_level -f[]format))
+
+        AT_SETUP(acquirestream with options: 'ewfacquirestream_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfacquirestream_and_verify_file $1 "option_set" ewfacquirestream_options < "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with different block sizes.
+      m4_foreach_w(
+        [block_size],
+        [16 32 64 128 256 512 1024 2048 4096 8192 16384 32768],
+        [m4_define([ewfacquirestream_options], m4_normalize($2 test_options -b[]block_size -cdeflate:empty-block -f[]format))
+
+        AT_SETUP(acquirestream with options: 'ewfacquirestream_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfacquirestream_and_verify_file $1 "option_set" ewfacquirestream_options < "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with a small segment file size and no compression.
+      m4_define([ewfacquirestream_options], m4_normalize($2 test_options -cdeflate:none -f[]format -S1MiB))
+
+      AT_SETUP(acquirestream with options: 'ewfacquirestream_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquirestream_and_verify_file $1 "option_set" ewfacquirestream_options < "${TEST_FILE}")
+
+      AT_CLEANUP
+      ])
+
+    dnl Test with different digest hasher. Note that md5 is the default.
+    m4_foreach_w(
+      [digest_hash],
+      [sha1 sha256],
+      [m4_define([ewfacquirestream_options], m4_normalize($2 test_options -cdeflate:empty-block -d[]digest_hash -fencase7))
+
+      AT_SETUP(acquirestream with options: 'ewfacquirestream_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfacquirestream_and_verify_file $1 "option_set" ewfacquirestream_options < "${TEST_FILE}")
+
+      AT_CLEANUP])
+    ])
+  ])
+
+dnl Runs ewfexport and verifies the resulting files with ewfverify
+dnl Arguments:
+dnl   test_profile
+dnl   test_options
+dnl   test_inputs
+m4_define([RUN_WRITE_TEST_EWFEXPORT],
+  [m4_foreach_w(
+    [test_input],
+    [$3],
+    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+
+    m4_ifblank(option_set, m4_define([option_set], [.]))
+
+    m4_define([sanitized_test_file],
+      [m4_translit([test_file], [[],[],[]"'`\], [______])])
+
+    dnl Test with different output formats. Note that encase7, encase7-v2 and smart are tested next.
+    m4_foreach_w(
+      [format],
+      [encase1 encase2 encase3 encase4 encase5 encase6 ewf ewfx ftk linen5 linen6 linen7],
+      [m4_define([ewfexport_options], m4_normalize($2 test_options -cdeflate:empty-block -f[]format))
+       
+      AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfexport_and_verify_file $1 "option_set" ewfexport_options "${TEST_FILE}")
+
+      AT_CLEANUP])
+
+    dnl Test various options with encase7, encase7-v2 and smart.
+    m4_foreach_w(
+      [format],
+      [encase7 encase7-v2 smart],
+      [dnl Test with different compression levels.
+      m4_foreach_w(
+        [compression_level],
+        [deflate:none deflate:empty-block deflate:fast deflate:best],
+        [m4_define([ewfexport_options], m4_normalize($2 test_options -c[]compression_level -f[]format))
+
+        AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfexport_and_verify_file $1 "option_set" ewfexport_options "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with different block sizes.
+      m4_foreach_w(
+        [block_size],
+        [16 32 64 128 256 512 1024 2048 4096 8192 16384 32768],
+        [m4_define([ewfexport_options], m4_normalize($2 test_options -b[]block_size -cdeflate:empty-block -f[]format))
+
+        AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+
+        AT_SKIP_IF(
+          [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+        TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+        AT_CHECK(ath_fn_run_ewfexport_and_verify_file $1 "option_set" ewfexport_options "${TEST_FILE}")
+
+        AT_CLEANUP])
+
+      dnl Test with a small segment file size and no compression.
+      m4_define([ewfexport_options], m4_normalize($2 test_options -cdeflate:none -f[]format -S1MiB))
+
+      AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfexport_and_verify_file $1 "option_set" ewfexport_options "${TEST_FILE}")
+
+      AT_CLEANUP
+      ])
+
+    dnl Test with different digest hasher. Note that md5 is the default.
+    m4_foreach_w(
+      [digest_hash],
+      [sha1 sha256],
+      [m4_define([ewfexport_options], m4_normalize($2 test_options -cdeflate:empty-block -d[]digest_hash -fencase7))
+
+      AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+
+      AT_SKIP_IF(
+        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+
+      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
+
+      AT_CHECK(ath_fn_run_ewfexport_and_verify_file $1 "option_set" ewfexport_options "${TEST_FILE}")
+
+      AT_CLEANUP])
+    ])
+  ])
+
+dnl Wrap m4_define to overwrite AT_TESTSUITE_NAME
+m4_define([_M4_DEFINE_HOOK], m4_defn([m4_define]))
+m4_define([m4_define],
+  [m4_if(
+    [$1],
+    [AT_TESTSUITE_NAME],
+    [_M4_DEFINE_HOOK([$1], [Running tools tests])],
+    [_M4_DEFINE_HOOK([$1], [$2])])])
+
+dnl Redefine AS_BOX to remove the "box"
+m4_undefine([AS_BOX])
+m4_define([AS_BOX], [echo "$1"])
+
+AT_INIT([tools])
+AT_COLOR_TESTS
+
+dnl Rewrite AT_SETUP to change the minimum line length
+m4_define([AT_SETUP],
+  m4_unquote(
+    [m4_bpatsubst(
+      m4_dquote(m4_defn([AT_SETUP])),
+      [47],
+      [72])
+    ])
+  )
+
+SETUP_HELPER_FUNCTIONS
+
+m4_if(
+  HAVE_MULTI_THREAD_SUPPORT,
+  [1],
+  [dnl Test with:
+  dnl * single-threaded with buffered writes (-j0)
+  dnl * single-threaded with data chunk writes (-j0 -x)
+  dnl * multi-threaded with buffered writes (-j4)
+  dnl * multi-threaded with data chunk writes (-j4 -x)
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [-j0],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [-j0 -x],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [-j4],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [-j4 -x],
+    test_inputs_ewfacquire)],
+
+  [dnl Test with:
+  dnl * with buffered writes
+  dnl * with data chunk writes (-x)
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE(
+    [ewfacquire],
+    [-x],
+    test_inputs_ewfacquire)
+  ])
+
+m4_if(
+  HAVE_MULTI_THREAD_SUPPORT,
+  [1],
+  [dnl Test with:
+  dnl * single-threaded with buffered writes (-j0)
+  dnl * single-threaded with data chunk writes (-j0 -x)
+  dnl * multi-threaded with buffered writes (-j4)
+  dnl * multi-threaded with data chunk writes (-j4 -x)
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [-j0],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [-j0 -x],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [-j4],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [-j4 -x],
+    test_inputs_ewfacquire)],
+
+  [dnl Test with:
+  dnl * with buffered writes
+  dnl * with data chunk writes (-x)
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [],
+    test_inputs_ewfacquire)
+
+  RUN_WRITE_TEST_EWFACQUIRE_RESUME(
+    [ewfacquire],
+    [-x],
+    test_inputs_ewfacquire)
+  ])
+
+dnl TODO: complete test
+dnl RUN_WRITE_TEST_EWFACQUIRE_OPTICAL(
+dnl   [ewfacquire_optical],
+dnl   [-j0],
+dnl   test_inputs_ewfacquire_optical)
+
+m4_if(
+  HAVE_MULTI_THREAD_SUPPORT,
+  [1],
+  [dnl Test with:
+  dnl * single-threaded with buffered writes (-j0)
+  dnl * single-threaded with data chunk writes (-j0 -x)
+  dnl * multi-threaded with buffered writes (-j4)
+  dnl * multi-threaded with data chunk writes (-j4 -x)
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [-j0],
+    test_inputs_ewfacquirestream)
+
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [-j0 -x],
+    test_inputs_ewfacquirestream)
+
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [-j4],
+    test_inputs_ewfacquirestream)
+
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [-j4 -x],
+    test_inputs_ewfacquirestream)],
+
+  [dnl Test with:
+  dnl * with buffered writes
+  dnl * with data chunk writes (-x)
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [],
+    test_inputs_ewfacquirestream)
+
+  RUN_WRITE_TEST_EWFACQUIRESTREAM(
+    [ewfacquirestream],
+    [-x],
+    test_inputs_ewfacquirestream)
+  ])
+
+m4_if(
+  HAVE_MULTI_THREAD_SUPPORT,
+  [1],
+  [dnl Test with:
+  dnl * single-threaded with buffered writes (-j0)
+  dnl * single-threaded with data chunk writes (-j0 -x)
+  dnl * multi-threaded with buffered writes (-j4)
+  dnl * multi-threaded with data chunk writes (-j4 -x)
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [-j0],
+    test_inputs_ewfexport_write)
+
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [-j0 -x],
+    test_inputs_ewfexport_write)
+
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [-j4],
+    test_inputs_ewfexport_write)
+
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [-j4 -x],
+    test_inputs_ewfexport_write)],
+
+  [dnl Test with:
+  dnl * with buffered writes
+  dnl * with data chunk writes (-x)
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [],
+    test_inputs_ewfexport_write)
+
+  RUN_WRITE_TEST_EWFEXPORT(
+    [ewfexport_write],
+    [-x],
+    test_inputs_ewfexport_write)
+  ])

@@ -5072,9 +5072,12 @@ int export_handle_export_input(
 	ssize_t write_count                                 = 0;
 	off64_t input_storage_media_offset                  = 0;
 	uint8_t storage_media_buffer_mode                   = 0;
-	int maximum_number_of_queued_items                  = 0;
 	int result                                          = 0;
 	int status                                          = PROCESS_STATUS_COMPLETED;
+
+#if defined( HAVE_MULTI_THREAD_SUPPORT )
+	int maximum_number_of_queued_items                  = 0;
+#endif
 
 	if( export_handle == NULL )
 	{
