@@ -1,11 +1,11 @@
 m4_include([package.m4])
 m4_include([test_macros.at])
 
+include_test_inputs([ewfexport])
+include_test_inputs([ewfexport_logical])
 include_test_inputs([ewfinfo])
 include_test_inputs([ewfinfo_logical])
 include_test_inputs([ewfinfo_logical_bodyfile])
-include_test_inputs([ewfexport])
-include_test_inputs([ewfexport_logical])
 include_test_inputs([ewfverify])
 include_test_inputs([ewfverify_logical])
 
@@ -54,7 +54,7 @@ AT_TEST_HELPER_FN(
 
 AT_TEST_HELPER_FN(
   [run_ewftools_binary_and_compare_bodyfile],
-  [tool_name test_profile options_set arguments test_file],
+  [tool_name test_profile option_set arguments test_file],
   [Runs a ewftools binary and compares a resulting bodyfile against a reference],
   [EWFTOOL="$[]1"
   shift
@@ -82,12 +82,12 @@ AT_TEST_HELPER_FN(
     ath_fn_compare_with_reference "${TEST_PROFILE}" "${TEST_SET}" "${FILENAME}-${OUTPUT_FILE}" "${OUTPUT_FILE}"
     STATUS=$?
   fi
-  return $STATUS
+  exit $STATUS
   ])
 
 AT_TEST_HELPER_FN(
   [run_ewftools_binary_and_compare_files],
-  [tool_name test_profile options_set arguments test_file],
+  [tool_name test_profile option_set arguments test_file],
   [Runs a ewftools binary and compares resulting files against a reference],
   [EWFTOOL="$[]1"
   shift
@@ -112,7 +112,7 @@ AT_TEST_HELPER_FN(
   ath_fn_run_ewftools_binary "${EWFTOOL}" "$[]@" > /dev/null
   STATUS=$?
 
-  if test ${STATUS} -eq 0; then
+  if test ${STATUS} -eq 0 && test -d "${OUTPUT_DIRECTORY}"; then
     # md5sum prefixes the output of a filename that contains an escape character with "\"
     find "${OUTPUT_DIRECTORY}" -type f -exec ${MD5SUM} {} \; | sed 's/^\\//' | LC_ALL=C sort -k2,2 -k1,1 > "${OUTPUT_FILE}"
 
@@ -124,7 +124,7 @@ AT_TEST_HELPER_FN(
 
 AT_TEST_HELPER_FN(
   [run_ewftools_binary_and_compare_stdout],
-  [tool_name test_profile options_set arguments test_file],
+  [tool_name test_profile option_set arguments test_file],
   [Runs a ewftools binary and compares stdout against a reference],
   [EWFTOOL="$[]1"
   shift
@@ -159,7 +159,7 @@ AT_TEST_HELPER_FN(
 
 AT_TEST_HELPER_FN(
   [run_ewfexport_and_compare_files],
-  [tool_name test_profile options_set arguments test_file],
+  [tool_name test_profile option_set arguments test_file],
   [Runs ewfexport and compares resulting files against a reference],
   [TEST_PROFILE="$[]1"
   shift
@@ -203,9 +203,9 @@ m4_define([RUN_TEST_EWFTOOL_AND_COMPARE_BODYFILE],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -214,143 +214,120 @@ m4_define([RUN_TEST_EWFTOOL_AND_COMPARE_BODYFILE],
 
     m4_ifblank(
       test_options,
-      [AT_SETUP($1 with input: 'sanitized_test_file')
+      [m4_define(
+        [test_description],
+        [$1 with input: 'sanitized_test_file'])],
+      [m4_define(
+        [test_description],
+        [$1 with options: ']test_options[' and input: 'sanitized_test_file'])])
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+    AT_SETUP(test_description)
 
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${MD5SUM}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
+    AT_SKIP_IF(
+      [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
 
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
+    AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
+    AT_SKIP_IF([test -z "${SED}"])
+    AT_SKIP_IF([test -z "${ZCAT}"])
 
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_bodyfile $1 $2 "option_set" "${TEST_FILE}")
+    TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
 
-      AT_CLEANUP],
-      [AT_SETUP($1 with options: 'test_options' and input: 'sanitized_test_file')
+    AT_CHECK(ath_fn_run_ewftools_binary_and_compare_bodyfile $1 $2 "option_set" test_options "${TEST_FILE}")
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
-
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
-
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
-
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_bodyfile $1 $2 "option_set" test_options "${TEST_FILE}")
-
-      AT_CLEANUP])]
-    )]
-  )]
-)
+    AT_CLEANUP])
+  ])
 
 dnl Runs a ewftool and compares resulting files against a reference
 dnl Arguments:
 dnl   tool_name
 dnl   test_profile
+dnl   test_options
 dnl   test_inputs
 m4_define([RUN_TEST_EWFTOOL_AND_COMPARE_FILES],
   [m4_foreach_w(
     [test_input],
-    [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [$4],
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
     m4_define([sanitized_test_file],
       [m4_translit([test_file], [[],[],[]"'`\], [______])])
 
+    m4_define([ewftools_options], m4_normalize(test_options $3))
+
     m4_ifblank(
-      test_options,
-      [AT_SETUP($1 with input: 'sanitized_test_file')
+      ewftools_options,
+      [m4_define(
+        [test_description],
+        [$1 with input: 'sanitized_test_file'])],
+      [m4_define(
+        [test_description],
+        [$1 with options: ']ewftools_options[' and input: 'sanitized_test_file'])])
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+    AT_SETUP(test_description)
 
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${MD5SUM}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
+    AT_SKIP_IF(
+      [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
 
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
+    AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
+    AT_SKIP_IF([test -z "${SED}"])
+    AT_SKIP_IF([test -z "${ZCAT}"])
 
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_files $1 $2 "option_set" "${TEST_FILE}")
+    TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
 
-      AT_CLEANUP],
-      [AT_SETUP($1 with options: 'test_options' and input: 'sanitized_test_file')
+    AT_CHECK(ath_fn_run_ewftools_binary_and_compare_files $1 $2 "option_set" ewftools_options "${TEST_FILE}")
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
-
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
-
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
-
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_files $1 $2 "option_set" test_options "${TEST_FILE}")
-
-      AT_CLEANUP])]
-    )]
-  )]
-)
+    AT_CLEANUP])
+  ])
 
 dnl Runs a ewftool and compares stdout against a reference
 dnl Arguments:
 dnl   tool_name
 dnl   test_profile
+dnl   test_options
 dnl   test_inputs
 m4_define([RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT],
   [m4_foreach_w(
     [test_input],
-    [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [$4],
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
     m4_define([sanitized_test_file],
       [m4_translit([test_file], [[],[],[]"'`\], [______])])
 
+    m4_define([ewftools_options], m4_normalize(test_options $3))
+
     m4_ifblank(
-      test_options,
-      [AT_SETUP($1 with input: 'sanitized_test_file')
+      ewftools_options,
+      [m4_define(
+        [test_description],
+        [$1 with input: 'sanitized_test_file'])],
+      [m4_define(
+        [test_description],
+        [$1 with options: ']ewftools_options[' and input: 'sanitized_test_file'])])
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
+    AT_SETUP(test_description)
 
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
+    AT_SKIP_IF(
+      [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
 
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
+    AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
+    AT_SKIP_IF([test -z "${SED}"])
+    AT_SKIP_IF([test -z "${ZCAT}"])
 
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_stdout $1 $2 "option_set" "${TEST_FILE}")
+    TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
 
-      AT_CLEANUP],
-      [AT_SETUP($1 with options: 'test_options' and input: 'sanitized_test_file')
+    AT_CHECK(ath_fn_run_ewftools_binary_and_compare_stdout $1 $2 "option_set" ewftools_options "${TEST_FILE}")
 
-      AT_SKIP_IF(
-        [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
-
-      AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-      AT_SKIP_IF([test -z "${SED}"])
-      AT_SKIP_IF([test -z "${ZCAT}"])
-
-      TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
-
-      AT_CHECK(ath_fn_run_ewftools_binary_and_compare_stdout $1 $2 "option_set" test_options "${TEST_FILE}")
-
-      AT_CLEANUP])]
-    )]
-  )]
-)
+    AT_CLEANUP])
+  ])
 
 dnl Runs ewfexport and compares resulting files against a reference
 dnl Arguments:
@@ -361,9 +338,9 @@ m4_define([RUN_TEST_EWFEXPORT_AND_COMPARE_FILES],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -372,7 +349,16 @@ m4_define([RUN_TEST_EWFEXPORT_AND_COMPARE_FILES],
 
     m4_define([ewfexport_options], m4_normalize($2 test_options))
 
-    AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
+    m4_ifblank(
+      ewfexport_options,
+      [m4_define(
+        [test_description],
+        [ewfexport with input: 'sanitized_test_file'])],
+      [m4_define(
+        [test_description],
+        [ewfexport with options: ']ewfexport_options[' and input: 'sanitized_test_file'])])
+
+    AT_SETUP(test_description)
 
     AT_SKIP_IF(
       [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
@@ -384,42 +370,6 @@ m4_define([RUN_TEST_EWFEXPORT_AND_COMPARE_FILES],
     TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
 
     AT_CHECK(ath_fn_run_ewfexport_and_compare_files $1 "option_set" ewfexport_options "${TEST_FILE}")
-
-    AT_CLEANUP])
-  ])
-
-dnl Runs ewfverify and compares stdout against a reference
-dnl Arguments:
-dnl   test_profile
-dnl   test_options
-dnl   test_inputs
-m4_define([RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT],
-  [m4_foreach_w(
-    [test_input],
-    [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
-
-    m4_ifblank(option_set, m4_define([option_set], [.]))
-
-    m4_define([sanitized_test_file],
-      [m4_translit([test_file], [[],[],[]"'`\], [______])])
-
-    m4_define([ewfverify_options], m4_normalize($2 test_options))
-
-    AT_SETUP(ewfverify with options: 'ewfverify_options' and input: 'sanitized_test_file')
-
-    AT_SKIP_IF(
-      [test -n "${SKIP_TOOLS_TESTS}" || test -n "${SKIP_TOOLS_END_TO_END_TESTS}"])
-
-    AT_SKIP_IF([test -z "${GZIP_COMMAND}"])
-    AT_SKIP_IF([test -z "${SED}"])
-    AT_SKIP_IF([test -z "${ZCAT}"])
-
-    TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
-
-    AT_CHECK(ath_fn_run_ewftools_binary_and_compare_stdout ewfverify $1 "option_set" ewfverify_options -q "${TEST_FILE}")
 
     AT_CLEANUP])
   ])
@@ -459,11 +409,13 @@ RUN_TEST_BINARIES(
 RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
   [ewfinfo],
   [ewfinfo],
+  [],
   test_inputs_ewfinfo)
 
 RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
   [ewfinfo],
   [ewfinfo_logical],
+  [],
   test_inputs_ewfinfo_logical)
 
 RUN_TEST_EWFTOOL_AND_COMPARE_BODYFILE(
@@ -472,91 +424,103 @@ RUN_TEST_EWFTOOL_AND_COMPARE_BODYFILE(
   test_inputs_ewfinfo_logical_bodyfile)
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered reads (-j0)
   dnl * single-threaded with data chunk reads (-j0 -x)
   dnl * multi-threaded with buffered reads (-j4)
   dnl * multi-threaded with data chunk reads (-j4 -x)
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [-j0],
+    [ewfverify],
+    [-j0 -q],
     test_inputs_ewfverify)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [-j0 -x],
+    [ewfverify],
+    [-j0 -q -x],
     test_inputs_ewfverify)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [-j4],
+    [ewfverify],
+    [-j4 -q],
     test_inputs_ewfverify)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [-j4 -x],
+    [ewfverify],
+    [-j4 -q -x],
     test_inputs_ewfverify)],
 
   [dnl Test with:
   dnl * with buffered reads
   dnl * with data chunk reads (-x)
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [],
+    [ewfverify],
+    [-q],
     test_inputs_ewfverify)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
     [ewfverify],
-    [-x],
+    [ewfverify],
+    [-q -x],
     test_inputs_ewfverify)
   ])
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered reads (-j0)
   dnl * single-threaded with data chunk reads (-j0 -x)
   dnl * multi-threaded with buffered reads (-j4)
   dnl * multi-threaded with data chunk reads (-j4 -x)
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [-j0],
+    [-j0 -q],
     test_inputs_ewfverify_logical)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [-j0 -x],
+    [-j0 -q -x],
     test_inputs_ewfverify_logical)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [-j4],
+    [-j4 -q],
     test_inputs_ewfverify_logical)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [-j4 -x],
+    [-j4 -q -x],
     test_inputs_ewfverify_logical)],
 
   [dnl Test with:
   dnl * with buffered reads
   dnl * with data chunk reads (-x)
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [],
+    [-q],
     test_inputs_ewfverify_logical)
 
-  RUN_TEST_EWFVERIFY_AND_COMPARE_STDOUT(
+  RUN_TEST_EWFTOOL_AND_COMPARE_STDOUT(
+    [ewfverify],
     [ewfverify_logical],
-    [-x],
+    [-q -x],
     test_inputs_ewfverify_logical)
   ])
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered reads (-j0)
@@ -598,7 +562,7 @@ m4_if(
   ])
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered reads (-j0)

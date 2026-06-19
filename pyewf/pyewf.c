@@ -151,7 +151,7 @@ PyObject *pyewf_check_file_signature(
 	int result                   = 0;
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	const wchar_t *filename_wide = NULL;
+	wchar_t *filename_wide       = NULL;
 #else
 	PyObject *utf8_string_object = NULL;
 #endif
@@ -465,7 +465,7 @@ PyObject *pyewf_glob(
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	wchar_t **filenames_wide         = NULL;
-	const wchar_t *filename_wide     = NULL;
+	wchar_t *filename_wide           = NULL;
 #else
 	PyObject *utf8_string_object     = NULL;
 #endif

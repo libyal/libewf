@@ -636,7 +636,6 @@ PyObject *pyewf_handle_open(
 {
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	PyObject *filename_string_object = NULL;
-	const wchar_t *filename_wide     = NULL;
 	wchar_t *filename                = NULL;
 	wchar_t **filenames              = NULL;
 	char *narrow_string              = NULL;
@@ -659,6 +658,12 @@ PyObject *pyewf_handle_open(
 	int filename_index               = 0;
 	int number_of_filenames          = 0;
 	int result                       = 0;
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	wchar_t *filename_wide           = NULL;
+#endif
+#endif
 
 	if( pyewf_handle == NULL )
 	{

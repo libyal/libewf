@@ -1,243 +1,16 @@
 # Tests library functions and types.
-#
-# Version: 20260614
-
-$ExitSuccess = 0
-$ExitFailure = 1
-$ExitIgnore = 77
 
 $LibraryTests = "access_control_entry analytical_data attribute bit_stream buffer_data_handle case_data case_data_section checksum chunk_data chunk_descriptor chunk_group chunk_table compression data_chunk date_time date_time_values deflate device_information device_information_section digest_section error error2_section file_entry filename hash_sections hash_values header_sections header_values huffman_tree io_handle lef_extended_attribute lef_file_entry lef_permission lef_source lef_subject line_reader ltree_section md5_hash_section media_values notify permission_group read_io_handle restart_data section_data_handle section_descriptor sector_range sector_range_list segment_file segment_table serialized_string session_section sha1_hash_section single_file_tree single_files source table_section value_reader value_table volume_section write_io_handle"
 $LibraryTestsWithInput = "handle support"
-$OptionSets = ""
+$OptionSets = "" -split " "
 
-$InputGlob = "*.[Ees]*01"
-
-$VSDirectories = @(
-	"msvscpp",
-	"vs2008",
-	"vs2010",
-	"vs2012",
-	"vs2013",
-	"vs2015",
-	"vs2017",
-	"vs2019",
-	"vs2022",
-	"vs2026"
-)
-
-$VSConfigurations = @(
-	"Release",
-	"VSDebug"
-)
-
-$VSPlatforms = @(
-	"Win32",
-	"x64"
-)
-
-Function GetTestExecutablesDirectory
-{
-	$TestExecutablesDirectory = ""
-
-	ForEach (${VSDirectory} in $VSDirectories)
-	{
-		ForEach (${VSConfiguration} in $VSConfigurations)
-		{
-			ForEach (${VSPlatform} in $VSPlatforms)
-			{
-				$TestExecutablesDirectory = "..\${VSDirectory}\${VSConfiguration}\${VSPlatform}"
-
-				If (Test-Path ${TestExecutablesDirectory})
-				{
-					Return ${TestExecutablesDirectory}
-				}
-			}
-			$TestExecutablesDirectory = "..\${VSDirectory}\${VSConfiguration}"
-
-			If (Test-Path ${TestExecutablesDirectory})
-			{
-				Return ${TestExecutablesDirectory}
-			}
-		}
-	}
-	Return ${TestExecutablesDirectory}
-}
-
-Function ReadIgnoreList
-{
-	param( [string]$TestProfileDirectory )
-
-	$IgnoreFile = "${TestProfileDirectory}\ignore"
-	$IgnoreList = ""
-
-	If (Test-Path -Path ${IgnoreFile} -PathType Leaf)
-	{
-		$IgnoreList = Get-Content -Path ${IgnoreFile} |
-			Where {$_ -notmatch '^#.*'}
-	}
-	Return $IgnoreList
-}
-
-Function RunTest
-{
-	param( [string]$TestType )
-
-	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
-
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
-	{
-		Write-Host "${TestDescription} (" -nonewline
-		Write-Host "SKIP" -foreground Cyan -nonewline
-		Write-Host ")"
-
-		Return ${ExitIgnore}
-	}
-	$Output = Invoke-Expression ${TestExecutable}
-	$Result = ${LastExitCode}
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	Write-Host "${TestDescription} (" -nonewline
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host "FAIL" -foreground Red -nonewline
-	}
-	Else
-	{
-		Write-Host "PASS" -foreground Green -nonewline
-	}
-	Write-Host ")"
-
-	Return ${Result}
-}
-
-Function RunTestWithInput
-{
-	param( [string]$TestType )
-
-	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_${TestName}.exe"
-
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
-	{
-		Write-Host "${TestDescription} (" -nonewline
-		Write-Host "SKIP" -foreground Cyan -nonewline
-		Write-Host ")"
-
-		Return ${ExitIgnore}
-	}
-	$TestProfileDirectory = "input\.libewf"
-
-	If (-Not (Test-Path -Path ${TestProfileDirectory} -PathType Container))
-	{
-		New-Item -ItemType "directory" -Path ${TestProfileDirectory}
-	}
-	$IgnoreList = ReadIgnoreList ${TestProfileDirectory}
-
-	$Result = ${ExitSuccess}
-
-	ForEach ($TestSetInputDirectory in Get-ChildItem -Path "input" -Exclude ".*")
-	{
-		If (-Not (Test-Path -Path ${TestSetInputDirectory} -PathType Container))
-		{
-			Continue
-		}
-		If (${TestSetInputDirectory} -Contains ${IgnoreList})
-		{
-			Continue
-		}
-		$TestSetName = ${TestSetInputDirectory}.Name
-
-		If (Test-Path -Path "${TestProfileDirectory}\${TestSetName}\files" -PathType Leaf)
-		{
-			$InputFiles = Get-Content -Path "${TestProfileDirectory}\${TestSetName}\files" |
-				Where {$_ -ne ""}
-			$InputFiles = $InputFiles -replace "^","${TestSetInputDirectory}\"
-		}
-		Else
-		{
-			$InputFiles = Get-ChildItem -Path ${TestSetInputDirectory} -Include ${InputGlob}
-		}
-		ForEach ($InputFile in ${InputFiles})
-		{
-			$TestedWithOptions = $False
-
-			ForEach ($OptionSet in ${OptionSets} -split " ")
-			{
-				$InputFileName = ${InputFile}.Name
-				$TestDataOptionFile = "${TestProfileDirectory}\${TestSetName}\${InputFileName}.${OptionSet}"
-
-				If (-Not (Test-Path -Path "${TestDataOptionFile}" -PathType Leaf))
-				{
-					Continue
-				}
-				$OptionsHeader = Get-content -Path "${TestDataOptionFile}" -First 1
-
-				If (-Not (${OptionsHeader} -match "^# libyal test data options"))
-				{
-					Continue
-				}
-				$InputOptions = Get-content -Path "${TestDataOptionFile}" |
-					Select-Object -Skip 1
-
-				$InputOptions = $InputOptions -replace "^offset=","-o"
-				$InputOptions = $InputOptions -replace "^password=","-p"
-				$InputOptions = $InputOptions -replace "^recovery_password=","-r"
-				$InputOptions = $InputOptions -replace "^startup_key=","-sinput\${TestSetName}\"
-				$InputOptions = $InputOptions -replace "^virtual_address=","-v"
-
-				$Output = Invoke-Expression "${TestExecutable} ${InputOptions} ${InputFile}"
-				$Result = $LastExitCode
-
-				If (${Result} -ne ${ExitSuccess})
-				{
-					Break
-				}
-				$TestedWithOptions = $True
-			}
-			If ((${Result} -eq ${ExitSuccess}) -And (-Not (${TestedWithOptions})))
-			{
-				$Output = Invoke-Expression "${TestExecutable} ${InputFile}"
-				$Result = ${LastExitCode}
-			}
-			If (${Result} -ne ${ExitSuccess})
-			{
-				Break
-			}
-		}
-		If (${Result} -ne ${ExitSuccess})
-		{
-			Break
-		}
-	}
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	Write-Host "${TestDescription} (" -nonewline
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host "FAIL" -foreground Red -nonewline
-	}
-	Else
-	{
-		Write-Host "PASS" -foreground Green -nonewline
-	}
-	Write-Host ")"
-
-	Return ${Result}
-}
+. .\test_functions.ps1
 
 $TestExecutablesDirectory = GetTestExecutablesDirectory
 
 If (-Not (Test-Path ${TestExecutablesDirectory}))
 {
-	Write-Host "Missing test executables directory." -foreground Red
+	Write-Error "Missing test executables directory"
 
 	Exit ${ExitFailure}
 }
@@ -251,13 +24,15 @@ Foreach (${TestName} in ${LibraryTests} -split " ")
 	{
 		Continue
 	}
-	$Result = RunTest ${TestName}
+	$Result = RunTestBinary ${TestExecutablesDirectory} "ewf_test_${TestName}"
 
 	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 	{
 		Break
 	}
 }
+
+$TestInputs = GenerateTestInputs "libewf" ${OptionSets}
 
 Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 {
@@ -266,13 +41,14 @@ Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 	{
 		Continue
 	}
-	If (Test-Path -Path "input" -PathType Container)
+	ForEach ($TestInput in ${TestInputs})
 	{
-		$Result = RunTestWithInput ${TestName}
-	}
-	Else
-	{
-		$Result = RunTest ${TestName}
+		$Result = RunTestBinaryWithInput ${TestExecutablesDirectory} "ewf_test_${TestName}" ${TestInput}
+
+		If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
+		{
+			Break
+		}
 	}
 	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 	{
@@ -281,4 +57,3 @@ Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 }
 
 Exit ${Result}
-

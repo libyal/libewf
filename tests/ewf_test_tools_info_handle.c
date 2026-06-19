@@ -328,30 +328,23 @@ on_error:
 int ewf_test_tools_info_handle_dfxml_header_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
-
 	FILE *stream             = NULL;
-#endif
-
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
+
 	/* Test regular cases
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	result = info_handle_dfxml_header_fprint(
 	          stream,
 	          &error );
-
-	fclose(
-	 stream );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -361,8 +354,6 @@ int ewf_test_tools_info_handle_dfxml_header_fprint(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -382,6 +373,18 @@ int ewf_test_tools_info_handle_dfxml_header_fprint(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
 
 on_error:
@@ -389,6 +392,11 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
 	}
 	return( 0 );
 }
@@ -399,30 +407,23 @@ on_error:
 int ewf_test_tools_info_handle_dfxml_footer_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
-
 	FILE *stream             = NULL;
-#endif
-
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
+
 	/* Test regular cases
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	result = info_handle_dfxml_footer_fprint(
 	          stream,
 	          &error );
-
-	fclose(
-	 stream );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -432,8 +433,6 @@ int ewf_test_tools_info_handle_dfxml_footer_fprint(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -453,6 +452,18 @@ int ewf_test_tools_info_handle_dfxml_footer_fprint(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
 
 on_error:
@@ -460,6 +471,11 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
 	}
 	return( 0 );
 }
@@ -470,30 +486,23 @@ on_error:
 int ewf_test_tools_info_handle_dfxml_build_environment_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
-
 	FILE *stream             = NULL;
-#endif
-
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
+
 	/* Test regular cases
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	result = info_handle_dfxml_build_environment_fprint(
 	          stream,
 	          &error );
-
-	fclose(
-	 stream );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -503,8 +512,6 @@ int ewf_test_tools_info_handle_dfxml_build_environment_fprint(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -524,6 +531,18 @@ int ewf_test_tools_info_handle_dfxml_build_environment_fprint(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
 
 on_error:
@@ -531,6 +550,11 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
 	}
 	return( 0 );
 }
@@ -541,30 +565,23 @@ on_error:
 int ewf_test_tools_info_handle_dfxml_execution_environment_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
-
 	FILE *stream             = NULL;
-#endif
-
 	libcerror_error_t *error = NULL;
 	int result               = 0;
 
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
+
 	/* Test regular cases
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	result = info_handle_dfxml_execution_environment_fprint(
 	          stream,
 	          &error );
-
-	fclose(
-	 stream );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -574,8 +591,6 @@ int ewf_test_tools_info_handle_dfxml_execution_environment_fprint(
 	EWF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -595,6 +610,18 @@ int ewf_test_tools_info_handle_dfxml_execution_environment_fprint(
 	libcerror_error_free(
 	 &error );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
 
 on_error:
@@ -602,6 +629,11 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
 	}
 	return( 0 );
 }

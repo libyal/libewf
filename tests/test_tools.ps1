@@ -1,199 +1,90 @@
 # Tests tools functions and types.
-#
-# Version: 20260608
-
-$ExitSuccess = 0
-$ExitFailure = 1
-$ExitIgnore = 77
 
 $ToolsTests = "bodyfile byte_size_string device_handle digest_hash export_handle guid imaging_handle info_handle log_handle mount_path_string output path_string platform signal storage_media_buffer system_string verification_handle"
-$ToolsTestsWithInput = ""
+$OptionSets = "" -split " "
 
-$InputGlob = "*.[Ees]*01"
+. .\test_functions.ps1
 
-$VSDirectories = @(
-	"msvscpp",
-	"vs2008",
-	"vs2010",
-	"vs2012",
-	"vs2013",
-	"vs2015",
-	"vs2017",
-	"vs2019",
-	"vs2022",
-	"vs2026"
-)
-
-$VSConfigurations = @(
-	"Release",
-	"VSDebug"
-)
-
-$VSPlatforms = @(
-	"Win32",
-	"x64"
-)
-
-Function GetTestProfileDirectory
+Function CompareWithReference
 {
-	param( [string]$TestInputDirectory, [string]$TestProfile )
+	param( [string]$TestProfileDirectory, [string]$TestSet, [string]$TestFileName, [string]$TestResults )
 
-	$TestProfileDirectory = "${TestInputDirectory}\.${TestProfile}"
+	$ExpectedTestResults = "${TestProfileDirectory}\${TestSet}\${TestFileName}"
 
-	If (-Not (Test-Path -Path ${TestProfileDirectory} -PathType "Container"))
+	If (Test-Path -Path ${ExpectedTestResults} -PathType Leaf)
 	{
-		New-Item -ItemType "directory" -Path ${TestProfileDirectory}
-	}
-	Return ${TestProfileDirectory}
-}
+		$Difference = Compare-Object -ReferenceObject (Get-Content -Path ${ExpectedTestResults}) -DifferenceObject (Get-Content -Path ${TestResults})
 
-Function GetTestSetDirectory
-{
-	param( [string]$TestProfileDirectory, [string]$TestSetInputDirectory )
-
-	$TestSetDirectory = "${TestProfileDirectory}\${TestSetInputDirectory.Basename}"
-
-	If (-Not (Test-Path -Path ${TestSetDirectory} -PathType "Container"))
-	{
-		New-Item -ItemType "directory" -Path ${TestSetDirectory}
-	}
-	Return ${TestSetDirectory}
-}
-
-Function GetTestExecutablesDirectory
-{
-	$TestExecutablesDirectory = ""
-
-	ForEach (${VSDirectory} in $VSDirectories)
-	{
-		ForEach (${VSConfiguration} in $VSConfigurations)
+		If (${Difference})
 		{
-			ForEach (${VSPlatform} in $VSPlatforms)
-			{
-				$TestExecutablesDirectory = "..\${VSDirectory}\${VSConfiguration}\${VSPlatform}"
-
-				If (Test-Path ${TestExecutablesDirectory})
-				{
-					Return ${TestExecutablesDirectory}
-				}
-			}
-			$TestExecutablesDirectory = "..\${VSDirectory}\${VSConfiguration}"
-
-			If (Test-Path ${TestExecutablesDirectory})
-			{
-				Return ${TestExecutablesDirectory}
-			}
+			Return ${ExitFailure}
 		}
-	}
-	Return ${TestExecutablesDirectory}
-}
-
-Function ReadIgnoreList
-{
-	param( [string]$TestProfileDirectory )
-
-	$IgnoreFile = "${TestProfileDirectory}\ignore"
-	$IgnoreList = ""
-
-	If (Test-Path -Path ${IgnoreFile} -PathType "Leaf")
-	{
-		$IgnoreList = Get-Content -Path ${IgnoreFile} |
-			Where {$_ -notmatch '^#.*'}
-	}
-	Return $IgnoreList
-}
-
-Function RunTest
-{
-	param( [string]$TestType )
-
-	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_tools_${TestName}.exe"
-
-	$Output = Invoke-Expression ${TestExecutable}
-	$Result = ${LastExitCode}
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	Write-Host "${TestDescription} " -nonewline
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host " (FAIL)"
 	}
 	Else
 	{
-		Write-Host " (PASS)"
+		New-Item -Force -ItemType Directory -Path "${TestProfileDirectory}\${TestSet}" | Out-Null
+		Move-Item -Path ${TestResults} -Destination ${ExpectedTestResults}
 	}
-	Return ${Result}
+	Return ${ExitSuccess}
 }
 
-Function RunTestWithInput
+Function RunToolsBinaryAndCompareStdout
 {
-	param( [string]$TestType )
+	param( [string]$TestExecutablesDirectory, [string]$ToolName, [string]$TestProfile, [string]$TestOptions, [string[]]$TestInput )
 
-	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestExecutablesDirectory}\ewf_test_tools_${TestName}.exe"
+	$TestExecutable = "${TestExecutablesDirectory}\${ToolName}.exe"
 
-	$TestProfileDirectory = GetTestProfileDirectory "input" "ewftools"
-
-	$IgnoreList = ReadIgnoreList ${TestProfileDirectory}
-
-	$Result = ${ExitSuccess}
-
-	ForEach ($TestSetInputDirectory in Get-ChildItem -Path "input" -Exclude ".*")
+	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
 	{
-		If (-Not (Test-Path -Path ${TestSetInputDirectory} -PathType "Container"))
-		{
-			Continue
-		}
-		If (${TestSetInputDirectory} -Contains ${IgnoreList})
-		{
-			Continue
-		}
-		$TestSetDirectory = GetTestSetDirectory ${TestProfileDirectory} ${TestSetInputDirectory}
+		$TestDescription = "Missing binary: ${ToolName}"
+		WriteTestResult ${TestDescription} ${ExitCommandNotFound}
 
-		If (Test-Path -Path "${TestSetDirectory}\files" -PathType "Leaf")
-		{
-			$InputFiles = Get-Content -Path "${TestSetDirectory}\files" |
-				Where {$_ -ne ""}
-		}
-		Else
-		{
-			$InputFiles = Get-ChildItem -Path ${TestSetInputDirectory} -Include ${InputGlob}
-		}
-		ForEach ($InputFile in ${InputFiles})
-		{
-			# TODO: add test option support
-			$Output = Invoke-Expression ${TestExecutable}
-			$Result = ${LastExitCode}
-
-			If (${Result} -ne ${ExitSuccess})
-			{
-				Break
-			}
-		}
-		If (${Result} -ne ${ExitSuccess})
-		{
-			Break
-		}
+		Return ${ExitCommandNotFound}
 	}
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	Write-Host "${TestDescription} " -nonewline
+	$OptionSet = $TestInput[0]
+	$Options = $TestInput[1]
+	$TestFile = $TestInput[2]
 
-	If (${Result} -ne ${ExitSuccess})
+	$TestProfileDirectory = "input\.${TestProfile}"
+	$TestSet = Split-Path (Split-Path -Path ${TestFile} -Parent) -Leaf
+	$TestFileName = Split-Path -Path ${TestFile} -Leaf
+
+	If ($OptionSet)
 	{
-		Write-Host " (FAIL)"
+		$OutputFile = "${TestFileName}-${OptionSet}.log"
 	}
 	Else
 	{
-		Write-Host " (PASS)"
+		$OutputFile = "${TestFileName}.log"
 	}
+	$TmpDir = "tmp${PID}"
+
+	New-Item -Name ${TmpDir} -ItemType "directory" | Out-Null
+
+	Push-Location ${TmpDir}
+
+	Try
+	{
+		Invoke-Expression "..\${TestExecutable} ${Options} ${TestFile} > ${OutputFile}"
+		$Result = $global:LastExitCode
+
+		If (${Result} -eq ${ExitSuccess})
+		{
+			# Strip header with version.
+			(Get-Content ${OutputFile} | Select-Object -Skip 2) | Set-Content ${OutputFile}
+
+			$Result = CompareWithReference "..\${TestProfileDirectory}" ${TestSet} ${TestFileName} ${OutputFile}
+		}
+	}
+	Finally
+	{
+		Pop-Location
+
+		Remove-Item ${TmpDir} -Force -Recurse
+	}
+	$TestDescription = "${ToolName} with input: '${TestSet}\${TestFileName}"
+	WriteTestResult ${TestDescription} ${Result}
+
 	Return ${Result}
 }
 
@@ -201,7 +92,7 @@ $TestExecutablesDirectory = GetTestExecutablesDirectory
 
 If (-Not (Test-Path ${TestExecutablesDirectory}))
 {
-	Write-Host "Missing test executables directory." -foreground Red
+	Write-Error "Missing test executables directory"
 
 	Exit ${ExitFailure}
 }
@@ -215,34 +106,35 @@ Foreach (${TestName} in ${ToolsTests} -split " ")
 	{
 		Continue
 	}
-	$Result = RunTest ${TestName}
+	$Result = RunTestBinary ${TestExecutablesDirectory} "ewf_test_tools_${TestName}"
 
-	If (${Result} -ne ${ExitSuccess})
+	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 	{
 		Break
 	}
 }
 
-Foreach (${TestName} in ${ToolsTestsWithInput} -split " ")
+$Profiles = @("ewfinfo", "ewfinfo_logical", "ewfinfo_logical_bodyfile")
+
+For ($ProfileIndex = 0; $ProfileIndex -le ($Profiles.length - 1); $ProfileIndex += 1)
 {
-	# Split will return an array of a single empty string when ToolsTestsWithInput is empty.
-	If (-Not (${TestName}))
+	$TestProfile = $Profiles[$ProfileIndex]
+
+	$TestInputs = GenerateTestInputs ${TestProfile} ${OptionSets}
+
+	ForEach ($TestInput in ${TestInputs})
 	{
-		Continue
+		$Result = RunToolsBinaryAndCompareStdout ${TestExecutablesDirectory} "ewfinfo" ${TestProfile} "" ${TestInput}
+
+		If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
+		{
+			Break
+		}
 	}
-	If (Test-Path -Path "input" -PathType "Container")
-	{
-		$Result = RunTestWithInput ${TestName}
-	}
-	Else
-	{
-		$Result = RunTest ${TestName}
-	}
-	If (${Result} -ne ${ExitSuccess})
+	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 	{
 		Break
 	}
 }
 
 Exit ${Result}
-

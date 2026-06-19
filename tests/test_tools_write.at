@@ -122,9 +122,9 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRE],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -136,7 +136,7 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRE],
       [format],
       [encase1 encase2 encase3 encase4 encase5 encase6 ewf ewfx ftk linen5 linen6 linen7],
       [m4_define([ewfacquire_options], m4_normalize($2 test_options -cdeflate:empty-block -f[]format))
-       
+
       AT_SETUP(ewfacquire with options: 'ewfacquire_options' and input: 'sanitized_test_file')
 
       AT_SKIP_IF(
@@ -229,9 +229,9 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRE_OPTICAL],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -268,9 +268,9 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRE_RESUME],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -314,9 +314,9 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRESTREAM],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -421,9 +421,9 @@ m4_define([RUN_WRITE_TEST_EWFEXPORT],
   [m4_foreach_w(
     [test_input],
     [$3],
-    [m4_define([option_set], m4_normalize(get_test_result_value([test_input], 1)))
-    m4_define([test_options], m4_normalize(get_test_result_value([test_input], 2)))
-    m4_define([test_file], [_strip(get_test_result_value([test_input], 3))])
+    [m4_define([option_set], m4_normalize(get_test_input_value([test_input], 1)))
+    m4_define([test_options], m4_normalize(get_test_input_value([test_input], 2)))
+    m4_define([test_file], [_strip(get_test_input_value([test_input], 3))])
 
     m4_ifblank(option_set, m4_define([option_set], [.]))
 
@@ -435,7 +435,7 @@ m4_define([RUN_WRITE_TEST_EWFEXPORT],
       [format],
       [encase1 encase2 encase3 encase4 encase5 encase6 ewf ewfx ftk linen5 linen6 linen7],
       [m4_define([ewfexport_options], m4_normalize($2 test_options -cdeflate:empty-block -f[]format))
-       
+
       AT_SETUP(ewfexport with options: 'ewfexport_options' and input: 'sanitized_test_file')
 
       AT_SKIP_IF(
@@ -548,7 +548,7 @@ m4_define([AT_SETUP],
 SETUP_HELPER_FUNCTIONS
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered writes (-j0)
@@ -590,7 +590,7 @@ m4_if(
   ])
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered writes (-j0)
@@ -638,7 +638,7 @@ dnl   [-j0],
 dnl   test_inputs_ewfacquire_optical)
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered writes (-j0)
@@ -680,7 +680,7 @@ m4_if(
   ])
 
 m4_if(
-  HAVE_MULTI_THREAD_SUPPORT,
+  [HAVE_MULTI_THREAD_SUPPORT],
   [1],
   [dnl Test with:
   dnl * single-threaded with buffered writes (-j0)

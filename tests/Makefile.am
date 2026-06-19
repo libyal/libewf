@@ -30,15 +30,13 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
-check_PYTHONdir = $(abs_top_builddir)
-
 AM_TESTS_ENVIRONMENT = \
 	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
 
 BUILT_SOURCES = package.m4
 
 TESTS = \
-	$(check_SCRIPTS)
+	test_glob.sh
 
 check_AUTOTESTS = \
 	test_library \
@@ -56,9 +54,6 @@ check_AUTOTESTS += test_tools_write
 endif
 
 check_SCRIPTS = \
-	test_glob.sh
-
-check_PYTHON_SCRIPTS = \
 	pyewf_test_handle.py \
 	pyewf_test_support.py
 
@@ -1663,9 +1658,9 @@ test_tools_write: \
 EXTRA_DIST = \
 	$(check_AUTOTESTS:=.at) \
 	$(check_SCRIPTS) \
-	$(check_PYTHON_SCRIPTS) \
 	generate_test_inputs.sh \
 	package.m4 \
+	test_glob.sh \
 	test_macros.at \
 	test_runner.sh
 

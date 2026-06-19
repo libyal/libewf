@@ -101,33 +101,59 @@ on_error:
 int ewf_test_tools_output_copyright_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
+	libcerror_error_t *error = NULL;
+	FILE *stream             = NULL;
+	int result               = 0;
 
-	FILE *stream = NULL;
-#endif
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
 
 	/* Test invocation of function only
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	ewftools_output_copyright_fprint(
 	 stream );
 
-	fclose(
-	 stream );
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
-
+	/* Test error cases
+	 */
 	ewftools_output_copyright_fprint(
 	 NULL );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
+	}
+	return( 0 );
 }
 
 /* Tests the ewftools_output_version_fprint function
@@ -136,29 +162,23 @@ int ewf_test_tools_output_copyright_fprint(
 int ewf_test_tools_output_version_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
+	libcerror_error_t *error = NULL;
+	FILE *stream             = NULL;
+	int result               = 0;
 
-	FILE *stream = NULL;
-#endif
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
 
 	/* Test invocation of function only
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	ewftools_output_version_fprint(
 	 stream,
 	 _SYSTEM_STRING( "test" ) );
-
-	fclose(
-	 stream );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -167,10 +187,35 @@ int ewf_test_tools_output_version_fprint(
 	 _SYSTEM_STRING( "test" ) );
 
 	ewftools_output_version_fprint(
-	 (FILE *) 0x12345678UL,
+	 stream,
 	 NULL );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
+	}
+	return( 0 );
 }
 
 /* Tests the ewftools_output_version_detailed_fprint function
@@ -179,29 +224,23 @@ int ewf_test_tools_output_version_fprint(
 int ewf_test_tools_output_version_detailed_fprint(
      void )
 {
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-	char string[ 1024 ];
+	libcerror_error_t *error = NULL;
+	FILE *stream             = NULL;
+	int result               = 0;
 
-	FILE *stream = NULL;
-#endif
+	/* Initialize test
+	 */
+	stream = tmpfile();
+
+	EWF_TEST_ASSERT_IS_NOT_NULL(
+	 "stream",
+	 stream );
 
 	/* Test invocation of function only
 	 */
-#if defined( HAVE_FMEMOPEN ) && !defined( WINAPI )
-
-	stream = fmemopen(
-	          string,
-	          1024,
-	          "w+");
-
 	ewftools_output_version_detailed_fprint(
 	 stream,
 	 _SYSTEM_STRING( "test" ) );
-
-	fclose(
-	 stream );
-
-#endif /* defined( HAVE_FMEMOPEN ) && !defined( WINAPI ) */
 
 	/* Test error cases
 	 */
@@ -210,10 +249,35 @@ int ewf_test_tools_output_version_detailed_fprint(
 	 _SYSTEM_STRING( "test" ) );
 
 	ewftools_output_version_detailed_fprint(
-	 (FILE *) 0x12345678UL,
+	 stream,
 	 NULL );
 
+	/* Clean up
+	 */
+	result = fclose(
+	          stream );
+
+	stream = NULL;
+
+	EWF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( stream != NULL )
+	{
+		fclose(
+		 stream );
+	}
+	return( 0 );
 }
 
 /* The main program
