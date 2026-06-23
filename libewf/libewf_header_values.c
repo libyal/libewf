@@ -5478,7 +5478,7 @@ int libewf_generate_date_xheader_value(
 	size_t date_time_values_string_index = 0;
 	int print_count                      = 0;
 
-#if defined( WINAPI )
+#if defined( WINAPI ) || defined( __MINGW32__ )
 	size_t tzname_length                 = 0;
 #endif
 
@@ -5665,9 +5665,7 @@ int libewf_generate_date_xheader_value(
 	               time_elements.tm_gmtoff % 60,
 		       time_elements.tm_zone );
 
-#elif defined( WINAPI )
-	/* WINAPI sometimes uses long timezone names
-	 */
+#elif defined( WINAPI ) || defined( __MINGW32__ )
 	tzname_length = narrow_string_length(
 	                 _tzname[ time_elements.tm_isdst ] );
 
@@ -5681,7 +5679,11 @@ int libewf_generate_date_xheader_value(
 	}
 	else
 	{
+		/* Ignore long time zone names
+		 */
 		print_count = 0;
+
+		date_time_values_string_index -= 1;
 	}
 #else
 	print_count = narrow_string_snprintf(

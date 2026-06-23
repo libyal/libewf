@@ -74,10 +74,10 @@ AC_DEFUN([AX_TOOLS_CHECK_ENABLE_MINGW_BINMODE],
 dnl Function to detect if ewftools dependencies are available
 AC_DEFUN([AX_EWFTOOLS_CHECK_LOCAL],
   [dnl Headers used in ewftools
-  AC_CHECK_HEADERS([signal.h sys/signal.h unistd.h])
+  AC_CHECK_HEADERS([signal.h sys/resource.h sys/signal.h unistd.h])
 
   dnl Functions used in ewftools
-  AC_CHECK_FUNCS([close getopt setvbuf])
+  AC_CHECK_FUNCS([close getopt getrlimit setvbuf])
 
   AS_IF(
    [test "x$ac_cv_func_close" != xyes],

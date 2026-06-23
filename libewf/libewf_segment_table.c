@@ -730,6 +730,7 @@ int libewf_segment_table_get_basename(
 		return( -1 );
 	}
 	basename[ segment_table->basename_size - 1 ] = 0;
+
 #endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 	return( 1 );
@@ -931,6 +932,7 @@ int libewf_segment_table_set_basename(
 		return( -1 );
 	}
 	segment_table->basename[ basename_length ] = 0;
+
 #endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
 
 	return( 1 );
@@ -1409,6 +1411,7 @@ int libewf_segment_table_set_basename_wide(
 		return( -1 );
 	}
 #endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 	return( 1 );
 }
 

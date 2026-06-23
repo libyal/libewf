@@ -914,7 +914,7 @@ on_error:
 }
 
 /* Closes the device handle
- * Returns the 0 if succesful or -1 on error
+ * Returns the 0 if successful or -1 on error
  */
 int device_handle_close(
      device_handle_t *device_handle,

@@ -1001,7 +1001,7 @@ int export_handle_open_output(
 }
 
 /* Closes the export handle
- * Returns the 0 if succesful or -1 on error
+ * Returns the 0 if successful or -1 on error
  */
 int export_handle_close(
      export_handle_t *export_handle,
@@ -3518,12 +3518,11 @@ int export_handle_set_output_values(
      uint8_t copy_input_values,
      libcerror_error_t **error )
 {
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 	uint8_t guid[ GUID_SIZE ];
 
 	uint8_t guid_type          = 0;
 #endif
-
 	static char *function      = "export_handle_set_output_values";
 	size_t value_string_length = 0;
 	int result                 = 0;
@@ -3894,7 +3893,7 @@ int export_handle_set_output_values(
 
 				return( -1 );
 			}
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 			if( ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
 			 || ( export_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
 			 || ( export_handle->ewf_format == LIBEWF_FORMAT_EWFX ) )
@@ -3941,7 +3940,7 @@ int export_handle_set_output_values(
 					return( -1 );
 				}
 			}
-#endif
+#endif /* defined( HAVE_GUID_SUPPORT ) */
 		}
 	}
 	else if( ( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_RAW )

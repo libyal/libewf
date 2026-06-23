@@ -38,7 +38,7 @@
 
 #include "../ewftools/guid.h"
 
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 
 /* Tests the guid_generate function
  * Returns 1 if successful or 0 if not
@@ -168,7 +168,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
+#endif /* defined( HAVE_GUID_SUPPORT ) */
 
 /* Tests the guid_to_string function
  * Returns 1 if successful or 0 if not
@@ -205,7 +205,7 @@ int ewf_test_tools_guid_to_string(
 
 	result = memory_compare(
 	          string,
-	          "d074eb89-79fe-4e3d-919f-95bf46f7f55f",
+	          _SYSTEM_STRING( "d074eb89-79fe-4e3d-919f-95bf46f7f55f" ),
 	          37 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -232,7 +232,7 @@ int ewf_test_tools_guid_to_string(
 
 	result = memory_compare(
 	          string,
-	          "89eb74d0-fe79-3d4e-919f-95bf46f7f55f",
+	          _SYSTEM_STRING( "89eb74d0-fe79-3d4e-919f-95bf46f7f55f" ),
 	          37 );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -408,13 +408,13 @@ int main(
 	EWF_TEST_UNREFERENCED_PARAMETER( argc )
 	EWF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 
 	EWF_TEST_RUN(
 	 "guid_generate",
 	 ewf_test_tools_guid_generate );
 
-#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
+#endif /* defined( HAVE_GUID_SUPPORT ) */
 
 	EWF_TEST_RUN(
 	 "guid_to_string",

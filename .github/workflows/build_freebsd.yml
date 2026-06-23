@@ -19,7 +19,7 @@ jobs:
         usesh: true
         mem: 4096
         prepare: |
-          pkg install -y autoconf automake bash byacc curl flex fusefs-libs gettext git libtool openssl pkgconf
+          pkg install -y autoconf automake byacc curl flex fusefs-libs gettext git libtool openssl pkgconf
     - name: Download test data
       shell: freebsd {0}
       run: |

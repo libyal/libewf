@@ -287,8 +287,11 @@ m4_define([RUN_WRITE_TEST_EWFACQUIRE_RESUME],
 
     TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/[]test_file"`
 
-    FILE_SIZE=`ls -ln "${TEST_FILE}" | sed 's/^[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*[^ ][^ ]*[ ][ ]*//;s/[ ].*$//'`
-
+    if stat --version 2>/dev/null | grep -q GNU; then
+      FILE_SIZE=$(stat -c "%s" "${TEST_FILE}")
+    else
+      FILE_SIZE=$(stat -f "%z" "${TEST_FILE}")
+    fi
     dnl TODO: calculate different resume points based on file size
     AT_SKIP_IF(
       [test -z "${FILE_SIZE}" || test ${FILE_SIZE} -ne 1474560])

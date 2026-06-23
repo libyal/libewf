@@ -129,23 +129,6 @@ int verification_handle_initialize(
 
 		goto on_error;
 	}
-#ifdef TODO
-	/* TODO: have application determine limit value and set to value - 4 */
-	if( libewf_handle_set_maximum_number_of_open_handles(
-	     ( *verification_handle )->input_handle,
-	     1000,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set maximum number of open handles.",
-		 function );
-
-		goto on_error;
-	}
-#endif
 	( *verification_handle )->stored_md5_hash_string = narrow_string_allocate(
 							    33 );
 
@@ -639,7 +622,7 @@ on_error:
 }
 
 /* Closes the verification handle
- * Returns the 0 if succesful or -1 on error
+ * Returns the 0 if successful or -1 on error
  */
 int verification_handle_close(
      verification_handle_t *verification_handle,

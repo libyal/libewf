@@ -1,6 +1,6 @@
 dnl Functions for libuuid
 dnl
-dnl Version: 20260606
+dnl Version: 20260621
 
 dnl Function to detect if UuidCreate in librpcrt4 is available
 AC_DEFUN([AX_LIBRPCRT4_CHECK_UUID_CREATE], [
@@ -25,7 +25,32 @@ UuidCreate(&uuid);]])],
 
   AC_MSG_RESULT(
     [$ac_cv_have_rpcrt4_uuid_create])
-])
+
+  AS_IF(
+    [test "x$ac_cv_have_rpcrt4_uuid_create" = xyes],
+    [AC_MSG_CHECKING([for UuidCreateSequential in -lrpcrt4])
+
+    BACKUP_LIBS="$LIBS"
+    LIBS="$LIBS -lrpcrt4"
+    AC_LANG_PUSH(C)
+
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [[#include <windows.h>
+#include <rpcdce.h>]],
+        [[UUID uuid;
+UuidCreateSequential(&uuid);]])],
+      [ac_cv_have_rpcrt4_uuid_create_sequential=yes],
+      [ac_cv_have_rpcrt4_uuid_create_sequential=no],
+      [ac_cv_have_rpcrt4_uuid_create_sequential=undetermined])
+
+    AC_LANG_POP(C)
+    LIBS="$BACKUP_LIBS"
+
+    AC_MSG_RESULT(
+      [$ac_cv_have_rpcrt4_uuid_create_sequential])
+    ])
+  ])
 
 dnl Function to detect if libuuid is available
 AC_DEFUN([AX_LIBUUID_CHECK_LIB],
@@ -128,6 +153,13 @@ AC_DEFUN([AX_LIBUUID_CHECK_LIB],
       [1],
       [Define to 1 if you have the 'librpcrt4' library (-lrpcrt4).])
     ])
+  AS_IF(
+    [test "x$ac_cv_have_rpcrt4_uuid_create_sequential" = xyes],
+    [AC_DEFINE(
+      [HAVE_LIBRPCRT4_UUID_CREATE_SEQUENTIAL],
+      [1],
+      [Define to 1 if UuidCreateSequential funtion is available in librpcrt4.])
+    ])
 
   AS_IF(
     [test "x$ac_cv_libuuid" = xlibuuid],
@@ -152,14 +184,6 @@ AC_DEFUN([AX_LIBUUID_CHECK_LIB],
       [HAVE_LIBUUID],
       [1],
       [Define to 1 if you have the 'libuuid' library (-luuid).])
-    ])
-
-  AS_IF(
-    [test "x$ac_cv_libuuid" != xno],
-    [AC_DEFINE(
-      [HAVE_GUID_SUPPORT],
-      [1],
-      [Define to 1 if GUID/UUID support is available.])
     ])
 
   AS_IF(

@@ -231,6 +231,7 @@ stamp-h[1-9]
 /tests/notify_stream.log
 /tests/package.m4
 /tests/test_inputs_*.at
+/tests/test_glob
 /tests/test_library
 /tests/test_library_write
 /tests/test_manpages

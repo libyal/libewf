@@ -544,7 +544,7 @@ int libewf_glob_determine_format(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: invalid filename - unsupported extension: %s.",
+				 "%s: invalid filename - unsupported extension: %s",
 				 function,
 				 &( filename[ filename_length - 4 ] ) );
 
@@ -569,7 +569,7 @@ int libewf_glob_determine_format(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: invalid filename - unsupported extension: %s.",
+				 "%s: invalid filename - unsupported extension: %s",
 				 function,
 				 &( filename[ filename_length - 5 ] ) );
 
@@ -581,7 +581,7 @@ int libewf_glob_determine_format(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - unsupported extension: %s.",
+			 "%s: invalid filename - unsupported extension: %s",
 			 function,
 			 &( filename[ filename_length - 5 ] ) );
 
@@ -1150,7 +1150,7 @@ int libewf_glob_wide_determine_format(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: invalid filename - unsupported extension: %s.",
+				 "%s: invalid filename - unsupported extension: %ls",
 				 function,
 				 &( filename[ filename_length - 4 ] ) );
 
@@ -1175,7 +1175,7 @@ int libewf_glob_wide_determine_format(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 				 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-				 "%s: invalid filename - unsupported extension: %s.",
+				 "%s: invalid filename - unsupported extension: %ls",
 				 function,
 				 &( filename[ filename_length - 5 ] ) );
 
@@ -1187,7 +1187,7 @@ int libewf_glob_wide_determine_format(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - unsupported extension: %s.",
+			 "%s: invalid filename - unsupported extension: %ls",
 			 function,
 			 &( filename[ filename_length - 5 ] ) );
 

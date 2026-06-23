@@ -37,7 +37,7 @@
 #include "ewftools_libcerror.h"
 #include "guid.h"
 
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 
 /* Determines the GUID
  * Returns 1 if successful or -1 on error
@@ -51,7 +51,6 @@ int guid_generate(
 #if defined( HAVE_LIBRPCRT4 ) || defined( WINAPI )
 	UUID uuid             = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 #endif
-
 	static char *function = "guid_generate";
 
 	if( guid == NULL )
@@ -102,10 +101,7 @@ int guid_generate(
 	}
 	else if( guid_type == GUID_TYPE_TIME )
 	{
-#if defined( __BORLANDC__ ) && __BORLANDC__ <= 0x0520
-		/* No support for the time type GUID */
-
-#elif defined( WINAPI ) && _WIN32_WINNT >= 0x0500
+#if defined( HAVE_LIBRPCRT4_UUID_CREATE_SEQUENTIAL ) || ( defined( _MSC_VER ) && _WIN32_WINNT >= 0x0500 )
 		UuidCreateSequential(
 		 &uuid );
 
@@ -147,7 +143,7 @@ int guid_generate(
 	return( 1 );
 }
 
-#endif /* defined( HAVE_GUID_SUPPORT ) || defined( WINAPI ) */
+#endif /* defined( HAVE_GUID_SUPPORT ) */
 
 /* Converts the GUID into a string
  * Returns 1 if successful or -1 on error

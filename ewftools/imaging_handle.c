@@ -54,7 +54,7 @@
 #define IMAGING_HANDLE_INPUT_BUFFER_SIZE		64
 #define IMAGING_HANDLE_STRING_SIZE			1024
 #define IMAGING_HANDLE_NOTIFY_STREAM			stdout
-#define IMAGING_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE	64 * 1024 * 1024
+#define IMAGING_HANDLE_MAXIMUM_PROCESS_BUFFERS_SIZE	256 * 1024 * 1024
 
 /* Creates an imaging handle
  * Make sure the value imaging_handle is referencing, is set to NULL
@@ -959,7 +959,7 @@ on_error:
 }
 
 /* Closes the imaging handle
- * Returns the 0 if succesful or -1 on error
+ * Returns the 0 if successful or -1 on error
  */
 int imaging_handle_close(
      imaging_handle_t *imaging_handle,
@@ -4795,7 +4795,7 @@ int imaging_handle_set_output_values(
 {
 	system_character_t acquiry_operating_system[ 32 ];
 
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 	uint8_t guid[ GUID_SIZE ];
 
 	uint8_t guid_type     = 0;
@@ -5357,7 +5357,7 @@ int imaging_handle_set_output_values(
 			return( -1 );
 		}
 	}
-#if defined( HAVE_GUID_SUPPORT ) || defined( WINAPI )
+#if defined( HAVE_GUID_SUPPORT )
 	if( ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( imaging_handle->ewf_format == LIBEWF_FORMAT_ENCASE7 )
@@ -5425,7 +5425,8 @@ int imaging_handle_set_output_values(
 			}
 		}
 	}
-#endif
+#endif /* defined( HAVE_GUID_SUPPORT ) */
+
 	return( 1 );
 }
 

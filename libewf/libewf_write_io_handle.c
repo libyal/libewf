@@ -2512,13 +2512,13 @@ int libewf_write_io_handle_create_segment_file(
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,
-	     filename_size,
+	     filename_size - 1,
 	     error ) != 1 )
 #else
 	if( libbfio_file_set_name(
 	     file_io_handle,
 	     filename,
-	     filename_size,
+	     filename_size - 1,
 	     error ) != 1 )
 #endif
 	{

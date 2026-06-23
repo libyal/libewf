@@ -30,27 +30,21 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBEWF_DLL_IMPORT@
 
-AM_TESTS_ENVIRONMENT = \
-	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
-
 BUILT_SOURCES = package.m4
-
-TESTS = \
-	test_glob.sh
 
 check_AUTOTESTS = \
 	test_library \
+	test_glob \
 	test_manpages \
 	test_tools
 
-if HAVE_WRITE_TESTS
-check_AUTOTESTS += test_library_write
-endif
 if HAVE_PYTHON_TESTS
 check_AUTOTESTS += test_python_module
 endif
 if HAVE_WRITE_TESTS
-check_AUTOTESTS += test_tools_write
+check_AUTOTESTS += \
+	test_library_write \
+	test_tools_write
 endif
 
 check_SCRIPTS = \
@@ -1614,6 +1608,11 @@ test_inputs_ewfacquire_optical.at: generate_test_inputs.sh
 test_inputs_ewfacquirestream.at: generate_test_inputs.sh
 	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) ewfacquirestream
 
+test_glob: \
+	package.m4 \
+	test_glob.at \
+	test_macros.at
+
 test_library: \
 	package.m4 \
 	test_inputs_libewf.at \
@@ -1632,6 +1631,7 @@ test_manpages: \
 test_python_module: \
 	package.m4 \
 	test_inputs_pyewf.at \
+	test_macros.at \
 	test_python_module.at
 
 test_tools: \
@@ -1660,9 +1660,7 @@ EXTRA_DIST = \
 	$(check_SCRIPTS) \
 	generate_test_inputs.sh \
 	package.m4 \
-	test_glob.sh \
-	test_macros.at \
-	test_runner.sh
+	test_macros.at
 
 CLEANFILES = \
 	$(check_AUTOTESTS) \
