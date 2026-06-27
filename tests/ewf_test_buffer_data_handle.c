@@ -404,7 +404,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) 12 );
@@ -436,7 +436,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) 4 );
@@ -468,7 +468,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) 0 );
@@ -509,7 +509,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) -1 );
@@ -536,7 +536,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 
 	buffer_data_handle->current_offset = 0;
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) -1 );
@@ -559,7 +559,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) -1 );
@@ -582,7 +582,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) -1 );
@@ -605,7 +605,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	              0,
 	              &error );
 
-	EWF_TEST_ASSERT_EQUAL_INT64(
+	EWF_TEST_ASSERT_EQUAL_SSIZE(
 	 "read_count",
 	 read_count,
 	 (ssize_t) -1 );
@@ -640,7 +640,7 @@ int ewf_test_buffer_data_handle_read_segment_data(
 	}
 	else
 	{
-		EWF_TEST_ASSERT_EQUAL_INT64(
+		EWF_TEST_ASSERT_EQUAL_SSIZE(
 		 "read_count",
 		 read_count,
 		 (ssize_t) -1 );

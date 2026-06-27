@@ -1,6 +1,6 @@
-.Dd November 29, 2020
-.Dt ewfrecover
-.Os libewf
+.Dd June 27, 2026
+.Dt EWFRECOVER 1
+.Os
 .Sh NAME
 .Nm ewfrecover
 .Nd exports media data stored in EWF files
@@ -29,7 +29,10 @@ the first or the entire set of EWF segment files
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl A Ar codepage
-the codepage of header section, options: ascii (default), windows-874, windows-932, windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257 or windows-1258
+the codepage of header section, options: ascii (default), windows-874, \
+windows-932, windows-936, windows-949, windows-950, windows-1250, \
+windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, \
+windows-1256, windows-1257 or windows-1258
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
@@ -54,40 +57,33 @@ None
 will ask the information it needs.
 .Ss Recovering a corrupted image
 .Bd -literal
-ewfrecover corrupt.E01 
+# ewfrecover corrupt.E01
 ewfrecover 20120805
-
+.sp
 Export started at: Mon Aug  6 07:09:34 2012
-
+.sp
 This could take a while.
-
-.Dl ...
-
+.sp
+\...
+.sp
 Export completed at: Mon Aug  6 07:09:34 2012
-
+.sp
 MD5 hash calculated over data:		d41d8cd98f00b204e9800998ecf8427e
 ewfrecover: SUCCESS
+.sp
 .Ed
 .Ss Trying to recover a non-corrupted image
 .Bd -literal
-ewfrecover notcorrupt.E01 
+# ewfrecover notcorrupt.E01
 ewfrecover 20120805
-
+.sp
 EWF file(s) are not corrupted.
+.sp
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
-.Sh BUGS
-Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
-https://github.com/libyal/libewf/
-.Sh AUTHOR
-.Pp
-These man pages were written by Joachim Metz.
-.Sh COPYRIGHT
-.Pp
-Copyright (C) 2006-2026, Joachim Metz <joachim.metz@gmail.com>.
-.Pp
-This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Errors, verbose and debug output are printed to stderr when verbose output \
+\-v is enabled.
+Verbose and debug output are only printed when enabled at compilation.
 .Sh SEE ALSO
 .Xr ewfacquire 1 ,
 .Xr ewfacquirestream 1 ,
@@ -95,3 +91,14 @@ This is free software; see the source for copying conditions. There is NO warran
 .Xr ewfinfo 1 ,
 .Xr ewfmount 1 ,
 .Xr ewfverify 1
+.Sh AUTHORS
+.An Joachim Metz <joachim.metz@gmail.com>
+.Sh BUGS
+Please report bugs of any kind on the project issue tracker: \
+https://github.com/libyal/libewf/issues
+.Sh COPYRIGHT
+Copyright (C) 2006-2026, Joachim Metz <joachim.metz@gmail.com>.
+.sp
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A \
+PARTICULAR PURPOSE.

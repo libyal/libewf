@@ -2291,10 +2291,12 @@ int verification_handle_verify_input(
 	}
 	if( verification_handle->abort == 0 )
 	{
-		fprintf(
-		 verification_handle->notify_stream,
-		 "\n" );
-
+		if( print_status_information != 0 )
+		{
+			fprintf(
+			 verification_handle->notify_stream,
+			 "\n" );
+		}
 		if( verification_handle_checksum_errors_fprint(
 		     verification_handle,
 		     verification_handle->notify_stream,

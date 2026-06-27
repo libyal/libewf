@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libewf],
-  [20260623],
+  [20260627],
   [https://github.com/libyal/libewf/issues])
 
 AC_CONFIG_SRCDIR(

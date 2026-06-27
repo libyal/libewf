@@ -1,40 +1,41 @@
-.Dd April  3, 2022
-.Dt ewfmount
-.Os libewf
+.Dd June 27, 2026
+.Dt EWFMOUNT 1
+.Os
 .Sh NAME
 .Nm ewfmount
-.Nd mount data stored in EWF files
+.Nd mounts an Expert Witness Compression Format (EWF) image
 .Sh SYNOPSIS
 .Nm ewfmount
 .Op Fl f Ar format
 .Op Fl X Ar extended_options
 .Op Fl hvV
-.Ar ewf_files
+.Ar sources
 .Ar mount_point
 .Sh DESCRIPTION
 .Nm ewfmount
-is a utility to mount data stored in EWF files.
+is a utility to mount an Expert Witness Compression Format (EWF) image
 .Pp
 .Nm ewfmount
 is part of the
 .Nm libewf
 package.
 .Nm libewf
-is a library to access the Expert Witness Compression Format (EWF).
+is a library to access the Expert Witness Compression Format (EWF) format
 .Pp
-.Ar ewf_files
-the first or the entire set of EWF segment files
+.Ar sources
+first or all files of a set of EWF segment files
 .Ar mount_point
 the directory to serve as mount point
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl f Ar format
-specify the input format, options: raw (default), files (restricted to logical volume files)
+specify the input format, options: raw (default), files (restricted to logical \
+volume files)
 .It Fl h
 shows this help
 .It Fl v
-verbose output to stderr
+verbose output to stderr, while ewfmount will remain running in the foreground
 .It Fl V
 print version
 .It Fl X Ar extended_options
@@ -46,24 +47,14 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# ewfmount floppy.E01 floppy/
-ewfmount 20110918
-.sp
+# ewfmount image1.E01 /mnt/ewf
+ewfmount 20260627
 .sp
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
-.Sh BUGS
-Please report bugs of any kind to <joachim.metz@gmail.com> or on the project website:
-https://github.com/libyal/libewf/
-.Sh AUTHOR
-.Pp
-These man pages were written by Joachim Metz.
-.Sh COPYRIGHT
-.Pp
-Copyright (C) 2006-2026, Joachim Metz <joachim.metz@gmail.com>.
-.Pp
-This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Errors, verbose and debug output are printed to stderr when verbose output \
+\-v is enabled.
+Verbose and debug output are only printed when enabled at compilation.
 .Sh SEE ALSO
 .Xr ewfacquire 1 ,
 .Xr ewfacquirestream 1 ,
@@ -71,3 +62,14 @@ This is free software; see the source for copying conditions. There is NO warran
 .Xr ewfinfo 1 ,
 .Xr ewfrecover 1 ,
 .Xr ewfverify 1
+.Sh AUTHORS
+.An Joachim Metz <joachim.metz@gmail.com>
+.Sh BUGS
+Please report bugs of any kind on the project issue tracker: \
+https://github.com/libyal/libewf/issues
+.Sh COPYRIGHT
+Copyright (C) 2006-2026, Joachim Metz <joachim.metz@gmail.com>.
+.sp
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A \
+PARTICULAR PURPOSE.

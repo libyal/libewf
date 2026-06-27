@@ -130,7 +130,17 @@ m4_define([RUN_TEST_GLOB],
     [test_binary],
     [m4_expand(test_prefix[]_test_glob)])dnl
 
-  AT_SETUP(test_binary with 'PREFIX.$1 - PREFIX.$2')
+  m4_if(
+    [$1],
+    [$2],
+    [m4_define(
+      [test_description],
+      [test_binary with 'PREFIX.$1'])],
+    [m4_define(
+      [test_description],
+      [test_binary with 'PREFIX.$1 - PREFIX.$2'])])
+
+  AT_SETUP(test_description)
 
   AT_SKIP_IF(
     [test -n "${SKIP_LIBRARY_TESTS}"])
