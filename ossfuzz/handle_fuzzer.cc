@@ -47,10 +47,23 @@ int LLVMFuzzerTestOneInput(
      const uint8_t *data,
      size_t size )
 {
+	uint8_t buffer[ 512 ];
+	uint8_t guid[ 16 ];
+
 	libbfio_handle_t *file_io_handle = NULL;
 	libbfio_pool_t *file_io_pool     = NULL;
 	libewf_handle_t *handle          = NULL;
+	off64_t media_offset             = 0;
+	size64_t media_size              = 0;
+	uint64_t value_64bit             = 0;
+	uint32_t value_32bit             = 0;
+	uint16_t value_16bit             = 0;
+	uint8_t major_version            = 0;
+	uint8_t minor_version            = 0;
+	uint8_t value_8bit               = 0;
+	int8_t compression_level         = 0;
 	int entry_index                  = 0;
+	int read_iterator                = 0;
 
 	if( libbfio_memory_range_initialize(
 	     &file_io_handle,
@@ -97,6 +110,175 @@ int LLVMFuzzerTestOneInput(
 	     handle,
 	     file_io_pool,
 	     LIBEWF_OPEN_READ,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_segment_files_corrupted(
+	     handle,
+	     NULL ) == -1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_segment_files_encrypted(
+	     handle,
+	     NULL ) == -1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_bytes_per_sector(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_sectors_per_chunk(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_number_of_sectors(
+	     handle,
+	     &value_64bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_chunk_size(
+	     handle,
+	     (size32_t *) &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_error_granularity(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_compression_method(
+	     handle,
+	     &value_16bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_compression_values(
+	     handle,
+	     &compression_level,
+	     &value_8bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_media_type(
+	     handle,
+	     &value_8bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_media_flags(
+	     handle,
+	     &value_8bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_format(
+	     handle,
+	     &value_8bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_segment_file_version(
+	     handle,
+	     &major_version,
+	     &minor_version,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_segment_file_set_identifier(
+	     handle,
+	     guid,
+	     16,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_md5_hash(
+	     handle,
+	     buffer,
+	     16,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_sha1_hash(
+	     handle,
+	     buffer,
+	     20,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_number_of_acquiry_errors(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_number_of_sessions(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_number_of_tracks(
+	     handle,
+	     &value_32bit,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	if( libewf_handle_get_media_size(
+	     handle,
+	     &media_size,
+	     NULL ) != 1 )
+	{
+		goto on_error_libewf;
+	}
+	for( read_iterator = 0;
+	     read_iterator < 128;
+	     read_iterator++ )
+	{
+		if( media_offset >= media_size )
+		{
+			break;
+		}
+		if( libewf_handle_read_buffer_at_offset(
+		     handle,
+		     buffer,
+		     497,
+		     media_offset,
+		     NULL ) == -1 )
+		{
+			goto on_error_libewf;
+		}
+		media_offset += 497;
+	}
+	if( libewf_handle_get_number_of_checksum_errors(
+	     handle,
+	     &value_32bit,
 	     NULL ) != 1 )
 	{
 		goto on_error_libewf;
