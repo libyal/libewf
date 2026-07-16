@@ -62,6 +62,10 @@ struct libewf_line_reader
 	 */
 	size_t buffer_size;
 
+	/* The buffer data size
+	 */
+	size_t buffer_data_size;
+
 	/* The buffer offset
 	 */
 	size_t buffer_offset;
@@ -112,6 +116,10 @@ int libewf_line_reader_read_utf8_string(
 int libewf_line_reader_finalize(
      libewf_line_reader_t *line_reader,
      libcerror_error_t **error );
+
+ssize_t libewf_line_reader_get_remaining_size(
+         libewf_line_reader_t *line_reader,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

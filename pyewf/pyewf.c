@@ -649,7 +649,6 @@ PyObject *pyewf_glob(
 			  number_of_filenames,
 			  &error );
 #endif
-
 		Py_END_ALLOW_THREADS
 
 		if( result != 1 )

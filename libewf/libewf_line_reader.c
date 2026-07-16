@@ -292,7 +292,8 @@ int libewf_line_reader_read_data(
 
 		return( -1 );
 	}
-	if( line_reader->buffer_offset >= line_reader->buffer_size )
+	if( ( line_reader->buffer_data_size != 0 )
+	 && ( line_reader->buffer_offset >= line_reader->buffer_data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -399,7 +400,8 @@ int libewf_line_reader_read_data(
 
 				return( -1 );
 			}
-			line_reader->stream_offset += read_count;
+			line_reader->buffer_data_size = line_reader->buffer_offset + read_count;
+			line_reader->stream_offset   += read_count;
 
 			if( libhmac_md5_update(
 			     line_reader->md5_context,
@@ -423,7 +425,7 @@ int libewf_line_reader_read_data(
 	safe_line_index = line_reader->line_index;
 
 	for( end_of_line_offset = line_reader->buffer_offset;
-	     end_of_line_offset < line_reader->buffer_size;
+	     end_of_line_offset < line_reader->buffer_data_size;
 	     end_of_line_offset += 2 )
 	{
 		if( ( line_reader->buffer[ end_of_line_offset ] == (uint8_t) '\n' )
@@ -468,7 +470,7 @@ int libewf_line_reader_read_data(
 			libcnotify_print_data(
 			 safe_line_data,
 			 safe_line_data_size,
-			 0 );
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 #endif
 	}
@@ -720,5 +722,39 @@ int libewf_line_reader_finalize(
 	}
 */
 	return( 1 );
+}
+
+/* Determine amount of bytes remaining
+ * Returns the amount of bytes remaining or -1 on error
+ */
+ssize_t libewf_line_reader_get_remaining_size(
+         libewf_line_reader_t *line_reader,
+         libcerror_error_t **error )
+{
+	static char *function          = "libewf_line_reader_get_remaining_size";
+	size64_t remaining_stream_size = 0;
+	size_t remaining_buffer_size   = 0;
+
+	if( line_reader == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid line reader.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( line_reader->buffer_data_size != 0 )
+	 && ( line_reader->buffer_offset < line_reader->buffer_data_size ) )
+	{
+		remaining_buffer_size = line_reader->buffer_data_size - line_reader->buffer_offset;
+	}
+	if( (size64_t) line_reader->stream_offset < line_reader->stream_size )
+	{
+		remaining_stream_size = line_reader->stream_size - line_reader->stream_offset;
+	}
+	return( (ssize_t) ( remaining_stream_size + remaining_buffer_size ) );
 }
 

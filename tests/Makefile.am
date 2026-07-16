@@ -1656,11 +1656,17 @@ test_tools_write: \
 	test_tools_write.at
 
 EXTRA_DIST = \
-	$(check_AUTOTESTS:=.at) \
 	$(check_SCRIPTS) \
 	generate_test_inputs.sh \
 	package.m4 \
-	test_macros.at
+	test_glob.at \
+	test_library.at \
+	test_library_write.at \
+	test_macros.at \
+	test_manpages.at \
+	test_python_module.at \
+	test_tools.at \
+	test_tools_write.at
 
 CLEANFILES = \
 	$(check_AUTOTESTS) \

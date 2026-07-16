@@ -944,62 +944,8 @@ int libewf_single_files_parse_rec_category(
      size64_t *media_size,
      libcerror_error_t **error )
 {
-	uint8_t *line_string    = NULL;
-	static char *function   = "libewf_single_files_parse_rec_category";
-	size_t line_string_size = 0;
+	static char *function = "libewf_single_files_parse_rec_category";
 
-	if( single_files == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid single files.",
-		 function );
-
-		return( -1 );
-	}
-	if( line_reader == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid line reader.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		return( -1 );
-	}
-	if( ( line_string_size != 4 )
-	 || ( line_string[ 0 ] != (uint8_t) 'r' )
-	 || ( line_string[ 1 ] != (uint8_t) 'e' )
-	 || ( line_string[ 2 ] != (uint8_t) 'c' ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported category header.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_single_files_parse_record_values(
 	     single_files,
 	     line_reader,
@@ -1012,37 +958,6 @@ int libewf_single_files_parse_rec_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse record values.",
 		 function );
-
-		return( -1 );
-	}
-	/* The category should be followed by an empty line
-	 */
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		return( -1 );
-	}
-	if( ( line_string_size != 1 )
-	 || ( line_string[ 0 ] != 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported empty line string: %d - not empty.",
-		 function,
-		 line_reader->line_index );
 
 		return( -1 );
 	}
@@ -1421,37 +1336,6 @@ int libewf_single_files_parse_perm_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 5 )
-	 || ( line_string[ 0 ] != (uint8_t) 'p' )
-	 || ( line_string[ 1 ] != (uint8_t) 'e' )
-	 || ( line_string[ 2 ] != (uint8_t) 'r' )
-	 || ( line_string[ 3 ] != (uint8_t) 'm' ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported category header.",
-		 function );
-
-		goto on_error;
-	}
 	if( libewf_single_files_parse_category_number_of_entries(
 	     single_files,
 	     line_reader,
@@ -1633,37 +1517,6 @@ int libewf_single_files_parse_perm_category(
 			goto on_error;
 		}
 		permission_group = NULL;
-	}
-	/* The category should be followed by an empty line
-	 */
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 1 )
-	 || ( line_string[ 0 ] != 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported empty line string: %d - not empty.",
-		 function,
-		 line_reader->line_index - 1 );
-
-		goto on_error;
 	}
 	if( libfvalue_split_utf8_string_free(
 	     &types,
@@ -1980,37 +1833,6 @@ int libewf_single_files_parse_srce_category(
 
 		return( -1 );
 	}
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 5 )
-	 || ( line_string[ 0 ] != (uint8_t) 's' )
-	 || ( line_string[ 1 ] != (uint8_t) 'r' )
-	 || ( line_string[ 2 ] != (uint8_t) 'c' )
-	 || ( line_string[ 3 ] != (uint8_t) 'e' ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported category header.",
-		 function );
-
-		goto on_error;
-	}
 	if( libewf_single_files_parse_category_number_of_entries(
 	     single_files,
 	     line_reader,
@@ -2260,37 +2082,6 @@ int libewf_single_files_parse_srce_category(
 		}
 		lef_source = NULL;
 	}
-	/* The category should be followed by an empty line
-	 */
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 1 )
-	 || ( line_string[ 0 ] != 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported empty line string: %d - not empty.",
-		 function,
-		 line_reader->line_index - 1 );
-
-		goto on_error;
-	}
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -2361,36 +2152,6 @@ int libewf_single_files_parse_sub_category(
 		 function );
 
 		return( -1 );
-	}
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 4 )
-	 || ( line_string[ 0 ] != (uint8_t) 's' )
-	 || ( line_string[ 1 ] != (uint8_t) 'u' )
-	 || ( line_string[ 2 ] != (uint8_t) 'b' ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported category header.",
-		 function );
-
-		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
 	     single_files,
@@ -2609,37 +2370,6 @@ int libewf_single_files_parse_sub_category(
 			goto on_error;
 		}
 	}
-	/* The category should be followed by an empty line
-	 */
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 1 )
-	 || ( line_string[ 0 ] != 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported empty line string: %d - not empty.",
-		 function,
-		 line_reader->line_index - 1 );
-
-		goto on_error;
-	}
 	if( libfvalue_split_utf8_string_free(
 	     &types,
 	     error ) != 1 )
@@ -2681,9 +2411,7 @@ int libewf_single_files_parse_entry_category(
      libcerror_error_t **error )
 {
 	libfvalue_split_utf8_string_t *types = NULL;
-	uint8_t *line_string                 = NULL;
 	static char *function                = "libewf_single_files_parse_entry_category";
-	size_t line_string_size              = 0;
 	int number_of_sub_entries            = 0;
 
 	if( single_files == NULL )
@@ -2718,38 +2446,6 @@ int libewf_single_files_parse_entry_category(
 		 function );
 
 		return( -1 );
-	}
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 6 )
-	 || ( line_string[ 0 ] != (uint8_t) 'e' )
-	 || ( line_string[ 1 ] != (uint8_t) 'n' )
-	 || ( line_string[ 2 ] != (uint8_t) 't' )
-	 || ( line_string[ 3 ] != (uint8_t) 'r' )
-	 || ( line_string[ 4 ] != (uint8_t) 'y' ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported category header.",
-		 function );
-
-		goto on_error;
 	}
 	if( libewf_single_files_parse_category_number_of_entries(
 	     single_files,
@@ -2823,37 +2519,6 @@ int libewf_single_files_parse_entry_category(
 		 LIBCERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse file entry.",
 		 function );
-
-		goto on_error;
-	}
-	/* The category should be followed by an empty line
-	 */
-	if( libewf_line_reader_read_utf8_string(
-	     line_reader,
-	     &line_string,
-	     &line_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read line: %d.",
-		 function,
-		 line_reader->line_index );
-
-		goto on_error;
-	}
-	if( ( line_string_size != 1 )
-	 || ( line_string[ 0 ] != 0 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported empty line string: %d - not empty.",
-		 function,
-		 line_reader->line_index - 1 );
 
 		goto on_error;
 	}
@@ -3360,6 +3025,13 @@ int libewf_single_files_read_data_stream(
 	uint8_t *line_string              = NULL;
 	static char *function             = "libewf_single_files_read_data_stream";
 	size_t line_string_size           = 0;
+	ssize_t bytes_remaining           = 0;
+	int category                      = 0;
+	int has_category_entry            = 0;
+	int has_category_perm             = 0;
+	int has_category_rec              = 0;
+	int has_category_srce             = 0;
+	int has_category_sub              = 0;
 
 	if( single_files == NULL )
 	{
@@ -3415,74 +3087,347 @@ int libewf_single_files_read_data_stream(
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_rec_category(
-	     single_files,
-	     line_reader,
-	     media_size,
-	     error ) != 1 )
+	do
+	{
+		if( libewf_line_reader_read_utf8_string(
+		     line_reader,
+		     &line_string,
+		     &line_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read line: %d.",
+			 function,
+			 line_reader->line_index );
+
+			goto on_error;
+		}
+		category = LIBEWF_SINGLE_FILES_CATEGORY_UNDEFINED;
+
+		if( line_string_size == 0 )
+		{
+			break;
+		}
+		if( line_string_size == 4 )
+		{
+			if( ( line_string[ 0 ] == (uint8_t) 'r' )
+			 && ( line_string[ 1 ] == (uint8_t) 'e' )
+			 && ( line_string[ 2 ] == (uint8_t) 'c' ) )
+			{
+				category = LIBEWF_SINGLE_FILES_CATEGORY_REC;
+			}
+			else if( ( line_string[ 0 ] == (uint8_t) 's' )
+			      && ( line_string[ 1 ] == (uint8_t) 'u' )
+			      && ( line_string[ 2 ] == (uint8_t) 'b' ) )
+			{
+				category = LIBEWF_SINGLE_FILES_CATEGORY_SUB;
+			}
+		}
+		else if( line_string_size == 5 )
+		{
+			if( ( line_string[ 0 ] == (uint8_t) 'p' )
+			 && ( line_string[ 1 ] == (uint8_t) 'e' )
+			 && ( line_string[ 2 ] == (uint8_t) 'r' )
+			 && ( line_string[ 3 ] == (uint8_t) 'm' ) )
+			{
+				category = LIBEWF_SINGLE_FILES_CATEGORY_PERM;
+			}
+			else if( ( line_string[ 0 ] == (uint8_t) 's' )
+			      && ( line_string[ 1 ] == (uint8_t) 'r' )
+			      && ( line_string[ 2 ] == (uint8_t) 'c' )
+			      && ( line_string[ 3 ] == (uint8_t) 'e' ) )
+			{
+				category = LIBEWF_SINGLE_FILES_CATEGORY_SRCE;
+			}
+		}
+		else if( line_string_size == 6 )
+		{
+			if( ( line_string[ 0 ] == (uint8_t) 'e' )
+			 && ( line_string[ 1 ] == (uint8_t) 'n' )
+			 && ( line_string[ 2 ] == (uint8_t) 't' )
+			 && ( line_string[ 3 ] == (uint8_t) 'r' )
+			 && ( line_string[ 4 ] == (uint8_t) 'y' ) )
+			{
+				category = LIBEWF_SINGLE_FILES_CATEGORY_ENTRY;
+			}
+		}
+		if( ( category == LIBEWF_SINGLE_FILES_CATEGORY_UNDEFINED )
+		 && ( has_category_entry != 0 )
+		 && ( has_category_perm != 0 )
+		 && ( has_category_rec != 0 )
+		 && ( has_category_srce != 0 )
+		 && ( has_category_sub != 0 ) )
+		{
+/* TODO debug print trailing data */
+			break;
+		}
+		switch( category )
+		{
+			case LIBEWF_SINGLE_FILES_CATEGORY_ENTRY:
+				if( has_category_entry != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+					 "%s: invalid single files - category entry already read.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_single_files_parse_entry_category(
+				     single_files,
+				     line_reader,
+				     format,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse entry category.",
+					 function );
+
+					goto on_error;
+				}
+				has_category_entry = 1;
+
+				break;
+
+			case LIBEWF_SINGLE_FILES_CATEGORY_PERM:
+				if( has_category_perm != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+					 "%s: invalid single files - category perm already read.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_single_files_parse_perm_category(
+				     single_files,
+				     line_reader,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse perm category.",
+					 function );
+
+					goto on_error;
+				}
+				has_category_perm = 1;
+
+				break;
+
+			case LIBEWF_SINGLE_FILES_CATEGORY_REC:
+				if( has_category_rec != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+					 "%s: invalid single files - category rec already read.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_single_files_parse_rec_category(
+				     single_files,
+				     line_reader,
+				     media_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse rec category.",
+					 function );
+
+					goto on_error;
+				}
+				has_category_rec = 1;
+
+				break;
+
+			case LIBEWF_SINGLE_FILES_CATEGORY_SRCE:
+				if( has_category_srce != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+					 "%s: invalid single files - category srce already read.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_single_files_parse_srce_category(
+				     single_files,
+				     line_reader,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse srce category.",
+					 function );
+
+					goto on_error;
+				}
+				has_category_srce = 1;
+
+				break;
+
+			case LIBEWF_SINGLE_FILES_CATEGORY_SUB:
+				if( has_category_sub != 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+					 "%s: invalid single files - category sub already read.",
+					 function );
+
+					goto on_error;
+				}
+				if( libewf_single_files_parse_sub_category(
+				     single_files,
+				     line_reader,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+					 LIBCERROR_CONVERSION_ERROR_GENERIC,
+					 "%s: unable to parse sub category.",
+					 function );
+
+					goto on_error;
+				}
+				has_category_sub = 1;
+
+				break;
+
+			default:
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_GENERIC,
+				 "%s: unsupported category.",
+				 function );
+
+				goto on_error;
+		}
+		/* The category should be followed by an empty line
+		 */
+		if( libewf_line_reader_read_utf8_string(
+		     line_reader,
+		     &line_string,
+		     &line_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read line: %d.",
+			 function,
+			 line_reader->line_index );
+
+			goto on_error;
+		}
+		if( ( line_string_size != 1 )
+		 || ( line_string[ 0 ] != 0 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported empty line string: %d - not empty.",
+			 function,
+			 line_reader->line_index - 1 );
+
+			goto on_error;
+		}
+		bytes_remaining = libewf_line_reader_get_remaining_size(
+		                   line_reader,
+		                   error );
+
+		if( bytes_remaining < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine number of bytes remaining.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	while( bytes_remaining > 5 );
+
+	if( has_category_entry == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse rec category.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid single files - missing category entry.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_perm_category(
-	     single_files,
-	     line_reader,
-	     error ) != 1 )
+	if( has_category_perm == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse perm category.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid single files - missing category perm.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_srce_category(
-	     single_files,
-	     line_reader,
-	     error ) != 1 )
+	if( has_category_rec == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse srce category.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid single files - missing category rec.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_sub_category(
-	     single_files,
-	     line_reader,
-	     error ) != 1 )
+	if( has_category_srce == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse sub category.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid single files - missing category srce.",
 		 function );
 
 		goto on_error;
 	}
-	if( libewf_single_files_parse_entry_category(
-	     single_files,
-	     line_reader,
-	     format,
-	     error ) != 1 )
+	if( has_category_sub == 0 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to parse entry category.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid single files - missing category sub.",
 		 function );
 
 		goto on_error;

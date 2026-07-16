@@ -2698,12 +2698,9 @@ int libewf_internal_handle_open_read_segment_file_section_data(
 
 			goto on_error;
 		}
-		if( internal_handle->io_handle->segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
+		if( internal_handle->io_handle->segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF2_LOGICAL )
 		{
-			if( internal_handle->io_handle->format == LIBEWF_FORMAT_LOGICAL_ENCASE7 )
-			{
-				internal_handle->io_handle->format = LIBEWF_FORMAT_V2_LOGICAL_ENCASE7;
-			}
+			internal_handle->io_handle->format = LIBEWF_FORMAT_V2_LOGICAL_ENCASE7;
 		}
 		internal_handle->media_values->number_of_sectors = internal_handle->media_values->media_size
 		                                                 / internal_handle->media_values->bytes_per_sector;

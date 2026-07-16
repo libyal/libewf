@@ -1553,8 +1553,8 @@ int ewf_test_single_files_parse_rec_category(
 
 	/* Test regular cases
 	 */
-	line_reader->buffer_offset = 0x4;
-	line_reader->line_index    = 1;
+	line_reader->buffer_offset = 0xc;
+	line_reader->line_index    = 2;
 
 	result = libewf_single_files_parse_rec_category(
 	          single_files,
@@ -1573,8 +1573,8 @@ int ewf_test_single_files_parse_rec_category(
 
 	/* Test error cases
 	 */
-	line_reader->buffer_offset = 0x4;
-	line_reader->line_index    = 1;
+	line_reader->buffer_offset = 0xc;
+	line_reader->line_index    = 2;
 
 	result = libewf_single_files_parse_rec_category(
 	          NULL,
@@ -1616,29 +1616,6 @@ int ewf_test_single_files_parse_rec_category(
 	          single_files,
 	          line_reader,
 	          NULL,
-	          &error );
-
-	EWF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	EWF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Test unsupported category header
-	 */
-	line_reader->buffer_offset = 0x136;
-	line_reader->line_index    = 5;
-
-	result = libewf_single_files_parse_rec_category(
-	          single_files,
-	          line_reader,
-	          &media_size,
 	          &error );
 
 	EWF_TEST_ASSERT_EQUAL_INT(
@@ -1831,8 +1808,8 @@ int ewf_test_single_files_parse_perm_category(
 
 	/* Test regular cases
 	 */
-	line_reader->buffer_offset = 0x136;
-	line_reader->line_index    = 5;
+	line_reader->buffer_offset = 0x140;
+	line_reader->line_index    = 6;
 
 	result = libewf_single_files_parse_perm_category(
 	          single_files,
@@ -1850,8 +1827,8 @@ int ewf_test_single_files_parse_perm_category(
 
 	/* Test error cases
 	 */
-	line_reader->buffer_offset = 0x136;
-	line_reader->line_index    = 5;
+	line_reader->buffer_offset = 0x140;
+	line_reader->line_index    = 6;
 
 	result = libewf_single_files_parse_perm_category(
 	          NULL,
@@ -2091,8 +2068,8 @@ int ewf_test_single_files_parse_srce_category(
 
 	/* Test regular cases
 	 */
-	line_reader->buffer_offset = 0x1a0;
-	line_reader->line_index    = 13;
+	line_reader->buffer_offset = 0x1aa;
+	line_reader->line_index    = 14;
 
 	result = libewf_single_files_parse_srce_category(
 	          single_files,
@@ -2110,8 +2087,8 @@ int ewf_test_single_files_parse_srce_category(
 
 	/* Test error cases
 	 */
-	line_reader->buffer_offset = 0x1a0;
-	line_reader->line_index    = 13;
+	line_reader->buffer_offset = 0x1aa;
+	line_reader->line_index    = 14;
 
 	result = libewf_single_files_parse_srce_category(
 	          NULL,
@@ -2197,8 +2174,8 @@ int ewf_test_single_files_parse_sub_category(
 
 	/* Test regular cases
 	 */
-	line_reader->buffer_offset = 0x52e;
-	line_reader->line_index    = 21;
+	line_reader->buffer_offset = 0x536;
+	line_reader->line_index    = 22;
 
 	result = libewf_single_files_parse_sub_category(
 	          single_files,
@@ -2216,8 +2193,8 @@ int ewf_test_single_files_parse_sub_category(
 
 	/* Test error cases
 	 */
-	line_reader->buffer_offset = 0x52e;
-	line_reader->line_index    = 21;
+	line_reader->buffer_offset = 0x536;
+	line_reader->line_index    = 22;
 
 	result = libewf_single_files_parse_sub_category(
 	          NULL,
@@ -2304,8 +2281,8 @@ int ewf_test_single_files_parse_entry_category(
 
 	/* Test regular cases
 	 */
-	line_reader->buffer_offset = 0x5b8;
-	line_reader->line_index    = 27;
+	line_reader->buffer_offset = 0x5c4;
+	line_reader->line_index    = 28;
 
 	result = libewf_single_files_parse_entry_category(
 	          single_files,
@@ -2324,8 +2301,8 @@ int ewf_test_single_files_parse_entry_category(
 
 	/* Test error cases
 	 */
-	line_reader->buffer_offset = 0x5b8;
-	line_reader->line_index    = 27;
+	line_reader->buffer_offset = 0x5c4;
+	line_reader->line_index    = 28;
 
 	result = libewf_single_files_parse_entry_category(
 	          NULL,

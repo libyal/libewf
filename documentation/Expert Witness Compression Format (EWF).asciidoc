@@ -137,6 +137,7 @@ January 2010 | Added information about ltree section.
 | 0.0.84 | J.B. Metz | July 2023 | Additional information about encoding and special characters in ltree names with thanks to J. Dua and P. Livingstone.
 | 0.0.85 | J.B. Metz | July 2023 | Additional information regarding ltree.
 | 0.0.86 | J.B. Metz | June 2026 | Additional information regarding ltree.
+| 0.0.87 | J.B. Metz | July 2026 | Additional information regarding ltree with thanks to Y. Turgeman.
 |===
 
 :numbered:
@@ -1842,6 +1843,23 @@ See section: <<file_entries_category3,File entries category>>
 |===
 
 The end of line character(s) is a newline (0x0a).
+
+Note that the order of the sections is not fixed e.g. the following order has
+been observed in an Lx01 created by a TX1 and TX2:
+
+* entry
+* perm
+* rec
+* srce
+* sub
+
+There are interdependencies between sections such as the "pm" value in the
+"entries" section.
+
+Currently it is assumed all 5 categories are required and can only be defined
+once.
+
+Sometimes there is trailing data after the last category.
 
 ==== [[records_category3]]Records category
 

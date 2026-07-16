@@ -116,9 +116,11 @@ class HandleTypeTests(unittest.TestCase):
     ewf_handle.open(filenames)
     ewf_handle.close()
 
+    if len(filenames) != 1:
+      return
+
     if os.path.isfile(test_source):
       with open(test_source, "rb") as file_object:
-
         # Test open_file_objects and close.
         ewf_handle.open_file_objects([file_object])
         ewf_handle.close()
@@ -221,6 +223,10 @@ class HandleTypeTests(unittest.TestCase):
 
     if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
+
+    filenames = pyewf.glob(test_source)
+    if len(filenames) != 1:
+      return
 
     ewf_handle = pyewf.handle()
 
@@ -377,6 +383,10 @@ class HandleTypeTests(unittest.TestCase):
 
     if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
+
+    filenames = pyewf.glob(test_source)
+    if len(filenames) != 1:
+      return
 
     ewf_handle = pyewf.handle()
 
