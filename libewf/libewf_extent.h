@@ -60,6 +60,14 @@ int libewf_extent_free(
      libewf_extent_t **extent,
      libcerror_error_t **error );
 
+LIBEWF_EXTERN \
+int libewf_extent_get_values(
+     libewf_extent_t *extent,
+     off64_t *offset,
+     size64_t *size,
+     uint32_t *flags,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
