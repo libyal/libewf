@@ -56,8 +56,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\LIBBZ2.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="..\..\..\bzip2\libbz2.def"
 				RandomizedBaseAddress="2"
 				DataExecutionPrevention="2"
 				TargetMachine="1"
@@ -130,8 +131,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\LIBBZ2.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
+				ModuleDefinitionFile="..\..\..\bzip2\libbz2.def"
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="1"
@@ -191,6 +193,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\bzip2\huffman.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\bzip2\libbz2.def"
 				>
 			</File>
 			<File
