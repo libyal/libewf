@@ -183,3 +183,79 @@ int libewf_extent_free(
 	return( result );
 }
 
+/* Retrieves the values
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_extent_get_values(
+     libewf_extent_t *extent,
+     off64_t *offset,
+     size64_t *size,
+     uint32_t *flags,
+     libcerror_error_t **error )
+{
+	libewf_internal_extent_t *internal_extent = NULL;
+	static char *function                     = "libewf_extent_get_values";
+	int result                                = 1;
+
+	if( extent == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent.",
+		 function );
+
+		return( -1 );
+	}
+	internal_extent = (libewf_internal_extent_t *) extent;
+
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_extent->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libewf_lef_extent_get_values(
+	     internal_extent->lef_extent,
+	     offset,
+	     size,
+	     flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve values.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBEWF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_extent->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+

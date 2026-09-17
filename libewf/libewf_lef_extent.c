@@ -218,3 +218,66 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the extent values.
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_lef_extent_get_values(
+     libewf_lef_extent_t *lef_extent,
+     off64_t *offset,
+     size64_t *size,
+     uint32_t *flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libewf_lef_extent_get_values";
+
+	if( lef_extent == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.",
+		 function );
+
+		return( -1 );
+	}
+	if( flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid flags.",
+		 function );
+
+		return( -1 );
+	}
+	*offset = lef_extent->data_offset;
+	*size   = lef_extent->data_size;
+	*flags  = lef_extent->data_flags;
+
+	return( 1 );
+}
+

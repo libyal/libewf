@@ -34,6 +34,7 @@ MSVSCPP_FILES = \
 	ewf_test_huffman_tree/ewf_test_huffman_tree.vcproj \
 	ewf_test_io_handle/ewf_test_io_handle.vcproj \
 	ewf_test_lef_extended_attribute/ewf_test_lef_extended_attribute.vcproj \
+	ewf_test_lef_extent/ewf_test_lef_extent.vcproj \
 	ewf_test_lef_file_entry/ewf_test_lef_file_entry.vcproj \
 	ewf_test_lef_permission/ewf_test_lef_permission.vcproj \
 	ewf_test_lef_source/ewf_test_lef_source.vcproj \

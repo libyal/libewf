@@ -2215,6 +2215,17 @@ int libewf_extent_free(
      libewf_extent_t **extent,
      libewf_error_t **error );
 
+/* Retrieves the values
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN \
+int libewf_extent_get_values(
+     libewf_extent_t *extent,
+     off64_t *offset,
+     size64_t *size,
+     uint32_t *flags,
+     libewf_error_t **error );
+
 /* -------------------------------------------------------------------------
  * Source functions
  * ------------------------------------------------------------------------- */

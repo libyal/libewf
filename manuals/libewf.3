@@ -1,4 +1,4 @@
-.Dd June 27, 2026
+.Dd September 17, 2026
 .Dt LIBEWF 3
 .Os
 .Sh NAME
@@ -1642,6 +1642,16 @@ Extent functions
 .Ft int
 .Fo libewf_extent_free
 .Fa "libewf_extent_t **extent"
+.Fa "libewf_error_t **error"
+.Fc
+.fi
+.nf
+.Ft int
+.Fo libewf_extent_get_values
+.Fa "libewf_extent_t *extent"
+.Fa "off64_t *offset"
+.Fa "size64_t *size"
+.Fa "uint32_t *flags"
 .Fa "libewf_error_t **error"
 .Fc
 .fi

@@ -61,6 +61,13 @@ int libewf_lef_extent_clone(
      libewf_lef_extent_t *source_lef_extent,
      libcerror_error_t **error );
 
+int libewf_lef_extent_get_values(
+     libewf_lef_extent_t *lef_extent,
+     off64_t *offset,
+     size64_t *size,
+     uint32_t *flags,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

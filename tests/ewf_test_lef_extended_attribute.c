@@ -1682,7 +1682,6 @@ on_error:
 	return( 0 );
 }
 
-
 #endif /* defined( __GNUC__ ) && !defined( LIBEWF_DLL_IMPORT ) */
 
 /* The main program
