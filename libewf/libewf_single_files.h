@@ -139,6 +139,7 @@ int libewf_single_files_parse_file_entry(
      libewf_line_reader_t *line_reader,
      libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *types,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libewf_single_files_parse_file_entry_number_of_sub_entries(

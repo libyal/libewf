@@ -2511,6 +2511,7 @@ int libewf_single_files_parse_entry_category(
 	     line_reader,
 	     single_files->file_entry_tree_root_node,
 	     types,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2562,6 +2563,7 @@ int libewf_single_files_parse_file_entry(
      libewf_line_reader_t *line_reader,
      libcdata_tree_node_t *parent_file_entry_node,
      libfvalue_split_utf8_string_t *types,
+     int recursion_depth,
      libcerror_error_t **error )
 {
 	libcdata_tree_node_t *file_entry_node   = NULL;
@@ -2602,6 +2604,18 @@ int libewf_single_files_parse_file_entry(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid parent file entry node.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBEWF_MAXIMUM_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -2705,6 +2719,7 @@ int libewf_single_files_parse_file_entry(
 		     line_reader,
 		     file_entry_node,
 		     types,
+		     recursion_depth + 1,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
