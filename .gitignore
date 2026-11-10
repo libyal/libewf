@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20260604
+# Version: 20260631
 
 # Generic auto-generated build files
 *~
@@ -138,6 +138,7 @@ stamp-h[1-9]
 /ewftools/ewfmount
 /ewftools/ewfrecover
 /ewftools/ewfverify
+/ossfuzz/*_fuzzer
 /tests/*.dir
 /tests/*.exe
 /tests/*.log
