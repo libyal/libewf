@@ -1,0 +1,4 @@
+[libfuzzer]
+dict = write_fuzzer.dict
+max_len = 4096
+timeout = 25
