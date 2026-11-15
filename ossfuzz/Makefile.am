@@ -12,7 +12,8 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@
 
 bin_PROGRAMS = \
-	handle_fuzzer
+	handle_fuzzer \
+	write_fuzzer
 
 handle_fuzzer_SOURCES = \
 	handle_fuzzer.cc \
@@ -20,6 +21,23 @@ handle_fuzzer_SOURCES = \
 	ossfuzz_libewf.h
 
 handle_fuzzer_LDADD = \
+	@LIB_FUZZING_ENGINE@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libewf/libewf.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+write_fuzzer_SOURCES = \
+	write_fuzzer.cc \
+	ossfuzz_libewf.h
+
+write_fuzzer_LDADD = \
 	@LIB_FUZZING_ENGINE@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
